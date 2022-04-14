@@ -45,10 +45,10 @@ public:
 private:
 	required_device<tlc34076_device> m_tlc34076;
 	required_shared_ptr<uint16_t> m_tms_vram;
-	uint8_t m_porta_latch;
-	uint8_t m_ay_sel;
-	uint8_t m_lastdataw;
-	uint16_t m_lastdatar;
+	uint8_t m_porta_latch = 0;
+	uint8_t m_ay_sel = 0;
+	uint8_t m_lastdataw = 0;
+	uint16_t m_lastdatar = 0;
 	uint16_t ramdac_r(offs_t offset);
 	void ramdac_w(offs_t offset, uint16_t data);
 	void tms_w(offs_t offset, uint8_t data);

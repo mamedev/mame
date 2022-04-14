@@ -64,7 +64,7 @@ P0-100A                 93 Quiz Kokology 2                      Tecmo
 P0-101-1                94 Pro Mahjong Kiwame                   Athena
 P0-102A                 93 Mad Shark                            Allumer
 P0-107A  (prototype?)   94 Orbs (prototype?)                    American Sammy
-P0-107A                 93 Kero Kero Keroppi no Issyoni Asobou  Sammy Industries  [added Chack'n, Hau]
+P0-107A                 93 Kero Kero Keroppi no Isshoni Asobou  Sammy Industries  [added Chack'n, Hau]
 P0-111A                 94 Magical Speed                        Allumer
 P0-114A  (SKB-001)      94 Krazy Bowl                           American Sammy
 P0-117A  (DH-01)        95 Extreme Downhill                     Sammy Japan
@@ -146,6 +146,7 @@ TODO:
 
 Thundercade / Twin Formation
 Taito America Corp./Romstar USA/Seta, 1987
+Hardware info by Guru
 
 PCB Layout
 ---------
@@ -194,8 +195,8 @@ Notes:
                     X1-001 (SDIP64)
                     X1-002 (SDIP64)
                     X1-006 (SDIP64)
-                    X0-006 (SDIP64), also marked 'RP5A10-0001'. This is a 65C02 in disguise,
-                                     possibly with additional ROM or logic acting as a protection chip.
+                    X0-006 (SDIP64), also marked 'RP5A10-0001'. This is a Ricoh 65c02 with ROM, RAM and
+                                     logic acting as a protection chip.
                                      clocks - pin1 16MHz, pin2 2MHz, pin3 59.1845Hz [VSYNC),
                                      pin63 2MHz, pin62 2MHz
                     X1-003 (SDIP42)
@@ -630,6 +631,7 @@ BPGH-013.U70    TC538000
 
 Zombie Raid
 Sammy, 1996
+Hardware info by Guru
 
 This is a gun shooting game using Seta/Allumer hardware.
 
@@ -689,6 +691,7 @@ NEC 71054C  ----???
                                 Kamen Rider
 Kamen Riderclub Battleracer
 Banpresto, 1993
+Hardware info by Guru
 
 Runs on Seta/Allumer hardware
 
@@ -748,6 +751,7 @@ X1-010           X1-006
 
 Allumer, 1993
 This game is a vertical shoot'em-up and runs on fairly standard Allumer hardware.
+Hardware info by Guru
 
 PCB Layout
 ----------
@@ -882,6 +886,7 @@ Custom chips:   X1-001A X1-002A
 
 Triple Fun
 ??, 19??
+Hardware info by Guru
 
 
 CPU   : TMP68HC000P-16 (68000)
@@ -1006,6 +1011,7 @@ Other   : Allumer
 
 Banpresto, 1992
 This game runs on Seta/Allumer hardware
+Hardware info by Guru
 
 PCB Layout
 ----------
@@ -1081,6 +1087,7 @@ Custom chips:   X1-001A X1-002A
 
 Banpresto, 1992
 Board looks similar to Castle of Dragon PCB.
+Hardware info by Guru
 
 PCB No: P0-077A (Seta Number)
         BP922   (Banpresto Number)
@@ -1116,6 +1123,7 @@ BP-U-003.U13      8M mask (32 pin, 1M x 8),   read as MX27C8000           Sound
 /***************************************************************************
 Ultra Toukon Densetsu
 Banpresto, 1993
+Hardware info by Guru
 
 This game runs on fairly standard Allumer hardware.
 
@@ -1212,6 +1220,7 @@ X1-010                           5168-10       68000-16
 
 Pairs Love
 Allumer, 199x
+Hardware info by Guru
 
 PCB Layout
 ----------
@@ -1249,6 +1258,7 @@ Notes:
 
 Rezon (Taito License)
 Allumer / Taito, 1992
+Hardware info by Guru
 
 This game runs on fairly standard Allumer hardware.
 
@@ -1324,7 +1334,7 @@ Notes:
 
 Crazy Fight
 Subsino 1996
-Readme by Guru
+Hardware info by Guru
 This game runs on Allumer-based hardware.
 It is a whack-a-mole type game using 6 buttons.
 
@@ -1363,10 +1373,9 @@ Notes:
       6164         - 8kx8 SRAM (SDIP28)
       62256        - 32kx8 SRAM (SDIP28)
       TD62003      - Toshiba TD62003 7-Channel Darlington Sink Driver (DIP16)
-      DIP42        - Unknown DIP42 IC. Note several pins have no connection.
+      DIP42        - Oki ULA. Note several pins have no connection.
                      Pins 6-26 tied to inputs on JAMMA connector.
                      Some other pins tied to logic.
-                     No pins have a clock so this chip is not a MCU.
       J2           - 4 pin connector. Pin 2 tied to DIP42 IC pin 27
                      and pin 3 tied to TD62003 pin 16
       Custom Chips - X1-007
@@ -2175,7 +2184,7 @@ void seta_state::orbs_map(address_map &map)
 }
 
 /***************************************************************************
-                  Kero Kero Keroppi no Issyoni Asobou
+                  Kero Kero Keroppi no Isshoni Asobou
 ***************************************************************************/
 
 static const u16 keroppi_protection_word[] = {
@@ -2425,13 +2434,13 @@ void seta_state::drgnunit_map(address_map &map)
                                 The Roulette
 ***************************************************************************/
 
-MACHINE_START_MEMBER(setaroul_state, setaroul)
+void setaroul_state::machine_start()
 {
 	m_leds.resolve();
 }
 
 // Coin drop
-MACHINE_RESET_MEMBER(setaroul_state, setaroul)
+void setaroul_state::machine_reset()
 {
 	m_coin_start_cycles = 0;
 }
@@ -4300,6 +4309,20 @@ static INPUT_PORTS_START( daiohp )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+/***************************************************************************
+                       Daioh (prototype, earlier)
+***************************************************************************/
+
+static INPUT_PORTS_START( daiohp2 )
+	PORT_INCLUDE(daiohp)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0xc000, 0xc000, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(      0x8000, "300k and every 800k" )
+	PORT_DIPSETTING(      0xc000, "500k and every 1000k" )
+	PORT_DIPSETTING(      0x4000, "800k and 2000k only" )
+	PORT_DIPSETTING(      0x0000, "1000k Only" )
+INPUT_PORTS_END
 
 /***************************************************************************
                                 Dragon Unit
@@ -6981,7 +7004,7 @@ static INPUT_PORTS_START( orbs )
 INPUT_PORTS_END
 
 /***************************************************************************
-                  Kero Kero Keroppi no Issyoni Asobou
+                  Kero Kero Keroppi no Isshoni Asobou
 ***************************************************************************/
 
 
@@ -7947,8 +7970,6 @@ void downtown_state::tndrcade(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
-	MCFG_VIDEO_START_OVERRIDE(downtown_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -8005,8 +8026,6 @@ void downtown_state::twineagl(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(512);
 
-	MCFG_VIDEO_START_OVERRIDE(downtown_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -8056,8 +8075,6 @@ void downtown_state::downtown(machine_config &config)
 	m_layers[0]->set_xoffsets(0, -1);
 
 	PALETTE(config, m_palette).set_entries(512);
-
-	MCFG_VIDEO_START_OVERRIDE(downtown_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8147,8 +8164,6 @@ void usclssic_state::usclssic(machine_config &config)
 
 	PALETTE(config, m_palette, FUNC(usclssic_state::usclssic_palette), 16*32 + 64*32*2, 0x400); // sprites, layer - layer is 6 planes deep
 
-	MCFG_VIDEO_START_OVERRIDE(usclssic_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -8212,8 +8227,6 @@ void downtown_state::calibr50(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(512);
 
-	MCFG_VIDEO_START_OVERRIDE(downtown_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -8267,8 +8280,6 @@ void downtown_state::metafox(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(512);
 
-	MCFG_VIDEO_START_OVERRIDE(downtown_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -8317,8 +8328,6 @@ void seta_state::atehate(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -8366,8 +8375,6 @@ void seta_state::blandia(machine_config &config)
 	X1_012(config, m_layers[1], m_palette, gfx_blandia_layer2).set_xoffsets(6, -2);
 	PALETTE(config, m_palette, FUNC(seta_state::blandia_palette), (16*32 + 64*32*4)*2, 0x600*2);  // sprites, layer1, layer2, palette effect - layers 1&2 are 6 planes deep
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -8404,8 +8411,6 @@ void seta_state::blandiap(machine_config &config)
 	X1_012(config, m_layers[0], m_palette, gfx_blandia_layer1).set_xoffsets(6, -2);
 	X1_012(config, m_layers[1], m_palette, gfx_blandia_layer2).set_xoffsets(6, -2);
 	PALETTE(config, m_palette, FUNC(seta_state::blandia_palette), (16*32 + 64*32*4)*2, 0x600*2);  // sprites, layer1, layer2, palette effect - layers 1&2 are 6 planes deep
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8444,8 +8449,6 @@ void seta_state::blockcar(machine_config &config)
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8523,8 +8526,6 @@ void seta_state::daioh(machine_config &config)
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(-2, -2);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -8581,8 +8582,6 @@ void seta_state::drgnunit(machine_config &config)
 
 	X1_012(config, m_layers[0], m_palette, gfx_downtown).set_xoffsets(-2, -2);
 	PALETTE(config, m_palette).set_entries(512);
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8643,9 +8642,6 @@ void setaroul_state::setaroul(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_MACHINE_START_OVERRIDE(setaroul_state, setaroul)
-	MCFG_MACHINE_RESET_OVERRIDE(setaroul_state, setaroul)
-
 	SETA001_SPRITE(config, m_seta001, 16'000'000, m_palette, gfx_setaroul_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 	// position kludges
@@ -8673,8 +8669,6 @@ void setaroul_state::setaroul(machine_config &config)
 
 	X1_012(config, m_layers[0], m_palette, gfx_setaroul).set_xoffsets(0, 5);
 	PALETTE(config, m_palette, FUNC(setaroul_state::setaroul_palette), 512);
-
-	MCFG_VIDEO_START_OVERRIDE(setaroul_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -8721,8 +8715,6 @@ void seta_state::eightfrc(machine_config &config)
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -8768,8 +8760,6 @@ void seta_state::extdwnhl(machine_config &config)
 	X1_012(config, m_layers[0], m_palette, gfx_zingzip_layer1).set_xoffsets(-2, -2);
 	X1_012(config, m_layers[1], m_palette, gfx_zingzip_layer2).set_xoffsets(-2, -2);
 	PALETTE(config, m_palette, FUNC(seta_state::zingzip_palette), 16*32 + 16*32 + 64*32*2, 0x600);    // sprites, layer2, layer1 - layer 1 gfx is 6 planes deep
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -8837,8 +8827,6 @@ void seta_state::gundhara(machine_config &config)
 	X1_012(config, m_layers[0], m_palette, gfx_jjsquawk_layer1);
 	X1_012(config, m_layers[1], m_palette, gfx_jjsquawk_layer2);
 	PALETTE(config, m_palette, FUNC(seta_state::gundhara_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep (seta_state,but have only 4 palettes)
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8914,8 +8902,6 @@ void seta_state::jjsquawk(machine_config &config)
 	X1_012(config, m_layers[1], m_palette, gfx_jjsquawk_layer2).set_xoffsets(-1, -1);
 	PALETTE(config, m_palette, FUNC(seta_state::jjsquawk_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -8949,8 +8935,6 @@ void seta_state::jjsquawb(machine_config &config)
 	X1_012(config, m_layers[0], m_palette, gfx_jjsquawkb_layer1).set_xoffsets(-1, -1);
 	X1_012(config, m_layers[1], m_palette, gfx_jjsquawkb_layer2).set_xoffsets(-1, -1);
 	PALETTE(config, m_palette, FUNC(seta_state::jjsquawk_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8998,8 +8982,6 @@ void seta_state::kamenrid(machine_config &config)
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(-2, -2);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -9039,8 +9021,6 @@ void seta_state::orbs(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -9052,7 +9032,7 @@ void seta_state::orbs(machine_config &config)
 
 
 /***************************************************************************
-                  Kero Kero Keroppi no Issyoni Asobou
+                  Kero Kero Keroppi no Isshoni Asobou
 ***************************************************************************/
 
 void seta_state::keroppi(machine_config &config)
@@ -9081,8 +9061,6 @@ void seta_state::keroppi(machine_config &config)
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -9131,8 +9109,6 @@ void seta_state::krzybowl(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -9178,8 +9154,6 @@ void seta_state::madshark(machine_config &config)
 	X1_012(config, m_layers[0], m_palette, gfx_jjsquawk_layer1);
 	X1_012(config, m_layers[1], m_palette, gfx_jjsquawk_layer2);
 	PALETTE(config, m_palette, FUNC(seta_state::jjsquawk_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9231,8 +9205,6 @@ void seta_state::magspeed(machine_config &config)
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(0, -2);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -9278,8 +9250,6 @@ void seta_state::msgundam(machine_config &config)
 	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1).set_xoffsets(-2, -2);
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(-2, -2);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9421,8 +9391,6 @@ void kiwame_state::kiwame(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
-	MCFG_VIDEO_START_OVERRIDE(kiwame_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -9468,8 +9436,6 @@ void seta_state::rezon(machine_config &config)
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(-2, -2);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -9508,8 +9474,6 @@ void seta_state::thunderl(machine_config &config)
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9585,8 +9549,6 @@ void seta_state::wiggie(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -9627,8 +9589,6 @@ void seta_state::wits(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -9665,8 +9625,6 @@ void seta_state::umanclub(machine_config &config)
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_entries(512);
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9710,8 +9668,6 @@ void seta_state::utoukond(machine_config &config)
 	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1).set_xoffsets(0, -2);
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(0, -2);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -9773,8 +9729,6 @@ void seta_state::wrofaero(machine_config &config)
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -9820,8 +9774,6 @@ void seta_state::zingzip(machine_config &config)
 	X1_012(config, m_layers[0], m_palette, gfx_zingzip_layer1).set_xoffsets(-2, -1);
 	X1_012(config, m_layers[1], m_palette, gfx_zingzip_layer2).set_xoffsets(-2, -1);
 	PALETTE(config, m_palette, FUNC(seta_state::zingzip_palette), 16*32 + 16*32 + 64*32*2, 0x600);    // sprites, layer2, layer1 - layer 1 gfx is 6 planes deep
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9877,8 +9829,6 @@ void seta_state::pairlove(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(2048);   // sprites only
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -9928,8 +9878,6 @@ void seta_state::crazyfgt(machine_config &config)
 	X1_012(config, m_layers[0], m_palette, gfx_blandia_layer1).set_xoffsets(0, -2);
 	X1_012(config, m_layers[1], m_palette, gfx_blandia_layer2).set_xoffsets(0, -2);
 	PALETTE(config, m_palette, FUNC(seta_state::gundhara_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep (seta_state,but have only 4 palettes)
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -10009,8 +9957,6 @@ void jockeyc_state::jockeyc(machine_config &config)
 
 	X1_012(config, m_layers[0], m_palette, gfx_downtown).set_xoffsets(126, -2);
 	PALETTE(config, m_palette, FUNC(seta_state::palette_init_RRRRRGGGGGBBBBB_proms), 512 * 1);
-
-	MCFG_VIDEO_START_OVERRIDE(jockeyc_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -10730,7 +10676,11 @@ ROM_START( blockcar )
 	ROM_LOAD( "bl-chr-1.l3",  0x080000, 0x080000, CRC(563de808) SHA1(40b2f9f4a4cb1a019f6419572ee21d66dda7d4af) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
-	ROM_LOAD( "bl-snd-0.a13",  0x000000, 0x080000, CRC(a92dabaf) SHA1(610c1dc0467753dfddaa4b27bc40cb118b0bc7a3) )
+	/* The game plays music from 0x000000 to 0x0bffff and sfx from 0x0c0000 to 0x0fffff
+	   Loading the ROM mirrored like this causes sfx to play instead of music in some levels.
+	   the most logical conclusion is that the ROM below was dumped at half size and should
+	   be 1MByte, hence BAD_DUMP */
+	ROM_LOAD( "bl-snd-0.a13",  0x000000, 0x080000, BAD_DUMP CRC(a92dabaf) SHA1(610c1dc0467753dfddaa4b27bc40cb118b0bc7a3) )
 	ROM_RELOAD(                0x080000, 0x080000  )
 ROM_END
 
@@ -10995,7 +10945,7 @@ ROM_START( daiohp2 ) /* Found on the same P0-072-2 PCB as the previous Daioh pro
 	ROM_REGION( 0x200000, "gfx3", 0 )   /* Layer 2 */
 	ROM_LOAD16_BYTE( "bg2_0.u164", 0x000001, 0x080000, CRC(7e46a10e) SHA1(a8576f7a140b065b88a0dab648f7b31c75fec006) )
 	ROM_LOAD16_BYTE( "bg2_1.u166", 0x000000, 0x080000, CRC(9274123b) SHA1(b58e107a5bd222e454fd435d515e57cab52e6593) )
-	ROM_LOAD16_BYTE( "bg2_2.u165", 0x100001, 0x080000, CRC(3119189b) SHA1(3a45ec8db30659d7fd47090cb137df05bbdc1c86) )
+	ROM_LOAD16_BYTE( "bg2_2.u165", 0x100001, 0x080000, CRC(dc8ecfb7) SHA1(a202ff32c74601d5cd0aebdf84a481d36f540403) )
 	ROM_LOAD16_BYTE( "bg2_3.u167", 0x100000, 0x080000, CRC(533ba782) SHA1(b5f62323be95b2def8d1383b400b4ef0d3b3d6cd) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
@@ -11798,6 +11748,13 @@ ROM_START( madshark )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "fq001007.26", 0x000000, 0x100000, CRC(e4b33c13) SHA1(c4f9532de7a09c80f5a74c3a386e99a0f546846f) )
+
+	ROM_REGION( 0xa00, "plds", 0 )
+	ROM_LOAD( "fq-008.u50", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "fq-009.u51", 0x200, 0x104, NO_DUMP )
+	ROM_LOAD( "fq-010.u52", 0x400, 0x104, NO_DUMP )
+	ROM_LOAD( "fq-011.u53", 0x600, 0x104, NO_DUMP )
+	ROM_LOAD( "fq-012.u54", 0x800, 0x104, NO_DUMP )
 ROM_END
 
 ROM_START( magspeed )
@@ -11881,9 +11838,8 @@ ROM_START( pairlove )
 	ROM_LOAD( "ut2-001-004.5j",  0x000000, 0x080000, CRC(fdc47b26) SHA1(0de51bcf67b909ac9578f0d1b14af8a4c758aacf) )
 	ROM_LOAD( "ut2-001-005.5l",  0x080000, 0x080000, CRC(076f94a2) SHA1(94b4b41a497dea1b6db5396bd7cd81ebcb217735) )
 
-	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
+	ROM_REGION( 0x80000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "ut2-001-003.12a",  0x000000, 0x080000, CRC(900219a9) SHA1(3260a900df25beba597bf947a9fbb6f7392827d7) )
-	ROM_RELOAD(                   0x080000, 0x080000 )
 ROM_END
 
 ROM_START( crazyfgt )
@@ -12520,7 +12476,7 @@ GAME( 1993, atehate,   0,        atehate,   atehate,   seta_state,     empty_ini
 GAME( 1993, daioh,     0,        daioh,     daioh,     seta_state,     empty_init,     ROT270, "Athena",                    "Daioh", 0 )
 GAME( 1993, daioha,    daioh,    daioh,     daioh,     seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (earlier)", 0 )
 GAME( 1993, daiohp,    daioh,    daiohp,    daiohp,    seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (prototype)", 0 )
-GAME( 1993, daiohp2,   daioh,    daiohp,    daiohp,    seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (prototype, earlier)", 0 )
+GAME( 1993, daiohp2,   daioh,    daiohp,    daiohp2,   seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (prototype, earlier)", 0 )
 GAME( 1993, daiohc,    daioh,    wrofaero,  daioh,     seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (93111A PCB conversion)", 0 )
 
 GAME( 1993, jjsquawk,  0,        jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "Athena / Able",             "J. J. Squawkers", MACHINE_IMPERFECT_SOUND )
@@ -12529,7 +12485,7 @@ GAME( 1999, jjsquawkb, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     empty_ini
 GAME( 1999, jjsquawkb2,jjsquawk, jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg",                   "J. J. Squawkers (bootleg, Blandia Conversion)", MACHINE_IMPERFECT_SOUND )
 GAME( 2003, simpsonjr, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg (Daigom Games)",    "Simpson Junior (bootleg of J. J. Squawkers)", MACHINE_IMPERFECT_SOUND )
 
-GAME( 1993, kamenrid,  0,        kamenrid,  kamenrid,  seta_state,     empty_init,     ROT0,   "Banpresto / Toei",          "Masked Riders Club Battle Race", 0 )
+GAME( 1993, kamenrid,  0,        kamenrid,  kamenrid,  seta_state,     empty_init,     ROT0,   "Banpresto / Toei",          "Masked Riders Club Battle Race / Kamen Rider Club Battle Racer", 0 )
 
 GAME( 1993, madshark,  0,        madshark,  madshark,  seta_state,     empty_init,     ROT270, "Allumer",                   "Mad Shark", 0 )
 
@@ -12558,7 +12514,7 @@ GAME( 1994, magspeed,  0,        magspeed,  magspeed,  seta_state,     empty_ini
 GAME( 1994, orbs,      0,        orbs,      orbs,      seta_state,     empty_init,     ROT0,   "American Sammy",            "Orbs (10/7/94 prototype?)", 0 )
 
 GAME( 1995, keroppi,   0,        keroppi,   keroppi,   seta_state,     empty_init,     ROT0,   "American Sammy",            "Kero Kero Keroppi's Let's Play Together (USA, Version 2.0)", 0 ) // ROM labels are all v1.0 tho.
-GAME( 1993, keroppij,  keroppi,  keroppi,   keroppij,  seta_state,     empty_init,     ROT0,   "Sammy Industries",          "Kero Kero Keroppi no Issyoni Asobou (Japan)", 0 )
+GAME( 1993, keroppij,  keroppi,  keroppi,   keroppij,  seta_state,     empty_init,     ROT0,   "Sammy Industries",          "Kero Kero Keroppi no Isshoni Asobou (Japan)", 0 )
 
 GAME( 1995, extdwnhl,  0,        extdwnhl,  extdwnhl,  seta_state,     empty_init,     ROT0,   "Sammy Industries Japan",    "Extreme Downhill (v1.5)", MACHINE_IMPERFECT_GRAPHICS )
 

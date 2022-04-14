@@ -37,7 +37,6 @@ public:
 		m_pfprotect(*this, "pfprotect"),
 		m_sndprotect(*this, "sndprotect"),
 		m_ram(*this, "ram"),
-		m_robocop_shared_ram(*this, "robocop_shared"),
 		m_hippodrm_shared_ram(*this, "hippodrm_shared")
 	{ }
 
@@ -62,7 +61,6 @@ public:
 	void init_hbarrel();
 	void init_slyspy();
 	void init_drgninja();
-	void init_midresb();
 	void init_ffantasybl();
 
 protected:
@@ -77,8 +75,8 @@ protected:
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint16_t> m_paletteram;
 
-	uint16_t *m_buffered_spriteram;
-	uint16_t m_pri;
+	uint16_t *m_buffered_spriteram = nullptr;
+	uint16_t m_pri = 0U;
 
 	uint16_t dec0_controls_r(offs_t offset);
 	uint16_t slyspy_controls_r(offs_t offset);
@@ -103,20 +101,18 @@ private:
 	optional_device<address_map_bank_device> m_pfprotect;
 	optional_device<address_map_bank_device> m_sndprotect;
 	required_shared_ptr<uint16_t> m_ram;
-	optional_shared_ptr<uint8_t> m_robocop_shared_ram;
 	optional_shared_ptr<uint8_t> m_hippodrm_shared_ram;
 
-	mcu_type m_game;
-	uint16_t m_i8751_return;
-	uint16_t m_i8751_command;
-	int m_slyspy_state;
-	int m_slyspy_sound_state;
-	int m_hippodrm_msb;
-	int m_hippodrm_lsb;
-	uint8_t m_i8751_ports[4];
+	mcu_type m_game{};
+	uint16_t m_i8751_return = 0U;
+	uint16_t m_i8751_command = 0U;
+	int m_slyspy_state = 0;
+	int m_slyspy_sound_state = 0;
+	int m_hippodrm_msb = 0;
+	int m_hippodrm_lsb = 0;
+	uint8_t m_i8751_ports[4]{};
 
 	void dec0_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void midres_sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t slyspy_protection_r(offs_t offset);
 	void slyspy_state_w(uint16_t data);
 	uint16_t slyspy_state_r();
@@ -131,8 +127,6 @@ private:
 	uint16_t hippodrm_68000_share_r(offs_t offset);
 	void hippodrm_68000_share_w(offs_t offset, uint16_t data);
 	void sprite_mirror_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t robocop_68000_share_r(offs_t offset);
-	void robocop_68000_share_w(offs_t offset, uint16_t data);
 	uint16_t ffantasybl_242024_r();
 
 	uint8_t slyspy_sound_state_r();
@@ -195,8 +189,8 @@ private:
 	required_device_array<ls157_device, 2> m_adpcm_select;
 	required_memory_bank m_soundbank;
 
-	bool m_adpcm_toggle[2];
-	uint16_t m_automat_scroll_regs[4];
+	bool m_adpcm_toggle[2]{};
+	uint16_t m_automat_scroll_regs[4]{};
 
 	void automat_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t automat_palette_r(offs_t offset);

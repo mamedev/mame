@@ -121,10 +121,10 @@ private:
 	bool m_nmi_gate;
 
 	// gates
-	bool m_ASaw, m_ATri, m_Sync, m_BSaw, m_BTri, m_PModFA, m_PModFil;
+	bool m_ASaw = false, m_ATri = false, m_Sync = false, m_BSaw = false, m_BTri = false, m_PModFA = false, m_PModFil = false;
 
 	// control voltages
-	uint16_t m_CVs[CV_MAX];
+	uint16_t m_CVs[CV_MAX]{};
 };
 
 WRITE_LINE_MEMBER( prophet600_state::pit_ch0_tick_w )

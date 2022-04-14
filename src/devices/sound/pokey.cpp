@@ -358,7 +358,7 @@ void pokey_device::device_clock_changed()
 //  our sound stream
 //-------------------------------------------------
 
-void pokey_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pokey_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

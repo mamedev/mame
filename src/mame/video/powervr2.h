@@ -9,6 +9,10 @@ class powervr2_device : public device_t,
 						public device_video_interface
 {
 public:
+	powervr2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	auto irq_callback() { return irq_cb.bind(); }
+	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
+
 	enum { NUM_BUFFERS = 4 };
 	enum {
 		EOXFER_YUV_IRQ,
@@ -181,7 +185,6 @@ public:
 
 	uint64_t *pvr2_texture_ram;
 	uint64_t *pvr2_framebuffer_ram;
-	uint64_t *elan_ram;
 
 	uint32_t debug_dip_status;
 	emu_timer *vbout_timer;
@@ -194,9 +197,6 @@ public:
 	uint32_t tafifo_buff[32];
 	int scanline;
 	int next_y;
-
-	powervr2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	auto irq_callback() { return irq_cb.bind(); }
 
 	uint32_t id_r();
 	uint32_t revision_r();
@@ -278,7 +278,6 @@ public:
 	uint32_t ta_yuv_tex_ctrl_r();
 	void ta_yuv_tex_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t ta_yuv_tex_cnt_r();
-	void ta_yuv_tex_cnt_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void ta_list_cont_w(uint32_t data);
 	uint32_t ta_next_opb_init_r();
 	void ta_next_opb_init_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -307,10 +306,7 @@ public:
 	void sb_pdapro_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	uint32_t pvr2_ta_r(offs_t offset);
-	void pvr2_ta_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void pvrs_ta_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t elan_regs_r(offs_t offset);
-	void elan_regs_w(offs_t offset, uint32_t data);
+
 	void ta_fifo_poly_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	void ta_fifo_yuv_w(uint8_t data);
 	void ta_texture_directpath0_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
@@ -344,6 +340,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	ioport_constructor device_input_ports() const override;
 
 private:
 	devcb_write8 irq_cb;
@@ -366,8 +363,8 @@ private:
 	uint32_t ta_next_opb, ta_itp_current, ta_alloc_ctrl, ta_next_opb_init;
 	uint32_t ta_yuv_tex_base, ta_yuv_tex_ctrl, ta_yuv_tex_cnt;
 	uint32_t ta_yuv_index;
-	int ta_yuv_x,ta_yuv_y;
-	int ta_yuv_x_size,ta_yuv_y_size;
+	int ta_yuv_u_ptr, ta_yuv_v_ptr;
+	int ta_yuv_u_size, ta_yuv_v_size;
 	uint8_t yuv_fifo[384];
 
 	// Other registers

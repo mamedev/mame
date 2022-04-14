@@ -91,7 +91,7 @@ void dpc_device::decrement_counter(uint8_t data_fetcher)
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void dpc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void dpc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_OSC)
 	{

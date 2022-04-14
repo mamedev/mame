@@ -454,7 +454,7 @@ void hle_hp_ipc_device::device_reset()
 
 void hle_hp_ipc_device::hil_idd()
 {
-	m_hp_hil_mlc->hil_write(0x0100 |  ioport("COL0")->read());
+	m_hp_hil_mlc->hil_write(0x0100 | ioport("COL0")->read());
 	m_hp_hil_mlc->hil_write(m_device_id16 | 0);
 }
 
@@ -509,7 +509,7 @@ void hle_hp_ipc_device::will_scan_row(u8 row)
 
 attotime hle_hp_ipc_device::typematic_delay() const
 {
-	return attotime::from_msec(250); // XXX
+	return attotime::from_msec(250); // FIXME
 }
 
 attotime hle_hp_ipc_device::typematic_period() const
@@ -606,7 +606,7 @@ ioport_constructor hle_hp_itf_device::device_input_ports() const
 
 void hle_hp_itf_device::hil_idd()
 {
-	m_hp_hil_mlc->hil_write(m_device_id16 |  ioport("COL0")->read());
+	m_hp_hil_mlc->hil_write(m_device_id16 | ioport("COL0")->read());
 	m_hp_hil_mlc->hil_write(m_device_id16 | 0x04);
 }
 

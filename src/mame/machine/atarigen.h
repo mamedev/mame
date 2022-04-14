@@ -28,7 +28,7 @@ protected:
 	// users must call through to these
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// video helpers
 	void halt_until_hblank_0(device_t &device, screen_device &screen);

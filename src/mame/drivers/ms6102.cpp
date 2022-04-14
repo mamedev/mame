@@ -13,6 +13,7 @@
     To do:
     - character attributes
     - improve keyboard response and add LED layout (MS7002)
+    - verify CRTC clock
 
     Chips:
     - DD5 - KR580WM80A (8080 clone) - CPU
@@ -47,10 +48,9 @@
 #include "emupal.h"
 #include "screen.h"
 
-#define LOG_GENERAL (1U <<  0)
 
 #define VERBOSE (LOG_GENERAL)
-//#define LOG_OUTPUT_FUNC printf
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 
@@ -104,7 +104,7 @@ private:
 	void crtc_w(offs_t offset, u8 data);
 
 	u8 misc_status_r();
-	u16 m_dmaaddr;
+	u16 m_dmaaddr = 0;
 
 	void kbd_uart_clock_w(u8 data);
 
@@ -163,10 +163,10 @@ GFXDECODE_END
 
 WRITE_LINE_MEMBER(ms6102_state::hrq_w)
 {
-	/* HACK - this should be connected to the HOLD line of 8080 */
+	/* FIXME: this should be connected to the HOLD line of 8080 */
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 
-	/* HACK - this should be connected to the HLDA line of 8080 */
+	/* FIXME: this should be connected to the HLDA line of 8080 */
 	m_dma8257->hlda_w(state);
 }
 
@@ -329,13 +329,13 @@ void ms6102_state::ms6102(machine_config &config)
 	m_dma8257->in_memr_cb().set(FUNC(ms6102_state::memory_read_byte));
 	m_dma8257->out_iow_cb<2>().set(FUNC(ms6102_state::vdack_w));
 
-	I8275(config, m_crtc1, XTAL(16'400'000) / 8); // XXX
+	I8275(config, m_crtc1, XTAL(16'400'000) / 8);
 	m_crtc1->set_character_width(8);
 	m_crtc1->set_display_callback(FUNC(ms6102_state::display_pixels));
 	m_crtc1->drq_wr_callback().set("dma8257", FUNC(i8257_device::dreq2_w));
 	m_crtc1->set_screen(m_screen);
 
-	I8275(config, m_crtc2, XTAL(16'400'000) / 8); // XXX
+	I8275(config, m_crtc2, XTAL(16'400'000) / 8);
 	m_crtc2->set_character_width(8);
 	m_crtc2->set_display_callback(FUNC(ms6102_state::display_attr));
 	m_crtc2->irq_wr_callback().set(FUNC(ms6102_state::irq<5>));

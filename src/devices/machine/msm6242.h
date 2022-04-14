@@ -62,7 +62,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_pre_save() override;
 	virtual void device_post_load() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// rtc overrides
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;

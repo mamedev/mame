@@ -75,7 +75,7 @@ void c64_super_explode_cartridge_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void c64_super_explode_cartridge_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void c64_super_explode_cartridge_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_exrom = 1;
 }

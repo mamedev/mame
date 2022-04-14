@@ -266,7 +266,7 @@ uint16_t tatsumi_state::tatsumi_v30_68000_r(offs_t offset)
 	/* Read from 68k RAM */
 	if ((m_control_word&0x1f)==0x18)
 	{
-		#ifdef UNUSED_FUNCTION
+#if 0
 		// hack to make roundup 5 boot
 		// doesn't seem necessary anymore, left for reference
 		if (m_maincpu->pc()==0xec575)
@@ -282,7 +282,7 @@ uint16_t tatsumi_state::tatsumi_v30_68000_r(offs_t offset)
 			dst[BYTE_XOR_LE(0xfc524)]=0x46;
 			dst[BYTE_XOR_LE(0xfc525)]=0x46;
 		}
-		#endif
+#endif
 
 		return m_sharedram[offset & 0x1fff];
 	}
@@ -313,7 +313,7 @@ uint8_t cyclwarr_state::oki_status_xor_r()
 	// fwiw returning normal oki status doesn't work at all, both games don't make any sound.
 	// TODO: verify with HW
 	return (r ^ 0xff);
-	#ifdef UNUSED_FUNCTION
+#if 0
 	// old hack left for reference
 
 	if (m_audiocpu->pc()==0x2b70 || m_audiocpu->pc()==0x2bb5
@@ -326,5 +326,5 @@ uint8_t cyclwarr_state::oki_status_xor_r()
 		|| m_audiocpu->pc()==0x1cac) // BigFight
 		return 0;
 	return r;
-	#endif
+#endif
 }

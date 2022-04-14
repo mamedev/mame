@@ -31,7 +31,7 @@ protected:
 
 private:
 	// internal state
-	uint8_t m_lfo_val;
+	uint8_t m_lfo_val = 0;
 };
 
 class mooncrst_sound_device : public galaxian_sound_device
@@ -44,7 +44,23 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 };
 
+class sbhoei_sound_device : public galaxian_sound_device
+{
+public:
+	sbhoei_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	void noise1_enable_w(offs_t offset, uint8_t data);
+	void noise2_enable_w(offs_t offset, uint8_t data);
+	void noise3_enable_w(offs_t offset, uint8_t data);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+};
+
 DECLARE_DEVICE_TYPE(GALAXIAN_SOUND, galaxian_sound_device)
 DECLARE_DEVICE_TYPE(MOONCRST_SOUND, mooncrst_sound_device)
+DECLARE_DEVICE_TYPE(SBHOEI_SOUND, sbhoei_sound_device)
 
 #endif // MAME_AUDIO_GALAXIAN_H

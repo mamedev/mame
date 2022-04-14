@@ -184,7 +184,7 @@ protected:
 
 	virtual void interface_pre_start() override;
 
-	int get_index() { return m_index; };
+	int get_index() { return m_index; }
 	address_space &program_space() { return m_dio_dev->program_space(); }
 
 	DECLARE_WRITE_LINE_MEMBER(irq1_out) { m_dio_dev->set_irq(m_index, 0, state); }

@@ -1146,7 +1146,7 @@ sty_m_aba
 sty_m_zpg
 	TMP = read_pc();
 	read_dummy(TMP);
-	write(TMP, X);
+	write(TMP, Y);
 	prefetch();
 
 sty_m_zpx

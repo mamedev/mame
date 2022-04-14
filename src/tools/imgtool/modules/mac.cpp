@@ -146,19 +146,17 @@ static inline void set_UINT16BE(UINT16BE *word, uint16_t data)
 	word->bytes[1] = data & 0xff;
 }
 
-#if 0
 static inline uint32_t get_UINT24BE(UINT24BE word)
 {
 	return (word.bytes[0] << 16) | (word.bytes[1] << 8) | word.bytes[2];
 }
 
-static inline void set_UINT24BE(UINT24BE *word, uint32_t data)
+[[maybe_unused]] static inline void set_UINT24BE(UINT24BE *word, uint32_t data)
 {
 	word->bytes[0] = (data >> 16) & 0xff;
 	word->bytes[1] = (data >> 8) & 0xff;
 	word->bytes[2] = data & 0xff;
 }
-#endif
 
 static inline uint32_t get_UINT32BE(UINT32BE word)
 {
@@ -439,8 +437,7 @@ exit:
     Return a zero if s1 and s2 are equal, a negative value if s1 is less than
     s2, and a positive value if s1 is greater than s2.
 */
-#ifdef UNUSED_FUNCTION
-static int mac_strcmp(const uint8_t *s1, const uint8_t *s2)
+[[maybe_unused]] static int mac_strcmp(const uint8_t *s1, const uint8_t *s2)
 {
 	size_t common_len;
 
@@ -448,7 +445,6 @@ static int mac_strcmp(const uint8_t *s1, const uint8_t *s2)
 
 	return memcmp(s1+1, s2+1, common_len) || ((int)s1[0] - s2[0]);
 }
-#endif
 
 /*
     mac_stricmp()
@@ -473,7 +469,7 @@ Known issues:
     you must consider that, unlike UNIX, the Macintosh was not designed for
     droids, but error-prone human beings that may forget about case.)
 
-    (Also, letters with diatrical signs follow the corresponding letters
+    (Also, letters with diacritical signs follow the corresponding letters
     without diacritical signs in the HFS catalog file.  This does not matter,
     though, since the Finder will not display files in the HFS catalog order,
     but it will instead sort files according to whatever order is currently
@@ -482,7 +478,7 @@ Known issues:
     However, with other text encodings, the behavior will be completely absurd.
     For instance, with the Greek encoding, it will think that the degree symbol
     is the same letter (with different case) as the upper-case Psi, so that if
-    a program asks for a file called "90??" on a greek HFS volume, and there is
+    a program asks for a file called "90??" on a Greek HFS volume, and there is
     a file called "90??" on this volume, file "90??" will be opened.
     Results will probably be even weirder with 2-byte scripts like Japanese or
     Chinese.  Of course, we are not going to fix this issue, since doing so
@@ -592,7 +588,6 @@ static inline void mac_strcpy(uint8_t *dest, const uint8_t *src)
 	memcpy(dest, src, src[0]+1);
 }
 
-#ifdef UNUSED_FUNCTION
 /*
     mac_strncpy()
 
@@ -602,7 +597,7 @@ static inline void mac_strcpy(uint8_t *dest, const uint8_t *src)
     n (I): max string length for dest (range 0-255, buffer length + 1)
     src (I): source macintosh string (first byte is length)
 */
-static void mac_strncpy(uint8_t *dest, int n, const uint8_t *src)
+[[maybe_unused]] static void mac_strncpy(uint8_t *dest, int n, const uint8_t *src)
 {
 	size_t len;
 
@@ -612,7 +607,6 @@ static void mac_strncpy(uint8_t *dest, int n, const uint8_t *src)
 	dest[0] = len;
 	memcpy(dest+1, src+1, len);
 }
-#endif
 
 /*
     disk image reference
@@ -1061,9 +1055,7 @@ struct floppy_tag_record
 								/* (DV17 says "disk block number", but it cannot be true) */
 };
 
-#ifdef UNUSED_FUNCTION
-static void hfs_image_close(struct mac_l2_imgref *l2_img);
-#endif
+static void hfs_image_close(struct mac_l2_imgref &l2_img);
 static imgtoolerr_t mfs_file_get_nth_block_address(struct mac_fileref *fileref, uint32_t block_num, uint32_t *block_address);
 static imgtoolerr_t hfs_file_get_nth_block_address(struct mac_fileref *fileref, uint32_t block_num, uint32_t *block_address);
 static imgtoolerr_t mfs_lookup_path(struct mac_l2_imgref *l2_img, const char *fpath, mac_str255 filename, mac_dirent *cat_info, int create_it);
@@ -1079,7 +1071,6 @@ static struct mac_l2_imgref *get_imgref(imgtool::image &img)
 }
 
 
-#ifdef UNUSED_FUNCTION
 /*
     mac_image_close
 
@@ -1087,9 +1078,9 @@ static struct mac_l2_imgref *get_imgref(imgtool::image &img)
 
     l2_img (I/O): level-2 image reference
 */
-static void mac_image_close(struct mac_l2_imgref *l2_img)
+static void mac_image_close(struct mac_l2_imgref &l2_img)
 {
-	switch (l2_img->format)
+	switch (l2_img.format)
 	{
 	case L2I_MFS:
 		break;
@@ -1099,7 +1090,6 @@ static void mac_image_close(struct mac_l2_imgref *l2_img)
 		break;
 	}
 }
-#endif
 
 /*
     mac_lookup_path
@@ -1348,7 +1338,6 @@ static imgtoolerr_t mac_file_write(struct mac_fileref *fileref, uint32_t len, co
 	return IMGTOOLERR_SUCCESS;
 }
 
-#ifdef UNUSED_FUNCTION
 /*
     mac_file_tell
 
@@ -1359,13 +1348,12 @@ static imgtoolerr_t mac_file_write(struct mac_fileref *fileref, uint32_t len, co
 
     Return imgtool error code
 */
-static imgtoolerr_t mac_file_tell(struct mac_fileref *fileref, uint32_t *filePos)
+[[maybe_unused]] static imgtoolerr_t mac_file_tell(struct mac_fileref *fileref, uint32_t *filePos)
 {
 	*filePos = fileref->crPs;
 
 	return IMGTOOLERR_SUCCESS;
 }
-#endif
 
 /*
     mac_file_seek
@@ -2732,7 +2720,6 @@ static imgtoolerr_t mfs_file_setABeof(struct mac_fileref *fileref, uint32_t newA
 	return IMGTOOLERR_SUCCESS;
 }
 
-#ifdef UNUSED_FUNCTION
 /*
     mfs_hashString
 
@@ -2768,7 +2755,6 @@ static int mfs_hashString(const mac_str255 string)
 
 	return reply;
 }
-#endif
 
 #if 0
 #pragma mark -
@@ -3137,7 +3123,6 @@ static imgtoolerr_t hfs_image_open(imgtool::image &image, imgtool::stream::ptr &
 	return IMGTOOLERR_SUCCESS;
 }
 
-#ifdef UNUSED_FUNCTION
 /*
     hfs_image_close
 
@@ -3145,14 +3130,13 @@ static imgtoolerr_t hfs_image_open(imgtool::image &image, imgtool::stream::ptr &
 
     l2_img (I/O): level-2 image reference
 */
-static void hfs_image_close(struct mac_l2_imgref *l2_img)
+static void hfs_image_close(struct mac_l2_imgref &l2_img)
 {
-	assert(l2_img->format == L2I_HFS);
+	assert(l2_img.format == L2I_HFS);
 
-	BT_close(&l2_img->u.hfs.extents_BT);
-	BT_close(&l2_img->u.hfs.cat_BT);
+	BT_close(&l2_img.u.hfs.extents_BT);
+	BT_close(&l2_img.u.hfs.cat_BT);
 }
-#endif
 
 /*
     hfs_get_cat_record_data
@@ -4925,7 +4909,6 @@ struct mac_resfileref
 							/* This is actually part of the type list, which matters for offsets */
 };
 
-#ifdef UNUSED_FUNCTION
 /*
     resfile_open
 
@@ -5051,7 +5034,7 @@ static imgtoolerr_t resfile_get_entry(mac_resfileref *resfileref, uint32_t type,
 
     Return imgtool error code
 */
-static imgtoolerr_t resfile_get_resname(mac_resfileref *resfileref, const rsrc_ref_entry *entry, mac_str255 string)
+[[maybe_unused]] static imgtoolerr_t resfile_get_resname(mac_resfileref *resfileref, const rsrc_ref_entry *entry, mac_str255 string)
 {
 	imgtoolerr_t err;
 	uint16_t name_offs;
@@ -5169,7 +5152,6 @@ static imgtoolerr_t resfile_get_resdata(mac_resfileref *resfileref, const rsrc_r
 
 	return IMGTOOLERR_SUCCESS;
 }
-#endif
 
 #if 0
 #pragma mark -
@@ -5212,7 +5194,6 @@ static imgtoolerr_t resfile_get_resdata(mac_resfileref *resfileref, const rsrc_r
         many programs/comments
 */
 
-#ifdef UNUSED_FUNCTION
 /*
     get_comment
 
@@ -5270,16 +5251,13 @@ static imgtoolerr_t get_comment(struct mac_l2_imgref *l2_img, uint16_t id, mac_s
 	/* phew, we are done! */
 	return IMGTOOLERR_SUCCESS;
 }
-#endif
 
 #if 0
 #pragma mark -
 #pragma mark IMGTOOL MODULE IMPLEMENTATION
 #endif
 
-#ifdef UNUSED_FUNCTION
-static void mac_image_exit(imgtool::image *img);
-#endif
+[[maybe_unused]] static void mac_image_exit(imgtool::image &img);
 static void mac_image_info(imgtool::image &img, std::ostream &stream);
 static imgtoolerr_t mac_image_beginenum(imgtool::directory &enumeration, const char *path);
 static imgtoolerr_t mac_image_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent);
@@ -5287,17 +5265,15 @@ static imgtoolerr_t mac_image_freespace(imgtool::partition &partition, uint64_t 
 static imgtoolerr_t mac_image_readfile(imgtool::partition &partition, const char *filename, const char *fork, imgtool::stream &destf);
 static imgtoolerr_t mac_image_writefile(imgtool::partition &partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *writeoptions);
 
-#ifdef UNUSED_FUNCTION
 /*
     close a mfs/hfs image
 */
-static void mac_image_exit(imgtool::image *img)
+static void mac_image_exit(imgtool::image &img)
 {
 	struct mac_l2_imgref *image = get_imgref(img);
 
-	mac_image_close(image);
+	mac_image_close(*image);
 }
-#endif
 
 /*
     get basic information on a mfs/hfs image
@@ -5588,8 +5564,7 @@ static imgtoolerr_t mac_image_freespace(imgtool::partition &partition, uint64_t 
 	return IMGTOOLERR_SUCCESS;
 }
 
-#ifdef UNUSED_FUNCTION
-static imgtoolerr_t mac_get_comment(struct mac_l2_imgref *image, mac_str255 filename, const mac_dirent *cat_info, mac_str255 comment)
+[[maybe_unused]] static imgtoolerr_t mac_get_comment(struct mac_l2_imgref *image, mac_str255 filename, const mac_dirent *cat_info, mac_str255 comment)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
 	uint16_t commentID;
@@ -5614,7 +5589,6 @@ static imgtoolerr_t mac_get_comment(struct mac_l2_imgref *image, mac_str255 file
 	}
 	return err;
 }
-#endif
 
 
 /*

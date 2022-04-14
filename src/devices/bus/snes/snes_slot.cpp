@@ -188,6 +188,30 @@ uint8_t device_sns_cart_interface::read_open_bus()
 	return 0xff;
 }
 
+//-------------------------------------------------
+//  scanlines_r - get motherboard scanline count
+//-------------------------------------------------
+
+int device_sns_cart_interface::scanlines_r()
+{
+	if (m_slot != nullptr)
+		return m_slot->scanlines_r();
+
+	return 0xff;
+}
+
+//-------------------------------------------------
+//  address_r - get address pin from S-CPU
+//-------------------------------------------------
+
+offs_t device_sns_cart_interface::address_r()
+{
+	if (m_slot != nullptr)
+		return m_slot->address_r();
+
+	return 0xff;
+}
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -197,7 +221,7 @@ uint8_t device_sns_cart_interface::read_open_bus()
 //-------------------------------------------------
 base_sns_cart_slot_device::base_sns_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	device_slot_interface(mconfig, *this),
 	m_addon(ADDON_NONE),
 	m_type(SNES_MODE20),

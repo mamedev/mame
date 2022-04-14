@@ -24,6 +24,10 @@
     Notes:
     - The hardware has some similarities to cit220.cpp
     - Everything here is guessed (including the system name), no docs available
+    - Other (undumped) terminals from Tab:
+      * 132/15: VT52/VT100/VT132 (1982)
+      * 132/15-G: Tektronix graphics (1982)
+      * 132/15-H: Honeywell (1983)
 
 ***************************************************************************/
 
@@ -67,6 +71,13 @@ protected:
 	virtual void machine_start() override;
 
 private:
+	required_device<i8085a_cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<scn2674_device> m_avdc;
+	required_region_ptr<uint8_t> m_chargen;
+	required_device<address_map_bank_device> m_vram_bank;
+
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 	void vram_map(address_map &map);
@@ -74,19 +85,12 @@ private:
 	void char_map(address_map &map);
 	void attr_map(address_map &map);
 
-	required_device<i8085a_cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	required_device<scn2674_device> m_avdc;
-	required_region_ptr<uint8_t> m_chargen;
-	optional_device<address_map_bank_device> m_vram_bank;
-
 	void video_ctrl_w(uint8_t data);
 	void crt_brightness_w(uint8_t data);
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 	void palette(palette_device &palette) const;
 
-	bool m_screen_light;
+	bool m_screen_light = false;
 };
 
 
@@ -155,16 +159,17 @@ void tabe22_state::crt_brightness_w(uint8_t data)
 
 SCN2674_DRAW_CHARACTER_MEMBER( tabe22_state::draw_character )
 {
-	uint16_t data = m_chargen[charcode << 4 | linecount] << 2;
-	const pen_t *const pen = m_palette->pens();
-
-	// 76------  unknown
+	// 7-------  chargen high bit
+	// -6------  unknown
 	// --5-----  shaded
 	// ---4----  unknown
 	// ----3---  bold
 	// -----2--  blink
 	// ------1-  underline
 	// -------0  reverse
+
+	uint16_t data = m_chargen[(BIT(attrcode, 7) << 12) | charcode << 4 | linecount] << 2;
+	const pen_t *const pen = m_palette->pens();
 
 	if (ul && (BIT(attrcode, 1)))
 		data = 0x1ff;

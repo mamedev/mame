@@ -93,10 +93,10 @@ protected:
 	optional_shared_ptr<uint8_t> m_spriteram2;
 
 	// internal state
-	uint8_t m_irq_mask;
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_gfx_bank;
-	uint8_t m_palette_bank;
+	uint8_t m_irq_mask = 0U;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_gfx_bank = 0U;
+	uint8_t m_palette_bank = 0U;
 };
 
 class exctsccr_state : public champbas_state

@@ -42,20 +42,20 @@ protected:
 	required_device<teleprinter_device> m_tty;
 
 private:
-	uint8_t* paper_tape_data;
-	uint32_t paper_tape_length;
-	uint32_t paper_tape_address;
+	uint8_t* paper_tape_data = nullptr;
+	uint32_t paper_tape_length = 0;
+	uint32_t paper_tape_address = 0;
 
-	emu_timer *m_decwriter_timer;
-	emu_timer *m_teletype_timer;
-	output_manager *m_out;
-	uint8_t m_prev_ACC;
-	uint8_t m_prev_opcode;
-	uint8_t m_prev_mem_data;
-	uint16_t m_prev_mem_addr;
-	uint16_t m_prev_PC;
-	uint8_t m_prev_FLAGS;
-	uint16_t m_prev_RC;
+	emu_timer *m_decwriter_timer = nullptr;
+	emu_timer *m_teletype_timer = nullptr;
+	output_manager *m_out = nullptr;
+	uint8_t m_prev_ACC = 0;
+	uint8_t m_prev_opcode = 0;
+	uint8_t m_prev_mem_data = 0;
+	uint16_t m_prev_mem_addr = 0;
+	uint16_t m_prev_PC = 0;
+	uint8_t m_prev_FLAGS = 0;
+	uint16_t m_prev_RC = 0;
 };
 
 #endif // MAME_INCLUDES_PATINHOFEIO_H

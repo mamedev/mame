@@ -954,21 +954,6 @@ end
 
 --------------------------------------------------
 --
---@src/devices/video/stvvdp1.h,VIDEOS["STVVDP"] = true
---@src/devices/video/stvvdp2.h,VIDEOS["STVVDP"] = true
---------------------------------------------------
-
-if (VIDEOS["STVVDP"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/video/stvvdp1.cpp",
-		MAME_DIR .. "src/devices/video/stvvdp1.h",
-		MAME_DIR .. "src/devices/video/stvvdp2.cpp",
-		MAME_DIR .. "src/devices/video/stvvdp2.h",
-	}
-end
-
---------------------------------------------------
---
 --@src/devices/video/t6963c.h,VIDEOS["T6963C"] = true
 --------------------------------------------------
 

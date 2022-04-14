@@ -162,7 +162,7 @@ Notes: (All IC's shown)
 #include "sound/dave.h"
 #include "video/nick.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

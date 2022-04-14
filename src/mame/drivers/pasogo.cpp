@@ -111,7 +111,7 @@ TODO:
 #include "machine/timer.h"
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 /*
   rtc interrupt irq 2
@@ -150,22 +150,22 @@ private:
 
 	struct
 	{
-		uint8_t index;
-		uint8_t data[0x100];
+		uint8_t index = 0;
+		uint8_t data[0x100]{};
 		struct {
-			uint16_t data;
+			uint16_t data = 0;
 		} bios_timer; // 1.19 MHz tclk signal
 		struct {
-			int seconds, minutes, hours, days;
-			int alarm_seconds, alarm_minutes, alarm_hours, alarm_days;
+			int seconds = 0, minutes = 0, hours = 0, days = 0;
+			int alarm_seconds = 0, alarm_minutes = 0, alarm_hours = 0, alarm_days = 0;
 
-			int onehertz_interrupt_on;
-			int onehertz_interrupt_request;
-			int alarm_interrupt_on;
-			int alarm_interrupt_request;
+			int onehertz_interrupt_on = 0;
+			int onehertz_interrupt_request = 0;
+			int alarm_interrupt_on = 0;
+			int alarm_interrupt_request = 0;
 		} rtc;
 		struct {
-			int write_protected;
+			int write_protected = 0;
 		} pmu;
 	} m_vg230;
 
@@ -176,9 +176,9 @@ private:
 	INTERRUPT_GEN_MEMBER(pasogo_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(vg230_timer);
 
-	memory_region *m_cart_rom;
-	uint8_t m_ems_index;
-	uint16_t m_ems_bank[28];
+	memory_region *m_cart_rom = nullptr;
+	uint8_t m_ems_index = 0;
+	uint16_t m_ems_bank[28]{};
 	void emsbank_map(address_map &map);
 	void pasogo_io(address_map &map);
 	void pasogo_mem(address_map &map);

@@ -50,7 +50,7 @@ void trucocl_state::irq_enable_w(uint8_t data)
 }
 
 
-void trucocl_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void trucocl_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

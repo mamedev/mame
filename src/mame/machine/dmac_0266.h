@@ -40,7 +40,7 @@ protected:
 
 	// dma logic
 	void soft_reset();
-	void dma_check(void *ptr, s32 param);
+	void dma_check(s32 param);
 
 private:
 	required_address_space m_bus;

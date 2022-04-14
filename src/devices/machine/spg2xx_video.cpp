@@ -463,7 +463,7 @@ void spg2xx_video_device::check_video_irq()
 	m_video_irq_cb((VIDEO_IRQ_STATUS & VIDEO_IRQ_ENABLE) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void spg2xx_video_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void spg2xx_video_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

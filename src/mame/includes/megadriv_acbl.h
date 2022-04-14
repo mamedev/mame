@@ -22,13 +22,13 @@ public:
 	void init_srmdb();
 	void init_topshoot();
 	void init_puckpkmn();
-	void init_hshavoc();
 	void init_barek2();
 	void init_barek2ch();
 	void init_barek3();
 	void init_barekch();
 	void init_bk3ssrmb();
 	void init_sonic2mb();
+	void init_sonic3mb();
 	void init_twinktmb();
 	void init_jparkmb();
 	void init_sbubsm();
@@ -40,6 +40,7 @@ private:
 	uint16_t aladmdb_r();
 	uint16_t barek2mb_r();
 	uint16_t jparkmb_r();
+	uint16_t sonic3mb_r();
 	uint16_t twinktmb_r();
 	uint16_t dsw_r(offs_t offset);
 	uint16_t topshoot_200051_r();
@@ -54,7 +55,7 @@ private:
 	void puckpkmna_map(address_map &map);
 
 	// bootleg specific
-	int m_aladmdb_mcu_port;
+	int m_aladmdb_mcu_port = 0;
 
 	int m_protcount;
 };

@@ -74,10 +74,10 @@ namespace webpp {
 
 		public:
 			virtual ~Connection() {}
-			explicit Connection(const std::shared_ptr<socket_type> &socket) : super(0), socket(socket), strand(socket->get_io_service()), closed(false) { }
+			Connection(asio::io_context &context, const std::shared_ptr<socket_type> &socket) : super(0), socket(socket), strand(context), closed(false) { }
 
 		private:
-			explicit Connection(socket_type *socket): super(0), socket(socket), strand(socket->get_io_service()), closed(false) { }
+			Connection(asio::io_context &context, socket_type *socket): super(0), socket(socket), strand(context), closed(false) { }
 
 			class SendData {
 			public:
@@ -361,7 +361,7 @@ namespace webpp {
 		std::shared_ptr<asio::system_timer> get_timeout_timer(const std::shared_ptr<Connection> &connection, size_t seconds) {
 			if (seconds == 0)
 				return nullptr;
-			auto timer = std::make_shared<asio::system_timer>(connection->socket->get_io_service());
+			auto timer = std::make_shared<asio::system_timer>(connection->socket->get_executor());
 			timer->expires_at(std::chrono::system_clock::now() + std::chrono::seconds(static_cast<long>(seconds)));
 			timer->async_wait([connection](const std::error_code& ec){
 				if(!ec) {
@@ -652,7 +652,7 @@ namespace webpp {
 
 		void timer_idle_init(const std::shared_ptr<Connection> &connection) {
 			if(config.timeout_idle>0) {
-				connection->timer_idle= std::make_unique<asio::system_timer>(connection->socket->get_io_service());
+				connection->timer_idle= std::make_unique<asio::system_timer>(connection->socket->get_executor());
 				connection->timer_idle->expires_from_now(std::chrono::seconds(static_cast<unsigned long>(config.timeout_idle)));
 				timer_idle_expired_function(connection);
 			}
@@ -693,7 +693,7 @@ namespace webpp {
 		void accept() override {
 			//Create new socket for this connection (stored in Connection::socket)
 			//Shared_ptr is used to pass temporary objects to the asynchronous functions
-			std::shared_ptr<Connection> connection(new Connection(new WS(*io_context)));
+			std::shared_ptr<Connection> connection(new Connection(*io_context, new WS(*io_context)));
 
 			acceptor->async_accept(*connection->socket, [this, connection](const std::error_code& ec) {
 				//Immediately start accepting a new connection (if io_context hasn't been stopped)

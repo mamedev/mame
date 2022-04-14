@@ -4,6 +4,9 @@
 
   Rockwell PPS-4/1 MCU cores
 
+  Don't include this file, include the specific device header instead,
+  for example mm76.h
+
 */
 
 #ifndef MAME_CPU_PPS41_PPS41BASE_H

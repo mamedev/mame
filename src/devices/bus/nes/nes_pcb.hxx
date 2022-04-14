@@ -42,6 +42,7 @@ static const nes_pcb pcb_list[] =
 	{ "pal_zz",           PAL_ZZ },
 	{ "nes_qj",           NES_QJ },
 	{ "nes_event",        STD_EVENT },
+	{ "nes_event2",       STD_EVENT2 },
 	{ "discrete_74x139",  DIS_74X139X74 },
 	{ "discrete_74x377",  DIS_74X377 },
 	{ "discrete_74x161",  DIS_74X161X161X32 },
@@ -108,7 +109,6 @@ static const nes_pcb pcb_list[] =
 	{ "cne_shlz",         CNE_SHLZ },
 	{ "cocoma",           COCOMA_BOARD },
 	{ "nanjing",          NANJING_BOARD },  // mapper 163
-	{ "ntdec_2746",       NTDEC_2746 },
 	{ "ntdec_asder",      NTDEC_ASDER },    // mapper 112
 	{ "ntdec_fh",         NTDEC_FIGHTINGHERO },     // mapper 193
 	{ "ntdec_n715021",    NTDEC_N715021 },  // mapper 81
@@ -150,7 +150,6 @@ static const nes_pcb pcb_list[] =
 	{ "waixing_h1",       WAIXING_TYPE_H1 },
 	{ "waixing_i",        WAIXING_TYPE_I },
 	{ "waixing_j",        WAIXING_TYPE_J },
-	{ "waixing_sgz",      WAIXING_SGZ },
 	{ "waixing_sgzlz",    WAIXING_SGZLZ },
 	{ "waixing_sec",      WAIXING_SECURITY },
 	{ "waixing_ffv",      WAIXING_FFV },
@@ -160,10 +159,10 @@ static const nes_pcb pcb_list[] =
 	{ "waixing_sh2",      WAIXING_SH2 },
 	{ "fs304",            WAIXING_FS304 },   // used in Zelda 3 by Waixing
 	{ "cony",             CONY_BOARD },
+	{ "cony1k",           CONY1K_BOARD },
 	{ "yoko",             YOKO_BOARD },
 	{ "hengg_srich",      HENGG_SRICH },
 	{ "hengg_xhzs",       HENGG_XHZS },
-	{ "hengg_shjy3",      HENGG_SHJY3 },    // mapper 253
 	{ "hes",              HES_BOARD },
 	{ "ks106c",           KAISER_KS106C },  // mapper 352
 	{ "ks202",            KAISER_KS202 },   // mapper 56
@@ -200,12 +199,24 @@ static const nes_pcb pcb_list[] =
 	{ "cc21",             UNL_CC21 },
 	{ "xiaozy",           UNL_XIAOZY },
 	{ "edu2k",            UNL_EDU2K },
-	{ "t230",             UNL_T230 },
-	{ "mk2",              UNL_MK2 },
+	{ "jy830623c",        UNL_JY830623C },
 	{ "zemina",           ZEMINA_BOARD },
-	// misc bootleg boards
+	// misc VRC clone boards
+	{ "btl_2yudb",        BTL_2YUDB },
+	{ "btl_900218",       BTL_900218 },  // pirate The Lord of King
 	{ "ax40g",            UNL_AX40G },
 	{ "ax5705",           UNL_AX5705 },
+	{ "bmc_830506c",      BMC_830506C },
+	{ "bmc_831128c",      BMC_831128C },
+	{ "bmc_kl06",         BMC_KL06 },
+	{ "unl_cfight",       UNL_CITYFIGHT },
+	{ "hengg_shjy3",      HENGG_SHJY3 },    // mapper 253
+	{ "sgpipe",           BTL_SHUIGUAN },
+	{ "t230",             UNL_T230 },
+	{ "tf1201",           UNL_TF1201 },
+	{ "th21311",          UNL_TH21311 },
+	{ "waixing_sgz",      WAIXING_SGZ },
+	// misc bootleg boards
 	{ "sc127",            UNL_SC127 },
 	{ "mariobaby",        BTL_MARIOBABY },
 	{ "asnicol",          BTL_AISENSHINICOL },
@@ -217,8 +228,6 @@ static const nes_pcb pcb_list[] =
 	{ "smb2jb",           BTL_SMB2JB },
 	{ "yung08",           BTL_YUNG08 },
 	{ "btl_0353",         BTL_0353 },
-	{ "btl_2yudb",        BTL_2YUDB },
-	{ "btl_900218",       BTL_900218 },  // pirate The Lord of King
 	{ "09034a",           BTL_09034A },
 	{ "l001",             BTL_L001 },
 	{ "batmanfs",         BTL_BATMANFS },
@@ -229,6 +238,7 @@ static const nes_pcb pcb_list[] =
 	{ "somari",           SOMARI_SL12 },  // mapper 116
 	{ "huang2",           SOMARI_HUANG2 },  // mapper 116 also
 	{ "nitra",            NITRA_TDA },
+	{ "bmw8544",          UNL_BMW8544 },
 	{ "fs6",              UNL_FS6 },  // mapper 196 alt? (for Street Fighter VI / Fight Street VI },
 	{ "sbros11",          BTL_SBROS11 },
 	{ "family4646",       BMC_FAMILY_4646 },
@@ -262,16 +272,21 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_60311c",       BMC_60311C },
 	{ "bmc_80013b",       BMC_80013B },
 	{ "bmc_810544c",      BMC_810544C },
+	{ "bmc_82ab",         BMC_82AB },
 	{ "bmc_830425c",      BMC_830425C },
-	{ "bmc_830506c",      BMC_830506C },
 	{ "bmc_830928c",      BMC_830928C },
 	{ "bmc_850437c",      BMC_850437C },
+	{ "bmc_891227",       BMC_891227 },
 	{ "bmc_970630c",      BMC_970630C },
+	{ "bmc_jy012005",     BMC_JY012005 },
 	{ "bmc_jy820845c",    BMC_JY820845C },
 	{ "srpg_5in1",        BMC_SRPG_5IN1 },
 	{ "n32_4in1",         BMC_N32_4IN1 },
 	{ "ntd03",            BMC_NTD_03 },
 	{ "bmc_ctc09",        BMC_CTC09 },
+	{ "bmc_ctc12in1",     BMC_CTC_12IN1 },
+	{ "bmc_ds927",        BMC_DS927 },
+	{ "bmc_fam250",       BMC_FAM250 },
 	{ "bmc_gka",          BMC_GKA },
 	{ "bmc_gkb",          BMC_GKB },
 	{ "bmc_gkcxin1",      BMC_GKCXIN1 },
@@ -282,7 +297,11 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_k3033",        BMC_K3033 },
 	{ "bmc_k3036",        BMC_K3036 },
 	{ "bmc_k3046",        BMC_K3046 },
+	{ "bmc_k3071",        BMC_K3071 },
+	{ "bmc_s009",         BMC_S009 },
 	{ "bmc_sa005a",       BMC_SA005A },
+	{ "bmc_tf2740",       BMC_TF2740 },
+	{ "bmc_th2348",       BMC_TH2348 },
 	{ "bmc_tj03",         BMC_TJ03 },
 	{ "bmc_ws",           BMC_WS },
 	{ "bmc_hik300",       BMC_SUPERHIK_300IN1 },
@@ -318,12 +337,16 @@ static const nes_pcb pcb_list[] =
 	{ "resetsxrom",       BMC_RESETSXROM },
 	{ "resettxrom",       BMC_RESETTXROM },
 	{ "s24in1c03",        BMC_S24IN1SC03 },
+	{ "smd133",           SMD133_BOARD },
 	{ "tech9in1",         BMC_TECHLINE9IN1 },
+	{ "bmc_5in1",         BMC_5IN1_1993 },
 	{ "bmc_8in1",         BMC_8IN1 },
 	{ "bmc_15in1",        BMC_15IN1 },
 	{ "bmc_sbig7in1",     BMC_SUPERBIG_7IN1 },
 	{ "bmc_hik8in1",      BMC_HIK8IN1 },
 	{ "bmc_jy208",        BMC_JY208 },
+	{ "bmc_jy302",        BMC_JY302 },
+	{ "bmc_kc885",        BMC_KC885 },
 	{ "bmc_sfc12",        BMC_SFC12 },
 	{ "bmc_hik4in1",      BMC_SUPERHIK_4IN1 },
 	{ "bmc_mario7in1",    BMC_MARIOPARTY_7IN1 },
@@ -341,7 +364,6 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_yy841101c",    BMC_YY841101C },
 	{ "bmc_yy841155c",    BMC_YY841155C },
 	{ "pjoy84",           BMC_PJOY84 },
-	{ "bmc_gold150",      BMC_GOLD150 },
 	{ "bmc_gold260",      BMC_GOLD260 },
 	{ "bmc_th22913",      BMC_TH22913 },
 	{ "bmc_reset4",       BMC_4IN1RESET },
@@ -354,7 +376,8 @@ static const nes_pcb pcb_list[] =
 	{ "jyc_c",            JYCOMPANY_C },
 	{ "tek90",            JYCOMPANY_A },
 	{ "sa9602b",          SACHEN_SA9602B },
-	{ "unl_shero",        SACHEN_SHERO },
+	{ "sachen_shero",     SACHEN_SHERO },
+	{ "sachen_zgdh",      SACHEN_ZGDH },
 	{ "a9746",            UNL_A9746 },
 	{ "mmalee2",          UNL_MMALEE },
 	{ "unl_2708",         UNL_2708 },
@@ -370,22 +393,19 @@ static const nes_pcb pcb_list[] =
 	{ "unl_lh53",         UNL_LH53 },
 	{ "unl_ac08",         UNL_AC08 },
 	{ "unl_malisb",       UNL_MALISB },
-	{ "sgpipe",           BTL_SHUIGUAN },
 	{ "rt01",             UNL_RT01 },   // Russian Test Cart
 	{ "unl_43272",        UNL_43272 },
-	{ "tf1201",           UNL_TF1201 },
-	{ "th21311",          UNL_TH21311 },
-	{ "unl_cfight",       UNL_CITYFIGHT },
 	{ "ninjaryu",         UNL_NINJARYU },
 	{ "unl_eh8813a",      UNL_EH8813A },  // Dr. Mario II
 	{ "nocash_nochr",     NOCASH_NOCHR },
 	{ "action53",         UNL_ACTION53 },
 	{ "batmap_000",       BATMAP_000 },
 	{ "batmap_srrx",      BATMAP_SRRX },
-	{ "cufrom",           UNL_CUFROM },
-	{ "unrom512",         UNL_UNROM512 },
+	{ "8bitxmas",         SEALIE_8BITXMAS },
+	{ "cufrom",           SEALIE_CUFROM },
+	{ "dpcmcart",         SEALIE_DPCMCART },
+	{ "unrom512",         SEALIE_UNROM512 },
 	{ "2a03pur",          UNL_2A03PURITANS },
-	{ "dpcmcart",         UNL_DPCMCART },
 	{ "farid_slrom8in1",  FARID_SLROM8IN1 },
 	{ "farid_unrom8in1",  FARID_UNROM8IN1 },
 	{ "ffe3",             FFE3_BOARD },
@@ -394,9 +414,7 @@ static const nes_pcb pcb_list[] =
 	{ "unl_dance",        UNSUPPORTED_BOARD },
 	{ "bmc_hik_kof",      UNSUPPORTED_BOARD },
 	{ "onebus",           UNSUPPORTED_BOARD },
-	{ "coolboy",          UNSUPPORTED_BOARD },
 	{ "pec586",           UNSUPPORTED_BOARD },
-	{ "unl_drgnfgt",      UNSUPPORTED_BOARD },  // Dragon Fighter by Flying Star
 	{ "test",             TEST_BOARD },
 	{ "unknown",          UNKNOWN_BOARD }  //  a few pirate dumps uses the wrong mapper...
 };
@@ -645,6 +663,9 @@ void nes_cart_slot_device::call_load_pcb()
 //      osd_printf_error("VRC-6, pin9: A%d, pin10: A%d\n", nes_cart_get_line(get_feature("vrc6-pin9"), nes_cart_get_line(get_feature("vrc6-pin10"));
 	}
 
+	if (m_pcb_id == KONAMI_VRC7)
+		m_cart->set_vrc_lines(nes_cart_get_line(get_feature("vrc7-pin19")), 0, 0);
+
 	if (m_pcb_id == STD_SXROM || m_pcb_id == STD_SOROM)
 	{
 		if (get_feature("mmc1_type") != nullptr)
@@ -676,6 +697,17 @@ void nes_cart_slot_device::call_load_pcb()
 	{
 		if (get_feature("n163-vol"))
 			m_cart->set_n163_vol(n163_get_submapper_num(get_feature("n163-vol")));
+	}
+
+	// get address of SMD133 chip on boards that use it
+	if (m_pcb_id == SMD133_BOARD)
+	{
+		const char *addr = get_feature("smd133-addr");
+		int val = 6;
+
+		if (addr == nullptr || sscanf(addr, "%u%*c", &val) != 1 || val < 5 || val > 6)
+			logerror("Unexpected smd133-addr: %s\n", addr ? addr : "(nullptr)");
+		m_cart->set_smd133_addr(val * 0x1000);
 	}
 
 	// get outer PRG bank size for multicart boards that use this feature

@@ -34,14 +34,14 @@ protected:
 
 private:
 	required_region_ptr<u8> m_disk;
-	u8 m_flopdat;
-	u8 m_flopcmd;
-	u8 m_flopsec;
-	u8 m_flopstat;
-	u8 m_floptrk;
+	u8 m_flopdat = 0;
+	u8 m_flopcmd = 0;
+	u8 m_flopsec = 0;
+	u8 m_flopstat = 0;
+	u8 m_floptrk = 0;
 
-	u8 m_curtrack;
-	int m_secoffs;
+	u8 m_curtrack = 0;
+	int m_secoffs = 0;
 
 };
 

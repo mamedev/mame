@@ -309,7 +309,7 @@ void h8_sci_device::device_reset()
 	cur_sync_time = attotime::never;
 }
 
-void h8_sci_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void h8_sci_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	// Used only to force system-wide syncs
 }
@@ -623,7 +623,6 @@ void h8_sci_device::tx_dropped_edge()
 
 void h8_sci_device::rx_start()
 {
-	ssr |= SSR_TDRE;
 	rx_parity = smr & SMR_OE ? 0 : 1;
 	rsr = 0x00;
 	if(V>=2) logerror("start receive\n");

@@ -1427,14 +1427,6 @@ void scsp_device::exec_dma()
 	}
 }
 
-#ifdef UNUSED_FUNCTION
-int IRQCB(void *param)
-{
-	CheckPendingIRQ(param);
-	return -1;
-}
-#endif
-
 
 u16 scsp_device::read(offs_t offset)
 {

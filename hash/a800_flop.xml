@@ -851,4 +851,21 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- http://www.mr-atari.com/Mr.Atari/LiteDOS/ -->
+	<software name="litedosse"> <!-- runs but needs testing -->
+		<description>Atari LiteDOS-SE</description>
+		<year>2022</year>
+		<publisher>Mr.Atari</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="LiteDOS-SE (build 2022-01-14).atr" size="92176" crc="779dbfae" sha1="5cbbe75cf0489213d87e2c7cdaf2f8bfc802cf56"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="TBasic UBasic (No DOS).atr" size="92176" crc="22213f8f" sha1="994787ec0b3f487aca22d943fb82d60138d6e68f"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

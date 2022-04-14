@@ -14,7 +14,7 @@ READ_LINE_MEMBER(pocketc_state::brk_r)
 	return BIT(m_extra->read(), 0);
 }
 
-void pocketc_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pocketc_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

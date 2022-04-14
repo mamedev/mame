@@ -25,7 +25,7 @@
 #include "bus/rs232/terminal.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -82,27 +82,27 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart2_load) { return load_cart(image, m_cart2); }
 	void pc_speaker_set_spkrdata(uint8_t data);
 
-	uint8_t m_pc_spkrdata;
-	uint8_t m_pit_out2;
-	uint8_t m_pcjr_dor;
-	uint8_t m_pcjx_1ff_count;
-	uint8_t m_pcjx_1ff_val;
-	uint8_t m_pcjx_1ff_bankval;
-	uint8_t m_pcjx_1ff_bank[20][2];
-	int m_ppi_portc_switch_high;
-	uint8_t m_ppi_portb;
+	uint8_t m_pc_spkrdata = 0;
+	uint8_t m_pit_out2 = 0;
+	uint8_t m_pcjr_dor = 0;
+	uint8_t m_pcjx_1ff_count = 0;
+	uint8_t m_pcjx_1ff_val = 0;
+	uint8_t m_pcjx_1ff_bankval = 0;
+	uint8_t m_pcjx_1ff_bank[20][2]{};
+	int m_ppi_portc_switch_high = 0;
+	uint8_t m_ppi_portb = 0;
 
-	uint8_t m_pc_keyb_data;
-	uint8_t m_transferring;
-	uint8_t m_latch;
-	uint32_t m_raw_keyb_data;
-	int m_signal_count;
-	uint8_t m_nmi_enabled;
+	uint8_t m_pc_keyb_data = 0;
+	uint8_t m_transferring = 0;
+	uint8_t m_latch = 0;
+	uint32_t m_raw_keyb_data = 0;
+	int m_signal_count = 0;
+	uint8_t m_nmi_enabled = 0;
 
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	emu_timer *m_pc_int_delay_timer;
-	emu_timer *m_pcjr_watchdog;
-	emu_timer *m_keyb_signal_timer;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	emu_timer *m_pc_int_delay_timer = nullptr;
+	emu_timer *m_pcjr_watchdog = nullptr;
+	emu_timer *m_keyb_signal_timer = nullptr;
 
 	enum
 	{
@@ -153,7 +153,7 @@ void pcjr_state::machine_reset()
 	m_nmi_enabled = 0x80;
 }
 
-void pcjr_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pcjr_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{

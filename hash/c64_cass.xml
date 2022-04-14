@@ -953,34 +953,34 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<publisher>Domark</publisher>
 
 		<part name="cass1" interface="cbm_cass">
-			<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side 1"/>
 			<dataarea name="cass" size="582692">
 				<rom name="APB_Side_1.tap" size="582692" crc="6bd55d0f" sha1="54cadbb25e03ce82eeba4fd5a46db21f6236c9fb"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
-			<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side 2"/>
 			<dataarea name="cass" size="591896">
 				<rom name="APB_Side_2.tap" size="591896" crc="2405c53d" sha1="2a8f9757d7c38462314aada36598f8b0c802c0a0"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="apba" cloneof="apb" supported="no"> <!-- tape loads but doesn't run (remains stuck showing black screen) -->
+	<software name="apba" cloneof="apb">
 		<description>APB (alt)</description>
 		<year>1989</year>
 		<publisher>Domark</publisher>
 
 		<part name="cass1" interface="cbm_cass">
-			<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side 1"/>
 			<dataarea name="cass" size="582695">
 				<rom name="APB_Side_1 (alt).tap" size="582695" crc="5feeaf42" sha1="adfe6390e092435638cb397d5b080b87c9e24b45"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
-			<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side 2"/>
 			<dataarea name="cass" size="591908">
 				<rom name="APB_Side_2 (alt).tap" size="591908" crc="6d6b5ea1" sha1="7cbd62ddb837e401722978c0e9b301e71d9ddecb"/>
 			</dataarea>
@@ -4845,6 +4845,33 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="ferrari">
+		<description>Ferrari Formula One</description>
+		<year>1990</year>
+		<publisher>Activision</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 1: Boot"/>
+			<dataarea name="cass" size="262666">
+				<rom name="Ferrari_Formula_One_Tape_1_Side_1.tap" size="262666" crc="5af5f5b7" sha1="20afc4a8f3fad1ce3cd5024c3c04b291dcbb3d02"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 1: Fiorano Set-up and Practice"/>
+			<dataarea name="cass" size="551020">
+				<rom name="Ferrari_Formula_One_Tape_2_Side_1.tap" size="551020" crc="d6fa9877" sha1="ca1e5a1c8b599d14ebd932c4ddd50b183648ee30"/>
+			</dataarea>
+		</part>
+
+		<part name="cass3" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 2: Grand Prix Circuits"/>
+			<dataarea name="cass" size="1057500">
+				<rom name="Ferrari_Formula_One_Tape_2_Side_2.tap" size="1057500" crc="3dd58955" sha1="9a917617bd5f37edf16417bf1a1ad136cead919f"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="feud">
 		<description>Feud</description>
 		<year>1987</year>
@@ -4862,6 +4889,26 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="611910">
 				<rom name="feudb.tap" size="611910" crc="0cbe87c1" sha1="b06e65952e8d2c8ee0b8cb227134136ba53b62b3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fightn">
+		<description>Fight Night</description>
+		<year>1985</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="421960">
+				<rom name="Fight_Night_Side_1.tap" size="421960" crc="3ac7ad28" sha1="b13af54a028280c139b72ce0e8be7e61e0898805"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="629356">
+				<rom name="Fight_Night_Side_2.tap" size="629356" crc="7adb74c6" sha1="17895eed3074e7a353cd5fac754ca303fd9632d5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4885,6 +4932,26 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="ffight" supported="no"> <!-- game loads and runs, but once past the player select screen, graphics are completely garbled so game is unplayable -->
+		<description>Final Fight</description>
+		<year>1991</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="671950">
+				<rom name="Final_Fight_Side_1.tap" size="671950" crc="0825dc9a" sha1="5866658a8cdfcd4339f4d30c7e1cfcaa5a6ce55a"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="1311108">
+				<rom name="Final_Fight_Side_2.tap" size="1311108" crc="c5511e5e" sha1="b2466265993813b918f48a6d060a813a44086d05"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="findkeep">
 		<description>Finders Keepers</description>
 		<year>1985</year>
@@ -4903,6 +4970,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="fireant">
+		<description>Fire Ant</description>
+		<year>1983</year>
+		<publisher>Mogul</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="720103">
+				<rom name="Fire_Ant.tap" size="720103" crc="94e6a521" sha1="50e0480d749c455cb01657441014fc3fd722dec8"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="firelord">
 		<description>Firelord</description>
 		<year>1990</year>
@@ -4911,6 +4990,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="532122">
 				<rom name="Firelord.tap" size="532122" crc="3bafc24e" sha1="ccfad147bbbb48ef0e2d2cd6bd614a578ec02605"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="firelordh" cloneof="firelord">
+		<description>Firelord (Hewson Consultants)</description>
+		<year>1986</year>
+		<publisher>Hewson Consultants</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="532122">
+				<rom name="Firelord.tap" size="532122" crc="80c4a7a9" sha1="f3fa271de452cb12f1a773a9dacf6f9631274c3f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4951,7 +5042,19 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
-	<software name="fist2">
+	<software name="fstrikee" cloneof="fstrike">
+		<description>First Strike (Elite Systems)</description>
+		<year>1989</year>
+		<publisher>Elite Systems</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="675937">
+				<rom name="First_Strike.tap" size="675937" crc="a24edc7e" sha1="6376af476c81e96a395850cab6e3163b04247275"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fist2" supported="no"> <!-- game loads but doesn't run (just displays a light blue screen) -->
 		<description>Fist II: La Leyenda Continua</description>
 		<year>1986</year>
 		<publisher>Erbe</publisher>
@@ -4971,6 +5074,60 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="fist2m" cloneof="fist2" supported="no"> <!-- game loads but doesn't run (just displays a light blue screen) -->
+		<description>Fist II: The Legend Continues</description>
+		<year>1986</year>
+		<publisher>Melbourne House</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="597436">
+				<rom name="Fist_II-_The_Legend_Continues_Side_1.tap" size="597436" crc="7233b95d" sha1="1d0c979c97b48f07a97c198abb9535dfa42304f9"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="523846">
+				<rom name="Fist_II-_The_Legend_Continues_Side_2.tap" size="523846" crc="6989fe06" sha1="86883ab655cc9cbff21f221908139b3578d2929f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fistsnth">
+		<description>Fists 'n' Throttles</description>
+		<year>1988</year>
+		<publisher>Elite Systems</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side A: Dragons Lair"/>
+			<dataarea name="cass" size="1222090">
+				<rom name="Fists_'N'_Throttles_Tape_1_Side_A.tap" size="1222090" crc="95df659e" sha1="3f92f7b7161e18a664c71f3dad0cb222acc8871b"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side B: Dragons Lair"/>
+			<dataarea name="cass" size="1222090">
+				<rom name="Fists_'N'_Throttles_Tape_1_Side_B.tap" size="1222090" crc="2210ea51" sha1="c04afd8a7f04e2b4996efac8bca67fed7a7ad2c0"/>
+			</dataarea>
+		</part>
+
+		<part name="cass3" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side A: Enduro Racer / Ikari Warriors"/>
+			<dataarea name="cass" size="1214682">
+				<rom name="Fists_'N'_Throttles_Tape_2_Side_A.tap" size="1214682" crc="cdcdb248" sha1="8f04429e4a52d0f0e82681952578c7852896229d"/>
+			</dataarea>
+		</part>
+
+		<part name="cass4" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side B: Buggy Boy / Thundercats"/>
+			<dataarea name="cass" size="1360150">
+				<rom name="Fists_'N'_Throttles_Tape_2_Side_B.tap" size="1360150" crc="e8fe6f73" sha1="bd65bf898fe669509bfcad6493d6638c4f42b0b3"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="flak">
 		<description>Flak</description>
 		<year>1984</year>
@@ -4983,6 +5140,37 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="flightpa">
+		<description>Flight Path 737</description>
+		<year>1984</year>
+		<publisher>Anirog</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="610450">
+				<rom name="Flight_Path_737-_Advanced_Pilot_Trainer.tap" size="610450" crc="97f34bcf" sha1="b8888c5b9855e8492d39f3ecc23eabf357a83a98"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flintstn">
+		<description>The Flintstones</description>
+		<year>1989</year>
+		<publisher>Grandslam</publisher>
+		<info name="usage" value="Ensure c1541 Slot Device is removed prior to loading"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="614404">
+				<rom name="Flintstones,_The.tap" size="614404" crc="e4a2b051" sha1="b6490b868ce4c76addec347cdc0b8ecf2a325ac3"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="614404">
+				<rom name="Flintstones,_The_a1.tap" size="614404" crc="ea60184b" sha1="c82606fd67a85b210faef3ac05fe4837002e5662"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="flyfther">
 		<description>Flying Feathers</description>
 		<year>1984</year>
@@ -4991,6 +5179,48 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="491822">
 				<rom name="Flying_Feathers.tap" size="491822" crc="ff6b2ba0" sha1="e336ead87fa377f01ac6ff8ccbbb9382da588542"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flyfthera" cloneof="flyfther">
+		<description>Flying Feathers (alt)</description>
+		<year>1984</year>
+		<publisher>Bubble Bus Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="472747">
+				<rom name="Flying_Feathers.tap" size="472747" crc="6cfdf56b" sha1="13b90e55d57aed325709f7672147c491645204c1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fshark">
+		<description>Flying Shark</description>
+		<year>1987</year>
+		<publisher>Firebird</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1399905">
+				<rom name="Flying_Shark.tap" size="1399905" crc="73cf4228" sha1="7bf18c573584305255c9a8a1c68b6166729528ef"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="1400017">
+				<rom name="Flying_Shark_a1.tap" size="1400017" crc="4ab4e5eb" sha1="ded24bfdc10b3c2d108a10b56c6de34eba48847e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fbmngr2">
+		<description>Football Manager 2</description>
+		<year>1988</year>
+		<publisher>Addictive Games</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="477077">
+				<rom name="Football_Manager_2.tap" size="477077" crc="743e80d6" sha1="cf72514b8bc7e3d18a5475a13cc19169a254387e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5025,6 +5255,26 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="forgottn">
+		<description>Forgotten Worlds</description>
+		<year>1989</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="512014">
+				<rom name="Forgotten_Worlds_Side_1.tap" size="512014" crc="8086cadf" sha1="41b58795a98f026be651e03d3ad8e2adfc87683b"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="1652512">
+				<rom name="Forgotten_Worlds_Side_2.tap" size="1652512" crc="d3e4c76a" sha1="e8f850d63f0ee8d62a848e4ac7784cc7b806a95e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="f1sim">
 		<description>Formula 1 Simulator</description>
 		<year>1985</year>
@@ -5039,6 +5289,36 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="448397">
 				<rom name="Formula_1_Simulator_a1.tap" size="448397" crc="827409bc" sha1="361d1223ef22b62637a6ed18c543f8010517d622"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fortapoc">
+		<description>Fort Apocalypse</description>
+		<year>1984</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="225834">
+				<rom name="Fort_Apocalypse.tap" size="225834" crc="ca5e88d4" sha1="6596e883e3150574a9626799b32227da022350e8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="foxxfb">
+		<description>Foxx Fights Back</description>
+		<year>1988</year>
+		<publisher>Image Works</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="577959">
+				<rom name="Foxx_Fights_Back.tap" size="577959" crc="5ef1ebf1" sha1="4b1f093ea4d86bbff4b9573c198897e591918894"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="577959">
+				<rom name="Foxx_Fights_Back_a1.tap" size="577959" crc="50b7a537" sha1="f6a2867ea420ee3ba6a025a5cb20b342c78d7f41"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5115,6 +5395,26 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="freddy" supported="partial"> <!-- game loads load and runs but when starting game, player character keeps dropping through floor and dies -->
+		<description>Freddy Hardest</description>
+		<year>1987</year>
+		<publisher>Imagine</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="738562">
+				<rom name="Freddy_Hardest_Side_1.tap" size="738562" crc="88b7655a" sha1="1c2bdb47e49039deb0433799b567274b470c66dd"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="738562">
+				<rom name="Freddy_Hardest_Side_2.tap" size="738562" crc="7c2073d5" sha1="b6793c73daa2f77a1e512a14e4f974b5956c1a11"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="frightmare">
 		<description>Frightmare</description>
 		<year>1989</year>
@@ -5123,6 +5423,30 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="643137">
 				<rom name="Frightmare.tap" size="643137" crc="0760196b" sha1="985f185d710ef67956a184339343d9218ffb4e29"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frogger64">
+		<description>Frogger 64</description>
+		<year>1983</year>
+		<publisher>Interceptor Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1162592">
+				<rom name="Frogger_64.tap" size="1162592" crc="de32ab16" sha1="7b033612916c6994098884313c95e5de78c72ee4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frontlin">
+		<description>Front Line</description>
+		<year>1984</year>
+		<publisher>Interceptor Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="538666">
+				<rom name="Front_Line.tap" size="538666" crc="191105e7" sha1="337bcd321d0bb6b860c0df861d3e9821d0e3b304"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5189,6 +5513,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="futurekn">
+		<description>Future Knight</description>
+		<year>1986</year>
+		<publisher>Gremlin Graphics</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="555234">
+				<rom name="Future_Knight.tap" size="555234" crc="01f48865" sha1="244a93ef3b84241115e4234524efecad28765e80"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="galgames">
 		<description>Galactic Games</description>
 		<year>1990</year>
@@ -5205,6 +5541,112 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 			<feature name="part_id" value="Side 2"/>
 			<dataarea name="cass" size="1072892">
 				<rom name="Galactic_Games_Side_2.tap" size="1072892" crc="3efec4da" sha1="9a645a9afaaad05999361b7d7200ccdbdebccc1f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galgamesa" cloneof="galgames">
+		<description>Galactic Games (Activision)</description>
+		<year>1987</year>
+		<publisher>Activision</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="992147">
+				<rom name="Galactic_Games_Side_1.tap" size="992147" crc="abaf6119" sha1="7d1c71b9253c019bf835369388e72964c57007f9"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="1072892">
+				<rom name="Galactic_Games_Side_2.tap" size="1072892" crc="39582660" sha1="17bf4141fbd05c92960f884e51ddea5df8e965ef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galivan" supported="no"> <!-- game loads partially and then stops (just displays a black screen) -->
+		<description>Galivan</description>
+		<year>1986</year>
+		<publisher>Imagine</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="669787">
+				<rom name="Galivan.tap" size="669787" crc="f6e7a097" sha1="5a7d68dba52dfb247dd8ff38181690c38d1ea800"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gameover2">
+		<description>Game Over II</description>
+		<year>1988</year>
+		<publisher>Dinamic</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 1: Game Over"/>
+			<dataarea name="cass" size="899461">
+				<rom name="Game_Over_II_Tape_1_Side_1.tap" size="899461" crc="af440de8" sha1="7e8810c31233c1bdf326e8aac6e74c3e03035352"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 2: Game Over"/>
+			<dataarea name="cass" size="904593">
+				<rom name="Game_Over_II_Tape_1_Side_2.tap" size="904593" crc="a28c72e8" sha1="6ac53dec93db004eb513973e52b1ea27077fd09b"/>
+			</dataarea>
+		</part>
+
+		<part name="cass3" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 1: Game Over II"/>
+			<dataarea name="cass" size="809340">
+				<rom name="Game_Over_II_Tape_2_Side_1.tap" size="809340" crc="9030ac9f" sha1="3c08d160eb8671329c7bfc012139d54950341391"/>
+			</dataarea>
+		</part>
+
+		<part name="cass4" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 2: Game Over II"/>
+			<dataarea name="cass" size="774563">
+				<rom name="Game_Over_II_Tape_2_Side_2.tap" size="774563" crc="80fdb6d2" sha1="10513a3e794017c7915ffabb6089e70da5f17d44"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gamesse" supported="no"> <!-- game loads to a point and then just displays a green screen -->
+		<description>The Games: Summer Edition</description>
+		<year>1988</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="2962406">
+				<rom name="Games,_The-_Summer_Edition_Side_1.tap" size="2962406" crc="5cb4e6f6" sha1="b7c63b7b722797650c61298091a0e2db85f8dbeb"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="2287372">
+				<rom name="Games,_The-_Summer_Edition_Side_2.tap" size="2287372" crc="c8e1ba48" sha1="335f4c6199ce56303c9bf7d2cd1dadefbee42c03"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gameswe" supported="no"> <!-- game loads to a point and then just displays a light blue screen -->
+		<description>The Games: Winter Edition</description>
+		<year>1988</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="4789558">
+				<rom name="Games,_The-_Winter_Edition_Side_1.tap" size="4789558" crc="654e0212" sha1="cac79f417bc6ce64d1857978a86559347b81e40d"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="3758424">
+				<rom name="Games,_The-_Winter_Edition_Side_2.tap" size="3758424" crc="5db3ef28" sha1="e32f48ad0bdf4b6a79792b273535e467d8724d18"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5229,6 +5671,30 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="438350">
 				<rom name="Gaplus.tap" size="438350" crc="6f04172b" sha1="79ae516a091dc5e1e66bac4c862e90466b6beda6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="garfield">
+		<description>Garfield</description>
+		<year>1987</year>
+		<publisher>The Edge</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="424437">
+				<rom name="Garfield.tap" size="424437" crc="37d9a18d" sha1="6bfc0c9e2beeb9c4c643567c06c5976338289bf5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="garfldwt">
+		<description>Garfield: Winter's Tail</description>
+		<year>1989</year>
+		<publisher>The Edge</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1479735">
+				<rom name="Garfield-_Winter's_Tail.tap" size="1479735" crc="8213bfb1" sha1="b9a803b442181047fd1d11196a8d85f16c2b54ee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5281,6 +5747,53 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 			<feature name="part_id" value="Side 2"/>
 			<dataarea name="cass" size="627540">
 				<rom name="Gauntlet_Side_2_(Kixx).tap" size="627540" crc="2adead5c" sha1="1b373c0d4bb0c7c6972747b6328933bc769d6aa1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gauntletu" cloneof="gauntlet">
+		<description>Gauntlet (U.S. Gold)</description>
+		<year>1986</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="713850">
+				<rom name="Gauntlet_Side_1.tap" size="713850" crc="dca365df" sha1="a294f3a17ad4dd7a953e3939710f0c967532f749"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="612513">
+				<rom name="Gauntlet_Side_2.tap" size="612513" crc="bb9303e0" sha1="a52bbdf33497c63ef427d6dce28a771505180423"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gauntxev">
+		<description>Gauntlet / Xevious (U.S. Gold)</description>
+		<year>198?</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1: Gauntlet"/>
+			<dataarea name="cass" size="716762">
+				<rom name="Gauntlet__Xevious_Side_1.tap" size="716762" crc="ff2f12d6" sha1="ad0bc4c648ed6e99196ebf9be32866633fec717f"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2: Gauntlet"/>
+			<dataarea name="cass" size="612513">
+				<rom name="Gauntlet__Xevious_Side_2.tap" size="612513" crc="fa11122c" sha1="d7a4ff01fa5cdc04ae764a1e47ab01d50b3971b4"/>
+			</dataarea>
+		</part>
+
+		<part name="cass3" interface="cbm_cass">
+			<feature name="part_id" value="Xevious"/>
+			<dataarea name="cass" size="481514">
+				<rom name="Gauntlet__Xevious.tap" size="481514" crc="b04b6189" sha1="e01d65fe86301de31524a9457882549ceb0d0b0a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5353,6 +5866,24 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="ghostchs">
+		<description>Ghost Chaser</description>
+		<year>1984</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="489919">
+				<rom name="Ghost_Chaser.tap" size="489919" crc="593202a3" sha1="1c450da33862da74682500c870df5e6b6ba32619"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="489919">
+				<rom name="Ghost_Chaser_a1.tap" size="489919" crc="a85adebf" sha1="3a2637d0cf1e37d49f028d6a9bd9fd080f51d9fc"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ghostbst">
 		<description>Ghostbusters</description>
 		<year>1988</year>
@@ -5361,6 +5892,57 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="491599">
 				<rom name="Ghostbusters.tap" size="491599" crc="9847a79c" sha1="63ba376376e17e75cf6c8c1ffa8b1fad57e08464"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ghostbsta" cloneof="ghostbst">
+		<description>Ghostbusters (Activision)</description>
+		<year>1984</year>
+		<publisher>Activision</publisher>
+		<info name="usage" value="Ensure c1541 Slot Device is removed prior to loading"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="467682">
+				<rom name="Ghostbusters.tap" size="467682" crc="3bbed4bc" sha1="dce1360f4be0116521791b0de4a45173ca3bc4a0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ghostbst2">
+		<description>Ghostbusters II</description>
+		<year>1989</year>
+		<publisher>Activision</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="1098726">
+				<rom name="Ghostbusters_II_Side_1.tap" size="1098726" crc="cf6bab50" sha1="531bea33fe61bdb84d53cdf6257a0af4cb7481ec"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="1172112">
+				<rom name="Ghostbusters_II_Side_2.tap" size="1172112" crc="4ed7277c" sha1="89f2593f25d4bcc0a22354724e6006ead541d8bf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gng">
+		<description>Ghosts'n Goblins</description>
+		<year>1985</year>
+		<publisher>Elite Systems</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="718105">
+				<rom name="Ghosts_'n_Goblins.tap" size="718105" crc="087b2522" sha1="2573c01f2242c3204db2cdff7f44c57f6e29e21e"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="718105">
+				<rom name="Ghosts_'n_Goblins_a1.tap" size="718105" crc="e21d9045" sha1="91411b4339f26adf6479422bb60ddc09f798e602"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5377,6 +5959,74 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="ghoulsng">
+		<description>Ghouls'n Ghosts</description>
+		<year>1989</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="442550">
+				<rom name="Ghouls'n'Ghosts_Side_1.tap" size="442550" crc="fb531b91" sha1="fe243ddea74659e72682c0533dfbb2370ca549f2"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="1083140">
+				<rom name="Ghouls'n'Ghosts_Side_2.tap" size="1083140" crc="1a10a4e8" sha1="e2d3074951dff031eeedf1abce1ff93ebd42403f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="giants">
+		<description>Giants</description>
+		<year>1988</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 1: Out Run"/>
+			<dataarea name="cass" size="1258728">
+				<rom name="Giants_Tape_1_Side_1.tap" size="1258728" crc="f004631b" sha1="0fde560f4703685c2592a5453f471bf99a65f44b"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 2: Out Run"/>
+			<dataarea name="cass" size="1888082">
+				<rom name="Giants_Tape_1_Side_2.tap" size="1888082" crc="80b6d179" sha1="40c0106d2c18d997d703ae21ce58e12a0ad5853c"/>
+			</dataarea>
+		</part>
+
+		<part name="cass3" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 1: 720 Degrees / Rolling Thunder"/>
+			<dataarea name="cass" size="1221396">
+				<rom name="Giants_Tape_2_Side_1.tap" size="1221396" crc="aea1e11c" sha1="e0c23e33ea2a50a5182becc581c465ded638336a"/>
+			</dataarea>
+		</part>
+
+		<part name="cass4" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 2: Gauntlet II"/>
+			<dataarea name="cass" size="1208630">
+				<rom name="Giants_Tape_2_Side_2.tap" size="1208630" crc="52295df8" sha1="4e02b04b8b38c3c8f8aa05eee8ad458eb8861886"/>
+			</dataarea>
+		</part>
+
+		<part name="cass5" interface="cbm_cass">
+			<feature name="part_id" value="Tape 3 Side 1: California Games"/>
+			<dataarea name="cass" size="2132994">
+				<rom name="Giants_Tape_3_Side_1.tap" size="2132994" crc="402ce325" sha1="3cebbcc7c8482951f8367ba8b1a3dcbf89cf0a0a"/>
+			</dataarea>
+		</part>
+
+		<part name="cass6" interface="cbm_cass">
+			<feature name="part_id" value="Tape 3 Side 2: California Games"/>
+			<dataarea name="cass" size="1638332">
+				<rom name="Giants_Tape_3_Side_2.tap" size="1638332" crc="4878799f" sha1="4e1a3b9178d72775421304c0397227e15aeabfca"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gilligan">
 		<description>Gilligan's Gold</description>
 		<year>1984</year>
@@ -5385,6 +6035,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="485328">
 				<rom name="Gilligan's_Gold.tap" size="485328" crc="4587215d" sha1="81e64f0b5347f39de1d3f4fc6e707f1f5df603bb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gliderri">
+		<description>Glider Rider</description>
+		<year>1986</year>
+		<publisher>Quicksilva</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="516586">
+				<rom name="Glider_Rider.tap" size="516586" crc="dc723a30" sha1="e643ae88c60b92d0a56707dc7c88e3217fa4e40f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5401,6 +6063,54 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="gocrazy">
+		<description>Go Crazy</description>
+		<year>1988</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 1: Bedlam"/>
+			<dataarea name="cass" size="661914">
+				<rom name="Go_Crazy_Tape_1_Side_1.tap" size="661914" crc="c097cd26" sha1="a7161ac0e2c635342c238204aa2b87eb6479deee"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 2: Desolator"/>
+			<dataarea name="cass" size="2028502">
+				<rom name="Go_Crazy_Tape_1_Side_2.tap" size="2028502" crc="251d7f2f" sha1="d6c826dcbd4392af5009a757fedb6fd28e09c90f"/>
+			</dataarea>
+		</part>
+
+		<part name="cass3" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 1: Side Arms"/>
+			<dataarea name="cass" size="1475190">
+				<rom name="Go_Crazy_Tape_2_Side_1.tap" size="1475190" crc="4387617e" sha1="3afeaea1bfa0ed56e63f57560872447da583e0c2"/>
+			</dataarea>
+		</part>
+
+		<part name="cass4" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 2: Shackled"/>
+			<dataarea name="cass" size="835406">
+				<rom name="Go_Crazy_Tape_2_Side_2.tap" size="835406" crc="7e97d423" sha1="9614ea18268699411f996d002ce35205141b9d15"/>
+			</dataarea>
+		</part>
+
+		<part name="cass5" interface="cbm_cass">
+			<feature name="part_id" value="Tape 3 Side 1: Bad Cat"/>
+			<dataarea name="cass" size="2340676">
+				<rom name="Go_Crazy_Tape_3_Side_1.tap" size="2340676" crc="c016c593" sha1="66ab69fdab1968de0df99c8f2da8674a451b9180"/>
+			</dataarea>
+		</part>
+
+		<part name="cass6" interface="cbm_cass">
+			<feature name="part_id" value="Tape 3 Side 2: Jinks"/>
+			<dataarea name="cass" size="694071">
+				<rom name="Go_Crazy_Tape_3_Side_2.tap" size="694071" crc="89094ad1" sha1="71bf90d66b175d62eba72d891a8552288411c918"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="goldglory">
 		<description>Gold or Glory</description>
 		<year>1989</year>
@@ -5409,6 +6119,74 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="456859">
 				<rom name="Gold_or_Glory.tap" size="456859" crc="beb8ea88" sha1="6786aa8793aa8c59ef44da6caeb907567cf1eac6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goldcol">
+		<description>The Gold Collection</description>
+		<year>1986</year>
+		<publisher>Guild Publishing</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 1: Talladega"/>
+			<dataarea name="cass" size="653268">
+				<rom name="Gold_Collection,_The_Tape_1_Side_1.tap" size="653268" crc="76bca224" sha1="51d181a5d5d9989f1411f608c126f13286fefbae"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 2: Ghost Chaser / Drop Zone"/>
+			<dataarea name="cass" size="992349">
+				<rom name="Gold_Collection,_The_Tape_1_Side_2.tap" size="992349" crc="684a138f" sha1="3c4dfca6d412d6a488af094f551b2a62448a2dd2"/>
+			</dataarea>
+		</part>
+
+		<part name="cass3" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 1: Spy Hunter"/>
+			<dataarea name="cass" size="252706">
+				<rom name="Gold_Collection,_The_Tape_2_Side_1.tap" size="252706" crc="4631a484" sha1="5bc85140b68e6bd7667b987d46530b541a2d8a99"/>
+			</dataarea>
+		</part>
+
+		<part name="cass4" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 2: Beach Head / Tapper"/>
+			<dataarea name="cass" size="873548">
+				<rom name="Gold_Collection,_The_Tape_2_Side_2.tap" size="873548" crc="fc9ee882" sha1="d00ca9cce99bdc4ae2890ac025ae7f7b17ff46a8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goldcol3">
+		<description>The Gold Collection III</description>
+		<year>1987</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 1: Express Raider / Leviathan"/>
+			<dataarea name="cass" size="1598364">
+				<rom name="Gold_Collection_III,_The_Tape_1_Side_1.tap" size="1598364" crc="b418a2ba" sha1="1c2b4ce4bb3a2a5a6d0d8bd88b1ce99d145a53ff"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 2: Super Cycle"/>
+			<dataarea name="cass" size="1727358">
+				<rom name="Gold_Collection_III,_The_Tape_1_Side_2.tap" size="1727358" crc="6d65806d" sha1="8513af2326fc1147d05b468da099b75aa5e35c09"/>
+			</dataarea>
+		</part>
+
+		<part name="cass3" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 1: Aces of Aces / Master of the Universe"/>
+			<dataarea name="cass" size="1297207">
+				<rom name="Gold_Collection_III,_The_Tape_2_Side_1.tap" size="1297207" crc="0cfebadd" sha1="0c66081b74bfe4fd2c276f8404619503b285dadf"/>
+			</dataarea>
+		</part>
+
+		<part name="cass4" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 2: Super Huey II"/>
+			<dataarea name="cass" size="1314203">
+				<rom name="Gold_Collection_III,_The_Tape_2_Side_2.tap" size="1314203" crc="a32f3e42" sha1="e14f7069ffe0c10f3e71bfafe6d3c6ed0fe446be"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5429,6 +6207,26 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 			<feature name="part_id" value="Side 2"/>
 			<dataarea name="cass" size="1913160">
 				<rom name="Golden_Axe_Side_2.tap" size="1913160" crc="bfe6c74f" sha1="ef32f08a6a2b843f90fb7d0c5d6e584987d87f31"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goldnaxev" cloneof="goldnaxe">
+		<description>Golden Axe (Virgin)</description>
+		<year>1990</year>
+		<publisher>Virgin</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="1106074">
+				<rom name="Golden_Axe_Side_1.tap" size="1106074" crc="2caa56e8" sha1="64c2dd72405a0618164fd826ef540878ff7db4f0"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="1913160">
+				<rom name="Golden_Axe_Side_2.tap" size="1913160" crc="de91308d" sha1="49d871ba86c9debda0e1756fc2ab11f12b621689"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5457,6 +6255,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="goonies">
+		<description>The Goonies</description>
+		<year>1985</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="718661">
+				<rom name="Goonies,_The.tap" size="718661" crc="6cb4dc16" sha1="8b2fe02543499511af820fad155e8728da1885f4"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="glarceny">
 		<description>Grand Larceny</description>
 		<year>1984</year>
@@ -5465,6 +6275,52 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="424663">
 				<rom name="Grand_Larceny.tap" size="424663" crc="fa4b9494" sha1="41161bb48d2bb8d41726923e7e9ac8e88d4e16ba"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grandmon">
+		<description>Grand Moster Slam</description>
+		<year>1989</year>
+		<publisher>Golden Goblins</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="7235546">
+				<rom name="Grand_Monster_Slam.tap" size="7235546" crc="241b24cc" sha1="5ace065be4aee82fc740d76127e98612b9f86522"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gps">
+		<description>Grand Prix Selection</description>
+		<year>1987</year>
+		<publisher>Electric Dreams</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side A: Super Sprint"/>
+			<dataarea name="cass" size="787575">
+				<rom name="Grand_Prix_Selection_Tape_1_Side_1.tap" size="787575" crc="990f7969" sha1="ebec2b9ef58ed04b52c24a3352d350da4fe0f7cc"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side B: Championship Sprint"/>
+			<dataarea name="cass" size="519043">
+				<rom name="Grand_Prix_Selection_Tape_1_Side_2.tap" size="519043" crc="7707a168" sha1="24855437a437a73e58a8c66acdcbbeb59c59a968"/>
+			</dataarea>
+		</part>
+
+		<part name="cass3" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side A: Super Hang On"/>
+			<dataarea name="cass" size="1248663">
+				<rom name="Grand_Prix_Selection_Tape_2_Side_1.tap" size="1248663" crc="bebc905e" sha1="402d0450819e817cf1806a08791c31a26839e0cd"/>
+			</dataarea>
+		</part>
+
+		<part name="cass4" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side B: Super Hang On"/>
+			<dataarea name="cass" size="1248665">
+				<rom name="Grand_Prix_Selection_Tape_2_Side_2.tap" size="1248665" crc="f163eac7" sha1="582cca449d2e3379391161ea8adb18ec4a222c4c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5538,6 +6394,30 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="greatesc">
+		<description>The Great Escape</description>
+		<year>1986</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="577571">
+				<rom name="Great_Escape,_The.tap" size="577571" crc="b125a2c1" sha1="9f6f25e257b62c9eec56891a309cbca3bd4ca3df"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ggiana" supported="no"> <!-- game loads fully with a light blue screen but doesn't run -->
+		<description>The Great Giana Sisters</description>
+		<year>1987</year>
+		<publisher>Go!</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="770867">
+				<rom name="Great_Giana_Sisters,_The.tap" size="770867" crc="0f91f776" sha1="eb405f8ef76e1d1aef1a48de6db91a3dc75b8fcc"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="greedmn">
 		<description>The Greed Monster</description>
 		<year>1990</year>
@@ -5559,6 +6439,55 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="gberet">
+		<description>Green Beret</description>
+		<year>1986</year>
+		<publisher>Imagine</publisher>
+		<info name="usage" value="Ensure c1541 Slot Device is removed prior to loading"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="724171">
+				<rom name="Green_Beret.tap" size="724171" crc="061572ac" sha1="1d9079c2680fd1ecefc082cce24dcb3750c76ec0"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="724171">
+				<rom name="Green_Beret_a1.tap" size="724171" crc="5ed9f362" sha1="0e471cf035ce1fe74bc6c0a57252b6cd5c3239b8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gremlins">
+		<description>Gremlins: The Adventure</description>
+		<year>1985</year>
+		<publisher>Adventure International</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="581791">
+				<rom name="Gremlins-_The_Adventure.tap" size="581791" crc="dc85f813" sha1="6b08576050ccb41ab3f4e631ffc478e9051ad687"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gremlins2">
+		<description>Gremlins 2: The New Batch</description>
+		<year>1989</year>
+		<publisher>Elite Systems</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1162416">
+				<rom name="Gremlins_2_-_The_New_Batch.tap" size="1162416" crc="b5e43257" sha1="6423c16e249810b36043471f60c0f644645e0f82"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="1184002">
+				<rom name="Gremlins_2_-_The_New_Batch_a1.tap" size="1184002" crc="1e14066c" sha1="8ff0edb7981bb01d84c481c035df831bd47c73d3"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gribblys">
 		<description>Gribbly's Day Out</description>
 		<year>1985</year>
@@ -5567,6 +6496,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="381402">
 				<rom name="Gribbly's_Day_Out.tap" size="381402" crc="18f4cabd" sha1="e3fe2314f5dbfa2dabaeeae966d0f714cea116e7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gridrunn">
+		<description>Gridrunner</description>
+		<year>1983</year>
+		<publisher>Llamasoft</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="500108">
+				<rom name="Gridrunner.tap" size="500108" crc="fc955b3e" sha1="f3e177325bb59886c67bdcab1b8c1fdf9aa8ea9d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5591,14 +6532,53 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="gryphon">
+		<description>Gryphon</description>
+		<year>1985</year>
+		<publisher>Microbyte</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="575945">
+				<rom name="Gryphon.tap" size="575945" crc="97a80dd7" sha1="217b0c4503d6c844df49423f5d992da09ce6daa4"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gryzor">
 		<description>Gryzor</description>
 		<year>1991</year>
 		<publisher>The Hit Squad</publisher>
+		<info name="alt_title" value="Contra"/>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="738562">
 				<rom name="Gryzor.tap" size="738562" crc="86f2722e" sha1="2abe9cea91ae396f6566a258d3c9f1528d29fc03"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gryzoro" cloneof="gryzor">
+		<description>Gryzor (Ocean)</description>
+		<year>1988</year>
+		<publisher>Ocean</publisher>
+		<info name="alt_title" value="Contra"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1477104">
+				<rom name="Gryzor.tap" size="1477104" crc="8b1e1c21" sha1="005233e3c74c6f16adb8623a52bf2eb0ef414c63"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guadalca">
+		<description>Guadalcanal</description>
+		<year>1987</year>
+		<publisher>Activision</publisher>
+		<info name="alt_title" value="The Fabulous Wanda"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="628701">
+				<rom name="Guadalcanal.tap" size="628701" crc="b6b48789" sha1="645132ce85c8eccdd704f49da809a512b026fd1d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5627,6 +6607,26 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="gunship">
+		<description>Gunship</description>
+		<year>1986</year>
+		<publisher>Microprose</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="1150416">
+				<rom name="Gunship_Side_1.tap" size="1150416" crc="a08eab75" sha1="f6ea0567200726ad3abe6a3ea0804ca7447b8783"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="1371442">
+				<rom name="Gunship_Side_2.tap" size="1371442" crc="a07e245f" sha1="1ac9a7504a98f15125c286a62d1d580750ef5047"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gunstar">
 		<description>Gunstar</description>
 		<year>1987</year>
@@ -5645,6 +6645,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="gutz">
+		<description>Gutz</description>
+		<year>1988</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="724198">
+				<rom name="Gutz.tap" size="724198" crc="2372cce5" sha1="9269713d8324a8724049347945dfffe6cc5b0b65"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gyroscope">
 		<description>Gyroscope</description>
 		<year>1985</year>
@@ -5653,27 +6665,6 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="427656">
 				<rom name="Gyroscope.tap" size="427656" crc="75b0c08c" sha1="81de40a67d30d5e59a769cbb76eb8cd9d8d8d6ea"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="hacker2">
-		<description>Hacker II</description>
-		<year>1989</year>
-		<publisher>Mastertronic</publisher>
-		<!-- Dumped by @c64tapes -->
-
-		<part name="cass1" interface="cbm_cass">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="cass" size="384234">
-				<rom name="hacker2a.tap" size="384234" crc="9c9c5aed" sha1="a499a909d48578ad7b0df5b16a97c4f2930dbaad"/>
-			</dataarea>
-		</part>
-
-		<part name="cass2" interface="cbm_cass">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="cass" size="384234">
-				<rom name="hacker2b.tap" size="384234" crc="7c16e324" sha1="80e830dfb92916441ccfbd2c6e01e278bfa37c65"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5702,6 +6693,53 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="heroa" cloneof="hero">
+		<description>H.E.R.O. (Activision)</description>
+		<year>1984</year>
+		<publisher>Activision</publisher>
+		<info name="usage" value="Ensure c1541 Slot Device is removed prior to loading"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="965743">
+				<rom name="H.E.R.O..tap" size="965743" crc="9a67b7cf" sha1="d0ead28f204195999a3b05bbba45a013ecee27a9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hacker">
+		<description>Hacker</description>
+		<year>1985</year>
+		<publisher>Proein Soft Line</publisher>
+		<info name="usage" value="Ensure c1541 Slot Device is removed prior to loading"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="465790">
+				<rom name="Hacker.tap" size="465790" crc="29d05989" sha1="ffbb3626c7e6d6211c2a4bd030479cb282daa6ca"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hacker2">
+		<description>Hacker II</description>
+		<year>1989</year>
+		<publisher>Mastertronic</publisher>
+		<!-- Dumped by @c64tapes -->
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="384234">
+				<rom name="hacker2a.tap" size="384234" crc="9c9c5aed" sha1="a499a909d48578ad7b0df5b16a97c4f2930dbaad"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="384234">
+				<rom name="hacker2b.tap" size="384234" crc="7c16e324" sha1="80e830dfb92916441ccfbd2c6e01e278bfa37c65"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hallthngs">
 		<description>The Halls of the Things</description>
 		<year>1988</year>
@@ -5716,6 +6754,30 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="292088">
 				<rom name="Halls_of_the_Things,_The_a1.tap" size="292088" crc="17ba9eda" sha1="c7e36d85865a62a586d0f6da9bddd3aec8931727"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hardball">
+		<description>HardBall!</description>
+		<year>1985</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1244776">
+				<rom name="HardBall.tap" size="1244776" crc="d318ad9e" sha1="fcbf5ac432be98ecc35d5ca793b81e7254d41ad6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hardballc" cloneof="hardball">
+		<description>HardBall (Compulogical S.A.)</description>
+		<year>1985</year>
+		<publisher>Compulogical S.A.</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1157867">
+				<rom name="HardBall.tap" size="1157867" crc="5ca08716" sha1="7f6d8380d8cb515b9fc2db55ffd6dd494781f989"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5738,6 +6800,44 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="showjump">
+		<description>Harvey Smith Showjumper</description>
+		<year>1985</year>
+		<publisher>Software Projects</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="526200">
+				<rom name="Harvey_Smith_Showjumper.tap" size="526200" crc="8b3eb848" sha1="c0cf22d9bc5181b8be575530000421317b4e2df2"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="526200">
+				<rom name="Harvey_Smith_Showjumper_a1.tap" size="526200" crc="8df03e5f" sha1="4777bd7a4778198ecf8985a2e5919a8eba4b9f51"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hawkeye" supported="no"> <!-- game loads fully with a black screen but doesn't run -->
+		<description>Hawkeye</description>
+		<year>1988</year>
+		<publisher>Thalamus</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="695287">
+				<rom name="Hawkeye_Side_1.tap" size="695287" crc="e8cf55ee" sha1="99f187f60a7e9ba13c662ab37081388c4fab67e1"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="1020395">
+				<rom name="Hawkeye_Side_2.tap" size="1020395" crc="d0780583" sha1="2fc755b0e4f015686c65bda54e3fbd11a559de27"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="headovrh">
 		<description>Head Over Heels</description>
 		<year>1990</year>
@@ -5747,6 +6847,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass" interface="cbm_cass">
 			<dataarea name="cass" size="671518">
 				<rom name="headovhb.tap" size="671518" crc="0fa1d871" sha1="673c375205cc2cd052ccdf52f99f482f26f59038"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="headovrho" cloneof="headovrh">
+		<description>Head Over Heels (Ocean)</description>
+		<year>1987</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="671515">
+				<rom name="Head_Over_Heels.tap" size="671515" crc="6e53e768" sha1="ff6e68461bcfee8c960e9f71b32b790a9e9cc9fb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5765,6 +6877,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="322723">
 				<rom name="Headcoach_a1.tap" size="322723" crc="fdf87816" sha1="73b3108317a9b02c3970a33455399fd720c35936"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="heartlnd">
+		<description>Heartland</description>
+		<year>1986</year>
+		<publisher>Odin Computer Graphics</publisher>
+
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="467842">
+				<rom name="Heartland.tap" size="467842" crc="b276fbe2" sha1="9719a23de724d3275cfbb425c0d5c7645f158459"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5815,9 +6939,34 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>Hero of the Golden Talisman</description>
 		<year>1985</year>
 		<publisher>Mastertronic Added Dimension</publisher>
+
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="737275">
 				<rom name="hero of the golden talisman.tap" size="737275" crc="188a8887" sha1="f8f57df8de811bb8bcf6fe9eeb93688da86c947d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="heroqst">
+		<description>Hero Quest</description>
+		<year>1991</year>
+		<publisher>Gremlin Graphics</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1393538">
+				<rom name="Hero_Quest.tap" size="1393538" crc="bdc2d640" sha1="9a8709bedb0b9a6907ed079886def7c7e69ec155"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="heroboti">
+		<description>Herobotix</description>
+		<year>1992</year>
+		<publisher>Prism Leisure</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="351587">
+				<rom name="Herobotix.tap" size="351587" crc="c21aa3dd" sha1="a57b57a6118bec52fc59422a5b2ab6b1dd8c59e0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5830,6 +6979,92 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="1191304">
 				<rom name="Hexpert.tap" size="1191304" crc="0177efa7" sha1="775cb426e82e4df430c42c260a89131b204b91f7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="highfron">
+		<description>High Frontier</description>
+		<year>1987</year>
+		<publisher>Activision</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="523491">
+				<rom name="High_Frontier.tap" size="523491" crc="9776e64b" sha1="988ea83a0b433642da836f941427fc072a6ad297"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="highlndr" supported="no"> <!-- game loads partially and then stops (just displays a black screen) -->
+		<description>Highlander</description>
+		<year>1986</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="2034089">
+				<rom name="Highlander.tap" size="2034089" crc="28300e9a" sha1="94965ea4090e9c41417e230224744aa04ecb0f16"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="highwaye" supported="no"> <!-- game loads fully with a light blue screen but doesn't run -->
+		<description>Highway Ecounter</description>
+		<year>1986</year>
+		<publisher>Gremlin Graphics</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="474042">
+				<rom name="Highway_Encounter.tap" size="474042" crc="023782aa" sha1="46b59134ad2d6cb858226095de9ea90f17f0d763"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hitsvol1">
+		<description>Hits! Vol 1</description>
+		<year>198?</year>
+		<publisher>Micropool</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A: Red Hawk / Starion"/>
+			<dataarea name="cass" size="1116590">
+				<rom name="Hits_Vol_1_Side_1.tap" size="1116590" crc="f1f5523a" sha1="64dc8405b465f9af011173082e85ff199f1e7b25"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B: Way of the Exploding Fist / Rock'n Wrestle"/>
+			<dataarea name="cass" size="1350512">
+				<rom name="Hits_Vol_1_Side_2.tap" size="1350512" crc="f884c8fa" sha1="c183985207eeb7c42205a0cc83e150655f624b9c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hobbit">
+		<description>The Hobbit</description>
+		<year>1985</year>
+		<publisher>Melbourne House</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="572141">
+				<rom name="Hobbit,_The.tap" size="572141" crc="e28be944" sha1="325be34e5d3692f3b3d362475fd40d3f4a199a97"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="572114">
+				<rom name="Hobbit,_The_a1.tap" size="572114" crc="53713168" sha1="6df1f93eb77523471c0f85f5cd6618c4d013e153"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hobbita" cloneof="hobbit" supported="no"> <!-- game loads fully with a light blue screen but doesn't run -->
+		<description>The Hobbit (alt)</description>
+		<year>1985</year>
+		<publisher>Melbourne House</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="360879">
+				<rom name="Hobbit,_The.tap" size="360879" crc="c14191d0" sha1="d0dd9d5433d4d015af725cb5cb673dce72aa7b7d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5902,6 +7137,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="hoppinmade" cloneof="hoppinmad">
+		<description>Hopping Mad (Elite Systems)</description>
+		<year>1988</year>
+		<publisher>Elite Systems</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="725833">
+				<rom name="Hopping_Mad.tap" size="725833" crc="f8911a30" sha1="57d22a2bbb6f0b88d4685416407370f90bb4f4a2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="horaceski">
 		<description>Horace Goes Skiing</description>
 		<year>1984</year>
@@ -5910,6 +7157,100 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="309414">
 				<rom name="Horace_Goes_Skiing.tap" size="309414" crc="8e80d9a7" sha1="2a0d6e63ab428c2c8bbd15933d06bceb8a716ef0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hostages">
+		<description>Hostages</description>
+		<year>1989</year>
+		<publisher>Infogrames</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1583525">
+				<rom name="Hostages.tap" size="1583525" crc="6afb1ca7" sha1="81d66b712335629bd84cd105594d4af8a3607d6f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hotwheel">
+		<description>Hot Wheels</description>
+		<year>1985</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1384965">
+				<rom name="Hot_Wheels.tap" size="1384965" crc="f502cf77" sha1="5905f2701936cff4f57c45710f293d188e9305a2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hotshot">
+		<description>Hot Shot</description>
+		<year>1988</year>
+		<publisher>Prism Leisure</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="528358">
+				<rom name="Hotshot.tap" size="528358" crc="ef67d5d4" sha1="1d208ef6e2e59aa84856d5c2cd152c7d66a9931e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="housemix">
+		<description>The House Mix</description>
+		<year>1989</year>
+		<publisher>Gremlin Graphics</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 1: Skate Crazy"/>
+			<dataarea name="cass" size="1319275">
+				<rom name="House_Mix,_The_Tape_1_Side_1.tap" size="1319275" crc="3bff5dac" sha1="59c28c7840aff63217b24d56be560c9ffb4643c5"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 2: Techno Cop"/>
+			<dataarea name="cass" size="2499470">
+				<rom name="House_Mix,_The_Tape_1_Side_2.tap" size="2499470" crc="1f7e2fcc" sha1="879455799e78183fe46646a26bbc43e4ccd12c9e"/>
+			</dataarea>
+		</part>
+
+		<part name="cass3" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 1: Night Raider / Dark Fusion / Artura"/>
+			<dataarea name="cass" size="2333802">
+				<rom name="House_Mix,_The_Tape_2_Side_1.tap" size="2333802" crc="bfaa56a2" sha1="ca474d7762d639f41a184dcb540ec72becccaa43"/>
+			</dataarea>
+		</part>
+
+		<part name="cass4" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 2: Motor Massacre"/>
+			<dataarea name="cass" size="1333589">
+				<rom name="House_Mix,_The_Tape_2_Side_2.tap" size="1333589" crc="c5fee3ba" sha1="fd1b2922275f09d4a9cf620c958ff033f667af26"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="howrduck">
+		<description>Howard the Duck</description>
+		<year>1986</year>
+		<publisher>Activision</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1255833">
+				<rom name="Howard_the_Duck.tap" size="1255833" crc="7d07bca6" sha1="efa3f510fe853e6376db283ef6414cd8ce5238d7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hkm">
+		<description>Human Killing Machine</description>
+		<year>1989</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1175554">
+				<rom name="HKM_[Human_Killing_Machine].tap" size="1175554" crc="a9625d42" sha1="5fba5a29ded93a2649470a24af2347d83ca17c12"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5944,6 +7285,40 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="hunchadv" supported="no"> <!-- game loads to title screen but fails to load part 1 -->
+		<description>Hunchback: The Adventure</description>
+		<year>1986</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 1: Loader"/>
+			<dataarea name="cass" size="451243">
+				<rom name="Hunchback-_The_Adventure_Tape_1_Side_1.tap" size="451243" crc="62021354" sha1="6541840857f77326edf2e42017d5ad6a0fcb6777"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 2: Part 1"/>
+			<dataarea name="cass" size="206401">
+				<rom name="Hunchback-_The_Adventure_Tape_1_Side_2.tap" size="206401" crc="efcd96bd" sha1="ced0f8faa2f1d9e7bb56755dc2fd0f32cfe095f9"/>
+			</dataarea>
+		</part>
+
+		<part name="cass3" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 1: Part 2"/>
+			<dataarea name="cass" size="206401">
+				<rom name="Hunchback-_The_Adventure_Tape_2_Side_1.tap" size="206401" crc="eed7b9d0" sha1="4cd11e5c548f2eccc8574d815b3cdeb41ddf70d8"/>
+			</dataarea>
+		</part>
+
+		<part name="cass4" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 2: Part 3"/>
+			<dataarea name="cass" size="206401">
+				<rom name="Hunchback-_The_Adventure_Tape_2_Side_2.tap" size="206401" crc="f323508b" sha1="54d9c94d847c6d167fc841193ba38892b5c713c7"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="horace">
 		<description>Hungry Horace</description>
 		<year>1983</year>
@@ -5952,6 +7327,36 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="863762">
 				<rom name="Hungry_Horace.tap" size="863762" crc="8ec9e3c4" sha1="2f1d3708c43e0b5ed74d581162de16ade5f7f1ec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hfro">
+		<description>The Hunt for Red October</description>
+		<year>1991</year>
+		<publisher>Grandslam</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1786163">
+				<rom name="Hunt_for_Red_October,_The.tap" size="1786163" crc="da736823" sha1="46aa0ec0eabf60e3d6a134cbea7e7939060ae3c6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="huntmoon">
+		<description>Hunter's Moon</description>
+		<year>1987</year>
+		<publisher>Thalamus</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="566025">
+				<rom name="Hunter's_Moon.tap" size="566025" crc="3cf00b0e" sha1="0edb58a2e5ffe0333688484eb0abac46d460d7ee"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="566019">
+				<rom name="Hunter's_Moon_a1.tap" size="566019" crc="264fa527" sha1="9cf5e50ce30fb6899ded76e1d849d05ea7b43cd6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5976,6 +7381,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="732187">
 				<rom name="Huxley_Pig.tap" size="732187" crc="afae7411" sha1="e19f4fe6af91da836bc7d0c51e62f8ba547088c5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hyperspt">
+		<description>Hyper Sports</description>
+		<year>1985</year>
+		<publisher>Imagine</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="660039">
+				<rom name="Hyper_Sports.tap" size="660039" crc="35c1929a" sha1="2751b40f8c37cbf14765614784e72f4342779a65"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6046,6 +7463,29 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="icehuntr">
+		<description>Ice Hunter</description>
+		<year>1983</year>
+		<publisher>Anirog</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="297621">
+				<rom name="Ice_Hunter.tap" size="297621" crc="127cdd1f" sha1="5265bf2b8505712b5e85804041b91ee324396933"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ikplus">
+		<description>IK+</description>
+		<year>1987</year>
+		<publisher>Activision</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="745527">
+				<rom name="IK+.tap" size="745527" crc="2230ed88" sha1="ec2bc848563a77086a5a1f0e621c183f50ca8b73"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ikari">
 		<description>Ikari Warriors</description>
 		<year>1990</year>
@@ -6054,6 +7494,134 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="718171">
 				<rom name="Ikari_Warriors.tap" size="718171" crc="1361c92d" sha1="66d61881a95ce2db3c602d88c478112befabcea7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arcadegi">
+		<description>Imagine's Arcade Giants</description>
+		<year>1987</year>
+		<publisher>Ariolasoft</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 1: Arkanoid / Mag Max"/>
+			<dataarea name="cass" size="1365692">
+				<rom name="Imagine's_Arcade_Giants_Tape_1_Side_1.tap" size="1365692" crc="2fb74f13" sha1="96358fb670a8cf9cfc2430ae17c2b6a9e76e6316"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 2: Galvan / Slap Fight"/>
+			<dataarea name="cass" size="1411313">
+				<rom name="Imagine's_Arcade_Giants_Tape_1_Side_2.tap" size="1411313" crc="06cdc5e7" sha1="8f1a75ba5fb4370451d40d88b550065a6300215e"/>
+			</dataarea>
+		</part>
+
+		<part name="cass3" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 1: Game Over Part 1 &amp; 2"/>
+			<dataarea name="cass" size="710931">
+				<rom name="Imagine's_Arcade_Giants_Tape_2_Side_1.tap" size="710931" crc="a1d86ee2" sha1="4337cc03d2cc1505b4704a958f2f0fe6e659cd32"/>
+			</dataarea>
+		</part>
+
+		<part name="cass4" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 2: Terra Cresta"/>
+			<dataarea name="cass" size="704539">
+				<rom name="Imagine's_Arcade_Giants_Tape_2_Side_2.tap" size="704539" crc="ca77ff01" sha1="ddf2dd6871ec9ffa68978bc939ea90db68d08466"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="impact">
+		<description>Impact</description>
+		<year>1987</year>
+		<publisher>Audiogenic</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1: Game"/>
+			<dataarea name="cass" size="395546">
+				<rom name="Impact_Side_1_-_Game.tap" size="395546" crc="8bedd8e1" sha1="cc9764201680a94d87cff6bf3243c052ffa425e1"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2: Screen Designer"/>
+			<dataarea name="cass" size="203344">
+				<rom name="Impact_Side_2_-_Screen_Designer.tap" size="203344" crc="f3385f2d" sha1="a7dee30dac293ac56636d36e7d74a8038c856c66"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="impmiss">
+		<description>Impossible Mission</description>
+		<year>1984</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="530619">
+				<rom name="Impossible_Mission.tap" size="530619" crc="66b60c9c" sha1="e64791b085d2401ecb13d138054ca83c16af2de0"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="529489">
+				<rom name="Impossible_Mission_a1.tap" size="529489" crc="1f3da3c2" sha1="30192cd723c34e8855438b335f28ef511873ac63"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="impmissc" cloneof="impmiss">
+		<description>Impossible Mission (CBS Software)</description>
+		<year>1984</year>
+		<publisher>CBS Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="577000">
+				<rom name="Impossible_Mission.tap" size="577000" crc="8f9e3db8" sha1="4713faf25aa878d929266978ace6d6debd6671d0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="impmiss2">
+		<description>Impossible Mission II</description>
+		<year>1988</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1331706">
+				<rom name="Impossible_Mission_II.tap" size="1331706" crc="73af9e2f" sha1="d8f40614db7fd5a754172070d37371a56f6d29cc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="indydoom">
+		<description>Indiana Jones and the Temple of Doom</description>
+		<year>1987</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="428482">
+				<rom name="Indiana_Jones_and_the_Temple_of_Doom_Side_1.tap" size="428482" crc="78253ee4" sha1="e75d63e67000b331e0f84db9b3a213577d8aa338"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="1627680">
+				<rom name="Indiana_Jones_and_the_Temple_of_Doom_Side_2.tap" size="1627680" crc="d38a4c9a" sha1="81ee5a8102eb6caaf41d5e39c789a529924e5018"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="infiltrt">
+		<description>Infiltrator</description>
+		<year>1986</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="2238854">
+				<rom name="Infiltrator.tap" size="2238854" crc="4cbeb8bf" sha1="74e1b282a075e68b915f6aa0a0db78189b097a7c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6410,6 +7978,52 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="inspectg">
+		<description>Inspector Gadget and the Circus of !!Fear!!</description>
+		<year>1987</year>
+		<publisher>Melbourne House</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="407822">
+				<rom name="Inspector_Gadget_and_the_Circus_of_Fear.tap" size="407822" crc="aac8cf73" sha1="54b6ce3e80945361632545dc31dd11c485f96768"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ik">
+		<description>International Karate</description>
+		<year>1985</year>
+		<publisher>System 3</publisher>
+		<info name="alt_title" value="World Karate Championship"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="640706">
+				<rom name="International_Karate_Side_1.tap" size="640706" crc="cd0c5b09" sha1="8dd2899615d407c82f5f0c0cff8ac5ac28699acc"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2: Different Backdrops"/>
+			<dataarea name="cass" size="640722">
+				<rom name="International_Karate_Side_2.tap" size="640722" crc="0d989c8b" sha1="7d85e25e58aea8083b1d354f56993619350b1397"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ikp" cloneof="ik">
+		<description>International Karate (Prism Leisure)</description>
+		<year>1987</year>
+		<publisher>Prism Leisure</publisher>
+		<info name="alt_title" value="World Karate Championship"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="551066">
+				<rom name="International_Karate.tap" size="551066" crc="4328aeff" sha1="47b29c42539374a4252d2d0c744e0adee9118206"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="intrugby">
 		<description>International Rugby Simulator</description>
 		<year>1988</year>
@@ -6424,6 +8038,54 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="925914">
 				<rom name="International_Rugby_Simulator_a1.tap" size="925914" crc="f67efb43" sha1="79f7d9bdddf3dc7c968b386a66cb7328cc8f1355"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="intsoccr" supported="no"> <!-- once FOUND SOCCER is displayed, game title does not load any further -->
+		<description>International Soccer</description>
+		<year>1988</year>
+		<publisher>CRL</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="361008">
+				<rom name="International_Soccer.tap" size="361008" crc="9a30d8c9" sha1="803a73bcf1acc637e351484b6ff5b98b286c557e"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="361008">
+				<rom name="International_Soccer_a1.tap" size="361008" crc="384bbea6" sha1="6b86d0cf87f7795b56a24620cc7e5c65ee088c41"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inttenns">
+		<description>International Tennis</description>
+		<year>1985</year>
+		<publisher>Commodore</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="333202">
+				<rom name="International_Tennis.tap" size="333202" crc="3e034e2b" sha1="c959625785b38e64c991cd6434aa198a371e8083"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="333202">
+				<rom name="International_Tennis_a1.tap" size="333202" crc="f4126e8f" sha1="589083541eef4c98e4df32d0ac6909b41c926fc4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eaglnest" supported="no"> <!-- game loads to the title screen but crashes to a black screen once player has started a game -->
+		<description>Into the Eagles Nest</description>
+		<year>1987</year>
+		<publisher>Pandora</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="472663">
+				<rom name="Into_the_Eagles_Nest.tap" size="472663" crc="244164df" sha1="a109f574918f004f786559456e07334188fa9856"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6446,6 +8108,30 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="itsaknoc">
+		<description>It's a Knockout</description>
+		<year>1986</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="604259">
+				<rom name="It's_a_Knockout.tap" size="604259" crc="16ce2007" sha1="08940390ceabc704a9a9b5533aec4bf399135616"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jacknipr">
+		<description>Jack the Nipper</description>
+		<year>1986</year>
+		<publisher>Gremlin Graphics</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="533676">
+				<rom name="Jack_the_Nipper.tap" size="533676" crc="13999665" sha1="f2fe6231108c2854bfbbf7099abdb645b19a2828"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jacknip2">
 		<description>Jack the Nipper II: In Coconut Capers</description>
 		<year>1990</year>
@@ -6454,6 +8140,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="522098">
 				<rom name="Jack_the_Nipper_II-_In_Coconut_Capers.tap" size="522098" crc="6f7f7a52" sha1="d4fcdfd7fe5bbc58aabf552d7b79cb1cfcdda3fc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jacknip2g" cloneof="jacknip2">
+		<description>Jack the Nipper II: In Coconut Capers (Gremlin Graphics)</description>
+		<year>1987</year>
+		<publisher>Gremlin Graphics</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="522098">
+				<rom name="Jack_the_Nipper_II-_In_Coconut_Capers.tap" size="522098" crc="c0691756" sha1="90a408388b07bb02fd5ef87a70ceebd1e6f66a53"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6472,6 +8170,24 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="712270">
 				<rom name="James_Bond_007_in_Live_and_Let_Die_-_The_Computer_Game_a1.tap" size="712270" crc="bbe1aad4" sha1="85afd67902609095b1db9d8c563235f36fd961f7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="livinday">
+		<description>James Bond 007 in The Living Daylights - The Computer Game</description>
+		<year>1987</year>
+		<publisher>Domark</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="573375">
+				<rom name="James_Bond_007_in_The_Living_Daylights_the_Computer_Game.tap" size="573375" crc="e17393a1" sha1="ef5272eb78dba2f2cac49ca96d7f895b97b33a58"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="573375">
+				<rom name="James_Bond_007_in_The_Living_Daylights_the_Computer_Game_a1.tap" size="573375" crc="edf971f9" sha1="3c8f8d911a6625cf2ad736b061e0f73519d433eb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6524,6 +8240,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="jinks">
+		<description>Jinks</description>
+		<year>1987</year>
+		<publisher>Go!</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="510562">
+				<rom name="Jinks.tap" size="510562" crc="fffda148" sha1="079e05f0c806d7476ee167a28c99b6b1a2274d71"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="joeblade">
 		<description>Joe Blade</description>
 		<year>1987</year>
@@ -6560,6 +8288,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="matchdy2">
+		<description>Jon Ritman's Match Day II</description>
+		<year>1987</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="738562">
+				<rom name="Jon_Ritman's_Match_Day_II.tap" size="738562" crc="bb4b3059" sha1="e1723e3b8b0af30a63ec88ef74706ce4027e780a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jbsquash">
 		<description>Jonah Barrington's Squash</description>
 		<year>1989</year>
@@ -6588,6 +8328,72 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 			<feature name="part_id" value="Side 2 - Bangers and Mash"/>
 			<dataarea name="cass" size="279498">
 				<rom name="Jonny_and_the_Jimpys_Side_2_-_Bangers_and_Mash.tap" size="279498" crc="c1290409" sha1="dca9ed149fa07bb36d9585ae00979b90609d0176"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="judgedre" supported="no"> <!-- game loads fully with a light blue screen but doesn't run -->
+		<description>Judge Dredd</description>
+		<year>1986</year>
+		<publisher>Melbourne House</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="512664">
+				<rom name="Judge_Dredd.tap" size="512664" crc="0ca7be84" sha1="0b1421d9c4e25226d81489ddc2e0631a79c75c4a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="juice">
+		<description>Juice!</description>
+		<year>1984</year>
+		<publisher>System 3</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="205194">
+				<rom name="Juice.tap" size="205194" crc="6cf28f4c" sha1="9d0e5352340304aaeec0c21970a494b4d0bbd455"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="205194">
+				<rom name="Juice_a1.tap" size="205194" crc="59aa4895" sha1="1bd77b8a02eedcbae254c7ac42244ed97e2a20fd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jumpjet">
+		<description>Jump Jet</description>
+		<year>1985</year>
+		<publisher>Anirog</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="354966">
+				<rom name="Jump_Jet.tap" size="354966" crc="631d75f3" sha1="f230ac74c2f0a23de241cb35ee82aa2e243af36f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jungleqt">
+		<description>Jungle Quest</description>
+		<year>1984</year>
+		<publisher>Solar Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="614962">
+				<rom name="Jungle_Quest.tap" size="614962" crc="ad13ee95" sha1="03c653bfc4925093c704b278a9aa35af7c3d065e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jungleqta" cloneof="jungleqt">
+		<description>Jungle Quest (alt)</description>
+		<year>1984</year>
+		<publisher>Solar Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="609335">
+				<rom name="Jungle_Quest.tap" size="609335" crc="6f4d0d65" sha1="99b7de57a23ec732edcf32080a5a0b04f013fb3e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6642,6 +8448,39 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="kayleth">
+		<description>Kayleth</description>
+		<year>1986</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="474667">
+				<rom name="Kayleth.tap" size="474667" crc="1457be73" sha1="d21d0f707af639b7c7abfe4f9e141afe7942c019"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kennedy">
+		<description>Kennedy Approach</description>
+		<year>1985</year>
+		<publisher>Transatlantic Simulations</publisher>
+		<info name="usage" value="Ensure c1541 Slot Device is removed prior to loading"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="837889">
+				<rom name="Kennedy_Approach_Side_1.tap" size="837889" crc="fa6a0e80" sha1="5b469b3ccb2017784aa31c78c0d3c39ac5b526f1"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="918840">
+				<rom name="Kennedy_Approach_Side_2.tap" size="918840" crc="8b80f8da" sha1="80e9ed3599791f968cb9b6a4c3d533234e416c50"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kentilla">
 		<description>Kentilla</description>
 		<year>1986</year>
@@ -6688,6 +8527,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="329346">
 				<rom name="kettlea.tap" size="329346" crc="1ac910df" sha1="6f99c98d6c67ab1fd0678db4d26cb30bb4db7b55"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kettlea" cloneof="kettle">
+		<description>Kettle (alt)</description>
+		<year>1986</year>
+		<publisher>Alligata</publisher>
+
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="329345">
+				<rom name="Kettle.tap" size="329345" crc="c36d43bb" sha1="15f8a588a63265f47f6777883a0638a48d3920dc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6752,6 +8603,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="killedun">
+		<description>Killed Until Dead</description>
+		<year>1987</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1561886">
+				<rom name="Killed_Until_Dead.tap" size="1561886" crc="06a2ca29" sha1="d4008456455c8c2cb96672e208db9a40f1c77b5e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="killmchn">
 		<description>Killing Machine</description>
 		<year>1990</year>
@@ -6760,6 +8623,54 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="637266">
 				<rom name="Killing_Machine.tap" size="637266" crc="0b97b5af" sha1="fba84385527e9ade36afa8615fafbf793a12f099"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kinetik">
+		<description>Kinetik</description>
+		<year>1987</year>
+		<publisher>Firebird</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="597305">
+				<rom name="Kinetik.tap" size="597305" crc="0e442d0b" sha1="f1f9df273438e26716b381e48910b9df8b96414e"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="597178">
+				<rom name="Kinetik_a1.tap" size="597178" crc="01b6a017" sha1="0001b3c678714b11530ec2dd8d95f1e74affef5e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="klax">
+		<description>Klax</description>
+		<year>1990</year>
+		<publisher>Domark</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="555089">
+				<rom name="Klax.tap" size="555089" crc="085808e3" sha1="9a170d437852ed007ddbd417282c5560fbb834bc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kntrider">
+		<description>Knight Rider</description>
+		<year>1986</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="597627">
+				<rom name="Knight_Rider.tap" size="597627" crc="a94dffd5" sha1="6cc23900053be8f44a4440630efc6cc7a389782b"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="597627">
+				<rom name="Knight_Rider_a1.tap" size="597627" crc="69152ae4" sha1="3249dca8a33fbde66493bc7563cff9635f4751d4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6788,6 +8699,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="knuckleb" supported="no"> <!-- game loads fully with a light blue screen but doesn't run -->
+		<description>Knuckle Busters</description>
+		<year>1986</year>
+		<publisher>Melbourne House</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="355994">
+				<rom name="Knuckle_Busters.tap" size="355994" crc="c8c6cc1f" sha1="a9b4b5cb2633697c733f1f3886b6b70d5fdbdb36"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kokotoni">
 		<description>Kokotoni Wilf</description>
 		<year>1984</year>
@@ -6806,6 +8729,41 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="konhits">
+		<description>Konami's Coin-Op Hits</description>
+		<year>1986</year>
+		<publisher>Imagine</publisher>
+		<info name="usage" value="Ensure c1541 Slot Device is removed prior to loading Green Beret or Yie Ar Kung-Fu"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 1: Green Beret"/>
+			<dataarea name="cass" size="724171">
+				<rom name="Konami_Coin-Op_Hits_Tape_1_Side_1.tap" size="724171" crc="5225564a" sha1="65e2e22782eb6cb089c38651c04bcc12b8115079"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 2: Yie Ar Kung-Fu"/>
+			<dataarea name="cass" size="644167">
+				<rom name="Konami_Coin-Op_Hits_Tape_1_Side_2.tap" size="644167" crc="84a54d4e" sha1="166aa174cb64f92f7d84cdf6193145876fc55de3"/>
+			</dataarea>
+		</part>
+
+		<part name="cass3" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 1: Hyper Sports"/>
+			<dataarea name="cass" size="630995">
+				<rom name="Konami_Coin-Op_Hits_Tape_2_Side_1.tap" size="630995" crc="c22580a9" sha1="4af1b31eaa26ce5d19926db2190c53fcceb0fa28"/>
+			</dataarea>
+		</part>
+
+		<part name="cass4" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 2: Mikie / Ping Pong"/>
+			<dataarea name="cass" size="1117854">
+				<rom name="Konami_Coin-Op_Hits_Tape_2_Side_2.tap" size="1117854" crc="31b311da" sha1="388ced50a8df05b8e6333d7eb15771474caa00dc"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pooyan">
 		<description>Konami's Pooyan</description>
 		<year>1983</year>
@@ -6814,6 +8772,42 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="895950">
 				<rom name="Konami's_Pooyan.tap" size="895950" crc="38040b35" sha1="2ef02bf5bc0c998d9f73776908726cbf3a4010d0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kong">
+		<description>Kong</description>
+		<year>1983</year>
+		<publisher>Anirog</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="554264">
+				<rom name="Kong.tap" size="554264" crc="458939ed" sha1="06a5cdb94c31676cfe7e196515cf201bfe2e2d21"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="konga" cloneof="kong">
+		<description>Kong (alt)</description>
+		<year>1983</year>
+		<publisher>Anirog</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1344746">
+				<rom name="Kong.tap" size="1344746" crc="ca1e0071" sha1="93589b51401a8c92da783151bf0a4a61248d4c45"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kongsb">
+		<description>Kong Strikes Back!</description>
+		<year>1984</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="411634">
+				<rom name="Kong_Strikes_Back.tap" size="411634" crc="c2495d21" sha1="7b45552bc580e24ec4a0e28d38fa1cff85e97f9e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6848,6 +8842,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="krakout">
+		<description>Krakout</description>
+		<year>1987</year>
+		<publisher>Gremlin Graphics</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="578198">
+				<rom name="Krakout.tap" size="578198" crc="fa863dfa" sha1="2fe907e474fc5d725397ad0e95c298ed134ee065"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="krazykar">
 		<description>Krazy Kar</description>
 		<year>1984</year>
@@ -6860,6 +8866,30 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="kwah" supported="no"> <!-- game loads fully with a light blue screen but doesn't run -->
+		<description>Kwah!</description>
+		<year>1986</year>
+		<publisher>Melbourne House</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="428018">
+				<rom name="Kwah.tap" size="428018" crc="5a95f844" sha1="31dbdded2dc067753543bae9e11a643e3c373903"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kwiksnax">
+		<description>Kwik Snax</description>
+		<year>1990</year>
+		<publisher>Codemasters</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="934247">
+				<rom name="Kwik_Snax.tap" size="934247" crc="de9e67e9" sha1="cc4da407f29b4093c832befbfdc5aca763dd2b67"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="labyrinth">
 		<description>Labyrinth</description>
 		<year>1983</year>
@@ -6868,6 +8898,26 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="776986">
 				<rom name="Labyrinth.tap" size="776986" crc="a4ae1993" sha1="5f63c9b75b13b761e67f621b0f60c99dc36c3e9a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="labyrintha">
+		<description>Labyrinth: The Computer Game (Activision)</description>
+		<year>1986</year>
+		<publisher>Activision</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="1737975">
+				<rom name="Labyrinth_Side_1.tap" size="1737975" crc="642af717" sha1="47d31ef55d22bf057c697d6f20c6e4129ab25d37"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="1779017">
+				<rom name="Labyrinth_Side_2.tap" size="1779017" crc="5f51b71b" sha1="73cc54a573068f86826aa84518daa50d2f614e65"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6896,6 +8946,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="lastmiss">
+		<description>Last Mission</description>
+		<year>1987</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="477195">
+				<rom name="Last_Mission.tap" size="477195" crc="4db1b25b" sha1="5a67c06e8571323b7d3277b5a03ee314ee8d2e1b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lastninja">
 		<description>The Last Ninja</description>
 		<year>1991</year>
@@ -6912,6 +8974,50 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 			<feature name="part_id" value="Side 2"/>
 			<dataarea name="cass" size="928356">
 				<rom name="Last_Ninja,_The_Side_2.tap" size="928356" crc="56f943cb" sha1="43ce3b28be9f988a606dcc5dc29038c3047a4ea5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lastninjaa" cloneof="lastninja">
+		<description>The Last Ninja (Activision)</description>
+		<year>1987</year>
+		<publisher>Activision</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="1258117">
+				<rom name="Last_Ninja,_The_Cassette_A.tap" size="1258117" crc="2bd5940d" sha1="d52a2ee5ae3cef3c8b2b2199e37b0f038cb0dc36"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="928356">
+				<rom name="Last_Ninja,_The_Cassette_B.tap" size="928356" crc="97f31e99" sha1="3c727f705b7ffc5071142aa00ddc339721933393"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lastninja2">
+		<description>Last Ninja 2: Back with a Vengeance</description>
+		<year>1988</year>
+		<publisher>System 3</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="3298230">
+				<rom name="Last_Ninja_2_Limited_Edition.tap" size="3298230" crc="b454ea2d" sha1="5dff5d9d63a1b0d1058fe4ac1422a41f6d27e94a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lastninja3">
+		<description>Last Ninja 3</description>
+		<year>1991</year>
+		<publisher>System 3</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="3400170">
+				<rom name="Last_Ninja_3.tap" size="3400170" crc="d8cbee93" sha1="da09bd5751d37b6c654195de7f125a39bd69564e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6952,6 +9058,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="lawwest">
+		<description>Law of the West</description>
+		<year>1985</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1946340">
+				<rom name="Law_of_the_West.tap" size="1946340" crc="664f2ddd" sha1="8676ecd0d76766dc3f704cc3d423df2ddb56f802"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lazforce">
 		<description>Lazer Force</description>
 		<year>1987</year>
@@ -6982,6 +9100,57 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="leadbg">
+		<description>Leader Board</description>
+		<year>1986</year>
+		<publisher>Erbe</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="519387">
+				<rom name="Leader_Board.tap" size="519387" crc="0b23bfd8" sha1="e88be59b513164ae8dbfb9ac0008f7d68838c87d"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="519387">
+				<rom name="Leader_Board_a1.tap" size="519387" crc="58cd2835" sha1="b34356d85385bb83306a7a377924863442d71874"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="leadbgee">
+		<description>Leader Board: Executive Edition</description>
+		<year>1987</year>
+		<publisher>U.S. Gold</publisher>
+		<info name="alt_title" value="Executive Leaderboard"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="545311">
+				<rom name="Leader_Board_Executive_Edition_Side_1.tap" size="545311" crc="8933a802" sha1="903c256c5a1dcc9acf99cc5522b12aa69e16b895"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="553705">
+				<rom name="Leader_Board_Executive_Edition_Side_2.tap" size="553705" crc="ce4c84ed" sha1="358c64978b3db46be41eeae164af0b206b7296e3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lkage">
+		<description>Legend of Kage</description>
+		<year>1987</year>
+		<publisher>Imagine</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="542005">
+				<rom name="Legend_of_Kage.tap" size="542005" crc="b7ad02e4" sha1="467e0ee182780a321ddeaf39f48223abc1dddb2e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="knucker">
 		<description>The Legend of the Knucker-Hole</description>
 		<year>1986</year>
@@ -6990,6 +9159,66 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="474776">
 				<rom name="Legend_of_the_Knucker-Hole,_The.tap" size="474776" crc="7a1c3d62" sha1="4caa3a4481a3dc18090d5fb39f1cfcdd833045fe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lic2killd" cloneof="lic2kill">
+		<description>Licence To Kill</description>
+		<year>1989</year>
+		<publisher>Domark</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="514499">
+				<rom name="Licence_to_Kill.tap" size="514499" crc="9c58b66b" sha1="310784e9f388c2f9a7cdaee64ca029664e49119f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lcp">
+		<description>Little Computer People</description>
+		<year>1985</year>
+		<publisher>Activision</publisher>
+		<info name="usage" value="Ensure c1541 Slot Device is removed prior to loading"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="621632">
+				<rom name="Little_Computer_People.tap" size="621632" crc="08df344b" sha1="a82cac076e0b0236a3914c0f11da9c559ac4c148"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="liveammo">
+		<description>Live Ammo</description>
+		<year>1987</year>
+		<publisher>Ocean</publisher>
+		<info name="usage" value="Ensure c1541 Slot Device is removed prior to loading Green Beret"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 1: The Great Escape"/>
+			<dataarea name="cass" size="577571">
+				<rom name="Live_Ammo_Tape_1_Side_1.tap" size="577571" crc="2ff8e4b6" sha1="173a4843c64bae4553d3c16f8b10e56cd6be89f2"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 2: Army Moves"/>
+			<dataarea name="cass" size="1417383">
+				<rom name="Live_Ammo_Tape_1_Side_2.tap" size="1417383" crc="a0b60166" sha1="5803a4a0a2d683e7acd856c257960b67fa745aec"/>
+			</dataarea>
+		</part>
+
+		<part name="cass3" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 1: Green Beret"/>
+			<dataarea name="cass" size="724171">
+				<rom name="Live_Ammo_Tape_2_Side_1.tap" size="724171" crc="b367d6e1" sha1="61b47cdf678cf061420e193d4edf3ef7af936087"/>
+			</dataarea>
+		</part>
+
+		<part name="cass4" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 2: Top Gun / Rambo: First Blood Part II"/>
+			<dataarea name="cass" size="1332374">
+				<rom name="Live_Ammo_Tape_2_Side_2.tap" size="1332374" crc="dde51d3a" sha1="1e116cd09e2fe8f57e3fe3e830974cb0b39efff8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7012,7 +9241,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
-	<software name="lotus">
+	<software name="lotus" supported="no"> <!-- game loads to side 2 but gets stuck continuosuly loading (game never starts) -->
 		<description>Lotus Esprit Turbo Challenge</description>
 		<year>1992</year>
 		<publisher>GBH</publisher>
@@ -7032,6 +9261,38 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="lotusg" cloneof="lotus"  supported="no"> <!-- game loads to side 2 but gets stuck continuosuly loading (game never starts) -->
+		<description>Lotus Esprit Turbo Challenge (Gremlin Graphics)</description>
+		<year>1990</year>
+		<publisher>Gremlin Graphics</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="727225">
+				<rom name="Lotus_Esprit_Turbo_Challenge_Side_1.tap" size="727225" crc="3567366e" sha1="1b060db8ff2ee4dab57529c0c5156db4f114d7c7"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="2145139">
+				<rom name="Lotus_Esprit_Turbo_Challenge_Side_2.tap" size="2145139" crc="09954270" sha1="6c0fccfa6a750bc0eb16af1aa0dc2c14ed33bc90"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magmax">
+		<description>Mag Max</description>
+		<year>1986</year>
+		<publisher>Imagine</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="725538">
+				<rom name="Mag_Max.tap" size="725538" crc="890af4e0" sha1="b8dd42cf356b22dea186318b13abf7cc189dc876"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="magcarpet">
 		<description>Magic Carpet</description>
 		<year>1984</year>
@@ -7040,6 +9301,42 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="360154">
 				<rom name="Magic_Carpet.tap" size="360154" crc="3bf280cc" sha1="7820c69a41cbe2844a34d496dd354421f4512e50"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magmarble">
+		<description>Magic Marbles</description>
+		<year>1986</year>
+		<publisher>Ariolasoft</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="418289">
+				<rom name="Magic_Marbles.tap" size="418289" crc="2ed93d5d" sha1="26b33ea6b4c0e46dff759d1eb20a0bf4583a4d19"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magdizzy">
+		<description>Magicland Dizzy</description>
+		<year>1990</year>
+		<publisher>Codemasters</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="731907">
+				<rom name="Magicland_Dizzy.tap" size="731907" crc="f6419be2" sha1="93a59dccb781b1a3e784f993bed7d03c017af2d5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magnetro">
+		<description>Magnetron</description>
+		<year>1988</year>
+		<publisher>Firebird</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="374894">
+				<rom name="Magnetron.tap" size="374894" crc="c3b7040d" sha1="c4abeec419b1615d84d9d95e9f83feb2b1b2a444"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7076,6 +9373,58 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="383066">
 				<rom name="Manic_Miner_(MAD).tap" size="383066" crc="9c652294" sha1="a8d2428249335da51fa910d58f85ccc5d71f6ef8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marble">
+		<description>Marble Madness</description>
+		<year>1986</year>
+		<publisher>Ariolasoft</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1: Main"/>
+			<dataarea name="cass" size="434338">
+				<rom name="Marble_Madness_Side_1_-_Main.tap" size="434338" crc="a4a479f9" sha1="ca740ed5b5294b90fd6743dddbffa4679d6bf6fc"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2: Level Data"/>
+			<dataarea name="cass" size="2235896">
+				<rom name="Marble_Madness_Side_2_-_Level_data.tap" size="2235896" crc="76d29d9a" sha1="7a911342162b806362cc3de0feeadc9f793b1c4f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mario"> <!-- cass1 image does not run correctly (screen is filled with garbled graphics) -->
+		<description>Mario Bros</description>
+		<year>1987</year>
+		<publisher>Ocean</publisher>
+		<info name="usage" value="cass1 image does not run correctly (screen is filled with garbled graphics) so use cass2 image instead"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="710739">
+				<rom name="Mario_Bros.tap" size="710739" crc="0eec9e90" sha1="95dac1f1782a8656d900ca54e4bc0615d5c126b5"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="710731">
+				<rom name="Mario_Bros_a1.tap" size="710731" crc="5d98b91b" sha1="aad3b9bbe5871eda6c0880175ffa25c864da1039"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mask2">
+		<description>MASK II</description>
+		<year>1987</year>
+		<publisher>Gremlin Graphics</publisher>
+		<info name="alt_title" value="MASK Two Two"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="961877">
+				<rom name="MASK_Two.tap" size="961877" crc="4677bc12" sha1="b2bb11ba10b06f5a59f3620ca910e26cde1e09d4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7117,9 +9466,66 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>Match Point (set 2)</description>
 		<year>1986</year>
 		<publisher>The Hit Squad</publisher>
+
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="412484">
 				<rom name="Match Point.tap" size="412484" crc="4fb72ed9" sha1="7bcc2d1c6dc9818b24236e1e8ef094e98111d623"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathstut">
+		<description>Maths Tutor</description>
+		<year>1983</year>
+		<publisher>Channel 8 Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="758388">
+				<rom name="Maths_Tutor.tap" size="758388" crc="6e23f4a6" sha1="a15a61476eadb47576bd7d58137299a554c31c2b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matrix">
+		<description>Matrix</description>
+		<year>1983</year>
+		<publisher>Llamasoft</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="845548">
+				<rom name="Matrix.tap" size="845548" crc="5dec5527" sha1="003fb7fd2bc40e14209fa5acf8df37c219d395b6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megaapoc">
+		<description>Mega-Apocalypse</description>
+		<year>1987</year>
+		<publisher>Martech</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="635233">
+				<rom name="Mega-Apocalypse.tap" size="635233" crc="323973ae" sha1="f0f70e124d1b7904ef720204befb7988e8c3d62f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megaplay">
+		<description>Megaplay Volume 1</description>
+		<year>1988</year>
+		<publisher>Mastertronic</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1: Agent X II / Pipeline II / Rapid Fire"/>
+			<dataarea name="cass" size="2115745">
+				<rom name="Megaplay_Volume_1_Side_1.tap" size="2115745" crc="81497a0c" sha1="05857a1c29f2655c057e0589fd7752e806a68172"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2: Cage Match / Destructo / Street Beat"/>
+			<dataarea name="cass" size="2104831">
+				<rom name="Megaplay_Volume_1_Side_2.tap" size="2104831" crc="d3df8255" sha1="2f1b15cc5babbe3333e62bfa7e5096feda9a170d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7128,9 +9534,22 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>Mermaid Madness</description>
 		<year>1986</year>
 		<publisher>Firebird Silver</publisher>
+
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="430865">
 				<rom name="mermaid madness.tap" size="430865" crc="c9984f7d" sha1="ddcf116b3b5ce2e174110f93008b36861c48786f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="metrobli">
+		<description>Metro Blitz</description>
+		<year>1983</year>
+		<publisher>Personal Software Services</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1421030">
+				<rom name="Metro_Blitz.tap" size="1421030" crc="e5d18f23" sha1="001a6eed8ae6bbd756065d2dfb6d5227ee43d9fe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7147,6 +9566,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="metroxg" cloneof="metrox">
+		<description>Metro Cross (U.S. Gold)</description>
+		<year>1987</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="462110">
+				<rom name="Metro_Cross.tap" size="462110" crc="6eea2b12" sha1="b343b0b05673e786263f490b5cbe62adb696bcb2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="miamichs">
 		<description>Miami Chase</description>
 		<year>1991</year>
@@ -7155,6 +9586,55 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="730166">
 				<rom name="Miami_Chase.tap" size="730166" crc="a7cb5895" sha1="cfab648ecb84b12e6af2074d6e62c71fd3931cf8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="miamivic">
+		<description>Miami Vice</description>
+		<year>1986</year>
+		<publisher>Ocean</publisher>
+		<info name="usage" value="Ensure c1541 Slot Device is removed prior to loading"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="667803">
+				<rom name="Miami_Vice.tap" size="667803" crc="77071e84" sha1="af3a1de2e1fad0b1aa8139b3d44418fbd5b91a83"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mwalk">
+		<description>Michael Jackson: Moonwalker</description>
+		<year>1989</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="2419326">
+				<rom name="Michael_Jackson_Moonwalker.tap" size="2419326" crc="cf1c98c6" sha1="0cb9c87066dce2c22ae5f09cdcf44466e42be46c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mwalka" cloneof="mwalk">
+		<description>Michael Jackson: Moonwalker (alt)</description>
+		<year>1989</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="2419326">
+				<rom name="Michael_Jackson_Moonwalker.tap" size="2419326" crc="2267b8ba" sha1="d7504dba5ba4ab856766285102880d8aa9b97e0e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickeymo">
+		<description>Mickey Mouse: The Computer Game</description>
+		<year>1988</year>
+		<publisher>Gremlin Graphics</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="667278">
+				<rom name="Mickey_Mouse.tap" size="667278" crc="df59dcc0" sha1="d2e24ea24094f1499094cad5ddb16a6a9bc583a5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7209,6 +9689,25 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="migalley">
+		<description>Mig Alley Ace</description>
+		<year>1985</year>
+		<publisher>U.S. Gold</publisher>
+		<info name="usage" value="Ensure c1541 Slot Device is removed prior to loading"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="606227">
+				<rom name="Mig_Alley_Ace.tap" size="606227" crc="6d3fd6af" sha1="151a6d42cbb9d6e8bc61f1a8f237d1a1b3c28fbf"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="606639">
+				<rom name="Mig_Alley_Ace_a1.tap" size="606639" crc="680c136f" sha1="76420f66e56f4a5d97d45d0ff1743634a29c13dd"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mrpopquiz">
 		<description>Mike Read's Computer Pop Quiz</description>
 		<year>1988</year>
@@ -7217,6 +9716,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="1530784">
 				<rom name="Mike_Read's_Computer_Pop_Quiz.tap" size="1530784" crc="935e2b55" sha1="877026e2900f7f6b2662b24c66e432e8e3106508"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mikie">
+		<description>Mikie</description>
+		<year>1986</year>
+		<publisher>Imagine</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="711067">
+				<rom name="Mikie.tap" size="711067" crc="6af138dd" sha1="2ca75acfe6d75cd789fbe1a0f064ebe95c0f9fb6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7241,6 +9752,36 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="1299884">
 				<rom name="Missile_Command.tap" size="1299884" crc="1114dd1c" sha1="dd4f97d7705349a6b64c173137b4b8fd307d3c0d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="missilea" cloneof="missile">
+		<description>Missile Command (alt)</description>
+		<year>1983</year>
+		<publisher>Interceptor Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1302284">
+				<rom name="Missile_Command.tap" size="1302284" crc="012582c4" sha1="eafcb091be4606e93a8f48c0d1c47d878a1291b3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="missione">
+		<description>Mission Elevator</description>
+		<year>1986</year>
+		<publisher>Micropool</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="490110">
+				<rom name="Mission_Elevator.tap" size="490110" crc="51ad0284" sha1="7e29ef3d652d7ae0eb1c67cffef17b8b530485a7"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="490110">
+				<rom name="Mission_Elevator_a1.tap" size="490110" crc="36854a5a" sha1="caf3d6ee04fb3564d7485e5540bdc5f7d6bac734"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7296,6 +9837,30 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="1013144">
 				<rom name="Monopole.tap" size="1013144" crc="832bf54b" sha1="22ed907b3e11df845b3b2ac13d8683cdd0d53c4d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcarlo">
+		<description>Monte Carlo Casino</description>
+		<year>1989</year>
+		<publisher>Codemasters</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="862377">
+				<rom name="Monte_Carlo_Casino.tap" size="862377" crc="92a58252" sha1="fcf8b4c2e1a578ae0b4e4aaeb34461527ca344fc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="montyont">
+		<description>Monty on the Run</description>
+		<year>1985</year>
+		<publisher>Gremlin Graphics</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="744341">
+				<rom name="Monty_on_the_Run.tap" size="744341" crc="15709d44" sha1="4ca378a79be4408516cc01e5f4d4e10327e7eb4a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7366,6 +9931,26 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="motormas">
+		<description>Motor Massacre</description>
+		<year>1988</year>
+		<publisher>Gremlin Graphics</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="647210">
+				<rom name="Motor_Massacre_Side_1.tap" size="647210" crc="280b664d" sha1="c000fb95511d46f49eb77edcce0ea0eeb01ae88c"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="686399">
+				<rom name="Motor_Massacre_Side_2.tap" size="686399" crc="708243b7" sha1="9e315bc42da46a1ed77ae095b8f86facd451127e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mrwimpy">
 		<description>Mr. Wimpy: The Hamburger Game</description>
 		<year>1984</year>
@@ -7414,6 +9999,36 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="mutants">
+		<description>Mutants</description>
+		<year>1986</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="622379">
+				<rom name="Mutants.tap" size="622379" crc="704ef61f" sha1="3aa4428ca457c95ad5c49b865366636077a765a2"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="622379">
+				<rom name="Mutants_a1.tap" size="622379" crc="9cf09c4e" sha1="53e872116a34ffc5c8c154c842407ee3c7d4483a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mylife">
+		<description>My Life</description>
+		<year>2016</year>
+		<publisher>Psytronik Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="464382">
+				<rom name="My_Life.tap" size="464382" crc="052d9456" sha1="412117ba78313390f4e15ed2bef69108318f5c6f"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mystindus">
 		<description>Mystery of the Indus Valley</description>
 		<year>1988</year>
@@ -7422,6 +10037,54 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="435739">
 				<rom name="Mystery_of_the_Indus_Valley.tap" size="435739" crc="cf528288" sha1="1a0098c5722e3925728333693415148849fc5c6c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mystnile">
+		<description>Mystery of the Nile</description>
+		<year>1987</year>
+		<publisher>Firebird</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="625862">
+				<rom name="Mystery_of_the_Nile.tap" size="625862" crc="d3b49d7f" sha1="459a8649d2bcdb077e9b6f339aa9840ec34b683f"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="625837">
+				<rom name="Mystery_of_the_Nile_a1.tap" size="625837" crc="db3cb686" sha1="2cab0d8288768d3a27f39edf04de2a8bbae5c6ff"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="myth">
+		<description>Myth: History in the Making</description>
+		<year>1989</year>
+		<publisher>System 3</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="2797325">
+				<rom name="Myth-_History_in_the_Making.tap" size="2797325" crc="e165df15" sha1="17330f68890a5a77e1d6afe9019f195a180dd2b3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nomad">
+		<description>N.O.M.A.D</description>
+		<year>1986</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="684475">
+				<rom name="N.O.M.A.D.tap" size="684475" crc="ec187307" sha1="0185818f24e99c7403631a52fdc2dafd99242000"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="684475">
+				<rom name="N.O.M.A.D_a1.tap" size="684475" crc="927ae53b" sha1="b86d0c9f40595454323eda951ef66ca470eea0df"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7450,6 +10113,30 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="nemwar" supported="no"> <!-- game loads partially and then stops with a flashing cursor -->
+		<description>Nemesis the Warlock</description>
+		<year>1987</year>
+		<publisher>Martech</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="467422">
+				<rom name="Nemesis_the_Warlock.tap" size="467422" crc="16bffefe" sha1="0e0e065d9993d9920628561a0439f7f68c28228b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neoclyps">
+		<description>Neoclyps</description>
+		<year>1982</year>
+		<publisher>Personal Software Services</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1962156">
+				<rom name="Neoclyps.tap" size="1962156" crc="764023c8" sha1="e3b0cc618ce5fba98245bfeb63b62ec22a6b2066"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="neutzone">
 		<description>Neutral Zone</description>
 		<year>1986</year>
@@ -7470,6 +10157,40 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="400921">
 				<rom name="Neutralizor.tap" size="400921" crc="eab90a7b" sha1="d9807b3c10d1835086481b8e8b130b2ddd3047da"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tnes">
+		<description>The Neverending Story</description>
+		<year>1985</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 1"/>
+			<dataarea name="cass" size="417847">
+				<rom name="Neverending_Story,_The_Tape_1_Side_1.tap" size="417847" crc="95d54b7a" sha1="4eeea7a62b69bdb687e147b19a346248c54068dc"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 2"/>
+			<dataarea name="cass" size="319769">
+				<rom name="Neverending_Story,_The_Tape_1_Side_2.tap" size="319769" crc="ab647981" sha1="1f132ba340b3de7d935e5a662107b25505273292"/>
+			</dataarea>
+		</part>
+
+		<part name="cass3" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 1"/>
+			<dataarea name="cass" size="319769">
+				<rom name="Neverending_Story,_The_Tape_2_Side_1.tap" size="319769" crc="11c8c021" sha1="501e67c55d76d5b2a85b8bc62154c1d2e1a75822"/>
+			</dataarea>
+		</part>
+
+		<part name="cass4" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 2"/>
+			<dataarea name="cass" size="319769">
+				<rom name="Neverending_Story,_The_Tape_2_Side_2.tap" size="319769" crc="d444166e" sha1="095af9c1e96b6de867ff9c7c81a6b63ab0fb8d91"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7536,6 +10257,30 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="nmassacr">
+		<description>Ninja Massacre</description>
+		<year>1989</year>
+		<publisher>Code Masters</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="920694">
+				<rom name="Ninja_Massacre.tap" size="920694" crc="ce11f979" sha1="d2b52fb2b0a7cb59348083b06e72c5d35a25c604"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ninjarem" cloneof="lastninja2">
+		<description>Ninja Remix</description>
+		<year>1990</year>
+		<publisher>System 3</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="3568161">
+				<rom name="Ninja_Remix.tap" size="3568161" crc="7f40c5e0" sha1="deae8aed4d0ed35131fd2cc98de92b209ea0016b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nonterra">
 		<description>Nonterraqueous</description>
 		<year>1985</year>
@@ -7550,6 +10295,108 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="514952">
 				<rom name="Nonterraqueous_a1.tap" size="514952" crc="ffa56ac9" sha1="c8fbdc269ad40d606181512c6d99d39612a6010b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="northsou">
+		<description>North &amp; South</description>
+		<year>1991</year>
+		<publisher>Infogrames</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 1: Main"/>
+			<dataarea name="cass" size="715384">
+				<rom name="North_&amp;_South_Tape_1_Side_1_-_Main.tap" size="715384" crc="0170d2e1" sha1="8a25fd4c7ee0e2d48cd0b6d5bc116979363b448e"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 2: Map"/>
+			<dataarea name="cass" size="725304">
+				<rom name="North_&amp;_South_Tape_1_Side_2_-_Map.tap" size="725304" crc="82fa00cc" sha1="c0fa2c2744b71a9f7ae09da7de64177ef907f74e"/>
+			</dataarea>
+		</part>
+
+		<part name="cass3" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 1: Battle"/>
+			<dataarea name="cass" size="329247">
+				<rom name="North_&amp;_South_Tape_2_Side_1_-_Battle.tap" size="329247" crc="f5e5cdb9" sha1="8f6be367e5c2fb1aa800b16d9f9e2b617b1de0aa"/>
+			</dataarea>
+		</part>
+
+		<part name="cass4" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 2: Fort"/>
+			<dataarea name="cass" size="526906">
+				<rom name="North_&amp;_South_Tape_2_Side_2_-_Fort.tap" size="526906" crc="13a252b9" sha1="695f642426e92aaf58b6308231e066a2060f5e5b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oceansal">
+		<description>Ocean's All Star Hits</description>
+		<year>1987</year>
+		<publisher>Ariolasoft</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 1: Tai-Pan (Part 1) / Double Take"/>
+			<dataarea name="cass" size="1429872">
+				<rom name="Ocean's_All_Star_Hits_Tape_1_Side_1.tap" size="1429872" crc="b48d1573" sha1="0209ed46cd5db181a41fb64fd0d475800588e3e9"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 2: Tai-Pan (Part 2) / Parallax"/>
+			<dataarea name="cass" size="1343997">
+				<rom name="Ocean's_All_Star_Hits_Tape_1_Side_2.tap" size="1343997" crc="bc1b71ae" sha1="dc99307fb10ab55a2a79f7d794c4e91d541e30e0"/>
+			</dataarea>
+		</part>
+
+		<part name="cass3" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 1: Head Over Heals / Wizball"/>
+			<dataarea name="cass" size="1397033">
+				<rom name="Ocean's_All_Star_Hits_Tape_2_Side_1.tap" size="1397033" crc="bbd5158c" sha1="88091647c0f05bd147195f3960e2d829293af8c2"/>
+			</dataarea>
+		</part>
+
+		<part name="cass4" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 2: Mutants"/>
+			<dataarea name="cass" size="622379">
+				<rom name="Ocean's_All_Star_Hits_Tape_2_Side_2.tap" size="622379" crc="7bbb3742" sha1="84f045975218ba36faa3ee6be0d3dc8d5523b1b0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oceansgr">
+		<description>Ocean's Greatest Hits</description>
+		<year>1986</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 1: Frankie Goes to Hollywood / World Series Baseball"/>
+			<dataarea name="cass" size="1104678">
+				<rom name="Ocean's_Greatest_Hits_Tape_1_Side_1.tap" size="1104678" crc="4449eef3" sha1="6d55b7ff701581a467f27b5d09b2928fe8c50674"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 2: Knight Rider / N.O.M.A.D"/>
+			<dataarea name="cass" size="1282082">
+				<rom name="Ocean's_Greatest_Hits_Tape_1_Side_2.tap" size="1282082" crc="aa1f1d94" sha1="d02266432e1f6f4bba3e1ec88d59c1b4414c24f2"/>
+			</dataarea>
+		</part>
+
+		<part name="cass3" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 1: Daley Thompson's Super-Test / Parallax"/>
+			<dataarea name="cass" size="1335106">
+				<rom name="Ocean's_Greatest_Hits_Tape_2_Side_1.tap" size="1335106" crc="cd8c5753" sha1="34c46a8bf1a06e9c7029cd4a01369e51267d4c3c"/>
+			</dataarea>
+		</part>
+
+		<part name="cass4" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 2: V"/>
+			<dataarea name="cass" size="481552">
+				<rom name="Ocean's_Greatest_Hits_Tape_2_Side_2.tap" size="481552" crc="843388fe" sha1="f7669e4c0c0bcec4729f0382f4b225299473e521"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7584,6 +10431,24 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="oinkc" cloneof="oink">
+		<description>Oink! (CRL)</description>
+		<year>1988</year>
+		<publisher>CRL</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="619098">
+				<rom name="Oink.tap" size="619098" crc="6d73d6d9" sha1="13c957a53400ec64fff2d7294b7a06cf0f55a408"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="619098">
+				<rom name="Oink_a1.tap" size="619098" crc="74c680ec" sha1="db96ed278eee550e0721679f199e09feeee4b4d9"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="olympski">
 		<description>Olympic Skier</description>
 		<year>1984</year>
@@ -7600,6 +10465,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>On Court Tennis</description>
 		<year>1984</year>
 		<publisher>Firebird Silver</publisher>
+
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="517655">
 				<rom name="on court tennis.tap" size="517655" crc="c7dbf50b" sha1="df6dc7bec0c870a387cc6478c0a81e9a00ddbdaa"/>
@@ -7631,6 +10497,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>On Field Football</description>
 		<year>1985</year>
 		<publisher>Firebird Silver</publisher>
+
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="522986">
 				<rom name="on field football.tap" size="522986" crc="3017a952" sha1="5ea48ba9d6f69b8b29479124564d03a488e0750e"/>
@@ -7655,6 +10522,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="598097">
 				<rom name="omahdb.tap" size="598097" crc="30661926" sha1="60d822dc311a72b197483b79b29ea9daab4366de"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ontiles">
+		<description>On the Tiles</description>
+		<year>1987</year>
+		<publisher>Firebird</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="542838">
+				<rom name="On_the_Tiles.tap" size="542838" crc="7e329b08" sha1="6863b817db52456fd7a6ed51d3ab263622c283b3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7691,6 +10570,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="opwolfo" cloneof="opwolf">
+		<description>Operation Wolf (Ocean)</description>
+		<year>1988</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="720182">
+				<rom name="Operation_Wolf.tap" size="720182" crc="07c6f513" sha1="46f333b8bcbdba6854faea225351bb33f203f0b9"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="orbitron">
 		<description>Orbitron</description>
 		<year>1984</year>
@@ -7706,6 +10597,38 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="368037">
 				<rom name="Orbitron.tap" size="368037" crc="841001c8" sha1="6960a62be217e87430e278e6d69452611e72c152"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outrun">
+		<description>Out Run</description>
+		<year>1987</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="1258728">
+				<rom name="Out_Run_Side_1.tap" size="1258728" crc="30effdc4" sha1="702bdf023d939127fdd708d80441b2bdae2f0182"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="1888082">
+				<rom name="Out_Run_Side_2.tap" size="1888082" crc="94ba830a" sha1="f15ed217b3e9612bd55ef32e8609475f3ef05aee"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outback">
+		<description>Outback</description>
+		<year>1984</year>
+		<publisher>Paramount Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1479908">
+				<rom name="Outback.tap" size="1479908" crc="5ffccfdb" sha1="5204b17d43637c4a2cb97c9f13520fd43e668843"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7726,14 +10649,28 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>Outlaws</description>
 		<year>1987</year>
 		<publisher>Ricochet</publisher>
+
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="663257">
 				<rom name="outlaws side a.tap" size="663257" crc="332f4483" sha1="f5752d3fad3971662c5b13f9570e5625821854a2"/>
 			</dataarea>
 		</part>
+
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="658990">
 				<rom name="outlaws side b.tap" size="658990" crc="429754e6" sha1="5fae6c04243e532008efe477eb7ffeab6178ca7c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="overland">
+		<description>Overlander</description>
+		<year>1988</year>
+		<publisher>Elite Systems</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="889826">
+				<rom name="Overlander.tap" size="889826" crc="4fde67e8" sha1="064af8c4416419d43136c19d3bd04a1f702b6070"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7752,6 +10689,38 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="483294">
 				<rom name="P.O.D._-_Proof_of_Destruction_a1.tap" size="483294" crc="d05e2212" sha1="7eace062982079d5770fa93df28dc240995df2a4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="packofac">
+		<description>Pack of Aces</description>
+		<year>1987</year>
+		<publisher>Prism Leisure</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A: IK / IK (Different Backdrops) / Boulder Dash"/>
+			<dataarea name="cass" size="1569901">
+				<rom name="Pack_of_Aces_Side_A_(IK,_IK,_Boulder_Dash).tap" size="1569901" crc="0779500f" sha1="00ad6f65ae331009af043df9c28ca9e70ff48298"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B: N.E.X.U.S. / Who Dares Wins II"/>
+			<dataarea name="cass" size="1050847">
+				<rom name="Pack_of_Aces_Side_B_(NEXUS,_Who_Dares_Wins_II).tap" size="1050847" crc="4baf26aa" sha1="c205e8229a2f82bd15eb0e70654154b8d6333bd2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacland">
+		<description>Pac-Land</description>
+		<year>1987</year>
+		<publisher>Quicksilva</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="663582">
+				<rom name="Pac-Land.tap" size="663582" crc="7e5444c7" sha1="f4ed5818bb19f938de3f632ff1eab811a2f625dd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7788,6 +10757,36 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="498902">
 				<rom name="Pakacuda.tap" size="498902" crc="c471a5b7" sha1="aeaa3544e839cb12e3b502362bedbe66229fc30a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pandora">
+		<description>Pandora</description>
+		<year>1988</year>
+		<publisher>Firebird</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="740576">
+				<rom name="Pandora.tap" size="740576" crc="a2119a64" sha1="b1c20d2e780a986facbc4b52c35a069de2db0206"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="740612">
+				<rom name="Pandora_a1.tap" size="740612" crc="55f23a3e" sha1="86872be4dfa6cf30ab74ddbe2e0bbe3dc97b1c9c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="panic">
+		<description>Panic</description>
+		<year>1983</year>
+		<publisher>Datamaxx</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="804507">
+				<rom name="Panic.tap" size="804507" crc="10aad8c5" sha1="741548979b0c90a97d9160ab6f2eded335b7838f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7840,6 +10839,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="paperboye"  cloneof="paperboy">
+		<description>Paperboy (Elite Systems)</description>
+		<year>1986</year>
+		<publisher>Elite Systems</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="718553">
+				<rom name="Paperboy.tap" size="718553" crc="5352e080" sha1="b7ad9794ffa8173f827963645161d2f7b54d9955"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="paradroid">
 		<description>Paradroid</description>
 		<year>1985</year>
@@ -7872,6 +10883,19 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="514430">
 				<rom name="Park_Patrol.tap" size="514430" crc="c2936365" sha1="8a9267b03ab24df2c5720c16a946e90e42366414"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pastfind">
+		<description>Pastfinder</description>
+		<year>1985</year>
+		<publisher>Activision</publisher>
+		<info name="usage" value="Ensure c1541 Slot Device is removed prior to loading"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1019144">
+				<rom name="Pastfinder.tap" size="1019144" crc="ed14ce6d" sha1="3dcc173a795d08c1761005c44ab54f2f9d3afa06"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7912,6 +10936,44 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="peterbea">
+		<description>Peter Beardsley's International Football</description>
+		<year>1988</year>
+		<publisher>Grandslam</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="614788">
+				<rom name="Peter_Beardsley's_International_Football.tap" size="614788" crc="576c3ac5" sha1="f4d0aa9dc7d4b1527d7faddcafadfbb8b8f43009"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="614788">
+				<rom name="Peter_Beardsley's_International_Football_a1.tap" size="614788" crc="1b6c666d" sha1="aa4af8be52669e660d2e77c53d190ce6b2a278f1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phmpeg" supported="no"> <!-- game loads fully including scenario but screen is filled with garbled graphics -->
+		<description>PHM Pegasus</description>
+		<year>1987</year>
+		<publisher>Electronic Arts</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1: Loader"/>
+			<dataarea name="cass" size="611098">
+				<rom name="PHM_Pegasus_Side_1.tap" size="611098" crc="398d5cc2" sha1="9a5370eb3cfed4fe970de05448fccd0f2dcad05d"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2: Scenarios"/>
+			<dataarea name="cass" size="764724">
+				<rom name="PHM_Pegasus_Side_2.tap" size="764724" crc="df4f0692" sha1="dab3cbeb91d94b2f0e3dae10cc46d8ca828fd211"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pilot64">
 		<description>Pilot 64</description>
 		<year>1983</year>
@@ -7948,6 +11010,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="pingpongi" cloneof="pingpong">
+		<description>Ping Pong (Imagine)</description>
+		<year>1986</year>
+		<publisher>Imagine</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="408823">
+				<rom name="Ping_Pong.tap" size="408823" crc="5a0a8d84" sha1="4f6000f141f640451a840ae28b9238a52ec96d96"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pipeline2">
 		<description>Pipeline 2</description>
 		<year>1986</year>
@@ -7962,6 +11036,43 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="643114">
 				<rom name="Pipeline_2_a1.tap" size="643114" crc="e138a90b" sha1="d9c6de2eb0e81fabd75d81fe641ea8542c14bc26"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pitfall2">
+		<description>Pitfall II: Lost Caverns</description>
+		<year>1984</year>
+		<publisher>Activision</publisher>
+		<info name="usage" value="Ensure c1541 Slot Device is removed prior to loading"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="989128">
+				<rom name="Pitfall_II_-_Lost_Caverns.tap" size="989128" crc="8befa0fe" sha1="496ed231145f5cc1875d0c9b38e0120833c79ffd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pitstop2">
+		<description>Pitstop II</description>
+		<year>1984</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="560092">
+				<rom name="Pitstop_II.tap" size="560092" crc="4d44b10d" sha1="a3399a69e06fc0cded79b53ed9d5d53101a34b0e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pitstop2r" cloneof="pitstop2">
+		<description>Pitstop II (Rushware)</description>
+		<year>1984</year>
+		<publisher>Rushware</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="498294">
+				<rom name="Pitstop_II.tap" size="498294" crc="e43ddbbc" sha1="8a1026570264441af8ebd205263f7e95d4956464"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7986,6 +11097,54 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="plumbcra">
+		<description>Plumb Crazy!</description>
+		<year>1984</year>
+		<publisher>Terminal Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="454123">
+				<rom name="Plumb_Crazy.tap" size="454123" crc="ec984281" sha1="17d2d9b732bd52a9035029387217871f5de6a005"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="454123">
+				<rom name="Plumb_Crazy_a1.tap" size="454123" crc="5eb678c5" sha1="c58ebd45baf35f4f861486eb59e408c139ab9297"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="polepos">
+		<description>Pole Position</description>
+		<year>1984</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="263026">
+				<rom name="Pole_Position.tap" size="263026" crc="52fe57b2" sha1="6d29b1d355a2f88e6e41c5ca12cb9144cc3b8e38"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="polterge">
+		<description>Poltergeist</description>
+		<year>1988</year>
+		<publisher>Codemasters</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="848522">
+				<rom name="Poltergeist.tap" size="848522" crc="885f6fba" sha1="e1ca6a768c33653f1fe23ac4556f1c8fcf6ad65d"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="840452">
+				<rom name="Poltergeist_a1.tap" size="840452" crc="960672cb" sha1="c2eacf0ce531173b3acae11ffac0d9f8d31509c8"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="poly64">
 		<description>Poly-64</description>
 		<year>1984</year>
@@ -7995,6 +11154,24 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="339731">
 				<rom name="poly64.tap" size="339731" crc="62b6ba45" sha1="5bfd8c63babbf44f8d7d2c81909a1e630b10bea3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="popeye">
+		<description>Popeye</description>
+		<year>1986</year>
+		<publisher>Macmillan Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="466330">
+				<rom name="Popeye.tap" size="466330" crc="8f26eb94" sha1="0c16174cd794663f10e66c492bc0d14323e761e5"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="466330">
+				<rom name="Popeye_a1.tap" size="466330" crc="654be4c3" sha1="1622b630a558d5638124ed77986d32c4784f6df8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8054,6 +11231,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="pdrift">
+		<description>Power Drift</description>
+		<year>1990</year>
+		<publisher>Activision</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="805770">
+				<rom name="Power_Drift.tap" size="805770" crc="51f8e5f5" sha1="c5df9e8575bf3abf4bed982587ecc0b56dbfaf94"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pwrpack">
 		<description>The Power Pack</description>
 		<year>1990</year>
@@ -8070,6 +11259,30 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 			<feature name="part_id" value="Side 2: Thrust II / Prodigy"/>
 			<dataarea name="cass" size="1268927">
 				<rom name="Power_Pack,_The_Side_2.tap" size="1268927" crc="37f118db" sha1="f679cea60141e5edb22757f79adbb0764ec2d8ab"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="presiden">
+		<description>The President is Missing</description>
+		<year>1988</year>
+		<publisher>Microprose Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1124746">
+				<rom name="President_is_Missing,_The.tap" size="1124746" crc="7ee9d326" sha1="fcd180c5169da807a6ec923cb09e6b2f81be0e65"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="princecl">
+		<description>Prince Clumsy</description>
+		<year>1990</year>
+		<publisher>Codemasters</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="930465">
+				<rom name="Prince_Clumsy.tap" size="930465" crc="2152729e" sha1="572a0cd657f1cb7322c67a796fb17857d277697d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8146,6 +11359,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="prohibit">
+		<description>Prohibition</description>
+		<year>1987</year>
+		<publisher>Zafiro Software Division</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="605643">
+				<rom name="Prohibition.tap" size="605643" crc="7d172a8a" sha1="79319a5292a8b97ea310e46c46b0a8f4f879be0e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="protium">
 		<description>Protium</description>
 		<year>1988</year>
@@ -8166,6 +11391,38 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="338915">
 				<rom name="Prowler.tap" size="338915" crc="4670011d" sha1="7b21d671ac8adbcf4a888124884f2e2318f82b21"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="psychos">
+		<description>Psycho Soldier</description>
+		<year>1987</year>
+		<publisher>Imagine</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="738565">
+				<rom name="Psycho_Soldier_Side_1.tap" size="738565" crc="a8628bb0" sha1="3db48d5b6c9507e86715c696150e8af5a75b368d"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="549959">
+				<rom name="Psycho_Soldier_Side_2.tap" size="549959" crc="2750092a" sha1="349223e7212271655f6210d2f81891216ffdd76c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pubgames">
+		<description>Pub Games</description>
+		<year>1986</year>
+		<publisher>Alligata</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1814548">
+				<rom name="Pub_Games.tap" size="1814548" crc="f196ebaa" sha1="fb37d3606583a1f3affcb56cbcbdfab49c86306a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8221,6 +11478,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="quartet">
+		<description>Quartet</description>
+		<year>1987</year>
+		<publisher>Activision</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="594655">
+				<rom name="Quartet.tap" size="594655" crc="842f592c" sha1="19e138ba77a8358289327e7dc3f7868420aba818"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="qadvent">
 		<description>QUATTRO Adventure</description>
 		<year>1990</year>
@@ -8257,6 +11526,26 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 			<feature name="part_id" value="Side 2: Frankenstein Jnr / Ollie and Lisa 3"/>
 			<dataarea name="cass" size="1463116">
 				<rom name="QUATTRO_Cartoon_Side_2.tap" size="1463116" crc="ba22541c" sha1="32bca84d0a0797731d365b2e69dd8ec79e95819e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qcoinops">
+		<description>QUATTRO Coin-Ops</description>
+		<year>1991</year>
+		<publisher>Codemasters</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1: Advanced Pinball Simulator / Pub Trivia"/>
+			<dataarea name="cass" size="2384085">
+				<rom name="QUATTRO_Coin-Ops_Side_1.tap" size="2384085" crc="96a7a8a7" sha1="4fdc364199c8a3eeb2aab9a1470d7209b79dcb18"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2: Fruit Machine Simulator / Fast Food"/>
+			<dataarea name="cass" size="1668738">
+				<rom name="QUATTRO_Coin-Ops_Side_2.tap" size="1668738" crc="45966241" sha1="7b70322d0393a123ff0c87410b02c853664c87be"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8341,6 +11630,19 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="quedex">
+		<description>Quedex</description>
+		<year>1987</year>
+		<publisher>Thalamus</publisher>
+		<info name="alt_title" value="Mindroll"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="947549">
+				<rom name="Que-Dex.tap" size="947549" crc="1466de42" sha1="dc77e8ef796b8a31e21c4cf52c033dc4eb995d29"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="qgoldegg">
 		<description>The Quest for the Golden Egg Cup</description>
 		<year>1988</year>
@@ -8387,6 +11689,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>Rad Ramp Racer</description>
 		<year>1990</year>
 		<publisher>Mastertronic Plus</publisher>
+
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="526363">
 				<rom name="rad ramp racer.tap" size="526363" crc="1ab3938b" sha1="65b7a3c1dde85ef83e2b7d139b16218d2258bfa1"/>
@@ -8462,6 +11765,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="rallycro">
+		<description>Rallycross Simulator</description>
+		<year>1989</year>
+		<publisher>Codemasters</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1147648">
+				<rom name="Rallycross_Simulator.tap" size="1147648" crc="2034f86d" sha1="c56a491637f87de647b0385b009b4161dd643261"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rambo3">
 		<description>Rambo III</description>
 		<year>1991</year>
@@ -8482,14 +11797,134 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="rambo3o" cloneof="rambo3">
+		<description>Rambo III (Ocean)</description>
+		<year>1988</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="1540958">
+				<rom name="Rambo_III_Side_1.tap" size="1540958" crc="aa4afe3f" sha1="46797c9ed6375363cc65102b4f1a35ad078bd637"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="1338382">
+				<rom name="Rambo_III_Side_2.tap" size="1338382" crc="3d9ae4cd" sha1="25c54c1e8df305aaa436da24223b44ae7d3e3be3"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rambo2">
 		<description>Rambo: First Blood Part II</description>
 		<year>1989</year>
 		<publisher>The Hit Squad</publisher>
+		<info name="alt_title" value="Rambo"/>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="642762">
 				<rom name="Rambo-_First_Blood_Part_II.tap" size="642762" crc="93462399" sha1="dbd106a71c21cd18d11ba140a59407417c353175"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rambo2o" cloneof="rambo2">
+		<description>Rambo: First Blood Part II (Ocean)</description>
+		<year>1985</year>
+		<publisher>Ocean</publisher>
+		<info name="alt_title" value="Rambo"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="743231">
+				<rom name="Rambo-_First_Blood_Part_II.tap" size="743231" crc="2af567f2" sha1="54ecae7a343a97a9725ae4a48c9ba8a39f5371a0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rampage">
+		<description>Rampage</description>
+		<year>1987</year>
+		<publisher>Activision</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="745387">
+				<rom name="Rampage.tap" size="745387" crc="9044afc8" sha1="b610ef2d6dd7e85106ec33155ed229bb5dde625c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ramparts">
+		<description>Ramparts</description>
+		<year>1987</year>
+		<publisher>Go!</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="642102">
+				<rom name="Ramparts.tap" size="642102" crc="ab9d07c5" sha1="ce1e063f52ddc2ec1e5bdce734d9d15779a12ce2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ranarama">
+		<description>Rana Rama</description>
+		<year>1987</year>
+		<publisher>Hewson Consultants</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="371686">
+				<rom name="Rana_Rama.tap" size="371686" crc="eb67ad69" sha1="65a3f198c86b43066986e4e78ad6521bad033cb3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rasputin">
+		<description>Rasputin</description>
+		<year>1985</year>
+		<publisher>Firebird</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="643649">
+				<rom name="Rasputin.tap" size="643649" crc="540ff12e" sha1="e1749fe05a2861d9696eb6033712d48f8329a655"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="632532">
+				<rom name="Rasputin_a1.tap" size="632532" crc="328d3bd2" sha1="8449ee323f51cc12ca47eb705c7248ad074f6378"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rastan">
+		<description>Rastan</description>
+		<year>1987</year>
+		<publisher>Imagine</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1397246">
+				<rom name="Rastan.tap" size="1397246" crc="46641e43" sha1="449c7c57554e937b2c442fd2c50ccd37a8334072"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="realgb">
+		<description>The Real Ghostbusters</description>
+		<year>1989</year>
+		<publisher>Activision</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="478131">
+				<rom name="Real_Ghostbusters,_The_Side_1.tap" size="478131" crc="8ae0e5ed" sha1="1f29797b08e4d33059352f8f9aa131d8bb8cf419"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="1668984">
+				<rom name="Real_Ghostbusters,_The_Side_2.tap" size="1668984" crc="30a8a94f" sha1="6c0ec5ba995e52b0cd83c33ef82aa9183a4dca15"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8535,6 +11970,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="rebound">
+		<description>Re-Bounder</description>
+		<year>1987</year>
+		<publisher>Prism Leisure</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="577426">
+				<rom name="Re-Bounder.tap" size="577426" crc="177b424a" sha1="a30a383c82a5713ddbd4276d50c2bd64e881b5db"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="redheat">
 		<description>Red Heat</description>
 		<year>1991</year>
@@ -8543,6 +11990,31 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="726358">
 				<rom name="Red_Heat.tap" size="726358" crc="56563908" sha1="54ba8a3106cd0a58b9fba474ded66649eab7f0fd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="redheato" cloneof="redheat">
+		<description>Red Heat (Ocean)</description>
+		<year>1989</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="726358">
+				<rom name="Red_Heat.tap" size="726358" crc="25f06b7c" sha1="d35f4331ced8224a0edd36d2e909be286f946f37"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="redled">
+		<description>Red L.E.D.</description>
+		<year>1987</year>
+		<publisher>Dro Soft</publisher>
+		<info name="alt_title" value="Battle Droidz"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="581262">
+				<rom name="Red_L.E.D..tap" size="581262" crc="3f5d111f" sha1="2ba56d660a799e126915b3b96807b18f707b1cc2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8559,6 +12031,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="redmaxc" cloneof="redmax">
+		<description>Red Max (Codemasters)</description>
+		<year>1987</year>
+		<publisher>Codemasters</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="956359">
+				<rom name="Red_Max.tap" size="956359" crc="642d40ca" sha1="58f60f3c988e8f6f1d16aa49ffd3d542402c9147"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="renegade">
 		<description>Renegade</description>
 		<year>1989</year>
@@ -8571,6 +12055,26 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="renegade3">
+		<description>Renegade III: The Final Chapter</description>
+		<year>1989</year>
+		<publisher>Imagine</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="1139698">
+				<rom name="Renegade_III-_The_Final_Chapter_Side_1.tap" size="1139698" crc="9a57dcbb" sha1="2032787ce5ea16bdcc08c85fc8b716d9d2297806"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="598114">
+				<rom name="Renegade_III-_The_Final_Chapter_Side_2.tap" size="598114" crc="ffbb3dd1" sha1="4f2681f1842afa52f7e613f5701a6ec3e49f2ed9"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fractal">
 		<description>Rescue on Fractalus!</description>
 		<year>1989</year>
@@ -8579,6 +12083,82 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="429826">
 				<rom name="Rescue_on_Fractalus.tap" size="429826" crc="753847ac" sha1="bb8b7e1abefaa8bdc6915a98d4b859067a0e1d4f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fractala" cloneof="fractal">
+		<description>Rescue on Fractalus! (Activision)</description>
+		<year>1985</year>
+		<publisher>Activision</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="609703">
+				<rom name="Rescue_on_Fractalus.tap" size="609703" crc="89735b64" sha1="6c52a7f625280a7fbde79c9b4a136cc37a528b09"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="retrogra">
+		<description>Retrograde</description>
+		<year>1989</year>
+		<publisher>Thalamus</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="560849">
+				<rom name="Retrograde_Side_1.tap" size="560849" crc="8d413e70" sha1="054fc95fe34eb227fabd7cb4e99fdc8dafa67706"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="2076073">
+				<rom name="Retrograde_Side_2.tap" size="2076073" crc="c531f30a" sha1="21e0a50a01642ad936136cfcfbc0e818f31b2dff"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="returnoz">
+		<description>Return to Oz</description>
+		<year>1986</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="519276">
+				<rom name="Return_to_Oz.tap" size="519276" crc="02553fc2" sha1="4cbb5d94941ca68f374f29c9e34a56ffb72477dd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="revcamel">
+		<description>Revenge of the Mutant Camels</description>
+		<year>1983</year>
+		<publisher>Llamasoft</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1: Fastload"/>
+			<dataarea name="cass" size="338088">
+				<rom name="Revenge_of_the_Mutant_Camels_Side_1_-_Fastload.tap" size="338088" crc="403e34dc" sha1="8074b1a08b8b1e3dc3df620a745638cc187ed2c8"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2: Slowload"/>
+			<dataarea name="cass" size="2076073">
+				<rom name="Revenge_of_the_Mutant_Camels_Side_2_-_Slowload.tap" size="1597742" crc="1bfed32c" sha1="e8ea1999f03f143a3a757f76372e8db19256ba92"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="talladeg">
+		<description>Richard Petty's Talladega</description>
+		<year>1985</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="653268">
+				<rom name="Richard_Petty's_Talladega.tap" size="653268" crc="01f9ee21" sha1="fc317b1979bb0a48061a2e67dc397a57537acf2e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8709,6 +12289,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="roadwars">
+		<description>Roadwars</description>
+		<year>1988</year>
+		<publisher>Melbourne House</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="480182">
+				<rom name="Roadwars.tap" size="480182" crc="b39eca44" sha1="85e742e1f99334f6b49cb442252416b53b687ac2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="robbers">
 		<description>Robbers of the Lost Tomb</description>
 		<year>1983</year>
@@ -8747,8 +12339,8 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
-	<software name="robocoph">
-		<description>Robocop</description>
+	<software name="robocop">
+		<description>RoboCop</description>
 		<year>1991</year>
 		<publisher>The Hit Squad</publisher>
 		<!-- Dumped by @c64tapes -->
@@ -8764,6 +12356,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="1510854">
 				<rom name="robocopb.tap" size="1510854" crc="a018d08f" sha1="b4730e17a2566994c017dcfe893968375c30d3ec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robocopo" cloneof="robocop">
+		<description>RoboCop (Ocean)</description>
+		<year>1988</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1510854">
+				<rom name="RoboCop.tap" size="1510854" crc="72c55b24" sha1="1cb1d87a7cccab082e304e37c8f80ae76a1aa494"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8833,6 +12437,26 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="rodland">
+		<description>Rodland</description>
+		<year>1991</year>
+		<publisher>Storm</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="448374">
+				<rom name="Rodland_Side_1.tap" size="448374" crc="081741a7" sha1="14eb1c38341433ff409eacfae50a110fca8c515c"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="411556">
+				<rom name="Rodland_Side_2.tap" size="411556" crc="f209521b" sha1="91a2491639af1dd0f258d30072058b6bbe1ba0b2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rollarnd">
 		<description>Rollaround</description>
 		<year>1988</year>
@@ -8881,6 +12505,36 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="rthunderu" cloneof="rthunder">
+		<description>Rolling Thunder (U.S. Gold)</description>
+		<year>1986</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="569954">
+				<rom name="Rolling_Thunder.tap" size="569954" crc="88cbc0b1" sha1="babc75b96d5b9aafc0ce5c6cb9f2429a0da16b75"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="roomten">
+		<description>Room Ten</description>
+		<year>1986</year>
+		<publisher>CRL</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="322194">
+				<rom name="Room_Ten.tap" size="322194" crc="f5a7e427" sha1="b281493b84833097b69e0481c49f519ff3dad251"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="322194">
+				<rom name="Room_Ten_a1.tap" size="322194" crc="fcfbb7e6" sha1="08b13a786b4d0494e50169ff5310d393962435e8"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="roomlord">
 		<description>RoomLord</description>
 		<year>1984</year>
@@ -8909,14 +12563,28 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>Run the Gauntlet</description>
 		<year>1990</year>
 		<publisher>The Hit Squad</publisher>
+
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="2223542">
 				<rom name="run the gauntlet side a.tap" size="2223542" crc="d0e77cb1" sha1="8592b26a06bde96cdb6a0877ceda75e4ed8db256"/>
 			</dataarea>
 		</part>
+
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="2217669">
 				<rom name="run the gauntlet side b.tap" size="2217669" crc="493bae24" sha1="17ff144092680f6635414e05586cb7af405772de"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="runthego" cloneof="runtheg">
+		<description>Run the Gauntlet (Ocean)</description>
+		<year>1989</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="2223162">
+				<rom name="Run_the_Gauntlet.tap" size="2223162" crc="81323723" sha1="5794e7c1c5a01809def7a432bd05e9377ac301ff"/>
 			</dataarea>
 		</part>
 	</software>

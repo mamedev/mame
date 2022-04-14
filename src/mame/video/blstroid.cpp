@@ -86,7 +86,7 @@ void blstroid_state::video_start()
  *
  *************************************/
 
-void blstroid_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void blstroid_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -99,7 +99,7 @@ void blstroid_state::device_timer(emu_timer &timer, device_timer_id id, int para
 			m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
 			break;
 		default:
-			atarigen_state::device_timer(timer, id, param, ptr);
+			atarigen_state::device_timer(timer, id, param);
 			break;
 	}
 }

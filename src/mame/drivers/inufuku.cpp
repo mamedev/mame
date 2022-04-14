@@ -14,6 +14,9 @@
 
     based on other Video System drivers
 
+    Known games not dumped ran on this hardware:
+    - 3 on 3 Hyper Slams '96 (Korea) https://youtu.be/3gGB4kYYgi0
+
 ******************************************************************************/
 /******************************************************************************
 

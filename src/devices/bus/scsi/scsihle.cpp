@@ -206,7 +206,7 @@ void scsihle_device::scsibus_write_data()
 	data_idx=0;
 }
 
-void scsihle_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void scsihle_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
 {
 	switch (tid)
 	{

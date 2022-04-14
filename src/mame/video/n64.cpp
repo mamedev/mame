@@ -2290,7 +2290,7 @@ void n64_rdp::cmd_tex_rect(uint64_t *cmd_buf)
 	ewdata[16] = ((dtdy >> 5) & 0xffff) << 32;                  // dsde, dtde, dwde (0)
 	ewdata[17] = ((dtdy >> 5) & 0xffff) << 32;                  // dsdy, dtdy, dwdy (0)
 	ewdata[18] = ((dtdy & 0x1f) << 11) << 32;                   // dsde frac, dtde frac, dwde frac (0)
-	ewdata[38] = ((dtdy & 0x1f) << 11) << 32;                   // dsdy frac, dtdy frac, dwdy frac (0)
+	ewdata[19] = ((dtdy & 0x1f) << 11) << 32;                   // dsdy frac, dtdy frac, dwdy frac (0)
 	// ewdata[40-43] = 0;                                       // depth
 
 	draw_triangle(cmd_buf, true, true, false, true);
@@ -2301,7 +2301,7 @@ void n64_rdp::cmd_tex_rect_flip(uint64_t *cmd_buf)
 	const uint64_t w1 = cmd_buf[0];
 	const uint64_t w2 = cmd_buf[1];
 
-	const uint64_t tilenum  = (w1 >> 56) & 0x7;
+	const uint64_t tilenum  = (w1 >> 24) & 0x7;
 	const uint64_t xh = (w1 >> 12) & 0xfff;
 	const uint64_t xl = (w1 >> 44) & 0xfff;
 	const uint64_t yh = (w1 >>  0) & 0xfff;
@@ -2393,7 +2393,7 @@ void n64_rdp::cmd_set_convert(uint64_t *cmd_buf)
 	k2 = (SIGN9(k2) << 1) + 1;
 	k3 = (SIGN9(k3) << 1) + 1;
 
-	set_yuv_factors(rgbaint_t(0, k0, k2, k3), rgbaint_t(0, 0, k1, 0), rgbaint_t(k4, k4, k4, k4), rgbaint_t(k5, k5, k5, k5));
+	set_yuv_factors(rgbaint_t(0, k0, k2, 0), rgbaint_t(0, 0, k1, k3), rgbaint_t(k4, k4, k4, k4), rgbaint_t(k5, k5, k5, k5));
 }
 
 void n64_rdp::cmd_set_scissor(uint64_t *cmd_buf)
@@ -2411,7 +2411,7 @@ void n64_rdp::cmd_set_scissor(uint64_t *cmd_buf)
 void n64_rdp::cmd_set_prim_depth(uint64_t *cmd_buf)
 {
 	const uint64_t w1 = cmd_buf[0];
-	m_misc_state.m_primitive_z = (uint32_t)(w1 & 0x7fff0000);
+	m_misc_state.m_primitive_z = (uint16_t)(w1 >> 16) & 0x7fff;
 	m_misc_state.m_primitive_dz = (uint16_t)(w1 >> 32);
 }
 
@@ -3718,7 +3718,7 @@ void n64_rdp::span_draw_1cycle(int32_t scanline, const extent_t &extent, const r
 
 	if(object.m_other_modes.z_source_sel)
 	{
-		z.w = object.m_misc_state.m_primitive_z;
+		z.w = (uint32_t)object.m_misc_state.m_primitive_z << 16;
 		dzpix = object.m_misc_state.m_primitive_dz;
 		dzinc = 0;
 	}
@@ -4045,7 +4045,7 @@ void n64_rdp::span_draw_2cycle(int32_t scanline, const extent_t &extent, const r
 
 	if(object.m_other_modes.z_source_sel)
 	{
-		z.w = object.m_misc_state.m_primitive_z;
+		z.w = (uint32_t)object.m_misc_state.m_primitive_z << 16;
 		dzpix = object.m_misc_state.m_primitive_dz;
 		dzinc = 0;
 	}

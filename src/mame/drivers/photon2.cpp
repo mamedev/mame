@@ -55,10 +55,10 @@ private:
 
 	required_shared_ptr<uint8_t> m_spectrum_video_ram;
 
-	int m_spectrum_frame_number;
-	int m_spectrum_flash_invert;
-	uint8_t m_spectrum_port_fe;
-	uint8_t m_nmi_enable;
+	int m_spectrum_frame_number = 0;
+	int m_spectrum_flash_invert = 0;
+	uint8_t m_spectrum_port_fe = 0;
+	uint8_t m_nmi_enable = 0;
 
 	void membank_w(uint8_t data);
 	uint8_t fe_r();
@@ -78,7 +78,7 @@ private:
 
 /*************************************
  *
- *  Video (copied from MESS apart from support
+ *  Video (copied from spectrum driver apart from support
  *  for changing border color mid-frame)
  *
  *************************************/

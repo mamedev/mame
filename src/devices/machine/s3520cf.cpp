@@ -172,9 +172,10 @@ void s3520cf_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void s3520cf_device::nvram_read(emu_file &file)
+bool s3520cf_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_nvdata, 15);
+	size_t actual;
+	return !file.read(m_nvdata, 15, actual) && actual == 15;
 }
 
 //-------------------------------------------------
@@ -182,9 +183,10 @@ void s3520cf_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void s3520cf_device::nvram_write(emu_file &file)
+bool s3520cf_device::nvram_write(util::write_stream &file)
 {
-	file.write(m_nvdata, 15);
+	size_t actual;
+	return !file.write(m_nvdata, 15, actual) && actual == 15;
 }
 
 //-------------------------------------------------

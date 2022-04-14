@@ -2,10 +2,10 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-        SEL Z80 Trainer (LEHRSYSTEME)
+SEL Z80 Trainer (LEHRSYSTEME)
 
-        31/08/2010 Skeleton driver.
-        23/06/2011 Working [Robbbert]
+2010-08-31 Skeleton driver.
+2011-06-23 Working [Robbbert]
 
 No diagram has been found. The following is guesswork.
 
@@ -62,8 +62,8 @@ protected:
 
 	void selz80_io(address_map &map);
 
-	u8 m_digit;
-	u8 m_seg;
+	u8 m_digit = 0U;
+	u8 m_seg = 0U;
 	void setup_baud();
 	void machine_start() override;
 	required_device<cpu_device> m_maincpu;

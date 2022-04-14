@@ -72,6 +72,7 @@ Paste test:
 #include "machine/timer.h"
 #include "video/pwm.h"
 
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "kim1.lh"

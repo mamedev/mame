@@ -50,7 +50,7 @@ public:
 	  For now we have this get_flip_state function so that drivers can query the bit and set other
 	  flip flags accordingly
 	*/
-	u8 get_flip_state(void) { return m_pf_control_0[0] & 0x80; };
+	u8 get_flip_state(void) { return m_pf_control_0[0] & 0x80; }
 
 	void set_flip_screen(bool flip);
 
@@ -95,8 +95,8 @@ public:
 	std::unique_ptr<u16[]> m_pf_rowscroll;
 	std::unique_ptr<u16[]> m_pf_colscroll;
 
-	tilemap_t* m_pf8x8_tilemap[3];
-	tilemap_t* m_pf16x16_tilemap[3];
+	tilemap_t* m_pf8x8_tilemap[3]{};
+	tilemap_t* m_pf16x16_tilemap[3]{};
 	int    m_tile_region_8;
 	int    m_tile_region_16;
 
@@ -110,7 +110,7 @@ public:
 	u16 m_pf_control_1[8];
 
 	int m_rambank; // external connection?
-	bool m_flip_screen;
+	bool m_flip_screen = false;
 
 protected:
 	virtual void device_start() override;

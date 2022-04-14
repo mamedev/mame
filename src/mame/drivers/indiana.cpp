@@ -8,9 +8,8 @@
         01/20/2014 Added ISA bus and peripherals
 
         TODO: Text appears in VGA f/b (0x6B8000), but doesn't display?
-
-        System often reads/writes 6003D4/5, might be a cut-down 6845,
-        as it only uses registers C,D,E,F.
+        TODO: Keyboard doesn't work very well. Scancodes are often lost
+              because the 68030 doesn't poll the MFP frequently enough.
 
 ****************************************************************************/
 

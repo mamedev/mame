@@ -43,7 +43,7 @@
 #include "machine/timer.h"
 
 #include "render.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "hp9845b.lh"
@@ -784,8 +784,8 @@ private:
 	// Optional character generator
 	required_region_ptr<uint8_t> m_optional_chargen;
 
-	uint8_t m_video_attr;
-	uint16_t m_gv_cursor_w;   // U38 & U39 (GS)
+	uint8_t m_video_attr = 0;
+	uint16_t m_gv_cursor_w = 0;   // U38 & U39 (GS)
 	std::vector<uint16_t> m_graphic_mem;
 };
 
@@ -2018,11 +2018,11 @@ private:
 	required_region_ptr<uint8_t> m_optional_chargen;
 
 	std::vector<uint16_t> m_graphic_mem[ 3 ];
-	uint16_t m_gv_music_memory;
-	uint8_t m_gv_cursor_color;
-	uint8_t m_gv_plane;
-	bool m_gv_lp_int_latched;
-	bool m_gv_sk_int_latched;
+	uint16_t m_gv_music_memory = 0;
+	uint8_t m_gv_cursor_color = 0;
+	uint8_t m_gv_plane = 0;
+	bool m_gv_lp_int_latched = false;
+	bool m_gv_sk_int_latched = false;
 };
 
 hp9845c_state::hp9845c_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -2728,17 +2728,17 @@ private:
 
 	std::vector<uint16_t> m_graphic_mem;
 
-	bool m_gv_stat;
-	bool m_gv_increment_to_next_row;
+	bool m_gv_stat = false;
+	bool m_gv_increment_to_next_row = false;
 
-	uint16_t m_gv_scan_start_x;
-	uint16_t m_gv_scan_start_y;
-	uint8_t m_gv_rb_control;
-	uint16_t m_gv_rb_counter;
-	uint16_t m_gv_rb_memory[ 256 ];
-	uint16_t m_gv_arc[ 4 ];
-	uint8_t m_gv_arc_parm;
-	bool m_back_arrow_cursor;
+	uint16_t m_gv_scan_start_x = 0;
+	uint16_t m_gv_scan_start_y = 0;
+	uint8_t m_gv_rb_control = 0;
+	uint16_t m_gv_rb_counter = 0;
+	uint16_t m_gv_rb_memory[ 256 ]{};
+	uint16_t m_gv_arc[ 4 ]{};
+	uint8_t m_gv_arc_parm = 0;
+	bool m_back_arrow_cursor = false;
 
 	static const uint8_t m_back_arrow_shape[];
 };
@@ -3654,7 +3654,7 @@ void hp9845_base_state::hp9845_base(machine_config &config)
 	m_ppu->set_9845_boot_mode(true);
 	m_ppu->set_rw_cycles(6 , 6);
 	m_ppu->set_relative_mode(true);
-	m_ppu->int_cb().set(m_io_sys , FUNC(hp98x5_io_sys_device::int_r));
+	m_ppu->set_int_cb(m_io_sys , FUNC(hp98x5_io_sys_device::int_r));
 	m_ppu->pa_changed_cb().set(m_io_sys , FUNC(hp98x5_io_sys_device::pa_w));
 
 	HP98X5_IO_SYS(config , m_io_sys , 0);

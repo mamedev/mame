@@ -168,7 +168,7 @@ void msm6242_device::device_post_load()
 //  fires
 //-------------------------------------------------
 
-void msm6242_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void msm6242_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{

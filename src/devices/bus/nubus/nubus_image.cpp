@@ -41,16 +41,13 @@ public:
 	messimg_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const noexcept override { return IO_QUICKLOAD; }
-
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return true; }
 	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "img"; }
-	virtual const char *custom_instance_name() const noexcept override { return "disk"; }
-	virtual const char *custom_brief_instance_name() const noexcept override { return "disk"; }
+	virtual const char *image_type_name() const noexcept override { return "disk"; }
+	virtual const char *image_brief_type_name() const noexcept override { return "disk"; }
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;

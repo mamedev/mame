@@ -150,10 +150,17 @@ bool k573mcr_device::pad_read(uint32_t port_no, uint8_t *output)
 	controller_port_send_byte(0x01);
 	uint8_t a = controller_port_send_byte('B');
 	uint8_t b = controller_port_send_byte(0);
-	*output++ = controller_port_send_byte(0);
-	*output++ = controller_port_send_byte(0);
+	auto connected = a == 0x41 && b == 0x5a;
+	if (connected) {
+		*output++ = controller_port_send_byte(0);
+		*output++ = controller_port_send_byte(0);
+	}
+	else {
+		*output++ = 0;
+		*output++ = 0;
+	}
 
-	return a == 0x41 && b == 0x5a;
+	return connected;
 }
 
 bool k573mcr_device::memcard_read(uint32_t port_no, uint16_t block_addr, uint8_t *output)

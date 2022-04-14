@@ -118,7 +118,7 @@ void a2bus_corvfdc02_device::device_reset()
 	m_timer->adjust(attotime::never);
 }
 
-void a2bus_corvfdc02_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void a2bus_corvfdc02_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_fdc->tc_w(true);
 	m_fdc->tc_w(false);

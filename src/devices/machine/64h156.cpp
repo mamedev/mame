@@ -133,7 +133,7 @@ void c64h156_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void c64h156_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void c64h156_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	live_sync();
 	live_run();

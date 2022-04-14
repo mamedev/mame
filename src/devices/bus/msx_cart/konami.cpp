@@ -148,7 +148,7 @@ void msx_cart_konami_scc_device::device_add_mconfig(machine_config &config)
 {
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
 	SPEAKER(config, "mono").front_center();
-	K051649(config, m_k051649, XTAL(10'738'635)/3/2).add_route(ALL_OUTPUTS, "mono", 0.15);
+	K051649(config, m_k051649, XTAL(10'738'635)/3).add_route(ALL_OUTPUTS, "mono", 0.15);
 }
 
 
@@ -559,7 +559,7 @@ void msx_cart_konami_sound_device::device_add_mconfig(machine_config &config)
 {
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
 	SPEAKER(config, "mono").front_center();
-	K051649(config, m_k052539, XTAL(10'738'635)/3/2).add_route(ALL_OUTPUTS, "mono", 0.15);
+	K051649(config, m_k052539, XTAL(10'738'635)/3).add_route(ALL_OUTPUTS, "mono", 0.15);
 }
 
 

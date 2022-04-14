@@ -36,12 +36,12 @@ midvunit_renderer::midvunit_renderer(midvunit_state &state)
  *
  *************************************/
 
-void midvunit_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void midvunit_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_SCANLINE:
-		scanline_timer_cb(ptr, param);
+		scanline_timer_cb(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in midvunit_state::device_timer");

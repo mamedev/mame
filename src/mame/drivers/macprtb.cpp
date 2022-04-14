@@ -107,7 +107,7 @@
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #define C32M (31.3344_MHz_XTAL)
@@ -165,10 +165,10 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	u16 *m_ram_ptr, *m_rom_ptr;
-	u32 m_ram_mask, m_ram_size, m_rom_size;
+	u16 *m_ram_ptr = nullptr, *m_rom_ptr = nullptr;
+	u32 m_ram_mask = 0, m_ram_size = 0, m_rom_size = 0;
 
-	emu_timer *m_6015_timer;
+	emu_timer *m_6015_timer = nullptr;
 
 	uint16_t mac_via_r(offs_t offset);
 	void mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask);
@@ -179,14 +179,14 @@ private:
 	void field_interrupts();
 	DECLARE_WRITE_LINE_MEMBER(via_irq_w);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
-	int m_via_cycles, m_via_interrupt, m_scc_interrupt, m_asc_interrupt, m_last_taken_interrupt;
-	int m_ca1_data;
+	int m_via_cycles = 0, m_via_interrupt = 0, m_scc_interrupt = 0, m_asc_interrupt = 0, m_last_taken_interrupt = 0;
+	int m_ca1_data = 0;
 
 	void phases_w(uint8_t phases);
 	void devsel_w(uint8_t devsel);
 
 	uint16_t rom_switch_r(offs_t offset);
-	bool m_overlay;
+	bool m_overlay = 0;
 
 	uint16_t scsi_r(offs_t offset, uint16_t mem_mask);
 	void scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask);
@@ -224,7 +224,7 @@ private:
 		field_interrupts();
 	}
 
-	u8 m_pmu_to_via, m_pmu_from_via, m_pmu_ack, m_pmu_req;
+	u8 m_pmu_to_via = 0, m_pmu_from_via = 0, m_pmu_ack = 0, m_pmu_req = 0;
 	u8 pmu_data_r() { return m_pmu_from_via; }
 	void pmu_data_w(u8 data) { m_pmu_to_via = data; }
 	u8 pmu_comms_r() { return (m_pmu_req<<7); }
@@ -241,7 +241,7 @@ private:
 			m_pmu_ack = BIT(data, 6);
 		//printf("PMU ACK = %d\n", m_pmu_ack);
 	}
-	int m_adb_line;
+	int m_adb_line = 0;
 	void set_adb_line(int state) { m_adb_line = state; }
 	u8 pmu_adb_r() { return (m_adb_line<<1); }
 	void pmu_adb_w(u8 data) { m_macadb->adb_linechange_w((data & 1) ^ 1); }

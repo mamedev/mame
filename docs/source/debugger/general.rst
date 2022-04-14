@@ -78,8 +78,8 @@ do
 
 The **do** command simply evaluates the supplied expression.  This is
 often used to set or modify device state variable (e.g. CPU registers),
-or to write to memory.  See :ref:`debugger-expressions` for details
-about expression syntax.
+or to write to memory.  See :ref:`debugger-express` for details about
+expression syntax.
 
 Examples:
 

@@ -16,7 +16,7 @@
     http://www.seasip.info/VintagePC/pgc.html
 
   To do:
-  - pass IBM diagnostics (currently fail with code 3905)
+  - pass IBM diagnostics (currently fail with code 3905 - 'Cold start cycle power error')
   - CGA emulator
   - what's up with irq 3 (= vblank irq)? (causes soft reset)
   - "test pin of the microprocessor samples the hsync pulse"

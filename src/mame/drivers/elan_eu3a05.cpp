@@ -211,6 +211,7 @@ Set 5043 bit 0 low
 //#include "cpu/m6502/m65c02.h"
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 #include "machine/bankdev.h"
 #include "audio/elan_eu3a05.h"

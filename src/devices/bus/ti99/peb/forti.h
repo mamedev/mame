@@ -28,8 +28,8 @@ public:
 	forti_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	void write(offs_t offset, uint8_t data) override;
 	void readz(offs_t offset, uint8_t *value) override;
-	void crureadz(offs_t offset, uint8_t *value) override { };
-	void cruwrite(offs_t offset, uint8_t data) override { };
+	void crureadz(offs_t offset, uint8_t *value) override { }
+	void cruwrite(offs_t offset, uint8_t data) override { }
 
 	DECLARE_WRITE_LINE_MEMBER( ready_sound );
 

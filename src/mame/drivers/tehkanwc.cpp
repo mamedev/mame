@@ -161,7 +161,7 @@ void tehkanwc_state::sound_command_w(uint8_t data)
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-void tehkanwc_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void tehkanwc_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

@@ -15,8 +15,12 @@ or write_row to set them.
 
 Display element states are sent to output tags "y.x" where y is the matrix row
 number, x is the row bit. It is also sent to "y.a" for all rows. The output state
-is 0 for off, and >0 for on, depending on brightness level. If segmask is defined,
-it is also sent to "digity", for use with multi-state elements, eg. 7seg leds.
+is 0 for off, and >0 for on, depending on brightness level.
+
+If segmask is defined, it is also sent to "multiy.b" where b is brightness level,
+for use with multi-state elements. This usecase is not common though (one example
+is Coleco Quarterback where some digit segments are brighter). And when brightness
+level does not matter, it is also sent to "digity", for common 7seg leds.
 
 If you use this device in a slot, or use multiple of them (or just don't want
 to use the default output tags), set a callback.
@@ -25,9 +29,9 @@ Brightness tresholds (0.0 to 1.0) indicate how long an element was powered on
 in the last frame, eg. 0.01 means a minimum on-time for 1%. Some games use two
 levels of brightness by strobing elements longer.
 
-
 TODO:
-- SVG screens and rendlay digit elements don't support multiple brightness levels
+- SVG screens and rendlay digit elements don't support multiple brightness levels,
+  the latter can be worked around with by stacking digits on top of eachother
 
 */
 
@@ -47,9 +51,11 @@ pwm_display_device::pwm_display_device(const machine_config &mconfig, const char
 	device_t(mconfig, PWM_DISPLAY, tag, owner, clock),
 	m_out_x(*this, "%u.%u", 0U, 0U),
 	m_out_a(*this, "%u.a", 0U),
+	m_out_multi(*this, "multi%u.%u", 0U, 0U),
 	m_out_digit(*this, "digit%u", 0U),
 	m_output_x_cb(*this),
 	m_output_a_cb(*this),
+	m_output_multi_cb(*this),
 	m_output_digit_cb(*this)
 {
 	// set defaults
@@ -70,15 +76,17 @@ pwm_display_device::pwm_display_device(const machine_config &mconfig, const char
 void pwm_display_device::device_start()
 {
 	// resolve handlers
-	m_external_output = !m_output_x_cb.isnull() || !m_output_a_cb.isnull() || !m_output_digit_cb.isnull();
+	m_external_output = !m_output_x_cb.isnull() || !m_output_a_cb.isnull() || !m_output_multi_cb.isnull() || !m_output_digit_cb.isnull();
 	m_output_x_cb.resolve_safe();
 	m_output_a_cb.resolve_safe();
+	m_output_multi_cb.resolve_safe();
 	m_output_digit_cb.resolve_safe();
 
 	if (!m_external_output)
 	{
 		m_out_x.resolve();
 		m_out_a.resolve();
+		m_out_multi.resolve();
 		m_out_digit.resolve();
 	}
 
@@ -191,13 +199,12 @@ TIMER_CALLBACK_MEMBER(pwm_display_device::frame_tick)
 	const double factor1 = 1.0 - factor0;
 
 	// determine brightness cutoff
+	u8 max_levels = 1;
+	for (; m_levels[max_levels] < 1.0; max_levels++) { ; }
 	double cutoff = m_level_max;
+
 	if (cutoff == 0.0)
-	{
-		u8 level;
-		for (level = 1; m_levels[level] < 1.0; level++) { ; }
-		cutoff = 4 * m_levels[level - 1];
-	}
+		cutoff = 4 * m_levels[max_levels - 1];
 	if (cutoff > 1.0)
 		cutoff = 1.0;
 
@@ -205,7 +212,8 @@ TIMER_CALLBACK_MEMBER(pwm_display_device::frame_tick)
 
 	for (int y = 0; y < m_height; y++)
 	{
-		u64 row = 0;
+		u64 multi_row[0x40];
+		std::fill(std::begin(multi_row), std::end(multi_row), 0);
 
 		for (int x = 0; x <= m_width; x++)
 		{
@@ -221,8 +229,7 @@ TIMER_CALLBACK_MEMBER(pwm_display_device::frame_tick)
 			// output to y.x, or y.a when always-on
 			if (x != m_width)
 			{
-				if (level > m_level_min)
-					row |= (u64(1) << x);
+				multi_row[level] |= (u64(1) << x);
 
 				if (m_external_output)
 					m_output_x_cb(x << 6 | y, level);
@@ -238,15 +245,29 @@ TIMER_CALLBACK_MEMBER(pwm_display_device::frame_tick)
 			}
 		}
 
-		// output to digity (does not support multiple brightness levels)
+		// multi-state outputs
 		if (m_segmask[y] != 0)
 		{
-			row &= m_segmask[y];
+			u64 digit_row = 0;
 
+			for (int b = 0; b <= max_levels; b++)
+			{
+				multi_row[b] &= m_segmask[y];
+				if (b > m_level_min)
+					digit_row |= multi_row[b];
+
+				// output to multiy.b
+				if (m_external_output)
+					m_output_multi_cb(b << 6 | y, digit_row);
+				else
+					m_out_multi[y][b] = multi_row[b];
+			}
+
+			// output to digity (single brightness level)
 			if (m_external_output)
-				m_output_digit_cb(y, row);
+				m_output_digit_cb(y, digit_row);
 			else
-				m_out_digit[y] = row;
+				m_out_digit[y] = digit_row;
 		}
 	}
 

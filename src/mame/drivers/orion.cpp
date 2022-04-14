@@ -23,6 +23,7 @@ It's unknown how to create a tape.
 #include "includes/orion.h"
 
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/smx_dsk.h"

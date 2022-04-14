@@ -13,7 +13,6 @@
 *************************************************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "tlcs90.h"
 #include "tlcs90d.h"
 
@@ -2806,7 +2805,7 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer_callback )
 		if(i & 1)
 			break;
 		if ( (m_tclk & (0x0C << (i * 2))) == 0 ) // T0/T1 match signal clocks T1/T3
-			t90_timer_callback(ptr, i+1);
+			t90_timer_callback(i+1);
 		break;
 		case 0x01: // 16bit, only can happen for i=0,2
 		m_timer_value[i+1] = 0;

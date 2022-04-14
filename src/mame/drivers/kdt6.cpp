@@ -31,7 +31,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "kdt6.lh"
 
 

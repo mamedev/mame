@@ -61,6 +61,7 @@
 
 #include "emu.h"
 #include "includes/kyocera.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 /* Read/Write Handlers */

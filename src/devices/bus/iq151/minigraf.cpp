@@ -10,6 +10,7 @@
 #include "minigraf.h"
 
 #include "emuopts.h"
+#include "fileio.h"
 #include "png.h"
 
 // paper is A4 (297x210mm)

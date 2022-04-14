@@ -252,41 +252,36 @@ const cassette_image::Format cassette_image::wavfile_format =
     This code has already identified some rounding errors
 *********************************************************************/
 
-#ifdef UNUSED_FUNCTION
-void wavfile_testload(const char *fname)
+[[maybe_unused]] void wavfile_testload(const char *fname)
 {
-	cassette_image *cassette;
-	FILE *f;
-	long offset;
-	int freq, samples, i;
-	int32_t cassamp;
-	int16_t wavsamp;
-
-	f = fopen(fname, "rb");
+	FILE *f = fopen(fname, "rb");
 	if (!f)
 		return;
 
-	if (cassette_open(f, &stdio_ioprocs, &wavfile_format, cassette_image::FLAG_READONLY, &cassette))
+	cassette_image::ptr cassette;
+	if (cassette_image::open(util::stdio_read_write_noclose(f, 0x00), &cassette_image::wavfile_format, cassette_image::FLAG_READONLY, cassette) != cassette_image::error::SUCCESS)
 	{
 		fclose(f);
 		return;
 	}
 
-	offset = 44;
-	freq = 44100;
-	samples = 5667062;
+	constexpr long offset = 44;
+	constexpr int freq = 44100;
+	constexpr int samples = 5667062;
 
-	for (i = 0; i < samples; i++)
+	for (int i = 0; i < samples; i++)
 	{
-		cassette_get_sample(cassette, 0, i / (double) freq, 0.0, &cassamp);
+		int32_t cassamp;
+		cassette->get_sample(0, i / double(freq), 0.0, &cassamp);
 
+		int16_t wavsamp;
 		fseek(f, offset + i * 2, SEEK_SET);
 		fread(&wavsamp, 1, 2, f);
-		assert(cassamp == (((uint32_t) wavsamp) << 16));
+
+		assert(cassamp == (uint32_t(wavsamp) << 16));
 	}
 
-	cassette_close(cassette);
+	cassette.reset();
 
 	fclose(f);
 }
-#endif

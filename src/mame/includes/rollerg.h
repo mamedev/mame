@@ -37,8 +37,8 @@ private:
 	};
 
 	/* misc */
-	int        m_readzoomroms;
-	emu_timer *m_nmi_timer;
+	int        m_readzoomroms = 0;
+	emu_timer *m_nmi_timer = nullptr;
 
 	/* devices */
 	required_device<konami_cpu_device> m_maincpu;
@@ -62,7 +62,7 @@ private:
 	void rollerg_map(address_map &map);
 	void rollerg_sound_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 #endif // MAME_INCLUDES_ROLLERG_H

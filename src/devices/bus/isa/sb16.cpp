@@ -742,7 +742,7 @@ void sb16_lle_device::device_reset()
 	m_dma8_done = m_dma16_done = false;
 }
 
-void sb16_lle_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void sb16_lle_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
 {
 	uint16_t dacl = 0, dacr = 0, adcl = 0, adcr = 0;
 	if(m_mode & 2)

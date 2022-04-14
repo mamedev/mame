@@ -41,7 +41,7 @@ Cassette (nascom2):
 #include "bus/nasbus/nasbus.h"
 
 #include "emupal.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "screen.h"
 
 
@@ -97,16 +97,11 @@ protected:
 	required_memory_region m_gfx1_region;
 	required_ioport_array<8> m_keyboard;
 
-	int m_tape_size;
-	uint8_t *m_tape_image;
-	int m_tape_index;
 	uint8_t m_kb_select;
 	uint8_t m_kb_control;
 	bool m_cassinbit, m_cassoutbit, m_cassold;
 	u8 m_port00;
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( load_nascom1_cassette );
-	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( unload_nascom1_cassette );
 	template<int Dest> DECLARE_SNAPSHOT_LOAD_MEMBER( snapshot_cb );
 };
 
@@ -314,25 +309,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( nascom2_state::nascom2_kansas_r )
 		m_cassinbit = (m_cass_data[1] < 12) ? 1 : 0;
 		m_cass_data[1] = 0;
 	}
-}
-
-// This stuff has never been connected up - what's it for?
-[[maybe_unused]] DEVICE_IMAGE_LOAD_MEMBER( nascom_state::load_nascom1_cassette )
-{
-	m_tape_size = image.length();
-	m_tape_image = (uint8_t*)image.ptr();
-
-	if (!m_tape_image)
-		return image_init_result::FAIL;
-
-	m_tape_index = 0;
-	return image_init_result::PASS;
-}
-
-[[maybe_unused]] DEVICE_IMAGE_UNLOAD_MEMBER( nascom_state::unload_nascom1_cassette )
-{
-	m_tape_image = nullptr;
-	m_tape_size = m_tape_index = 0;
 }
 
 

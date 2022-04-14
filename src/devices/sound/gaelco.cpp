@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Manuel Abadia
+// copyright-holders:Manuel Abadia, David Haywood
 /***************************************************************************
                     Gaelco Sound Hardware
 
@@ -215,35 +215,53 @@ void gaelco_gae1_device::gaelcosnd_w(offs_t offset, uint16_t data, uint16_t mem_
 
 	COMBINE_DATA(&m_sndregs[offset]);
 
-	switch(offset & 0x07)
+	switch (offset & 0x07)
 	{
-		case 0x03:
-			/* trigger sound */
-			if ((m_sndregs[offset - 1] != 0) && (data != 0))
+	case 0x03:
+		// if sample end position isn't 0, and length isn't 0
+		if ((m_sndregs[offset - 1] != 0) && (data != 0))
+		{
+			LOG_SOUND(("(GAE1) Playing or Queuing 1st chunk in channel: %02d, type: %02x, bank: %02x, end: %08x, Length: %04x\n", offset >> 3, (m_sndregs[offset - 2] >> 4) & 0x0f, m_sndregs[offset - 2] & 0x03, m_sndregs[offset - 1] << 8, data));
+
+			channel->loop = 1;
+
+			if (!channel->active)
 			{
-				if (!channel->active)
-				{
-					channel->active = 1;
-					channel->chunkNum = 0;
-					channel->loop = 0;
-					LOG_SOUND(("(GAE1) Playing sample channel: %02d, type: %02x, bank: %02x, end: %08x, Length: %04x\n", offset >> 3, (m_sndregs[offset - 2] >> 4) & 0x0f, m_sndregs[offset - 2] & 0x03, m_sndregs[offset - 1] << 8, data));
-				}
+				channel->chunkNum = 0;
 			}
-			else
-				channel->active = 0;
 
-			break;
+			channel->active = 1;
+		}
+		else
+		{
+			//channel->loop = 0;
+			channel->active = 0;
+		}
 
-		case 0x07: /* enable/disable looping */
-			if ((m_sndregs[offset - 1] != 0) && (data != 0))
+		break;
+
+	case 0x07:
+		// if sample end position isn't 0, and length isn't 0
+		if ((m_sndregs[offset - 1] != 0) && (data != 0))
+		{
+			LOG_SOUND(("(GAE1) Playing or Queuing 2nd chunk in channel: %02d, type: %02x, bank: %02x, end: %08x, Length: %04x\n", offset >> 3, (m_sndregs[offset - 2] >> 4) & 0x0f, m_sndregs[offset - 2] & 0x03, m_sndregs[offset - 1] << 8, data));
+
+			channel->loop = 1;
+
+			if (!channel->active)
 			{
-				LOG_SOUND(("(GAE1) Looping in channel: %02d, type: %02x, bank: %02x, end: %08x, Length: %04x\n", offset >> 3, (m_sndregs[offset - 2] >> 4) & 0x0f, m_sndregs[offset - 2] & 0x03, m_sndregs[offset - 1] << 8, data));
-				channel->loop = 1;
+				channel->chunkNum = 1;
 			}
-			else
-				channel->loop = 0;
 
-			break;
+			channel->active = 1;
+		}
+		else
+		{
+			channel->loop = 0;
+			// channel->active = 0;
+		}
+
+		break;
 	}
 }
 
@@ -263,12 +281,27 @@ void gaelco_gae1_device::device_start()
 
 	if (LOG_WAVE)
 		wavraw = util::wav_open("gae1_snd.wav", rate, 2);
+
+	for (int ch = 0; ch < NUM_CHANNELS; ch++)
+	{
+		save_item(NAME(m_channel[ch].active), ch);
+		save_item(NAME(m_channel[ch].loop), ch);
+		save_item(NAME(m_channel[ch].chunkNum), ch);
+	}
+
+	save_item(NAME(m_sndregs));
 }
 
 void gaelco_gae1_device::device_reset()
 {
 	for (int ch = 0; ch < NUM_CHANNELS; ch++)
+	{
 		m_channel[ch].active = 0;
+		m_channel[ch].loop = 0;
+		m_channel[ch].chunkNum = 0;
+	}
+
+	std::fill(std::begin(m_sndregs), std::end(m_sndregs), 0.0);
 }
 
 void gaelco_gae1_device::device_stop()

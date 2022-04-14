@@ -56,7 +56,7 @@ public:
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	static const device_timer_id TIMER_DIAL = 0;
 	static const device_timer_id TIMER_FRAME = 1;
@@ -180,15 +180,15 @@ uint32_t destroyr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-void destroyr_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void destroyr_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_DIAL:
-		dial_callback(ptr, param);
+		dial_callback(param);
 		break;
 	case TIMER_FRAME:
-		frame_callback(ptr, param);
+		frame_callback(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in destroyr_state::device_timer");

@@ -2292,8 +2292,9 @@ void validity_checker::validate_analog_input_field(const ioport_field &field)
 
 void validity_checker::validate_dip_settings(const ioport_field &field)
 {
-	const char *demo_sounds = ioport_string_from_index(INPUT_STRING_Demo_Sounds);
-	const char *flipscreen = ioport_string_from_index(INPUT_STRING_Flip_Screen);
+	char const *const demo_sounds = ioport_string_from_index(INPUT_STRING_Demo_Sounds);
+	char const *const flipscreen = ioport_string_from_index(INPUT_STRING_Flip_Screen);
+	char const *const name = field.specific_name();
 	u8 coin_list[__input_string_coinage_end + 1 - __input_string_coinage_start] = { 0 };
 	bool coin_error = false;
 
@@ -2306,15 +2307,15 @@ void validity_checker::validate_dip_settings(const ioport_field &field)
 			coin_list[strindex - __input_string_coinage_start] = 1;
 
 		// make sure demo sounds default to on
-		if (field.name() == demo_sounds && strindex == INPUT_STRING_On && field.defvalue() != setting->value())
+		if (name == demo_sounds && strindex == INPUT_STRING_On && field.defvalue() != setting->value())
 			osd_printf_error("Demo Sounds must default to On\n");
 
 		// check for bad demo sounds options
-		if (field.name() == demo_sounds && (strindex == INPUT_STRING_Yes || strindex == INPUT_STRING_No))
+		if (name == demo_sounds && (strindex == INPUT_STRING_Yes || strindex == INPUT_STRING_No))
 			osd_printf_error("Demo Sounds option must be Off/On, not %s\n", setting->name());
 
 		// check for bad flip screen options
-		if (field.name() == flipscreen && (strindex == INPUT_STRING_Yes || strindex == INPUT_STRING_No))
+		if (name == flipscreen && (strindex == INPUT_STRING_Yes || strindex == INPUT_STRING_No))
 			osd_printf_error("Flip Screen option must be Off/On, not %s\n", setting->name());
 
 		// if we have a neighbor, compare ourselves to him
@@ -2324,21 +2325,21 @@ void validity_checker::validate_dip_settings(const ioport_field &field)
 			// check for inverted off/on DIP switch order
 			int next_strindex = get_defstr_index(nextsetting->name(), true);
 			if (strindex == INPUT_STRING_On && next_strindex == INPUT_STRING_Off)
-				osd_printf_error("%s option must have Off/On options in the order: Off, On\n", field.name());
+				osd_printf_error("%s option must have Off/On options in the order: Off, On\n", name);
 
 			// check for inverted yes/no DIP switch order
 			else if (strindex == INPUT_STRING_Yes && next_strindex == INPUT_STRING_No)
-				osd_printf_error("%s option must have Yes/No options in the order: No, Yes\n", field.name());
+				osd_printf_error("%s option must have Yes/No options in the order: No, Yes\n", name);
 
 			// check for inverted upright/cocktail DIP switch order
 			else if (strindex == INPUT_STRING_Cocktail && next_strindex == INPUT_STRING_Upright)
-				osd_printf_error("%s option must have Upright/Cocktail options in the order: Upright, Cocktail\n", field.name());
+				osd_printf_error("%s option must have Upright/Cocktail options in the order: Upright, Cocktail\n", name);
 
 			// check for proper coin ordering
 			else if (strindex >= __input_string_coinage_start && strindex <= __input_string_coinage_end && next_strindex >= __input_string_coinage_start && next_strindex <= __input_string_coinage_end &&
 						strindex >= next_strindex && setting->condition() == nextsetting->condition())
 			{
-				osd_printf_error("%s option has unsorted coinage %s > %s\n", field.name(), setting->name(), nextsetting->name());
+				osd_printf_error("%s option has unsorted coinage %s > %s\n", name, setting->name(), nextsetting->name());
 				coin_error = true;
 			}
 		}
@@ -2467,9 +2468,6 @@ void validity_checker::validate_inputs(device_t &root)
 					// check for invalid UTF-8
 					if (!utf8_is_valid_string(name))
 						osd_printf_error("Field '%s' has invalid characters\n", name);
-
-					// look up the string and print an error if default strings are not used
-					/*strindex =get_defstr_index(defstr_map, name, driver, &error);*/
 				}
 
 				// verify conditions on the field

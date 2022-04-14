@@ -9,7 +9,7 @@
     Hardware:
     - 2x Z0840008PSC
     - 32 MHz XTAL
-    - MB8464A-15LL-SK (next go EPR-12646)
+    - MB8464A-15LL-SK (next to EPR-12646)
     - 2x ASSP 5C68A
     - 4x HM65256BLSP (next to 5C68A)
     - 315-5338

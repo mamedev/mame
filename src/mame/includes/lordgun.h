@@ -63,15 +63,15 @@ private:
 	required_shared_ptr_array<uint16_t, 4> m_scroll_x;
 	required_shared_ptr_array<uint16_t, 4> m_scroll_y;
 
-	uint8_t m_old;
-	uint8_t m_aliencha_dip_sel;
-	uint16_t m_priority;
-	int m_whitescreen;
-	lordgun_gun_data m_gun[2];
-	tilemap_t *m_tilemap[4];
-	std::unique_ptr<bitmap_ind16> m_bitmaps[5];
+	uint8_t m_old = 0U;
+	uint8_t m_aliencha_dip_sel = 0U;
+	uint16_t m_priority = 0U;
+	int m_whitescreen = 0;
+	lordgun_gun_data m_gun[2]{};
+	tilemap_t *m_tilemap[4]{};
+	std::unique_ptr<bitmap_ind16> m_bitmaps[5]{};
 
-	uint16_t m_protection_data;
+	uint16_t m_protection_data = 0U;
 	void lordgun_protection_w(offs_t offset, uint16_t data);
 	uint16_t lordgun_protection_r(offs_t offset);
 	void aliencha_protection_w(offs_t offset, uint16_t data);

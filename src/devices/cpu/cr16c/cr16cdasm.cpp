@@ -413,12 +413,21 @@ offs_t cr16c_disassembler::disassemble(std::ostream &stream, offs_t pc, const cr
 					stream << "bal     ";
 					format_rpair(stream, (op2 & 0x00f0) >> 4);
 					stream << ", ";
+					format_pc_disp24(stream, pc, u32(op2 & 0x000f) << 20 | u32(op2 & 0x0f00) << 8 | op3);
+					return 6 | STEP_OVER | SUPPORTED;
 				}
 				else if ((op2 & 0x00e0) == 0x00e0)
+				{
 					stream << "br      ";
+					format_pc_disp24(stream, pc, u32(op2 & 0x000f) << 20 | u32(op2 & 0x0f00) << 8 | op3);
+					return 6 | SUPPORTED;
+				}					
 				else
+				{
 					util::stream_format(stream, "b%s     ", s_cc[(opcode & 0x00f0) >> 4]);
-				format_pc_disp24(stream, pc, u32(op2 & 0x000f) << 20 | u32(op2 & 0x0f00) << 8 | op3);
+					format_pc_disp24(stream, pc, u32(op2 & 0x000f) << 20 | u32(op2 & 0x0f00) << 8 | op3);
+					return 6 | STEP_COND | SUPPORTED;
+				}
 			}
 			else
 				stream << "res/nop";
@@ -829,7 +838,7 @@ offs_t cr16c_disassembler::disassemble(std::ostream &stream, offs_t pc, const cr
 		else
 			util::stream_format(stream, "j%s     ", s_cc[(opcode & 0x00f0) >> 4]);
 		format_rpair(stream, opcode & 0x000f);
-		return 2 | ((opcode & 0x00ef) == 0x00ee ? STEP_OUT : 0) | SUPPORTED;
+		return 2 | ((opcode & 0x000f) == 0x000e ? STEP_OUT : 0) | ((opcode & 0x00e0) != 0x00e0 ? STEP_COND : 0) | SUPPORTED;
 
 	case 0x0b:
 		stream << "mulsb   ";
@@ -844,7 +853,7 @@ offs_t cr16c_disassembler::disassemble(std::ostream &stream, offs_t pc, const cr
 		format_reg(stream, opcode & 0x000f);
 		stream << ", ";
 		format_pc_disp4(stream, pc, (opcode & 0x00f0) >> 4);
-		return 2 | SUPPORTED;
+		return 2 | STEP_COND | SUPPORTED;
 
 	case 0x10: case 0x11: case 0x12: case 0x13:
 	case 0x14: case 0x15: case 0x16: case 0x17:
@@ -858,12 +867,12 @@ offs_t cr16c_disassembler::disassemble(std::ostream &stream, offs_t pc, const cr
 		if ((opcode & 0x0f0f) == 0x0800)
 		{
 			format_pc_disp16(stream, pc, opcodes.r16(pc + 2));
-			return 4 | SUPPORTED;
+			return 4 | ((opcode & 0x00e0) != 0x00e0 ? STEP_COND : 0) | SUPPORTED;
 		}
 		else
 		{
 			format_pc_disp8(stream, pc, (opcode & 0x0f00) >> 4 | (opcode & 0x000f));
-			return 2 | SUPPORTED;
+			return 2 | ((opcode & 0x00e0) != 0x00e0 ? STEP_COND : 0) | SUPPORTED;
 		}
 
 	case 0x20: case 0x21: case 0x22: case 0x23:

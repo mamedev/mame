@@ -55,7 +55,7 @@
 #include "bus/centronics/ctronics.h"
 #include "formats/flex_dsk.h"
 #include "formats/poly_dsk.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 
 class proteus_state : public driver_device
@@ -111,7 +111,7 @@ private:
 	required_device<fd1771_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
-	floppy_image_device *m_floppy;
+	floppy_image_device *m_floppy = nullptr;
 };
 
 

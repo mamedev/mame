@@ -191,7 +191,7 @@ PCB - LEAPSTER-TV:
 #include "bus/generic/carts.h"
 #include "cpu/arcompact/arcompact.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 
 class leapster_state : public driver_device
@@ -230,7 +230,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 
-	memory_region *m_cart_rom;
+	memory_region *m_cart_rom = nullptr;
 };
 
 

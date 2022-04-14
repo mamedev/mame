@@ -382,7 +382,7 @@ u8 pc9801_86_device::queue_pop()
 	return ret;
 }
 
-void pc9801_86_device::device_timer(emu_timer& timer, device_timer_id id, int param, void* ptr)
+void pc9801_86_device::device_timer(emu_timer& timer, device_timer_id id, int param)
 {
 	int16_t lsample, rsample;
 

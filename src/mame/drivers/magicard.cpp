@@ -7,6 +7,23 @@
 
   Preliminary driver by Roberto Fresca, David Haywood & Angelo Salese
 
+  TODO:
+  - driver based off raw guesses (we don't have relevant key docs);
+  - Device-ize 66470
+    Handles video and CRTC, has annoying blitter ops (magicard text on
+    playfield at very least, most likely service mode too);
+  - Verify RAM config on PCBs;
+  - I/Os;
+  - UART;
+  - magicardj & magicle: hook-up PIC;
+  - magicardj: expects GFX pitch width to be 320 rather than 336 for
+    title screen to draw correctly;
+  - hotslots, quingo: sets up 68070 timer chs 1 & 2, currently unsupported;
+  - magicardj: keeps reading timer 0 low byte, expects a live change?
+  - bigdeal0: punts with an address error PC=0x60ea3a A2=$c71c38e3;
+  - lucky7i, unkte06, magicardw: loops on i2c accesses;
+  - Is int1_w unconnected? Doesn't seem to be enabled by games so far;
+  - puzzleme: confirm it has a ssg (mapping matches hotslots);
 
   Games running on this hardware:
 
@@ -381,27 +398,11 @@
   F = 74HCU04D
   G = 74HC74D
 
-*******************************************************************************
-
-  TODO:
-
-  - Proper handling of the 68070 (68k with 32 address lines instead of 24)
-    & handle the extra features properly (UART, DMA, timers, etc.)
-
-  - Proper emulation of the 66470 Video Chip (still many unhandled features)
-
-  - Inputs;
-
-  - Many unknown memory maps;
-
-  - Proper memory map and machine driver for magicardj & magicle.
-    (different sound chip, extra undumped rom and PIC controller)
-
-
 *******************************************************************************/
 
 #include "emu.h"
 #include "machine/scc68070.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/saa1099.h"
 #include "video/ramdac.h"
@@ -419,13 +420,14 @@ class magicard_state : public driver_device
 {
 public:
 	magicard_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_magicram(*this, "magicram"),
-		m_magicramb(*this, "magicramb"),
-		m_pcab_vregs(*this, "pcab_vregs"),
-		m_maincpu(*this, "maincpu"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette")  { }
+		: driver_device(mconfig, type, tag)
+		, m_magicram(*this, "magicram")
+		, m_magicramb(*this, "magicramb")
+		, m_pcab_vregs(*this, "pcab_vregs")
+		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+	{ }
 
 	void magicard(machine_config &config);
 	void hotslots(machine_config &config);
@@ -443,12 +445,12 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(magicard_irq);
-	required_device<cpu_device> m_maincpu;
+	TIMER_DEVICE_CALLBACK_MEMBER(magicard_scanline_cb);
+	required_device<scc68070_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	void hotslots_mem(address_map &map);
-	void magicard_mem(address_map &map);
+	void hotslots_map(address_map &map);
+	void magicard_map(address_map &map);
 	void ramdac_map(address_map &map);
 };
 
@@ -646,9 +648,11 @@ void magicard_state::video_start()
 
 uint32_t magicard_state::screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->black_pen(), cliprect); //TODO
+	// TODO: border & genlock
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	if(!(SCC_DE_VREG)) //display enable
+	 // punt if display enable is off
+	if(!(SCC_DE_VREG))
 		return 0;
 
 	uint32_t count = ((SCC_VSR_VREG) / 2);
@@ -730,12 +734,10 @@ uint16_t magicard_state::philips_66470_r(offs_t offset)
 			uint8_t vdisp;
 			vdisp = m_screen->vpos() < 256;
 
-			return (m_pcab_vregs[offset] & 0xff7f) | vdisp << 7; //TODO
+			// TODO: other bits
+			return (m_pcab_vregs[offset] & 0xff7f) | vdisp << 7;
 		}
 	}
-
-	//printf("[%04x]\n",offset*2);
-
 
 	return m_pcab_vregs[offset];
 }
@@ -756,31 +758,38 @@ void magicard_state::philips_66470_w(offs_t offset, uint16_t data, uint16_t mem_
 *      Memory Maps       *
 *************************/
 
-void magicard_state::magicard_mem(address_map &map)
+void magicard_state::magicard_map(address_map &map)
 {
 //  map.global_mask(0x1fffff);
 	map(0x00000000, 0x001ffbff).mirror(0x00200000).ram().share("magicram");
 	map(0x00600000, 0x007ffbff).ram().share("magicramb");
 	/* 001ffc00-001ffdff System I/O */
-	map(0x001ffc00, 0x001ffc01).mirror(0x7fe00000).r(FUNC(magicard_state::test_r));
+	map(0x001ffc00, 0x001ffc01).mirror(0x7fe00000).portr("SYSTEM");
 	map(0x001ffc40, 0x001ffc41).mirror(0x7fe00000).r(FUNC(magicard_state::test_r));
 	map(0x001ffd01, 0x001ffd01).mirror(0x7fe00000).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x001ffd03, 0x001ffd03).mirror(0x7fe00000).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x001ffd05, 0x001ffd05).mirror(0x7fe00000).w("ramdac", FUNC(ramdac_device::mask_w));
 	map(0x001ffd40, 0x001ffd43).mirror(0x7fe00000).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
 	map(0x001ffd80, 0x001ffd81).mirror(0x7fe00000).r(FUNC(magicard_state::test_r));
-	map(0x001ffd80, 0x001ffd81).mirror(0x7fe00000).nopw(); //?
+	map(0x001ffd80, 0x001ffd81).mirror(0x7fe00000).nopw();
 	map(0x001fff80, 0x001fffbf).mirror(0x7fe00000).ram(); //DRAM I/O, not accessed by this game, CD buffer?
-	map(0x001fffe0, 0x001fffff).mirror(0x7fe00000).rw(FUNC(magicard_state::philips_66470_r), FUNC(magicard_state::philips_66470_w)).share("pcab_vregs"); //video registers
+	map(0x001fffe0, 0x001fffff).mirror(0x7fe00000).rw(FUNC(magicard_state::philips_66470_r), FUNC(magicard_state::philips_66470_w)).share("pcab_vregs");
 }
 
-void magicard_state::hotslots_mem(address_map &map)
+// Different PAL mapping?
+void magicard_state::hotslots_map(address_map &map)
 {
 //  map.global_mask(0x1fffff);
+	// puzzleme sets $0080000a as default reset vector, magicardf sets $00800078
+	// latter also will address error if we mirror with bank A by logic (i.e. .mirror(0x00a00000))
+	// we currently map it to B bank for now
 	map(0x00000000, 0x001ffbff).mirror(0x00200000).ram().share("magicram");
 	map(0x00600000, 0x007ffbff).ram().share("magicramb");
+	map(0x00800000, 0x009ffbff).ram().share("magicramb");
 	map(0x001fff80, 0x001fffbf).mirror(0x7fe00000).ram(); //DRAM I/O, not accessed by this game, CD buffer?
-	map(0x001fffe0, 0x001fffff).mirror(0x7fe00000).rw(FUNC(magicard_state::philips_66470_r), FUNC(magicard_state::philips_66470_w)).share("pcab_vregs"); //video registers
+	map(0x001fffe0, 0x001fffff).mirror(0x7fe00000).rw(FUNC(magicard_state::philips_66470_r), FUNC(magicard_state::philips_66470_w)).share("pcab_vregs");
+	map(0x00400000, 0x00403fff).ram(); // ? bigdeal0, magicardj accesses this as scratchram
+	map(0x00411000, 0x00411001).portr("SYSTEM");
 	map(0x00414001, 0x00414001).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x00414003, 0x00414003).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x00414005, 0x00414005).w("ramdac", FUNC(ramdac_device::mask_w));
@@ -795,12 +804,64 @@ void magicard_state::hotslots_mem(address_map &map)
 *************************/
 
 static INPUT_PORTS_START( magicard )
+	PORT_START("SYSTEM")
+	PORT_DIPNAME( 0x01, 0x01, "SYSTEM0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, "SYSTEM1" )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	// Used by magicard to enter into gameplay
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	// coin sound in magicard (but no GFX is updated?)
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
 void magicard_state::machine_reset()
 {
-	uint16_t *src    = (uint16_t*)memregion("maincpu" )->base();
+	// TODO: confirm reset state
+	uint16_t *src    = (uint16_t*)memregion("maincpu")->base();
 	uint16_t *dst    = m_magicram;
 	memcpy (dst, src, 0x80000);
 	memcpy (dst + 0x40000 * 1, src, 0x80000);
@@ -818,20 +879,17 @@ void magicard_state::machine_reset()
 *    Machine Drivers     *
 *************************/
 
-
-/*Probably there's a mask somewhere if it REALLY uses irqs at all...irq vectors dynamically changes after some time.*/
-INTERRUPT_GEN_MEMBER(magicard_state::magicard_irq)
+TIMER_DEVICE_CALLBACK_MEMBER(magicard_state::magicard_scanline_cb)
 {
-#if 0
-	if(machine().input().code_pressed(KEYCODE_Z)) { //vblank?
-		m_vector = 0xe4;
-		device.execute().set_input_line(1, HOLD_LINE);
+	int scanline = param;
+
+	// hotslots and quingo definitely wants two irqs per frame,
+	// reading vdisp as branch dispatch and setting a specific flag in RAM
+	if (scanline == 256 || scanline == 0)
+	{
+		m_maincpu->int2_w(1);
+		m_maincpu->int2_w(0);
 	}
-	if(machine().input().code_pressed(KEYCODE_X)) { //uart irq
-		m_vector = 0xf0;
-		device.execute().set_input_line(1, HOLD_LINE);
-	}
-#endif
 }
 
 void magicard_state::ramdac_map(address_map &map)
@@ -842,15 +900,17 @@ void magicard_state::ramdac_map(address_map &map)
 
 void magicard_state::magicard(machine_config &config)
 {
-	SCC68070(config, m_maincpu, CLOCK_A);    /* SCC-68070 CCA84 datasheet */
-	m_maincpu->set_addrmap(AS_PROGRAM, &magicard_state::magicard_mem);
-	m_maincpu->set_vblank_int("screen", FUNC(magicard_state::magicard_irq)); /* no interrupts? (it erases the vectors..) */
+	SCC68070(config, m_maincpu, CLOCK_A); /* SCC-68070 CCA84 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &magicard_state::magicard_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(magicard_state::magicard_scanline_cb), "screen", 0, 1);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	// TODO: has dynamic resolution, fill defaults and convert to set_raw
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(400, 300);
-	m_screen->set_visarea(0, 320-1, 0, 256-1); //dynamic resolution,TODO
+	m_screen->set_visarea(0, 320-1, 0, 256-1);
+//  m_screen->screen_vblank().set(m_maincpu, FUNC(scc68070_device::int2_w));
 	m_screen->set_screen_update(FUNC(magicard_state::screen_update_magicard));
 
 	PALETTE(config, m_palette).set_entries(0x100);
@@ -864,7 +924,7 @@ void magicard_state::magicard(machine_config &config)
 void magicard_state::hotslots(machine_config &config)
 {
 	magicard(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &magicard_state::hotslots_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &magicard_state::hotslots_map);
 
 	config.device_remove("saa");
 	YMZ284(config, "ssg", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -1134,7 +1194,7 @@ ROM_END
   Puzzle Me!
   Impera.
 
-  vectors are wrong.
+  TODO: PCB
 */
 ROM_START( puzzleme )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68070 Code & GFX */
@@ -1192,15 +1252,15 @@ void magicard_state::init_magicard()
 GAME( 199?, magicard,  0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card (set 1)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 199?, magicarda, magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card (set 2)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 199?, magicardb, magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card (set 3)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1994, magicarde, magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card Export 94",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1994, magicardf, magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Export (V.211A)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1998, magicardj, magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card Jackpot (4.01)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1994, magicarde, magicard, hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card Export 94",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1994, magicardf, magicard, hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Export (V.211A)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1998, magicardj, 0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card III Jackpot (4.01)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1993, magicardw, magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card - Wien (Sicherheitsversion 1.2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2001, magicle,   0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Lotto Export (5.03)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2002, hotslots,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Hot Slots (6.00)",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1999, quingo,    0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Quingo Export (5.00)",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1999, belslots,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Bel Slots Export (5.01)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2001, bigdeal0,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Big Deal Belgien (5.04)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 199?, puzzleme,  0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Puzzle Me!",                                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 199?, unkte06,   0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "unknown 'TE06'",                             MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, puzzleme,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Puzzle Me!",                                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, unkte06,   0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "unknown Poker 'TE06'",                             MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // strings in ROM
 GAME( 199?, lucky7i,   0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Lucky 7 (Impera)",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -35,6 +35,8 @@
 #include "speaker.h"
 #include "imagedev/cassette.h"
 
+#include "db32016.lh"
+
 #define VERBOSE 0
 #include "logmacro.h"
 
@@ -55,7 +57,7 @@ public:
 		, m_sdm(*this, "sdm%u", 0U)
 		, m_cass(*this, "cassette")
 		, m_cfg(*this, "S3")
-		, m_led(*this, "DS%u", 0U)
+		, m_led(*this, "DS%u", 1U)
 	{
 	}
 
@@ -99,6 +101,13 @@ void ns32kdb_state::machine_start()
 
 void ns32kdb_state::machine_reset()
 {
+	m_led[0] = 0;
+	m_led[1] = 0;
+	m_led[2] = 0;
+	m_led[3] = 0;
+
+	// FIXME: tied to TCU bus timeout
+	m_led[3] = 1;
 }
 
 template <unsigned ST> void ns32kdb_state::cpu_map(address_map &map)
@@ -114,7 +123,7 @@ template <unsigned ST> void ns32kdb_state::cpu_map(address_map &map)
 	map(0xc00020, 0xc00027).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 
 	map(0xc00030, 0xc00030).lr8([this]() { return m_cfg->read(); }, "cfg_r");
-	map(0xc00032, 0xc00037).lw8([this](offs_t offset, u8 data) { m_led[offset ^ 3] = data; }, "led_w").umask16(0x00ff);
+	map(0xc00032, 0xc00037).lw8([this](offs_t offset, u8 data) { m_led[2 - offset] = data; }, "led_w").umask16(0x00ff);
 	map(0xc00038, 0xc00038).lw8([this](u8 data) { m_sdm[0]->select_w(data); m_sdm[1]->select_w(data); }, "sdm_w");
 
 	map(0xc00040, 0xc00043).rw(m_pci[1], FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
@@ -244,11 +253,13 @@ void ns32kdb_state::db32016(machine_config &config)
 	//m_sdm[1]->out_callback().append(m_pci[1], FUNC(i8251_device::write_txc)).bit(2);
 	//m_sdm[1]->out_callback().append(m_pci[1], FUNC(i8251_device::write_rxc)).bit(3);
 
-	/* Cassette */
+	// cassette
 	SPEAKER(config, "mono").front_center();
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+
+	config.set_default_layout(layout_db32016);
 }
 
 ROM_START(db32016)

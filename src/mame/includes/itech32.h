@@ -106,42 +106,42 @@ protected:
 	virtual void nvram_init(nvram_device &nvram, void *base, size_t length);
 
 	std::unique_ptr<u16[]> m_videoram;
-	u8 m_vint_state;
-	u8 m_xint_state;
-	u8 m_qint_state;
-	u8 m_irq_base;
-	u8 m_sound_return;
-	offs_t m_itech020_prot_address;
-	int m_special_result;
-	int m_p1_effx;
-	int m_p1_effy;
-	int m_p1_lastresult;
-	attotime m_p1_lasttime;
-	int m_p2_effx;
-	int m_p2_effy;
-	int m_p2_lastresult;
-	attotime m_p2_lasttime;
-	u8 m_written[0x8000];
-	u16 m_xfer_xcount;
-	u16 m_xfer_ycount;
-	u16 m_xfer_xcur;
-	u16 m_xfer_ycur;
-	rectangle m_clip_rect;
-	rectangle m_scaled_clip_rect;
-	rectangle m_clip_save;
-	emu_timer *m_scanline_timer;
-	u32 m_grom_bank;
-	u16 m_color_latch[2];
-	u8 m_enable_latch[2];
-	u16 *m_videoplane[2];
+	u8 m_vint_state = 0;
+	u8 m_xint_state = 0;
+	u8 m_qint_state = 0;
+	u8 m_irq_base = 0;
+	u8 m_sound_return = 0;
+	offs_t m_itech020_prot_address = 0;
+	int m_special_result = 0;
+	int m_p1_effx = 0;
+	int m_p1_effy = 0;
+	int m_p1_lastresult = 0;
+	attotime m_p1_lasttime{};
+	int m_p2_effx = 0;
+	int m_p2_effy = 0;
+	int m_p2_lastresult = 0;
+	attotime m_p2_lasttime{};
+	u8 m_written[0x8000]{};
+	u16 m_xfer_xcount = 0;
+	u16 m_xfer_ycount = 0;
+	u16 m_xfer_xcur = 0;
+	u16 m_xfer_ycur = 0;
+	rectangle m_clip_rect{};
+	rectangle m_scaled_clip_rect{};
+	rectangle m_clip_save{};
+	emu_timer *m_scanline_timer = nullptr;
+	u32 m_grom_bank = 0;
+	u16 m_color_latch[2]{};
+	u8 m_enable_latch[2]{};
+	u16 *m_videoplane[2]{};
 
 	// configuration at init time
-	u8 m_planes;
-	u16 m_vram_height;
-	u32 m_vram_mask;
-	u32 m_vram_xmask;
-	u32 m_vram_ymask;
-	u32 m_grom_bank_mask;
+	u8 m_planes = 0;
+	u16 m_vram_height = 0;
+	u32 m_vram_mask = 0;
+	u32 m_vram_xmask = 0;
+	u32 m_vram_ymask = 0;
+	u32 m_grom_bank_mask = 0;
 
 	void int1_ack_w(u16 data);
 	u8 trackball_r();
@@ -301,7 +301,7 @@ private:
 	required_ioport m_dips;
 	required_ioport_array<2> m_gun_x;
 	required_ioport_array<2> m_gun_y;
-	emu_timer *m_gun_timer;
+	emu_timer *m_gun_timer = nullptr;
 };
 
 #endif // MAME_INCLUDES_ITECH32_H

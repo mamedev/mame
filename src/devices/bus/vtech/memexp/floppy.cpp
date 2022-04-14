@@ -71,7 +71,7 @@ void vtech_floppy_controller_device::floppy_formats(format_registration &fr)
 {
 	fr.add(FLOPPY_VTECH_BIN_FORMAT);
 	fr.add(FLOPPY_VTECH_DSK_FORMAT);
-	fr.add(FS_VTECH);
+	fr.add(fs::VTECH);
 }
 
 void vtech_floppy_controller_device::device_add_mconfig(machine_config &config)

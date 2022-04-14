@@ -90,7 +90,7 @@ local function populate_main_menu(buttons)
 			rate = math.floor(rate * 100) / 100
 			local text
 			if button.button then
-				text = string.format(_p('plugin-autofire', '%s [%g Hz]'), _p('input-name', button.button.name), rate)
+				text = string.format(_p('plugin-autofire', '%s [%g Hz]'), button.button.name, rate)
 			else
 				text = string.format(_p('plugin-autofire', 'n/a [%g Hz]'), rate)
 			end
@@ -145,7 +145,7 @@ end
 local function populate_configure_menu(menu)
 	local button_name
 	if current_button.button then
-		button_name = _p('input-name', current_button.button.name)
+		button_name = current_button.button.name
 	elseif current_button.port then
 		button_name = _p('plugin-autofire', 'n/a')
 	else
@@ -157,8 +157,8 @@ local function populate_configure_menu(menu)
 		configure_selection_save = #menu
 	end
 	table.insert(menu, {_p('plugin-autofire', 'Hotkey'), key_name, hotkey_poller and 'lr' or ''})
-	table.insert(menu, {_p('plugin-autofire', 'On frames'), current_button.on_frames, current_button.on_frames > 1 and 'lr' or 'r'})
-	table.insert(menu, {_p('plugin-autofire', 'Off frames'), current_button.off_frames, current_button.off_frames > 1 and 'lr' or 'r'})
+	table.insert(menu, {_p('plugin-autofire', 'On frames'), tostring(current_button.on_frames), current_button.on_frames > 1 and 'lr' or 'r'})
+	table.insert(menu, {_p('plugin-autofire', 'Off frames'), tostring(current_button.off_frames), current_button.off_frames > 1 and 'lr' or 'r'})
 	configure_menu_active = true
 end
 

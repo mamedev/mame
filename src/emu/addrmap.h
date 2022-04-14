@@ -156,6 +156,9 @@ public:
 	// chip select width setting
 	address_map_entry &cswidth(int _cswidth) { m_cswidth = _cswidth; return *this; }
 
+	// flags setting
+	address_map_entry &flags(u16 _flags) { m_flags = _flags; return *this; }
+
 	// I/O port configuration
 	address_map_entry &portr(const char *tag) { m_read.m_type = AMH_PORT; m_read.m_tag = tag; return *this; }
 	address_map_entry &portw(const char *tag) { m_write.m_type = AMH_PORT; m_write.m_tag = tag; return *this; }
@@ -365,6 +368,7 @@ public:
 	offs_t                  m_addrselect;           // select bits
 	u64                     m_mask;                 // mask for which lanes apply
 	int                     m_cswidth;              // chip select width override
+	u16                     m_flags;                // user flags
 	map_handler_data        m_read;                 // data for read handler
 	map_handler_data        m_write;                // data for write handler
 	const char *            m_share;                // tag of a shared memory block
@@ -504,7 +508,7 @@ public:
 	address_map(device_t &device, int spacenum);
 	address_map(memory_view &view);
 	address_map(device_t &device, address_map_entry *entry);
-	address_map(const address_space &space, offs_t start, offs_t end, u64 unitmask, int cswidth, device_t &device, address_map_constructor submap_delegate);
+	address_map(const address_space &space, offs_t start, offs_t end, u64 unitmask, int cswidth, u16 flags, device_t &device, address_map_constructor submap_delegate);
 	~address_map();
 
 	// setters

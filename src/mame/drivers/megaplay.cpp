@@ -88,17 +88,17 @@ private:
 	void megaplay_bios_io_map(address_map &map);
 	void megaplay_bios_map(address_map &map);
 
-	uint32_t m_bios_mode;  // determines whether ROM banks or Game data is to read from 0x8000-0xffff
+	uint32_t m_bios_mode = 0;  // determines whether ROM banks or Game data is to read from 0x8000-0xffff
 
-	uint32_t m_bios_bank; // ROM bank selection
-	uint16_t m_game_banksel;  // Game bank selection
-	uint32_t m_readpos;  // serial bank selection position (9-bit)
-	uint32_t m_bios_bank_addr;
+	uint32_t m_bios_bank = 0; // ROM bank selection
+	uint16_t m_game_banksel = 0;  // Game bank selection
+	uint32_t m_readpos = 0;  // serial bank selection position (9-bit)
+	uint32_t m_bios_bank_addr = 0;
 
-	uint32_t m_bios_width;  // determines the way the game info ROM is read
-	uint8_t m_bios_6600;
-	uint8_t m_bios_6403;
-	uint8_t m_bios_6404;
+	uint32_t m_bios_width = 0;  // determines the way the game info ROM is read
+	uint8_t m_bios_6600 = 0;
+	uint8_t m_bios_6403 = 0;
+	uint8_t m_bios_6404 = 0;
 
 	std::unique_ptr<uint16_t[]> m_ic36_ram;
 	std::unique_ptr<uint8_t[]> m_ic37_ram;
@@ -1014,10 +1014,10 @@ didn't have original Sega part numbers it's probably a converted TWC cart
 /* 03 */ GAME( 1993, mp_gslam, megaplay, megaplay, mp_gslam, mplay_state, init_megaplay, ROT0, "Sega", "Grand Slam (Mega Play)",              MACHINE_IMPERFECT_GRAPHICS )
 /* 04 */ GAME( 1993, mp_twcup, megaplay, megaplay, mp_twc,   mplay_state, init_megaplay, ROT0, "Sega", "Tecmo World Cup (Mega Play)",         MACHINE_IMPERFECT_GRAPHICS )
 /* 05 */ GAME( 1993, mp_sor2,  megaplay, megaplay, mp_sor2,  mplay_state, init_megaplay, ROT0, "Sega", "Streets of Rage II (Mega Play)",      MACHINE_IMPERFECT_GRAPHICS )
-/* 06 */ GAME( 1993, mp_bio,   megaplay, megaplay, mp_bio,   mplay_state, init_megaplay, ROT0, "Sega", "Bio-hazard Battle (Mega Play)",       MACHINE_IMPERFECT_GRAPHICS )
+/* 06 */ GAME( 1993, mp_bio,   megaplay, megaplay, mp_bio,   mplay_state, init_megaplay, ROT0, "Sega", "Bio-hazard Battle (Mega Play)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // frequently softlocks after continue, usually on the 2nd stage
 /* 07 */ GAME( 1993, mp_soni2, megaplay, megaplay, mp_soni2, mplay_state, init_megaplay, ROT0, "Sega", "Sonic The Hedgehog 2 (Mega Play)",    MACHINE_IMPERFECT_GRAPHICS )
 /* 08 - Columns 3? see below */
-/* 09 */ GAME( 1993, mp_shnb3, megaplay, megaplay, mp_shnb3, mplay_state, init_megaplay, ROT0, "Sega", "Shinobi III (Mega Play)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+/* 09 */ GAME( 1993, mp_shnb3, megaplay, megaplay, mp_shnb3, mplay_state, init_megaplay, ROT0, "Sega", "Shinobi III (Mega Play)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // game softlocks if you coin during the intro sequence
 /* 10 */ GAME( 1993, mp_gunhe, megaplay, megaplay, mp_gunhe, mplay_state, init_megaplay, ROT0, "Sega", "Gunstar Heroes (Mega Play)",          MACHINE_IMPERFECT_GRAPHICS )
 /* 11 */ GAME( 1993, mp_mazin, megaplay, megaplay, mp_mazin, mplay_state, init_megaplay, ROT0, "Sega", "Mazin Wars / Mazin Saga (Mega Play)", MACHINE_IMPERFECT_GRAPHICS )
 

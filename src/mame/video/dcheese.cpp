@@ -64,7 +64,7 @@ void dcheese_state::update_scanline_irq()
 }
 
 
-void dcheese_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void dcheese_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

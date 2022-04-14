@@ -378,6 +378,18 @@ void galaxian_state::eagle_palette(palette_device &palette)
 	}
 }
 
+void sbhoei_state::sbhoei_palette(palette_device &palette)
+{
+	galaxian_palette(palette);
+
+	// uses a wiring harness that swaps RGB -> RBG
+	for (unsigned i = 0; palette.entries() > i; ++i)
+	{
+		rgb_t const c = palette.pen(i);
+		palette.set_pen_color(i, c.r(), c.b(), c.g());
+	}
+}
+
 /*************************************
  *
  *  Common video init
@@ -1400,6 +1412,8 @@ void galaxian_state::jumpbug_extend_sprite_info(const uint8_t *base, uint8_t *sx
 	}
 }
 
+
+/*** Namennayo ***/
 void namenayo_state::namenayo_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y)
 {
 	if ((attrib & 0x01) == 0x00) // main game display
@@ -1431,6 +1445,12 @@ void namenayo_state::namenayo_unk_d800_w(uint8_t data)
 	// popmessage("namenayo_unk_d800_w %02x", data);
 }
 
+void namenayo_state::namenayo_extattr_w(offs_t offset, uint8_t data)
+{
+	m_screen->update_partial(m_screen->vpos());
+	m_exattrram[offset] = data;
+	m_bg_tilemap->mark_all_dirty();
+}
 
 void namenayo_state::namenayo_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -1455,7 +1475,8 @@ void namenayo_state::namenayo_draw_background(bitmap_rgb32 &bitmap, const rectan
 	m_bg_tilemap->draw(*m_screen, bitmap, draw, TILEMAP_DRAW_OPAQUE, 0);
 }
 
-// Guttang Gottong bootleg
+
+/*** Guttang Gottong bootleg ***/
 void galaxian_state::guttangt_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color)
 {
 	// is this configurable or a hardwired mod?
@@ -1463,30 +1484,32 @@ void galaxian_state::guttangt_extend_sprite_info(const uint8_t *base, uint8_t *s
 }
 
 
-/*************************************
- *
- *  Four Play extensions
- *
- *************************************/
+/*** Hoei Space Battle ***/
+void sbhoei_state::sbhoei_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y)
+{
+	if (((m_gfxbank[2] & 1) && (*code & 0xc0) == 0x80) || ((m_gfxbank[3] & 1) && (*code & 0xc0) == 0xc0))
+		*code = (*code & 0x3f) | ((m_gfxbank[0] & 1) << 6) | ((m_gfxbank[1] & 1) << 7) | (0x0100 << (m_gfxbank[4] & 1));
+}
 
-// gfxbank[4] is used as a cpu bank number, and gfxbank[0] for graphics banking
+void sbhoei_state::sbhoei_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color)
+{
+	if (((m_gfxbank[2] & 1) && (*code & 0x30) == 0x20) || ((m_gfxbank[3] & 1) && (*code & 0x30) == 0x30))
+		*code = (*code & 0x0f) | ((m_gfxbank[0] & 1) << 4) | ((m_gfxbank[1] & 1) << 5) | (0x40 << (m_gfxbank[4] & 1));
+}
+
+
+/*** Four Play ***/
 void fourplay_state::fourplay_rombank_w(offs_t offset, uint8_t data)
 {
+	// gfxbank[4] is used as a cpu bank number, and gfxbank[0] for graphics banking
 	m_gfxbank[4] = (m_gfxbank[4] & (2 - offset)) | (data << offset);
-
 	m_gfxbank[0] = (m_gfxbank[4] == 3); // 1 = true, 0 = false
 
 	m_rombank->set_entry(m_gfxbank[4]);
 }
 
 
-
-/*************************************
- *
- *  Video Eight extensions
- *
- *************************************/
-
+/*** Video Eight ***/
 void videight_state::videight_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y)
 {
 	*code |= (m_gfxbank[0] << 8);
@@ -1499,8 +1522,7 @@ void videight_state::videight_extend_sprite_info(const uint8_t *base, uint8_t *s
 	*color |= (m_gfxbank[4] << 3);
 }
 
-
-/* This handles the main bankswitching for code and one-bank gfx games */
+// This handles the main bankswitching for code and one-bank gfx games
 void videight_state::videight_rombank_w(offs_t offset, uint8_t data)
 {
 	static constexpr uint8_t gfxbanks[] = { 0, 10, 2, 8, 1, 9, 4, 11 };
@@ -1514,10 +1536,10 @@ void videight_state::videight_rombank_w(offs_t offset, uint8_t data)
 	}
 }
 
-/* This handles those games with multiple gfx banks */
+// This handles those games with multiple gfx banks
 void videight_state::videight_gfxbank_w(offs_t offset, uint8_t data)
 {
-	/* Moon Cresta (mooncrgx) */
+	// Moon Cresta (mooncrgx)
 	if ((data < 2) && (m_gfxbank[4] == 3))
 	{
 		static constexpr uint8_t gfxbanks[] = { 8, 12, 8, 14, 8, 13, 8, 15 };
@@ -1527,18 +1549,11 @@ void videight_state::videight_gfxbank_w(offs_t offset, uint8_t data)
 		galaxian_gfxbank_w(0, gfxbanks[m_gfxbank[3]]);
 	}
 
-	/* Uniwar S */
+	// Uniwar S
 	if ((data < 2) && (m_gfxbank[4] == 2) && (offset == 2))
 		galaxian_gfxbank_w(0, data + 2);
 
-	/* Pisces (piscesb) */
+	// Pisces (piscesb)
 	if ((data < 2) && (m_gfxbank[4] == 6) && (offset == 2))
 		galaxian_gfxbank_w(0, data + 4);
-}
-
-void namenayo_state::namenayo_extattr_w(offs_t offset, uint8_t data)
-{
-	m_screen->update_partial(m_screen->vpos());
-	m_exattrram[offset] = data;
-	m_bg_tilemap->mark_all_dirty();
 }

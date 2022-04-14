@@ -21,7 +21,7 @@
 #include "machine/input_merger.h"
 #include "machine/mbc55x_kbd.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

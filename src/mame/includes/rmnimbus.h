@@ -87,13 +87,13 @@ public:
 
 	void nimbus(machine_config &config);
 
-	uint32_t m_debug_machine;
-	uint32_t m_debug_trap;
+	uint32_t m_debug_machine = 0;
+	uint32_t m_debug_trap = 0;
 
 	void decode_subbios(device_t *device, offs_t pc);
 	void decode_subbios_return(device_t *device, offs_t pc);
 	void decode_dos21(device_t *device, offs_t pc);
-	
+
 private:
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<i8031_device> m_iocpu;
@@ -118,17 +118,17 @@ private:
 
 	bitmap_ind16 m_video_mem;
 
-	uint8_t m_mcu_reg080;
-	uint8_t m_iou_reg092;
-	uint8_t m_last_playmode;
-	uint8_t m_ay8910_a;
-	uint8_t m_ay8910_b;
-	uint16_t m_x, m_y, m_yline;
-	uint8_t m_colours, m_mode, m_upmode;
-	uint32_t m_debug_video;
-	uint8_t m_vector;
-	uint8_t m_eeprom_bits;
-	uint8_t m_eeprom_state;
+	uint8_t m_mcu_reg080 = 0;
+	uint8_t m_iou_reg092 = 0;
+	uint8_t m_last_playmode = 0;
+	uint8_t m_ay8910_a = 0;
+	uint8_t m_ay8910_b = 0;
+	uint16_t m_x = 0, m_y = 0, m_yline = 0;
+	uint8_t m_colours = 0, m_mode = 0, m_upmode = 0;
+	uint32_t m_debug_video = 0;
+	uint8_t m_vector = 0;
+	uint8_t m_eeprom_bits = 0;
+	uint8_t m_eeprom_state = 0;
 
 	uint8_t nimbus_mcu_r();
 	void nimbus_mcu_w(uint8_t data);
@@ -148,7 +148,7 @@ private:
 	void nimbus_pc8031_port3_w(uint8_t data);
 	uint8_t nimbus_iou_r(offs_t offset);
 	void nimbus_iou_w(offs_t offset, uint8_t data);
-	
+
 	uint8_t nimbus_rompack_r(offs_t offset);
 	void nimbus_rompack_w(offs_t offset, uint8_t data);
 	void nimbus_sound_ay8910_porta_w(uint8_t data);
@@ -166,7 +166,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(nimbus_fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(nimbus_fdc_drq_w);
 	DECLARE_READ_LINE_MEMBER(nimbus_fdc_enmf_r);
-	
+
 	void nimbus_via_write_portb(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_bsy);
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_cd);
@@ -200,17 +200,17 @@ private:
 	void rmni_sound_reset();
 	void mouse_js_reset();
 	void check_scsi_irq();
-	void set_scsi_drqlat(bool	clock, bool clear);
-	
-	int m_scsi_iena;
-	int m_scsi_msg;
-	int m_scsi_bsy;
-	int m_scsi_io;
-	int m_scsi_cd;
-	int m_scsi_req;
-	int m_scsi_reqlat;
+	void set_scsi_drqlat(bool   clock, bool clear);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	int m_scsi_iena = 0;
+	int m_scsi_msg = 0;
+	int m_scsi_bsy = 0;
+	int m_scsi_io = 0;
+	int m_scsi_cd = 0;
+	int m_scsi_req = 0;
+	int m_scsi_reqlat = 0;
+
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	enum
 	{
@@ -220,36 +220,36 @@ private:
 	// Static data related to Floppy and SCSI hard disks
 	struct
 	{
-		uint8_t   reg400;
+		uint8_t   reg400 = 0;
 	} m_nimbus_drives;
 
 	/* 8031 Peripheral controller */
 	struct
 	{
-		uint8_t   ipc_in;
-		uint8_t   ipc_out;
-		uint8_t   status_in;
-		uint8_t   status_out;
+		uint8_t   ipc_in = 0;
+		uint8_t   ipc_out = 0;
+		uint8_t   status_in = 0;
+		uint8_t   status_out = 0;
 	} m_ipc_interface;
 
 	/* Mouse/Joystick */
 	struct
 	{
-		int8_t		m_mouse_x;
-		int8_t   	m_mouse_y;
+		uint8_t     m_mouse_x = 0;
+		uint8_t     m_mouse_y = 0;
 
-		uint8_t   	m_mouse_pcx;
-		uint8_t   	m_mouse_pcy;
+		uint8_t     m_mouse_pcx = 0;
+		uint8_t     m_mouse_pcy = 0;
 
-		uint8_t   	m_intstate_x;
-		uint8_t   	m_intstate_y;
+		uint8_t     m_intstate_x = 0;
+		uint8_t     m_intstate_y = 0;
 
-		uint8_t   	m_reg0a4;
+		uint8_t     m_reg0a4 = 0;
 
-		emu_timer   *m_mouse_timer;
+		emu_timer   *m_mouse_timer = nullptr;
 	} m_nimbus_mouse;
-	
-	bool m_voice_enabled;
+
+	bool m_voice_enabled = false;
 
 	void nimbus_io(address_map &map);
 	void nimbus_iocpu_io(address_map &map);
@@ -263,7 +263,7 @@ private:
 	void decode_dssi_f_set_new_clt(uint16_t ds, uint16_t si);
 	void decode_dssi_f_plonk_char(uint16_t ds, uint16_t si);
 	void decode_dssi_f_rw_sectors(uint16_t ds, uint16_t si);
-	
+
 	void debug_command(const std::vector<std::string> &params);
 	void video_debug(const std::vector<std::string> &params);
 	offs_t dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);

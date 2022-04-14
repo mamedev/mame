@@ -2,7 +2,7 @@
 // detail/win_iocp_io_context.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -48,7 +48,10 @@ public:
   // Constructor. Specifies a concurrency hint that is passed through to the
   // underlying I/O completion port.
   ASIO_DECL win_iocp_io_context(asio::execution_context& ctx,
-      int concurrency_hint = -1);
+      int concurrency_hint = -1, bool own_thread = true);
+
+  // Destructor.
+  ASIO_DECL ~win_iocp_io_context();
 
   // Destroy all user-defined handler objects owned by the service.
   ASIO_DECL void shutdown();
@@ -106,10 +109,10 @@ public:
   }
 
   // Return whether a handler can be dispatched immediately.
-  bool can_dispatch()
-  {
-    return thread_call_stack::contains(this) != 0;
-  }
+  ASIO_DECL bool can_dispatch();
+
+  /// Capture the current exception so it can be rethrown from a run function.
+  ASIO_DECL void capture_current_exception();
 
   // Request invocation of the given operation and return immediately. Assumes
   // that work_started() has not yet been called for the operation.
@@ -194,6 +197,12 @@ public:
       typename timer_queue<Time_Traits>::per_timer_data& timer,
       std::size_t max_cancelled = (std::numeric_limits<std::size_t>::max)());
 
+  // Cancel the timer operations associated with the given key.
+  template <typename Time_Traits>
+  void cancel_timer_by_key(timer_queue<Time_Traits>& queue,
+      typename timer_queue<Time_Traits>::per_timer_data* timer,
+      void* cancellation_key);
+
   // Move the timer operations associated with the given timer.
   template <typename Time_Traits>
   void move_timer(timer_queue<Time_Traits>& queue,
@@ -218,7 +227,8 @@ private:
   // Dequeues at most one operation from the I/O completion port, and then
   // executes it. Returns the number of operations that were dequeued (i.e.
   // either 0 or 1).
-  ASIO_DECL size_t do_one(DWORD msec, asio::error_code& ec);
+  ASIO_DECL size_t do_one(DWORD msec,
+      win_iocp_thread_info& this_thread, asio::error_code& ec);
 
   // Helper to calculate the GetQueuedCompletionStatus timeout.
   ASIO_DECL static DWORD get_gqcs_timeout();
@@ -287,6 +297,10 @@ private:
   // Timeout to use with GetQueuedCompletionStatus.
   const DWORD gqcs_timeout_;
 
+  // Helper class to run the scheduler in its own thread.
+  struct thread_function;
+  friend struct thread_function;
+
   // Function object for processing timeouts in a background thread.
   struct timer_thread_function;
   friend struct timer_thread_function;
@@ -311,6 +325,9 @@ private:
 
   // The concurrency hint used to initialise the io_context.
   const int concurrency_hint_;
+
+  // The thread that is running the io_context.
+  scoped_ptr<thread> thread_;
 };
 
 } // namespace detail

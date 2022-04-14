@@ -71,7 +71,7 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual space_config_vector memory_space_config() const override;
 
@@ -119,7 +119,7 @@ protected:
 	void scsi_drq(bool state, int channel);
 	//void scsi_dma(int channel);
 
-	void enet_transmit(void *ptr = nullptr, int param = 0);
+	void enet_transmit(int param = 0);
 	void enet_misc_w(u32 data);
 	bool enet_rx_bc_dec(unsigned const count = 1);
 
@@ -127,15 +127,15 @@ protected:
 
 	struct pbus_dma_t
 	{
-		bool m_active;
-		uint32_t m_cur_ptr;
-		uint32_t m_desc_ptr;
-		uint32_t m_desc_flags;
-		uint32_t m_next_ptr;
-		uint32_t m_bytes_left;
-		uint32_t m_config;
-		uint32_t m_control;
-		emu_timer *m_timer;
+		bool m_active = false;
+		uint32_t m_cur_ptr = 0;
+		uint32_t m_desc_ptr = 0;
+		uint32_t m_desc_flags = 0;
+		uint32_t m_next_ptr = 0;
+		uint32_t m_bytes_left = 0;
+		uint32_t m_config = 0;
+		uint32_t m_control = 0;
+		emu_timer *m_timer = nullptr;
 	};
 
 	enum
@@ -177,10 +177,10 @@ protected:
 		ENET_XMIT = 1
 	};
 
-	const address_space_config m_pio_space_config[10];
+	const address_space_config m_pio_space_config[10]{};
 
 	required_address_space m_gio64_space;
-	address_space *m_pio_space[10];
+	address_space *m_pio_space[10]{};
 	required_device<hal2_device> m_hal2;
 	required_device<seeq80c03_device> m_enet;
 
@@ -199,23 +199,23 @@ protected:
 	devcb_write_line m_eeprom_pre_cb;
 	devcb_write_line m_dma_complete_int_cb;
 
-	uint32_t m_intstat;
-	uint32_t m_misc;
-	uint32_t m_cpu_aux_ctrl;
+	uint32_t m_intstat = 0;
+	uint32_t m_misc = 0;
+	uint32_t m_cpu_aux_ctrl = 0;
 
 	struct scsi_dma_t
 	{
-		uint32_t m_cbp;
-		uint32_t m_nbdp;
-		uint8_t m_ctrl;
-		uint32_t m_bc;
-		uint16_t m_count;
-		uint32_t m_dmacfg;
-		uint32_t m_piocfg;
-		bool m_drq;
-		bool m_big_endian;
-		bool m_to_device;
-		bool m_active;
+		uint32_t m_cbp = 0;
+		uint32_t m_nbdp = 0;
+		uint8_t m_ctrl = 0;
+		uint32_t m_bc = 0;
+		uint16_t m_count = 0;
+		uint32_t m_dmacfg = 0;
+		uint32_t m_piocfg = 0;
+		bool m_drq = false;
+		bool m_big_endian = false;
+		bool m_to_device = false;
+		bool m_active = false;
 	};
 
 	scsi_dma_t m_scsi_dma[2];
@@ -227,7 +227,7 @@ protected:
 	std::unique_ptr<uint32_t[]> m_enet_fifo[2];
 
 private:
-	emu_timer *m_enet_tx_timer;
+	emu_timer *m_enet_tx_timer = nullptr;
 
 	enum enet_dma_rx_ctrl : u32
 	{
@@ -279,24 +279,24 @@ private:
 	};
 
 	// ethernet registers
-	u32 m_enet_rx_cbp;    // current receive buffer pointer
-	u32 m_enet_rx_nbdp;   // next receive buffer descriptor pointer
-	u32 m_enet_rx_bc;     // receive byte count
-	u32 m_enet_rx_ctrl;   // receive status
-	u32 m_enet_rx_gio;    // receive gio fifo pointer
-	u32 m_enet_rx_dev;    // receive device fifo pointer
-	u32 m_enet_misc;      // reset, clear interrupt, loopback
-	u32 m_enet_piocfg;    // pio configuration
-	u32 m_enet_dmacfg;    // dma configuration
-	u32 m_enet_tx_cbp;    // current transmit buffer pointer
-	u32 m_enet_tx_nbdp;   // next transmit buffer descriptor pointer
-	u32 m_enet_tx_bc;     // transmit byte count
-	u32 m_enet_tx_ctrl;   // transmit status
-	u32 m_enet_tx_gio;    // transmit gio fifo pointer
-	u32 m_enet_tx_dev;    // transmit device fifo pointer
-	u32 m_enet_rx_cbdp;   // current receive buffer descriptor pointer
-	u32 m_enet_tx_cpfbdp; // current/previous first transmit buffer descriptor pointer
-	u32 m_enet_tx_ppfbdp; // previous/previous? first transmit buffer descriptor pointer
+	u32 m_enet_rx_cbp = 0;    // current receive buffer pointer
+	u32 m_enet_rx_nbdp = 0;   // next receive buffer descriptor pointer
+	u32 m_enet_rx_bc = 0;     // receive byte count
+	u32 m_enet_rx_ctrl = 0;   // receive status
+	u32 m_enet_rx_gio = 0;    // receive gio fifo pointer
+	u32 m_enet_rx_dev = 0;    // receive device fifo pointer
+	u32 m_enet_misc = 0;      // reset, clear interrupt, loopback
+	u32 m_enet_piocfg = 0;    // pio configuration
+	u32 m_enet_dmacfg = 0;    // dma configuration
+	u32 m_enet_tx_cbp = 0;    // current transmit buffer pointer
+	u32 m_enet_tx_nbdp = 0;   // next transmit buffer descriptor pointer
+	u32 m_enet_tx_bc = 0;     // transmit byte count
+	u32 m_enet_tx_ctrl = 0;   // transmit status
+	u32 m_enet_tx_gio = 0;    // transmit gio fifo pointer
+	u32 m_enet_tx_dev = 0;    // transmit device fifo pointer
+	u32 m_enet_rx_cbdp = 0;   // current receive buffer descriptor pointer
+	u32 m_enet_tx_cpfbdp = 0; // current/previous first transmit buffer descriptor pointer
+	u32 m_enet_tx_ppfbdp = 0; // previous/previous? first transmit buffer descriptor pointer
 };
 
 DECLARE_DEVICE_TYPE(SGI_HPC3, hpc3_device)

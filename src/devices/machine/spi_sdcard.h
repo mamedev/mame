@@ -21,7 +21,7 @@ public:
 	devcb_write_line write_miso;
 
 protected:
-	enum
+	enum sd_type : u8
 	{
 		SD_TYPE_V2 = 0,
 		SD_TYPE_HC
@@ -35,24 +35,41 @@ protected:
 
 	required_device<harddisk_image_device> m_image;
 
-	int m_type;
+	sd_type m_type;
 
 private:
-	enum
+	enum sd_state : u8
 	{
+		//REF Table 4-1:Overview of Card States vs. Operation Mode
 		SD_STATE_IDLE = 0,
+		SD_STATE_READY,
+		SD_STATE_IDENT,
+		SD_STATE_STBY,
+		SD_STATE_TRAN,
+		SD_STATE_DATA,
+		SD_STATE_DATA_MULTI, // synthetical state for this implementation
+		SD_STATE_RCV,
+		SD_STATE_PRG,
+		SD_STATE_DIS,
+		SD_STATE_INA,
+
+		//FIXME Existing states wich must be revisited
 		SD_STATE_WRITE_WAITFE,
 		SD_STATE_WRITE_DATA
 	};
+	sd_state m_state;
 
-	void send_data(int count);
+	void send_data(u16 count, sd_state new_state);
 	void do_command();
+	void change_state(sd_state new_state);
 
 	u8 m_data[520], m_cmd[6];
 	hard_disk_file *m_harddisk;
 
-	u8 m_in_latch, m_out_latch;
-	int m_cmd_ptr, m_state, m_out_ptr, m_out_count, m_ss, m_in_bit, m_cur_bit, m_write_ptr, m_blksize;
+	int m_ss, m_in_bit;
+	u8 m_in_latch, m_out_latch, m_cur_bit;
+	u16 m_out_count, m_out_ptr, m_write_ptr, m_blksize;
+	u32 m_blknext;
 	bool m_bACMD;
 };
 

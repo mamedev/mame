@@ -37,31 +37,44 @@ public:
 
 	auto fc_cb() { return m_read_fc.bind(); }
 	auto buserr_cb() { return m_write_buserr.bind(); }
+	auto in_tren0_cb() { return m_read_tren[0].bind(); }
+	auto out_tren0_cb() { return m_write_tren[0].bind(); }
+	auto in_tren1_cb() { return m_read_tren[1].bind(); }
+	auto out_tren1_cb() { return m_write_tren[1].bind(); }
+	auto in_tren2_cb() { return m_read_tren[2].bind(); }
+	auto out_tren2_cb() { return m_write_tren[2].bind(); }
 
-	virtual void map(address_map &map);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	uint8_t cause_r();
 	void task_w(offs_t offset, uint8_t data);
 	uint8_t segment_r(offs_t offset);
 	void segment_w(offs_t offset, uint8_t data);
-	uint8_t page_r(offs_t offset);
-	void page_w(offs_t offset, uint8_t data);
+	uint8_t page_lo_r(offs_t offset);
+	void page_lo_w(offs_t offset, uint8_t data);
+	uint8_t page_hi_r(offs_t offset);
+	void page_hi_w(offs_t offset, uint8_t data);
 	void dmamap_w(offs_t offset, uint8_t data);
+	void partst_w(int state);
 
-	uint8_t dma0_mreq_r(offs_t offset) { return dma_mreq_r(DMAMAP_R0_LO, offset); }
-	void dma0_mreq_w(offs_t offset, uint8_t data) { dma_mreq_w(DMAMAP_R0_LO, offset, data); }
+	uint8_t dma0_mreq_r(offs_t offset) { return dma_mreq_r(0, DMAMAP_R0_LO, offset); }
+	void dma0_mreq_w(offs_t offset, uint8_t data) { dma_mreq_w(0, DMAMAP_R0_LO, offset, data); }
 	uint8_t dma0_iorq_r(offs_t offset) { return dma_iorq_r(DMAMAP_R0_LO, offset); }
 	void dma0_iorq_w(offs_t offset, uint8_t data) { dma_iorq_w(DMAMAP_R0_LO, offset, data); }
-	uint8_t dma1_mreq_r(offs_t offset) { return dma_mreq_r(DMAMAP_R1_LO, offset); }
-	void dma1_mreq_w(offs_t offset, uint8_t data) { dma_mreq_w(DMAMAP_R1_LO, offset, data); }
+
+	uint8_t dma1_mreq_r(offs_t offset) { return dma_mreq_r(1, DMAMAP_R1_LO, offset); }
+	void dma1_mreq_w(offs_t offset, uint8_t data) { dma_mreq_w(1, DMAMAP_R1_LO, offset, data); }
 	uint8_t dma1_iorq_r(offs_t offset) { return dma_iorq_r(DMAMAP_R1_LO, offset); }
 	void dma1_iorq_w(offs_t offset, uint8_t data) { dma_iorq_w(DMAMAP_R1_LO, offset, data); }
-	uint8_t dma2_mreq_r(offs_t offset) { return dma_mreq_r(DMAMAP_R2_LO, offset); }
-	void dma2_mreq_w(offs_t offset, uint8_t data) { dma_mreq_w(DMAMAP_R2_LO, offset, data); }
+
+	uint8_t dma2_mreq_r(offs_t offset) { return dma_mreq_r(2, DMAMAP_R2_LO, offset); }
+	void dma2_mreq_w(offs_t offset, uint8_t data) { dma_mreq_w(2, DMAMAP_R2_LO, offset, data); }
 	uint8_t dma2_iorq_r(offs_t offset) { return dma_iorq_r(DMAMAP_R2_LO, offset); }
 	void dma2_iorq_w(offs_t offset, uint8_t data) { dma_iorq_w(DMAMAP_R2_LO, offset, data); }
 
-	void program_map(address_map &map);
+	void dump();
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -85,40 +98,43 @@ private:
 		DMAMAP_R0_HI
 	};
 
-	uint8_t read(offs_t offset);
-	void write(offs_t offset, uint8_t data);
+	offs_t get_physical_offset(offs_t offset, int task, bool &nonx, bool &wp);
 
-	int get_current_task(offs_t offset);
-	offs_t get_segment_address(offs_t offset);
-	offs_t get_page_address(offs_t offset, uint8_t segd);
-	offs_t translate_address(offs_t offset, int *nonx, int *wp);
-	uint8_t read_user_memory(offs_t offset);
-	void write_user_memory(offs_t offset, uint8_t data);
-	int get_fc();
-	uint8_t read_supervisor_memory(offs_t offset);
-	void write_supervisor_memory(offs_t offset, uint8_t data);
-	offs_t get_dma_address(int index, uint16_t offset);
-	uint8_t dma_mreq_r(int index, uint16_t offset);
-	void dma_mreq_w(int index, uint16_t offset, uint8_t data);
-	uint8_t dma_iorq_r(int index, uint16_t offset);
-	void dma_iorq_w(int index, uint16_t offset, uint8_t data);
+	offs_t get_dma_address(int index, offs_t offset, bool &rw);
+	uint8_t dma_mreq_r(int index, int dmamap, offs_t offset);
+	void dma_mreq_w(int index, int dmamap, offs_t offset, uint8_t data);
+	uint8_t dma_iorq_r(int dmamap, offs_t offset);
+	void dma_iorq_w(int dmamap, offs_t offset, uint8_t data);
 
+	void program_map(address_map &map);
+	void mac_map(address_map &map);
 	const address_space_config m_program_config;
+	const address_space_config m_mac_config;
 
 	required_memory_region m_rom;
-	memory_share_creator<uint8_t> m_segment_ram;
-	memory_share_creator<uint16_t> m_page_ram;
+	memory_share_creator<u8> m_segment_ram;
+	memory_share_creator<u16> m_page_ram;
 
 	required_device<watchdog_timer_device> m_watchdog;
 
 	devcb_read8        m_read_fc;
-	devcb_write_line   m_write_buserr;
+	devcb_write8       m_write_buserr;
 
-	int m_ifc2;
-	uint8_t m_task;
+	devcb_read8::array<3> m_read_tren;
+	devcb_write8::array<3> m_write_tren;
+
+	bool m_boote = 0;
+	bool m_magic = 0;
+	int m_task = 0;
+
 	uint8_t m_dmamap[8];
 	uint8_t m_cause;
+	bool m_partst = 0;
 };
+
+
+constexpr int AS_MAC = 1;
+
 
 
 // device type definition

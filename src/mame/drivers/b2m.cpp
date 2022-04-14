@@ -36,6 +36,7 @@ Need a schematic so that the fdc could be repaired.
 #include "includes/b2m.h"
 #include "formats/smx_dsk.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 /* Address maps */

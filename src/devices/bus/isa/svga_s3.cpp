@@ -57,7 +57,9 @@ void isa16_svga_s3_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(s3_vga_device::screen_update));
 
-	S3_VGA(config, m_vga, 0).set_screen("screen");
+	S3_VGA(config, m_vga, 0);
+	m_vga->set_screen("screen");
+	m_vga->set_vram_size(0x100000);
 }
 
 //-------------------------------------------------
@@ -160,7 +162,9 @@ void isa16_s3virge_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(s3virge_vga_device::screen_update));
 
-	S3VIRGE(config, m_vga, 0).set_screen("screen");
+	S3VIRGE(config, m_vga, 0);
+	m_vga->set_screen("screen");
+	m_vga->set_vram_size(0x400000);
 	m_vga->linear_config_changed().set(FUNC(isa16_s3virge_device::linear_config_changed_w));
 }
 
@@ -250,7 +254,9 @@ void isa16_s3virgedx_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(s3virgedx_vga_device::screen_update));
 
-	S3VIRGEDX(config, m_vga, 0).set_screen("screen");
+	S3VIRGEDX(config, m_vga, 0);
+	m_vga->set_screen("screen");
+	m_vga->set_vram_size(0x400000);
 	m_vga->linear_config_changed().set(FUNC(isa16_s3virgedx_device::linear_config_changed_w));
 }
 
@@ -364,7 +370,9 @@ void isa16_stealth3d2kpro_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(s3virgedx_rev1_vga_device::screen_update));
 
-	S3VIRGEDX1(config, m_vga, 0).set_screen("screen");
+	S3VIRGEDX1(config, m_vga, 0);
+	m_vga->set_screen("screen");
+	m_vga->set_vram_size(0x400000);
 	m_vga->linear_config_changed().set(FUNC(isa16_stealth3d2kpro_device::linear_config_changed_w));
 }
 

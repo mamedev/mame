@@ -156,7 +156,7 @@ private:
 	required_device<palette_device> m_palette;
 
 	required_ioport_array<2> m_input;
-	uint8_t m_selected_input;
+	uint8_t m_selected_input = 0;
 };
 
 

@@ -2,7 +2,7 @@
 // udp.cpp
 // ~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -20,13 +20,12 @@
 #include "asio/io_context.hpp"
 #include "../unit_test.hpp"
 #include "../archetypes/async_result.hpp"
-#include "../archetypes/deprecated_async_result.hpp"
 #include "../archetypes/gettable_socket_option.hpp"
 #include "../archetypes/io_control_command.hpp"
 #include "../archetypes/settable_socket_option.hpp"
 
 #if defined(ASIO_HAS_BOOST_BIND)
-# include <boost/bind.hpp>
+# include <boost/bind/bind.hpp>
 #else // defined(ASIO_HAS_BOOST_BIND)
 # include <functional>
 #endif // defined(ASIO_HAS_BOOST_BIND)
@@ -92,6 +91,7 @@ void test()
   try
   {
     io_context ioc;
+    const io_context::executor_type ioc_ex = ioc.get_executor();
     char mutable_char_buffer[128] = "";
     const char const_char_buffer[128] = "";
     socket_base::message_flags in_flags = 0;
@@ -103,9 +103,6 @@ void test()
     archetypes::gettable_socket_option<double> gettable_socket_option3;
     archetypes::io_control_command io_control_command;
     archetypes::lazy_handler lazy;
-#if !defined(ASIO_NO_DEPRECATED)
-    archetypes::deprecated_lazy_handler dlazy;
-#endif // !defined(ASIO_NO_DEPRECATED)
     asio::error_code ec;
 
     // basic_datagram_socket constructors.
@@ -121,8 +118,19 @@ void test()
     ip::udp::socket socket6(ioc, ip::udp::v4(), native_socket1);
 #endif // !defined(ASIO_WINDOWS_RUNTIME)
 
+    ip::udp::socket socket7(ioc_ex);
+    ip::udp::socket socket8(ioc_ex, ip::udp::v4());
+    ip::udp::socket socket9(ioc_ex, ip::udp::v6());
+    ip::udp::socket socket10(ioc_ex, ip::udp::endpoint(ip::udp::v4(), 0));
+    ip::udp::socket socket11(ioc_ex, ip::udp::endpoint(ip::udp::v6(), 0));
+#if !defined(ASIO_WINDOWS_RUNTIME)
+    ip::udp::socket::native_handle_type native_socket2
+      = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    ip::udp::socket socket12(ioc_ex, ip::udp::v4(), native_socket2);
+#endif // !defined(ASIO_WINDOWS_RUNTIME)
+
 #if defined(ASIO_HAS_MOVE)
-    ip::udp::socket socket7(std::move(socket6));
+    ip::udp::socket socket13(std::move(socket6));
 #endif // defined(ASIO_HAS_MOVE)
 
     // basic_datagram_socket operators.
@@ -134,11 +142,6 @@ void test()
 
     // basic_io_object functions.
 
-#if !defined(ASIO_NO_DEPRECATED)
-    io_context& ioc_ref = socket1.get_io_context();
-    (void)ioc_ref;
-#endif // !defined(ASIO_NO_DEPRECATED)
-
     ip::udp::socket::executor_type ex = socket1.get_executor();
     (void)ex;
 
@@ -147,9 +150,9 @@ void test()
     ip::udp::socket::lowest_layer_type& lowest_layer = socket1.lowest_layer();
     (void)lowest_layer;
 
-    const ip::udp::socket& socket8 = socket1;
+    const ip::udp::socket& socket14 = socket1;
     const ip::udp::socket::lowest_layer_type& lowest_layer2
-      = socket8.lowest_layer();
+      = socket14.lowest_layer();
     (void)lowest_layer2;
 
     socket1.open(ip::udp::v4());
@@ -158,12 +161,12 @@ void test()
     socket1.open(ip::udp::v6(), ec);
 
 #if !defined(ASIO_WINDOWS_RUNTIME)
-    ip::udp::socket::native_handle_type native_socket2
-      = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    socket1.assign(ip::udp::v4(), native_socket2);
     ip::udp::socket::native_handle_type native_socket3
       = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    socket1.assign(ip::udp::v4(), native_socket3, ec);
+    socket1.assign(ip::udp::v4(), native_socket3);
+    ip::udp::socket::native_handle_type native_socket4
+      = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    socket1.assign(ip::udp::v4(), native_socket4, ec);
 #endif // !defined(ASIO_WINDOWS_RUNTIME)
 
     bool is_open = socket1.is_open();
@@ -172,9 +175,12 @@ void test()
     socket1.close();
     socket1.close(ec);
 
-    ip::udp::socket::native_handle_type native_socket4
+    socket1.release();
+    socket1.release(ec);
+
+    ip::udp::socket::native_handle_type native_socket5
       = socket1.native_handle();
-    (void)native_socket4;
+    (void)native_socket5;
 
     socket1.cancel();
     socket1.cancel(ec);
@@ -207,14 +213,6 @@ void test()
     (void)i1;
     int i2 = socket1.async_connect(ip::udp::endpoint(ip::udp::v6(), 0), lazy);
     (void)i2;
-#if !defined(ASIO_NO_DEPRECATED)
-    double d1 = socket1.async_connect(
-        ip::udp::endpoint(ip::udp::v4(), 0), dlazy);
-    (void)d1;
-    double d2 = socket1.async_connect(
-        ip::udp::endpoint(ip::udp::v6(), 0), dlazy);
-    (void)d2;
-#endif // !defined(ASIO_NO_DEPRECATED)
 
     socket1.set_option(settable_socket_option1);
     socket1.set_option(settable_socket_option1, ec);
@@ -244,10 +242,14 @@ void test()
     socket1.native_non_blocking(false, ec);
 
     ip::udp::endpoint endpoint1 = socket1.local_endpoint();
+    (void)endpoint1;
     ip::udp::endpoint endpoint2 = socket1.local_endpoint(ec);
+    (void)endpoint2;
 
     ip::udp::endpoint endpoint3 = socket1.remote_endpoint();
+    (void)endpoint3;
     ip::udp::endpoint endpoint4 = socket1.remote_endpoint(ec);
+    (void)endpoint4;
 
     socket1.shutdown(socket_base::shutdown_both);
     socket1.shutdown(socket_base::shutdown_both, ec);
@@ -258,10 +260,6 @@ void test()
     socket1.async_wait(socket_base::wait_read, wait_handler());
     int i3 = socket1.async_wait(socket_base::wait_write, lazy);
     (void)i3;
-#if !defined(ASIO_NO_DEPRECATED)
-    double d3 = socket1.async_wait(socket_base::wait_write, dlazy);
-    (void)d3;
-#endif // !defined(ASIO_NO_DEPRECATED)
 
     // basic_datagram_socket functions.
 
@@ -293,21 +291,6 @@ void test()
     (void)i8;
     int i9 = socket1.async_send(null_buffers(), in_flags, lazy);
     (void)i9;
-#if !defined(ASIO_NO_DEPRECATED)
-    double d4 = socket1.async_send(buffer(mutable_char_buffer), dlazy);
-    (void)d4;
-    double d5 = socket1.async_send(buffer(const_char_buffer), dlazy);
-    (void)d5;
-    double d6 = socket1.async_send(null_buffers(), dlazy);
-    (void)d6;
-    double d7 = socket1.async_send(
-        buffer(mutable_char_buffer), in_flags, dlazy);
-    (void)d7;
-    double d8 = socket1.async_send(buffer(const_char_buffer), in_flags, dlazy);
-    (void)d8;
-    double d9 = socket1.async_send(null_buffers(), in_flags, dlazy);
-    (void)d9;
-#endif // !defined(ASIO_NO_DEPRECATED)
 
     socket1.send_to(buffer(mutable_char_buffer),
         ip::udp::endpoint(ip::udp::v4(), 0));
@@ -406,44 +389,6 @@ void test()
     int i21 = socket1.async_send_to(null_buffers(),
         ip::udp::endpoint(ip::udp::v6(), 0), in_flags, lazy);
     (void)i21;
-#if !defined(ASIO_NO_DEPRECATED)
-    double d10 = socket1.async_send_to(buffer(mutable_char_buffer),
-        ip::udp::endpoint(ip::udp::v4(), 0), dlazy);
-    (void)d10;
-    double d11 = socket1.async_send_to(buffer(mutable_char_buffer),
-        ip::udp::endpoint(ip::udp::v6(), 0), dlazy);
-    (void)d11;
-    double d12 = socket1.async_send_to(buffer(const_char_buffer),
-        ip::udp::endpoint(ip::udp::v4(), 0), dlazy);
-    (void)d12;
-    double d13 = socket1.async_send_to(buffer(const_char_buffer),
-        ip::udp::endpoint(ip::udp::v6(), 0), dlazy);
-    (void)d13;
-    double d14 = socket1.async_send_to(null_buffers(),
-        ip::udp::endpoint(ip::udp::v4(), 0), dlazy);
-    (void)d14;
-    double d15 = socket1.async_send_to(null_buffers(),
-        ip::udp::endpoint(ip::udp::v6(), 0), dlazy);
-    (void)d15;
-    double d16 = socket1.async_send_to(buffer(mutable_char_buffer),
-        ip::udp::endpoint(ip::udp::v4(), 0), in_flags, dlazy);
-    (void)d16;
-    double d17 = socket1.async_send_to(buffer(mutable_char_buffer),
-        ip::udp::endpoint(ip::udp::v6(), 0), in_flags, dlazy);
-    (void)d17;
-    double d18 = socket1.async_send_to(buffer(const_char_buffer),
-        ip::udp::endpoint(ip::udp::v4(), 0), in_flags, dlazy);
-    (void)d18;
-    double d19 = socket1.async_send_to(buffer(const_char_buffer),
-        ip::udp::endpoint(ip::udp::v6(), 0), in_flags, dlazy);
-    (void)d19;
-    double d20 = socket1.async_send_to(null_buffers(),
-        ip::udp::endpoint(ip::udp::v4(), 0), in_flags, dlazy);
-    (void)d20;
-    double d21 = socket1.async_send_to(null_buffers(),
-        ip::udp::endpoint(ip::udp::v6(), 0), in_flags, dlazy);
-    (void)d21;
-#endif // !defined(ASIO_NO_DEPRECATED)
 
     socket1.receive(buffer(mutable_char_buffer));
     socket1.receive(null_buffers());
@@ -466,17 +411,6 @@ void test()
     (void)i24;
     int i25 = socket1.async_receive(null_buffers(), in_flags, lazy);
     (void)i25;
-#if !defined(ASIO_NO_DEPRECATED)
-    double d22 = socket1.async_receive(buffer(mutable_char_buffer), dlazy);
-    (void)d22;
-    double d23 = socket1.async_receive(null_buffers(), dlazy);
-    (void)d23;
-    double d24 = socket1.async_receive(buffer(mutable_char_buffer),
-        in_flags, dlazy);
-    (void)d24;
-    double d25 = socket1.async_receive(null_buffers(), in_flags, dlazy);
-    (void)d25;
-#endif // !defined(ASIO_NO_DEPRECATED)
 
     ip::udp::endpoint endpoint;
     socket1.receive_from(buffer(mutable_char_buffer), endpoint);
@@ -506,20 +440,6 @@ void test()
     int i29 = socket1.async_receive_from(null_buffers(),
         endpoint, in_flags, lazy);
     (void)i29;
-#if !defined(ASIO_NO_DEPRECATED)
-    double d26 = socket1.async_receive_from(buffer(mutable_char_buffer),
-        endpoint, dlazy);
-    (void)d26;
-    double d27 = socket1.async_receive_from(null_buffers(),
-        endpoint, dlazy);
-    (void)d27;
-    double d28 = socket1.async_receive_from(buffer(mutable_char_buffer),
-        endpoint, in_flags, dlazy);
-    (void)d28;
-    double d29 = socket1.async_receive_from(null_buffers(),
-        endpoint, in_flags, dlazy);
-    (void)d29;
-#endif // !defined(ASIO_NO_DEPRECATED)
   }
   catch (std::exception&)
   {
@@ -560,9 +480,9 @@ void test()
   namespace bindns = boost;
 #else // defined(ASIO_HAS_BOOST_BIND)
   namespace bindns = std;
-  using std::placeholders::_1;
-  using std::placeholders::_2;
 #endif // defined(ASIO_HAS_BOOST_BIND)
+  using bindns::placeholders::_1;
+  using bindns::placeholders::_2;
 
   io_context ioc;
 
@@ -628,10 +548,8 @@ void test()
   try
   {
     io_context ioc;
+    const io_context::executor_type ioc_ex = ioc.get_executor();
     archetypes::lazy_handler lazy;
-#if !defined(ASIO_NO_DEPRECATED)
-    archetypes::deprecated_lazy_handler dlazy;
-#endif // !defined(ASIO_NO_DEPRECATED)
     asio::error_code ec;
 #if !defined(ASIO_NO_DEPRECATED)
     ip::udp::resolver::query q(ip::udp::v4(), "localhost", "0");
@@ -641,24 +559,20 @@ void test()
     // basic_resolver constructors.
 
     ip::udp::resolver resolver(ioc);
+    ip::udp::resolver resolver2(ioc_ex);
 
 #if defined(ASIO_HAS_MOVE)
-    ip::udp::resolver resolver2(std::move(resolver));
+    ip::udp::resolver resolver3(std::move(resolver));
 #endif // defined(ASIO_HAS_MOVE)
 
     // basic_resolver operators.
 
 #if defined(ASIO_HAS_MOVE)
     resolver = ip::udp::resolver(ioc);
-    resolver = std::move(resolver2);
+    resolver = std::move(resolver3);
 #endif // defined(ASIO_HAS_MOVE)
 
     // basic_io_object functions.
-
-#if !defined(ASIO_NO_DEPRECATED)
-    io_context& ioc_ref = resolver.get_io_context();
-    (void)ioc_ref;
-#endif // !defined(ASIO_NO_DEPRECATED)
 
     ip::udp::resolver::executor_type ex = resolver.get_executor();
     (void)ex;
@@ -715,55 +629,31 @@ void test()
     resolver.async_resolve(q, resolve_handler());
     int i1 = resolver.async_resolve(q, lazy);
     (void)i1;
-    double d1 = resolver.async_resolve(q, dlazy);
-    (void)d1;
 #endif // !defined(ASIO_NO_DEPRECATED)
 
     resolver.async_resolve("", "", resolve_handler());
     int i2 = resolver.async_resolve("", "", lazy);
     (void)i2;
-#if !defined(ASIO_NO_DEPRECATED)
-    double d2 = resolver.async_resolve("", "", dlazy);
-    (void)d2;
-#endif // !defined(ASIO_NO_DEPRECATED)
 
     resolver.async_resolve("", "",
         ip::udp::resolver::flags(), resolve_handler());
     int i3 = resolver.async_resolve("", "",
         ip::udp::resolver::flags(), lazy);
     (void)i3;
-#if !defined(ASIO_NO_DEPRECATED)
-    double d3 = resolver.async_resolve("", "",
-        ip::udp::resolver::flags(), dlazy);
-    (void)d3;
-#endif // !defined(ASIO_NO_DEPRECATED)
 
     resolver.async_resolve(ip::udp::v4(), "", "", resolve_handler());
     int i4 = resolver.async_resolve(ip::udp::v4(), "", "", lazy);
     (void)i4;
-#if !defined(ASIO_NO_DEPRECATED)
-    double d4 = resolver.async_resolve(ip::udp::v4(), "", "", dlazy);
-    (void)d4;
-#endif // !defined(ASIO_NO_DEPRECATED)
 
     resolver.async_resolve(ip::udp::v4(),
         "", "", ip::udp::resolver::flags(), resolve_handler());
     int i5 = resolver.async_resolve(ip::udp::v4(),
         "", "", ip::udp::resolver::flags(), lazy);
     (void)i5;
-#if !defined(ASIO_NO_DEPRECATED)
-    double d5 = resolver.async_resolve(ip::udp::v4(),
-        "", "", ip::udp::resolver::flags(), dlazy);
-    (void)d5;
-#endif // !defined(ASIO_NO_DEPRECATED)
 
     resolver.async_resolve(e, resolve_handler());
     int i6 = resolver.async_resolve(e, lazy);
     (void)i6;
-#if !defined(ASIO_NO_DEPRECATED)
-    double d6 = resolver.async_resolve(e, dlazy);
-    (void)d6;
-#endif // !defined(ASIO_NO_DEPRECATED)
   }
   catch (std::exception&)
   {

@@ -50,6 +50,11 @@ TODO:
 
 #define GAL_INP_PITCH           NODE_28     /* at 6T in schematics */
 
+#define SB_INP_NOISE_3          NODE_30
+#define SB_INP_NOISE_2          NODE_31
+#define SB_INP_NOISE_1          NODE_32
+
+
 #define TTL_OUT                 (4.0)
 
 #define GAL_R15                 RES_K(100)
@@ -121,13 +126,54 @@ TODO:
 
 #define GAL_C46                 CAP_U(0.1)
 
+/*
+ * Hoei Space Battle values
+ *
+*/
+#define SB_VOL_MIX_R1           RES_K(120)
+#define SB_VOL_MIX_R2           RES_K(39)
+#define SB_VOL_MIX_R3           RES_K(82)
+#define SB_VOL_MIX_R4           RES_K(62)
+
+#define SB_R76                  RES_K(33)
+#define SB_R77                  RES_K(22)
+
+#define SB_R66                  RES_K(470)
+#define SB_R62                  RES_K(150)
+#define SB_R36                  RES_K(22)
+#define SB_C30                  CAP_U(0.01)
+#define SB_C29                  CAP_U(0.01)
+#define SB_C22                  CAP_U(2.2)
+
+#define SB_R67                  RES_K(470)
+#define SB_R68                  RES_K(100)
+#define SB_R61                  RES_K(22)
+#define SB_C26                  CAP_U(1.0)
+#define SB_C32                  CAP_U(0.01)
+#define SB_C33                  CAP_U(0.01)
+
+#define SB_R69                  RES_K(470)
+#define SB_R64                  RES_K(100)
+#define SB_R58                  RES_K(22)
+#define SB_C19                  CAP_U(1.0)
+#define SB_C35                  CAP_U(0.01)
+#define SB_C34                  CAP_U(0.01)
+#define SB_C40                  CAP_U(0.1)
+#define SB_C41                  CAP_U(0.1)
+#define SB_C43                  CAP_U(0.1)
+#define SB_C44                  CAP_U(0.1)
+
+#define SB_R80                  RES_K(4.7)
+#define SB_R82                  RES_K(2.2)
+#define SB_R83                  RES_K(2.2)
+#define SB_R85                  RES_K(2.2)
+
 
 /*************************************
  *
  *  Structures for discrete core
  *
  *************************************/
-
 
 static const discrete_dac_r1_ladder galaxian_bck_dac =
 {
@@ -237,12 +283,54 @@ static const discrete_op_amp_filt_info galaxian_bandpass_desc =
 	5, 0
 };
 
+/* sbhoei mixing */
+
+static const discrete_mixer_desc sbhoei_mixer_desc =
+{
+	DISC_MIXER_IS_RESISTOR,
+	{SB_VOL_MIX_R1, 0, SB_VOL_MIX_R3, 0,SB_R82, SB_R83, SB_R85, SB_R80},        /* A, C, C, D */
+	{0, GAL_INP_VOL1, 0, GAL_INP_VOL2,0, 0, 0, 0, },
+	{0, 0, 0, 0, SB_C41,SB_C43,SB_C44,SB_C40},
+	0, GAL_R91,
+	0,
+	GAL_C46,
+	0, 1
+};
+
+static const discrete_op_amp_filt_info sbhoei_bandpass_desc1 =
+{
+	SB_R62, SB_R36, 0, 0,
+	SB_R66,
+	SB_C30, SB_C29, 0,
+	5.0*SB_R76/(SB_R77+SB_R76),
+	5, 0
+};
+
+static const discrete_op_amp_filt_info sbhoei_bandpass_desc2 =
+{
+	SB_R68, SB_R61, 0, 0,
+	SB_R67,
+	SB_C32, SB_C33, 0,
+	5.0*SB_R76/(SB_R77+SB_R76),
+	5, 0
+};
+
+static const discrete_op_amp_filt_info sbhoei_bandpass_desc3 =
+{
+	SB_R64, SB_R58, 0, 0,
+	SB_R69,
+	SB_C35, SB_C34, 0,
+	5.0*SB_R76/(SB_R77+SB_R76),
+	5, 0
+};
+
+
+
 /*************************************
  *
  *  Discrete Sound Blocks
  *
  *************************************/
-
 
 static DISCRETE_SOUND_START(galaxian_discrete)
 
@@ -387,8 +475,136 @@ static DISCRETE_SOUND_START(mooncrst_discrete)
 	DISCRETE_MIXER7(NODE_280, 1, NODE_133_00, NODE_133_02, NODE_133_02,NODE_133_03, NODE_120, NODE_157, NODE_182, &mooncrst_mixer_desc)
 DISCRETE_SOUND_END
 
+
+static DISCRETE_SOUND_START(sbhoei_discrete)
+
+	/************************************************/
+	/* Input register mapping for hoei space battle */
+	/************************************************/
+
+	/* HIT */
+	DISCRETE_INPUTX_DATA(SB_INP_NOISE_3, TTL_OUT, 0, 0)
+	DISCRETE_INPUTX_DATA(SB_INP_NOISE_2, TTL_OUT, 0, 0)
+	DISCRETE_INPUTX_DATA(SB_INP_NOISE_1, TTL_OUT, 0, 0)
+
+	/* FIRE */
+	DISCRETE_INPUT_LOGIC(GAL_INP_FIRE)
+
+	/* PITCH */
+	DISCRETE_INPUT_DATA(GAL_INP_PITCH)
+
+	/* Turns on / off resistors in mixer */
+	DISCRETE_INPUTX_DATA(GAL_INP_VOL1, SB_VOL_MIX_R2, 0, 0)
+	DISCRETE_INPUTX_DATA(GAL_INP_VOL2, SB_VOL_MIX_R4, 0, 0)
+
+	DISCRETE_TASK_START(0)
+
+		/************************************************/
+		/* NOISE                                        */
+		/************************************************/
+
+		/* since only a sample of the LFSR is latched @V2 we let the lfsr
+		 * run at a lower speed
+		 */
+		DISCRETE_LFSR_NOISE(NODE_150, 1, 1, RNG_RATE.dvalue()/100, 1.0, 0, 0.5, &galaxian_lfsr)
+		DISCRETE_SQUAREWFIX(NODE_151,1,(60*264)/2,1.0,50,0.5,0)  /* 2V signal */
+		DISCRETE_LOGIC_DFLIPFLOP(NODE_152,1,1,NODE_151,NODE_150)
+
+		DISCRETE_SQUAREWFIX(NODE_200,1,(60*264*384)/128,1.0,50,0.5,0)  /* 128H signal */
+		DISCRETE_LOGIC_DFLIPFLOP(NODE_201,1,1,NODE_200,NODE_150)
+
+		DISCRETE_SQUAREWFIX(NODE_206,1,(60*264)/8,1.0,50,0.5,0)  /* 4v+8v signal */
+		DISCRETE_LOGIC_DFLIPFLOP(NODE_205,1,1,NODE_206,NODE_150)
+	DISCRETE_TASK_END()
+
+	/* pitch */
+	DISCRETE_TASK_START(1)
+
+		/************************************************/
+		/* PITCH                                        */
+		/************************************************/
+
+		/* two cascaded LS164 which are reset to pitch latch value,
+		 * thus generating SOUND_CLOCK / (256 - pitch_clock) signal
+		 *
+		 * One possibility to implement this is
+		 * DISCRETE_TRANSFORM3(NODE_130, SOUND_CLOCK, 256, GAL_INP_PITCH, "012-/")
+		 * DISCRETE_COUNTER(NODE_132, 1, 0, NODE_130, 0, 15, DISC_COUNT_UP, 0, DISC_CLK_IS_FREQ)
+		 * but there is a native choice:
+		 */
+		DISCRETE_NOTE(NODE_132, 1, SOUND_CLOCK.dvalue(), GAL_INP_PITCH, 255, 15,  DISC_CLK_IS_FREQ)
+
+		/* from the 74393 (counter 2 above) only QA, QC, QD are used.
+		 * We decode three here and use SUB_NODE(133,x) below to access.
+		 */
+		DISCRETE_BITS_DECODE(NODE_133, NODE_132, 0, 3, TTL_OUT)     /* QA-QD 74393 */
+
+	/* End of this task */
+	DISCRETE_TASK_END()
+
+	DISCRETE_TASK_START(1)
+
+		/* NOISE 3
+		 * Not 100% correct - switching causes high impedance input for node_157
+		 * this is not emulated */
+		DISCRETE_RCDISC5(NODE_155, NODE_152, SB_INP_NOISE_3, (SB_R62 + SB_R36), SB_C22)
+		DISCRETE_OP_AMP_FILTER(NODE_157, 1, NODE_155, 0, DISC_OP_AMP_FILTER_IS_BAND_PASS_1M, &sbhoei_bandpass_desc1)
+
+		/* NOISE 2
+		 * Not 100% correct - switching causes high impedance input for node_157
+		 * this is not emulated */
+		DISCRETE_RCDISC5(NODE_202, NODE_205, SB_INP_NOISE_2, (SB_R64 + SB_R58), SB_C19)
+		DISCRETE_OP_AMP_FILTER(NODE_204, 1, NODE_202, 0, DISC_OP_AMP_FILTER_IS_BAND_PASS_1M, &sbhoei_bandpass_desc3)
+
+		/* NOISE 1
+		 * Not 100% correct - switching causes high impedance input for node_157
+		 * this is not emulated */
+		DISCRETE_RCDISC5(NODE_207, NODE_201, SB_INP_NOISE_1, (SB_R68 + SB_R61), SB_C26)
+		DISCRETE_OP_AMP_FILTER(NODE_203, 1, NODE_207, 0, DISC_OP_AMP_FILTER_IS_BAND_PASS_1M, &sbhoei_bandpass_desc2)
+
+	DISCRETE_TASK_END()
+
+	DISCRETE_TASK_START(1)
+		/************************************************/
+		/* FIRE                                         */
+		/************************************************/
+
+		DISCRETE_LOGIC_INVERT(NODE_170, GAL_INP_FIRE)
+		DISCRETE_MULTIPLY(NODE_171, TTL_OUT, GAL_INP_FIRE)
+		DISCRETE_MULTIPLY(NODE_172, TTL_OUT, NODE_170) // inverted
+		DISCRETE_RCFILTER(NODE_173, NODE_172, GAL_R47, GAL_C28)
+		/* Mix noise and 163 */
+		DISCRETE_TRANSFORM5(NODE_177, NODE_152, TTL_OUT, 1.0/GAL_R46, NODE_173, 1.0/GAL_R48,
+				"01*2*34*+" )
+		//DISCRETE_MULTIPLY(NODE_174, 1, TTL_OUT, NODE_152)
+		//DISCRETE_MULTIPLY(NODE_175, 1, 1.0/GAL_R46, NODE_174)
+		//DISCRETE_MULTIPLY(NODE_176, 1, 1.0/GAL_R48, NODE_173)
+		//DISCRETE_ADDER2(NODE_177, 1, NODE_175, NODE_176)
+		DISCRETE_MULTIPLY(NODE_178, RES_2_PARALLEL(GAL_R46, GAL_R48), NODE_177)
+
+		DISCRETE_555_ASTABLE_CV(NODE_181, 1, GAL_R44, GAL_R45, GAL_C27, NODE_178, &galaxian_555_fire_vco_desc)
+
+		/* 555 toggles discharge on rc discharge module */
+		DISCRETE_RCDISC5(NODE_182, NODE_181, NODE_171, (GAL_R41), GAL_C25)
+
+	/* End of task */
+	DISCRETE_TASK_END()
+
+	/************************************************/
+	/* FINAL MIX                                    */
+	/************************************************/
+
+	DISCRETE_TASK_START(2)
+		DISCRETE_MIXER8(NODE_280, 1, NODE_133_00, NODE_133_02, NODE_133_02, NODE_133_03,NODE_157, NODE_203, NODE_204, NODE_182, &sbhoei_mixer_desc)
+		DISCRETE_OUTPUT(NODE_280, 32767.0/5.0*5)
+	DISCRETE_TASK_END()
+
+DISCRETE_SOUND_END
+
+
 DEFINE_DEVICE_TYPE(GALAXIAN_SOUND, galaxian_sound_device, "galaxian_sound", "Galaxian Custom Sound")
-DEFINE_DEVICE_TYPE(MOONCRST_SOUND, mooncrst_sound_device, "mooncrst_sound", "Mooncrst Custom Sound")
+DEFINE_DEVICE_TYPE(MOONCRST_SOUND, mooncrst_sound_device, "mooncrst_sound", "Moon Cresta Custom Sound")
+DEFINE_DEVICE_TYPE(SBHOEI_SOUND, sbhoei_sound_device, "sbhoei_sound", "Space Battle Custom Sound")
 
 galaxian_sound_device::galaxian_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: galaxian_sound_device(mconfig, GALAXIAN_SOUND, tag, owner, clock)
@@ -398,9 +614,19 @@ galaxian_sound_device::galaxian_sound_device(const machine_config &mconfig, cons
 galaxian_sound_device::galaxian_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_discrete(*this, "discrete")
-	, m_lfo_val(0)
 {
 }
+
+mooncrst_sound_device::mooncrst_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: galaxian_sound_device(mconfig, MOONCRST_SOUND, tag, owner, clock)
+{
+}
+
+sbhoei_sound_device::sbhoei_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: galaxian_sound_device(mconfig, SBHOEI_SOUND, tag, owner, clock)
+{
+}
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -413,16 +639,33 @@ void galaxian_sound_device::device_start()
 	save_item(NAME(m_lfo_val));
 }
 
+void sbhoei_sound_device::device_start()
+{
+}
+
+
 //-------------------------------------------------
 //  machine_add_config - add device configuration
 //-------------------------------------------------
 
 void galaxian_sound_device::device_add_mconfig(machine_config &config)
 {
-	// sound hardware
 	DISCRETE(config, m_discrete).add_route(ALL_OUTPUTS, ":speaker", 1.0);
 	m_discrete->set_intf(galaxian_discrete);
 }
+
+void mooncrst_sound_device::device_add_mconfig(machine_config &config)
+{
+	galaxian_sound_device::device_add_mconfig(config);
+	m_discrete->set_intf(mooncrst_discrete);
+}
+
+void sbhoei_sound_device::device_add_mconfig(machine_config &config)
+{
+	galaxian_sound_device::device_add_mconfig(config);
+	m_discrete->set_intf(sbhoei_discrete);
+}
+
 
 /*************************************
  *
@@ -433,7 +676,7 @@ void galaxian_sound_device::device_add_mconfig(machine_config &config)
 /* IC 9J */
 void galaxian_sound_device::pitch_w(uint8_t data)
 {
-	m_discrete->write(GAL_INP_PITCH, data );
+	m_discrete->write(GAL_INP_PITCH, data);
 }
 
 void galaxian_sound_device::lfo_freq_w(offs_t offset, uint8_t data)
@@ -459,7 +702,7 @@ void galaxian_sound_device::noise_enable_w(uint8_t data)
 
 void galaxian_sound_device::vol_w(offs_t offset, uint8_t data)
 {
-	m_discrete->write(NODE_RELATIVE(GAL_INP_VOL1,offset), data & 0x01);
+	m_discrete->write(NODE_RELATIVE(GAL_INP_VOL1, offset), data & 0x01);
 }
 
 void galaxian_sound_device::fire_enable_w(uint8_t data)
@@ -497,13 +740,18 @@ void galaxian_sound_device::sound_w(offs_t offset, uint8_t data)
 	}
 }
 
-mooncrst_sound_device::mooncrst_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: galaxian_sound_device(mconfig, MOONCRST_SOUND, tag, owner, clock)
+
+void sbhoei_sound_device::noise1_enable_w(offs_t offset, uint8_t data)
 {
+	m_discrete->write(SB_INP_NOISE_1, data & 0x01);
 }
 
-void mooncrst_sound_device::device_add_mconfig(machine_config &config)
+void sbhoei_sound_device::noise2_enable_w(offs_t offset, uint8_t data)
 {
-	galaxian_sound_device::device_add_mconfig(config);
-	m_discrete->set_intf(mooncrst_discrete);
+	m_discrete->write(SB_INP_NOISE_2, data & 0x01);
+}
+
+void sbhoei_sound_device::noise3_enable_w(offs_t offset, uint8_t data)
+{
+	m_discrete->write(SB_INP_NOISE_3, data & 0x01);
 }

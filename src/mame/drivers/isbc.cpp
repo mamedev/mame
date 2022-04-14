@@ -103,11 +103,11 @@ private:
 	optional_shared_ptr<u16> m_biosram;
 	optional_device_array<isbx_slot_device, 2> m_sbx;
 
-	bool m_upperen;
-	offs_t m_megabyte_page;
-	bool m_nmi_enable;
-	bool m_override;
-	bool m_megabyte_enable;
+	bool m_upperen = 0;
+	offs_t m_megabyte_page = 0;
+	bool m_nmi_enable = 0;
+	bool m_override = 0;
+	bool m_megabyte_enable = 0;
 };
 
 void isbc_state::machine_reset()

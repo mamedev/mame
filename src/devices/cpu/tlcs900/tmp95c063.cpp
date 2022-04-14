@@ -268,7 +268,7 @@ void tmp95c063_device::tlcs900_handle_timers()
 			m_timer[0] += 1;
 			if ( m_timer[0] == m_t8_reg[0] )
 			{
-				if ( ( m_t8_mode[0] & 0x0c ) == 0x00 )
+				if ( ( m_t8run & 0x02 ) && ( m_t8_mode[0] & 0x0c ) == 0x00 )
 				{
 					m_timer_change[1] += 1;
 				}
@@ -345,7 +345,7 @@ void tmp95c063_device::tlcs900_handle_timers()
 			m_timer[2] += 1;
 			if ( m_timer[2] == m_t8_reg[2] )
 			{
-				if ( ( m_t8_mode[1] & 0x0c ) == 0x00 )
+				if ( ( m_t8run & 0x08 ) && ( m_t8_mode[1] & 0x0c ) == 0x00 )
 				{
 					m_timer_change[3] += 1;
 				}

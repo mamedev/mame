@@ -86,9 +86,9 @@ private:
 	optional_device<tms1k_base_device> m_subcpu;
 	optional_device<tms6100_device> m_tms6100;
 
-	u8 m_rev1_ctl;
-	u16 m_sub_o;
-	u16 m_sub_r;
+	u8 m_rev1_ctl = 0;
+	u16 m_sub_o = 0;
+	u16 m_sub_r = 0;
 
 	virtual void power_off() override;
 	void power_subcpu();
@@ -113,11 +113,6 @@ private:
 void tispellb_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
-
-	// zerofill
-	m_rev1_ctl = 0;
-	m_sub_o = 0;
-	m_sub_r = 0;
 
 	// register for savestates
 	save_item(NAME(m_rev1_ctl));
@@ -340,7 +335,7 @@ INPUT_PORTS_END
 
 void tispellb_state::rev1(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS0270(config, m_maincpu, 350000); // approximation
 	m_maincpu->k().set(FUNC(tispellb_state::main_read_k));
 	m_maincpu->o().set(FUNC(tispellb_state::main_write_o));
@@ -355,18 +350,18 @@ void tispellb_state::rev1(machine_config &config)
 
 	config.set_perfect_quantum(m_maincpu);
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(16, 16);
 	m_display->set_segmask(0xff, 0x3fff);
 	config.set_default_layout(layout_spellb);
 
-	/* no sound! */
+	// no sound!
 }
 
 
 void tispellb_state::rev2(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS0270(config, m_maincpu, 350000); // approximation
 	m_maincpu->k().set(FUNC(tispellb_state::main_read_k));
 	m_maincpu->o().set(FUNC(tispellb_state::rev2_write_o));
@@ -377,12 +372,12 @@ void tispellb_state::rev2(machine_config &config)
 	TMS6100(config, m_tms6100, 350000);
 	m_tms6100->enable_4bit_mode(true);
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(16, 16);
 	m_display->set_segmask(0xff, 0x3fff);
 	config.set_default_layout(layout_spellb);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }

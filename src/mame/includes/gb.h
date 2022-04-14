@@ -32,38 +32,38 @@ public:
 		m_bios_hack(*this, "SKIP_CHECK"),
 		m_ram(*this, RAM_TAG),
 		m_ppu(*this, "ppu"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_cart_low(*this, "cartlow"),
+		m_cart_high(*this, "carthigh")
 	{ }
 
-	uint8_t       m_gb_io[0x10];
+	uint8_t       m_gb_io[0x10]{};
 
 	/* Timer related */
-	uint16_t      m_divcount;
-	uint8_t       m_shift;
-	uint16_t      m_shift_cycles;
-	uint8_t       m_triggering_irq;
-	uint8_t       m_reloading;
+	uint16_t      m_divcount = 0;
+	uint8_t       m_shift = 0;
+	uint16_t      m_shift_cycles = 0;
+	uint8_t       m_triggering_irq = 0;
+	uint8_t       m_reloading = 0;
 
 	/* Serial I/O related */
-	uint16_t      m_internal_serial_clock;
-	uint16_t      m_internal_serial_frequency;
-	uint32_t      m_sio_count;             /* Serial I/O counter */
+	uint16_t      m_internal_serial_clock = 0;
+	uint16_t      m_internal_serial_frequency = 0;
+	uint32_t      m_sio_count = 0;             /* Serial I/O counter */
 
 	/* SGB variables */
-	int8_t m_sgb_packets;
-	uint8_t m_sgb_bitcount;
-	uint8_t m_sgb_bytecount;
-	uint8_t m_sgb_start;
-	uint8_t m_sgb_rest;
-	uint8_t m_sgb_controller_no;
-	uint8_t m_sgb_controller_mode;
-	uint8_t m_sgb_data[0x100];
+	int8_t m_sgb_packets = 0;
+	uint8_t m_sgb_bitcount = 0;
+	uint8_t m_sgb_bytecount = 0;
+	uint8_t m_sgb_start = 0;
+	uint8_t m_sgb_rest = 0;
+	uint8_t m_sgb_controller_no = 0;
+	uint8_t m_sgb_controller_mode = 0;
+	uint8_t m_sgb_data[0x100]{};
 
 	/* CGB variables */
-	uint8_t       *m_gbc_rammap[8];           /* (CGB) Addresses of internal RAM banks */
-	uint8_t       m_gbc_rambank;          /* (CGB) Current CGB RAM bank */
-
-	bool m_bios_disable;
+	uint8_t       *m_gbc_rammap[8]{};           /* (CGB) Addresses of internal RAM banks */
+	uint8_t       m_gbc_rambank = 0;          /* (CGB) Current CGB RAM bank */
 
 	void gb_io_w(offs_t offset, uint8_t data);
 	void gb_io2_w(offs_t offset, uint8_t data);
@@ -84,13 +84,7 @@ public:
 	void gbc_palette(palette_device &palette) const;
 	void gb_timer_callback(uint8_t data);
 
-	uint8_t gb_cart_r(offs_t offset);
-	uint8_t gbc_cart_r(offs_t offset);
-	void gb_bank_w(offs_t offset, uint8_t data);
-	uint8_t gb_ram_r(offs_t offset);
-	void gb_ram_w(offs_t offset, uint8_t data);
-	uint8_t gb_echo_r(address_space &space, offs_t offset);
-	void gb_echo_w(address_space &space, offs_t offset, uint8_t data);
+	uint8_t gb_bios_r(offs_t offset);
 	optional_device<gb_cart_slot_device> m_cartslot;
 
 	void supergb(machine_config &config);
@@ -108,6 +102,10 @@ protected:
 		SIO_FAST_CLOCK = 0x02,
 		SIO_INTERNAL_CLOCK = 0x01
 	};
+	static constexpr u8 NO_CART = 0x00;
+	static constexpr u8 BIOS_ENABLED = 0x00;
+	static constexpr u8 CART_PRESENT = 0x01;
+	static constexpr u8 BIOS_DISABLED = 0x02;
 
 	required_device<lr35902_cpu_device> m_maincpu;
 	required_device<gameboy_sound_device> m_apu;
@@ -118,6 +116,8 @@ protected:
 	optional_device<ram_device> m_ram;
 	required_device<dmg_ppu_device> m_ppu;
 	required_device<palette_device> m_palette;
+	memory_view m_cart_low;
+	memory_view m_cart_high;
 
 	void gb_timer_increment();
 	void gb_timer_check_irq();
@@ -158,9 +158,6 @@ private:
 	void megaduck_palette(palette_device &palette) const;
 	void megaduck_map(address_map &map);
 
-	uint8_t cart_r(offs_t offset);
-	void bank1_w(offs_t offset, uint8_t data);
-	void bank2_w(offs_t offset, uint8_t data);
 	required_device<megaduck_cart_slot_device> m_cartslot;
 };
 

@@ -226,8 +226,8 @@ protected:
 	virtual u32 cmdfifo_2d_w(u32 offset, u32 data);
 
 	// VBLANK timing
-	virtual void vblank_start(void *ptr, s32 param) override;
-	virtual void vblank_stop(void *ptr, s32 param) override;
+	virtual void vblank_start(s32 param) override;
+	virtual void vblank_stop(s32 param) override;
 
 	// video timing and updates
 	virtual void recompute_video_memory() override;

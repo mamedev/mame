@@ -593,7 +593,7 @@ void tms9914_device::device_reset()
 	update_ren();
 }
 
-void tms9914_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void tms9914_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	LOG_NOISY("tmr %d\n" , id);
 	update_fsm();

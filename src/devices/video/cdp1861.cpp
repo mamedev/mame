@@ -154,7 +154,7 @@ void cdp1861_device::device_reset()
 //  device_timer - handle timer events
 //-------------------------------------------------
 
-void cdp1861_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void cdp1861_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	int scanline = screen().vpos();
 

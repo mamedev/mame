@@ -223,7 +223,6 @@ void dkong_state::dkong2b_palette(palette_device &palette)
 	m_color_codes = color_prom; // we'll need it later
 }
 
-#ifdef UNUSED_FUNCTION
 void dkong_state::dkong4b_palette(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
@@ -258,7 +257,6 @@ void dkong_state::dkong4b_palette(palette_device &palette)
 	// color_prom now points to the beginning of the character color codes
 	m_color_codes = color_prom; // we'll need it later
 }
-#endif
 
 void dkong_state::radarscp_palette(palette_device &palette)
 {

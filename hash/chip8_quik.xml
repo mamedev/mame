@@ -559,10 +559,10 @@ possible to bundle a list to such software.
 	</software>
 
 	<software name="rushhour2">
-		<description>Rush Hour (alt)</description>
+		<description>Rush Hour</description>
 		<year>2006</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="developer" value="Hap"/>
+		<info name="developer" value="hap"/>
 		<info name="usage" value="Keys are 5,7,8,9,A,1" />
 		<part name="quik" interface="chip8quik">
 			<dataarea name="quik" size="3582">
@@ -572,10 +572,10 @@ possible to bundle a list to such software.
 	</software>
 
 	<software name="rushhour">
-		<description>Rush Hour</description>
-		<year>2006</year>
+		<description>Rush Hour (v1.1)</description>
+		<year>2008</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="developer" value="Hap"/>
+		<info name="developer" value="hap"/>
 		<sharedfeat name="compatibility" value="V" />
 		<part name="quik" interface="chip8quik">
 			<dataarea name="quik" size="3582">
@@ -737,7 +737,7 @@ possible to bundle a list to such software.
 
 	<software name="tetris">
 		<description>Tetris</description>
-		<year>????</year>
+		<year>1991</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="developer" value="Fran Dachille"/>
 		<part name="quik" interface="chip8quik">

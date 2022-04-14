@@ -379,7 +379,7 @@ uint32_t astrocde_state::screen_update_profpac(screen_device &screen, bitmap_ind
  *
  *************************************/
 
-void astrocde_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void astrocde_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -387,7 +387,7 @@ void astrocde_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 		break;
 	case TIMER_SCANLINE:
-		scanline_callback(ptr, param);
+		scanline_callback(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in astrocde_state::device_timer");

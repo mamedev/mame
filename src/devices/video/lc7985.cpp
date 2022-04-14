@@ -66,7 +66,7 @@ void lc7985_device::busy(attotime time)
 	m_busy_timer->adjust(time);
 }
 
-void lc7985_device::device_timer(emu_timer &, device_timer_id, int, void *)
+void lc7985_device::device_timer(emu_timer &, device_timer_id, int)
 {
 	m_busy_flag = false;
 }

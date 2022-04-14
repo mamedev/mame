@@ -150,7 +150,7 @@ private:
 	template<int Which> uint32_t tmcon_r();
 	template<int Which> void tmcnt_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	template<int Which> uint16_t tmcnt_r();
-	TIMER_CALLBACK_MEMBER(Timercb);
+	template<int Which> TIMER_CALLBACK_MEMBER(Timercb);
 
 	uint32_t m_timer_control[4] = { 0, 0, 0, 0 };
 	uint16_t m_timer_count[4] = { 0, 0, 0, 0 };

@@ -57,7 +57,7 @@ RO-3-9506 = 8KiB (4Kiw) self decoding address mask rom with external address dec
 #include "cpu/cp1610/cp1610.h"
 #include "sound/ay8910.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -424,18 +424,18 @@ void intv_state::intvkbd2_mem(address_map &map)
 	map(0xe000, 0xffff).r(FUNC(intv_state::intvkb_iocart_r));
 }
 
-void intv_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void intv_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_INTV_INTERRUPT2_COMPLETE:
-		intv_interrupt2_complete(ptr, param);
+		intv_interrupt2_complete(param);
 		break;
 	case TIMER_INTV_INTERRUPT_COMPLETE:
-		intv_interrupt_complete(ptr, param);
+		intv_interrupt_complete(param);
 		break;
 	case TIMER_INTV_BTB_FILL:
-		intv_btb_fill(ptr, param);
+		intv_btb_fill(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in intv_state::device_timer");
@@ -658,12 +658,12 @@ void intv_state::init_intvkbd()
 
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS       INIT          COMPANY   FULLNAME */
-CONS( 1979, intv,     0,      0,      intv,     0,       intv_state, init_intv,    "Mattel", "Intellivision", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, intvsrs,  intv,   0,      intv,     0,       intv_state, init_intv,    "Sears",  "Super Video Arcade", MACHINE_SUPPORTS_SAVE )
-COMP( 1981, intvkbd,  intv,   0,      intvkbd,  intvkbd, intv_state, init_intvkbd, "Mattel", "Intellivision Keyboard Component (Unreleased)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-CONS( 1982, intv2,    intv,   0,      intv2,    0,       intv_state, init_intv,    "Mattel", "Intellivision II", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS       INIT          COMPANY               FULLNAME, FLAGS */
+CONS( 1979, intv,     0,      0,      intv,     0,       intv_state, init_intv,    "Mattel Electronics", "Intellivision", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, intvsrs,  intv,   0,      intv,     0,       intv_state, init_intv,    "Sears",              "Super Video Arcade", MACHINE_SUPPORTS_SAVE )
+COMP( 1981, intvkbd,  intv,   0,      intvkbd,  intvkbd, intv_state, init_intvkbd, "Mattel Electronics", "Intellivision Keyboard Component (Unreleased)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+CONS( 1982, intv2,    intv,   0,      intv2,    0,       intv_state, init_intv,    "Mattel Electronics", "Intellivision II", MACHINE_SUPPORTS_SAVE )
 
 // made up, user friendlier machines with pre-mounted passthu expansions
-COMP( 1982, intvoice, intv,   0,      intvoice, 0,       intv_state, init_intv,    "Mattel", "Intellivision w/IntelliVoice expansion", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, intvecs,  intv,   0,      intvecs,  0,       intv_state, init_intv,    "Mattel", "Intellivision w/Entertainment Computer System + Intellivoice expansions", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, intvoice, intv,   0,      intvoice, 0,       intv_state, init_intv,    "Mattel Electronics", "Intellivision w/IntelliVoice expansion", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, intvecs,  intv,   0,      intvecs,  0,       intv_state, init_intv,    "Mattel Electronics", "Intellivision w/Entertainment Computer System + Intellivoice expansions", MACHINE_SUPPORTS_SAVE )

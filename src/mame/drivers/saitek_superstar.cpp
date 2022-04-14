@@ -48,7 +48,7 @@ TODO:
 #include "sound/dac.h"
 #include "video/pwm.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 // internal artwork

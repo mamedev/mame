@@ -65,7 +65,7 @@
 #include "video/upd7220.h"
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 //#include "sound/ay8910.h"
 
@@ -117,7 +117,7 @@ private:
 	required_device<am9517a_device> m_dmac;
 	required_device<pit8253_device> m_pit;
 	required_shared_ptr<uint16_t> m_aux_pcg;
-	uint8_t *m_char_rom;
+	uint8_t *m_char_rom = nullptr;
 
 	required_device<speaker_device> m_speaker;
 	required_device<upd1771c_device> m_sound;
@@ -148,10 +148,10 @@ private:
 //  void aux_pcg_w(uint8_t data);
 
 	struct {
-		uint8_t status; //status
-		uint8_t data; //key data
-		uint8_t sig; //switch signal port
-		uint8_t sh; //shift switches
+		uint8_t status = 0; //status
+		uint8_t data = 0; //key data
+		uint8_t sig = 0; //switch signal port
+		uint8_t sh = 0; //shift switches
 	}m_keyb;
 
 	uint8_t get_slave_ack(offs_t offset);
@@ -164,8 +164,8 @@ private:
 	uint8_t apc_dma_read_byte(offs_t offset);
 	void apc_dma_write_byte(offs_t offset, uint8_t data);
 
-	int m_dack;
-	uint8_t m_dma_offset[4];
+	int m_dack = 0;
+	uint8_t m_dma_offset[4]{};
 
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );

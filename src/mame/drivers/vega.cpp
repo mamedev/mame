@@ -113,7 +113,7 @@ protected:
 private:
 	struct vega_obj
 	{
-		int m_x, m_y, m_enable, m_type;
+		int m_x = 0, m_y = 0, m_enable = 0, m_type = 0;
 	};
 
 	enum
@@ -134,20 +134,20 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	int m_p2_data;
-	int m_ext_offset_w;
-	int m_ext_offset_r;
+	int m_p2_data = 0;
+	int m_ext_offset_w = 0;
+	int m_ext_offset_r = 0;
 
-	int m_tmp;
-	int m_t1;
+	int m_tmp = 0;
+	int m_t1 = 0;
 
-	uint8_t m_txt_ram[0x400];
+	uint8_t m_txt_ram[0x400]{};
 
 	vega_obj    m_obj[NUM_OBJ];
 
-	int m_frame_counter;
+	int m_frame_counter = 0;
 
-	int m_tilemap_offset_x, m_tilemap_offset_y, m_tilemap_flags, m_tilemap_top;
+	int m_tilemap_offset_x = 0, m_tilemap_offset_y = 0, m_tilemap_flags = 0, m_tilemap_top = 0;
 
 	uint8_t extern_r(offs_t offset);
 	void extern_w(offs_t offset, uint8_t data);

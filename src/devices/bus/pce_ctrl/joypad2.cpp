@@ -19,7 +19,7 @@
     models
 
     NEC Turbo Stick (PI-PD4)
-    Arcade joystick variation of Turbo Pad, with Seperated autofire
+    Arcade joystick variation of Turbo Pad, with separated autofire
     buttons.
     Turbo Stick for TurboGrafx-16 has slow motion.
 

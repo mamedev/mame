@@ -51,13 +51,13 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device_array<filter_rc_device, 3> m_filter;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
-	bool m_flipscreen_x;
-	bool m_flipscreen_y;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	bool m_flipscreen_x = false;
+	bool m_flipscreen_y = false;
 
-	bool m_irq_enable;
-	bool m_sub_irq_mask;
+	bool m_irq_enable = false;
+	bool m_sub_irq_mask = false;
 
 	DECLARE_WRITE_LINE_MEMBER(irq_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);

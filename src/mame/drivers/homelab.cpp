@@ -66,8 +66,8 @@ protected:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	std::unique_ptr<u8[]> m_vram;
-	u8 m_rows;
-	u8 m_cols;
+	u8 m_rows = 0U;
+	u8 m_cols = 0U;
 	required_device<cpu_device> m_maincpu;
 	required_memory_bank m_bank1;
 	required_region_ptr<u8> m_p_chargen;
@@ -90,8 +90,8 @@ private:
 	INTERRUPT_GEN_MEMBER(homelab_frame);
 	void homelab2_mem(address_map &map);
 	u8 cass2_r();
-	bool m_nmi;
-	bool m_spr_bit;
+	bool m_nmi = 0;
+	bool m_spr_bit = 0;
 	u8 mem3800_r();
 	u8 mem3a00_r(offs_t);
 	void mem3c00_w(offs_t, u8);
@@ -684,15 +684,16 @@ QUICKLOAD_LOAD_MEMBER(homelab_state::quickload_cb)
 	u16 args[2];
 
 	image.fseek(0x100, SEEK_SET);
-	u8 ch = image.fgetc();
-	if (ch != 0xA5)
+	u8 ch = 0;
+	u32 bytes = image.fread(&ch, 1);
+	if (bytes != 1 || ch != 0xA5)
 	{
 		image.seterror(image_error::INVALIDIMAGE, "Invalid header");
 		image.message(" Invalid header");
 		return image_init_result::FAIL;
 	}
 
-	while((ch = image.fgetc()))
+	while ((bytes = image.fread(&ch, 1)) != 0 && ch != 0)
 	{
 		if (i >= (std::size(pgmname) - 1))
 		{

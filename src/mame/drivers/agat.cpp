@@ -69,17 +69,9 @@
 ************************************************************************/
 
 #include "emu.h"
+#include "machine/agatkeyb.h"
 #include "video/agat7.h"
 #include "video/agat9.h"
-
-#include "cpu/m6502/m6502.h"
-
-#include "imagedev/cassette.h"
-
-#include "machine/bankdev.h"
-#include "machine/agatkeyb.h"
-#include "machine/timer.h"
-#include "sound/spkrdev.h"
 
 #include "bus/a2bus/a2diskii.h"
 #include "bus/a2bus/agat7langcard.h"
@@ -88,7 +80,12 @@
 #include "bus/a2bus/agat840k_hle.h"
 #include "bus/a2bus/agat_fdc.h"
 #include "bus/a2bus/nippelclock.h"
+#include "cpu/m6502/m6502.h"
 #include "cpu/m6502/r65c02.h"
+#include "imagedev/cassette.h"
+#include "machine/bankdev.h"
+#include "machine/timer.h"
+#include "sound/spkrdev.h"
 
 #include "screen.h"
 #include "softlist.h"
@@ -154,7 +151,7 @@ public:
 	void controller_strobe_w(uint8_t data);
 
 	void kbd_put(u8 data);
-	DECLARE_WRITE_LINE_MEMBER( kbd_meta );
+	DECLARE_WRITE_LINE_MEMBER(kbd_meta);
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -256,11 +253,11 @@ public:
 	void agat9_upperbank_w(offs_t offset, uint8_t data);
 
 private:
-	int m_agat9_membank[16]; // 8 physical banks, but ram chip has 16 locations
-	int m_agat9_upperbank;
-	int m_agat9_lcbank;
-	bool m_agat9_prewrite;
-	bool m_apple;
+	int m_agat9_membank[16]{}; // 8 physical banks, but ram chip has 16 locations
+	int m_agat9_upperbank = 0;
+	int m_agat9_lcbank = 0;
+	bool m_agat9_prewrite = false;
+	bool m_apple = false;
 };
 
 /***************************************************************************
@@ -746,7 +743,7 @@ void agat9_state::apple_w(offs_t offset, uint8_t data)
 	logerror("%s: c0f0_w %04X <- %02X (apple mode set)\n", machine().describe_context(), offset + 0xc0f0, data);
 
 	m_apple = true;
-	m_upperbank->set_bank(5); // XXX get current bank
+	m_upperbank->set_bank(5); // FIXME: get current bank
 }
 
 uint8_t agat_base_state::inh_r(offs_t offset)

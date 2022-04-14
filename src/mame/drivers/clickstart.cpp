@@ -67,7 +67,7 @@
 #include "machine/spg2xx.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 class clickstart_state : public driver_device
@@ -101,7 +101,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(key_update);
 
 private:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	static const device_timer_id TIMER_UART_TX = 0;
 
@@ -205,7 +205,7 @@ DEVICE_IMAGE_LOAD_MEMBER(clickstart_state::cart_load)
 	return image_init_result::PASS;
 }
 
-void clickstart_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void clickstart_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_UART_TX)
 	{

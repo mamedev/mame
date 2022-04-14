@@ -307,7 +307,7 @@ void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_
 }
 
 
-void k054539_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void k054539_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (regs[0x22f] & 0x20)
 		m_timer_handler(m_timer_state ^= 1);

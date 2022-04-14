@@ -70,7 +70,6 @@ TODO:
 */
 
 #include "emu.h"
-#include "debugger.h"
 #include "m6800.h"
 #include "6800dasm.h"
 

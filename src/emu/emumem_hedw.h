@@ -22,6 +22,7 @@ public:
 	~handler_entry_write_dispatch();
 
 	void write(offs_t offset, uX data, uX mem_mask) const override;
+	u16 write_flags(offs_t offset, uX data, uX mem_mask) const override;
 	void *get_ptr(offs_t offset) const override;
 	void lookup(offs_t address, offs_t &start, offs_t &end, handler_entry_write<Width, AddrShift> *&handler) const override;
 

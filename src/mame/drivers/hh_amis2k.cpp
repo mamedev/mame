@@ -36,6 +36,10 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	// devices
 	required_device<amis2000_base_device> m_maincpu;
 	optional_device<pwm_display_device> m_display;
@@ -43,16 +47,12 @@ public:
 	optional_ioport_array<4> m_inputs; // max 4
 
 	// misc common
-	u16 m_a;                        // MCU address bus
-	u8 m_d;                         // MCU data bus
-	int m_f;                        // MCU F_out pin
-	u16 m_inp_mux;                  // multiplexed inputs mask
+	u16 m_a = 0;                    // MCU address bus
+	u8 m_d = 0;                     // MCU data bus
+	int m_f = 0;                    // MCU F_out pin
+	u16 m_inp_mux = 0;              // multiplexed inputs mask
 
 	u8 read_inputs(int columns);
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 };
 
 
@@ -60,12 +60,6 @@ protected:
 
 void hh_amis2k_state::machine_start()
 {
-	// zerofill
-	m_a = 0;
-	m_d = 0;
-	m_f = 0;
-	m_inp_mux = 0;
-
 	// register for savestates
 	save_item(NAME(m_a));
 	save_item(NAME(m_d));
@@ -145,6 +139,12 @@ public:
 		hh_amis2k_state(mconfig, type, tag)
 	{ }
 
+	void wildfire(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
 	void update_display();
 	void write_d(u8 data);
 	void write_a(u16 data);
@@ -152,11 +152,7 @@ public:
 
 	void speaker_update();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
-	double m_speaker_volume;
-	void wildfire(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
+	double m_speaker_volume = 0.0;
 
 	std::vector<double> m_speaker_levels;
 };
@@ -164,9 +160,6 @@ protected:
 void wildfire_state::machine_start()
 {
 	hh_amis2k_state::machine_start();
-
-	// zerofill/init
-	m_speaker_volume = 0;
 	save_item(NAME(m_speaker_volume));
 }
 
@@ -236,7 +229,7 @@ static const u8 wildfire_7seg_table[0x10] =
 
 void wildfire_state::wildfire(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	AMI_S2152(config, m_maincpu, 850000); // approximation - RC osc. R=?, C=?
 	m_maincpu->set_7seg_table(wildfire_7seg_table);
 	m_maincpu->read_i().set_ioport("IN.0");
@@ -244,13 +237,13 @@ void wildfire_state::wildfire(machine_config &config)
 	m_maincpu->write_a().set(FUNC(wildfire_state::write_a));
 	m_maincpu->write_f().set(FUNC(wildfire_state::write_f));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(12, 8);
 	m_display->set_segmask(7, 0x7f);
 	m_display->set_bri_levels(0.01, 0.1); // bumpers are dimmed
 	config.set_default_layout(layout_wildfire);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 

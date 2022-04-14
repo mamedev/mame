@@ -141,7 +141,7 @@ public:
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	static const device_timer_id TIMER_IOWQ = 0;
 
@@ -253,7 +253,7 @@ void hazl1500_state::machine_reset()
 	m_kbd_status_latch = 0;
 }
 
-void hazl1500_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void hazl1500_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_cpu_iowq->write(1);
 	m_cpu_ba4->write(1);

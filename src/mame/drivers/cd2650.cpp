@@ -86,10 +86,10 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	u8 m_term_data;
-	bool m_cassbit;
-	bool m_cassold;
-	u8 m_cass_data[4];
+	u8 m_term_data = 0U;
+	bool m_cassbit = 0;
+	bool m_cassold = 0;
+	u8 m_cass_data[4]{};
 	void machine_reset() override;
 	void machine_start() override;
 	required_device<s2650_device> m_maincpu;

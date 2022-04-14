@@ -28,14 +28,14 @@ private:
 
 	required_shared_ptr<uint8_t> m_bosco_starcontrol;
 
-	uint8_t *m_bosco_radarx;
-	uint8_t *m_bosco_radary;
+	uint8_t *m_bosco_radarx = nullptr;
+	uint8_t *m_bosco_radary = nullptr;
 
-	uint8_t m_bosco_starclr;
+	uint8_t m_bosco_starclr = 0U;
 
-	uint8_t *m_spriteram;
-	uint8_t *m_spriteram2;
-	uint32_t m_spriteram_size;
+	uint8_t *m_spriteram = nullptr;
+	uint8_t *m_spriteram2 = nullptr;
+	uint32_t m_spriteram_size = 0U;
 	TILEMAP_MAPPER_MEMBER(fg_tilemap_scan);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);

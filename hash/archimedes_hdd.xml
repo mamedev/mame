@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+
+<softwarelist name="archimedes_hdd" description="Acorn Archimedes hard disks">
+
+	<software name="ros311_apps">
+		<description>RISC OS 3.11 Applications</description>
+		<year>1992</year>
+		<publisher>Acorn Computers</publisher>
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="riscos311_apps" sha1="d69e2fb15d82f83d32786a29dd3321a37a9dbb36" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -3,11 +3,12 @@
 <!--
 license:CC0
 -->
-<softwarelist name="cdi" description="CD-i CD-ROMs">
+<softwarelist name="cdi" description="Philips CD-i CD-ROMs">
 
 <!--
-    These are converted from old TOSEC set (I think v2009-04-05), but a double check is being performed, at
-    least for discs that can still be found for this set
+    Most of these are converted from old TOSEC set (I think v2009-04-05).
+
+    Some (notably CD-i Ready titles) are from more recent Redump sets.
 -->
 
 	<software name="3degree">
@@ -10674,44 +10675,49 @@ license:CC0
 
 
 <!--
-    These are non-tosec sourced, and could be bad
+    These are non-tosec sourced
 -->
 
-
-	<!-- The Apprentice is a CDi-Ready disc, the format of these discs is strange, and not properly supported
-	   in a PC the first track is identified as an audio track, with the game DATA being in the audio
-	   pre-gap.  Trying to convert this in CHDMAN from the cuesheet results in a mangled CHD, with
-	   incorrect offsets when trying to output it again.
-
-	   Manually adding a pregap area to the cuesheet encodes it without mangling the offsets, but
-	   still doesn't result in anything that boots.
-
-	   Creating an additional 'track' data track in the cuesheet allows the game to boot, it still
-	   appears to play the correct audio tracks too, however this can't be considered accurate.
-
-	   The same applies to Dimo's quest and Alien Gate
-
-	   Lucky Luke is similar, but I've not been able to convert it to anything that works or is even
-	   recognized as having a valid data track.  (it also requires digital video, which we don't support)
-	-->
 	<software name="apprentc">
 		<description>The Apprentice [CDi Ready]</description>
 		<year>????</year>
 		<publisher>The Vision Factory</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="the apprentice (cdi-ready)" sha1="7e1f612f1c36dabdc304abf2d17200b5faa4e180" status="baddump"/>
+				<disk name="the apprentice (cdi-ready)" sha1="3a66337c20b9157e64228847ee3d153f80c25e4e"/>
 			</diskarea>
 		</part>
 	</software>
 
 	<software name="aliengat">
-		<description>Alien Gate [CDi Ready]</description>
-		<year>????</year>
+		<description>Alien Gate (Euro)</description>
+		<year>1992</year>
 		<publisher>The Vision Factory</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="alien gate (cdi-ready)" sha1="09e4a5276382d65e6ce42bed2662638a62704768" status="baddump"/>
+				<disk name="alien gate (euro)" sha1="8ad4d0c5b875a04a7db3abbe236ba18eb2696a96"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="aliengatu" cloneof="aliengat">
+		<description>Alien Gate (US, set 1)</description>
+		<year>1992</year>
+		<publisher>The Vision Factory</publisher>
+		<part name="cdrom" interface="cdi_cdrom">
+			<diskarea name="cdrom">
+				<disk name="alien gate (us)(cdi-ready)" sha1="16009503b1fadb28b9fff293a7099b7cab062325"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="aliengatu1" cloneof="aliengat">
+		<description>Alien Gate (US, set 2)</description>
+		<year>1992</year>
+		<publisher>The Vision Factory</publisher>
+		<part name="cdrom" interface="cdi_cdrom">
+			<diskarea name="cdrom">
+				<disk name="alien gate (us, set 1)(cdi-ready)" sha1="823a5b692a87b51a7c2f35ac0d63865494e253f7"/>
 			</diskarea>
 		</part>
 	</software>
@@ -10730,7 +10736,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="from the associated press - the best of photo journalism (1993)[dvc]" sha1="c8eb407a10916be732e9fa10c198dce1a277e525"/>
+				<disk name="from the associated press - the best of photo journalism (1993)[dvc]" sha1="4059c3d61a00194f1e761d7a0d76ec871c9dad74"/>
 			</diskarea>
 		</part>
 	</software>
@@ -10803,7 +10809,7 @@ license:CC0
 		<publisher>The Vision Factory</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="dimo's quest (cdi-ready)" sha1="dff8f6fa034a9f0cb2b84a42aa07c20f875c2614" status="baddump"/>
+				<disk name="dimo's quest (cdi-ready)" sha1="4264e939dc76c3f8386390c597be4dde765207d1"/>
 			</diskarea>
 		</part>
 	</software>
@@ -10974,6 +10980,17 @@ license:CC0
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
 				<disk name="go - special edition" sha1="abcb043a29b8c5f432b8c1097a76a8b45e9c946c" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="luckluke" supported="no">
+		<description>Lucky Luke: The Video Game [CDi Ready]</description>
+		<year>1996</year>
+		<publisher>Philips Media GmbH</publisher>
+		<part name="cdrom" interface="cdi_cdrom">
+			<diskarea name="cdrom">
+				<disk name="lucky luke (cdi-ready)" sha1="88982afebcfcd9fb171855ffd575efc63450d341"/>
 			</diskarea>
 		</part>
 	</software>

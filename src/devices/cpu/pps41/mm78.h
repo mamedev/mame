@@ -68,9 +68,9 @@ protected:
 	void program_2k(address_map &map);
 
 	// opcode helpers
-	virtual bool op_is_eob(u8 op) override { return (op & 0xf8) == 0x08; };
-	virtual bool op_is_lb(u8 op) override { return (op & 0xf0) == 0x10; };
-	virtual bool op_is_lai(u8 op) override { return (op & 0xf0) == 0x40; };
+	virtual bool op_is_eob(u8 op) override { return (op & 0xf8) == 0x08; }
+	virtual bool op_is_lb(u8 op) override { return (op & 0xf0) == 0x10; }
+	virtual bool op_is_lai(u8 op) override { return (op & 0xf0) == 0x40; }
 
 	// opcode handlers
 	virtual void op_lba() override;

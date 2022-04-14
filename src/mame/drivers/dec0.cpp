@@ -53,8 +53,9 @@ ToDo:
 - Fighting Fantasy (bootleg) doesn't move on when killing the Lamia, is the MCU involved?
 - Hook up the 68705 in Midnight Resistance (bootleg) (it might not be used, leftover from the Fighting Fantasy bootleg on the same PCB?)
 - Get rid of ROM patch in Hippodrome;
-- background pen in Birdie Try is presumably wrong.
-- Pixel clock frequency isn't verified
+- background pen in Birdie Try is presumably wrong;
+- Unemulated coin counter, manuals mentions it but nowhere to be found, HW triggered?
+- Pixel clock frequency isn't verified;
 
 Bad Dudes MCU implements a command to calculate a program ROM checksum and
 compare the low byte of the result to a value supplied by the host CPU, but it
@@ -264,7 +265,7 @@ DE-0318-4
 |    C1060  | 45|                                       |
 |-----------|---|---------------------------------------|
 Notes:
-      49        - Unknown DIP40 ASIC (no clock input so not an MCU)
+      49        - NEC DIP40 ULA (no clock input)
       47        - Unknown SDIP52 ASIC (no clock input so not an MCU)
       45        - HuC6280 sound CPU in disguise as Data East custom chip #45. Clock input 21.4772MHz on pin 10
       M6295     - Clock 1.000MHz [20/2/10], pin 7 HIGH
@@ -312,7 +313,7 @@ DE-0316-4
 |  PZ-2.A2                                              |
 |-------------------------------------------------------|
 Notes:
-      DEM-01    - Unknown SDIP52 ASIC (no clock input so not an MCU, decapping it found only ASIC, no ROM)
+      DEM-01    - Fujitsu MB8421 Dual port SRAM in disguise as Data East custom chip DEM-01.
       DEC-01    - HuC6280 sound CPU in disguise as Data East custom chip DEC-01. Clock input 21.4772MHz on pin 10
       M6295     - Clock 1.000MHz [20/2/10], pin 7 HIGH
       4558      - NEC C4558 Dual Op Amp
@@ -396,6 +397,7 @@ Notes:
 #include "cpu/m6502/m6502.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m68705.h"
+#include "machine/mb8421.h"
 #include "machine/upd4701.h"
 #include "sound/okim6295.h"
 #include "sound/ymopn.h"
@@ -478,12 +480,6 @@ void dec0_automat_state::automat_control_w(offs_t offset, uint16_t data, uint16_
 	}
 }
 
-void dec0_state::midres_sound_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-		m_soundlatch->write(data & 0xff);
-}
-
 /******************************************************************************/
 
 void dec0_state::dec0_map(address_map &map)
@@ -528,9 +524,9 @@ void dec0_state::ffantasybl_map(address_map &map)
 {
 	dec0_map(map);
 
-	map(0x0024c880, 0x0024cbff).ram(); // what is this? layer 3-related??
-	map(0x00242024, 0x00242025).r(FUNC(dec0_state::ffantasybl_242024_r));
-	map(0x00ff87ee, 0x00ff87ef).portr("VBLANK");
+	map(0x24c880, 0x24cbff).ram(); // what is this? layer 3-related??
+	map(0x242024, 0x242025).r(FUNC(dec0_state::ffantasybl_242024_r));
+	map(0xff87ee, 0xff87ef).portr("VBLANK");
 }
 
 void dec0_state::dec0_tb_map(address_map &map)
@@ -547,14 +543,14 @@ void dec0_state::dec0_tb_map(address_map &map)
 void dec0_state::robocop_map(address_map &map)
 {
 	dec0_map(map);
-	map(0x180000, 0x180fff).rw(FUNC(dec0_state::robocop_68000_share_r), FUNC(dec0_state::robocop_68000_share_w));
+	map(0x180000, 0x180fff).rw("dem01", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w)).umask16(0x00ff);
 }
 
 void dec0_state::robocop_sub_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
 	map(0x1f0000, 0x1f1fff).ram();                                 /* Main ram */
-	map(0x1f2000, 0x1f3fff).ram().share("robocop_shared");  /* Shared ram */
+	map(0x1f2000, 0x1f27ff).rw("dem01", FUNC(mb8421_device::right_r), FUNC(mb8421_device::right_w));  /* Shared ram */
 }
 
 void dec0_state::hippodrm_map(address_map &map)
@@ -751,7 +747,7 @@ void dec0_state::midresb_map(address_map &map)
 	map(0x160010, 0x160011).w(FUNC(dec0_state::priority_w));
 	map(0x180000, 0x18000f).r(FUNC(dec0_state::dec0_controls_r));
 	map(0x180012, 0x180013).noprw();
-	map(0x180014, 0x180015).w(FUNC(dec0_state::midres_sound_w));
+	map(0x180015, 0x180015).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x180018, 0x180019).noprw();
 	map(0x1a0000, 0x1a0001).portr("AN0");
 	map(0x1a0008, 0x1a0009).portr("AN1");
@@ -972,18 +968,18 @@ static INPUT_PORTS_START( dec0 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) /* Button 3 - only in Service Mode */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) /* Button 4 - only in Service Mode */
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL /* Button 3 - only in Service Mode */
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL /* Button 4 - only in Service Mode */
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) /* Button 3 - only in Service Mode */
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) /* Button 4 - only in Service Mode */
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON5 ) /* Button 5 - only in Service Mode */
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_COCKTAIL /* Button 5 - only in Service Mode */
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) /* Button 5 - only in Service Mode */
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1002,13 +998,13 @@ static INPUT_PORTS_START( dec1 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) /* Button 3 - only in Service Mode */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL /* Button 3 - only in Service Mode */
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) /* Button 3 - only in Service Mode */
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("SYSTEM")
@@ -1079,8 +1075,8 @@ static INPUT_PORTS_START( hbarrel )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Fire")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Bomb")
 	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Fire")
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Bomb")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Fire")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Bomb")
 	PORT_BIT( 0xc000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("SYSTEM")
@@ -1136,8 +1132,8 @@ static INPUT_PORTS_START( bandit )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Fire")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Bomb")
 	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Fire")
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Bomb")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Fire")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Bomb")
 	PORT_BIT( 0xc000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 #if 0
@@ -1231,8 +1227,8 @@ static INPUT_PORTS_START( birdtry )
 //  PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Shoot")
 //  PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Select")
 	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_UNUSED )
-//  PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Shoot")
-//  PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Select")
+//  PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Shoot")
+//  PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Select")
 	PORT_BIT( 0xc000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("SYSTEM")
@@ -1297,8 +1293,8 @@ static INPUT_PORTS_START( baddudes )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Attack")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Jump")
 	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Attack")
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Jump")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Attack")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Jump")
 	PORT_BIT( 0xc000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("SYSTEM")
@@ -1358,8 +1354,8 @@ static INPUT_PORTS_START( robocop )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Attack")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Jump")
 	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Attack")
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Jump")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Attack")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Jump")
 	PORT_BIT( 0xc000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("SYSTEM")
@@ -1413,8 +1409,8 @@ static INPUT_PORTS_START( hippodrm )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Attack")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Jump")
 	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Attack")
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Jump")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Attack")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Jump")
 	PORT_BIT( 0xc000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("SYSTEM")
@@ -1486,8 +1482,8 @@ static INPUT_PORTS_START( slyspy )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Attack")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Jump")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Attack")
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Jump")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Attack")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Jump")
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW")
@@ -1530,8 +1526,8 @@ static INPUT_PORTS_START( midres )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Fire")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Jump")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Fire")
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Jump")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Fire")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Jump")
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW")
@@ -1569,6 +1565,17 @@ static INPUT_PORTS_START( midres )
 	PORT_INCLUDE( rotary_ports )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( midres2 )
+	PORT_INCLUDE( midres )
+
+	// game reads positional buffers but discards the result and instead reads the rotation state from b3
+	// Press once for rotating clockwise, depress and press again for counterclockwise
+	// NB: this matches MD port B-1 control scheme
+	PORT_MODIFY("INPUTS")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Rotation") PORT_PLAYER(1)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P2 Rotation") PORT_PLAYER(2)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( midresb )
 	PORT_INCLUDE( dec0 )
 
@@ -1576,8 +1583,8 @@ static INPUT_PORTS_START( midresb )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Fire")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Jump")
 	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Fire")
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Jump")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Fire")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Jump")
 	PORT_BIT( 0xc000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("SYSTEM")
@@ -1627,12 +1634,12 @@ static INPUT_PORTS_START( bouldash )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) // escape
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED ) /* Button 3 - only in Service Mode */
 //  PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL // squeeze diamond
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL // escape
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) // squeeze diamond
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) // escape
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 //  PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
@@ -2176,6 +2183,10 @@ void dec0_state::robocop(machine_config &config)
 	H6280(config, m_subcpu, XTAL(21'477'272) / 16);
 	m_subcpu->set_addrmap(AS_PROGRAM, &dec0_state::robocop_sub_map);
 	m_subcpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
+
+	mb8421_device &dem01(MB8421(config, "dem01"));
+	dem01.intl_callback().set_inputline(m_maincpu, M68K_IRQ_4);
+	dem01.intr_callback().set_inputline(m_subcpu, 0);
 
 	config.set_maximum_quantum(attotime::from_hz(3000));  /* Interleave between HuC6280 & 68000 */
 
@@ -3889,6 +3900,53 @@ ROM_START( midres )
 	ROM_LOAD( "pal16l8a-6.bin", 0x0a00, 0x0104, CRC(23b17abe) SHA1(ca6c47f4df63d84401ccb29d0a0e3633b09d708a) )
 ROM_END
 
+ROM_START( midres2 ) // DE-0323-4 PCB, only the first 2 main CPU ROMs differ, ROM labels weren't original so unfortunately not possible to determine version
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "mr14",         0x00000, 0x20000, CRC(ad4617a9) SHA1(cca7cf9d21050fc187a6279ac008b4bd83baf5ac) )
+	ROM_LOAD16_BYTE( "mr12",         0x00001, 0x20000, CRC(c9ed677b) SHA1(7efcde8a1cf84910e9d946648a419fb9f7fd30ac) )
+	ROM_LOAD16_BYTE( "mr15",         0x40000, 0x20000, CRC(1328354e) SHA1(2780a524718f351350e0fbc92a9a7ce9bdfc315e) )
+	ROM_LOAD16_BYTE( "mr13",         0x40001, 0x20000, CRC(e3b3955e) SHA1(10ff430b14c1dbcce81b13251bac124ef4f9f1d9) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "mr16",              0x00000, 0x10000, CRC(66360bdf) SHA1(76ecaeb396118bb2fe6c0151bb0705a3a878f7a5) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 ) // chars
+	ROM_LOAD( "mr05",              0x08000, 0x08000, CRC(d75aba06) SHA1(cb3b969db3dd8e0c5c3729482f7461cde3a961f3) )
+	ROM_CONTINUE(                  0x00000, 0x08000 )   // the two halves are swapped
+	ROM_LOAD( "mr04",              0x18000, 0x08000, CRC(8f5bbb79) SHA1(cb10f68787606111ba5e9967bf0b0cd21269a902) )
+	ROM_CONTINUE(                  0x10000, 0x08000 )
+
+	ROM_REGION( 0x80000, "gfx2", 0 ) // tiles
+	ROM_LOAD( "fl09",              0x00000, 0x20000, CRC(907d5910) SHA1(6f4963724987bf44007988d117a1f7276cf270d8) )
+	ROM_LOAD( "fl08",              0x20000, 0x20000, CRC(a936c03c) SHA1(293e69874ce9b2dfb1d605c9f988fa736b12bbcf) )
+	ROM_LOAD( "fl07",              0x40000, 0x20000, CRC(2068c45c) SHA1(943ed767a462ee39a42cd15f02d06c8a2e4556b3) )
+	ROM_LOAD( "fl06",              0x60000, 0x20000, CRC(b7241ab9) SHA1(3e83f9285ff4c476f1287bf73b514eace482dccc) )
+
+	ROM_REGION( 0x40000, "gfx3", 0 ) // tiles
+	ROM_LOAD( "fl11",              0x00000, 0x20000, CRC(b86b73b4) SHA1(dd0e61d60574e537aa1b7f35ffdfd08434ec8208) )
+	ROM_LOAD( "fl10",              0x20000, 0x20000, CRC(92245b29) SHA1(3289842bbd4bd7858846b234f08ea5737c11536d) )
+
+	ROM_REGION( 0x80000, "gfx4", 0 ) // sprites
+	ROM_LOAD( "fl01",              0x00000, 0x20000, CRC(2c8b35a7) SHA1(9ab1c2f014a24837ee99c4db000291f7e55aeb12) )
+	ROM_LOAD( "fl03",              0x20000, 0x20000, CRC(1eefed3c) SHA1(be0ce3db211587086ae3ee8df85b7c56f831c623) )
+	ROM_LOAD( "fl00",              0x40000, 0x20000, CRC(756fb801) SHA1(35510c4ddf9258d87fdee0d3a64a8de0ebd1967d) )
+	ROM_LOAD( "fl02",              0x60000, 0x20000, CRC(54d2c120) SHA1(84f93bcd41d5bda8cfb39c4947fff025f53b143d) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) // ADPCM samples
+	ROM_LOAD( "mr17",              0x00000, 0x20000, CRC(9029965d) SHA1(9b28dc38e86f24fa89d7971b141c9bdddc662c99) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "7114.prm",          0x0000, 0x0100, CRC(eb539ffb) SHA1(6a8c9112f289f63e8c88320c9df698b559632c3d) )   // Priority (not used)
+
+	ROM_REGION( 0x0c00, "plds", 0 )
+	ROM_LOAD( "pal16r4a-1.bin", 0x0000, 0x0104, CRC(d28fb8e0) SHA1(73cd73a075bd3ba3b3e50f3b71a4aaecce37115f) )
+	ROM_LOAD( "pal16l8b-2.bin", 0x0200, 0x0104, CRC(bcb591e3) SHA1(d3ebc2a19108c9db355d3ba1512ab4cf0d9fad76) )
+	ROM_LOAD( "pal16l8a-3.bin", 0x0400, 0x0104, CRC(e12972ac) SHA1(6b178c936068d9017a1444f437aea7e2ab1c6ca9) )
+	ROM_LOAD( "pal16l8a-4.bin", 0x0600, 0x0104, CRC(c6437e49) SHA1(0d89855378ab5f45d55f6aa175a63458b3da52a3) )
+	ROM_LOAD( "pal16l8b-5.bin", 0x0800, 0x0104, CRC(e9ee3a67) SHA1(5299f44f1141fcd57b0559b91ec7adb51b36c5c4) )
+	ROM_LOAD( "pal16l8a-6.bin", 0x0a00, 0x0104, CRC(23b17abe) SHA1(ca6c47f4df63d84401ccb29d0a0e3633b09d708a) )
+ROM_END
+
 ROM_START( midresu )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "fl14",         0x00000, 0x20000, CRC(2f9507a2) SHA1(bfa3449c2f8d706ec9eebb41c0f089229cd30537) )
@@ -4181,14 +4239,6 @@ ROM_START( bouldashj )
 ROM_END
 
 
-void dec0_state::init_midresb()
-{
-//  m_maincpu->space(AS_PROGRAM).install_read_handler(0x00180000, 0x0018000f, read16_delegate(*this, FUNC(dec0_state::dec0_controls_r)));
-//  m_maincpu->space(AS_PROGRAM).install_read_handler(0x001a0000, 0x001a000f, read16_delegate(*this, FUNC(dec0_state::dec0_rotary_r)));
-
-//  m_maincpu->space(AS_PROGRAM).install_write_handler(0x00180014, 0x00180015, write16_delegate(*this, FUNC(dec0_state::midres_sound_w)));
-}
-
 uint16_t dec0_state::ffantasybl_242024_r()
 {
 /*
@@ -4227,7 +4277,8 @@ GAME( 1989, secretagj,  secretag, slyspy,     slyspy,     dec0_state, init_slysp
 GAME( 1989, slyspy,     secretag, slyspy,     slyspy,     dec0_state, init_slyspy,     ROT0,   "Data East USA",         "Sly Spy (US revision 4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, slyspy3,    secretag, slyspy,     slyspy,     dec0_state, init_slyspy,     ROT0,   "Data East USA",         "Sly Spy (US revision 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, slyspy2,    secretag, slyspy,     slyspy,     dec0_state, init_slyspy,     ROT0,   "Data East USA",         "Sly Spy (US revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, midres,     0,        midres,     midres,     dec0_state, empty_init,      ROT0,   "Data East Corporation", "Midnight Resistance (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, midres,     0,        midres,     midres,     dec0_state, empty_init,      ROT0,   "Data East Corporation", "Midnight Resistance (World, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, midres2,    midres,   midres,     midres2,    dec0_state, empty_init,      ROT0,   "Data East Corporation", "Midnight Resistance (World, set 2)", MACHINE_SUPPORTS_SAVE ) // uses button 3 for rotating, later rev?
 GAME( 1989, midresu,    midres,   midres,     midres,     dec0_state, empty_init,      ROT0,   "Data East USA",         "Midnight Resistance (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, midresj,    midres,   midres,     midres,     dec0_state, empty_init,      ROT0,   "Data East Corporation", "Midnight Resistance (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, bouldash,   0,        slyspy,     bouldash,   dec0_state, init_slyspy,     ROT0,   "Data East Corporation (licensed from First Star)", "Boulder Dash / Boulder Dash Part 2 (World)", MACHINE_SUPPORTS_SAVE )
@@ -4241,8 +4292,8 @@ GAME( 1988, drgninjab,  baddudes, drgninjab,  drgninja,   dec0_state, init_drgni
 
 
 // this is a common bootleg board
-GAME( 1989, midresb,    midres,   midresb,    midresb,    dec0_state, init_midresb,    ROT0, "bootleg", "Midnight Resistance (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // need to hook up 68705? (probably unused)
-GAME( 1989, midresbj,   midres,   midresbj,   midresb,    dec0_state, init_midresb,    ROT0, "bootleg", "Midnight Resistance (Joystick bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, midresb,    midres,   midresb,    midresb,    dec0_state, empty_init,      ROT0, "bootleg", "Midnight Resistance (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // need to hook up 68705? (probably unused)
+GAME( 1989, midresbj,   midres,   midresbj,   midresb,    dec0_state, empty_init,      ROT0, "bootleg", "Midnight Resistance (Joystick bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, ffantasybl, hippodrm, ffantasybl, ffantasybl, dec0_state, empty_init,      ROT0, "bootleg", "Fighting Fantasy (bootleg with 68705)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // 68705 not dumped, might be the same as midresb
 GAME( 1988, drgninjab2, baddudes, drgninjab,  drgninja,   dec0_state, init_drgninja,   ROT0, "bootleg", "Dragonninja (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // is this the same board as above? (region warning hacked to World, but still shows Japanese text), 68705 dumped but not hooked up
 

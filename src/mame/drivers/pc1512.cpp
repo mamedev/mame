@@ -97,7 +97,7 @@ PC1640-HD30: Western Digital 95038 [-chs 615,6,17 -ss 512]
 #include "bus/rs232/rs232.h"
 #include "bus/isa/ega.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

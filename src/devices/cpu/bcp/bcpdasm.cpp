@@ -7,14 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "util/disasmintf.h"
 #include "bcpdasm.h"
-
-#include "util/strformat.h"
-
-using osd::u32;
-using util::BIT;
-using offs_t = u32;
 
 
 //**************************************************************************
@@ -230,12 +223,13 @@ offs_t dp8344_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			{
 				// 8C00-8DFF, 0000-FFFF: LJMP Rs,p,s,nn (2 + 2 T-states)
 				util::stream_format(stream, "%-8s", "ljmp");
+				words |= STEP_COND;
 			}
 			else
 			{
 				// 8E00-8FFF, 0000-FFFF: LCALL Rs,p,s,nn (2 + 2 T-states)
 				util::stream_format(stream, "%-8s", "lcall");
-				words |= STEP_OVER;
+				words |= STEP_OVER | STEP_COND;
 			}
 			format_register(stream, inst & 0x001f);
 			util::stream_format(stream, ",%d,%d,", (inst & 0x00e0) >> 5, BIT(inst, 8));
@@ -304,7 +298,10 @@ offs_t dp8344_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			// AF00-A7FF: RETF f,s{,{g}{,rf}} (2 or 3 T-states)
 			// AF80-AFF0: RET  {g{,rf}} (2 T-states)
 			if (!BIT(inst, 7))
+			{
 				util::stream_format(stream, (inst & 0x0070) == 0 ? "r%s" : "r%-7s", cc_to_string(inst & 0x0007, BIT(inst, 3)));
+				words |= STEP_COND;
+			}
 			else
 				util::stream_format(stream, (inst & 0x0070) == 0 ? "%s" : "%-8s", "ret");
 
@@ -455,6 +452,7 @@ offs_t dp8344_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		// D000-DFFF: JMP f,s,n (2 or 3 T-states)
 		util::stream_format(stream, "j%-7s", cc_to_string((inst & 0x0700) >> 8, BIT(inst, 11)));
 		format_address(stream, pc + 1 + s8(inst & 0x00ff));
+		words |= STEP_COND;
 		break;
 
 	case 0xe000: case 0xf000:

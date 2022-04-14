@@ -66,7 +66,7 @@ ToDo:
 #include "machine/pit8253.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

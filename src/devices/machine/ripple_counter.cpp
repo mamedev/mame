@@ -178,7 +178,7 @@ WRITE_LINE_MEMBER(ripple_counter_device::reset_w)
 //  fires
 //-------------------------------------------------
 
-void ripple_counter_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ripple_counter_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

@@ -85,7 +85,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/mz_cas.h"

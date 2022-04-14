@@ -60,9 +60,9 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 	output_finder<2> m_lamps;
 
-	int m_scroll;
-	tilemap_t *m_foreground;
-	tilemap_t *m_background;
+	int m_scroll = 0;
+	tilemap_t *m_foreground = nullptr;
+	tilemap_t *m_background = nullptr;
 };
 
 #endif // MAME_INCLUDES_PORTRAIT_H

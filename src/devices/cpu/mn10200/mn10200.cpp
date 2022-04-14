@@ -9,7 +9,6 @@
 */
 
 #include "emu.h"
-#include "debugger.h"
 #include "mn10200.h"
 #include "mn102dis.h"
 

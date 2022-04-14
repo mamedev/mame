@@ -1,12 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Sergey Svishchev
+
 #include "emu.h"
 #include "machine/genpc.h"
 
-#include "cpu/i86/i86.h"
 #include "bus/pc_joy/pc_joy.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
+#include "cpu/i86/i86.h"
 #include "imagedev/floppy.h"
 #include "machine/pc_fdc.h"
 
@@ -21,8 +22,7 @@ public:
 	// construction/destruction
 	asst128_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0)
 		: ibm5150_mb_device(mconfig, ASST128_MOTHERBOARD, tag, owner, clock)
-	{
-	}
+	{ }
 
 	void map(address_map &map);
 };
@@ -146,7 +146,6 @@ ROM_START( asst128 )
 	ROM_LOAD( "basic.bin",        0x6000, 0x8000, CRC(a4ec66f6) SHA1(80e934986022681ccde180e92aa108e716c4f19b))
 	ROM_LOAD( "mainbios.bin",     0xe000, 0x2000, CRC(8426cbf5) SHA1(41d14137ffa651977041da22aa8071c0f7854158))
 
-	// XXX needs dumping
 	ROM_REGION(0x2000,"gfx1", ROMREGION_ERASE00)
 	ROM_LOAD( "asst128cg.bin", 0, 0x2000, NO_DUMP )
 ROM_END

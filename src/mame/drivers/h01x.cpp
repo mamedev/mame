@@ -84,14 +84,15 @@ private:
 	required_device<cassette_image_device> m_cassette;
 	required_ioport_array<11> m_io_keyboard;
 
-	uint8_t m_bank = 0;
+	uint8_t m_bank = 0U;
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	uint8_t *m_ram_ptr, *m_vram_ptr;
+	uint8_t *m_ram_ptr = nullptr;
+	uint8_t *m_vram_ptr = nullptr;
 
 	TIMER_CALLBACK_MEMBER(cassette_data_callback);
-	bool m_cassette_data = 0;
-	emu_timer *m_cassette_data_timer;
+	bool m_cassette_data = false;
+	emu_timer *m_cassette_data_timer = nullptr;
 };
 
 

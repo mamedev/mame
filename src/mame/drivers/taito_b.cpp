@@ -168,6 +168,72 @@ Notes:
             Vsync: 60Hz
 
 
+***************************************************************************
+
+Master of Weapon, Taito 1989
+Hardware info by Guru
+
+PCB Layout
+----------
+
+B SYSTEM
+K1100424A
+J1100181A
+K1100426A MAST OF WEAPON (sticker)
+|------------------------------------------------------------------|
+|VOL 4556  Y3014    YM2203       PC060HA       CXK58257  CXK58257  |
+|  MB3735           Z80                B72-10.IC32                 |
+|                   2018         B72_07.IC30                       |
+|                                              CXK58257  CXK58257  |
+|      62064  |-----|            TMM2063                           |
+|             |TC0260                                              |
+|J            |DAR  |            27.164MHz     CXK58257  CXK58257  |
+|A            |-----|                                              |
+|M                              |--------|                         |
+|M                              |TAITO   |     CXK58257  CXK58257  |
+|A                              |TC0180  |                         |
+|    48CR-1                     |VCU     |                         |
+|    48CR-1                     |--------|              B72-02.IC6 |
+|    48CR-1                                                        |
+|    48CR-1         TMM2063      TMM2063                B72-01.IC5 |
+|            MB3771                                                |
+| 48CR-1            B72_04.IC34  B72_03.IC25 B72-09.IC23 B72-08.IC3|
+|       TC0040IOC                                            24MHz |
+|   SW2   SW1       B72_06.IC33  B72_12.IC24          68000        |
+|------------------------------------------------------------------|
+Notes:
+      68000 - Motorola MC68000P12 CPU. Clock input 12.000MHz [24/2]
+        Z80 - Zilog Z0840006PSC CPU. Clock input 6.000MHz [24/4]
+     YM2203 - Yamaha YM2203 FM Operator Type-N sound chip. Clock input 3.000MHz [24/8]
+      Y3014 - Yamaha YM3014B Serial Input Floating D/A Converter. Clock input 1.0000MHz [24/24] on pin 5
+    PC060HA - Taito PC060HA CIU custom IC (68K<>Z80 communication)
+  TC0260DAR - Taito TC0260DAR custom IC (palette and RGB output)
+  TC0180VCU - Taito TC0180VCU custom IC (tilemap)
+  TC0040IOC - Taito TC0040IOC custom IC (controls, coin lockout, coin meter, DIP switch management and master reset/watchdog)
+   CXK58257 - Sony CXK58257 32kBx8-bit SRAM (video RAM)
+       2018 - Motorola MCM2018 2kBx8-bit SRAM (palette RAM)
+    TMM2063 - Toshiba TMM2063 8kBx8-bit SRAM (program RAM for 68000 & Z80)
+      62064 - Toshiba TD62064 4-Channel Darlington Sink Driver
+     MB3771 - Fujitsu MB3771 Master Reset IC
+      SW1/2 - 8-position DIP switch
+     48CR-1 - Custom resistor array
+       4556 - NEC uPC4556 Dual Operational Amplifier
+    MBB3735 - Fujitsu MB3735 Audio Power Amplifier
+B72_04.IC34 \
+B72_03.IC25  \ M5M27C101 128kBx8-bit EPROM (main program)
+B72_06.IC33  /
+B72_12.IC24 /
+B72_07.IC30 - 27C512 64kBx8-bit EPROM (sound program)
+ B72-02.IC6 \ 234000 512kBx8-bit mask ROM (equivalent to AM27C400, graphics)
+ B72-01.IC5 /
+B72-09.IC23 - MMI PAL16L8 (PCB marked 'INT')
+ B72-08.IC3 - MMI PAL16L8 (PCB marked 'DEC')
+B72-10.IC32 - MMI PAL16L8
+      HSync - 15.1782kHz \
+      VSync - 60.00000Hz / <-- actual measurements on PCB
+
+***************************************************************************
+
 Real Puncher
 Taito, 1994
 
@@ -1532,49 +1598,70 @@ static INPUT_PORTS_START( ryujin )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sbm )
-	PORT_START("DSWA") //+-ok
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x01, 0x01, "Tickets" )                   PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Win Bonus Tickets" )         PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC(  0x04, IP_ACTIVE_LOW, "SW1:3" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x08, DEF_STR( On ))
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSWB") //+-ok
+	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0c, 0x0c, "Punch Power" )               PORT_DIPLOCATION("SW2:3,4")
+	/* Modifies the power of the player's punch by a set amount. Table is at 0x0A614:
+	    DIP 00: 0000 ;+00
+	    DIP 01: FFFB ;-05
+	    DIP 10: 0005 :+05
+	    DIP 11: 000A :+10
+	    For example, if the player had an initial power of 200t and Dip Switches 2-3 and 2-4 were both set, the power would be increased to 210t.
+	    This bonus (or penalty) is applied before the game floors the punch power at 1t and before it caps the punch power at 300t. So, if in MAME, you hold Pad Photosensors 1 and 2 and then immediately hit Pad Photosensor 3, you'll still get a punch power of 300t even if Dip Switch 2-3 was set and Dip Switch 2-4 wasn't.
+	    Just for reference, the initial power of the player's punch is calculated by taking 24000 and dividing it by the timer at 105048 in RAM. This is performed in the subroutine at 0x0A5B0 in the main CPU.
+	*/
+	PORT_DIPSETTING(    0x08, "Lower" )
+	PORT_DIPSETTING(    0x0c, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Higher ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Highest ) )
+	PORT_DIPNAME( 0x30, 0x30, "Tickets Payout" )            PORT_DIPLOCATION("SW2:5,6")
+	/* Controls the power divider. The game calculates the base ticket total by taking the total power of the player's three punches and then dividing it by one of four values in the table at 0x7FFC0:
+	    DIP 00: 50
+	    DIP 01: 40
+	    DIP 10: 80
+	    DIP 11: 120
+	    For example, if the player got a combined total of 640t power and dip switch 2-6 was set but 2-5 was not, they'll have a base of 8 tickets.
+	*/
+	PORT_DIPSETTING(    0x00, "Total Power / 120" )
+	PORT_DIPSETTING(    0x10, "Total Power / 80" )
+	PORT_DIPSETTING(    0x30, "Total Power / 50" )
+	PORT_DIPSETTING(    0x20, "Total Power / 40" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Win Bonus Tickets Payout" )  PORT_DIPLOCATION("SW2:7,8")
+	/* Controls the value of the round completion ticket bonus. Each round has its own ticket table: The first value is for 00, the second is for 01, third for 10, fourth for 11:
+	    7FFC8: 0001 0002 0003 0002 #ROUND 1 BONUS TABLE - 01 / 02 / 03 / 02
+	    7FFD0: 0002 0004 0004 0004 #ROUND 2 BONUS TABLE - 02 / 04 / 04 / 04
+	    7FFD8: 0003 0006 0005 0008 #ROUND 3 BONUS TABLE - 03 / 06 / 05 / 08
+	    7FFE0: 0004 0008 0006 0010 #ROUND 4 BONUS TABLE - 04 / 08 / 06 / 16
+	    7FFE8: 0005 000A 0007 0020 #ROUND 5 BONUS TABLE - 05 / 10 / 07 / 32
+	    For example, if the player beat round 4 and dip switch 2-7 was set but 2-8 was not, they'd have a bonus of 8 tickets.
+	*/
+	PORT_DIPSETTING(    0xc0, "1, 2, 3, 4, 5" )
+	PORT_DIPSETTING(    0x80, "2, 4, 6, 8, 10" )
+	PORT_DIPSETTING(    0x40, "3, 4, 5, 6, 7" )
+	PORT_DIPSETTING(    0x00, "2, 4, 8, 16, 32" )
 
 	PORT_START("JOY")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)//sound select UP
@@ -1613,6 +1700,42 @@ static INPUT_PORTS_START( sbm )
 	    The longer the time - the less power.
 	*/
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Pad Photosensor 4")//PHOTO 4  ??? ACTIVE_LOW  ??? (punching pad photosensor 4)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( sbmj )
+	PORT_INCLUDE(sbm)
+
+	PORT_MODIFY("DSWA")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
+
+	PORT_MODIFY("DSWB")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( realpunc )
@@ -3262,6 +3385,11 @@ ROM_START( masterw )
 	ROM_REGION( 0x100000, "tc0180vcu", 0 )
 	ROM_LOAD( "b72-02.6", 0x000000, 0x080000, CRC(843444eb) SHA1(2b466045f882996c80e0090009ee957e11d32825) )
 	ROM_LOAD( "b72-01.5", 0x080000, 0x080000, CRC(a24ac26e) SHA1(895715a2bb0cb15334cba2283bd228b4fc08cd0c) )
+
+	ROM_REGION( 0x00600, "plds", 0 )
+	ROM_LOAD( "b72-08.ic3",  0x0000, 0x0104, CRC(1501a44a) SHA1(4dcda59238f17ce9d8654c27f45e217e6460fc03) )
+	ROM_LOAD( "b72-09.ic23", 0x0200, 0x0104, CRC(a1d19d49) SHA1(5ca983147ef57240f6b6a05a07a821f72bb13001) )
+	ROM_LOAD( "b72-10.ic32", 0x0400, 0x0104, CRC(20b0450b) SHA1(235ebbfd5b4cd179bb4d87e30d0e449028bb1df6) )
 ROM_END
 
 ROM_START( masterwu )
@@ -3277,6 +3405,11 @@ ROM_START( masterwu )
 	ROM_REGION( 0x100000, "tc0180vcu", 0 )
 	ROM_LOAD( "b72-02.6", 0x000000, 0x080000, CRC(843444eb) SHA1(2b466045f882996c80e0090009ee957e11d32825) )
 	ROM_LOAD( "b72-01.5", 0x080000, 0x080000, CRC(a24ac26e) SHA1(895715a2bb0cb15334cba2283bd228b4fc08cd0c) )
+
+	ROM_REGION( 0x00600, "plds", 0 )
+	ROM_LOAD( "b72-08.ic3",  0x0000, 0x0104, CRC(1501a44a) SHA1(4dcda59238f17ce9d8654c27f45e217e6460fc03) )
+	ROM_LOAD( "b72-09.ic23", 0x0200, 0x0104, CRC(a1d19d49) SHA1(5ca983147ef57240f6b6a05a07a821f72bb13001) )
+	ROM_LOAD( "b72-10.ic32", 0x0400, 0x0104, CRC(20b0450b) SHA1(235ebbfd5b4cd179bb4d87e30d0e449028bb1df6) )
 ROM_END
 
 ROM_START( masterwj )
@@ -3292,6 +3425,11 @@ ROM_START( masterwj )
 	ROM_REGION( 0x100000, "tc0180vcu", 0 )
 	ROM_LOAD( "b72-02.6", 0x000000, 0x080000, CRC(843444eb) SHA1(2b466045f882996c80e0090009ee957e11d32825) )
 	ROM_LOAD( "b72-01.5", 0x080000, 0x080000, CRC(a24ac26e) SHA1(895715a2bb0cb15334cba2283bd228b4fc08cd0c) )
+
+	ROM_REGION( 0x00600, "plds", 0 )
+	ROM_LOAD( "b72-08.ic3",  0x0000, 0x0104, CRC(1501a44a) SHA1(4dcda59238f17ce9d8654c27f45e217e6460fc03) )
+	ROM_LOAD( "b72-09.ic23", 0x0200, 0x0104, CRC(a1d19d49) SHA1(5ca983147ef57240f6b6a05a07a821f72bb13001) )
+	ROM_LOAD( "b72-10.ic32", 0x0400, 0x0104, CRC(20b0450b) SHA1(235ebbfd5b4cd179bb4d87e30d0e449028bb1df6) )
 ROM_END
 
 ROM_START( yukiwo ) /* Prototype of Master of Weapon */
@@ -3588,6 +3726,6 @@ GAME( 1994, spacedxo, spacedx, spacedxo, spacedxo,  taitob_state, init_taito_b, 
     the enemy.
 */
 GAME( 1990, sbm,      0,       sbm,      sbm,       taitob_state,   init_taito_b, ROT0, "Taito Corporation",       "Sonic Blast Man (US)",    MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
-GAME( 1990, sbmj,     sbm,     sbm,      sbm,       taitob_state,   init_taito_b, ROT0, "Taito Corporation",       "Sonic Blast Man (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
+GAME( 1990, sbmj,     sbm,     sbm,      sbmj,      taitob_state,   init_taito_b, ROT0, "Taito Corporation",       "Sonic Blast Man (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
 GAME( 1994, realpunc, 0,       realpunc, realpunc,  taitob_c_state, init_taito_b, ROT0, "Taito Corporation Japan", "Real Puncher (World, v2.12O)",   MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
 GAME( 1994, realpuncj,realpunc,realpunc, realpunc,  taitob_c_state, init_taito_b, ROT0, "Taito Corporation Japan", "Real Puncher (Japan, v2.12J)",   MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )

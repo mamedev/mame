@@ -8,7 +8,7 @@ DEFINE_DEVICE_TYPE(WPC_PIC, wpc_pic_device, "wpc_pic", "Williams Pinball Control
 
 wpc_pic_device::wpc_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, WPC_PIC, tag, owner, clock),
-	swarray(*this, ":SW.%u", 0)
+	swarray(*this, ":X%u", 0)
 {
 	serial = "000 000000 00000 000";
 }

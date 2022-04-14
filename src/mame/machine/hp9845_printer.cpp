@@ -186,7 +186,7 @@ void hp9845_printer_device::device_reset()
 	m_sts_handler(true);
 }
 
-void hp9845_printer_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void hp9845_printer_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_busy = false;
 	update_fsm();

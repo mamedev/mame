@@ -228,7 +228,7 @@ void elan_eu3a05commonsys_device::map(address_map &map)
 }
 
 
-void elan_eu3a05commonsys_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void elan_eu3a05commonsys_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

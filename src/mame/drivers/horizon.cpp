@@ -41,7 +41,7 @@ involves replacing the XTAL and reconnecting one jumper.
 #include "bus/s100/s100.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8251.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 #define Z80_TAG         "z80"
 #define I8251_L_TAG     "3a"

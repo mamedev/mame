@@ -68,13 +68,13 @@ private:
 	optional_region_ptr<uint8_t> m_adpcm_rom;
 	required_memory_bank m_mainbank;
 
-	tilemap_t *m_tx_tilemap;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
-	int m_adpcm_pos;
-	int m_adpcm_end;
-	int m_adpcm_data;
-	int m_video_type;
+	tilemap_t *m_tx_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	int m_adpcm_pos = 0;
+	int m_adpcm_end = 0;
+	int m_adpcm_data = 0;
+	int m_video_type = 0;
 
 	void bankswitch_w(uint8_t data);
 	void adpcm_end_w(uint8_t data);

@@ -114,7 +114,6 @@ void gb_state::save_gb_base()
 	save_item(NAME(m_triggering_irq));
 	save_item(NAME(m_reloading));
 	save_item(NAME(m_sio_count));
-	save_item(NAME(m_bios_disable));
 	if (m_cartslot)
 		m_cartslot->save_ram();
 }
@@ -195,18 +194,15 @@ void gb_state::machine_reset()
 {
 	gb_init();
 
-	// Enable BIOS ROM
-	m_bios_disable = false;
+	m_cart_low.select(BIOS_ENABLED | (m_cartslot ? CART_PRESENT : NO_CART));
+	m_cart_high.select(m_cartslot ? CART_PRESENT : NO_CART);
 }
 
 MACHINE_RESET_MEMBER(gb_state,gbc)
 {
-	gb_init();
+	gb_state::machine_reset();
 
 	gb_init_regs();
-
-	/* Enable BIOS rom */
-	m_bios_disable = false;
 
 	for (auto & elem : m_gbc_rammap)
 		memset(elem, 0, 0x1000);
@@ -214,12 +210,9 @@ MACHINE_RESET_MEMBER(gb_state,gbc)
 
 MACHINE_RESET_MEMBER(gb_state,sgb)
 {
-	gb_init();
+	gb_state::machine_reset();
 
 	gb_init_regs();
-
-	/* Enable BIOS rom */
-	m_bios_disable = false;
 }
 
 
@@ -310,7 +303,7 @@ void gb_state::gb_io2_w(offs_t offset, uint8_t data)
 	if (offset == 0x10)
 	{
 		/* disable BIOS ROM */
-		m_bios_disable = true;
+		m_cart_low.select(BIOS_DISABLED | (m_cartslot ? CART_PRESENT : NO_CART));
 	}
 	else
 		m_ppu->video_w(offset, data);
@@ -625,7 +618,7 @@ void gb_state::gbc_io2_w(offs_t offset, uint8_t data)
 			m_maincpu->set_speed(data);
 			return;
 		case 0x10:  /* BFF - Bios disable */
-			m_bios_disable = true;
+			m_cart_low.select(BIOS_DISABLED | (m_cartslot ? CART_PRESENT : NO_CART));
 			return;
 		case 0x16:  /* RP - Infrared port */
 			break;
@@ -670,10 +663,10 @@ void megaduck_state::machine_start()
 
 void megaduck_state::machine_reset()
 {
-	// We may have to add some more stuff here, if not then it can be merged back into gb
-	gb_state::machine_reset();
+	gb_init();
 
-	m_bios_disable = true;
+	m_cart_low.select((m_cartslot ? CART_PRESENT : NO_CART));
+	m_cart_high.select(m_cartslot ? CART_PRESENT : NO_CART);
 }
 
 /*

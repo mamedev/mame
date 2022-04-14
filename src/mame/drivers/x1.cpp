@@ -208,7 +208,7 @@
 #include "emu.h"
 #include "includes/x1.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/2d_dsk.h"

@@ -416,7 +416,7 @@ uint8_t mos6560_device::read(offs_t offset)
 		break;
 	case 6:                        /*lightpen horizontal */
 	case 7:                        /*lightpen vertical */
-#ifdef UNUSED_FUNCTION
+#if 0
 		if (LIGHTPEN_BUTTON && ((machine().time().as_double() - m_lightpenreadtime) * MOS656X_VRETRACERATE >= 1))
 		{
 			/* only 1 update each frame */
@@ -865,7 +865,7 @@ void mos6560_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void mos6560_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mos6560_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

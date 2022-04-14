@@ -35,7 +35,7 @@
 #include "machine/rescap.h"
 #include "machine/upd7001.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "px8.lh"

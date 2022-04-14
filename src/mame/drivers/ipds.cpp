@@ -39,7 +39,7 @@ private:
 	void ipds_b1_w(uint8_t data);
 	void kbd_put(u8 data);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
-	uint8_t m_term_data;
+	uint8_t m_term_data = 0U;
 	virtual void machine_reset() override;
 	void ipds_io(address_map &map);
 	void ipds_mem(address_map &map);

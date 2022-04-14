@@ -23,18 +23,19 @@ The daughter card has a big box on it labelled as follows:
 The daughter board is connected to the main board via 40 pin socket.
 
 TODO:
-- decryption is only preliminary. The game puts some strings at 0xc000 and at 0xf800 then stops in a loop reading 0xf810;
+- decryption is only preliminary (?). The game puts some strings at 0xc000 and at 0xf810. At 0xf810 it puts 'MICRO' and then it expects to read 'DRAGON', if it doesn't it loops endlessly;
 - after decryption is completed, everything else.
 */
 
 #include "emu.h"
-#include "emupal.h"
-#include "screen.h"
-#include "speaker.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "sound/ymopl.h"
 
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
 
 namespace {
 
@@ -73,8 +74,6 @@ void cointek_state::prg_map(address_map &map)
 
 void cointek_state::io_map(address_map &map)
 {
-	map.global_mask(0xff);
-	map.unmap_value_high();
 }
 
 void cointek_state::audio_prg_map(address_map &map)
@@ -84,8 +83,6 @@ void cointek_state::audio_prg_map(address_map &map)
 
 void cointek_state::audio_io_map(address_map &map)
 {
-	map.global_mask(0xff);
-	map.unmap_value_high();
 }
 
 
@@ -124,6 +121,21 @@ static INPUT_PORTS_START( unkct )
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSWC:8")
 INPUT_PORTS_END
 
+const gfx_layout gfx_8x8x4 = // TODO: not correct but it allows to see something in the GFX viewer for now
+{
+	8,8,
+	RGN_FRAC(1,4),
+	4,
+	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
+	{ 7, 6, 5, 4, 3, 2, 1, 0 },
+	{ 0, 8, 16, 24, 32, 40, 48, 56 },
+	8*8
+};
+
+static GFXDECODE_START( gfx_unkct )
+	GFXDECODE_ENTRY("unsorted_gfx", 0, gfx_8x8x4, 0, 32)
+GFXDECODE_END
+
 
 void cointek_state::cointek(machine_config &config)
 {
@@ -150,6 +162,7 @@ void cointek_state::cointek(machine_config &config)
 	screen.set_screen_update(FUNC(cointek_state::screen_update));
 	screen.set_palette("palette");
 
+	GFXDECODE(config, "gfxdecode", "palette", gfx_unkct);
 	PALETTE(config, "palette").set_entries(0x100);
 
 	// sound hardware
@@ -219,4 +232,4 @@ void cointek_state::init_unkct()
 } // Anonymous namespace
 
 
-GAME( 199?, unkct, 0, cointek, unkct, cointek_state, init_unkct, ROT0, "Cointek Enterprise Corp", "unknown Cointek game", MACHINE_IS_SKELETON )
+GAME( 1989, unkct, 0, cointek, unkct, cointek_state, init_unkct, ROT0, "Cointek Enterprise Corp", "unknown Cointek game", MACHINE_IS_SKELETON ) // string in ROM at 0x7839: Ver 4.00 1989-08-01

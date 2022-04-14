@@ -2,22 +2,25 @@
 // copyright-holders:Robbbert
 /*************************************************************************************************
 
-
     The Kaypro 2/83 computer - the very first Kaypro II - 2 full height floppy drives.
     Each disk was single sided, and could hold 191k. The computer had 2x pio
     and 1x sio. One of the sio ports communicated with the keyboard with a coiled
     telephone cord, complete with modular plug on each end. The keyboard carries
     its own Intel 87C51 processor and is an intelligent device.
 
+    Kaypro 5 notes:
+    The Kaycomp Kay Pro V / Non-Linear Systems Kaypro 5: https://retrocmp.de/kaypro/kay-p1_vers.htm#kay-5,
+    a version of the Kaypro II, but with a 5MB harddisk instead of one of the floppy drives, was announced
+    in December 1982, but apart from the relevant articles of the time, only one photo can be found.
+
     Kaypro 10 notes:
-    - This machine comes with a 10MB hard drive, split into 2 5MB partitions. It also
-      has one floppy drive. The drive letters change depending on what drive it was booted
-      from. The boot drive is always A:.
-      If booted from floppy:
+    This machine comes with a 10MB hard drive, split into 2 5MB partitions. It also has one floppy drive.
+    The drive letters change depending on what drive it was booted from. The boot drive is always A:.
+    - If booted from floppy:
       A: floppy
       B: HD partition 1
       C: HD partition 2
-      If booted from HD (presumably partition 1)
+    - If booted from HD (presumably partition 1)
       A: HD partition 1
       B: HD partition 2
       C: floppy
@@ -53,7 +56,7 @@
 #include "machine/com8116.h"
 #include "machine/z80sio.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

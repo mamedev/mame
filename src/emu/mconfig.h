@@ -133,7 +133,7 @@ public:
 	/// replace an existing device.
 	/// \return A device replacement helper to pass to a device type
 	///   when replacing an existing device.
-	emu::detail::machine_config_replace replace() { return emu::detail::machine_config_replace(*this); };
+	emu::detail::machine_config_replace replace() { return emu::detail::machine_config_replace(*this); }
 
 	/// \brief Set internal layout for current device
 	///

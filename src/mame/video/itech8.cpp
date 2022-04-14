@@ -541,7 +541,7 @@ void grmatch_state::xscroll_w(uint8_t data)
 }
 
 
-void grmatch_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void grmatch_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -549,7 +549,7 @@ void grmatch_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		palette_update();
 		break;
 	default:
-		itech8_state::device_timer(timer, id, param, ptr);
+		itech8_state::device_timer(timer, id, param);
 		break;
 	}
 }

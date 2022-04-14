@@ -1302,7 +1302,7 @@ void segas16b_state::machine_reset()
 //  device_timer - handle device timers
 //-------------------------------------------------
 
-void segas16b_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void segas16b_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

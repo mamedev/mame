@@ -81,6 +81,7 @@
 
 #include "corestr.h"
 #include "emuopts.h"
+#include "fileio.h"
 
 #include <cstring>
 #include <iterator>
@@ -204,7 +205,7 @@ const char *cheat_parameter::text()
 //  save - save a single cheat parameter
 //-------------------------------------------------
 
-void cheat_parameter::save(emu_file &cheatfile) const
+void cheat_parameter::save(util::core_file &cheatfile) const
 {
 	// output the parameter tag
 	cheatfile.printf("\t\t<parameter");
@@ -367,7 +368,7 @@ void cheat_script::execute(cheat_manager &manager, uint64_t &argindex)
 //  save - save a single cheat script
 //-------------------------------------------------
 
-void cheat_script::save(emu_file &cheatfile) const
+void cheat_script::save(util::core_file &cheatfile) const
 {
 	// output the script tag
 	cheatfile.printf("\t\t<script");
@@ -418,6 +419,10 @@ cheat_script::script_entry::script_entry(
 			if (!expression || !expression[0])
 				throw emu_fatalerror("%s.xml(%d): missing expression in action tag\n", filename, entrynode.line);
 			m_expression.parse(expression);
+
+			// initialise these to defautlt values
+			m_line = 0;
+			m_justify = ui::text_layout::text_justify::LEFT;
 		}
 		else
 		{
@@ -527,7 +532,7 @@ void cheat_script::script_entry::execute(cheat_manager &manager, uint64_t &argin
 //  save - save a single action or output
 //-------------------------------------------------
 
-void cheat_script::script_entry::save(emu_file &cheatfile) const
+void cheat_script::script_entry::save(util::core_file &cheatfile) const
 {
 	if (m_format.empty())
 	{
@@ -540,7 +545,7 @@ void cheat_script::script_entry::save(emu_file &cheatfile) const
 	else
 	{
 		// output an output
-		cheatfile.printf("\t\t\t<output format=\"%s\"", m_format.c_str());
+		cheatfile.printf("\t\t\t<output format=\"%s\"", m_format);
 		if (!m_condition.is_empty())
 			cheatfile.printf(" condition=\"%s\"", cheat_manager::quote_expression(m_condition));
 
@@ -658,7 +663,7 @@ int cheat_script::script_entry::output_argument::values(uint64_t &argindex, uint
 //  save - save a single output argument
 //-------------------------------------------------
 
-void cheat_script::script_entry::output_argument::save(emu_file &cheatfile) const
+void cheat_script::script_entry::output_argument::save(util::core_file &cheatfile) const
 {
 	cheatfile.printf("\t\t\t\t<argument");
 	if (m_count != 1)
@@ -758,7 +763,7 @@ cheat_entry::~cheat_entry()
 //  save - save a single cheat entry
 //-------------------------------------------------
 
-void cheat_entry::save(emu_file &cheatfile) const
+void cheat_entry::save(util::core_file &cheatfile) const
 {
 	// determine if we have scripts
 	bool const has_scripts(m_off_script || m_on_script || m_run_script || m_change_script);
@@ -1056,6 +1061,9 @@ constexpr int cheat_manager::CHEAT_VERSION;
 
 cheat_manager::cheat_manager(running_machine &machine)
 	: m_machine(machine)
+	, m_framecount(0)
+	, m_numlines(0)
+	, m_lastline(0)
 	, m_disabled(true)
 	, m_symtable(machine)
 {
@@ -1393,7 +1401,7 @@ void cheat_manager::load_cheats(std::string const &filename)
 	emu_file cheatfile(std::move(searchstr), OPEN_FLAG_READ);
 	try
 	{
-		// loop over all instrances of the files found in our search paths
+		// loop over all instances of the files found in our search paths
 		for (std::error_condition filerr = cheatfile.open(filename + ".xml"); !filerr; filerr = cheatfile.open_next())
 		{
 			osd_printf_verbose("Loading cheats file from %s\n", cheatfile.fullpath());

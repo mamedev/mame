@@ -2281,29 +2281,86 @@ ROM_START( rallybik )
 	ROM_LOAD( "b45-17.bpr",  0x220, 0x020, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )   /* sprite attribute (flip/position) ?? */
 ROM_END
 
+/*
+Truxton/Tatsujin, Toaplan 1988
+Hardware info by Guru
+
+PCB Layout
+----------
+TOAPLAN Co., Ltd.
+TP-O13B
+|---------------------------------------------------------|
+|MB3730   YM3812 LC3517       TOAPLAN-02   LC3517  LC3517 |
+| YM3014       B65_09.2F                                  |
+|VOL  LM358     Z80A                            |--------||
+|  10MHz                                  LC3517| FCU-2  ||
+|                                   B65-13.6D   |        ||
+|   B65_11.7K  B65_10.7L                        |        ||
+|                                               |--------||
+|                                           B65-12.7C     |
+|                   |----------|B65_05.8E                 |
+|   6264      6264  |NEC       |B65_06.10E                |
+|  |-------------|  |D65081R077|                          |
+|J |    68000    |  |          |B65_07.11E    6264        |
+|A |-------------|  |          |              6264        |
+|M                  |----------|B65_08.13E    6264        |
+|M                  62256                     6264        |
+|A                  62256    D65024GF035      6264        |
+|           28MHz   62256                                 |
+|                   62256              B65_04.20C         |
+|                              LC3517    B65_03.20B       |
+|                   SW1                    B65_02.20AB    |
+|                              LC3517         B65_01.20A  |
+|                   SW2                2148 2148          |
+|                                      2148 2148 2148     |
+|                                      2148 2148 2148     |
+|---------------------------------------------------------|
+Notes:
+        68000 - Motorola MC68000P10 CPU. Clock input 10.000MHz
+         Z80A - Sharp LH0080A Z80A-compatible CPU. Clock input 3.500MHz [28/8]
+       YM3812 - Yamaha YM3812 FM operator type-L II (OPL II) LSI (DIP24). Clock input 3.500MHz [28/8]
+       YM3014 - Yamaha YM3014 Serial Input Floating D/A Converter (DIP8)
+       LC3517 - Sanyo LC3517 2kx8 SRAM (DIP24)
+         6264 - Hitachi HM6264 8kx8 SRAM (DIP28)
+        62256 - Hitachi s256KP-12 32kx8 SRAM (DIP28)
+         2148 - AMD AM2148 1kx4-bit SRAM (DIP18)
+        FCU-2 - Custom graphics IC (QFP136)
+   D65081R077 - Custom graphics IC (PGA177)
+   TOAPLAN-02 - Custom chip marked 'TOAPLAN-02 M70H005' (ULA, DIP42)
+        LM358 - National Semiconductor LM358 Dual Operational Amplifier (DIP8)
+       D65024 - NEC D65024GF035 uPD65000-series CMOS Gate Array (QFP100)
+    B65-13.6D - Philips/Signetics N82S123 Bipolar PROM (DIP16)
+    B65-12.7C - Philips/Signetics N82S123 Bipolar PROM (DIP16)
+       MB3730 - Fujitsu MB3730 14W BTL Audio Power Amplifier
+      SW1,SW2 - 8-position DIP switch
+        HSYNC - 14.5648kHz (changes in-game to around 15.4kHz)
+        VSYNC - 57.6072Hz
+
+*/
+
 ROM_START( truxton )
 	ROM_REGION( 0x040000, "maincpu", 0 )    /* Main 68K code */
-	ROM_LOAD16_BYTE( "b65_11.bin",  0x000000, 0x20000, CRC(1a62379a) SHA1(b9470d4b70c38f2523b22636874d742abe4099eb) )
-	ROM_LOAD16_BYTE( "b65_10.bin",  0x000001, 0x20000, CRC(aff5195d) SHA1(a7f379dc35e3acf9e7a8ae8a47a9b5b4193f93a1) )
+	ROM_LOAD16_BYTE( "b65_11.7k", 0x000000, 0x20000, CRC(1a62379a) SHA1(b9470d4b70c38f2523b22636874d742abe4099eb) )
+	ROM_LOAD16_BYTE( "b65_10.7l", 0x000001, 0x20000, CRC(aff5195d) SHA1(a7f379dc35e3acf9e7a8ae8a47a9b5b4193f93a1) )
 
 	ROM_REGION( 0x8000, "audiocpu", 0 )    /* Sound Z80 code */
-	ROM_LOAD( "b65_09.bin",  0x0000, 0x4000, CRC(1bdd4ddc) SHA1(6bf7e3a7ca42f79082503ef471f30f271e2f0f99) )
+	ROM_LOAD( "b65_09.2f",  0x0000, 0x4000, CRC(1bdd4ddc) SHA1(6bf7e3a7ca42f79082503ef471f30f271e2f0f99) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "b65_08.bin",  0x00000, 0x20000, CRC(d2315b37) SHA1(eb42a884df319728c830c067c2423043ed4536ee) )
-	ROM_LOAD16_BYTE( "b65_07.bin",  0x00001, 0x20000, CRC(fb83252a) SHA1(48a38584d223f56286137f7acdfaec86ee6588e7) )
-	ROM_LOAD16_BYTE( "b65_06.bin",  0x40000, 0x20000, CRC(36cedcbe) SHA1(f79d4b1e98b3c9091ae907fb671ad201d3698b42) )
-	ROM_LOAD16_BYTE( "b65_05.bin",  0x40001, 0x20000, CRC(81cd95f1) SHA1(526a437fbe033ac21054ee5c3bf1ba2fed354c7a) )
+	ROM_LOAD16_BYTE( "b65_08.13e", 0x00000, 0x20000, CRC(d2315b37) SHA1(eb42a884df319728c830c067c2423043ed4536ee) )
+	ROM_LOAD16_BYTE( "b65_07.11e", 0x00001, 0x20000, CRC(fb83252a) SHA1(48a38584d223f56286137f7acdfaec86ee6588e7) )
+	ROM_LOAD16_BYTE( "b65_06.10e", 0x40000, 0x20000, CRC(36cedcbe) SHA1(f79d4b1e98b3c9091ae907fb671ad201d3698b42) )
+	ROM_LOAD16_BYTE( "b65_05.8e",  0x40001, 0x20000, CRC(81cd95f1) SHA1(526a437fbe033ac21054ee5c3bf1ba2fed354c7a) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "b65_04.bin",  0x00000, 0x20000, CRC(8c6ff461) SHA1(5199e31f4eb23bad01f7d1079f3618fe39d8a32e) )
-	ROM_LOAD16_BYTE( "b65_03.bin",  0x00001, 0x20000, CRC(58b1350b) SHA1(7eb2fe329579a6f651d3c1aed9155ac6ffefbc4b) )
-	ROM_LOAD16_BYTE( "b65_02.bin",  0x40000, 0x20000, CRC(1dd55161) SHA1(c537456ac56801dea0ac48fb1389228530d00a61) )
-	ROM_LOAD16_BYTE( "b65_01.bin",  0x40001, 0x20000, CRC(e974937f) SHA1(ab282472c04ce6d9ed368956c427403275bc9080) )
+	ROM_LOAD16_BYTE( "b65_04.20c",  0x00000, 0x20000, CRC(8c6ff461) SHA1(5199e31f4eb23bad01f7d1079f3618fe39d8a32e) )
+	ROM_LOAD16_BYTE( "b65_03.20b",  0x00001, 0x20000, CRC(58b1350b) SHA1(7eb2fe329579a6f651d3c1aed9155ac6ffefbc4b) )
+	ROM_LOAD16_BYTE( "b65_02.20ab", 0x40000, 0x20000, CRC(1dd55161) SHA1(c537456ac56801dea0ac48fb1389228530d00a61) )
+	ROM_LOAD16_BYTE( "b65_01.20a",  0x40001, 0x20000, CRC(e974937f) SHA1(ab282472c04ce6d9ed368956c427403275bc9080) )
 
-	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
-	ROM_LOAD( "b65_12.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) ) /* sprite attribute (flip/position) ?? */
-	ROM_LOAD( "b65_13.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) ) /* ??? */
+	ROM_REGION( 0x40, "proms", 0 )      /* 82s123 nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "b65_12.7c",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) ) /* sprite attribute (flip/position) ?? */
+	ROM_LOAD( "b65_13.6d",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) ) /* ??? */
 ROM_END
 
 ROM_START( hellfire )
@@ -2717,12 +2774,11 @@ ROM_START( samesamenh ) /* this hack has been used on various PCBs */
 ROM_END
 
 /*
-Fire Shark
-Toaplan 1990
+Fire Shark, Toaplan 1990
+Hardware info by Guru
 
 PCB Layout
 ----------
-
 TOAPLAN Co., Ltd.
 TP-O17
 |---------------------------------------------------------|
@@ -2737,7 +2793,7 @@ TP-O17
 |A           O17_07   O17_05                              |
 |M           O17_08   O17_06                         6264 |
 |M                                              |------|  |
-|A           DSW1    |------|                   |FOU-2 |  |
+|A           DSW1    |------|                   |FCU-2 |  |
 |                    |BCU-2 |   8464            |      |  |
 |            DSW2    |      |   8464            |------|  |
 |                    |------|   8464        PROM15        |
@@ -2757,7 +2813,7 @@ Notes:
          6464 - Hyundai HY6264LP-10 8kx8 SRAM (DIP28)
          6116 - Hyundai HY6116AP-15 2kx8 SRAM (DIP24)
         BCU-2 - Custom graphics IC (QFP160)
-        FOU-2 - Custom graphics IC (QFP136)
+        FCU-2 - Custom graphics IC (QFP136)
         LM358 - National Semiconductor LM358 Dual Operational Amplifier (DIP8)
        D65024 - NEC D65024GF035 uPD65000-series CMOS Gate Array (QFP100)
       MN53007 - Panasonic MN53007 CMOS Gate Array {732 gates} (DIP42)

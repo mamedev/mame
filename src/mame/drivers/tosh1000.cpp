@@ -26,7 +26,8 @@
     - backup ram (stores config.sys)
     - HardRAM (static RAM board)
     - native keyboard (MCU dump missing)
-    - font selector (CRTC register 0x12; DIP switches PJ20, PJ21)
+    - font selector (system register 0x5A; DIP switches PJ20, PJ21)
+    - display contrast and type (CRTC register 0x12)
 
     Useful links:
     - board photo: http://s8.hostingkartinok.com/uploads/images/2016/05/579e9d152bc772d9c16bc8ac611eb97f.jpg
@@ -37,8 +38,9 @@
 
 
 #include "emu.h"
-
 #include "machine/genpc.h"
+#include "machine/tosh1000_bram.h"
+
 #include "bus/isa/isa_cards.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
@@ -46,7 +48,7 @@
 #include "machine/bankdev.h"
 #include "machine/ram.h"
 #include "machine/rp5c01.h"
-#include "machine/tosh1000_bram.h"
+
 #include "softlist.h"
 
 
@@ -55,7 +57,7 @@
 #define LOG_DEBUG     (1U <<  2)
 
 //#define VERBOSE (LOG_DEBUG)
-//#define LOG_OUTPUT_FUNC printf
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 

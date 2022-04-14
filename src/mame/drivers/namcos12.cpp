@@ -34,6 +34,7 @@ Derby Quiz My Dream Horse (MDH1/VER.A2)  (C) Namco,        1998  COH-700     SYS
 Ehrgeiz (EG1/VER.A)                      (C) Square/Namco, 1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC021
 Ehrgeiz (EG2/VER.A)                      (C) Square/Namco, 1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC021
 Ehrgeiz (EG3/VER.A)                      (C) Square/Namco, 1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC021
+Fighting Layer (FTL3/VER.A)              (C) Arika/Namco,  1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F4    KC037
 Fighting Layer (FTL0/VER.A)              (C) Arika/Namco,  1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F4    KC037
 Ghoul Panic (OB2/VER.A)                  (C) Namco/Raizing,1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC045
 Oh! Bakyuuun (OB1/VER.A)                 (C) Namco/Raizing,1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC045
@@ -275,6 +276,7 @@ Notes:
                      --------------------------------------------------------------------
                      Attack Pla-Rail           AP1 Ver.A    none             MOTHER(B)
                      Ehrgeiz                   EG2 Ver.A    EG2/VER.A        MOTHER(B)
+                     Fighting Layer            FTL3 Ver.A   FTL3/VER.A       MOTHER(B)
                      Fighting Layer            FTL1 Ver.A   FTL0/VER.A       MOTHER(B)
                      Ghoul Panic               OB2 Ver.A    OB2/VER.A        MOTHER(B)
                      Soul Calibur              SOC1 Ver.B   SOC11/VER.B      MOTHER(B)
@@ -489,6 +491,11 @@ Attack Pla-Rail AP1/VER.A   SYSTEM 12 M5F4 PCB 8661961200 (8661971200)     KC032
                                                                                     AP1 ROM0, AP1 ROM1, AP1 ROM2
                                                                                     AP1 FL4L, AP1 FL4H
                                                                                     AP1 FL3L, AP1 FL3H
+
+Fighting Layer FTL3/VER.A   SYSTEM 12 M5F4 PCB 8661961200 (8661971200)     KC037    FTL1 WAVE0, FTL1 WAVE1
+                                                                                    FTL1 ROM0, FTL1 ROM1, FTL1 ROM2
+                                                                                    FTL1 FL4L, FTL1 FL4H
+                                                                                    FTL1 FL3L, FTL1 FL3H
 
 Fighting Layer FTL0/VER.A   SYSTEM 12 M5F4 PCB 8661961200 (8661971200)     KC037    FTL1 WAVE0, FTL1 WAVE1
                                                                                     FTL1 ROM0, FTL1 ROM1, FTL1 ROM2
@@ -2256,8 +2263,30 @@ ROM_END
 
 ROM_START( fgtlayer )
 	ROM_REGION32_LE( 0x00400000, "maincpu:rom", 0 ) /* main prg */
-	ROM_LOAD16_BYTE( "ftl1vera.2e",  0x0000000, 0x200000, CRC(f4156e79) SHA1(cedb917940be8c74fa4ddb48213ce6917444e306) )
-	ROM_LOAD16_BYTE( "ftl1vera.2j",  0x0000001, 0x200000, CRC(c65b57c0) SHA1(0051aa46d09fbe9d896ae5f534e21955373f1d46) )
+	ROM_LOAD16_BYTE( "ftl3vera.2e",  0x0000000, 0x200000, CRC(90e33126) SHA1(81caedd72d7634810d6f7093d4ad437aca83fbf2) )
+	ROM_LOAD16_BYTE( "ftl3vera.2j",  0x0000001, 0x200000, CRC(1626465d) SHA1(941e7f8fbbaa232aab10a52aba1c462b4c91bb71) )
+
+	ROM_REGION32_LE( 0x2000000, "bankedroms", 0 ) /* main data */
+	ROM_LOAD(        "ftl1rom0.9",   0x0000000, 0x800000, CRC(e33ce365) SHA1(f7e5b98d2e8e5f233265909477c84331f016ebfb) )
+	ROM_LOAD(        "ftl1rom1.10",  0x0800000, 0x800000, CRC(a1ec7d08) SHA1(e693a0b16235c44d4165b2f53dc25d5288297c27) )
+	ROM_LOAD(        "ftl1rom2.11",  0x1000000, 0x800000, CRC(204be858) SHA1(95b22b678b7d11b0ec907698c18cebd84437c656) )
+	ROM_LOAD16_BYTE( "ftl1fl3l.7",   0x1800000, 0x200000, CRC(e4fb01e1) SHA1(c7883e86afb58412281a317bfdf62a21488421be) )
+	ROM_LOAD16_BYTE( "ftl1fl3h.8",   0x1800001, 0x200000, CRC(67a5c56f) SHA1(6f0a4f93b4975b24efb26c3dd47b791c92c55fbf) )
+	ROM_LOAD16_BYTE( "ftl1fl4l.5",   0x1c00000, 0x200000, CRC(8039242c) SHA1(9c3f9637d7cd0c004c0c39aee815eed228ebad20) )
+	ROM_LOAD16_BYTE( "ftl1fl4h.6",   0x1c00001, 0x200000, CRC(5ad59726) SHA1(b3a68f7ba2052b99407a5423223202001f2a4f67) )
+
+	ROM_REGION( 0x0080000, "sub", 0 ) /* sound prg */
+	ROM_LOAD16_WORD_SWAP( "ftl1vera.11s", 0x0000000, 0x080000, CRC(e3f957cd) SHA1(1c7f2033025fb9c40654cff26d78697baf697c59) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
+	ROM_LOAD( "ftl1wave0.2",         0x0000000, 0x800000, CRC(ee009a2b) SHA1(c332bf59917b2673d7acb864bf92d25d74a350b6) )
+	ROM_LOAD( "ftl1wave1.1",         0x0800000, 0x800000, CRC(a54a89cd) SHA1(543b47c6442f7a78e26992b041235a91d719bb89) )
+ROM_END
+
+ROM_START( fgtlayerj )
+	ROM_REGION32_LE( 0x00400000, "maincpu:rom", 0 ) /* main prg */
+	ROM_LOAD16_BYTE( "ftl0vera.2e",  0x0000000, 0x200000, CRC(f4156e79) SHA1(cedb917940be8c74fa4ddb48213ce6917444e306) ) // Service mode shows FTL0/VER.A
+	ROM_LOAD16_BYTE( "ftl0vera.2j",  0x0000001, 0x200000, CRC(c65b57c0) SHA1(0051aa46d09fbe9d896ae5f534e21955373f1d46) )
 
 	ROM_REGION32_LE( 0x2000000, "bankedroms", 0 ) /* main data */
 	ROM_LOAD(        "ftl1rom0.9",   0x0000000, 0x800000, CRC(e33ce365) SHA1(f7e5b98d2e8e5f233265909477c84331f016ebfb) )
@@ -3329,7 +3358,8 @@ GAME( 1998, sws98,     0,        coh700,   namcos12,  namcos12_state,          i
 GAME( 1998, technodr,  0,        technodr, technodr,  namcos12_boothack_state, init_technodr, ROT0, "Namco",           "Techno Drive (Japan, TH1/VER.B)", MACHINE_NODEVICE_PRINTER ) /* KC056 */
 GAME( 1998, tenkomor,  0,        coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT90,"Namco",           "Tenkomori Shooting (World, TKM2/VER.A1)", 0 ) /* KC036 */
 GAME( 1998, tenkomorja,tenkomor, coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT90,"Namco",           "Tenkomori Shooting (Japan, TKM1/VER.A1)", 0 ) /* KC036 */
-GAME( 1998, fgtlayer,  0,        coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Arika / Namco",   "Fighting Layer (Japan, FTL1/VER.A)", 0 ) /* KC037 */
+GAME( 1998, fgtlayer,  0,        coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Arika / Namco",   "Fighting Layer (FTL3/VER.A)", 0 ) /* KC037 */ // supposedly US region but doesn't show the usual warning / WDUD screens
+GAME( 1998, fgtlayerj, fgtlayer, coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Arika / Namco",   "Fighting Layer (Japan, FTL0/VER.A)", 0 ) /* KC037 */
 GAME( 1998, pacapp,    0,        coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Produce / Namco", "Paca Paca Passion (Japan, PPP1/VER.A2)", 0 ) /* KC038 */
 GAME( 1999, ptblank2,  0,        ptblank2, ptblank2,  namcos12_boothack_state, init_ptblank2, ROT0, "Namco",           "Point Blank 2 (GNB5/VER.A)", 0 ) /* KC042 */
 GAME( 1999, gunbarl,   ptblank2, ptblank2, ptblank2,  namcos12_boothack_state, init_ptblank2, ROT0, "Namco",           "Gunbarl (Japan, GNB4/VER.A)", 0 ) /* KC042 */

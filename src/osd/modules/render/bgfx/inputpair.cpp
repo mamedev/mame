@@ -118,12 +118,8 @@ void bgfx_input_pair::create_selection_slider(uint32_t screen_index)
 	m_slider_state = std::make_unique<slider_state>(std::move(description), minval, defval, maxval, incval,
 													std::bind(&bgfx_input_pair::texture_changed, this, screen_index, _1, _2));
 
-	ui::menu_item item;
-	item.text = m_slider_state->description;
-	item.subtext = "";
-	item.flags = 0;
-	item.ref = m_slider_state.get();
-	item.type = ui::menu_item_type::SLIDER;
+	ui::menu_item item(ui::menu_item_type::SLIDER, m_slider_state.get());
+	item.set_text(m_slider_state->description);
 	m_selection_slider = item;
 }
 

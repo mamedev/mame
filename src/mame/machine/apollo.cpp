@@ -35,7 +35,7 @@
 #include "bus/isa/sc499.h"
 #include "bus/isa/3c505.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 
 #define APOLLO_IRQ_VECTOR 0xa0
 #define APOLLO_IRQ_PTM 0
@@ -1307,10 +1307,10 @@ void apollo_stdio_device::device_reset()
 }
 
 void apollo_stdio_device::device_timer(emu_timer &timer, device_timer_id id,
-		int param, void *ptr)
+		int param)
 {
 //  FIXME?
-//  device_serial_interface::device_timer(timer, id, param, ptr);
+//  device_serial_interface::device_timer(timer, id, param);
 }
 
 void apollo_stdio_device::rcv_complete() // Rx completed receiving byte

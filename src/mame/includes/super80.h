@@ -19,8 +19,10 @@
 #include "sound/samples.h"
 #include "sound/spkrdev.h"
 #include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
+
 
 /* Bits in m_portf0 variable:
     d5 cassette LED
@@ -67,14 +69,14 @@ protected:
 	void pio_port_a_w(u8 data);
 	u8 pio_port_b_r();
 	u8 portf2_r();
-	u8 m_portf0;
-	u8 m_s_options;
-	u8 m_palette_index;
-	u8 m_keylatch;
-	u8 m_cass_data[4];
-	u8 m_key_pressed;
-	u8 m_last_data;
-	bool m_boot_in_progress;
+	u8 m_portf0 = 0U;
+	u8 m_s_options = 0U;
+	u8 m_palette_index = 0U;
+	u8 m_keylatch = 0U;
+	u8 m_cass_data[4]{};
+	u8 m_key_pressed = 0U;
+	u8 m_last_data = 0U;
+	bool m_boot_in_progress = false;
 	void super80m_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
@@ -84,7 +86,7 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
-	memory_passthrough_handler *m_rom_shadow_tap;
+	memory_passthrough_handler m_rom_shadow_tap;
 	required_shared_ptr<u8> m_ram;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<z80pio_device> m_pio;
@@ -99,11 +101,12 @@ protected:
 	output_finder<> m_cass_led;
 
 private:
-
 	void machine_reset() override;
 	void machine_start() override;
+
 	void portf1_w(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_h);
+
 	uint32_t screen_update_super80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_super80d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_super80e(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -114,9 +117,9 @@ private:
 	void super80e_io(address_map &map);
 	void super80m_map(address_map &map);
 
-	u8 m_int_sw;
-	u16 m_vidpg;
-	bool m_current_charset;
+	u8 m_int_sw = 0;
+	u16 m_vidpg = 0;
+	bool m_current_charset = false;
 };
 
 

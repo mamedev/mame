@@ -99,26 +99,24 @@ void m68307_cpu_device::m68307_internal_timer_w(offs_t offset, uint16_t data, ui
 
 TIMER_CALLBACK_MEMBER(m68307_cpu_device::m68307_timer::timer0_callback )
 {
-	m68307_cpu_device* m68k = (m68307_cpu_device *)ptr;
-	single_timer* tptr = &m68k->m_m68307TIMER->singletimer[0];
+	single_timer* tptr = &parent->m_m68307TIMER->singletimer[0];
 	tptr->regs[m68307TIMER_TER] |= 0x2;
 
 	if (BIT(tptr->regs[m68307TIMER_TMR], 4))
-		m68k->timer0_interrupt(1);
+		parent->timer0_interrupt(1);
 
-	tptr->mametimer->adjust(m68k->cycles_to_attotime(20000));
+	tptr->mametimer->adjust(parent->cycles_to_attotime(20000));
 }
 
 TIMER_CALLBACK_MEMBER(m68307_cpu_device::m68307_timer::timer1_callback )
 {
-	m68307_cpu_device* m68k = (m68307_cpu_device *)ptr;
-	single_timer* tptr = &m68k->m_m68307TIMER->singletimer[1];
+	single_timer* tptr = &parent->m_m68307TIMER->singletimer[1];
 	tptr->regs[m68307TIMER_TER] |= 0x2;
 
 	if (BIT(tptr->regs[m68307TIMER_TMR], 4))
-		m68k->timer1_interrupt(1);
+		parent->timer1_interrupt(1);
 
-	tptr->mametimer->adjust(m68k->cycles_to_attotime(20000));
+	tptr->mametimer->adjust(parent->cycles_to_attotime(20000));
 
 }
 
@@ -134,12 +132,12 @@ void m68307_cpu_device::m68307_timer::init(m68307_cpu_device *device)
 	single_timer* tptr;
 
 	tptr = &singletimer[0];
-	tptr->mametimer = device->machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m68307_timer::timer0_callback),this), parent);
+	tptr->mametimer = device->machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m68307_timer::timer0_callback),this));
 
 	tptr = &singletimer[1];
-	tptr->mametimer = device->machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m68307_timer::timer1_callback),this), parent);
+	tptr->mametimer = device->machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m68307_timer::timer1_callback),this));
 
-	wd_mametimer = device->machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m68307_timer::wd_timer_callback),this), parent);
+	wd_mametimer = device->machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m68307_timer::wd_timer_callback),this));
 }
 
 uint16_t m68307_cpu_device::m68307_timer::read_tcn(uint16_t mem_mask, int which)

@@ -63,29 +63,29 @@ private:
 	required_ioport m_io_bit7;
 
 	// HW specifications
-	uint8_t m_hw_version;
-	bool m_ram_enabled;
+	uint8_t m_hw_version = 0;
+	bool m_ram_enabled = false;
 
 	// keyboard
-	uint16_t m_kb_mask;
-	uint8_t m_on_key;
+	uint16_t m_kb_mask = 0;
+	uint8_t m_on_key = 0;
 
 	// LCD
-	uint8_t m_lcd_on;
-	uint32_t m_lcd_base;
-	uint16_t m_lcd_width;
-	uint16_t m_lcd_height;
-	uint16_t m_lcd_contrast;
+	uint8_t m_lcd_on = 0;
+	uint32_t m_lcd_base = 0;
+	uint16_t m_lcd_width = 0;
+	uint16_t m_lcd_height = 0;
+	uint16_t m_lcd_contrast = 0;
 
 	// I/O
-	uint16_t m_io_hw1[0x10];
-	uint16_t m_io_hw2[0x80];
+	uint16_t m_io_hw1[0x10]{};
+	uint16_t m_io_hw2[0x80]{};
 
 	// Timer
-	uint8_t m_timer_on;
-	uint8_t m_timer_val;
-	uint16_t m_timer_mask;
-	uint64_t m_timer;
+	uint8_t m_timer_on = 0;
+	uint8_t m_timer_val = 0;
+	uint16_t m_timer_mask = 0;
+	uint64_t m_timer = 0;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

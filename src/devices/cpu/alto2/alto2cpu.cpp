@@ -2286,7 +2286,7 @@ void alto2_cpu_device::execute_run()
 			 * the bitclk sequence by leaving m_bitclk_time at -1.
 			 */
 			m_bitclk_time -= ucycle;
-			disk_bitclk(nullptr, m_bitclk_index);
+			disk_bitclk(m_bitclk_index);
 		}
 
 		m_mpc = m_next;             // next instruction's micro program counter

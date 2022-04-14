@@ -64,9 +64,9 @@ private:
 	optional_ioport m_io_eepromout;
 
 	/* video-related */
-	tilemap_t       *m_tilemap_16x16[2];
-	tilemap_t       *m_tilemap[2];
-	int             m_tilemap_color[2];
+	tilemap_t       *m_tilemap_16x16[2]{};
+	tilemap_t       *m_tilemap[2]{};
+	int             m_tilemap_color[2]{};
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

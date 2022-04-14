@@ -48,12 +48,12 @@ private:
 	required_region_ptr<uint8_t> m_gfxroms;
 
 	// misc
-	uint8_t    m_abca;
-	uint8_t    m_dr;
-	uint8_t    m_ds;
-	uint8_t    m_sh;
-	uint8_t    m_input_mux;
-	uint8_t    m_di;
+	uint8_t    m_abca = 0U;
+	uint8_t    m_dr = 0U;
+	uint8_t    m_ds = 0U;
+	uint8_t    m_sh = 0U;
+	uint8_t    m_input_mux = 0U;
+	uint8_t    m_di = 0U;
 
 	uint8_t ioread(offs_t offset);
 	void iowrite(offs_t offset, uint8_t data);

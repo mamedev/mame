@@ -136,7 +136,7 @@ small ics.
 #include "bus/spc1000/fdd.h"
 #include "bus/spc1000/vdp.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/spc1000_cas.h"
@@ -152,7 +152,7 @@ public:
 		, m_cass(*this, "cassette")
 		, m_ram(*this, RAM_TAG)
 		, m_p_videoram(*this, "videoram")
-		, m_io_kb(*this, "LINE.%u", 0)
+		, m_io_kb(*this, "LINE.%u", 0U)
 		, m_io_joy(*this, "JOY")
 		, m_centronics(*this, "centronics")
 	{}
@@ -178,12 +178,12 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	uint8_t m_IPLK;
-	uint8_t m_GMODE;
-	uint16_t m_page;
+	uint8_t m_IPLK = 0U;
+	uint8_t m_GMODE = 0U;
+	uint16_t m_page = 0U;
 	std::unique_ptr<uint8_t[]> m_work_ram;
 	attotime m_time;
-	bool m_centronics_busy;
+	bool m_centronics_busy = false;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<z80_device> m_maincpu;

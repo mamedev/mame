@@ -22,6 +22,7 @@ Known games using this hardware:
 - Great Sluggers '93
 - Great Sluggers '94
 - Gun Bullet / Point Blank
+- J-League Soccer V-Shoot
 - Nebulas Ray
 - Super World Stadium '95
 - Super World Stadium '96
@@ -1247,6 +1248,67 @@ ROM_START( nebulrayj )
 	ROM_LOAD( "c366.bin", 0, 0x20, CRC(8c96f31d) SHA1(d186859cfc19a63266084372080d0a5bee687ae2) )
 ROM_END
 
+ROM_START( nebulrayp ) // every label handwritten
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD32_WORD( "prgl_1-17.15b", 0x00002, 0x80000, CRC(9066aa9e) SHA1(5f9a07ccc255c93263fbe8a3ab7c88e4dcc29850) )
+	ROM_LOAD32_WORD( "prgu_1-17.13b", 0x00000, 0x80000, CRC(c77f06d3) SHA1(5baf5337e99aa31f8ff07cad217c5186ed63892b) )
+
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // sound data, seems much earlier than the other sets
+	ROM_LOAD( "sprg.5b", 0x00000, 0x80000, CRC(e32c099f) SHA1(e7214bda9c4ee1ad99aeac827520e69a723dfb8f) ) // 11xxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x1000000, "c352", 0 ) // on hi-pric P43 B SYSFL REX 64MB8 PCB G327R61100 (G327R63100), samples, same as the other sets but split in smaller ROMs
+	ROM_LOAD( "rom0_e-30.ic5", 0x000000, 0x80000, CRC(beee81e6) SHA1(13f2b0316c6466cdd9ad63a1345dc56dc7883297) )
+	ROM_LOAD( "rom1_a1.ic6",   0x080000, 0x80000, CRC(91a88946) SHA1(7f51a63e0dd09adae52f6476049949635c23adfa) )
+	ROM_LOAD( "rom2_22.ic7",   0x100000, 0x80000, CRC(ef492d2b) SHA1(672175e67957be683d9b0507f2a03b6293ae359b) )
+	ROM_LOAD( "rom3_w3.ic8",   0x180000, 0x80000, CRC(5d4900e1) SHA1(2434517c66e3cbe01ecaed025273ab05e267108f) )
+
+	ROM_REGION( 0x1000000, "c355spr", 0 ) // on MEMEXT OBJ EPROM PCB 8635903200 (8635903300), almost same as the other sets, but split in smaller ROMs
+	ROM_LOAD32_BYTE( "a0.1a", 0x000000, 0x80000, CRC(e6ecca1a) SHA1(310d8a40400d022003e88f19ae880fb1325294cf) )
+	ROM_LOAD32_BYTE( "b0.1b", 0x000001, 0x80000, CRC(004f6665) SHA1(56775749653ad968a6a4c0a335b28a3e72f53eac) )
+	ROM_LOAD32_BYTE( "c0.1c", 0x000002, 0x80000, CRC(58ce8745) SHA1(25774961408d4164295c056bf0381907b2ae17cc) )
+	ROM_LOAD32_BYTE( "d0.1d", 0x000003, 0x80000, CRC(94913c00) SHA1(89acec4409d3f56bfb8fc3bead5c93214e42ec63) )
+	ROM_LOAD32_BYTE( "a1.2a", 0x200000, 0x80000, CRC(4681329b) SHA1(871c01c3bfc84cb4f75d01dbc98798a593da6715) )
+	ROM_LOAD32_BYTE( "b1.2b", 0x200001, 0x80000, CRC(8464608d) SHA1(99cdb43485ce9c9bc759399a0d002861e2586ae0) )
+	ROM_LOAD32_BYTE( "c1.2c", 0x200002, 0x80000, CRC(8d82b485) SHA1(a431f5b1f15a8539f83edf198587597660f3e23b) )
+	ROM_LOAD32_BYTE( "d1.2d", 0x200003, 0x80000, CRC(f0b10fa7) SHA1(f0fed84fe655fe9ea47b9b607745b1728018d81f) )
+	ROM_LOAD32_BYTE( "a2.3a", 0x400000, 0x80000, CRC(03908666) SHA1(a9b82a8f16101522fa3df6cbab65afcba296fabd) )
+	ROM_LOAD32_BYTE( "b2.3b", 0x400001, 0x80000, CRC(ebfeb8d6) SHA1(7a8a126ddd900e3cf596949e141c80ec9cf411be) )
+	ROM_LOAD32_BYTE( "c2.3c", 0x400002, 0x80000, CRC(9b3c02dc) SHA1(a9717b7940ea23f538ef9973908f883573acf928) )
+	ROM_LOAD32_BYTE( "d2.3d", 0x400003, 0x80000, CRC(07767b77) SHA1(053cb730eabd70f928197e2b1151e36d52ffa718) )
+	ROM_LOAD32_BYTE( "a3.4a", 0x600000, 0x80000, CRC(ac6502a0) SHA1(5afd6ddc72535f1db6a3cd6d28eaabb73b9796f6) )
+	ROM_LOAD32_BYTE( "b3.4b", 0x600001, 0x80000, CRC(73eca091) SHA1(9920dcf4de599a91e4eff388ca16dc0e6ff2b2df) )
+	ROM_LOAD32_BYTE( "c3.4c", 0x600002, 0x80000, CRC(ea718267) SHA1(70a06cb83b90daddeda1bb823e933b7f978cb2f7) )
+	ROM_LOAD32_BYTE( "d3.4d", 0x600003, 0x80000, CRC(b22d1d10) SHA1(02c3dd7a6b19c14ace0cef3978473a77cabf32ed) )
+	ROM_LOAD32_BYTE( "a4.5a", 0x800000, 0x80000, CRC(c1da92b6) SHA1(57912d5993e46508d3432c093ac746cc3426467f) )
+	ROM_LOAD32_BYTE( "b4.5b", 0x800001, 0x80000, CRC(7b00567d) SHA1(7ec2f3d63f1e5c667263d21644cc421e25d577b7) )
+	ROM_LOAD32_BYTE( "c4.5c", 0x800002, 0x80000, CRC(d46ef578) SHA1(a9265380b0ae4bf209c8a754db834e898ae09b92) )
+	ROM_LOAD32_BYTE( "d4.5d", 0x800003, 0x80000, CRC(ffff82d9) SHA1(db4b57ac44dca14cc043827d77eb6958214c17c3) )
+	ROM_LOAD32_BYTE( "a5.6a", 0xa00000, 0x80000, CRC(6b171a66) SHA1(9a9cced3949ebdc9335e1029126a5bc5e9ff543a) )
+	ROM_LOAD32_BYTE( "b5.6b", 0xa00001, 0x80000, CRC(ce576891) SHA1(559f2840831e52f1fc105a9a4d6193891655b752) )
+	ROM_LOAD32_BYTE( "c5.6c", 0xa00002, 0x80000, CRC(d04ebb7a) SHA1(12de79e9130af93e7fd78f21549670c4c5cd70d8) )
+	ROM_LOAD32_BYTE( "d5.6d", 0xa00003, 0x80000, CRC(96aa1d38) SHA1(8d3b4771acd0b7e4829afdc520e1ed6d5adf823c) )
+	ROM_LOAD32_BYTE( "a6.7a", 0xc00000, 0x80000, CRC(c423ddd4) SHA1(dbccdcbfa96ce8c20d93520fd6e0af03a98da787) )
+	ROM_LOAD32_BYTE( "b6.7b", 0xc00001, 0x80000, CRC(4f51fc57) SHA1(d1655f6aeaa0f16cd7c888430ef437bf5341e323) )
+	ROM_LOAD32_BYTE( "c6.7c", 0xc00002, 0x80000, CRC(0c763fdb) SHA1(037456f6952dfdad045e8c01adb80881e6983d93) )
+	ROM_LOAD32_BYTE( "d6.7d", 0xc00003, 0x80000, CRC(82d6cef2) SHA1(d4158e6cb9f747bb2af662044262dc9efe306bc2) )
+	ROM_LOAD32_BYTE( "a7.8a", 0xe00000, 0x80000, CRC(811ccd6b) SHA1(875615a0662b2f756e2d00dcd85c3dddcac972e8) )
+	ROM_LOAD32_BYTE( "b7.8b", 0xe00001, 0x80000, CRC(2ee75fc6) SHA1(6d21dd6f62efc99e3a367328edab774cced87129) ) // 99.999809% identical to the other sets' data
+	ROM_LOAD32_BYTE( "c7.8c", 0xe00002, 0x80000, CRC(e22194fd) SHA1(b2f084c80437b3e22f564760e59ecb7a0dd748c8) )
+	ROM_LOAD32_BYTE( "d7.8d", 0xe00003, 0x80000, CRC(4b682344) SHA1(4f8e904708451dfe7656b0923ff8cdd9b131ee6d) ) // 99.999809% identical to the other sets' data
+
+	ROM_REGION( 0x400000, "c123tmap", 0 ) // same as the other sets
+	ROM_LOAD( "nr1-chr0", 0x000000, 0x100000,CRC(8d5b54ea) SHA1(616d5729f474da91da19a8246066280652da998c) )
+	ROM_LOAD( "nr1-chr1", 0x100000, 0x100000,CRC(cd21630c) SHA1(9974c0eb1051ca52f001e6631264a1936bb50620) )
+	ROM_LOAD( "nr1-chr2", 0x200000, 0x100000,CRC(70a11023) SHA1(bead486a86bd96c6fdfd2ea4d4d37c38bbe9bfbb) )
+	ROM_LOAD( "nr1-chr3", 0x300000, 0x100000,CRC(8f4b1d51) SHA1(b48fb2c8ccd9105a5b48be44dd3fe4309769efa4) )
+
+	ROM_REGION( 0x80000, "c123tmap:mask", 0 ) // same as the other sets
+	ROM_LOAD( "nr1-sha0", 0, 0x80000,CRC(ca667e13) SHA1(685032603224cb81bcb85361921477caec570d5e) )
+
+	ROM_REGION( 0x20, "proms", 0 ) // custom key data?
+	ROM_LOAD( "c366.bin", 0, 0x20, CRC(8c96f31d) SHA1(d186859cfc19a63266084372080d0a5bee687ae2) )
+ROM_END
+
 ROM_START( gslgr94u )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "gse2mprl.15b", 0x00002, 0x80000, CRC(a514349c) SHA1(1f7ec81cd6193410d2f01e6f0f84878561fc8035) )
@@ -1793,6 +1855,48 @@ ROM_START( outfxiesj )
 	ROM_LOAD16_WORD_SWAP( "ou1dat1.20b", 0x80000, 0x80000, CRC(63bb119d) SHA1(d4c2820243b84c3f5cdf7f9e66bb50f53d0efed2) )
 ROM_END
 
+ROM_START( outfxiesja ) // this set uses different "c355spr", "c169roz" and "c123tmap" region ROMs. The rest of the ROMs is identical. It was found on 2 different PCB sets.
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD32_WORD( "ou1_mprl.11c", 0x00002, 0x80000, CRC(d3b9e530) SHA1(3f5fe5eea817a23dfe42e76f32912ce94d4c49c9) )
+	ROM_LOAD32_WORD( "ou1_mpru.11d", 0x00000, 0x80000, CRC(d98308fb) SHA1(fdefeebf56464a20e3aaefd88df4eee9f7b5c4f3) )
+
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // sound data
+	ROM_LOAD( "ou1spr0.5b", 0, 0x80000, CRC(60cee566) SHA1(2f3b96793816d90011586e0f9f71c58b636b6d4c) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) // samples
+	ROM_LOAD( "ou1voi0.6n", 0, 0x200000, CRC(2d8fb271) SHA1(bde9d45979728f5a2cd8ec89f5f81bf16b694cc2) )
+
+	ROM_REGION( 0x200000, "c123tmap:mask", 0 )
+	ROM_LOAD( "ou1shas.12s", 0, 0x200000,CRC(9bcb0397) SHA1(54a32b6394d0e6f51bfd281f8a4bafce6ddf6246) )
+
+	ROM_REGION( 0x200000, "c169roz:mask", 0 )
+	ROM_LOAD( "ou1shar.18s", 0, 0x200000,   CRC(fbb48194) SHA1(2d3ec5bc519fad2b755018f83fadfe0cba13c292) )
+
+	ROM_REGION( 0x2000000, "c355spr", 0 ) // all sldh
+	ROM_LOAD32_WORD( "ou1obj0l.4c", 0x0000000, 0x200000, CRC(ecf135e4) SHA1(f88924bf4528845c6d178abf0c0d71e3030d6823) )
+	ROM_LOAD32_WORD( "ou1obj0u.8c", 0x0000002, 0x200000, CRC(229fe774) SHA1(97de8777a2bf3d39c8331183fa13e339ee946287) )
+	ROM_LOAD32_WORD( "ou1obj1l.4b", 0x0400000, 0x200000, CRC(0b9d060e) SHA1(3e148d5fd5857d267c83e08a2065e8af6554f538) )
+	ROM_LOAD32_WORD( "ou1obj1u.8b", 0x0400002, 0x200000, CRC(34a0feca) SHA1(dcd88d762c19ff2972f52f0c7fd506b48f2ad3e5) )
+	ROM_LOAD32_WORD( "ou1obj2l.4a", 0x0800000, 0x200000, CRC(128119c4) SHA1(92f373bda457826dbf017971171d91f01b4fb17b) )
+	ROM_LOAD32_WORD( "ou1obj2u.8a", 0x0800002, 0x200000, CRC(ce74c385) SHA1(fe93b451a762cbfc8b72778837f205b2c300d6b3) )
+	ROM_LOAD32_WORD( "ou1obj3l.6c", 0x0c00000, 0x200000, CRC(39d9aa54) SHA1(d5a40c145da84f77d9fa0c635ea6253d0d30bec4) )
+	ROM_LOAD32_WORD( "ou1obj3u.9c", 0x0c00002, 0x200000, CRC(022f4a73) SHA1(d0cf1df3731c5166f0e882f2eaa5603ff643d0e5) )
+	ROM_LOAD32_WORD( "ou1obj4l.6b", 0x1000000, 0x200000, CRC(b26fbb92) SHA1(906f4f9ebc114872ffb9a1443d3daec7fc9a66e4) )
+	ROM_LOAD32_WORD( "ou1obj4u.9b", 0x1000002, 0x200000, CRC(ad99607d) SHA1(b5a3442d74a2c153e646f498f4386a078fe51b80) )
+
+	ROM_REGION( 0x600000, "c169roz", 0 ) // all sldh
+	ROM_LOAD( "ou1-rot0.3d", 0x000000, 0x200000, CRC(30511ffb) SHA1(26f6c8ad0763427b90aa811528112318160399c1) )
+	ROM_LOAD( "ou1-rot1.3c", 0x200000, 0x200000, CRC(f4b61c22) SHA1(8421c021ab4eceef5974cf90b4281c09a6cd3fc7) )
+	ROM_LOAD( "ou1-rot2.3b", 0x400000, 0x200000, CRC(d48b29d8) SHA1(f4359eb0a5a1cf860abaa90a812e3ca5b2ed6e37) )
+
+	ROM_REGION( 0x200000, "c123tmap", 0 )
+	ROM_LOAD( "ou1-scr0.1d", 0x000000, 0x200000, CRC(692b63f8) SHA1(a16b95eb5e99ad59c39f64b83d09ae6c95ac7865) ) // sldh
+
+	ROM_REGION32_BE( 0x100000, "data", 0 )
+	ROM_LOAD16_WORD_SWAP( "ou1dat0.20a", 0x00000, 0x80000, CRC(1a49aead) SHA1(df243aff1a6fb5bcf4d5d883c5af2374a4aff477) )
+	ROM_LOAD16_WORD_SWAP( "ou1dat1.20b", 0x80000, 0x80000, CRC(63bb119d) SHA1(d4c2820243b84c3f5cdf7f9e66bb50f53d0efed2) )
+ROM_END
+
 ROM_START( outfxiesa ) /* briefly shows "For use in Japan" notice, but Japanese text removed from game play. A Korean version? */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "mprl.11c", 0x00002, 0x80000, CRC(22cd638d) SHA1(7b11ded9f2265678bb96b3fb706ed5fa37745511) ) // no label on ROM
@@ -1929,22 +2033,24 @@ ROM_END
 /***************************************************************/
 
 /*    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    CLASS,          INIT,          MONITOR,COMPANY,FULLNAME,   FLAGS */
-GAME( 1994, nebulray,  0,        namconb1, namconb1, namconb1_state, init_nebulray, ROT90, "Namco", "Nebulas Ray (World, NR2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, nebulrayj, nebulray, namconb1, namconb1, namconb1_state, init_nebulray, ROT90, "Namco", "Nebulas Ray (Japan, NR1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, ptblank,   0,        namconb1, gunbulet, namconb1_state, init_gunbulet, ROT0,  "Namco", "Point Blank (World, GN2 Rev B, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, ptblanka,  ptblank,  namconb1, gunbulet, namconb1_state, init_gunbulet, ROT0,  "Namco", "Point Blank (World, GN2 Rev B, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gunbuletj, ptblank,  namconb1, gunbulet, namconb1_state, init_gunbulet, ROT0,  "Namco", "Gun Bullet (Japan, GN1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gunbuletw, ptblank,  namconb1, gunbulet, namconb1_state, init_gunbulet, ROT0,  "Namco", "Gun Bullet (World, GN3 Rev B)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, gslugrsj,  0,        namconb1, namconb1, namconb1_state, init_gslgr94u, ROT0,  "Namco", "Great Sluggers (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gslgr94u,  0,        namconb1, namconb1, namconb1_state, init_gslgr94u, ROT0,  "Namco", "Great Sluggers '94", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gslgr94j,  gslgr94u, namconb1, namconb1, namconb1_state, init_gslgr94j, ROT0,  "Namco", "Great Sluggers '94 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sws95,     0,        namconb1, namconb1, namconb1_state, init_sws95,    ROT0,  "Namco", "Super World Stadium '95 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, sws96,     0,        namconb1, namconb1, namconb1_state, init_sws96,    ROT0,  "Namco", "Super World Stadium '96 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, sws97,     0,        namconb1, namconb1, namconb1_state, init_sws97,    ROT0,  "Namco", "Super World Stadium '97 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, vshoot,    0,        namconb1, namconb1, namconb1_state, init_vshoot,   ROT0,  "Namco", "J-League Soccer V-Shoot (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, nebulray,   0,        namconb1, namconb1, namconb1_state, init_nebulray, ROT90, "Namco", "Nebulas Ray (World, NR2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, nebulrayj,  nebulray, namconb1, namconb1, namconb1_state, init_nebulray, ROT90, "Namco", "Nebulas Ray (Japan, NR1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, nebulrayp,  nebulray, namconb1, namconb1, namconb1_state, init_nebulray, ROT90, "Namco", "Nebulas Ray (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, ptblank,    0,        namconb1, gunbulet, namconb1_state, init_gunbulet, ROT0,  "Namco", "Point Blank (World, GN2 Rev B, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, ptblanka,   ptblank,  namconb1, gunbulet, namconb1_state, init_gunbulet, ROT0,  "Namco", "Point Blank (World, GN2 Rev B, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gunbuletj,  ptblank,  namconb1, gunbulet, namconb1_state, init_gunbulet, ROT0,  "Namco", "Gun Bullet (Japan, GN1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gunbuletw,  ptblank,  namconb1, gunbulet, namconb1_state, init_gunbulet, ROT0,  "Namco", "Gun Bullet (World, GN3 Rev B)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, gslugrsj,   0,        namconb1, namconb1, namconb1_state, init_gslgr94u, ROT0,  "Namco", "Great Sluggers (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gslgr94u,   0,        namconb1, namconb1, namconb1_state, init_gslgr94u, ROT0,  "Namco", "Great Sluggers '94", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gslgr94j,   gslgr94u, namconb1, namconb1, namconb1_state, init_gslgr94j, ROT0,  "Namco", "Great Sluggers '94 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sws95,      0,        namconb1, namconb1, namconb1_state, init_sws95,    ROT0,  "Namco", "Super World Stadium '95 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, sws96,      0,        namconb1, namconb1, namconb1_state, init_sws96,    ROT0,  "Namco", "Super World Stadium '96 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, sws97,      0,        namconb1, namconb1, namconb1_state, init_sws97,    ROT0,  "Namco", "Super World Stadium '97 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, vshoot,     0,        namconb1, namconb1, namconb1_state, init_vshoot,   ROT0,  "Namco", "J-League Soccer V-Shoot (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, outfxies,  0,        outfxies, namconb1, namconb1_state, init_outfxies, ROT0, "Namco", "The Outfoxies (World, OU2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, outfxiesj, outfxies, outfxies, namconb1, namconb1_state, init_outfxies, ROT0, "Namco", "The Outfoxies (Japan, OU1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, outfxiesa, outfxies, outfxies, namconb1, namconb1_state, init_outfxies, ROT0, "Namco", "The Outfoxies (Korea?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, machbrkr,  0,        machbrkr, namconb1, namconb1_state, init_machbrkr, ROT0, "Namco", "Mach Breakers (World, MB2)", MACHINE_SUPPORTS_SAVE ) /* Title screen doesn't show subtitle "Numan Athletics 2" */
-GAME( 1995, machbrkrj, machbrkr, machbrkr, namconb1, namconb1_state, init_machbrkr, ROT0, "Namco", "Mach Breakers - Numan Athletics 2 (Japan, MB1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, outfxies,   0,        outfxies, namconb1, namconb1_state, init_outfxies, ROT0, "Namco", "The Outfoxies (World, OU2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, outfxiesj,  outfxies, outfxies, namconb1, namconb1_state, init_outfxies, ROT0, "Namco", "The Outfoxies (Japan, OU1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, outfxiesja, outfxies, machbrkr, namconb1, namconb1_state, init_outfxies, ROT0, "Namco", "The Outfoxies (Japan, OU1, alternate GFX ROMs)", MACHINE_SUPPORTS_SAVE ) // GFX ROMs are different and are in the same format as the Mach Breakers ones
+GAME( 1994, outfxiesa,  outfxies, outfxies, namconb1, namconb1_state, init_outfxies, ROT0, "Namco", "The Outfoxies (Korea?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, machbrkr,   0,        machbrkr, namconb1, namconb1_state, init_machbrkr, ROT0, "Namco", "Mach Breakers (World, MB2)", MACHINE_SUPPORTS_SAVE ) /* Title screen doesn't show subtitle "Numan Athletics 2" */
+GAME( 1995, machbrkrj,  machbrkr, machbrkr, namconb1, namconb1_state, init_machbrkr, ROT0, "Namco", "Mach Breakers - Numan Athletics 2 (Japan, MB1)", MACHINE_SUPPORTS_SAVE )

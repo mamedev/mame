@@ -381,15 +381,15 @@ void midyunit_state::dma_draw(uint16_t command)
  *
  *************************************/
 
-void midyunit_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void midyunit_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_DMA:
-		dma_callback(ptr, param);
+		dma_callback(param);
 		break;
 	case TIMER_AUTOERASE_LINE:
-		autoerase_line(ptr, param);
+		autoerase_line(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in midyunit_state::device_timer");
@@ -586,7 +586,7 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(midyunit_state::scanline_update)
 		dest[x] = m_pen_map[src[coladdr++ & 0x1ff]];
 
 	/* handle autoerase on the previous line */
-	autoerase_line(nullptr, params->rowaddr - 1);
+	autoerase_line(params->rowaddr - 1);
 
 	/* if this is the last update of the screen, set a timer to clear out the final line */
 	/* (since we update one behind) */

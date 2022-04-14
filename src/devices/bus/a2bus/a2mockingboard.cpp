@@ -137,9 +137,6 @@ protected:
 	virtual void write_cnxx(u8 offset, u8 data) override;
 
 	required_device<tms5220_device> m_tms;
-
-private:
-	u8 m_last_cnxx_addr;
 };
 
 //-------------------------------------------------
@@ -294,7 +291,6 @@ u8 a2bus_ayboard_device::read_cnxx(u8 offset)
 
 u8 a2bus_echoplus_device::read_cnxx(u8 offset)
 {
-	m_last_cnxx_addr = offset;
 	return m_via1->read(offset & 0xf);
 }
 
@@ -348,7 +344,6 @@ void a2bus_ayboard_device::write_cnxx(u8 offset, u8 data)
 
 void a2bus_echoplus_device::write_cnxx(u8 offset, u8 data)
 {
-	m_last_cnxx_addr = offset;
 	m_via1->write(offset & 0xf, data);
 }
 
@@ -437,13 +432,14 @@ void a2bus_ayboard_device::via1_out_b(u8 data)
 
 void a2bus_echoplus_device::via1_out_b(u8 data)
 {
-	if (!(m_last_cnxx_addr & 0x80))
+	if (!BIT(data, 2))
 	{
-		if (!BIT(data, 2))
-		{
-			m_ay1->reset_w();
-		}
-		else
+		m_ay1->reset_w();
+		m_ay2->reset_w();
+	}
+	else
+	{
+		if (BIT(data, 3)) // BC2_1=1 (PSG1 active)
 		{
 			switch (data & 3)
 			{
@@ -463,14 +459,7 @@ void a2bus_echoplus_device::via1_out_b(u8 data)
 				break;
 			}
 		}
-	}
-	else
-	{
-		if (!BIT(data, 2))
-		{
-			m_ay2->reset_w();
-		}
-		else
+		if (BIT(data, 4)) // BC2_2_=1 (PSG2 active)
 		{
 			switch (data & 3)
 			{

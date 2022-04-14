@@ -306,6 +306,14 @@ ROM_START(bbl380)
 	// 0x0022XX, 0x0026XX, 0x002AXX, 0x002CXX, 0x002DXX, 0x0031XX, 0x0036XX, etc. should not be FF fill
 ROM_END
 
+ROM_START(mc_cb203)
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("bbl380_st2205u.bin", 0x000000, 0x004000, NO_DUMP) // internal OTPROM BIOS (addresses are different from other sets, including bbl380)
+
+	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_LOAD("s25fl032.bin", 0x000000, 0x400000, CRC(33c4e67b) SHA1(5787db4c8ce4c2569a5f9e9054cbb1944c1b3092))
+ROM_END
+
 ROM_START(rhhc152)
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("st2x_internal.bin", 0x002000, 0x002000, BAD_DUMP CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941)) // internal OTPROM BIOS, dumped from dgun2953 PCB, 6000-7fff range
@@ -357,6 +365,8 @@ ROM_END
 // older releases (primarily for Asian market?)
 
 CONS( 201?, bbl380,        0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "BaoBaoLong", "BBL380 - 180 in 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
+CONS( 201?, mc_cb203,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Coolboy", "Coolboy RS-17 - 203 in 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 // newer releases (more heavily censored, for export markets?) internal ROM was changed for these
 

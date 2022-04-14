@@ -2,7 +2,7 @@
 // copyright-holders:AJR
 /****************************************************************************
 
-    Skeleton driver for Yamaha TX81Z.
+    Driver for Yamaha TX81Z.
 
 ****************************************************************************/
 
@@ -186,4 +186,4 @@ ROM_START(tx81z)
 	ROMX_LOAD("tx81z-27512-image-first-version-1_0.ic15", 0x00000, 0x10000, CRC(2f9628fa) SHA1(ce62dfb9a86da092c469fd25328b5447375f5bb2), ROM_BIOS(7))
 ROM_END
 
-SYST(1987, tx81z, 0, 0, tx81z, tx81z, ymtx81z_state, empty_init, "Yamaha", "TX81Z FM Tone Generator", MACHINE_IMPERFECT_SOUND)
+SYST(1987, tx81z, 0, 0, tx81z, tx81z, ymtx81z_state, empty_init, "Yamaha", "TX81Z FM Tone Generator", MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK)

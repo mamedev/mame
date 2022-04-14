@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "harddisk.h"
+#include "harddriv.h"
 #include "softlist_dev.h"
 
 #define DIABLO_TAG(id) "diablo"#id
@@ -20,7 +20,7 @@
 
 // ======================> diablo_image_device
 
-class diablo_image_device : public device_t, public device_image_interface
+class diablo_image_device : public harddisk_image_base_device
 {
 public:
 	// construction/destruction
@@ -36,20 +36,13 @@ public:
 	virtual image_init_result call_create(int create_format, util::option_resolution *create_args) override;
 	virtual void call_unload() override;
 
-	virtual iodevice_t image_type() const noexcept override { return IO_HARDDISK; }
-
-	virtual bool is_readable()  const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return true; }
-	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
-	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual bool image_is_chd_type() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return m_interface; }
 	virtual const char *file_extensions() const noexcept override { return "chd,dsk"; }
 	virtual const util::option_guide &create_option_guide() const override;
 
 	// specific implementation
 	hard_disk_file *get_hard_disk_file() { return m_hard_disk_handle; }
-	chd_file *get_chd_file();
 
 protected:
 	// device-level overrides

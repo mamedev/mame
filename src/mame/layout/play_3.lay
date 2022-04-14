@@ -66,8 +66,14 @@ copyright-holders:Robbbert
 		<element name="digit14" ref="digit">
 			<bounds left="54" top="345" right="88" bottom="384" />
 		</element>
+		<element name="digit24" ref="digit">
+			<bounds left="98" top="345" right="132" bottom="384" />
+		</element>
 		<element name="digit34" ref="digit">
 			<bounds left="142" top="345" right="176" bottom="384" />
+		</element>
+		<element name="digit44" ref="digit">
+			<bounds left="186" top="345" right="220" bottom="384" />
 		</element>
 		<element name="digit54" ref="digit">
 			<bounds left="230" top="345" right="264" bottom="384" />

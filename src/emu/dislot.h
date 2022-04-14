@@ -132,6 +132,10 @@ public:
 	///   configuration.
 	slot_option &option_add_internal(const char *option, const device_type &devtype);
 
+	slot_option &option_replace(const char *option, const device_type &devtype);
+	slot_option &option_replace_internal(const char *option, const device_type &devtype);
+	void option_remove(const char *option);
+
 	void set_option_default_bios(const char *option, const char *default_bios) { config_option(option)->default_bios(default_bios); }
 	template <typename T> void set_option_machine_config(const char *option, T &&machine_config) { config_option(option)->machine_config(std::forward<T>(machine_config)); }
 	void set_option_device_input_defaults(const char *option, const input_device_default *default_input) { config_option(option)->input_device_defaults(default_input); }

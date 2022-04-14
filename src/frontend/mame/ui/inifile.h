@@ -46,7 +46,7 @@ private:
 	// ini file structure
 	using categoryindex = std::vector<std::pair<std::string, int64_t>>;
 
-	void init_category(std::string &&filename, emu_file &file);
+	void init_category(std::string &&filename, util::core_file &file);
 
 	// internal state
 	ui_options &m_options;

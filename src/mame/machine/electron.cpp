@@ -1,11 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol, Nigel Barnes
 /******************************************************************************
+
     Acorn Electron driver
-
-    MESS Driver By:
-
-    Wilbert Pol
 
 ******************************************************************************/
 
@@ -28,18 +25,18 @@ void electron_state::waitforramsync()
 }
 
 
-void electron_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void electron_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_TAPE_HANDLER:
-		electron_tape_timer_handler(ptr, param);
+		electron_tape_timer_handler(param);
 		break;
 	case TIMER_SETUP_BEEP:
-		setup_beep(ptr, param);
+		setup_beep(param);
 		break;
 	case TIMER_SCANLINE_INTERRUPT:
-		electron_scanline_interrupt(ptr, param);
+		electron_scanline_interrupt(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in electron_state::device_timer");

@@ -53,10 +53,12 @@ public:
 	void spcewarla(machine_config &config);
 	void escmars(machine_config &config);
 	void lrescue(machine_config &config);
+	void lrescuem2(machine_config &config);
 	void invmulti(machine_config &config);
 	void yosakdon(machine_config &config);
 	void polaris(machine_config &config);
 	void attackfc(machine_config &config);
+	void attackfcu(machine_config &config);
 	void astropal(machine_config &config);
 	void rollingc(machine_config &config);
 	void vortex(machine_config &config);
@@ -111,30 +113,30 @@ private:
 	optional_ioport m_gunx;
 	optional_ioport m_guny;
 
-	uint8_t m_color_map;
-	uint8_t m_screen_red;
-	uint8_t m_fleet_step;
+	uint8_t m_color_map = 0;
+	uint8_t m_screen_red = 0;
+	uint8_t m_fleet_step = 0;
 
 	std::unique_ptr<uint8_t[]> m_scattered_colorram;
 	std::unique_ptr<uint8_t[]> m_scattered_colorram2;
 
 	/* sound-related */
-	uint8_t       m_port_1_last_extra;
-	uint8_t       m_port_2_last_extra;
-	uint8_t       m_port_3_last_extra;
+	uint8_t       m_port_1_last_extra = 0;
+	uint8_t       m_port_2_last_extra = 0;
+	uint8_t       m_port_3_last_extra = 0;
 
 	attotime m_schaser_effect_555_time_remain;
-	int32_t m_schaser_effect_555_time_remain_savable;
-	int m_schaser_effect_555_is_low;
-	int m_schaser_explosion;
-	int m_schaser_last_effect;
-	uint8_t m_polaris_cloud_speed;
-	uint8_t m_polaris_cloud_pos;
-	uint8_t m_schaser_background_disable;
-	uint8_t m_schaser_background_select;
-	uint16_t m_claybust_gun_pos;
-	u8 m_sound_data;
-	bool m_timer_state;
+	int32_t m_schaser_effect_555_time_remain_savable = 0;
+	int m_schaser_effect_555_is_low = 0;
+	int m_schaser_explosion = 0;
+	int m_schaser_last_effect = 0;
+	uint8_t m_polaris_cloud_speed = 0;
+	uint8_t m_polaris_cloud_pos = 0;
+	uint8_t m_schaser_background_disable = 0;
+	uint8_t m_schaser_background_select = 0;
+	uint16_t m_claybust_gun_pos = 0;
+	u8 m_sound_data = 0;
+	bool m_timer_state = false;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer);
 	uint8_t indianbt_r();
@@ -238,6 +240,7 @@ private:
 
 	void astropal_io_map(address_map &map);
 	void attackfc_io_map(address_map &map);
+	void attackfcu_io_map(address_map &map);
 	void ballbomb_io_map(address_map &map);
 	void claybust_io_map(address_map &map);
 	void cosmicmo_io_map(address_map &map);
@@ -254,6 +257,7 @@ private:
 	void invrvnge_io_map(address_map &map);
 	void invrvnge_sound_map(address_map &map);
 	void lrescue_io_map(address_map &map);
+	void lrescuem2_io_map(address_map &map);
 	void lupin3_io_map(address_map &map);
 	void polaris_io_map(address_map &map);
 	void rollingc_io_map(address_map &map);

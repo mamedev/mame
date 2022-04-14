@@ -103,7 +103,7 @@ protected:
 private:
 	optional_ioport_array<2> m_rotary_io;
 
-	uint8_t m_invert_controls;
+	uint8_t m_invert_controls = 0;
 
 	// searchar and ikari3
 	void fg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

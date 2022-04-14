@@ -20,13 +20,6 @@
   else on ZSNES Technical for probing the darker corners of the SNES
   with test programs so we have a chance at getting things accurate.
 
-  MESS Bugzilla bugs:
-  - 804 ADC sets carry too late (FIXED)
-  - 805 ADDW/SUBW set V wrongly (FIXED)
-  - 806 BRK should modify PSW (FIXED)
-  - 807 DAA/DAS problem (FIXED)
-
-
 */
 /* ======================================================================== */
 /* ================================= NOTES ================================ */
@@ -64,8 +57,6 @@ Address  Function Register  R/W  When Reset          Remarks
 
 #include "emu.h"
 #include "spc700.h"
-
-#include "debugger.h"
 
 #include <climits>
 

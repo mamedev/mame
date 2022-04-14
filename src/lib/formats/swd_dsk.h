@@ -24,9 +24,9 @@ public:
 
 private:
 	static const format formats[];
-	virtual int get_image_offset(const format &f, int head, int track) override;
+	virtual int get_image_offset(const format &f, int head, int track) const override;
 };
 
-extern const floppy_format_type FLOPPY_SWD_FORMAT;
+extern const swd_format FLOPPY_SWD_FORMAT;
 
 #endif // MAME_FORMATS_SWD_DSK_H

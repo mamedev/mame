@@ -32,7 +32,7 @@ void ad1848_device::device_add_mconfig(machine_config &config)
 
 void ad1848_device::device_start()
 {
-	m_timer = timer_alloc(0, nullptr);
+	m_timer = timer_alloc(0);
 	m_irq_cb.resolve_safe();
 	m_drq_cb.resolve_safe();
 	save_item(NAME(m_regs.idx));
@@ -156,7 +156,7 @@ void ad1848_device::dack_w(uint8_t data)
 		m_drq_cb(CLEAR_LINE);
 }
 
-void ad1848_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ad1848_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if(!m_play)
 		return;

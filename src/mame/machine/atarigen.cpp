@@ -35,13 +35,13 @@ void atarigen_state::machine_reset()
 }
 
 
-void atarigen_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void atarigen_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
-		// unhalt the CPU that was passed as a pointer
+		// unhalt the CPU
 		case TID_UNHALT_CPU:
-			reinterpret_cast<device_t *>(ptr)->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 			break;
 	}
 }
@@ -69,8 +69,8 @@ void atarigen_state::halt_until_hblank_0(device_t &device, screen_device &screen
 		hblank += width;
 
 	// halt and set a timer to wake up
-	device.execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-	timer_set(screen.scan_period() * (hblank - hpos) / width, TID_UNHALT_CPU, 0, (void *)&device);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	timer_set(screen.scan_period() * (hblank - hpos) / width, TID_UNHALT_CPU);
 }
 
 

@@ -106,6 +106,9 @@ public:
 		m_cart7(*this, "mt_slot7"),
 		m_cart8(*this, "mt_slot8"),
 		m_bioscpu(*this, "mtbios"),
+		m_pad(*this, "PAD%u", 1U),
+		m_alarm_sound(*this, "Alarm_sound"),
+		m_flash_screen(*this, "Flash_screen"),
 		m_region_maincpu(*this, "maincpu")
 	{ }
 
@@ -116,6 +119,7 @@ public:
 	void init_mt_slot();
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 private:
@@ -186,6 +190,9 @@ private:
 	optional_device<generic_slot_device> m_cart7;
 	optional_device<generic_slot_device> m_cart8;
 	required_device<cpu_device>          m_bioscpu;
+	required_ioport_array<2>             m_pad;
+	output_finder<>                      m_alarm_sound;
+	output_finder<>                      m_flash_screen;
 	required_memory_region               m_region_maincpu;
 
 	memory_region *m_cart_reg[8];
@@ -333,14 +340,14 @@ uint8_t mtech_state::sms_ioport_dc_r()
 {
 	/* 2009-05 FP: would it be worth to give separate inputs to SMS? SMS has only 2 keys A,B (which are B,C on megadrive) */
 	/* bit 4: TL-A; bit 5: TR-A */
-	return (ioport("PAD1")->read() & 0x3f) | ((ioport("PAD2")->read() & 0x03) << 6);
+	return (m_pad[0]->read() & 0x3f) | ((m_pad[1]->read() & 0x03) << 6);
 }
 
 uint8_t mtech_state::sms_ioport_dd_r()
 {
 	/* 2009-05 FP: would it be worth to give separate inputs to SMS? SMS has only 2 keys A,B (which are B,C on megadrive) */
 	/* bit 2: TL-B; bit 3: TR-B; bit 4: RESET; bit 5: unused; bit 6: TH-A; bit 7: TH-B*/
-	return ((ioport("PAD2")->read() & 0x3c) >> 2) | 0x10;
+	return ((m_pad[1]->read() & 0x3c) >> 2) | 0x10;
 }
 
 
@@ -485,13 +492,13 @@ uint8_t mtech_state::bios_porte_r()
 
 void mtech_state::bios_portd_w(uint8_t data)
 {
-	output().set_value("Alarm_sound", BIT(data, 7));
+	m_alarm_sound = BIT(data, 7);
 	m_bios_ctrl_inputs = data & 0x04;  // Genesis/SMS input ports disable bit
 }
 
 void mtech_state::bios_porte_w(uint8_t data)
 {
-	output().set_value("Flash_screen", BIT(data, 1));
+	m_flash_screen = BIT(data, 1);
 }
 
 /* this sets 0x300000 which may indicate that the 68k can see the instruction rom
@@ -642,6 +649,14 @@ WRITE_LINE_MEMBER(mtech_state::screen_vblank_main)
 {
 	if (!m_current_machine_is_sms)
 		screen_vblank_megadriv(state);
+}
+
+void mtech_state::machine_start()
+{
+	md_base_state::machine_start();
+
+	m_alarm_sound.resolve();
+	m_flash_screen.resolve();
 }
 
 void mtech_state::machine_reset()

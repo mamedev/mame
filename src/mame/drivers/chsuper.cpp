@@ -65,9 +65,9 @@ protected:
 	virtual void video_start() override;
 
 
-	int m_tilexor;
-	uint8_t m_blacklamp;
-	uint8_t m_redlamp;
+	int m_tilexor = 0;
+	uint8_t m_blacklamp = 0;
+	uint8_t m_redlamp = 0;
 	std::unique_ptr<uint8_t[]> m_vram;
 
 	required_device<z180_device> m_maincpu;

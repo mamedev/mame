@@ -127,7 +127,7 @@ mpu401_device::mpu401_device(const machine_config &mconfig, const char *tag, dev
 void mpu401_device::device_start()
 {
 	write_irq.resolve_safe();
-	m_timer = timer_alloc(0, nullptr);
+	m_timer = timer_alloc(0);
 }
 
 //-------------------------------------------------
@@ -148,7 +148,7 @@ void mpu401_device::device_reset()
 //  device_timer - called when our device timer expires
 //-------------------------------------------------
 
-void mpu401_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void mpu401_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
 {
 	m_ourcpu->m6801_clock_serial();
 }

@@ -180,7 +180,7 @@ private:
 	void ymf278_map(address_map &map);
 
 	virtual void machine_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -206,24 +206,24 @@ private:
 	optional_memory_bank m_okibank;
 
 	/* video-related */
-	tilemap_t   *m_k053936_tilemap;
+	tilemap_t   *m_k053936_tilemap = nullptr;
 
 	/* irq_related */
-	emu_timer   *m_mouja_irq_timer;
-	emu_timer   *m_karatour_irq_timer;
+	emu_timer   *m_mouja_irq_timer = nullptr;
+	emu_timer   *m_karatour_irq_timer = nullptr;
 
 	/* sound related */
-	u8     m_sound_data;
-	uint16_t      m_soundstatus;
-	int         m_porta;
-	int         m_portb;
-	int         m_busy_sndcpu;
-	int         m_essnd_bank;
-	bool        m_essnd_gate;
+	u8     m_sound_data = 0;
+	uint16_t      m_soundstatus = 0;
+	int         m_porta = 0;
+	int         m_portb = 0;
+	int         m_busy_sndcpu = 0;
+	int         m_essnd_bank = 0;
+	bool        m_essnd_gate = false;
 
 	/* misc */
-	int         m_gakusai_oki_bank_lo;
-	int         m_gakusai_oki_bank_hi;
+	int         m_gakusai_oki_bank_lo = 0;
+	int         m_gakusai_oki_bank_hi = 0;
 
 	void gakusai_oki_bank_set();
 };

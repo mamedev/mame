@@ -300,7 +300,7 @@ at_keyboard_device::at_keyboard_device(const machine_config &mconfig, const char
 }
 
 
-void pc_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pc_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	polling();
 	if(!charqueue_empty())

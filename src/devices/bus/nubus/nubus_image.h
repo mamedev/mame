@@ -6,7 +6,7 @@
 #pragma once
 
 #include "nubus.h"
-#include "osdcore.h"
+#include "osdfile.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

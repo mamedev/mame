@@ -12,6 +12,7 @@
 
 #include "emuopts.h"
 #include "romload.h"
+#include "softlist.h"
 
 #include <cstring>
 
@@ -32,7 +33,7 @@ DEFINE_DEVICE_TYPE(VBOY_CART_SLOT, vboy_cart_slot_device, "vboy_cart_slot", "Nin
 
 vboy_cart_slot_device::vboy_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, VBOY_CART_SLOT, tag, owner, clock),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_vboy_cart_interface>(mconfig, *this),
 	m_intcro(*this),
 	m_exp_space(*this, finder_base::DUMMY_TAG, -1, 32),

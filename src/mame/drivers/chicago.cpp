@@ -116,7 +116,7 @@ void chicago_state::chicago(machine_config &config)
  ***************************************************************************/
 
 // Demolition Derby is licensed from Exidy, PROMs are identical to Exidy Destruction Derby
-// However, the PCBs and layouts are different, so there is a seperate driver here
+// However, the PCBs and layouts are different, so there is a separate driver here
 
 ROM_START( dmodrbcc )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )

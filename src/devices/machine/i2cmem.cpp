@@ -106,6 +106,7 @@ i2cmem_device::i2cmem_device(
 	m_wc(0),
 	m_sdar(1),
 	m_state(STATE_IDLE),
+	m_bits(0),
 	m_shift(0),
 	m_devsel(0),
 	m_addresshigh(0),
@@ -249,9 +250,10 @@ void i2cmem_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void i2cmem_device::nvram_read( emu_file &file )
+bool i2cmem_device::nvram_read( util::read_stream &file )
 {
-	file.read( &m_data[0], m_data_size );
+	size_t actual;
+	return !file.read( &m_data[0], m_data_size, actual ) && actual == m_data_size;
 }
 
 //-------------------------------------------------
@@ -259,9 +261,10 @@ void i2cmem_device::nvram_read( emu_file &file )
 //  .nv file
 //-------------------------------------------------
 
-void i2cmem_device::nvram_write( emu_file &file )
+bool i2cmem_device::nvram_write( util::write_stream &file )
 {
-	file.write( &m_data[0], m_data_size );
+	size_t actual;
+	return !file.write( &m_data[0], m_data_size, actual ) && actual == m_data_size;
 }
 
 
@@ -330,7 +333,7 @@ WRITE_LINE_MEMBER( i2cmem_device::write_sda )
 			}
 			else
 			{
-				verboselog( this, 2, "start\n" );
+				verboselog( this, 1, "start\n" );
 				m_state = STATE_DEVSEL;
 				m_bits = 0;
 			}

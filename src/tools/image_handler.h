@@ -8,9 +8,8 @@
 
 #pragma once
 
-#include "../emu/emucore.h"
-
 #include "formats/fsmgr.h"
+#include "harddisk.h"
 
 #include <cstdint>
 #include <map>
@@ -24,22 +23,22 @@ using u16 = uint16_t;
 using u32 = uint32_t;
 
 struct floppy_format_info {
-	floppy_image_format_t *m_format;
+	const floppy_image_format_t *m_format;
 	std::string m_category;
 
-	floppy_format_info(floppy_image_format_t *format, std::string category) : m_format(format), m_category(category) {}
+	floppy_format_info(const floppy_image_format_t *format, std::string category) : m_format(format), m_category(category) {}
 };
 
 struct floppy_create_info {
-	const filesystem_manager_t *m_manager;
+	const fs::manager_t *m_manager;
 
-	floppy_format_type m_type;
+	const floppy_image_format_t *m_type;
 	u32 m_image_size;
 	u32 m_key;
 	const char *m_name;
 	const char *m_description;
 
-	floppy_create_info(const filesystem_manager_t *manager, floppy_format_type type, u32 image_size, const char *name, const char *description) :
+	floppy_create_info(const fs::manager_t *manager, const floppy_image_format_t *type, u32 image_size, const char *name, const char *description) :
 		m_manager(manager), m_type(type), m_image_size(image_size), m_key(0), m_name(name), m_description(description)
 	{ }
 
@@ -49,12 +48,12 @@ struct floppy_create_info {
 };
 
 struct filesystem_format {
-	const filesystem_manager_t *m_manager;
+	const fs::manager_t *m_manager;
 	std::vector<std::unique_ptr<floppy_create_info>> m_floppy_create;
 	std::string m_category;
 	bool m_floppy, m_floppy_raw, m_hd, m_cd;
 
-	filesystem_format(const filesystem_manager_t *manager, std::string category) : m_manager(manager), m_category(category), m_floppy(false), m_floppy_raw(false), m_hd(false), m_cd(false) {}
+	filesystem_format(const fs::manager_t *manager, std::string category) : m_manager(manager), m_category(category), m_floppy(false), m_floppy_raw(false), m_hd(false), m_cd(false) {}
 };
 
 struct formats_table {
@@ -87,12 +86,12 @@ public:
 	bool floppy_load(const floppy_format_info *format);
 	bool floppy_save(const floppy_format_info *format);
 
-	void floppy_create(const floppy_create_info *format, fs_meta_data meta);
+	void floppy_create(const floppy_create_info *format, fs::meta_data meta);
 	bool floppy_mount_fs(const filesystem_format *format);
 	bool hd_mount_fs(const filesystem_format *format);
 	void fs_to_floppy();
 
-	std::pair<const filesystem_manager_t *, filesystem_t *> get_fs() const { return std::make_pair(m_fsm, m_fs.get()); }
+	std::pair<const fs::manager_t *, fs::filesystem_t *> get_fs() const { return std::make_pair(m_fsm, m_fs.get()); }
 
 	std::vector<std::string> path_split(std::string path) const;
 
@@ -108,11 +107,11 @@ private:
 
 	floppy_image m_floppy_image;
 
-	floppy_format_type m_floppy_fs_converter;
+	const floppy_image_format_t *m_floppy_fs_converter = nullptr;
 	std::vector<u8> m_sector_image;
-	std::unique_ptr<fsblk_t> m_fsblk;
-	const filesystem_manager_t *m_fsm;
-	std::unique_ptr<filesystem_t> m_fs;
+	std::unique_ptr<fs::fsblk_t> m_fsblk;
+	const fs::manager_t *m_fsm = nullptr;
+	std::unique_ptr<fs::filesystem_t> m_fs;
 
 };
 

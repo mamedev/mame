@@ -88,7 +88,7 @@
 #define LOG_DEBUG     (1U <<  2)
 
 #define VERBOSE (LOG_GENERAL)
-//#define LOG_OUTPUT_FUNC printf
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGKBD(...) LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
@@ -158,10 +158,10 @@ private:
 	void grid1101_map(address_map &map);
 	void grid1121_map(address_map &map);
 
-	bool m_kbd_ready;
-	uint16_t m_kbd_data;
+	bool m_kbd_ready = false;
+	uint16_t m_kbd_data = 0;
 
-	uint16_t *m_videoram;
+	uint16_t *m_videoram = nullptr;
 };
 
 
@@ -375,6 +375,7 @@ void gridcomp_state::grid1101(machine_config &config)
 
 	i7220_device &i7220(I7220(config, "i7220", XTAL(4'000'000)));
 	i7220.set_data_size(3); // 3 1-Mbit MBM's
+	i7220.set_must_be_loaded(true);
 	i7220.irq_callback().set(I80130_TAG, FUNC(i80130_device::ir1_w));
 	i7220.drq_callback().set(I80130_TAG, FUNC(i80130_device::ir1_w));
 

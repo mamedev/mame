@@ -18,7 +18,6 @@
 #include "emu.h"
 #include "mb88xx.h"
 #include "mb88dasm.h"
-#include "debugger.h"
 
 
 DEFINE_DEVICE_TYPE(MB88201, mb88201_cpu_device, "mb88201", "Fujitsu MB88201")
@@ -368,8 +367,10 @@ int mb88_cpu_device::pla( int inA, int inB )
 
 void mb88_cpu_device::execute_set_input(int inputnum, int state)
 {
-	/* on rising edge trigger interrupt */
-	if ( (m_pio & 0x04) && !m_nf && state != CLEAR_LINE )
+	/* On rising edge trigger interrupt.
+	 * Note this is a logical level, the actual pin is high-to-low voltage
+	 * triggered. */
+	if ( (m_pio & INT_CAUSE_EXTERNAL) && !m_nf && state != CLEAR_LINE )
 	{
 		m_pending_interrupt |= INT_CAUSE_EXTERNAL;
 	}
@@ -437,6 +438,9 @@ void mb88_cpu_device::update_pio( int cycles )
 		{
 			/* if we have a live external source, call the irqcallback */
 			standard_irq_callback( 0 );
+			/* The datasheet doesn't mention if the interrupt flag
+			 * is cleared, but it seems to be only for this case. */
+			m_pio &= ~INT_CAUSE_EXTERNAL;
 			m_PC = 0x02;
 		}
 		else if (m_pending_interrupt & m_pio & INT_CAUSE_TIMER)

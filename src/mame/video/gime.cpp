@@ -344,7 +344,7 @@ void gime_device::device_reset(void)
 //  device_timer - handle timer callbacks
 //-------------------------------------------------
 
-void gime_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void gime_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{
@@ -353,7 +353,7 @@ void gime_device::device_timer(emu_timer &timer, device_timer_id id, int param, 
 			break;
 
 		default:
-			super::device_timer(timer, id, param, ptr);
+			super::device_timer(timer, id, param);
 			break;
 	}
 }

@@ -15,6 +15,7 @@
 
 #include "emu.h"
 #include "flopdrv.h"
+#include "softlist_dev.h"
 
 #include "formats/imageutl.h"
 
@@ -717,6 +718,11 @@ void legacy_floppy_image_device::device_config_complete()
 			image_specify_extension(m_extension_list, 256, floppy_options[i].extensions);
 		}
 	}
+}
+
+const software_list_loader &legacy_floppy_image_device::get_software_list_loader() const
+{
+	return image_software_list_loader::instance();
 }
 
 image_init_result legacy_floppy_image_device::call_create(int format_type, util::option_resolution *format_options)

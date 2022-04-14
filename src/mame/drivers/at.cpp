@@ -437,7 +437,7 @@ void at_state::init_at_common(int xmsbase)
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
 
-	/* MESS managed RAM */
+	/* managed RAM */
 	membank("bank10")->set_base(m_ram->pointer());
 
 	if (m_ram->size() > xmsbase)
@@ -462,7 +462,7 @@ void at_vrom_fix_state::machine_start()
 	at_state::machine_start();
 
 	address_space& space = m_maincpu->space(AS_PROGRAM);
-	space.install_rom(0xc0000, 0xcffff, machine().root_device().memregion("bios")->base());
+	space.install_rom(0xc0000, 0xcffff, memregion("bios")->base());
 }
 
 void at_state::cfg_single_1200K(device_t *device)

@@ -257,7 +257,7 @@ void ertictac_state::ertictac(machine_config &config)
 	m_ioc->gpio_w<0>().set("i2cmem", FUNC(pcf8583_device::sda_w));
 	m_ioc->gpio_w<1>().set("i2cmem", FUNC(pcf8583_device::scl_w));
 
-	ACORN_VIDC10(config, m_vidc10, 24_MHz_XTAL);
+	ACORN_VIDC1A(config, m_vidc10, 24_MHz_XTAL);
 	m_vidc10->set_screen("screen");
 	m_vidc10->sound_drq().set(m_memc, FUNC(acorn_memc_device::sndrq_w));
 }

@@ -43,7 +43,7 @@ public:
 
 	void alloc_sprite_bitmap();
 	void inefficient_copy_sprite_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t pri, uint16_t priority_mask, uint16_t colbase, uint16_t palmask, uint8_t alpha = 0xff);
-	bitmap_ind16& get_sprite_temp_bitmap() { assert(m_sprite_bitmap.valid()); return m_sprite_bitmap; };
+	bitmap_ind16& get_sprite_temp_bitmap() { assert(m_sprite_bitmap.valid()); return m_sprite_bitmap; }
 
 	DECOSPR_PRIORITY_CB_MEMBER(default_col_cb);
 
@@ -54,10 +54,10 @@ protected:
 	decospr_pri_cb_delegate m_pri_cb;
 	decospr_col_cb_delegate m_col_cb;
 	bitmap_ind16 m_sprite_bitmap;// optional sprite bitmap (should be INDEXED16)
-	bool m_alt_format;
-	uint16_t m_pixmask;
-	uint16_t m_raw_shift;
-	bool m_flip_screen;
+	bool m_alt_format = false;
+	uint16_t m_pixmask = 0;
+	uint16_t m_raw_shift = 0;
+	bool m_flip_screen = false;
 
 	// used by various bootleg / clone chips.
 	bool m_is_bootleg; // used by various bootlegs (disables masking of sprite tile number when multi-sprite is used)

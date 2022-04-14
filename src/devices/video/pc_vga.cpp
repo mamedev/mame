@@ -204,8 +204,8 @@ mach8_device::mach8_device(const machine_config &mconfig, const char *tag, devic
 // zero everything, keep vtbls
 void vga_device::zero()
 {
-	memset(&vga.svga_intf, 0, sizeof(vga.svga_intf));
-	vga.memory.resize(0);
+	vga.svga_intf.seq_regcount = 0;
+	vga.svga_intf.crtc_regcount = 0;
 	memset(vga.pens, 0, sizeof(vga.pens));
 	vga.miscellaneous_output = 0;
 	vga.feature_control = 0;
@@ -246,8 +246,7 @@ void vga_device::device_start()
 {
 	zero();
 
-	int i;
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 		set_pen_color(i, 0, 0, 0);
 
 	// Avoid an infinite loop when displaying.  0 is not possible anyway.
@@ -258,11 +257,10 @@ void vga_device::device_start()
 	vga.read_dipswitch.set(nullptr); //read_dipswitch;
 	vga.svga_intf.seq_regcount = 0x05;
 	vga.svga_intf.crtc_regcount = 0x19;
-	vga.svga_intf.vram_size = 0x100000;
 
-	vga.memory.resize(vga.svga_intf.vram_size);
+	vga.memory = std::make_unique<uint8_t []>(vga.svga_intf.vram_size);
 	memset(&vga.memory[0], 0, vga.svga_intf.vram_size);
-	save_item(NAME(vga.memory));
+	save_pointer(NAME(vga.memory), vga.svga_intf.vram_size);
 	save_item(NAME(vga.pens));
 
 	save_item(NAME(vga.miscellaneous_output));
@@ -6621,7 +6619,6 @@ void oak_oti111_vga_device::xga_write(offs_t offset, u8 data)
 void oak_oti111_vga_device::device_start()
 {
 	svga_device::device_start();
-	vga.svga_intf.vram_size = 0x100000;
 	std::fill(std::begin(m_oak_regs), std::end(m_oak_regs), 0);
 }
 

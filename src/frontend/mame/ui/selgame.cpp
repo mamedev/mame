@@ -28,6 +28,7 @@
 #include "corestr.h"
 #include "drivenum.h"
 #include "emuopts.h"
+#include "fileio.h"
 #include "rendutil.h"
 #include "romload.h"
 #include "softlist_dev.h"
@@ -93,12 +94,9 @@ menu_select_game::menu_select_game(mame_ui_manager &mui, render_container &conta
 			fake_ini = util::string_format(u8"\uFEFF%s = %s\n", tmp, sub_filter);
 		}
 
-		emu_file file(ui().options().ui_path(), OPEN_FLAG_READ);
-		if (!file.open_ram(fake_ini.c_str(), fake_ini.size()))
-		{
-			m_persistent_data.filter_data().load_ini(file);
-			file.close();
-		}
+		util::core_file::ptr file;
+		if (!util::core_file::open_ram(fake_ini.c_str(), fake_ini.size(), OPEN_FLAG_READ, file))
+			m_persistent_data.filter_data().load_ini(*file);
 	}
 
 	// do this after processing the last used filter setting so it overwrites the placeholder
@@ -167,7 +165,7 @@ void menu_select_game::menu_activated()
 void menu_select_game::handle(event const *ev)
 {
 	if (!m_prev_selected)
-		m_prev_selected = item(0).ref;
+		m_prev_selected = item(0).ref();
 
 	// if I have to select software, force software list submenu
 	if (reselect_last::get())
@@ -337,10 +335,13 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 		icon.second.texture.reset();
 
 	set_switch_image();
-	int old_item_selected = -1;
 
+	bool have_prev_selected = false;
+	int old_item_selected = -1;
 	if (!isfavorite())
 	{
+		if (m_populated_favorites)
+			m_prev_selected = nullptr;
 		m_populated_favorites = false;
 		m_displaylist.clear();
 		machine_filter const *const flt(m_persistent_data.filter_data().get_current_filter());
@@ -389,7 +390,8 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 		int curitem = 0;
 		for (ui_system_info const &elem : m_displaylist)
 		{
-			if (old_item_selected == -1 && elem.driver->name == reselect_last::driver())
+			have_prev_selected = have_prev_selected || (&elem == m_prev_selected);
+			if ((old_item_selected == -1) && (elem.driver->name == reselect_last::driver()))
 				old_item_selected = curitem;
 
 			item_append(elem.description, elem.is_clone ? FLAG_INVERT : 0, (void *)&elem);
@@ -399,11 +401,14 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 	else
 	{
 		// populate favorites list
+		if (!m_populated_favorites)
+			m_prev_selected = nullptr;
 		m_populated_favorites = true;
 		m_search.clear();
 		mame_machine_manager::instance()->favorite().apply_sorted(
-				[this, &old_item_selected, curitem = 0] (ui_software_info const &info) mutable
+				[this, &have_prev_selected, &old_item_selected, curitem = 0] (ui_software_info const &info) mutable
 				{
+					have_prev_selected = have_prev_selected || (&info == m_prev_selected);
 					if (info.startempty)
 					{
 						if (old_item_selected == -1 && info.shortname == reselect_last::driver())
@@ -412,8 +417,8 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 						bool cloneof = strcmp(info.driver->parent, "0");
 						if (cloneof)
 						{
-							int cx = driver_list::find(info.driver->parent);
-							if (cx != -1 && ((driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT) != 0))
+							int const cx = driver_list::find(info.driver->parent);
+							if ((0 <= cx) && ((driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT) != 0))
 								cloneof = false;
 						}
 
@@ -436,6 +441,9 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 		item_append(_("Configure Options"), 0, (void *)(uintptr_t)CONF_OPTS);
 		item_append(_("Configure Machine"), 0, (void *)(uintptr_t)CONF_MACHINE);
 		skip_main_items = 3;
+
+		if (m_prev_selected && !have_prev_selected)
+			m_prev_selected = item(0).ref();
 	}
 	else
 	{
@@ -1036,7 +1044,7 @@ void menu_select_game::get_selection(ui_software_info const *&software, ui_syste
 	if (m_populated_favorites)
 	{
 		software = reinterpret_cast<ui_software_info const *>(get_selection_ptr());
-		system = &m_persistent_data.systems()[driver_list::find(software->driver->name)];
+		system = software ? &m_persistent_data.systems()[driver_list::find(software->driver->name)] : nullptr;
 	}
 	else
 	{
@@ -1100,7 +1108,7 @@ void menu_select_game::filter_selected()
 						}
 					}
 					m_persistent_data.filter_data().set_current_filter_type(new_type);
-					reset(reset_options::SELECT_FIRST);
+					reset(reset_options::REMEMBER_REF);
 				});
 	}
 }

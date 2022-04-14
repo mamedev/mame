@@ -8,9 +8,6 @@
 
 #define LOG_TEMP_PAUSE      0
 
-// Needed for RAW Input
-#define WM_INPUT 0x00FF
-
 // standard C headers
 #include <process.h>
 
@@ -133,12 +130,13 @@ bool windows_osd_interface::window_init()
 	window_thread = GetCurrentThread();
 	window_threadid = main_threadid;
 
+	// initialize the renderer
 	const int fallbacks[VIDEO_MODE_COUNT] = {
 		-1,                 // NONE -> no fallback
 		VIDEO_MODE_NONE,    // GDI -> NONE
 		VIDEO_MODE_D3D,     // BGFX -> D3D
 #if (USE_OPENGL)
-		VIDEO_MODE_GDI,     // OPENGL -> GDI
+		-1,                 // OPENGL -> no fallback
 #endif
 		-1,                 // No SDL2ACCEL on Windows OSD
 #if (USE_OPENGL)
@@ -154,7 +152,7 @@ bool windows_osd_interface::window_init()
 	{
 		bool error = false;
 		switch(current_mode)
-	{
+		{
 			case VIDEO_MODE_NONE:
 				error = renderer_none::init(machine());
 				break;
@@ -304,6 +302,8 @@ win_window_info::win_window_info(
 	, m_targetview(0)
 	, m_targetorient(0)
 	, m_targetvismask(0)
+	, m_targetscalemode(0)
+	, m_targetkeepaspect(machine.options().keep_aspect())
 	, m_lastclicktime(std::chrono::steady_clock::time_point::min())
 	, m_lastclickx(0)
 	, m_lastclicky(0)
@@ -783,12 +783,17 @@ void win_window_info::update()
 	int const targetorient = target()->orientation();
 	render_layer_config const targetlayerconfig = target()->layer_config();
 	u32 const targetvismask = target()->visibility_mask();
-	if (targetview != m_targetview || targetorient != m_targetorient || targetlayerconfig != m_targetlayerconfig || targetvismask != m_targetvismask)
+	int const targetscalemode = target()->scale_mode();
+	bool const targetkeepaspect = target()->keepaspect();
+	if (targetview != m_targetview || targetorient != m_targetorient || targetlayerconfig != m_targetlayerconfig || targetvismask != m_targetvismask ||
+		targetscalemode != m_targetscalemode || targetkeepaspect != m_targetkeepaspect)
 	{
 		m_targetview = targetview;
 		m_targetorient = targetorient;
 		m_targetlayerconfig = targetlayerconfig;
 		m_targetvismask = targetvismask;
+		m_targetscalemode = targetscalemode;
+		m_targetkeepaspect = targetkeepaspect;
 
 		// in window mode, reminimize/maximize
 		if (!fullscreen())
@@ -1103,6 +1108,21 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 	case WM_NCPAINT:
 		if (!window->fullscreen() || window->win_has_menu())
 			return DefWindowProc(wnd, message, wparam, lparam);
+		break;
+
+	// input device change: handle RawInput device connection/disconnection
+	case WM_INPUT_DEVICE_CHANGE:
+		switch (wparam)
+		{
+		case GIDC_ARRIVAL:
+			downcast<windows_osd_interface&>(window->machine().osd()).handle_input_event(INPUT_EVENT_ARRIVAL, &lparam);
+			break;
+		case GIDC_REMOVAL:
+			downcast<windows_osd_interface&>(window->machine().osd()).handle_input_event(INPUT_EVENT_REMOVAL, &lparam);
+			break;
+		default:
+			return DefWindowProc(wnd, message, wparam, lparam);
+		}
 		break;
 
 	// input: handle the raw input
@@ -1480,6 +1500,10 @@ osd_rect win_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 	// compute the visible area based on the proposed rectangle
 	target()->compute_visible_area(propwidth, propheight, pixel_aspect, target()->orientation(), viswidth, visheight);
 
+	// clamp visable area to the proposed rectangle
+	viswidth = std::min(viswidth, propwidth);
+	visheight = std::min(visheight, propheight);
+
 	// compute the adjustments we need to make
 	adjwidth = (viswidth + extrawidth) - rect.width();
 	adjheight = (visheight + extraheight) - rect.height();
@@ -1527,6 +1551,12 @@ osd_dim win_window_info::get_min_bounds(int constrain)
 
 	// get the minimum target size
 	target()->compute_minimum_size(minwidth, minheight);
+
+	// check if visible area is bigger
+	int32_t viswidth, visheight;
+	target()->compute_visible_area(minwidth, minheight, monitor()->aspect(), target()->orientation(), viswidth, visheight);
+	minwidth = std::max(viswidth, minwidth);
+	minheight = std::max(visheight, minheight);
 
 	// expand to our minimum dimensions
 	if (minwidth < MIN_WINDOW_DIMX)
@@ -1631,6 +1661,10 @@ void win_window_info::update_minmax_state()
 								(rect_height(&bounds) == minbounds.height());
 		m_ismaximized = (rect_width(&bounds) == maxbounds.width()) ||
 								(rect_height(&bounds) == maxbounds.height());
+
+		// We can't be maximized and minimized simultaneously
+		if (m_ismaximized)
+			m_isminimized = FALSE;
 	}
 	else
 	{

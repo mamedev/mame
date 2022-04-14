@@ -34,7 +34,7 @@ public:
 		m_user_password_enable = (password != nullptr);
 	}
 
-	void set_dma_transfer_time(const attotime time) { m_dma_transfer_time = time; };
+	void set_dma_transfer_time(const attotime time) { m_dma_transfer_time = time; }
 protected:
 	ata_mass_storage_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -102,11 +102,10 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual int read_sector(uint32_t lba, void *buffer) override { return !m_disk ? 0 : hard_disk_read(m_disk, lba, buffer); }
-	virtual int write_sector(uint32_t lba, const void *buffer) override { return !m_disk ? 0 : hard_disk_write(m_disk, lba, buffer); }
+	virtual int read_sector(uint32_t lba, void *buffer) override { return !m_disk ? 0 : m_disk->read(lba, buffer); }
+	virtual int write_sector(uint32_t lba, const void *buffer) override { return !m_disk ? 0 : m_disk->write(lba, buffer); }
 	virtual uint8_t calculate_status() override;
 
-	chd_file       *m_handle;
 	hard_disk_file *m_disk;
 
 	enum

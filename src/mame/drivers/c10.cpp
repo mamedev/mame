@@ -17,10 +17,14 @@ constantly looking at.
 *****************************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
+
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
 
 class c10_state : public driver_device
 {
@@ -34,15 +38,18 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void c10(machine_config &config);
 
 private:
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
 	void machine_reset() override;
 	void machine_start() override;
-	memory_passthrough_handler *m_rom_shadow_tap;
+
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;
@@ -77,20 +84,22 @@ void c10_state::machine_reset()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_rom(0x0000, 0x0fff, m_rom);   // do it here for F3
-	m_rom_shadow_tap = program.install_read_tap(0x8000, 0x8fff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
-	{
-		if (!machine().side_effects_disabled())
-		{
-			// delete this tap
-			m_rom_shadow_tap->remove();
+	m_rom_shadow_tap.remove();
+	m_rom_shadow_tap = program.install_read_tap(
+			0x8000, 0x8fff,
+			"rom_shadow_r",
+			[this] (offs_t offset, u8 &data, u8 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					// delete this tap
+					m_rom_shadow_tap.remove();
 
-			// reinstall ram over the rom shadow
-			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x0fff, m_ram);
-		}
-
-		// return the original data
-		return data;
-	});
+					// reinstall RAM over the ROM shadow
+					m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x0fff, m_ram);
+				}
+			},
+			&m_rom_shadow_tap);
 }
 
 /* This system appears to have inline attribute bytes of unknown meaning.
@@ -188,6 +197,8 @@ ROM_START( c10 )
 	ROM_REGION( 0x2000, "chargen", 0 )
 	ROM_LOAD( "c10_char.ic9", 0x0000, 0x2000, CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
 ROM_END
+
+} // anonymous namespace
 
 /* Driver */
 

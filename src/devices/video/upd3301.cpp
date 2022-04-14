@@ -231,7 +231,7 @@ inline void upd3301_device::reset_fifo_vrtc()
 	}
 }
 
-void upd3301_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void upd3301_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

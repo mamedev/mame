@@ -34,6 +34,7 @@ ToDo:
 - No info on the sound (all it says is 4 TTL chips controlled by 6 bits of the IO expander)
 - A plug-in printer is used to view and alter settings. We have no info about it.
 - Default layout
+- Outputs
 
 *****************************************************************************************************/
 
@@ -49,6 +50,7 @@ ToDo:
 #define VERBOSE    1
 #include "logmacro.h"
 
+namespace {
 
 class recel_state : public genpin_class
 {
@@ -58,8 +60,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_pm(*this, "module")   // personality module
 		, m_nvram(*this, "nvram")
-		, m_switches(*this, "X%u", 0U)
-		, m_digit(*this, "digit%u", 0U)
+		, m_io_keyboard(*this, "X%d", 0U)
+		, m_digit(*this, "digit%d", 0U)
 	{ }
 
 	void recel(machine_config &config);
@@ -74,8 +76,8 @@ private:
 	void lamps_w(offs_t offset, u8 data);
 	u8 nvram_r(offs_t offset);
 	void nvram_w(offs_t offset, u8 data);
-	u8 bic_r(offs_t offset);
-	void bic_w(offs_t offset, u8 data);
+	[[maybe_unused]]u8 bic_r(offs_t offset);
+	[[maybe_unused]]void bic_w(offs_t offset, u8 data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -87,14 +89,14 @@ private:
 	required_device<pps4_2_device> m_maincpu;
 	required_region_ptr<u8> m_pm;
 	required_shared_ptr<u8> m_nvram;
-	required_ioport_array<6> m_switches;
+	required_ioport_array<6> m_io_keyboard;
 	output_finder<32> m_digit;
 
-	u8 m_strobe = 0;
-	u16 m_nvram_addr = 0;
-	u8 m_nvram_data = 0;
-	bool m_nvram_prev_clk = 0;
-	u8 m_prom_addr = 0;
+	u8 m_strobe = 0U;
+	u16 m_nvram_addr = 0U;
+	u8 m_nvram_data = 0U;
+	bool m_nvram_prev_clk = false;
+	u8 m_prom_addr = 0U;
 };
 
 void recel_state::recel_map(address_map &map) // need address ranges
@@ -121,53 +123,53 @@ void recel_state::recel_io(address_map &map) // to be done
 static INPUT_PORTS_START( recel )
 	PORT_START("X0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD)     PORT_NAME("Play/Test")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("SW.10")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("SW.20")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("SW.30")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("SW.40")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("SW.50")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("SW.60")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("SW.70")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP10")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP20")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP30")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("INP40")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("INP50")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("INP60")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("INP70")
 
 	PORT_START("X1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("SW.11")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("SW.21")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("SW.31")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("SW.41")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("SW.51")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("SW.61")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("SW.71")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("INP11")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("INP21")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("INP31")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("INP41")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("INP51")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("INP61")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("INP71")
 
 	PORT_START("X2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("SW.12")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME("SW.22")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("SW.32")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("SW.42")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("SW.52")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("SW.62")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("SW.72")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("INP12")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME("INP22")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("INP32")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("INP42")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("INP52")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("INP62")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("INP72")
 
 	PORT_START("X3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("SW.13")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("SW.23")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("SW.33")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("SW.43")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("SW.53")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("SW.63")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("SW.73")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("INP13")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("INP23")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INP33")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP43")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("INP53")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("INP63")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("INP73")
 
 	PORT_START("X4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("Tilt")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("SW.14")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("SW.24")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_NAME("SW.34")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("SW.44")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("SW.54")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("SW.64")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("SW.74")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("INP14")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("INP24")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_NAME("INP34")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP44")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP54")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP64")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP74")
 
 	PORT_START("X5")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Reset")
@@ -239,7 +241,7 @@ u8 recel_state::switches_r(offs_t offset) // to be done
 		for (u8 i = 0; i < 5; i++)
 			if (BIT(m_strobe, i))
 			{
-				data |= BIT(m_switches[i]->read(), offset & 7);
+				data |= BIT(m_io_keyboard[i]->read(), offset & 7);
 				//LOG("%s: switches[bit %X of %X, using offset of %X] got %x\n", __FUNCTION__, i, m_strobe, offset&7, data);
 			}
 	return data ? 0 : 1;    // FIXME: inverted or normal?
@@ -501,19 +503,21 @@ ROM_START(r_blackm4)
 	ROM_LOAD("b4.c5",   0x0000, 0x0800, CRC(cd383f5b) SHA1(c38acaae46e5fd2660efbd0e2d35e295892e60a5) )
 ROM_END
 
+} // anonymous namespace
+
 GAME(1977,  recel,       0,       recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Recel Bios",       MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING)
 
-GAME(1978,  r_alaska,    recel,   recel, recel,     recel_state, empty_init, ROT0, "Interflip", "Alaska",           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1978,  r_hotcold,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Inder",     "Hot & Cold",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1978,  r_screech,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Inder",     "Screech",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1978,  r_mrevil,    recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Mr Evil",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1978,  r_torneo,    recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Torneo",           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1978,  r_crzyrace,  recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Crazy Race",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1978,  r_fairfght,  recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Fair Fight",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1978,  r_pokrplus,  recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Poker Plus",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1979,  r_mrdoom,    recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Mr Doom",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1979,  r_cavalier,  recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Cavalier",         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1979,  r_swash,     recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Swashbuckler",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1979,  r_quijote,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Don Quijote",      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  r_flipper,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "The Flipper Game", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  r_blackm4,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Black Magic 4",    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1978,  r_alaska,    recel,   recel, recel,     recel_state, empty_init, ROT0, "Interflip", "Alaska",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_hotcold,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Inder",     "Hot & Cold",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_screech,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Inder",     "Screech",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_mrevil,    recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Mr Evil",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_torneo,    recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Torneo",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_crzyrace,  recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Crazy Race",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_fairfght,  recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Fair Fight",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_pokrplus,  recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Poker Plus",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  r_mrdoom,    recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Mr Doom",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  r_cavalier,  recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Cavalier",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  r_swash,     recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Swashbuckler",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  r_quijote,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Don Quijote",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  r_flipper,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "The Flipper Game", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  r_blackm4,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Black Magic 4",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

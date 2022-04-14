@@ -254,78 +254,78 @@ protected:
 	void state_save();
 
 	/* memory state */
-	uint8_t m_mmu;
+	uint8_t m_mmu = 0U;
 
 	/* keyboard state */
-	uint16_t m_ikbd_keylatch;
-	uint8_t m_ikbd_mouse;
+	uint16_t m_ikbd_keylatch = 0U;
+	uint8_t m_ikbd_mouse = 0U;
 	uint8_t m_ikbd_mouse_x;
 	uint8_t m_ikbd_mouse_y;
 	uint8_t m_ikbd_mouse_px;
 	uint8_t m_ikbd_mouse_py;
 	uint8_t m_ikbd_mouse_pc;
-	int m_ikbd_tx;
+	int m_ikbd_tx = 0;
 	int m_ikbd_joy;
-	int m_midi_tx;
+	int m_midi_tx = 0;
 
 	/* floppy state */
-	uint32_t m_dma_base;
-	uint16_t m_dma_error;
-	uint16_t m_fdc_mode;
-	uint8_t m_fdc_sectors;
-	uint16_t m_fdc_fifo[2][8];
-	int m_fdc_fifo_sel;
-	int m_fdc_fifo_index;
-	int m_fdc_fifo_msb;
-	int m_fdc_fifo_empty[2];
-	int m_fdc_dmabytes;
+	uint32_t m_dma_base = 0U;
+	uint16_t m_dma_error = 0U;
+	uint16_t m_fdc_mode = 0U;
+	uint8_t m_fdc_sectors = 0U;
+	uint16_t m_fdc_fifo[2][8]{};
+	int m_fdc_fifo_sel = 0;
+	int m_fdc_fifo_index = 0;
+	int m_fdc_fifo_msb = 0;
+	int m_fdc_fifo_empty[2]{};
+	int m_fdc_dmabytes = 0;
 
 	/* shifter state */
-	uint32_t m_shifter_base;
-	uint32_t m_shifter_ofs;
-	uint8_t m_shifter_sync;
-	uint8_t m_shifter_mode;
-	uint16_t m_shifter_palette[16];
-	uint16_t m_shifter_rr[4];
-	uint16_t m_shifter_ir[4];
-	int m_shifter_bitplane;
-	int m_shifter_shift;
-	int m_shifter_h;
-	int m_shifter_v;
-	int m_shifter_de;
-	int m_shifter_x_start;
-	int m_shifter_x_end;
-	int m_shifter_y_start;
-	int m_shifter_y_end;
-	int m_shifter_hblank_start;
-	int m_shifter_vblank_start;
+	uint32_t m_shifter_base = 0U;
+	uint32_t m_shifter_ofs = 0U;
+	uint8_t m_shifter_sync = 0U;
+	uint8_t m_shifter_mode = 0U;
+	uint16_t m_shifter_palette[16]{};
+	uint16_t m_shifter_rr[4]{};
+	uint16_t m_shifter_ir[4]{};
+	int m_shifter_bitplane = 0;
+	int m_shifter_shift = 0;
+	int m_shifter_h = 0;
+	int m_shifter_v = 0;
+	int m_shifter_de = 0;
+	int m_shifter_x_start = 0;
+	int m_shifter_x_end = 0;
+	int m_shifter_y_start = 0;
+	int m_shifter_y_end = 0;
+	int m_shifter_hblank_start = 0;
+	int m_shifter_vblank_start = 0;
 
 	/* blitter state */
-	uint16_t m_blitter_halftone[16];
-	int16_t m_blitter_src_inc_x;
-	int16_t m_blitter_src_inc_y;
-	int16_t m_blitter_dst_inc_x;
-	int16_t m_blitter_dst_inc_y;
-	uint32_t m_blitter_src;
-	uint32_t m_blitter_dst;
-	uint16_t m_blitter_endmask1;
-	uint16_t m_blitter_endmask2;
-	uint16_t m_blitter_endmask3;
-	uint16_t m_blitter_xcount;
-	uint16_t m_blitter_ycount;
-	uint16_t m_blitter_xcountl;
-	uint8_t m_blitter_hop;
-	uint8_t m_blitter_op;
-	uint8_t m_blitter_ctrl;
-	uint8_t m_blitter_skew;
-	uint32_t m_blitter_srcbuf;
+	uint16_t m_blitter_halftone[16]{};
+	int16_t m_blitter_src_inc_x = 0;
+	int16_t m_blitter_src_inc_y = 0;
+	int16_t m_blitter_dst_inc_x = 0;
+	int16_t m_blitter_dst_inc_y = 0;
+	uint32_t m_blitter_src = 0U;
+	uint32_t m_blitter_dst = 0U;
+	uint16_t m_blitter_endmask1 = 0U;
+	uint16_t m_blitter_endmask2 = 0U;
+	uint16_t m_blitter_endmask3 = 0U;
+	uint16_t m_blitter_xcount = 0U;
+	uint16_t m_blitter_ycount = 0U;
+	uint16_t m_blitter_xcountl = 0U;
+	uint8_t m_blitter_hop = 0U;
+	uint8_t m_blitter_op = 0U;
+	uint8_t m_blitter_ctrl = 0U;
+	uint8_t m_blitter_skew = 0U;
+	uint32_t m_blitter_srcbuf = 0U;
 
 	/* timers */
-	emu_timer *m_mouse_timer;
-	emu_timer *m_glue_timer;
-	emu_timer *m_shifter_timer;
+	emu_timer *m_mouse_timer = nullptr;
+	emu_timer *m_glue_timer = nullptr;
+	emu_timer *m_shifter_timer = nullptr;
 
-	bitmap_rgb32 m_bitmap;
+	bitmap_rgb32 m_bitmap = 0;
 
 	static void floppy_formats(format_registration &fr);
 
@@ -339,7 +339,7 @@ protected:
 	void st_map(address_map &map);
 	void keyboard(machine_config &config);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
@@ -408,29 +408,29 @@ public:
 	void state_save();
 
 	// shifter state
-	uint8_t m_shifter_lineofs;
-	uint8_t m_shifter_pixelofs;
+	uint8_t m_shifter_lineofs = 0U;
+	uint8_t m_shifter_pixelofs = 0U;
 
 	/* microwire state */
-	uint16_t m_mw_data;
-	uint16_t m_mw_mask;
-	int m_mw_shift;
+	uint16_t m_mw_data = 0U;
+	uint16_t m_mw_mask = 0U;
+	int m_mw_shift = 0;
 
 	/* DMA sound state */
-	uint32_t m_dmasnd_base;
-	uint32_t m_dmasnd_end;
-	uint32_t m_dmasnd_cntr;
-	uint32_t m_dmasnd_baselatch;
-	uint32_t m_dmasnd_endlatch;
-	uint8_t m_dmasnd_ctrl;
-	uint8_t m_dmasnd_mode;
-	uint8_t m_dmasnd_fifo[8];
-	uint8_t m_dmasnd_samples;
-	int m_dmasnd_active;
+	uint32_t m_dmasnd_base = 0U;
+	uint32_t m_dmasnd_end = 0U;
+	uint32_t m_dmasnd_cntr = 0U;
+	uint32_t m_dmasnd_baselatch = 0U;
+	uint32_t m_dmasnd_endlatch = 0U;
+	uint8_t m_dmasnd_ctrl = 0U;
+	uint8_t m_dmasnd_mode = 0U;
+	uint8_t m_dmasnd_fifo[8]{};
+	uint8_t m_dmasnd_samples = 0U;
+	int m_dmasnd_active = 0;
 
 	// timers
-	emu_timer *m_microwire_timer;
-	emu_timer *m_dmasound_timer;
+	emu_timer *m_microwire_timer = 0;
+	emu_timer *m_dmasound_timer = 0;
 
 	void falcon40(machine_config &config);
 	void tt030(machine_config &config);
@@ -438,7 +438,7 @@ public:
 	void ste(machine_config &config);
 	void ste_map(address_map &map);
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
 	virtual void video_start() override;
 };
@@ -453,7 +453,7 @@ public:
 	uint16_t cache_r();
 	void cache_w(uint16_t data);
 
-	uint16_t m_cache;
+	uint16_t m_cache = 0;
 	void megaste(machine_config &config);
 	void megaste_map(address_map &map);
 

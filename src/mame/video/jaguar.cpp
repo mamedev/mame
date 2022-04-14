@@ -732,7 +732,7 @@ uint32_t jaguar_state::cojag_gun_input_r(offs_t offset)
  *
  *************************************/
 
-void jaguar_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void jaguar_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

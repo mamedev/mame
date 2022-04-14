@@ -15,7 +15,7 @@
 #include "cpu/cop400/cop400.h"
 #include "formats/ap_dsk35.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 /***************************************************************************

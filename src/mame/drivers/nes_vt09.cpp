@@ -455,6 +455,12 @@ ROM_START( rbbrite )
 	ROM_LOAD( "coleco_rainbowbrite_29dl800ba_000422cb.bin", 0x00000, 0x100000, CRC(d2ad0d7d) SHA1(4423a5aa2eda20b3621ab46e951ac08dc2d24789) )
 ROM_END
 
+ROM_START( timetp25 )
+	ROM_REGION( 0x200000, "mainrom", 0 )
+	ROM_LOAD( "s29al016d70tfi02.u2", 0x00000, 0x200000, CRC(6109816a) SHA1(e48699d48b72219d80b8d27b1337e8d09793f4da) )
+	ROM_FILL(0x1fce36, 0x01, 0x04 | 0x40) // the code doesn't set the 'alt 4bpp' mode bit, but needs it? why? it isn't hardcoded as the system takes cartridges which don't want it
+ROM_END
+
 // MSI Entertainment games (MSI previously operated as Majesco Entertainment)
 
 // There are meant to be multiple revisions of this software, some with theme tunes for the new wrestlers, some without. This one appears to lack them.
@@ -498,3 +504,5 @@ CONS( 200?, jl2050,  0,  0,  nes_vt09_16mb,nes_vt09, nes_vt09_state, empty_init,
 
 // might be VT369 based, if so, move
 CONS( 2018, rbbrite,    0,  0,  nes_vt09_1mb, nes_vt09, nes_vt09_state, empty_init, "Coleco", "Rainbow Brite (mini-arcade)", MACHINE_NOT_WORKING )
+
+CONS( 200?, timetp25, 0,  0,  nes_vt09_2mb, nes_vt09, nes_vt09_state, empty_init, "Timetop", "Super Game 25-in-1 (GM-228)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

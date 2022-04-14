@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "coreutil.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
@@ -165,9 +164,9 @@ public:
 		m_tmss(*this, "tmss")
 	{ }
 
-	ioport_port *m_io_ctrlr;
-	ioport_port *m_io_pad3b[4];
-	ioport_port *m_io_pad6b[2][4];
+	ioport_port *m_io_ctrlr = nullptr;
+	ioport_port *m_io_pad3b[4]{};
+	ioport_port *m_io_pad6b[2][4]{};
 
 	optional_device<sega_32x_device> m_32x;
 	optional_device<sega_segacd_device> m_segacd;

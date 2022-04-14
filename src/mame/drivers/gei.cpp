@@ -1360,6 +1360,11 @@ Alt set included BONE in place of SPRD & a newer SLOT
 These board sets may also be known as the V116 (or V16)
 sets as the alt set also included that name on the labels
 
+To clear remaining credits:
+  Press STAND, DEAL and 3rd DISCARD buttons at the same time.
+  Hold all 3 buttons down for 5 seconds.  The screen will
+   turn RED indicating a successful "CLEAR" occurrred
+
 ****************************************************/
 
 ROM_START( gs4002 )
@@ -2031,9 +2036,9 @@ GAME( 1984, gtsers10,  gtsers8,  findout,   getrivia, gei_state, init_bank8k,   
 GAME( 1984, gtsers11,  gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 11)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, gtsers11a, gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 11 Alt Question Rom)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, gtsers12,  gtsers8,  findout,   gt103,    gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 12)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gtsers12a, gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 12 Alt Question Rom)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gtsers12a, gtsers8,  findout,   gt103,    gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 12 Alt Question Rom)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, gtsers14,  gtsers8,  findout,   gt103,    gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 14)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gtsers14a, gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 14 Alt Question Rom)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gtsers14a, gtsers8,  findout,   gt103,    gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 14 Alt Question Rom)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, gtsers15,  gtsers8,  findout,   gt103,    gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 15)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, gt103a1,   gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Unsorted question roms)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, gt103aa,   gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Version 1.03a Alt questions 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

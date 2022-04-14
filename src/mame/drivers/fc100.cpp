@@ -64,7 +64,7 @@ public:
 		, m_cart(*this, "cartslot")
 		, m_uart(*this, "uart")
 		, m_centronics(*this, "centronics")
-		, m_keyboard(*this, "KEY.%u", 0)
+		, m_keyboard(*this, "KEY.%u", 0U)
 	{ }
 
 	void fc100(machine_config &config);
@@ -94,19 +94,19 @@ private:
 	virtual void machine_reset() override;
 
 	// graphics signals
-	uint8_t m_ag;
-	uint8_t m_gm2;
-	uint8_t m_gm1;
-	uint8_t m_gm0;
-	uint8_t m_as;
-	uint8_t m_css;
-	uint8_t m_intext;
-	uint8_t m_inv;
-	uint8_t m_cass_data[4];
-	bool m_cassbit;
-	bool m_cassold;
-	uint8_t m_key_pressed;
-	bool m_banksw_unlocked;
+	uint8_t m_ag = 0U;
+	uint8_t m_gm2 = 0U;
+	uint8_t m_gm1 = 0U;
+	uint8_t m_gm0 = 0U;
+	uint8_t m_as = 0U;
+	uint8_t m_css = 0U;
+	uint8_t m_intext = 0U;
+	uint8_t m_inv = 0U;
+	uint8_t m_cass_data[4]{};
+	bool m_cassbit = 0;
+	bool m_cassold = 0;
+	uint8_t m_key_pressed = 0U;
+	bool m_banksw_unlocked = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6847_base_device> m_vdg;

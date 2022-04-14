@@ -64,7 +64,7 @@ protected:
 		TIMER_REFRESH_END
 	};
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void machine_start() override;
 
@@ -85,12 +85,12 @@ private:
 
 	required_ioport_array<3> m_inputs;
 
-	int m_sound_flags;
-	int m_coin_flag;
-	int m_output[2];
-	int m_xcenter;
-	int m_ycenter;
-	emu_timer *m_refresh_end_timer;
+	int m_sound_flags = 0;
+	int m_coin_flag = 0;
+	int m_output[2]{};
+	int m_xcenter = 0;
+	int m_ycenter = 0;
+	emu_timer *m_refresh_end_timer = nullptr;
 
 	void led_w(offs_t offset, uint16_t data);
 	void refresh_control_w(offs_t offset, uint8_t data);
@@ -319,7 +319,7 @@ WRITE_LINE_MEMBER(cchasm_state::ctc_timer_2_w)
 }
 
 
-void cchasm_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void cchasm_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

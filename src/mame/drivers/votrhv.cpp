@@ -109,7 +109,7 @@ public:
 	static const device_timer_id TIMER_SCAN = 1;
 private:
 	// overrides
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void mem_map(address_map &map);
 
@@ -136,9 +136,9 @@ protected:
 	bool m_latcha_in;
 	bool m_latchb_in;
 	bool m_scanflag;
-	emu_timer* m_scan_timer;
+	emu_timer* m_scan_timer = nullptr;
 private:
-	emu_timer* m_resume_timer;
+	emu_timer* m_resume_timer = nullptr;
 };
 
 class hc120_state : public votrhv_state
@@ -391,7 +391,7 @@ INPUT_PORTS_END
  Timer and machine/start/reset handlers
 ******************************************************************************/
 
-void votrhv_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void votrhv_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{

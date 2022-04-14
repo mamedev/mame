@@ -194,7 +194,7 @@ uint16_t swapb16(uint16_t data)
 }
 
 
-void m3comm_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void m3comm_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if(id != TIMER_IRQ5)
 		return;

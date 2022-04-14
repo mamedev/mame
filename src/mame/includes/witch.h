@@ -74,8 +74,8 @@ public:
 protected:
 	void common_map(address_map &map);
 
-	tilemap_t *m_gfx0_tilemap;
-	tilemap_t *m_gfx1_tilemap;
+	tilemap_t *m_gfx0_tilemap = nullptr;
+	tilemap_t *m_gfx1_tilemap = nullptr;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -93,10 +93,10 @@ protected:
 
 	optional_memory_bank m_mainbank;
 
-	int m_scrollx;
-	int m_scrolly;
-	uint8_t m_reg_a002;
-	uint8_t m_motor_active;
+	int m_scrollx = 0;
+	int m_scrolly = 0;
+	uint8_t m_reg_a002 = 0;
+	uint8_t m_motor_active = 0;
 
 	TILE_GET_INFO_MEMBER(get_gfx0_tile_info);
 	TILE_GET_INFO_MEMBER(get_gfx1_tile_info);
@@ -110,8 +110,8 @@ protected:
 	void witch_sub_map(address_map &map);
 
 	void video_common_init();
-	bool has_spr_rom_bank;
-	uint8_t m_spr_bank;
+	bool has_spr_rom_bank = false;
+	uint8_t m_spr_bank = 0;
 };
 
 class keirinou_state : public witch_state
@@ -135,7 +135,7 @@ private:
 
 	virtual void video_start() override;
 
-	uint8_t m_bg_bank;
+	uint8_t m_bg_bank = 0;
 	required_shared_ptr<uint8_t> m_paletteram;
 };
 

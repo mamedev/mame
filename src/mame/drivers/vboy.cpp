@@ -35,7 +35,7 @@
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "vboy.lh"
@@ -140,10 +140,10 @@ private:
 	vip_regs_t m_vip_regs;
 	vboy_timer_t m_vboy_timer;
 	std::unique_ptr<int32_t[]> m_ovr_tempdraw_map;
-	uint16_t m_frame_count;
-	uint8_t m_displayfb;
-	uint8_t m_drawfb;
-	uint8_t m_row_num;
+	uint16_t m_frame_count = 0;
+	uint8_t m_displayfb = 0;
+	uint8_t m_drawfb = 0;
+	uint8_t m_row_num = 0;
 	attotime m_input_latch_time;
 
 	uint32_t io_r(offs_t offset);
@@ -1269,6 +1269,7 @@ void vboy_state::vboy(machine_config &config)
 
 	/* cartridge */
 	VBOY_CART_SLOT(config, m_cart, vboy_carts, nullptr);
+	m_cart->set_must_be_loaded(true);
 	m_cart->intcro().set_inputline(m_maincpu, 2);
 	m_cart->set_exp(m_maincpu, AS_PROGRAM, 0x0400'0000);
 	m_cart->set_chip(m_maincpu, AS_PROGRAM, 0x0600'0000);

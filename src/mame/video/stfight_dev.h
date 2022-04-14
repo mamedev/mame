@@ -51,9 +51,9 @@ private:
 	required_shared_ptr<uint8_t> m_txram;
 
 	// tilemaps
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_tx_tilemap;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_tx_tilemap = nullptr;
 
 	TILEMAP_MAPPER_MEMBER(fg_scan);
 	TILEMAP_MAPPER_MEMBER(bg_scan);
@@ -63,7 +63,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 
 	// internal variables
-	int m_sprite_base;
+	int m_sprite_base = 0;
 
 	// rendering / mixing
 	bitmap_ind16 m_temp_bitmap;

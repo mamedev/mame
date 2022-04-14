@@ -95,11 +95,11 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	uint16_t m_lar;
-	uint8_t m_digit;
-	u8 m_seg;
-	bool m_cassin;
-	bool m_irqstate;
+	uint16_t m_lar = 0U;
+	uint8_t m_digit = 0U;
+	u8 m_seg = 0U;
+	bool m_cassin = 0;
+	bool m_irqstate = 0;
 	required_device<s2650_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_ram;
 	required_shared_ptr<uint8_t> m_p_smiram;

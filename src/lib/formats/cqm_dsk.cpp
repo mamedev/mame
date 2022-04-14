@@ -254,19 +254,19 @@ const char *cqm_format::extensions() const
 	return "cqm,cqi,dsk";
 }
 
-int cqm_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int cqm_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t h[3];
 	size_t actual;
 	io.read_at(0, h, 3, actual);
 
 	if (h[0] == 'C' && h[1] == 'Q' && h[2] == 0x14)
-		return 100;
+		return FIFID_SIGN;
 
 	return 0;
 }
 
-bool cqm_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool cqm_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	size_t actual;
 	const int max_size = 4*1024*1024; // 4MB ought to be large enough for any floppy
@@ -366,7 +366,7 @@ bool cqm_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-bool cqm_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool cqm_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	return false;
 }
@@ -376,4 +376,4 @@ bool cqm_format::supports_save() const
 	return false;
 }
 
-const floppy_format_type FLOPPY_CQM_FORMAT = &floppy_image_format_creator<cqm_format>;
+const cqm_format FLOPPY_CQM_FORMAT;

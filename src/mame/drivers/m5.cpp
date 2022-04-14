@@ -296,7 +296,7 @@ Few other notes:
 #include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/m5_dsk.h"
@@ -440,9 +440,9 @@ private:
 	required_device<wd2797_device> m_wdfdc;
 	required_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
-	floppy_image_device *m_floppy;
+	floppy_image_device *m_floppy = nullptr;
 
-	u8 m_rammap[16]; // memory map
+	u8 m_rammap[16]{}; // memory map
 };
 
 

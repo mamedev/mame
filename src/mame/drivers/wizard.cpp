@@ -65,7 +65,7 @@ More info:
 #include "cpu/arm7/arm7core.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 #include "screen.h"
 

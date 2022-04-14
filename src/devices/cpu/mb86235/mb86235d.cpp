@@ -219,7 +219,7 @@ void mb86235_disassembler::dasm_alu_mul(std::ostream &stream, uint64_t opcode, b
 	}
 }
 
-void mb86235_disassembler::dasm_control(std::ostream &stream, uint32_t pc, uint64_t opcode)
+offs_t mb86235_disassembler::dasm_control(std::ostream &stream, uint32_t pc, uint64_t opcode)
 {
 	int ef1 = (opcode >> 16) & 0x3f;
 	int ef2 = opcode & 0xffff;
@@ -227,6 +227,8 @@ void mb86235_disassembler::dasm_control(std::ostream &stream, uint32_t pc, uint6
 	int cop = (opcode >> 22) & 0x1f;
 
 	int rel12 = (opcode & 0x800) ? (0xfffff000 | (opcode & 0xfff)) : (opcode & 0xfff);
+
+	offs_t flags = 0;
 
 	switch (cop)
 	{
@@ -281,12 +283,15 @@ void mb86235_disassembler::dasm_control(std::ostream &stream, uint32_t pc, uint6
 			break;
 		case 0x14:
 			util::stream_format(stream, "DBBC AR%d:%d, %04X", (uint32_t)((opcode >> 13) & 7), (uint32_t)((opcode >> 16) & 0xf), pc + rel12);
+			flags = STEP_COND | step_over_extra(1);
 			break;
 		case 0x15:
 			util::stream_format(stream, "DBBS AR%d:%d, %04X", (uint32_t)((opcode >> 13) & 7), (uint32_t)((opcode >> 16) & 0xf), pc + rel12);
+			flags = STEP_COND | step_over_extra(1);
 			break;
 		case 0x1b:
 			stream << "DRET";
+			flags = STEP_OUT | step_over_extra(1);
 			break;
 
 		case 0x10:      // DBcc
@@ -297,17 +302,32 @@ void mb86235_disassembler::dasm_control(std::ostream &stream, uint32_t pc, uint6
 		case 0x12:      // DJMP
 		{
 			if (cop == 0x10)
+			{
 				util::stream_format(stream, "%s ", db_mnemonic[ef1]);
+				flags = STEP_COND | step_over_extra(1);
+			}
 			else if (cop == 0x11)
+			{
 				util::stream_format(stream, "%s ", dbn_mnemonic[ef1]);
+				flags = STEP_COND | step_over_extra(1);
+			}
 			else if (cop == 0x18)
+			{
 				util::stream_format(stream, "%s ", dc_mnemonic[ef1]);
+				flags = STEP_OVER | STEP_COND | step_over_extra(1);
+			}
 			else if (cop == 0x19)
+			{
 				util::stream_format(stream, "%s ", dcn_mnemonic[ef1]);
+				flags = STEP_OVER | STEP_COND | step_over_extra(1);
+			}
 			else if (cop == 0x12)
 				stream << "DJMP ";
 			else if (cop == 0x1a)
+			{
 				stream << "DCALL ";
+				flags = STEP_OVER | step_over_extra(1);
+			}
 
 			switch ((opcode >> 12) & 0xf)
 			{
@@ -332,6 +352,8 @@ void mb86235_disassembler::dasm_control(std::ostream &stream, uint32_t pc, uint6
 			break;
 		}
 	}
+
+	return flags;
 }
 
 void mb86235_disassembler::dasm_double_xfer1(std::ostream &stream, uint64_t opcode)
@@ -690,8 +712,7 @@ offs_t mb86235_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		case 2:     // ALU / MUL / control
 			dasm_alu_mul(stream, opcode, true);
 			stream << " : ";
-			dasm_control(stream, pc, opcode);
-			break;
+			return 1 | dasm_control(stream, pc, opcode) | SUPPORTED;
 		case 4:     // ALU or MUL / double transfer (type 2)
 			dasm_alu_mul(stream, opcode, false);
 			stream << " : ";
@@ -705,8 +726,7 @@ offs_t mb86235_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		case 6:     // ALU or MUL / control
 			dasm_alu_mul(stream, opcode, false);
 			stream << " : ";
-			dasm_control(stream, pc, opcode);
-			break;
+			return 1 | dasm_control(stream, pc, opcode) | SUPPORTED;
 		case 7:     // transfer (type 3)
 			dasm_xfer3(stream, opcode);
 			break;

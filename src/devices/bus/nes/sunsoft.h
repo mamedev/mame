@@ -20,10 +20,6 @@ public:
 	virtual void write_m(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
 
@@ -38,10 +34,6 @@ public:
 	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
 
@@ -60,7 +52,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	uint16_t m_irq_count;
@@ -118,7 +110,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	uint16_t m_irq_count;

@@ -191,7 +191,7 @@ private:
 	required_device<sn76477_device> m_sn;
 	required_device<dac_byte_interface> m_dac;
 
-	int m_speakres_vrx;
+	int m_speakres_vrx = 0;
 };
 
 

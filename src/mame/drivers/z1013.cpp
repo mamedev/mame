@@ -56,6 +56,7 @@ Due to no input checking, misuse of commands can crash the system.
 #include "imagedev/snapquik.h"
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 #include "sound/spkrdev.h"
 

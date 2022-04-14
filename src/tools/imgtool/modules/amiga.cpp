@@ -516,9 +516,8 @@ static imgtoolerr_t write_bitmap_block(imgtool::image &img, int block, const bit
 }
 
 
-#ifdef UNUSED_FUNCTION
 /* Read a bitmap extended block */
-static imgtoolerr_t read_bitmap_ext_block(imgtool::image *img, int block, bitmap_ext_block *bm)
+[[maybe_unused]] static imgtoolerr_t read_bitmap_ext_block(imgtool::image &img, int block, bitmap_ext_block *bm)
 {
 	imgtoolerr_t ret;
 	uint8_t buffer[BSIZE];
@@ -533,7 +532,6 @@ static imgtoolerr_t read_bitmap_ext_block(imgtool::image *img, int block, bitmap
 
 	return IMGTOOLERR_SUCCESS;
 }
-#endif
 
 
 /* Read the root block */
@@ -840,16 +838,14 @@ static int is_intl(imgtool::image &img)
 				t == DT_FFS_INTL_DIRC) ? true : false);
 }
 
-#ifdef UNUSED_FUNCTION
 /* Returns true if the disk uses the directory cache mode */
-static int is_dirc(imgtool::image *img)
+[[maybe_unused]] static int is_dirc(imgtool::image &img)
 {
 	disk_type t = get_disk_type(img);
 
 	return ((t == DT_OFS_INTL_DIRC ||
 				t == DT_FFS_INTL_DIRC) ? true : false);
 }
-#endif
 
 static imgtoolerr_t get_hash_table(imgtool::image &img, int block, uint32_t *ht)
 {
@@ -910,12 +906,10 @@ static imgtoolerr_t set_hash_table(imgtool::image &img, int block, const uint32_
 	return IMGTOOLERR_SUCCESS;
 }
 
-#ifdef UNUSED_FUNCTION
-static imgtoolerr_t get_root_hash_table(imgtool::image *img, uint32_t *ht)
+[[maybe_unused]] static imgtoolerr_t get_root_hash_table(imgtool::image &img, uint32_t *ht)
 {
 	return get_hash_table(img, get_total_blocks(img)/2, ht);
 }
-#endif
 
 static imgtoolerr_t get_blockname(imgtool::image &img, int block, char *dest)
 {
@@ -1370,8 +1364,7 @@ static int get_first_bit(uint32_t *array, int size)
 }
 
 
-#ifdef UNUSED_FUNCTION
-static imgtoolerr_t walk_bitmap_ext_blocks(imgtool::image *img, int start, int *block)
+[[maybe_unused]] static imgtoolerr_t walk_bitmap_ext_blocks(imgtool::image &img, int start, int *block)
 {
 	imgtoolerr_t ret;
 	bitmap_ext_block bm_ext;
@@ -1403,7 +1396,6 @@ static imgtoolerr_t walk_bitmap_ext_blocks(imgtool::image *img, int start, int *
 	/* else continue walking the list */
 	return walk_bitmap_ext_blocks(img, bm_ext.next, block);
 }
-#endif
 
 
 /* Searches for a block marked as free

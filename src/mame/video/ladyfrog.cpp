@@ -69,16 +69,6 @@ void ladyfrog_state::ladyfrog_gfxctrl2_w(uint8_t data)
 	m_bg_tilemap->mark_all_dirty();
 }
 
-
-#ifdef UNUSED_FUNCTION
-int gfxctrl;
-
-uint8_t ladyfrog_state::ladyfrog_gfxctrl_r()
-{
-	return gfxctrl;
-}
-#endif
-
 uint8_t ladyfrog_state::ladyfrog_scrlram_r(offs_t offset)
 {
 	return m_scrlram[offset];

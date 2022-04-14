@@ -140,7 +140,7 @@ protected:
 	template <size_t Line> uint16_t adc_r() { return m_adc_in[Line](); }
 
 	void eepromx_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0) { m_i2c_w(offset, data, mem_mask); }
-	uint8_t eepromx_r() { return m_i2c_r(); };
+	uint8_t eepromx_r() { return m_i2c_r(); }
 
 	void uart_tx_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0) { m_uart_tx(offset, data, mem_mask); }
 	DECLARE_WRITE_LINE_MEMBER(spi_tx_w) { m_spi_tx(state); }

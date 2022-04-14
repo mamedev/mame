@@ -61,11 +61,6 @@ nes_74x161x138_device::nes_74x161x138_device(const machine_config &mconfig, cons
 
 
 
-void nes_74x161x161x32_device::device_start()
-{
-	common_start();
-}
-
 void nes_74x161x161x32_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
@@ -74,40 +69,11 @@ void nes_74x161x161x32_device::pcb_reset()
 	chr8(0, m_chr_source);
 }
 
-void nes_74x139x74_device::device_start()
-{
-	common_start();
-}
-
 void nes_74x139x74_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
-	chr8(0, m_chr_source);
-}
-
-void nes_74x377_device::device_start()
-{
-	common_start();
-}
-
-void nes_74x377_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_74x161x138_device::device_start()
-{
-	common_start();
-}
-
-void nes_74x161x138_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
 	chr8(0, m_chr_source);
 }
 
@@ -156,7 +122,7 @@ void nes_74x139x74_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("74x139x74 write_m, offset: %04x, data: %02x\n", offset, data));
 
-	chr8(((data & 0x02) >> 1) | ((data & 0x01) << 1), CHRROM);
+	chr8(bitswap<2>(data, 0, 1), CHRROM);
 }
 
 /*-------------------------------------------------

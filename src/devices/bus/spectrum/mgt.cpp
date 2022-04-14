@@ -113,7 +113,7 @@
     the PAL is a 16L6 rather than a 20L8 used in later version (only known dump is bruteforced and converted to gal20v8 target.)
     details here: https://web.archive.org/web/20171118171054/http://trastero.speccy.org/cosas/JL/PlusD/PlusD-v1-0.html
 
-    from "pick-poke-it" user manual (reguarding v1.0 unit):
+    from "pick-poke-it" user manual (regarding v1.0 unit):
      "A few PLUS D users are still using Version 1 of the ROM which was used in PLUS D's sold in December 1987-January 1988.
       ... check the serial number on the bottom of your PLUS D. If it's a 4-figure number commencing with 1,
       then you have a PLUS D with the Version 1 ROM."
@@ -154,6 +154,7 @@
 
 #include "emu.h"
 #include "mgt.h"
+#include "softlist_dev.h"
 
 
 //**************************************************************************
@@ -169,7 +170,7 @@ DEFINE_DEVICE_TYPE(SPECTRUM_DISCIPLE, spectrum_disciple_device, "spectrum_discip
 
 INPUT_PORTS_START(plusd)
 	PORT_START("BUTTON")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Snapshot Button") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHANGED_MEMBER(DEVICE_SELF, spectrum_plusd_device, snapshot_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Snapshot Button") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, spectrum_plusd_device, snapshot_button, 0)
 INPUT_PORTS_END
 
 //-------------------------------------------------
@@ -226,7 +227,7 @@ static void plusd_floppies(device_slot_interface &device)
 }
 
 //-------------------------------------------------
-//  floppy_format_type floppy_formats
+//  floppy_formats
 //-------------------------------------------------
 
 void spectrum_plusd_device::floppy_formats(format_registration &fr)
@@ -307,6 +308,7 @@ void spectrum_disciple_device::device_add_mconfig(machine_config &config)
 	SPECTRUM_EXPANSION_SLOT(config, m_exp, spectrum_expansion_devices, nullptr);
 	m_exp->irq_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::irq_w));
 	m_exp->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::nmi_w));
+	m_exp->fb_r_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::fb_r));
 }
 
 const tiny_rom_entry *spectrum_plusd_device::device_rom_region() const
@@ -421,7 +423,7 @@ void spectrum_plusd_device::pre_opcode_fetch(offs_t offset)
 
 uint8_t spectrum_plusd_device::iorq_r(offs_t offset)
 {
-	uint8_t data = 0xff;
+	uint8_t data = offset & 1 ? m_slot->fb_r() : 0xff;
 
 	switch (offset & 0x7e) // address lines 0 and 7-15 ignored
 	{
@@ -714,7 +716,7 @@ void spectrum_disciple_device::mreq_w(offs_t offset, uint8_t data)
 		m_exp->mreq_w(offset, data);
 }
 
-void spectrum_disciple_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void spectrum_disciple_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

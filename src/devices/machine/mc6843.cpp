@@ -300,7 +300,7 @@ void mc6843_device::ready_callback(floppy_image_device *floppy, int state)
 	}
 }
 
-void mc6843_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mc6843_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	live_sync();
 	run(true, false, false);

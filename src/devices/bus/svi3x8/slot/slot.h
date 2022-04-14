@@ -64,9 +64,9 @@ public:
 	void add_card(device_svi_slot_interface &card);
 
 	// from slot
-	DECLARE_WRITE_LINE_MEMBER( int_w ) { m_int_handler(state); };
-	DECLARE_WRITE_LINE_MEMBER( romdis_w ) { m_romdis_handler(state); };
-	DECLARE_WRITE_LINE_MEMBER( ramdis_w ) { m_ramdis_handler(state); };
+	DECLARE_WRITE_LINE_MEMBER( int_w ) { m_int_handler(state); }
+	DECLARE_WRITE_LINE_MEMBER( romdis_w ) { m_romdis_handler(state); }
+	DECLARE_WRITE_LINE_MEMBER( ramdis_w ) { m_ramdis_handler(state); }
 
 	// from host
 	uint8_t mreq_r(offs_t offset);

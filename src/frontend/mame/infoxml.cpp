@@ -110,7 +110,7 @@ void output_footer(std::ostream &out);
 void output_one(std::ostream &out, driver_enumerator &drivlist, const game_driver &driver, device_type_set *devtypes);
 void output_sampleof(std::ostream &out, device_t &device);
 void output_bios(std::ostream &out, device_t const &device);
-void output_rom(std::ostream &out, machine_config &config, driver_enumerator *drivlist, const game_driver *driver, device_t &device);
+void output_rom(std::ostream &out, machine_config &config, driver_list const *drivlist, const game_driver *driver, device_t &device);
 void output_device_refs(std::ostream &out, device_t &root);
 void output_sample(std::ostream &out, device_t &device);
 void output_chips(std::ostream &out, device_t &device, const char *root_tag);
@@ -131,7 +131,7 @@ void output_ramoptions(std::ostream &out, device_t &root);
 void output_one_device(std::ostream &out, machine_config &config, device_t &device, const char *devtag);
 void output_devices(std::ostream &out, emu_options &lookup_options, device_type_set const *filter);
 
-char const *get_merge_name(driver_enumerator &drivlist, game_driver const &driver, util::hash_collection const &romhashes);
+char const *get_merge_name(driver_list const &drivlist, game_driver const &driver, util::hash_collection const &romhashes);
 char const *get_merge_name(machine_config &config, device_t const &device, util::hash_collection const &romhashes);
 char const *get_merge_name(tiny_rom_entry const *roms, util::hash_collection const &romhashes);
 
@@ -982,7 +982,7 @@ void output_bios(std::ostream &out, device_t const &device)
 //  the XML output
 //-------------------------------------------------
 
-void output_rom(std::ostream &out, machine_config &config, driver_enumerator *drivlist, const game_driver *driver, device_t &device)
+void output_rom(std::ostream &out, machine_config &config, driver_list const *drivlist, const game_driver *driver, device_t &device)
 {
 	enum class type { BIOS, NORMAL, DISK };
 	std::map<u32, char const *> biosnames;
@@ -1053,7 +1053,7 @@ void output_rom(std::ostream &out, machine_config &config, driver_enumerator *dr
 			if ((type::DISK == pass) != is_disk)
 				continue;
 
-			// BIOS ROMs only apply to bioses
+			// BIOS ROMs only apply to BIOSes
 			// FIXME: disk images associated with a system BIOS will never be listed
 			u32 const biosno(ROM_GETBIOSFLAGS(rom));
 			if ((type::BIOS == pass) != bool(biosno))
@@ -1824,7 +1824,7 @@ void output_switches(std::ostream &out, const ioport_list &portlist, const char 
 				newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
 
 				// output the switch name information
-				std::string const normalized_field_name(normalize_string(field.name()));
+				std::string const normalized_field_name(normalize_string(field.specific_name()));
 				std::string const normalized_newtag(normalize_string(newtag));
 				util::stream_format(out, "\t\t<%s name=\"%s\" tag=\"%s\" mask=\"%u\">\n", outertag, normalized_field_name, normalized_newtag, field.mask());
 				if (!field.condition().none())
@@ -1894,7 +1894,7 @@ void output_adjusters(std::ostream &out, const ioport_list &portlist)
 		for (ioport_field const &field : port.second->fields())
 			if (field.type() == IPT_ADJUSTER)
 			{
-				util::stream_format(out, "\t\t<adjuster name=\"%s\" default=\"%d\"/>\n", normalize_string(field.name()), field.defvalue());
+				util::stream_format(out, "\t\t<adjuster name=\"%s\" default=\"%d\"/>\n", normalize_string(field.specific_name()), field.defvalue());
 			}
 }
 
@@ -2169,7 +2169,7 @@ void output_ramoptions(std::ostream &out, device_t &root)
 //  parent set
 //-------------------------------------------------
 
-char const *get_merge_name(driver_enumerator &drivlist, game_driver const &driver, util::hash_collection const &romhashes)
+char const *get_merge_name(driver_list const &drivlist, game_driver const &driver, util::hash_collection const &romhashes)
 {
 	char const *result = nullptr;
 

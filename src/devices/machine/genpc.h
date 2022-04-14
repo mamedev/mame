@@ -154,6 +154,7 @@ protected:
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	required_device<cassette_image_device>  m_cassette;

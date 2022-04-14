@@ -505,6 +505,15 @@ void acorn_memc_device::high_mem_w(offs_t offset, uint32_t data, uint32_t mem_ma
 		invalid_access(true, addr, data, mem_mask);
 	else if (addr < 0x1000000)   // DRAM
 		m_space->write_dword(dram_address(addr), data, mem_mask);
+	else if (addr < 0x1400000)   // Buffer enabled by IOC
+	{
+		if (ACCESSING_BITS_16_31)
+		{
+			data >>= 16;
+			mem_mask >>= 16;
+		}
+		m_space->write_dword(0x2000000 | addr, data, mem_mask);
+	}
 	else
 		m_space->write_dword(0x2000000 | addr, data, mem_mask);
 }

@@ -395,8 +395,8 @@ void cuda_device::device_start()
 	write_via_clock.resolve_safe();
 	write_via_data.resolve_safe();
 
-	m_timer = timer_alloc(0, nullptr);
-	m_prog_timer = timer_alloc(1, nullptr);
+	m_timer = timer_alloc(0);
+	m_prog_timer = timer_alloc(1);
 	save_item(NAME(ddrs[0]));
 	save_item(NAME(ddrs[1]));
 	save_item(NAME(ddrs[2]));
@@ -457,7 +457,7 @@ void cuda_device::device_reset()
 	last_adb = 0;
 }
 
-void cuda_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void cuda_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == 0)
 	{
@@ -535,13 +535,20 @@ void cuda_device::nvram_default()
 	pram_loaded = false;
 }
 
-void cuda_device::nvram_read(emu_file &file)
+bool cuda_device::nvram_read(util::read_stream &file)
 {
-	file.read(disk_pram, 0x100);
-	pram_loaded = false;
+	size_t actual;
+	if (!file.read(disk_pram, 0x100, actual) && actual == 0x100)
+	{
+		pram_loaded = false;
+		return true;
+	}
+	return false;
 }
 
-void cuda_device::nvram_write(emu_file &file)
+
+bool cuda_device::nvram_write(util::write_stream &file)
 {
-	file.write(pram, 0x100);
+	size_t actual;
+	return !file.write(pram, 0x100, actual) && actual == 0x100;
 }

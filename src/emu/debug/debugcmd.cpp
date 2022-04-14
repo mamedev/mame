@@ -21,8 +21,10 @@
 
 #include "debugger.h"
 #include "emuopts.h"
+#include "fileio.h"
 #include "natkeyboard.h"
 #include "render.h"
+#include "screen.h"
 #include "softlist.h"
 
 #include "corestr.h"
@@ -30,6 +32,7 @@
 #include <algorithm>
 #include <cctype>
 #include <fstream>
+#include <sstream>
 
 
 
@@ -231,6 +234,9 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("gtime",     CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_go_time, this, _1));
 	m_console.register_command("gt",        CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_go_time, this, _1));
 	m_console.register_command("gp",        CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_go_privilege, this, _1));
+	m_console.register_command("gbt",       CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_go_branch, this, true, _1));
+	m_console.register_command("gbf",       CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_go_branch, this, false, _1));
+	m_console.register_command("gni",       CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_go_next_instruction, this, _1));
 	m_console.register_command("next",      CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_next, this, _1));
 	m_console.register_command("n",         CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_next, this, _1));
 	m_console.register_command("focus",     CMDFLAG_NONE, 1, 1, std::bind(&debugger_commands::execute_focus, this, _1));
@@ -942,53 +948,51 @@ void debugger_commands::execute_print(const std::vector<std::string> &params)
     mini_printf - safe printf to a buffer
 -------------------------------------------------*/
 
-int debugger_commands::mini_printf(char *buffer, const char *format, int params, u64 *param)
+bool debugger_commands::mini_printf(std::ostream &stream, std::string_view format, int params, u64 *param)
 {
-	const char *f = format;
-	char *p = buffer;
+	auto f = format.begin();
 
-	/* parse the string looking for % signs */
-	for (;;)
+	// parse the string looking for % signs
+	while (f != format.end())
 	{
 		char c = *f++;
-		if (!c) break;
 
-		/* escape sequences */
+		// escape sequences
 		if (c == '\\')
 		{
+			if (f == format.end()) break;
 			c = *f++;
-			if (!c) break;
 			switch (c)
 			{
-				case '\\':  *p++ = c;       break;
-				case 'n':   *p++ = '\n';    break;
+				case '\\':  stream << c;    break;
+				case 'n':   stream << '\n'; break;
 				default:                    break;
 			}
 			continue;
 		}
 
-		/* formatting */
+		// formatting
 		else if (c == '%')
 		{
 			int width = 0;
 			int zerofill = 0;
 
-			/* parse out the width */
-			for (;;)
+			// parse out the width
+			while (f != format.end() && *f >= '0' && *f <= '9')
 			{
 				c = *f++;
-				if (!c || c < '0' || c > '9') break;
 				if (c == '0' && width == 0)
 					zerofill = 1;
 				width = width * 10 + (c - '0');
 			}
-			if (!c) break;
+			if (f == format.end()) break;
 
-			/* get the format */
+			// get the format
+			c = *f++;
 			switch (c)
 			{
 				case '%':
-					*p++ = c;
+					stream << c;
 					break;
 
 				case 'X':
@@ -996,13 +1000,13 @@ int debugger_commands::mini_printf(char *buffer, const char *format, int params,
 					if (params == 0)
 					{
 						m_console.printf("Not enough parameters for format!\n");
-						return 0;
+						return false;
 					}
 					if (u32(*param >> 32) != 0)
-						p += sprintf(p, zerofill ? "%0*X" : "%*X", (width <= 8) ? 1 : width - 8, u32(*param >> 32));
+						util::stream_format(stream, zerofill ? "%0*X" : "%*X", (width <= 8) ? 1 : width - 8, u32(*param >> 32));
 					else if (width > 8)
-						p += sprintf(p, zerofill ? "%0*X" : "%*X", width - 8, 0);
-					p += sprintf(p, zerofill ? "%0*X" : "%*X", (width < 8) ? width : 8, u32(*param));
+						util::stream_format(stream, zerofill ? "%0*X" : "%*X", width - 8, 0);
+					util::stream_format(stream, zerofill ? "%0*X" : "%*X", (width < 8) ? width : 8, u32(*param));
 					param++;
 					params--;
 					break;
@@ -1012,23 +1016,23 @@ int debugger_commands::mini_printf(char *buffer, const char *format, int params,
 					if (params == 0)
 					{
 						m_console.printf("Not enough parameters for format!\n");
-						return 0;
+						return false;
 					}
 					if (u32(*param >> 60) != 0)
 					{
-						p += sprintf(p, zerofill ? "%0*o" : "%*o", (width <= 20) ? 1 : width - 20, u32(*param >> 60));
-						p += sprintf(p, "%0*o", 10, u32(BIT(*param, 30, 30)));
+						util::stream_format(stream, zerofill ? "%0*o" : "%*o", (width <= 20) ? 1 : width - 20, u32(*param >> 60));
+						util::stream_format(stream, "%0*o", 10, u32(BIT(*param, 30, 30)));
 					}
 					else
 					{
 						if (width > 20)
-							p += sprintf(p, zerofill ? "%0*o" : "%*o", width - 20, 0);
+							util::stream_format(stream, zerofill ? "%0*o" : "%*o", width - 20, 0);
 						if (u32(BIT(*param, 30, 30)) != 0)
-							p += sprintf(p, zerofill ? "%0*o" : "%*o", (width <= 10) ? 1 : width - 10, u32(BIT(*param, 30, 30)));
+							util::stream_format(stream, zerofill ? "%0*o" : "%*o", (width <= 10) ? 1 : width - 10, u32(BIT(*param, 30, 30)));
 						else if (width > 10)
-							p += sprintf(p, zerofill ? "%0*o" : "%*o", width - 10, 0);
+							util::stream_format(stream, zerofill ? "%0*o" : "%*o", width - 10, 0);
 					}
-					p += sprintf(p, zerofill ? "%0*o" : "%*o", (width < 10) ? width : 10, u32(BIT(*param, 0, 30)));
+					util::stream_format(stream, zerofill ? "%0*o" : "%*o", (width < 10) ? width : 10, u32(BIT(*param, 0, 30)));
 					param++;
 					params--;
 					break;
@@ -1038,9 +1042,9 @@ int debugger_commands::mini_printf(char *buffer, const char *format, int params,
 					if (params == 0)
 					{
 						m_console.printf("Not enough parameters for format!\n");
-						return 0;
+						return false;
 					}
-					p += sprintf(p, zerofill ? "%0*d" : "%*d", width, u32(*param));
+					util::stream_format(stream, zerofill ? "%0*d" : "%*d", width, u32(*param));
 					param++;
 					params--;
 					break;
@@ -1049,9 +1053,9 @@ int debugger_commands::mini_printf(char *buffer, const char *format, int params,
 					if (params == 0)
 					{
 						m_console.printf("Not enough parameters for format!\n");
-						return 0;
+						return false;
 					}
-					p += sprintf(p, "%c", char(*param));
+					stream << char(*param);
 					param++;
 					params--;
 					break;
@@ -1059,14 +1063,12 @@ int debugger_commands::mini_printf(char *buffer, const char *format, int params,
 			}
 		}
 
-		/* normal stuff */
+		// normal stuff
 		else
-			*p++ = c;
+			stream << c;
 	}
 
-	/* NULL-terminate and exit */
-	*p = 0;
-	return 1;
+	return true;
 }
 
 
@@ -1114,9 +1116,9 @@ void debugger_commands::execute_printf(const std::vector<std::string> &params)
 			return;
 
 	/* then do a printf */
-	char buffer[1024];
-	if (mini_printf(buffer, params[0].c_str(), params.size() - 1, &values[1]))
-		m_console.printf("%s\n", buffer);
+	std::ostringstream buffer;
+	if (mini_printf(buffer, params[0], params.size() - 1, &values[1]))
+		m_console.printf("%s\n", std::move(buffer).str());
 }
 
 
@@ -1133,9 +1135,9 @@ void debugger_commands::execute_logerror(const std::vector<std::string> &params)
 			return;
 
 	/* then do a printf */
-	char buffer[1024];
-	if (mini_printf(buffer, params[0].c_str(), params.size() - 1, &values[1]))
-		m_machine.logerror("%s", buffer);
+	std::ostringstream buffer;
+	if (mini_printf(buffer, params[0], params.size() - 1, &values[1]))
+		m_machine.logerror("%s", std::move(buffer).str());
 }
 
 
@@ -1152,9 +1154,9 @@ void debugger_commands::execute_tracelog(const std::vector<std::string> &params)
 			return;
 
 	/* then do a printf */
-	char buffer[1024];
-	if (mini_printf(buffer, params[0].c_str(), params.size() - 1, &values[1]))
-		m_console.get_visible_cpu()->debug()->trace_printf("%s", buffer);
+	std::ostringstream buffer;
+	if (mini_printf(buffer, params[0], params.size() - 1, &values[1]))
+		m_console.get_visible_cpu()->debug()->trace_printf("%s", std::move(buffer).str().c_str());
 }
 
 
@@ -1188,9 +1190,9 @@ void debugger_commands::execute_tracesym(const std::vector<std::string> &params)
 	}
 
 	// then do a printf
-	char buffer[1024];
-	if (mini_printf(buffer, format.str().c_str(), params.size(), values))
-		m_console.get_visible_cpu()->debug()->trace_printf("%s", buffer);
+	std::ostringstream buffer;
+	if (mini_printf(buffer, format.str(), params.size(), values))
+		m_console.get_visible_cpu()->debug()->trace_printf("%s", std::move(buffer).str().c_str());
 }
 
 
@@ -1356,6 +1358,56 @@ void debugger_commands::execute_go_privilege(const std::vector<std::string> &par
 
 	m_console.get_visible_cpu()->debug()->go_privilege((condition.is_empty()) ? "1" : condition.original_string());
 }
+
+
+/*-------------------------------------------------
+    execute_go_branch - execute gbt or gbf command
+-------------------------------------------------*/
+
+void debugger_commands::execute_go_branch(bool sense, const std::vector<std::string> &params)
+{
+	parsed_expression condition(m_console.visible_symtable());
+	if (params.size() > 0 && !debug_command_parameter_expression(params[0], condition))
+		return;
+
+	m_console.get_visible_cpu()->debug()->go_branch(sense, (condition.is_empty()) ? "1" : condition.original_string());
+}
+
+
+/*-------------------------------------------------
+    execute_go_next_instruction - execute gni command
+-------------------------------------------------*/
+
+void debugger_commands::execute_go_next_instruction(const std::vector<std::string> &params)
+{
+	u64 count = 1;
+
+	// if we have a parameter, use it instead */
+	if (params.size() > 0 && !validate_number_parameter(params[0], count))
+		return;
+	if (count == 0)
+		return;
+
+	device_state_interface *stateintf;
+	device_t *cpu = m_machine.debugger().console().get_visible_cpu();
+	if (!cpu->interface(stateintf))
+	{
+		m_console.printf("No state interface available for %s\n", cpu->name());
+		return;
+	}
+	u32 pc = stateintf->pcbase();
+
+	debug_disasm_buffer buffer(*cpu);
+	while (count-- != 0)
+	{
+		// disassemble the current instruction and get the length
+		u32 result = buffer.disassemble_info(pc);
+		pc = buffer.next_pc_wrap(pc, result & util::disasm_interface::LENGTHMASK);
+	}
+
+	cpu->debug()->go(pc);
+}
+
 
 /*-------------------------------------------------
     execute_next - execute the next command
@@ -2190,8 +2242,7 @@ void debugger_commands::execute_rplist(const std::vector<std::string> &params)
 
 void debugger_commands::execute_statesave(const std::vector<std::string> &params)
 {
-	const std::string &filename(params[0]);
-	m_machine.immediate_save(filename.c_str());
+	m_machine.immediate_save(params[0]);
 	m_console.printf("State save attempted.  Please refer to window message popup for results.\n");
 }
 
@@ -2202,8 +2253,7 @@ void debugger_commands::execute_statesave(const std::vector<std::string> &params
 
 void debugger_commands::execute_stateload(const std::vector<std::string> &params)
 {
-	const std::string &filename(params[0]);
-	m_machine.immediate_load(filename.c_str());
+	m_machine.immediate_load(params[0]);
 
 	// clear all PC & memory tracks
 	for (device_t &device : device_enumerator(m_machine.root_device()))
@@ -3395,7 +3445,7 @@ void debugger_commands::execute_find(int spacenum, const std::vector<std::string
 				data_size[data_count++] |= 0x10;
 
 			// otherwise, validate as a number
-			else if (!validate_number_parameter(params[i], data_to_find[data_count++]))
+			else if (!validate_number_parameter(pdata, data_to_find[data_count++]))
 				return;
 		}
 	}
@@ -4258,7 +4308,7 @@ void debugger_commands::execute_unmount(const std::vector<std::string> &params)
 
 void debugger_commands::execute_input(const std::vector<std::string> &params)
 {
-	m_machine.natkeyboard().post_coded(params[0].c_str());
+	m_machine.natkeyboard().post_coded(params[0]);
 }
 
 

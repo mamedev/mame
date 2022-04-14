@@ -59,6 +59,7 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 */
 
 #include "emu.h"
+
 #include "cpu/cop400/cop400.h"
 #include "cpu/tms9900/tms9995.h"
 #include "cpu/tms9900/tms9980a.h"
@@ -69,37 +70,14 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 #include "sound/dac.h"
 #include "sound/tms5220.h"
 #include "video/resnet.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
 
 
-/*************************************
- *
- *  Constants
- *
- *************************************/
-
-#define MAIN_CPU_CLOCK      (12000000)
-#define SOUND_CLOCK         (8000000)
-#define COP_CLOCK           (SOUND_CLOCK/2)     // unknown guess
-#define TMS_CLOCK           (640000)
-
-/* the schematics are very blurry here and don't actually specify the clock
-   values; however, everything else about the sync chain implies the standard
-   18.432MHz master clock, like is used in similar hardware of the time */
-#define MASTER_CLOCK        (18432000)
-
-#define PIXEL_CLOCK         (MASTER_CLOCK/3)
-
-#define HTOTAL              (384)
-#define HBEND               (0)
-#define HBSTART             (256)
-
-#define VTOTAL              (264)
-#define VBEND               (16)
-#define VBSTART             (224+16)
+namespace {
 
 
 /*************************************
@@ -173,10 +151,10 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_spriteram;
-	uint8_t m_cop_port_l;
+	uint8_t m_cop_port_l = 0;
 
 	// tilemaps
-	tilemap_t * m_bg_tilemap;
+	tilemap_t * m_bg_tilemap = nullptr;
 
 	required_device<tms9995_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -211,12 +189,10 @@ void looping_state::palette(palette_device &palette) const
 	// initialize the palette with these colors
 	for (int i = 0; i < 32; i++)
 	{
-		int bit0, bit1, bit2;
-
 		// red component
-		bit0 = BIT(color_prom[i], 0);
-		bit1 = BIT(color_prom[i], 1);
-		bit2 = BIT(color_prom[i], 2);
+		int bit0 = BIT(color_prom[i], 0);
+		int bit1 = BIT(color_prom[i], 1);
+		int bit2 = BIT(color_prom[i], 2);
 		int const r = combine_weights(rweights, bit0, bit1, bit2);
 
 		// green component
@@ -275,7 +251,7 @@ WRITE_LINE_MEMBER(looping_state::flip_screen_x_w)
 WRITE_LINE_MEMBER(looping_state::flip_screen_y_w)
 {
 	flip_screen_y_set(!state);
-	m_bg_tilemap->set_scrollx(0, flip_screen() ? 128 : 0);
+	m_bg_tilemap->set_scrollx(0, flip_screen() ? 256 : 0);
 }
 
 
@@ -294,14 +270,14 @@ void looping_state::colorram_w(offs_t offset, uint8_t data)
 	if (offset & 1)
 	{
 		// mark the whole column dirty
-		offs_t offs = (offset/2);
+		offs_t offs = (offset / 2);
 		for (int i = 0; i < 0x20; i++)
 			m_bg_tilemap->mark_tile_dirty(i * 0x20 + offs);
 	}
 
 	// even bytes are column scroll
 	else
-		m_bg_tilemap->set_scrolly(offset/2, data);
+		m_bg_tilemap->set_scrolly(offset / 2, data);
 }
 
 
@@ -314,9 +290,7 @@ void looping_state::colorram_w(offs_t offset, uint8_t data)
 
 void looping_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const uint8_t *source;
-
-	for (source = m_spriteram; source < m_spriteram + 0x40; source += 4)
+	for (const uint8_t *source = m_spriteram; source < m_spriteram + 0x40; source += 4)
 	{
 		int sx = source[3];
 		int sy = 240 - source[0];
@@ -337,7 +311,7 @@ void looping_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy, 0);
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, code, color, flipx, flipy, sx, sy, 0);
 	}
 }
 
@@ -414,8 +388,8 @@ WRITE_LINE_MEMBER(looping_state::souint_clr)
 
 WRITE_LINE_MEMBER(looping_state::spcint)
 {
-	logerror("Speech /int = %d\n", state==ASSERT_LINE? 1:0);
-	m_audiocpu->set_input_line(INT_9980A_LEVEL4, state==ASSERT_LINE? CLEAR_LINE : ASSERT_LINE);
+	logerror("Speech /int = %d\n", state == ASSERT_LINE ? 1 : 0);
+	m_audiocpu->set_input_line(INT_9980A_LEVEL4, state == ASSERT_LINE ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -545,6 +519,7 @@ uint8_t looping_state::protection_r()
 void looping_state::map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
+	map(0x7000, 0x7007).r(FUNC(looping_state::protection_r));
 
 	map(0x9000, 0x93ff).ram().w(FUNC(looping_state::videoram_w)).share(m_videoram);
 
@@ -607,8 +582,8 @@ static const gfx_layout sprite_layout =
 
 
 static GFXDECODE_START( gfx_looping )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x2_planar, 0, 8 )
-	GFXDECODE_ENTRY( "gfx1", 0, sprite_layout,    0, 8 )
+	GFXDECODE_ENTRY( "gfx", 0, gfx_8x8x2_planar, 0, 8 )
+	GFXDECODE_ENTRY( "gfx", 0, sprite_layout,    0, 8 )
 GFXDECODE_END
 
 
@@ -618,20 +593,21 @@ GFXDECODE_END
  *
  *************************************/
 
+
 void looping_state::looping(machine_config &config)
 {
 	// CPU TMS9995, standard variant; no line connections
-	TMS9995(config, m_maincpu, MAIN_CPU_CLOCK);
+	TMS9995(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &looping_state::map);
 	m_maincpu->set_addrmap(AS_IO, &looping_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(looping_state::interrupt));
 
 	// CPU TMS9980A for audio subsystem; no line connections
-	TMS9980A(config, m_audiocpu, SOUND_CLOCK);
+	TMS9980A(config, m_audiocpu, 8_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &looping_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &looping_state::sound_io_map);
 
-	cop420_cpu_device &cop(COP420(config, "mcu", COP_CLOCK));
+	cop420_cpu_device &cop(COP420(config, "mcu", 8_MHz_XTAL / 2)); // unknown guess
 	cop.set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false);
 	cop.write_l().set(FUNC(looping_state::cop_l_w));
 	cop.read_l().set(FUNC(looping_state::cop_unk_r));
@@ -653,7 +629,7 @@ void looping_state::looping(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0, 256, 264, 16, 224 + 16);
 	screen.set_screen_update(FUNC(looping_state::screen_update));
 	screen.set_palette(m_palette);
 
@@ -670,11 +646,11 @@ void looping_state::looping(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, INT_9980A_LEVEL2);
 
-	AY8910(config, m_aysnd, SOUND_CLOCK/4);
+	AY8910(config, m_aysnd, 8_MHz_XTAL / 4);
 	m_aysnd->port_a_read_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
 	m_aysnd->add_route(ALL_OUTPUTS, "speaker", 0.2);
 
-	TMS5220(config, m_tms, TMS_CLOCK);
+	TMS5220(config, m_tms, 640'000);
 	m_tms->irq_cb().set(FUNC(looping_state::spcint));
 	m_tms->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
@@ -718,10 +694,10 @@ static INPUT_PORTS_START( looping )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coin_B ) )     PORT_DIPLOCATION("DSW:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x0e, 0x02, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x0e, 0x02, DEF_STR( Coin_A ) )     PORT_DIPLOCATION("DSW:7,6,5")
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_3C ) )
@@ -730,14 +706,14 @@ static INPUT_PORTS_START( looping )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )      // Check code at 0x2c00
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW:4")  // Check code at 0x2c00
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Lives ) )      PORT_DIPLOCATION("DSW:3")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x20, "5" )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )
+	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "DSW:2" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )    PORT_DIPLOCATION("DSW:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
@@ -747,11 +723,11 @@ static INPUT_PORTS_START( skybump )
 	PORT_INCLUDE(looping)
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Lives ) )      PORT_DIPLOCATION("DSW:3,2")
 	PORT_DIPSETTING(    0x40, "3" )
 	PORT_DIPSETTING(    0x60, "5" )
 	PORT_DIPSETTING(    0x00, "Infinite (Cheat)")
-//  PORT_DIPSETTING(    0x20, "Infinite (Cheat)")
+	PORT_DIPSETTING(    0x20, "Infinite (Cheat)") // duplicate
 INPUT_PORTS_END
 
 
@@ -777,7 +753,7 @@ ROM_START( loopingv )
 	ROM_REGION( 0x0400, "mcu", 0 ) // COP420 microcontroller code
 	ROM_LOAD( "cop.bin",        0x0000, 0x0400, CRC(d47fecec) SHA1(7eeedcb40f4cd50e1e259c6b01744a3fc97b60aa) )
 
-	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_REGION( 0x1000, "gfx", 0 )
 	ROM_LOAD( "log2.8a",        0x0000, 0x800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
 	ROM_LOAD( "log1-9-3.6a",    0x0800, 0x800, CRC(c434c14c) SHA1(3669aaf7adc6b250378bcf62eb8e7058f55476ef) )
 
@@ -801,7 +777,7 @@ ROM_START( loopingva )
 	ROM_REGION( 0x0400, "mcu", 0 ) // COP420 microcontroller code
 	ROM_LOAD( "cop.bin",        0x0000, 0x0400, CRC(d47fecec) SHA1(7eeedcb40f4cd50e1e259c6b01744a3fc97b60aa) )
 
-	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_REGION( 0x1000, "gfx", 0 )
 	ROM_LOAD( "log2.8a",        0x0000, 0x800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
 	ROM_LOAD( "log1-9-3.6a",    0x0800, 0x800, CRC(c434c14c) SHA1(3669aaf7adc6b250378bcf62eb8e7058f55476ef) )
 
@@ -827,7 +803,7 @@ ROM_START( looping )
 	ROM_REGION( 0x0400, "mcu", 0 ) // COP420 microcontroller code
 	ROM_LOAD( "cop.bin",        0x0000, 0x0400, CRC(d47fecec) SHA1(7eeedcb40f4cd50e1e259c6b01744a3fc97b60aa) ) // taken from the other sets
 
-	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_REGION( 0x1000, "gfx", 0 )
 	ROM_LOAD( "loopaa8.bin",    0x0000, 0x800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
 	ROM_LOAD( "loopaa6.bin",    0x0800, 0x800, CRC(c434c14c) SHA1(3669aaf7adc6b250378bcf62eb8e7058f55476ef) )
 
@@ -850,7 +826,7 @@ ROM_START( skybump )
 	ROM_REGION( 0x0400, "mcu", 0 ) // COP420 microcontroller code
 	ROM_LOAD( "cop.bin",        0x0000, 0x0400, CRC(d47fecec) SHA1(7eeedcb40f4cd50e1e259c6b01744a3fc97b60aa) )
 
-	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_REGION( 0x1000, "gfx", 0 )
 	ROM_LOAD( "vid.8a",         0x0000, 0x800, CRC(459ccc55) SHA1(747f6789605b48be9e22f779f9e3f6c98ad4e594) )
 	ROM_LOAD( "vid.6a",         0x0800, 0x800, CRC(12ebbe74) SHA1(0f87c81a45d1bf3b8c6a70ee5e1a014069f67755) )
 
@@ -874,11 +850,10 @@ void looping_state::init_looping()
 	// bitswap the TMS9995 ROMs
 	for (int i = 0; i < length; i++)
 		rom[i] = bitswap<8>(rom[i], 0,1,2,3,4,5,6,7);
-
-	// install protection handlers
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7000, 0x7007, read8smo_delegate(*this, FUNC(looping_state::protection_r)));
 }
 
+
+} // Anonymous namespace
 
 
 /*************************************

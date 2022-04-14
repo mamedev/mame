@@ -130,8 +130,13 @@ uint8_t namco_51xx_device::R3_r()
 
 void namco_51xx_device::O_w(uint8_t data)
 {
-	uint8_t out = (data & 0x0f);
-	if (data & 0x10)
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_51xx_device::O_w_sync),this), data);
+}
+
+TIMER_CALLBACK_MEMBER( namco_51xx_device::O_w_sync )
+{
+	uint8_t out = (param & 0x0f);
+	if (param & 0x10)
 		m_portO = (m_portO & 0x0f) | (out << 4);
 	else
 		m_portO = (m_portO & 0xf0) | (out);

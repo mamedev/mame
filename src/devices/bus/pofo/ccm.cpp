@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "ccm.h"
 
+#include "softlist_dev.h"
+
 
 
 //**************************************************************************
@@ -46,7 +48,7 @@ device_portfolio_memory_card_slot_interface::device_portfolio_memory_card_slot_i
 portfolio_memory_card_slot_device::portfolio_memory_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PORTFOLIO_MEMORY_CARD_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_portfolio_memory_card_slot_interface>(mconfig, *this),
-	device_image_interface(mconfig, *this),
+	device_memcard_image_interface(mconfig, *this),
 	m_card(nullptr)
 {
 }
@@ -77,6 +79,16 @@ image_init_result portfolio_memory_card_slot_device::call_load()
 	}
 
 	return image_init_result::PASS;
+}
+
+
+//-------------------------------------------------
+//  get_software_list_loader -
+//-------------------------------------------------
+
+const software_list_loader &portfolio_memory_card_slot_device::get_software_list_loader() const
+{
+	return rom_software_list_loader::instance();
 }
 
 

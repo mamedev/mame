@@ -126,8 +126,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
-	virtual void mem_map(address_map &map) { };
-	virtual void io_map(address_map &map) { };
+	virtual void mem_map(address_map &map) { }
+	virtual void io_map(address_map &map) { }
 
 	required_device<address_map_bank_device> m_mem;
 	required_device<address_map_bank_device> m_io;

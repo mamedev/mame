@@ -94,7 +94,7 @@ TODO:
 #include "bus/rs232/rs232.h"
 #include "speaker.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 
 
 static constexpr XTAL MAIN_CLOCK = 15.9744_MHz_XTAL;

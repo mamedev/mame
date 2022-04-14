@@ -5,6 +5,8 @@
   this driver is for the single board version on the S-0087-011A-0 PCB
   for the version using a S-0086-002-B0 base PCB and separate video board see stfight.cpp
 
+  Video system is very similar to darkmist.cpp
+
   Custom Modules note:
 
   The Air Raid / Cross Shooter PCB contains 3 custom modules.
@@ -30,16 +32,12 @@
   The above information is based off a development board
   which was unfortunately stripped of all ROMs.
 
-  ---
+-----------------------------------------------------------------------
 
- TS 01.05.2006:
+  TODO:
+  - cshooter/airraid gfx, obviously
 
- - added sprites, bgmap reading and few fixes here and there
-   airraid and cshootere are a bit "playable" ;) without gfx
-
-Haze's notes
- - video system is very similar to darkmist.cpp
-
+-----------------------------------------------------------------------
 
 Stephh's notes (based on the game Z80 code and some tests) :
 
@@ -97,11 +95,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
       * 0xe237 : lives for player 1
       * 0xe238 : lives for player 2
 
-*/
-
-
-
-/*
+-----------------------------------------------------------------------
 
     Custom SIMM module placement
 
@@ -176,16 +170,17 @@ public:
 	{ }
 
 	void airraid(machine_config &config);
+	void airraide(machine_config &config);
 
-	void init_cshootere();
-	void init_cshooter();
+	void init_airraid();
+	void init_airraide();
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<seibu_sound_device> m_seibu_sound;
 	required_shared_ptr<uint8_t> m_mainram;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<uint8_t> m_decrypted_opcodes;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	required_device<airraid_video_device> m_airraid_video;
 	required_memory_bank m_mainbank;
 
@@ -211,7 +206,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(airraid_state::scanline)
 	if (scanline == 240) // updates scroll registers
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); // Z80 - RST 10h
 
-	if (scanline == 250) // vblank-out irq
+	if (scanline == 0) // vblank-out irq
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); // Z80 - RST 08h
 }
 
@@ -238,7 +233,6 @@ void airraid_state::bank_w(uint8_t data)
 
 	m_airraid_video->layer_enable_w(data & 0xcf);
 }
-
 
 
 
@@ -380,6 +374,47 @@ static INPUT_PORTS_START( airraid )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( failgate )
+	PORT_INCLUDE( airraid )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )      PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x06, 0x06, "Energy Consumption" )  PORT_DIPLOCATION("SW2:2,3")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x06, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )     PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )     PORT_DIPLOCATION("SW1:4,5,6")
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x28, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )
+INPUT_PORTS_END
+
 
 
 void airraid_state::airraid(machine_config &config)
@@ -387,7 +422,6 @@ void airraid_state::airraid(machine_config &config)
 	// basic machine hardware
 	Z80(config, m_maincpu, XTAL(12'000'000) / 2);        // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &airraid_state::main_map);
-	m_maincpu->set_addrmap(AS_OPCODES, &airraid_state::decrypted_opcodes_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(airraid_state::scanline), "airraid_vid:screen", 0, 1);
 
 	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(14'318'181) / 4));      // verified on PCB
@@ -418,6 +452,12 @@ void airraid_state::airraid(machine_config &config)
 	SEI80BU(config, "sei80bu", 0).set_device_rom_tag("audiocpu");
 }
 
+void airraid_state::airraide(machine_config &config)
+{
+	airraid(config);
+	m_maincpu->set_addrmap(AS_OPCODES, &airraid_state::decrypted_opcodes_map);
+}
+
 
 /*
 
@@ -438,7 +478,6 @@ TMM2015               TMM2015                                  x
 SEI0030BU          SEI0060BU                             sw1 xx xxxxx
                                    SEI80BU
                                    SEI0100BU(YM3931) YM3012
-
 */
 
 ROM_START( airraid )
@@ -491,7 +530,6 @@ ROM_START( airraid )
 ROM_END
 
 
-
 /*
 
 Cross Shooter
@@ -521,7 +559,6 @@ Note, all ROMs have official sticker, "(C) SEIBU KAIHATSU INC." and a number.
 4.g8   TMM24256 Mask   Sound (Samples?)
 5.g6   TMM2764         Sound program
 
-
 */
 
 ROM_START( cshooter )
@@ -538,7 +575,6 @@ ROM_START( cshooter )
 	ROM_REGION( 0x0200, "proms", 0 ) // this PCB type has different PROMs when compared to the cshootert hardware PCB where they were dumped
 	ROM_LOAD( "pr.c19",  0x0000, 0x0200, NO_DUMP )
 	ROM_LOAD( "6308.a13",  0x0000, 0x0100, NO_DUMP )
-
 
 	ROM_REGION( 0x02000, "airraid_vid:tx_gfx",  0 ) // TX Layer
 	ROM_LOAD( "3.f11",   0x00000, 0x02000, CRC(67b50a47) SHA1(b1f4aefc9437edbeefba5371149cc08c0b55c741) )
@@ -575,13 +611,64 @@ ROM_START( cshooter )
 ROM_END
 
 
+/*
 
-void airraid_state::init_cshooter()
+Fail Gate
+
+On Air Raid board, for black Seibu type only, not for green Taito type
+Sold as conversion kit with install instructions (Japanese) + ROM chips + riser boards
+3 large black packages on board are removed to install 3 riser boards SEI4BACK0 + SEI4BACK1 + SEI4OBJ
+SEI004OBU pins bridged with flying wire + other wires on board reverse side
+
+*/
+
+ROM_START( failgate )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "fail.k19",   0x00000, 0x08000,  CRC(b8ed4b0d) SHA1(9e204b7213625f0e17f87061fdcbe79a056b0986) )
+
+	ROM_REGION( 0x10000, "maindata", 0 )
+	ROM_LOAD( "fail.k20",   0x00000, 0x10000, CRC(893132a0) SHA1(2893d235130903b65be6a17e0f32b70e8c8fea73) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // on main board
+	ROM_LOAD( "fail.f6",    0x00000, 0x02000, CRC(9cb6e402) SHA1(089c6c186dc4816cc33207e5762c2721012041fa) )
+	ROM_LOAD( "fail.f7",    0x08000, 0x08000, CRC(9d74085e) SHA1(8309ec3258590beaec342b4689a0d36c26137ed1) )
+
+	ROM_REGION( 0x02000, "airraid_vid:tx_gfx", 0 )
+	ROM_LOAD( "fail.f11",        0x00000, 0x02000, CRC(845047d0) SHA1(b39b402724ab2b486a4e32ca20e6cd289e354433) )
+	ROM_REGION( 0x100, "airraid_vid:tx_clut", 0 )
+	ROM_LOAD( "fail.d16",        0x00000, 0x00100, CRC(c784cc55) SHA1(acb053d5f353b68139456eac472dc9f7542df042) )
+
+	// on riser board SEI4BACK1 with SEI001OBU + buffer RAM + other component
+	ROM_REGION( 0x40000, "airraid_vid:bg_map", 0 )
+	ROM_LOAD( "back1.fail.1c",   0x00000, 0x40000, CRC(de6bb59b) SHA1(ca991c7d0d4f30b6f499fb2133fc3054fa9d8953) )
+	ROM_REGION( 0x40000, "airraid_vid:bg_gfx", 0 )
+	ROM_LOAD( "back1.fail.1b",   0x00000, 0x40000, CRC(0421b0f7) SHA1(aeb78f05bb956cbec0ad9d45f24914177a48e15a) )
+	ROM_REGION( 0x100, "airraid_vid:bg_clut", 0 )
+	ROM_LOAD( "back1.fail.2b",   0x00000, 0x00100, CRC(36eead99) SHA1(cc934605c0cfc39abbab65bdc18fbb1d48ffdace) )
+
+	// on riser board SEI4BACK0 with SEI001OBU + buffer RAM + other component
+	ROM_REGION( 0x10000, "airraid_vid:fg_map", 0 )
+	ROM_LOAD( "back0.fail.1c",   0x00000, 0x10000, CRC(71aae804) SHA1(d8c217364fede3db132849c76a09f28b701c045c) )
+	ROM_REGION( 0x40000, "airraid_vid:fg_gfx", 0 )
+	ROM_LOAD( "back0.fail.1b",   0x00000, 0x40000, CRC(a80066d6) SHA1(77a97b14b1f27f9b043e93f25dca427d6412bfdd) )
+	ROM_REGION( 0x100, "airraid_vid:fg_clut", 0 )
+	ROM_LOAD( "back0.fail.2b",   0x00000, 0x00100, CRC(dbb1709f) SHA1(4b82776bc0d852070a3187ee263513a73c03fac8) )
+
+	// on riser board SEI4OBJ with SEI001OBU + buffer RAM + other component
+	ROM_REGION( 0x20000, "airraid_vid:spr_gfx", 0 )
+	ROM_LOAD( "obj.fail.1a",   0x00000, 0x20000, CRC(b32f1357) SHA1(92514eeb45ceef3463de741bc19da85737da8e1e) )
+	ROM_REGION( 0x100, "airraid_vid:spr_clut", 0 )
+	ROM_LOAD( "obj.fail.2a",   0x00000, 0x00100, CRC(5d11f0de) SHA1(c3d16395fd1b3f5501c73fd658a67a7ba91492ae) )
+ROM_END
+
+
+
+void airraid_state::init_airraid()
 {
 	m_mainbank->configure_entries(0, 4, memregion("maindata")->base(), 0x4000);
 }
 
-void airraid_state::init_cshootere()
+void airraid_state::init_airraide()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -610,12 +697,14 @@ void airraid_state::init_cshootere()
 			rom[A] = bitswap<8>(rom[A], 7, 6, 1, 4, 3, 2, 5, 0);
 	}
 
-	init_cshooter();
+	init_airraid();
 }
 
 } // Anonymous namespace
 
 
 // There's also an undumped International Games version
-GAME( 1987, cshooter, airraid, airraid, airraid, airraid_state, init_cshootere, ROT270, "Seibu Kaihatsu (J.K.H. license)", "Cross Shooter (Single PCB)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, airraid,  0,       airraid, airraid, airraid_state, init_cshootere, ROT270, "Seibu Kaihatsu",                  "Air Raid (Single PCB)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1987, cshooter, airraid, airraide, airraid,  airraid_state, init_airraide, ROT270, "Seibu Kaihatsu (J.K.H. license)",  "Cross Shooter (Single PCB)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, airraid,  0,       airraide, airraid,  airraid_state, init_airraide, ROT270, "Seibu Kaihatsu",                   "Air Raid (Single PCB)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+
+GAME( 1991, failgate, 0,       airraid,  failgate, airraid_state, init_airraid,  ROT270, "Success (Seibu Kaihatsu license)", "Fail Gate",                  MACHINE_SUPPORTS_SAVE ) // Seibu version of Final Gate (C) 1990 Success

@@ -161,35 +161,33 @@ glsl_shader_info *glsl_shader_init(osd_gl_context *gl_ctx)
 	#endif
 	}
 	if (err) return nullptr;
-	return (glsl_shader_info *) malloc(sizeof(glsl_shader_info *));
+	return new glsl_shader_info{ 0 };
 }
 
 int glsl_shader_free(glsl_shader_info *shinfo)
 {
-	int i,j;
-
 	pfn_glUseProgramObjectARB(0); // back to fixed function pipeline
 		glFinish();
 
-	for (i=0; i<GLSL_VERTEX_SHADER_MAX_NUMBER+9; i++)
+	for (int i=0; i<GLSL_VERTEX_SHADER_MAX_NUMBER+9; i++)
 	{
 		if ( glsl_mamebm_vsh_shader[i] )
 			(void) gl_delete_shader(nullptr,  &glsl_mamebm_vsh_shader[i], nullptr);
 	}
 
-	for (j=0; j<GLSL_SHADER_FEAT_MAX_NUMBER+9; j++)
+	for (int j=0; j<GLSL_SHADER_FEAT_MAX_NUMBER+9; j++)
 	{
 		if ( glsl_mamebm_fsh_shader[j] )
 			(void) gl_delete_shader(nullptr, nullptr, &glsl_mamebm_fsh_shader[j]);
 	}
 
-	for (j=0; j<GLSL_SHADER_FEAT_MAX_NUMBER+9; j++)
+	for (int j=0; j<GLSL_SHADER_FEAT_MAX_NUMBER+9; j++)
 	{
 		if ( glsl_mamebm_programs[j] )
 			(void) gl_delete_shader( &glsl_mamebm_programs[j], nullptr, nullptr);
 	}
 
-	for (i=0; i<10; i++)
+	for (int i=0; i<10; i++)
 	{
 		if ( glsl_scrn_vsh_shader[i] )
 			(void) gl_delete_shader(nullptr,  &glsl_scrn_vsh_shader[i], nullptr);
@@ -199,7 +197,7 @@ int glsl_shader_free(glsl_shader_info *shinfo)
 			(void) gl_delete_shader( &glsl_scrn_programs[i], nullptr, nullptr);
 	}
 
-	free(shinfo);
+	delete shinfo;
 	return 0;
 }
 

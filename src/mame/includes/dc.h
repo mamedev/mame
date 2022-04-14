@@ -1,36 +1,38 @@
 // license:LGPL-2.1+
 // copyright-holders:Angelo Salese, Olivier Galibert, David Haywood, Samuele Zannoli, R. Belmont, ElSemi
-/*
 
-    dc.h - Sega Dreamcast includes
-
-*/
 #ifndef MAME_INCLUDES_DC_H
 #define MAME_INCLUDES_DC_H
 
 #pragma once
 
-#include "video/powervr2.h"
+#include "cpu/sh/sh4.h"
+#include "cpu/arm7/arm7core.h"
+#include "cpu/arm7/arm7.h"
 #include "machine/naomig1.h"
+#include "machine/dc_g2if.h"
 #include "machine/maple-dc.h"
 #include "machine/timer.h"
 #include "sound/aica.h"
+#include "video/powervr2.h"
 
 class dc_state : public driver_device
 {
-	public:
-		dc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		dc_framebuffer_ram(*this, "frameram"),
-		dc_texture_ram(*this, "dc_texture_ram"),
-		dc_sound_ram(*this, "dc_sound_ram"),
-		dc_ram(*this, "dc_ram"),
-		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu"),
-		m_powervr2(*this, "powervr2"),
-		m_maple(*this, "maple_dc"),
-		m_naomig1(*this, "rom_board"),
-		m_aica(*this, "aica") { }
+public:
+	dc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, dc_framebuffer_ram(*this, "frameram")
+		, dc_texture_ram(*this, "dc_texture_ram")
+		, dc_sound_ram(*this, "dc_sound_ram")
+		, dc_ram(*this, "dc_ram")
+		, m_maincpu(*this, "maincpu")
+		, m_soundcpu(*this, "soundcpu")
+		, m_powervr2(*this, "powervr2")
+		, m_maple(*this, "maple_dc")
+		, m_naomig1(*this, "rom_board")
+		, m_g2if(*this, "sb_g2if")
+		, m_aica(*this, "aica")
+	{ }
 
 	required_shared_ptr<uint64_t> dc_framebuffer_ram; // '32-bit access area'
 	required_shared_ptr<uint64_t> dc_texture_ram; // '64-bit access area'
@@ -39,31 +41,19 @@ class dc_state : public driver_device
 	required_shared_ptr<uint64_t> dc_ram;
 
 	/* machine related */
-	uint32_t dc_sysctrl_regs[0x200/4];
-	uint32_t g1bus_regs[0x100/4]; // DC-only
-	uint32_t g2bus_regs[0x100/4];
-	uint8_t m_armrst;
-
-	struct {
-		uint32_t g2_addr;
-		uint32_t root_addr;
-		uint32_t size;
-		uint8_t dir;
-		uint8_t flag;
-		uint8_t indirect;
-		uint8_t start;
-		uint8_t sel;
-	} m_g2_dma[4];
+	uint32_t dc_sysctrl_regs[0x200/4]{};
+	uint8_t m_armrst = 0U;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	TIMER_CALLBACK_MEMBER(g2_dma_irq);
+	void g2_dma_end_w(offs_t channel, u8 state);
+	void g2_dma_error_ia_w(offs_t channel, u8 state);
+	void g2_dma_error_ov_w(offs_t channel, u8 state);
 	TIMER_CALLBACK_MEMBER(ch2_dma_irq);
 	uint32_t dc_aica_reg_r(offs_t offset, uint32_t mem_mask = ~0);
 	void dc_aica_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t dc_arm_aica_r(offs_t offset);
 	void dc_arm_aica_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void g2_dma_execute(address_space &space, int channel);
 	inline int decode_reg32_64(uint32_t offset, uint64_t mem_mask, uint64_t *shift);
 	inline int decode_reg3216_64(uint32_t offset, uint64_t mem_mask, uint64_t *shift);
 	int dc_compute_interrupt_level();
@@ -73,8 +63,6 @@ class dc_state : public driver_device
 	void dc_sysctrl_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	uint64_t dc_gdrom_r(offs_t offset, uint64_t mem_mask = ~0);
 	void dc_gdrom_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
-	uint64_t dc_g2_ctrl_r(offs_t offset, uint64_t mem_mask = ~0);
-	void dc_g2_ctrl_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	uint64_t dc_modem_r(offs_t offset, uint64_t mem_mask = ~0);
 	void dc_modem_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	void g1_irq(uint8_t data);
@@ -92,6 +80,7 @@ class dc_state : public driver_device
 	required_device<powervr2_device> m_powervr2;
 	required_device<maple_dc_device> m_maple;
 	optional_device<naomi_g1_device> m_naomig1;
+	required_device<dc_g2if_device> m_g2if;
 	required_device<aica_device> m_aica;
 
 	void generic_dma(uint32_t main_adr, void *dma_ptr, uint32_t length, uint32_t size, bool to_mainram);
@@ -101,6 +90,9 @@ class dc_state : public driver_device
 	void naomi_aw_base(machine_config &config);
 	void aica_map(address_map &map);
 	void dc_audio_map(address_map &map);
+
+protected:
+	void system_bus_config(machine_config &config, const char *cpu_tag);
 };
 
 /*--------- Ch2-DMA Control Registers ----------*/

@@ -154,8 +154,8 @@ private:
 	struct namcos22_scenenode *m_scenenode_cur;
 	std::list<namcos22_scenenode> m_scenenode_alloc;
 
-	float m_clipx;
-	float m_clipy;
+	float m_clipx = 0.0;
+	float m_clipy = 0.0;
 	rectangle m_cliprect;
 
 	inline u8 nthbyte(const u32 *src, int n) { return (src[n / 4] << ((n & 3) * 8)) >> 24; }
@@ -255,7 +255,7 @@ public:
 	int m_fog_r_per_cztype[4];
 	int m_fog_g_per_cztype[4];
 	int m_fog_b_per_cztype[4];
-	u16 m_czattr[8];
+	u16 m_czattr[8] = { };
 
 	required_device<palette_device> m_palette;
 	optional_shared_ptr<u32> m_czram;
@@ -428,74 +428,74 @@ protected:
 	output_finder<16> m_mcu_out;
 	output_finder<8> m_cpuled_out;
 
-	u8 m_syscontrol[0x20];
-	bool m_dsp_irq_enabled;
-	u16 m_dsp_master_bioz;
+	u8 m_syscontrol[0x20] = { };
+	bool m_dsp_irq_enabled = false;
+	u16 m_dsp_master_bioz = 0;
 	std::unique_ptr<u32[]> m_pointram;
-	int m_old_coin_state;
-	u32 m_credits1;
-	u32 m_credits2;
-	u32 m_point_address;
-	u32 m_point_data;
-	u16 m_SerialDataSlaveToMasterNext;
-	u16 m_SerialDataSlaveToMasterCurrent;
-	int m_RenderBufSize;
-	u16 m_RenderBufData[NAMCOS22_MAX_RENDER_CMD_SEQ];
-	u16 m_portbits[2];
-	int m_irq_state;
-	int m_irq_enabled;
+	int m_old_coin_state = 0;
+	u32 m_credits1 = 0;
+	u32 m_credits2 = 0;
+	u32 m_point_address = 0;
+	u32 m_point_data = 0;
+	u16 m_SerialDataSlaveToMasterNext = 0;
+	u16 m_SerialDataSlaveToMasterCurrent = 0;
+	int m_RenderBufSize = 0;
+	u16 m_RenderBufData[NAMCOS22_MAX_RENDER_CMD_SEQ] = { };
+	u16 m_portbits[2] = { };
+	int m_irq_state = 0;
+	int m_irq_enabled = 0;
 	namcos22_dsp_upload_state m_dsp_upload_state;
-	int m_UploadDestIdx;
-	u32 m_cpuled_data;
-	u16 m_su_82;
-	u16 m_keycus_id;
-	u16 m_keycus_rng;
-	int m_gametype;
-	int m_cz_adjust;
+	int m_UploadDestIdx = 0;
+	u32 m_cpuled_data = 0;
+	u16 m_su_82 = 0;
+	u16 m_keycus_id = 0;
+	u16 m_keycus_rng = 0;
+	int m_gametype = 0;
+	int m_cz_adjust = 0;
 	std::unique_ptr<namcos22_renderer> m_poly;
-	u16 m_dspram_bank;
-	u16 m_dspram16_latch;
-	bool m_slave_simulation_active;
-	int m_absolute_priority;
-	int m_objectshift;
-	float m_viewmatrix[4][4];
-	u8 m_reflection;
-	bool m_cullflip;
-	u8 m_LitSurfaceInfo[NAMCOS22_MAX_LIT_SURFACES];
-	int m_SurfaceNormalFormat;
-	unsigned m_LitSurfaceCount;
-	unsigned m_LitSurfaceIndex;
-	int m_pointrom_size;
+	u16 m_dspram_bank = 0;
+	u16 m_dspram16_latch = 0;
+	bool m_slave_simulation_active = false;
+	int m_absolute_priority = 0;
+	int m_objectshift = 0;
+	float m_viewmatrix[4][4] = { };
+	u8 m_reflection = 0;
+	bool m_cullflip = false;
+	u8 m_LitSurfaceInfo[NAMCOS22_MAX_LIT_SURFACES] = { };
+	int m_SurfaceNormalFormat = 0;
+	unsigned m_LitSurfaceCount = 0;
+	unsigned m_LitSurfaceIndex = 0;
+	int m_pointrom_size = 0;
 	std::unique_ptr<s32[]> m_pointrom;
 	std::unique_ptr<u8[]> m_dirtypal;
 	std::unique_ptr<bitmap_ind16> m_mix_bitmap;
 	tilemap_t *m_bgtilemap;
-	u16 m_tilemapattr[8];
+	u16 m_tilemapattr[8] = { };
 
-	int m_spot_factor;
-	int m_text_palbase;
-	int m_bg_palbase;
+	int m_spot_factor = 0;
+	int m_text_palbase = 0;
+	int m_bg_palbase = 0;
 
-	float m_camera_zoom;
-	float m_camera_vx;
-	float m_camera_vy;
-	float m_camera_vu;
-	float m_camera_vd;
-	float m_camera_vl;
-	float m_camera_vr;
-	float m_camera_lx; // unit vector for light direction
-	float m_camera_ly; // "
-	float m_camera_lz; // "
-	int m_camera_ambient; // 0.0..1.0
-	int m_camera_power;   // 0.0..1.0
+	float m_camera_zoom = 0.0f;
+	float m_camera_vx = 0.0f;
+	float m_camera_vy = 0.0f;
+	float m_camera_vu = 0.0f;
+	float m_camera_vd = 0.0f;
+	float m_camera_vl = 0.0f;
+	float m_camera_vr = 0.0f;
+	float m_camera_lx = 0.0f; // unit vector for light direction
+	float m_camera_ly = 0.0f; // "
+	float m_camera_lz = 0.0f; // "
+	int m_camera_ambient = 0; // 0.0..1.0
+	int m_camera_power = 0;   // 0.0..1.0
 
-	bool m_skipped_this_frame;
+	bool m_skipped_this_frame = false;
 	void render_frame_active();
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
-	bool m_pdp_render_done;
-	bool m_render_refresh;
-	uint64_t m_pdp_frame;
-	u16 m_pdp_base;
+	bool m_pdp_render_done = false;
+	bool m_render_refresh = false;
+	uint64_t m_pdp_frame = 0;
+	u16 m_pdp_base = 0;
 };
 
 class namcos22s_state : public namcos22_state
@@ -591,17 +591,17 @@ private:
 	optional_device<timer_device> m_pc_pedal_interrupt;
 	optional_device_array<timer_device, 2> m_ar_tb_interrupt;
 
-	int m_spotram_enable;
-	int m_spotram_address;
+	int m_spotram_enable = 0;
+	int m_spotram_address = 0;
 	std::unique_ptr<u16[]> m_spotram;
 	std::unique_ptr<u16[]> m_banked_czram[4];
 	u32 m_cz_was_written[4];
 
-	u32 m_alpinesa_protection;
-	int m_motor_status;
-	u8 m_mcu_iocontrol;
-	u8 m_mcu_outdata;
-	int m_chipselect;
+	u32 m_alpinesa_protection = 0;
+	int m_motor_status = 0;
+	u8 m_mcu_iocontrol = 0;
+	u8 m_mcu_outdata = 0;
+	int m_chipselect = 0;
 };
 
 #endif // MAME_INCLUDES_NAMCOS22_H

@@ -212,7 +212,7 @@ void atari_vad_device::device_reset()
 //  calbacks
 //-------------------------------------------------
 
-void atari_vad_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void atari_vad_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

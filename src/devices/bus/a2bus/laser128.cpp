@@ -43,8 +43,7 @@ void a2bus_laser128_device::device_add_mconfig(machine_config &config)
 
 a2bus_laser128_device::a2bus_laser128_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	device_a2bus_card_interface(mconfig, *this), m_rom(nullptr), m_slot7_bank(0), m_slot7_ram_bank(0)
-
+	device_a2bus_card_interface(mconfig, *this), m_rom(nullptr), m_slot7_bank(0), m_bParPrinter(false), m_slot7_ram_bank(0)
 {
 }
 
@@ -86,6 +85,11 @@ void a2bus_laser128_device::write_c0nx(uint8_t offset, uint8_t data)
 
 uint8_t a2bus_laser128_device::read_cnxx(uint8_t offset)
 {
+	if ((!m_bParPrinter) && (slotno() == 1))
+	{
+		return m_rom[offset + 0x5100];
+	}
+
 	return m_rom[offset + (slotno() * 0x100) + 0x4000];
 }
 

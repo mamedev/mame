@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "sv801.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "formats/svi_dsk.h"
 
 

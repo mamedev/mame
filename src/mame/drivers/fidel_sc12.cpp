@@ -55,7 +55,7 @@ If control Q4 is set, printer data can be read from I0.
 #include "sound/dac.h"
 #include "video/pwm.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 // internal artwork

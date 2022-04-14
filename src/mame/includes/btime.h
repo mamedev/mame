@@ -55,19 +55,19 @@ public:
 
 	/* video-related */
 	std::unique_ptr<bitmap_ind16> m_background_bitmap;
-	uint8_t    m_btime_palette;
-	uint8_t    m_bnj_scroll1;
-	uint8_t    m_bnj_scroll2;
-	uint8_t    m_btime_tilemap[4];
+	uint8_t    m_btime_palette = 0;
+	uint8_t    m_bnj_scroll1 = 0;
+	uint8_t    m_bnj_scroll2 = 0;
+	uint8_t    m_btime_tilemap[4]{};
 
 	/* audio-related */
-	uint8_t    m_audio_nmi_enable_type;
+	uint8_t    m_audio_nmi_enable_type = 0;
 
 	/* protection-related (for mmonkey) */
-	int      m_protection_command;
-	int      m_protection_status;
-	int      m_protection_value;
-	int      m_protection_ret;
+	int      m_protection_command = 0;
+	int      m_protection_status = 0;
+	int      m_protection_value = 0;
+	int      m_protection_ret = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

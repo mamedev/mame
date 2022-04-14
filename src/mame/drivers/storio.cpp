@@ -30,7 +30,7 @@
 #include "bus/generic/carts.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 class vtech_storio_state : public driver_device

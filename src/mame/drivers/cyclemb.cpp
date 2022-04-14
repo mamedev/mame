@@ -113,23 +113,23 @@ public:
 	optional_ioport_array<2> m_dial;
 	struct
 	{
-		uint8_t current_value;
-		bool reverse;
+		uint8_t current_value = 0;
+		bool reverse = false;
 	} m_dial_status[2];
 
 	struct
 	{
-		uint8_t rxd;
-		uint8_t txd;
-		uint8_t rst;
-		uint8_t state;
-		uint8_t packet_type;
+		uint8_t rxd = 0;
+		uint8_t txd = 0;
+		uint8_t rst = 0;
+		uint8_t state = 0;
+		uint8_t packet_type = 0;
 	} m_mcu[2];
 
-	uint16_t m_dsw_pc_hack;
-	bool m_use_dial;
-	bool m_screen_display;
-	int m_sprite_page;
+	uint16_t m_dsw_pc_hack = 0;
+	bool m_use_dial = false;
+	bool m_screen_display = false;
+	int m_sprite_page = 0;
 
 	void cyclemb_bankswitch_w(uint8_t data);
 	void skydest_bankswitch_w(uint8_t data);
@@ -867,10 +867,10 @@ static INPUT_PORTS_START( skydest )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P1_1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P2_0")
@@ -881,10 +881,10 @@ static INPUT_PORTS_START( skydest )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P2_1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW1")

@@ -52,7 +52,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	required_device<hp_dc100_tape_device> m_tape;
@@ -110,6 +110,7 @@ private:
 	bool is_at_slow_speed() const;
 	void start_rd();
 	void start_wr();
+	bool adv_bit_idx();
 	void update_checksum(uint16_t data);
 	void cmd_fsm();
 	static uint8_t get_cmd(uint16_t cmd_reg);

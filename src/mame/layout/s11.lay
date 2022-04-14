@@ -75,7 +75,7 @@ copyright-holders:Robbbert
 			<bounds left="280" top="200" right="300" bottom="239" />
 		</element>
 		<element name="digit60" ref="diag">
-			<bounds left="220" top="200" right="244" bottom="239" />
+			<bounds left="220" top="200" right="232" bottom="219" />
 		</element>
 		<element name="digit0" ref="ldigit">
 			<bounds left="310" top="200" right="330" bottom="239" />

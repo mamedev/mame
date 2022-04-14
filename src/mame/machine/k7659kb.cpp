@@ -224,7 +224,7 @@ void k7659_keyboard_device::device_reset()
 	m_timer->adjust(attotime::from_hz(200), 0, attotime::from_hz(200));
 }
 
-void k7659_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void k7659_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	uint8_t retVal = 0;//m_lookup;
 	uint8_t a1 = ioport("A1")->read();

@@ -73,13 +73,13 @@ private:
 	required_ioport m_dsw2;
 
 	/* video-related */
-	tilemap_t     *m_tilemap[3];
-	u32      m_spr_buffered_tilebank[2];
+	tilemap_t     *m_tilemap[3]{};
+	u32      m_spr_buffered_tilebank[2]{};
 
 	/* misc */
-	emu_timer   *m_level_1_interrupt_timer;
-	emu_timer   *m_vblank_interrupt_timer;
-	emu_timer   *m_raster_interrupt_timer;
+	emu_timer   *m_level_1_interrupt_timer = nullptr;
+	emu_timer   *m_vblank_interrupt_timer = nullptr;
+	emu_timer   *m_raster_interrupt_timer = nullptr;
 
 	u8 snd_020_r(offs_t offset);
 	void snd_020_w(offs_t offset, u8 data, u8 mem_mask = ~0);
@@ -107,7 +107,7 @@ private:
 	void fuuki32_sound_io_map(address_map &map);
 	void fuuki32_sound_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 #endif // MAME_INCLUDES_FUUKIFG3_H

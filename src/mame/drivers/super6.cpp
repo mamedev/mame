@@ -23,7 +23,7 @@ ToDo:
 #include "bus/rs232/rs232.h"
 //#include "bus/s100/s100.h"
 #include "includes/super6.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 //**************************************************************************
 //  MEMORY BANKING
@@ -371,7 +371,7 @@ void super6_state::io_write_byte(offs_t offset, uint8_t data)
 
 
 //-------------------------------------------------
-//  floppy_format_type floppy_formats
+//  floppy_formats
 //-------------------------------------------------
 
 static void super6_floppies(device_slot_interface &device)

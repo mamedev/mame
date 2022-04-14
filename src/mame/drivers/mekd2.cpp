@@ -115,12 +115,12 @@ private:
 
 	void mem_map(address_map &map);
 
-	uint8_t m_cass_data[4];
-	uint8_t m_segment;
-	uint8_t m_digit;
-	uint8_t m_keydata;
-	bool m_cassbit;
-	bool m_cassold;
+	uint8_t m_cass_data[4]{};
+	uint8_t m_segment = 0U;
+	uint8_t m_digit = 0U;
+	uint8_t m_keydata = 0U;
+	bool m_cassbit = 0;
+	bool m_cassold = 0;
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia_s;

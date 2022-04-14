@@ -26,8 +26,6 @@
 #include "hd61700.h"
 #include "hd61700d.h"
 
-#include "debugger.h"
-
 
 // internal ROM
 #define INT_ROM                 0x0c00
@@ -230,7 +228,7 @@ void hd61700_cpu_device::device_reset()
 //-------------------------------------------------
 //  device_timer - handler timer events
 //-------------------------------------------------
-void hd61700_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void hd61700_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{

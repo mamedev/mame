@@ -164,7 +164,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	enum base_addr
@@ -370,10 +370,10 @@ private:
 	devcb_write_line::array<4> m_gpio_out;
 
 	// Registers
-	uint32_t    m_mcfg;
-	uint32_t    m_mref;
-	uint32_t    m_mcntl;
-	uint32_t    m_reset;
+	uint32_t    m_mcfg = 0;
+	uint32_t    m_mref = 0;
+	uint32_t    m_mcntl = 0;
+	uint32_t    m_reset = 0;
 };
 
 
@@ -400,7 +400,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	enum timer_id
@@ -525,7 +525,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 

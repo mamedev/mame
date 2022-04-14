@@ -44,7 +44,7 @@
 
 ***************************************************************************/
 
-void mrdo_state::mrdo_palette(palette_device &palette) const
+void mrdo_state::palette_init(palette_device &palette) const
 {
 	constexpr int R1 = 150;
 	constexpr int R2 = 120;
@@ -179,25 +179,26 @@ void mrdo_state::video_start()
 
 ***************************************************************************/
 
-void mrdo_state::mrdo_bgvideoram_w(offs_t offset, uint8_t data)
+void mrdo_state::bgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-void mrdo_state::mrdo_fgvideoram_w(offs_t offset, uint8_t data)
+void mrdo_state::fgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
+
+	protection_w(data);
 }
 
-
-void mrdo_state::mrdo_scrollx_w(uint8_t data)
+void mrdo_state::scrollx_w(uint8_t data)
 {
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
-void mrdo_state::mrdo_scrolly_w(uint8_t data)
+void mrdo_state::scrolly_w(uint8_t data)
 {
 	/* This is NOT affected by flipscreen (so stop it happening) */
 	if (m_flipscreen)
@@ -207,11 +208,10 @@ void mrdo_state::mrdo_scrolly_w(uint8_t data)
 }
 
 
-void mrdo_state::mrdo_flipscreen_w(uint8_t data)
+void mrdo_state::flipscreen_w(uint8_t data)
 {
 	/* bits 1-3 control the playfield priority, but they are not used by */
 	/* Mr. Do! so we don't emulate them */
-
 	m_flipscreen = data & 0x01;
 	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 }
@@ -224,19 +224,16 @@ void mrdo_state::mrdo_flipscreen_w(uint8_t data)
 
 ***************************************************************************/
 
-void mrdo_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
+void mrdo_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	uint8_t *spriteram = m_spriteram;
-	int offs;
-
-	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
-		if (spriteram[offs + 1] != 0)
+		if (m_spriteram[offs + 1] != 0)
 		{
 			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
-					spriteram[offs], spriteram[offs + 2] & 0x0f,
-					spriteram[offs + 2] & 0x10, spriteram[offs + 2] & 0x20,
-					spriteram[offs + 3], 256 - spriteram[offs + 1], 0);
+					m_spriteram[offs], m_spriteram[offs + 2] & 0x0f,
+					m_spriteram[offs + 2] & 0x10, m_spriteram[offs + 2] & 0x20,
+					m_spriteram[offs + 3], 256 - m_spriteram[offs + 1], 0);
 		}
 	}
 }

@@ -19,6 +19,7 @@
 #include <fstream>
 #include <ios>
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <type_traits>
 #include <vector>

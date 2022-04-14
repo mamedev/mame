@@ -1842,10 +1842,10 @@ GAME( 1998, hngmnjpmd, hngmnjpm, impact_video, hngmnjpm, jpmimpct_video_state, e
 GAME( 1999, coronatn,  0,        impact_video, coronatn, jpmimpct_video_state, empty_init, ROT0, "JPM", "Coronation Street Quiz Game", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, coronatnd, coronatn, impact_video, coronatn, jpmimpct_video_state, empty_init, ROT0, "JPM", "Coronation Street Quiz Game (Protocol)", MACHINE_SUPPORTS_SAVE )
 // This acts a bit like a touchscreen game, is there an unmapped Dipswitch to enable touch support, or a different software revision?
-GAME( 199?, tqst,      0,        impact_video, tqst,     jpmimpct_video_state, empty_init, ROT0, "Ace", "Treasure Quest"             , MACHINE_SUPPORTS_SAVE)
-GAME( 199?, tqstp,     tqst,     impact_video, tqst,     jpmimpct_video_state, empty_init, ROT0, "Ace", "Treasure Quest (Protocol)"  , MACHINE_SUPPORTS_SAVE)
+GAME( 1996, tqst,      0,        impact_video, tqst,     jpmimpct_video_state, empty_init, ROT0, "Ace", "Treasure Quest"             , MACHINE_SUPPORTS_SAVE)
+GAME( 1996, tqstp,     tqst,     impact_video, tqst,     jpmimpct_video_state, empty_init, ROT0, "Ace", "Treasure Quest (Protocol)"  , MACHINE_SUPPORTS_SAVE)
 
 // sets below are incomplete, missing video ROMs etc.
 GAME( 199?, snlad,     0,        impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Snake & Ladders"            , MACHINE_NOT_WORKING) // incomplete
-GAME( 199?, buzzundr,  0,        impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "Ace", "Buzzundrum (Ace)", MACHINE_NOT_WORKING )
-GAME( 199?, monspdr ,  0,        impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "Ace", "Money Spider (Ace)", MACHINE_NOT_WORKING )
+GAME( 1997, buzzundr,  0,        impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "Ace", "Buzzundrum (Ace)", MACHINE_NOT_WORKING )
+GAME( 1997, monspdr ,  0,        impact_video, cluedo,   jpmimpct_video_state, empty_init, ROT0, "Ace", "Money Spider (Ace)", MACHINE_NOT_WORKING )

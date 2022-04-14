@@ -47,8 +47,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	uint8_t m_latch;
-	uint8_t m_reply;
+	uint8_t m_latch = 0;
+	uint8_t m_reply = 0;
 	bool m_reply_available;
 
 	// callback

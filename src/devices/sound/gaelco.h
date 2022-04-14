@@ -60,13 +60,16 @@ private:
 	};
 
 	sound_stream *m_stream;                     /* our stream */
-	int m_banks[4];                             /* start of each ROM bank */
-	sound_channel m_channel[NUM_CHANNELS];      /* 7 stereo channels */
 
+	// live
+	sound_channel m_channel[NUM_CHANNELS];      /* 7 stereo channels */
 	uint16_t m_sndregs[0x38];
 
 	// Table for converting from 8 to 16 bits with volume control
 	int16_t m_volume_table[VOLUME_LEVELS][256];
+
+	// config
+	int m_banks[4];                             /* start of each ROM bank */
 };
 
 DECLARE_DEVICE_TYPE(GAELCO_GAE1, gaelco_gae1_device)

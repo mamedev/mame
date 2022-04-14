@@ -115,7 +115,7 @@
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #define C32M (31.3344_MHz_XTAL)
@@ -184,13 +184,13 @@ private:
 	u32 screen_update_macpb160(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_macpbwd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	u32 *m_ram_ptr, *m_rom_ptr;
-	u32 m_ram_mask, m_ram_size, m_rom_size;
+	u32 *m_ram_ptr = nullptr, *m_rom_ptr = nullptr;
+	u32 m_ram_mask = 0, m_ram_size = 0, m_rom_size = 0;
 
-	emu_timer *m_6015_timer;
+	emu_timer *m_6015_timer = nullptr;
 
 	WRITE_LINE_MEMBER(adb_irq_w) { m_adb_irq_pending = state; }
-	int m_adb_irq_pending;
+	int m_adb_irq_pending = 0;
 
 	u16 mac_via_r(offs_t offset);
 	void mac_via_w(offs_t offset, u16 data, u16 mem_mask);
@@ -210,11 +210,11 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(via2_irq_w);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
 	WRITE_LINE_MEMBER(via_cb2_w) { m_macadb->adb_data_w(state); }
-	int m_via_interrupt, m_via2_interrupt, m_scc_interrupt, m_asc_interrupt, m_last_taken_interrupt;
-	int m_irq_count, m_ca1_data, m_ca2_data, m_via2_ca1_hack;
+	int m_via_interrupt = 0, m_via2_interrupt = 0, m_scc_interrupt = 0, m_asc_interrupt = 0, m_last_taken_interrupt = 0;
+	int m_irq_count = 0, m_ca1_data = 0, m_ca2_data = 0, m_via2_ca1_hack = 0;
 
 	u32 rom_switch_r(offs_t offset);
-	bool m_overlay;
+	bool m_overlay = false;
 
 	u16 scsi_r(offs_t offset, u16 mem_mask);
 	void scsi_w(offs_t offset, u16 data, u16 mem_mask);
@@ -229,8 +229,8 @@ private:
 	}
 	void mac_scc_2_w(offs_t offset, u16 data) { m_scc->dc_ab_w(offset, data >> 8); }
 
-	floppy_image_device *m_cur_floppy;
-	int m_hdsel;
+	floppy_image_device *m_cur_floppy = nullptr;
+	int m_hdsel = 0;
 
 	void phases_w(uint8_t phases);
 	void devsel_w(uint8_t devsel);
@@ -271,9 +271,9 @@ private:
 	uint32_t macwd_r(offs_t offset, uint32_t mem_mask = ~0);
 	void macwd_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	u32 m_colors[3], m_count, m_clutoffs, m_wd_palette[256];
+	u32 m_colors[3]{}, m_count = 0, m_clutoffs = 0, m_wd_palette[256]{};
 
-	u8 m_pmu_via_bus, m_pmu_ack, m_pmu_req;
+	u8 m_pmu_via_bus = 0, m_pmu_ack = 0, m_pmu_req = 0;
 	u8 pmu_data_r() { return m_pmu_via_bus; }
 	void pmu_data_w(u8 data) { m_pmu_via_bus = data; }
 	u8 pmu_comms_r() { return (m_pmu_req<<7); }
@@ -282,7 +282,7 @@ private:
 		m_via1->write_cb1(BIT(data, 5));
 		m_pmu_ack = BIT(data, 6);
 	}
-	int m_adb_line;
+	int m_adb_line = 0;
 	void set_adb_line(int state) { m_adb_line = state; }
 	u8 pmu_adb_r() { return (m_adb_line<<1); }
 	void pmu_adb_w(u8 data) { m_macadb->adb_linechange_w((data & 1) ^ 1); }

@@ -895,7 +895,7 @@ WRITE_LINE_MEMBER( i8255_device::pc2_w )
 		else
 		{
 			// port B strobe
-			if (!m_ibf[PORT_B] && !state)
+			if (!state)
 			{
 				LOG("I8255 Port B Strobe\n");
 
@@ -915,7 +915,7 @@ WRITE_LINE_MEMBER( i8255_device::pc4_w )
 	if ((group_mode(GROUP_A) == 2) || ((group_mode(GROUP_A) == 1) && (port_mode(PORT_A) == MODE_INPUT)))
 	{
 		// port A strobe
-		if (!m_ibf[PORT_A] && !state)
+		if (!state)
 		{
 			LOG("I8255 Port A Strobe\n");
 

@@ -49,6 +49,7 @@
 #include "formats/apridisk.h"
 #include "bus/apricot/keyboard/keyboard.h"
 #include "bus/apricot/video/video.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -169,9 +170,9 @@ private:
 	void cio_portb_w(uint8_t data);
 	void cio_portc_w(uint8_t data);
 
-	floppy_image_device *m_cur_floppy;
-	bool m_apvid;
-	uint8_t m_cpu_control;
+	floppy_image_device *m_cur_floppy = nullptr;
+	bool m_apvid = false;
+	uint8_t m_cpu_control = 0;
 };
 
 
@@ -472,11 +473,13 @@ void apxen_state::apxen(machine_config &config)
 	m_mem->set_addrmap(AS_PROGRAM, &apxen_state::mem_map);
 	m_mem->set_data_width(16);
 	m_mem->set_addr_width(24);
+	m_mem->set_endianness(ENDIANNESS_LITTLE);
 
 	ADDRESS_MAP_BANK(config, m_io);
 	m_io->set_addrmap(AS_PROGRAM, &apxen_state::io_map);
 	m_io->set_data_width(16);
 	m_io->set_addr_width(16);
+	m_io->set_endianness(ENDIANNESS_LITTLE);
 
 	UPD71071(config, m_dmac, 8000000);
 	m_dmac->set_cpu_tag("maincpu");

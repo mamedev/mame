@@ -16,13 +16,14 @@ interface and paper tape reader as a single device.
 #include "emu.h"
 #include "tapereader.h"
 
+#include "imagedev/papertape.h"
+
 
 namespace {
 
 class imm4_90_device
-		: public device_t
+		: public paper_tape_reader_device
 		, public bus::intellec4::device_univ_card_interface
-		, public device_image_interface
 {
 public:
 	imm4_90_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
@@ -30,13 +31,7 @@ public:
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 
-	virtual iodevice_t  image_type()       const noexcept override { return IO_PUNCHTAPE; }
-	virtual bool        is_readable()      const noexcept override { return true; }
-	virtual bool        is_writeable()     const noexcept override { return false; }
-	virtual bool        is_creatable()     const noexcept override { return false; }
-	virtual bool        must_be_loaded()   const noexcept override { return false; }
-	virtual bool        is_reset_on_load() const noexcept override { return false; }
-	virtual char const *file_extensions()  const noexcept override { return "bnpf,hex,lst,txt"; }
+	virtual char const *file_extensions() const noexcept override { return "bnpf,hex,lst,txt"; }
 
 protected:
 	virtual void device_start() override;
@@ -59,9 +54,8 @@ private:
 
 
 imm4_90_device::imm4_90_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, INTELLEC4_TAPE_READER, tag, owner, clock)
+	: paper_tape_reader_device(mconfig, INTELLEC4_TAPE_READER, tag, owner, clock)
 	, bus::intellec4::device_univ_card_interface(mconfig, *this)
-	, device_image_interface(mconfig, *this)
 	, m_step_timer(nullptr)
 	, m_data(0xffU)
 	, m_ready(false)

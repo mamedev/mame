@@ -54,8 +54,8 @@ public:
 protected:
 	required_device<cpu_device> m_maincpu;
 
-	uint8_t m_gfx_bank;
-	tilemap_t *m_bg_tilemap;
+	uint8_t m_gfx_bank = 0U;
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	// drivers/centiped.cpp
 	virtual void machine_start() override;
@@ -84,13 +84,13 @@ private:
 	required_device<palette_device> m_palette;
 	optional_device<ay8910_device> m_aysnd;
 
-	uint8_t m_oldpos[4];
-	uint8_t m_sign[4];
-	uint8_t m_dsw_select;
-	uint8_t m_control_select;
-	uint8_t m_flipscreen;
-	uint8_t m_bullsdrt_sprites_bank;
-	uint8_t m_penmask[64];
+	uint8_t m_oldpos[4]{};
+	uint8_t m_sign[4]{};
+	uint8_t m_dsw_select = 0U;
+	uint8_t m_control_select = 0U;
+	uint8_t m_flipscreen = 0U;
+	uint8_t m_bullsdrt_sprites_bank = 0U;
+	uint8_t m_penmask[64]{};
 
 	// drivers/centiped.cpp
 	DECLARE_WRITE_LINE_MEMBER(input_select_w);
@@ -170,8 +170,8 @@ private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_memory_bank m_rombank;
 
-	uint8_t m_prg_bank;
-	uint16_t m_0xxx_base;
+	uint8_t m_prg_bank = 0U;
+	uint16_t m_0xxx_base = 0U;
 
 	uint8_t multiped_0xxx_r(offs_t offset);
 	void multiped_0xxx_w(offs_t offset, uint8_t data);

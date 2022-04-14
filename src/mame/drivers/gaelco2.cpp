@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Manuel Abadia
+// copyright-holders:Manuel Abadia, David Haywood
 /***************************************************************************
 
     Gaelco CG-1V/GAE1 based games
@@ -194,7 +194,7 @@ void gaelco2_state::maniacsq(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco2);
-	PALETTE(config, m_palette).set_entries(4096*16 - 16);   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
+	PALETTE(config, m_palette).set_entries(0x10000);
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
@@ -478,7 +478,7 @@ void gaelco2_state::saltcrdi(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco2);
-	PALETTE(config, m_palette).set_entries(4096*16 - 16);   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
+	PALETTE(config, m_palette).set_entries(0x10000);
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
@@ -1010,7 +1010,7 @@ void gaelco2_state::play2000(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco2);
-	PALETTE(config, m_palette).set_entries(4096*16 - 16);   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
+	PALETTE(config, m_palette).set_entries(0x10000);
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
@@ -1049,7 +1049,7 @@ void gaelco2_state::srollnd(machine_config& config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco2);
-	PALETTE(config, m_palette).set_entries(4096*16 - 16);   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
+	PALETTE(config, m_palette).set_entries(0x10000);
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
@@ -1154,7 +1154,7 @@ void bang_state::bang(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco2);
-	PALETTE(config, m_palette).set_entries(4096*16 - 16);   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
+	PALETTE(config, m_palette).set_entries(0x10000);
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
@@ -1399,7 +1399,7 @@ void gaelco2_state::alighunt(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco2);
-	PALETTE(config, m_palette).set_entries(4096*16 - 16);   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
+	PALETTE(config, m_palette).set_entries(0x10000);
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
@@ -1750,7 +1750,7 @@ void gaelco2_state::touchgo(machine_config &config)
 	/* video hardware */
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco2);
-	PALETTE(config, m_palette).set_entries(4096*16 - 16);   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
+	PALETTE(config, m_palette).set_entries(0x10000);
 	config.set_default_layout(layout_dualhsxs);
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
@@ -2069,7 +2069,7 @@ void gaelco2_state::snowboar(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco2);
-	PALETTE(config, m_palette).set_entries(4096*16 - 16);   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
+	PALETTE(config, m_palette).set_entries(0x10000);
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
@@ -2113,7 +2113,7 @@ void gaelco2_state::maniacsqs(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco2);
-	PALETTE(config, m_palette).set_entries(4096*16 - 16);   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
+	PALETTE(config, m_palette).set_entries(0x10000);
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
@@ -2394,7 +2394,7 @@ void wrally2_state::wrally2(machine_config &config)
 	/* video hardware */
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco2);
-	PALETTE(config, m_palette).set_entries(4096*16 - 16);   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
+	PALETTE(config, m_palette).set_entries(0x10000);
 	config.set_default_layout(layout_dualhsxs);
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
@@ -2722,10 +2722,10 @@ GAME( 1994, aligatorun,  aligator,  alighunt,         alighunt, gaelco2_state, i
 GAME( 1994, aligatoruna, aligator,  alighunt,         alighunt, gaelco2_state, init_alighunt,  ROT0, "Gaelco", "Alligator Hunt (unprotected, set 2)", 0 ) // strange version, starts on space stages, but clearly a recompile not a trivial hack of the above, show version maybe?
 GAME( 1994, aligatorp,   aligator,  alighunt_d5002fp, alighunt, gaelco2_state, empty_init,     ROT0, "Gaelco", "Alligator Hunt (protected, prototype?)", MACHINE_NOT_WORKING ) // requires different protection program / data
 
-GAME( 1995, touchgo,     0,         touchgo_d5002fp,  touchgo,  gaelco2_state, init_touchgo,   ROT0, "Gaelco", "Touch & Go (World)", MACHINE_IMPERFECT_SOUND )
-GAME( 1995, touchgon,    touchgo,   touchgo_d5002fp,  touchgo,  gaelco2_state, init_touchgo,   ROT0, "Gaelco", "Touch & Go (Non North America)", MACHINE_IMPERFECT_SOUND )
-GAME( 1995, touchgoe,    touchgo,   touchgo_d5002fp,  touchgo,  gaelco2_state, init_touchgo,   ROT0, "Gaelco", "Touch & Go (earlier revision)",  MACHINE_IMPERFECT_SOUND )
-GAME( 1995, touchgok,    touchgo,   touchgo,          touchgo,  gaelco2_state, init_touchgo,   ROT0, "Gaelco", "Touch & Go (Korea, unprotected)", MACHINE_IMPERFECT_SOUND ) // doesn't say 'Korea' but was sourced there, shows 2 copyright lines like the 'earlier revision'
+GAME( 1995, touchgo,     0,         touchgo_d5002fp,  touchgo,  gaelco2_state, init_touchgo,   ROT0, "Gaelco", "Touch & Go (World)", 0 )
+GAME( 1995, touchgon,    touchgo,   touchgo_d5002fp,  touchgo,  gaelco2_state, init_touchgo,   ROT0, "Gaelco", "Touch & Go (Non North America)", 0 )
+GAME( 1995, touchgoe,    touchgo,   touchgo_d5002fp,  touchgo,  gaelco2_state, init_touchgo,   ROT0, "Gaelco", "Touch & Go (earlier revision)",  0 )
+GAME( 1995, touchgok,    touchgo,   touchgo,          touchgo,  gaelco2_state, init_touchgo,   ROT0, "Gaelco", "Touch & Go (Korea, unprotected)", 0 ) // doesn't say 'Korea' but was sourced there, shows 2 copyright lines like the 'earlier revision'
 
 GAME( 1995, wrally2,     0,         wrally2,          wrally2,  wrally2_state, init_wrally2,   ROT0, "Gaelco", "World Rally 2: Twin Racing (mask ROM version)", 0 )
 GAME( 1995, wrally2a,    wrally2,   wrally2,          wrally2,  wrally2_state, empty_init,     ROT0, "Gaelco", "World Rally 2: Twin Racing (EPROM version)", 0 )

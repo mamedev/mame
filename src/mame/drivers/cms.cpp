@@ -50,7 +50,6 @@
 #include "machine/input_merger.h"
 #include "machine/m3002.h"
 #include "bus/acorn/bus.h"
-#include "coreutil.h"
 
 
 class cms_state : public driver_device

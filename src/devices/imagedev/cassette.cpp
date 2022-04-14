@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "cassette.h"
+#include "softlist_dev.h"
 
 #include "formats/imageutl.h"
 
@@ -240,6 +241,11 @@ void cassette_image_device::device_start()
 	m_value = 0;
 
 	stream_alloc(0, m_stereo? 2:1, machine().sample_rate());
+}
+
+const software_list_loader &cassette_image_device::get_software_list_loader() const
+{
+	return image_software_list_loader::instance();
 }
 
 image_init_result cassette_image_device::call_create(int format_type, util::option_resolution *format_options)

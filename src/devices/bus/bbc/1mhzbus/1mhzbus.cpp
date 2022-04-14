@@ -109,6 +109,7 @@ void bbc_1mhzbus_slot_device::jim_w(offs_t offset, uint8_t data)
 // slot devices
 #include "autoprom.h"
 #include "cc500.h"
+#include "cisco.h"
 //#include "beebscan.h"
 //#include "teletext.h"
 #include "datacentre.h"
@@ -144,6 +145,7 @@ void bbc_1mhzbus_devices(device_slot_interface &device)
 	device.option_add("ide8",       BBC_IDE8);            /* RetroClinic BBC 8-bit IDE */
 	//device.option_add("beebscan",   BBC_BEEBSCAN);        /* Beeb HandScan */
 	device.option_add("b488",       BBC_B488);            /* Aries B488 */
+	device.option_add("cisco",      BBC_CISCO);           /* Cisco Terminal */
 	//device.option_add("videodig",   BBC_VIDEODIG);        /* Video Digitiser (RH Electronics) */
 	device.option_add("emrmidi",    BBC_EMRMIDI);         /* EMR Midi Interface */
 	//device.option_add("procyon",    BBC_PROCYON);         /* CST Procyon IEEE Interface */

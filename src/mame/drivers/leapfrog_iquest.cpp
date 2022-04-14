@@ -17,7 +17,7 @@
 #include "machine/bankdev.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 #include "screen.h"
 
@@ -83,7 +83,7 @@ private:
 
 	uint8_t unk_ff80_r();
 	void unk_ff80_w(uint8_t data);
-	uint8_t m_ff80;
+	uint8_t m_ff80 = 0;
 
 	uint8_t unk_fc00_r();
 	uint8_t unk_fc01_r(offs_t offset);
@@ -97,20 +97,20 @@ private:
 	uint8_t unk_fce5_r();
 	void unk_fce5_w(uint8_t data);
 
-	uint8_t m_fce5;
+	uint8_t m_fce5 = 0;
 
 	uint8_t unk_ff00_01_r(offs_t offset);
 
 	void unk_ff81_84_w(offs_t offset, uint8_t data);
-	uint8_t m_ff81_84[4];
+	uint8_t m_ff81_84[4]{};
 
 	uint8_t unk_ff91_93_r(offs_t offset);
 	void unk_ff91_93_w(offs_t offset, uint8_t data);
-	uint8_t m_ff91_93[3];
+	uint8_t m_ff91_93[3]{};
 
 	uint8_t unk_ffa8_r();
 	void unk_ffa8_w(uint8_t data);
-	uint8_t m_ffa8;
+	uint8_t m_ffa8 = 0;
 
 	void unk_ffa9_w(uint8_t data);
 

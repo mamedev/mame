@@ -58,7 +58,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override { lcd_w(!m_lcd); }
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override { lcd_w(!m_lcd); }
 
 private:
 	emu_timer *m_lcd_timer;

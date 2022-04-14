@@ -16,7 +16,7 @@
 
 #include "emu.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 #include "bus/cbmiec/cbmiec.h"
 #include "bus/cbmiec/c1541.h"
@@ -1973,6 +1973,8 @@ ROM_START( c64 )
 	ROMX_LOAD( "digidos.u4", 0x0000, 0x2000, CRC(2b0c8e89) SHA1(542d6f61c318bced0642e7c2d4d3b34a0f13e634), ROM_BIOS(27) )
 	ROM_SYSTEM_BIOS(28, "magnum", "Magnum Load" )
 	ROMX_LOAD( "magnum.u4", 0x0000, 0x2000, CRC(b2cffcc6) SHA1(827c782c1723b5d0992c05c00738ae4b2133b641), ROM_BIOS(28) )
+	ROM_SYSTEM_BIOS(29, "mercury31s", "Mercury-ROM v3.1s" )
+	ROMX_LOAD( "mercury31s.u4", 0x0000, 0x2000, CRC(97aa5d2f) SHA1(9fc653e61c34225245036f266db14e05feeadb21), ROM_BIOS(29) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901225-01.u5", 0x0000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )

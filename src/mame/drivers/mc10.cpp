@@ -19,7 +19,7 @@
 #include "video/ef9345.h"
 #include "video/mc6847.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/coco_cas.h"
@@ -71,8 +71,8 @@ protected:
 	required_device<ram_device> m_ram;
 	optional_device<mc10cart_slot_device> m_mc10cart;
 
-	uint8_t m_keyboard_strobe;
-	uint8_t m_port2;
+	uint8_t m_keyboard_strobe = 0;
+	uint8_t m_port2 = 0;
 
 	uint8_t read_keyboard_strobe(bool single_line);
 

@@ -514,7 +514,7 @@ inline void ygv608_device::raster_irq_check()
 }
 
 
-void ygv608_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ygv608_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{

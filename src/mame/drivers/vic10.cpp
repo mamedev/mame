@@ -11,7 +11,7 @@
 
 #include "emu.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 #include "bus/pet/cass.h"
 #include "bus/vic10/exp.h"
@@ -687,6 +687,7 @@ void vic10_state::vic10(machine_config &config)
 	VCS_CONTROL_PORT(config, m_joy2, vcs_control_port_devices, "joy");
 
 	VIC10_EXPANSION_SLOT(config, m_exp, XTAL(8'000'000)/8, vic10_expansion_cards, nullptr);
+	m_exp->set_must_be_loaded(true);
 	m_exp->irq_callback().set("mainirq", FUNC(input_merger_device::in_w<2>));
 	m_exp->res_callback().set(FUNC(vic10_state::exp_reset_w));
 	m_exp->cnt_callback().set(m_cia, FUNC(mos6526_device::cnt_w));

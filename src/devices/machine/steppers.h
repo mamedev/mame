@@ -69,6 +69,8 @@ public:
 	int get_position()          { return m_step_pos; }
 	/* get current absolute position in half steps */
 	int get_absolute_position() { return m_abs_step_pos; }
+	/* set absolute position in half steps */
+	void set_absolute_position(int pos) { m_abs_step_pos = pos; }
 	/* get maximum position in half steps */
 	int get_max()               { return m_max_steps; }
 

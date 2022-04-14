@@ -30,6 +30,7 @@ e05a30_device::e05a30_device(const machine_config &mconfig, const char *tag, dev
 	m_write_centronics_fault(*this),
 	m_write_centronics_select(*this),
 	m_write_cpu_reset(*this),
+	m_write_ready_led(*this),
 	m_printhead(0),
 	m_pf_stepper(0),
 	m_cr_stepper(0), m_centronics_data(0), m_centronics_busy(0), m_centronics_nack(0), m_centronics_init(1), m_centronics_strobe(0), m_centronics_data_latch(0), m_centronics_data_latched(0)
@@ -53,6 +54,7 @@ void e05a30_device::device_start()
 	m_write_centronics_fault.resolve_safe();
 	m_write_centronics_select.resolve_safe();
 	m_write_cpu_reset.resolve_safe();
+	m_write_ready_led.resolve_safe();
 
 	/* register for state saving */
 	save_item(NAME(m_printhead));
@@ -74,6 +76,7 @@ void e05a30_device::device_reset()
 	/* centronics init */
 	m_centronics_nack = false;
 	m_centronics_busy = false;
+	m_write_ready_led(get_ready_led());
 	m_write_centronics_ack   (!m_centronics_nack);
 	m_write_centronics_busy  ( m_centronics_busy);
 	m_write_centronics_perror(false);
@@ -154,6 +157,7 @@ WRITE_LINE_MEMBER( e05a30_device::centronics_input_strobe )
 
 		m_centronics_data_latched = true;
 		m_centronics_busy         = true;
+		m_write_ready_led(get_ready_led());
 		m_write_centronics_busy(m_centronics_busy);
 	}
 
@@ -201,13 +205,17 @@ void e05a30_device::write(offs_t offset, uint8_t data)
 	case 0x04:
 		m_centronics_nack = BIT(data,5);
 		m_centronics_busy = BIT(data,0);
+		m_write_ready_led(get_ready_led());
 		/* The ActionPrinter 2000 firmware might overwrite the busy signal at
 		 * address 20AB if the host depends only on the busy signal and
 		 * doesn't wait for the ack pulse. To avoid skipping input data, we
 		 * assume the busy signal cannot be reset while the data hasn't been
 		 * read. */
 		if (m_centronics_data_latched)
+		{
 			m_centronics_busy = true;
+			m_write_ready_led(get_ready_led());
+		}
 		m_write_centronics_ack (!m_centronics_nack);
 		m_write_centronics_busy( m_centronics_busy);
 		break;

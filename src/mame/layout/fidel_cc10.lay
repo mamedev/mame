@@ -41,7 +41,7 @@ license:CC0
 	</element>
 	<element name="text_b2">
 		<rect><color red="0.6" green="0.6" blue="0.6" /></rect>
-		<text string="spk"><color red="0.04" green="0.04" blue="0.04" /></text>
+		<text string="&#x266a;"><color red="0.04" green="0.04" blue="0.04" /></text> <!-- music note -->
 	</element>
 	<element name="text_b3">
 		<rect><color red="0.6" green="0.6" blue="0.6" /></rect>

@@ -27,6 +27,7 @@
 #include "corestr.h"
 #include "drivenum.h"
 #include "emuopts.h"
+#include "fileio.h"
 #include "rendfont.h"
 #include "rendutil.h"
 #include "romload.h"
@@ -1419,7 +1420,6 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 		}
 		else if (m_focus == focused_menu::LEFT)
 		{
-			m_prev_selected = nullptr;
 			filter_selected();
 		}
 		return;
@@ -1774,7 +1774,6 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 				}
 				else if (hover() >= HOVER_FILTER_FIRST && hover() <= HOVER_FILTER_LAST)
 				{
-					m_prev_selected = nullptr;
 					m_filter_highlight = hover() - HOVER_FILTER_FIRST;
 					filter_selected();
 					stop = true;
@@ -1953,18 +1952,29 @@ void menu_select_launch::draw(uint32_t flags)
 	// make sure the selection
 	if (m_available_items < m_visible_lines)
 		m_visible_lines = m_available_items;
-	if (top_line < 0 || is_first_selected())
+	int selection;
+	if (selected_index() < m_available_items)
+	{
+		selection = selected_index();
+	}
+	else
+	{
+		selection = 0;
+		while ((m_available_items > selection) && (item(selection).ref() != m_prev_selected))
+			++selection;
+	}
+	if (top_line < 0 || !selection)
 	{
 		top_line = 0;
 	}
-	else if (selected_index() < m_available_items)
+	else if (selection < m_available_items)
 	{
-		if (selected_index() >= (top_line + m_visible_lines))
-			top_line = selected_index() - (m_visible_lines / 2);
+		if ((selection >= (top_line + m_visible_lines)) || (selection <= top_line))
+			top_line = (std::max)(selection - (m_visible_lines / 2), 0);
 		if ((top_line + m_visible_lines) >= m_available_items)
 			top_line = m_available_items - m_visible_lines;
-		else if (selected_index() >= (top_line + m_visible_lines - 2))
-			top_line = selected_index() - m_visible_lines + ((selected_index() == (m_available_items - 1)) ? 1: 2);
+		else if (selection >= (top_line + m_visible_lines - 2))
+			top_line = selection - m_visible_lines + ((selection == (m_available_items - 1)) ? 1: 2);
 	}
 
 	// determine effective positions taking into account the hilighting arrows
@@ -1980,7 +1990,7 @@ void menu_select_launch::draw(uint32_t flags)
 		float line_y = visible_top + (float(linenum) * line_height);
 		int itemnum = top_line + linenum;
 		const menu_item &pitem = item(itemnum);
-		const std::string_view itemtext = pitem.text;
+		const std::string_view itemtext = pitem.text();
 		rgb_t fgcolor = ui().colors().text_color();
 		rgb_t bgcolor = ui().colors().text_bg_color();
 		rgb_t fgcolor3 = ui().colors().clone_color();
@@ -2012,7 +2022,7 @@ void menu_select_launch::draw(uint32_t flags)
 			bgcolor = ui().colors().mouseover_bg_color();
 			highlight(line_x0, line_y0, line_x1, line_y1, bgcolor);
 		}
-		else if (pitem.ref == m_prev_selected)
+		else if (pitem.ref() == m_prev_selected)
 		{
 			fgcolor = fgcolor3 = ui().options().mouseover_color();
 			bgcolor = ui().colors().mouseover_bg_color();
@@ -2038,18 +2048,18 @@ void menu_select_launch::draw(uint32_t flags)
 			if (hover() == itemnum)
 				set_hover(HOVER_ARROW_DOWN);
 		}
-		else if (pitem.type == menu_item_type::SEPARATOR)
+		else if (pitem.type() == menu_item_type::SEPARATOR)
 		{
 			// if we're just a divider, draw a line
 			container().add_line(visible_left, line_y + 0.5f * line_height, visible_left + visible_width, line_y + 0.5f * line_height,
 					UI_LINE_WIDTH, ui().colors().text_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		}
-		else if (pitem.subtext.empty())
+		else if (pitem.subtext().empty())
 		{
 			// draw the item centered
-			int const item_invert = pitem.flags & FLAG_INVERT;
+			int const item_invert = pitem.flags() & FLAG_INVERT;
 			if (m_has_icons)
-				draw_icon(linenum, item(itemnum).ref, effective_left, line_y);
+				draw_icon(linenum, item(itemnum).ref(), effective_left, line_y);
 			ui().draw_text_full(
 					container(),
 					itemtext,
@@ -2060,15 +2070,15 @@ void menu_select_launch::draw(uint32_t flags)
 		}
 		else
 		{
-			int const item_invert = pitem.flags & FLAG_INVERT;
-			std::string_view const subitem_text = pitem.subtext;
+			int const item_invert = pitem.flags() & FLAG_INVERT;
+			std::string_view const subitem_text = pitem.subtext();
 			float item_width, subitem_width;
 
 			// compute right space for subitem
 			ui().draw_text_full(
 					container(),
 					subitem_text,
-					effective_left + icon_offset, line_y, ui().get_string_width(pitem.subtext),
+					effective_left + icon_offset, line_y, ui().get_string_width(pitem.subtext()),
 					text_layout::text_justify::RIGHT, text_layout::word_wrapping::NEVER,
 					mame_ui_manager::NONE, item_invert ? fgcolor3 : fgcolor, bgcolor,
 					&subitem_width, nullptr);
@@ -2076,7 +2086,7 @@ void menu_select_launch::draw(uint32_t flags)
 
 			// draw the item left-justified
 			if (m_has_icons)
-				draw_icon(linenum, item(itemnum).ref, effective_left, line_y);
+				draw_icon(linenum, item(itemnum).ref(), effective_left, line_y);
 			ui().draw_text_full(
 					container(),
 					itemtext,
@@ -2099,7 +2109,7 @@ void menu_select_launch::draw(uint32_t flags)
 	for (size_t count = m_available_items; count < item_count(); count++)
 	{
 		const menu_item &pitem = item(count);
-		const std::string_view itemtext = pitem.text;
+		const std::string_view itemtext = pitem.text();
 		float line_x0 = x1 + 0.5f * UI_LINE_WIDTH;
 		float line_y0 = line;
 		float line_x1 = x2 - 0.5f * UI_LINE_WIDTH;
@@ -2126,7 +2136,7 @@ void menu_select_launch::draw(uint32_t flags)
 			highlight(line_x0, line_y0, line_x1, line_y1, bgcolor);
 		}
 
-		if (pitem.type == menu_item_type::SEPARATOR)
+		if (pitem.type() == menu_item_type::SEPARATOR)
 		{
 			container().add_line(
 					visible_left, line + 0.5f * line_height,
@@ -2759,7 +2769,7 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 			}
 			else
 			{
-				m_info_buffer = "";
+				m_info_buffer.clear();
 				mame_machine_manager::instance()->lua()->call_plugin("data", m_info_view - 1, m_info_buffer);
 			}
 		}
@@ -3048,9 +3058,9 @@ void menu_select_launch::general_info(ui_system_info const *system, game_driver 
 
 		// if everything looks good, schedule the new driver
 		if (audit_passed(summary))
-			str << _("ROM Audit Result\tOK\n");
+			str << _("Media Audit Result\tOK\n");
 		else
-			str << _("ROM Audit Result\tBAD\n");
+			str << _("Media Audit Result\tBAD\n");
 
 		if (summary_samples == media_auditor::NONE_NEEDED)
 			str << _("Samples Audit Result\tNone Needed\n");
@@ -3061,10 +3071,10 @@ void menu_select_launch::general_info(ui_system_info const *system, game_driver 
 	}
 	else
 	{
-		str << _("ROM Audit \tDisabled\nSamples Audit \tDisabled\n");
+		str << _("Media Audit\tDisabled\nSamples Audit\tDisabled\n");
 	}
 
-	buffer = str.str();
+	buffer = std::move(str).str();
 }
 
 } // namespace ui

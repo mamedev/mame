@@ -328,8 +328,8 @@ license:CC0
 			<feature name="u12" value="7W00F" />
 			<feature name="u13" value="946 80B" />
 			<feature name="bt1" value="BATTERY" />
-			<dataarea name="rom" size="2097152">
-				<rom name="ps 0bd400 00repcs c1d1.u9" size="2097152" crc="21895af8" sha1="3f3149fdb7ceb36f7f3262eb9b29eda973c8d1ef" />
+			<dataarea name="rom" size="4194304">
+				<rom name="ps 0bd400 00repcs c1d1.u9" size="4194304" crc="5601f35c" sha1="7b55ba4fe8ff7203fa60190106f2f79befb06aae" />
 			</dataarea>
 		</part>
 	</software>
@@ -341,8 +341,8 @@ license:CC0
 		<info name="serial" value="8BD400" />
 		<info name="alt_title" value="進研ゼミ 中学講座 - 中学地理・歴史パック (地理ソフト・歴史ソフト完全対応版) (CR)" />
 		<part name="cart" interface="pockchalw_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="8BD400 [CR].pcw" size="2097152" crc="77d1d534" sha1="4363f4c650ea5d91d88307eee4424434df9e489f" />
+			<dataarea name="rom" size="4194304">
+				<rom name="8BD400 [CR].pcw" size="4194304" crc="f27575fe" sha1="92f3ae2db233d3fd84809c7658f2feaa85477ecf" />
 			</dataarea>
 		</part>
 	</software>
@@ -395,8 +395,8 @@ license:CC0
 			<feature name="u12" value="7W00F" />
 			<feature name="u13" value="012 80B" />
 			<feature name="bt1" value="BATTERY" />
-			<dataarea name="rom" size="2097152">
-				<rom name="pl 0bf400 00pcr c1d1.u9" size="2097152" crc="341e732b" sha1="cf6fd71ced47d67bcad3e9e45a1ecb295bc7eb68" />
+			<dataarea name="rom" size="4194304">
+				<rom name="pl 0bf400 00pcr c1d1.u9" size="4194304" crc="50016928" sha1="16287268d138b99ca90421d6c1aff737b4273451" />
 			</dataarea>
 		</part>
 	</software>
@@ -408,8 +408,8 @@ license:CC0
 		<info name="serial" value="8BF400" />
 		<info name="alt_title" value="進研ゼミ 中学講座 - 中学理科パック (1分野ソフト・2分野ソフト完全対応版) (LP)" />
 		<part name="cart" interface="pockchalw_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="8BF400 [LP].pcw" size="2097152" crc="e1d5c9e0" sha1="067728493a94f88e603a3d92d672683d7dc9ecd0" />
+			<dataarea name="rom" size="4194304">
+				<rom name="8BF400 [LP].pcw" size="4194304" crc="d35a38da" sha1="eb17b2a7a791f68898e0162bd4ab5e0f1c2fa9e2" />
 			</dataarea>
 		</part>
 	</software>

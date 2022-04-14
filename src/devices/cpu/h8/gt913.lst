@@ -107,7 +107,7 @@
 5e00         ff00         0 bsr      rel8     -
 5f00         fff0         0 mov.w    imm16    r16l
 
-66000000     ff00ff8f     0 btst     imm3     abs8
+66000000     ff00ff8f     0 btst     imm3     r16ihh
 
 6800         ff80         0 mov.b    r16ih    r8l
 6900         ff88         0 mov.w    r16ih    r16l

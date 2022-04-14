@@ -68,7 +68,8 @@ uint32_t channelf_state::screen_update_channelf(screen_device &screen, bitmap_in
 	{
 		int const palette_offset = recalc_palette_offset(m_p_videoram[y*128+125]&3, m_p_videoram[y*128+126]&3);
 
-		for (int y_pos = y * y_rpt; y_pos < (y * y_rpt) + y_rpt; y_pos++)
+		int y_end_pos = std::min(bitmap.height(), (y * y_rpt) + y_rpt);
+		for (int y_pos = y * y_rpt; y_pos < y_end_pos; y_pos++)
 		{
 			uint16_t *p = &bitmap.pix(y_pos);
 			for (uint16_t x = ma; x < ma + 128; x++)

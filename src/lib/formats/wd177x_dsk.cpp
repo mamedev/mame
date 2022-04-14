@@ -27,7 +27,7 @@ wd177x_format::wd177x_format(const format *_formats)
 // encoded disk, or a track with an different sector IDs etc. Only the track
 // encoding is used from the returned format, the number of track_count is not
 // accessed.
-const wd177x_format::format &wd177x_format::get_track_format(const format &f, int head, int track)
+const wd177x_format::format &wd177x_format::get_track_format(const format &f, int head, int track) const
 {
 	return f;
 }
@@ -35,7 +35,7 @@ const wd177x_format::format &wd177x_format::get_track_format(const format &f, in
 /*
     Default implementation for find_size. May be overwritten by subclasses.
 */
-int wd177x_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int wd177x_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size;
 	if(io.length(size))
@@ -62,18 +62,18 @@ int wd177x_format::find_size(util::random_read &io, uint32_t form_factor, const 
 	return -1;
 }
 
-int wd177x_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int wd177x_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	int const type = find_size(io, form_factor, variants);
 
 	if(type != -1)
-		return 50;
+		return FIFID_SIZE;
 
 	return 0;
 }
 
 // A track specific format is to be supplied.
-int wd177x_format::compute_track_size(const format &f) const
+int wd177x_format::compute_track_size(const format &f)
 {
 	int track_size;
 	if(f.sector_base_size)
@@ -111,7 +111,7 @@ void wd177x_format::build_sector_description(const format &f, uint8_t *sectdata,
 }
 
 // A track specific format is to be supplied.
-floppy_image_format_t::desc_e* wd177x_format::get_desc_fm(const format &f, int &current_size, int &end_gap_index)
+floppy_image_format_t::desc_e* wd177x_format::get_desc_fm(const format &f, int &current_size, int &end_gap_index) const
 {
 	static floppy_image_format_t::desc_e desc[23] = {
 		/* 00 */ { FM, 0xff, 0 },
@@ -159,7 +159,7 @@ floppy_image_format_t::desc_e* wd177x_format::get_desc_fm(const format &f, int &
 }
 
 // A track specific format is to be supplied.
-floppy_image_format_t::desc_e* wd177x_format::get_desc_mfm(const format &f, int &current_size, int &end_gap_index)
+floppy_image_format_t::desc_e* wd177x_format::get_desc_mfm(const format &f, int &current_size, int &end_gap_index) const
 {
 	static floppy_image_format_t::desc_e desc[25] = {
 		/* 00 */ { MFM, 0x4e, 0 },
@@ -208,7 +208,7 @@ floppy_image_format_t::desc_e* wd177x_format::get_desc_mfm(const format &f, int 
 	return desc;
 }
 
-bool wd177x_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool wd177x_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	int const type = find_size(io, form_factor, variants);
 	if(type == -1)
@@ -277,7 +277,7 @@ bool wd177x_format::supports_save() const
 	return true;
 }
 
-bool wd177x_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool wd177x_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	// Count the number of formats
 	int formats_count;
@@ -401,7 +401,7 @@ bool wd177x_format::save(util::random_read_write &io, const std::vector<uint32_t
     Default implementation of the image offset computation. May be overwritten
     by subclasses.
 */
-int wd177x_format::get_image_offset(const format &f, int head, int track)
+int wd177x_format::get_image_offset(const format &f, int head, int track) const
 {
 	int offset = 0;
 
@@ -422,20 +422,20 @@ int wd177x_format::get_image_offset(const format &f, int head, int track)
 }
 
 // A track specific format is to be supplied.
-int wd177x_format::get_track_dam_fm(const format &f, int head, int track)
+int wd177x_format::get_track_dam_fm(const format &f, int head, int track) const
 {
 	// everything marked as data by default
 	return FM_DAM;
 }
 
 // A track specific format is to be supplied.
-int wd177x_format::get_track_dam_mfm(const format &f, int head, int track)
+int wd177x_format::get_track_dam_mfm(const format &f, int head, int track) const
 {
 	// everything marked as data by default
 	return MFM_DAM;
 }
 
-void wd177x_format::check_compatibility(floppy_image *image, std::vector<int> &candidates)
+void wd177x_format::check_compatibility(floppy_image *image, std::vector<int> &candidates) const
 {
 	// Check compatibility with every candidate, copy in-place
 	int *ok_cands = &candidates[0];
@@ -527,7 +527,7 @@ void wd177x_format::extract_sectors(floppy_image *image, const format &f, desc_s
 
 		else if(sectors[ds.sector_id].size() < ds.size) {
 			memcpy((void *)ds.data, sectors[ds.sector_id].data(), sectors[ds.sector_id].size());
-			memset((uint8_t *)ds.data + sectors[ds.sector_id].size(), 0, sectors[ds.sector_id].size() - ds.size);
+			memset((uint8_t *)ds.data + sectors[ds.sector_id].size(), 0, ds.size - sectors[ds.sector_id].size());
 
 		} else
 			memcpy((void *)ds.data, sectors[ds.sector_id].data(), ds.size);

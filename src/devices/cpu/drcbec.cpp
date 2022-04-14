@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
+#include "debug/debugcpu.h"
 #include "drcbec.h"
 
 #include <cmath>
@@ -1650,7 +1650,7 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_TEST, 8, 1):      // DTEST   src1,src2[,f]
-				temp64 = DPARAM1 & DPARAM2;
+				temp64 = DPARAM0 & DPARAM1;
 				flags = FLAGS64_NZ(temp64);
 				break;
 

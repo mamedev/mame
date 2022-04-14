@@ -141,15 +141,15 @@ private:
 	void sound_io_map(address_map &map);
 	void sound_map(address_map &map);
 
-	uint8_t m_sound_cmd;
+	uint8_t m_sound_cmd = 0;
 	required_shared_ptr<uint8_t> m_vram;
 	required_shared_ptr<uint8_t> m_attr;
-	tilemap_t *m_sc0_tilemap;
-	tilemap_t *m_sc0w_tilemap;
-	tilemap_t *m_sc1_tilemap;
-	uint8_t m_p1_hopper;
-	uint8_t m_p2_hopper;
-	uint8_t m_mux_data;
+	tilemap_t *m_sc0_tilemap = nullptr;
+	tilemap_t *m_sc0w_tilemap = nullptr;
+	tilemap_t *m_sc1_tilemap = nullptr;
+	uint8_t m_p1_hopper = 0;
+	uint8_t m_p2_hopper = 0;
+	uint8_t m_mux_data = 0;
 	required_device_array<i8255_device, 2> m_ppi;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_device<cpu_device> m_soundcpu;

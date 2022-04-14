@@ -1549,19 +1549,11 @@ static INPUT_PORTS_START( bubsys )
 	/* "None" = coin slot B disabled */
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
-	PORT_DIPSETTING(    0x03, "3" )
-	PORT_DIPSETTING(    0x02, "4" )
-	PORT_DIPSETTING(    0x01, "5" )
-	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,5")
-	PORT_DIPSETTING(    0x18, "50k and every 100k" )
-	PORT_DIPSETTING(    0x10, "30k" )
-	PORT_DIPSETTING(    0x08, "50k" )
-	PORT_DIPSETTING(    0x00, "100k" )
+	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW2:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW2:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW2:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "SW2:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW2:5" )
 	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
@@ -1575,11 +1567,51 @@ static INPUT_PORTS_START( bubsys )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Players ) )      PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, "1" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW3:3" )
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( gradiusb )
+	PORT_INCLUDE( bubsys )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x00, "7" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPSETTING(    0x18, "20k and every 70k" )
+	PORT_DIPSETTING(    0x10, "30k and every 80k" )
+	PORT_DIPSETTING(    0x08, "20k only" )
+	PORT_DIPSETTING(    0x00, "30k only" )
+
+	PORT_MODIFY("TEST")
 	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" )      PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
-	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW3:3" )
-	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( twinbeeb )
+	PORT_INCLUDE( bubsys )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x03, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x00, "7" )
+	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPSETTING(    0x18, "20k 100k" )
+	PORT_DIPSETTING(    0x10, "30k 120k" )
+	PORT_DIPSETTING(    0x08, "40k 140k" )
+	PORT_DIPSETTING(    0x00, "50k 160k" )
 INPUT_PORTS_END
 
 /******************************************************************************/
@@ -2028,10 +2060,8 @@ void nemesis_state::salamand(machine_config &config)
 
 	K007232(config, m_k007232, 3579545);
 	m_k007232->port_write().set(FUNC(nemesis_state::volume_callback));
-	m_k007232->add_route(0, "lspeaker", 0.08);
-	m_k007232->add_route(0, "rspeaker", 0.08);
-	m_k007232->add_route(1, "lspeaker", 0.08);
-	m_k007232->add_route(1, "rspeaker", 0.08);
+	m_k007232->add_route(ALL_OUTPUTS, "lspeaker", 0.08);
+	m_k007232->add_route(ALL_OUTPUTS, "rspeaker", 0.08);
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
 //  ymsnd.irq_handler().set_inputline(m_audiocpu, 0); ... Interrupts _are_ generated, I wonder where they go
@@ -2069,10 +2099,8 @@ void nemesis_state::blkpnthr(machine_config &config)
 
 	K007232(config, m_k007232, 3579545);
 	m_k007232->port_write().set(FUNC(nemesis_state::volume_callback));
-	m_k007232->add_route(0, "lspeaker", 0.10);
-	m_k007232->add_route(0, "rspeaker", 0.10);
-	m_k007232->add_route(1, "lspeaker", 0.10);
-	m_k007232->add_route(1, "rspeaker", 0.10);
+	m_k007232->add_route(ALL_OUTPUTS, "lspeaker", 0.10);
+	m_k007232->add_route(ALL_OUTPUTS, "rspeaker", 0.10);
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
 //  ymsnd.irq_handler().set_inputline(m_audiocpu, 0); ... Interrupts _are_ generated, I wonder where they go
@@ -2106,26 +2134,20 @@ void nemesis_state::citybomb(machine_config &config)
 	m_palette->set_membits(8);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
 	K007232(config, m_k007232, 3579545);
 	m_k007232->port_write().set(FUNC(nemesis_state::volume_callback));
-	m_k007232->add_route(0, "lspeaker", 0.30);
-	m_k007232->add_route(0, "rspeaker", 0.30);
-	m_k007232->add_route(1, "lspeaker", 0.30);
-	m_k007232->add_route(1, "rspeaker", 0.30);
+	m_k007232->add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	ym3812_device &ym3812(YM3812(config, "ymsnd", 3579545));
 //  ym3812.irq_handler().set_inputline("audiocpu", 0); ... Interrupts _are_ generated, I wonder where they go
-	ym3812.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	ym3812.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	ym3812.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	k051649_device &k051649(K051649(config, "k051649", 3579545/2));
-	k051649.add_route(ALL_OUTPUTS, "lspeaker", 0.38);
-	k051649.add_route(ALL_OUTPUTS, "rspeaker", 0.38);
+	k051649_device &k051649(K051649(config, "k051649", 3579545));
+	k051649.add_route(ALL_OUTPUTS, "mono", 0.38);
 }
 
 void nemesis_state::nyanpani(machine_config &config)
@@ -2151,26 +2173,20 @@ void nemesis_state::nyanpani(machine_config &config)
 	m_palette->set_membits(8);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
 	K007232(config, m_k007232, 3579545);
 	m_k007232->port_write().set(FUNC(nemesis_state::volume_callback));
-	m_k007232->add_route(0, "lspeaker", 0.30);
-	m_k007232->add_route(0, "rspeaker", 0.30);
-	m_k007232->add_route(1, "lspeaker", 0.30);
-	m_k007232->add_route(1, "rspeaker", 0.30);
+	m_k007232->add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	ym3812_device &ym3812(YM3812(config, "ymsnd", 3579545));
 //  ym3812.irq_handler().set_inputline("audiocpu", 0); ... Interrupts _are_ generated, I wonder where they go
-	ym3812.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	ym3812.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	ym3812.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	k051649_device &k051649(K051649(config, "k051649", 3579545/2));
-	k051649.add_route(ALL_OUTPUTS, "lspeaker", 0.38);
-	k051649.add_route(ALL_OUTPUTS, "rspeaker", 0.38);
+	k051649_device &k051649(K051649(config, "k051649", 3579545));
+	k051649.add_route(ALL_OUTPUTS, "mono", 0.38);
 }
 
 void nemesis_state::hcrash(machine_config &config)
@@ -2216,10 +2232,8 @@ void nemesis_state::hcrash(machine_config &config)
 
 	K007232(config, m_k007232, 3579545);
 	m_k007232->port_write().set(FUNC(nemesis_state::volume_callback));
-	m_k007232->add_route(0, "lspeaker", 0.10);
-	m_k007232->add_route(0, "rspeaker", 0.10);
-	m_k007232->add_route(1, "lspeaker", 0.10);
-	m_k007232->add_route(1, "rspeaker", 0.10);
+	m_k007232->add_route(ALL_OUTPUTS, "lspeaker", 0.10);
+	m_k007232->add_route(ALL_OUTPUTS, "rspeaker", 0.10);
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
 //  ymsnd.irq_handler().set_inputline(m_audiocpu, 0); ... Interrupts _are_ generated, I wonder where they go
@@ -2738,7 +2752,7 @@ Notes:
       VSync - 60Hz
       HSync - 15.52kHz
 
-      Custom Chips - 0005289 (DIP42, wavetable sound chip), 0005297 (SDIP64)
+      Custom Chips - 0005289 (DIP42, wavetable sound chip), 0005297 (SDIP64, ULA)
 
 
 Bottom PCB
@@ -2876,8 +2890,8 @@ Default = *
 |        5 |OFF|ON |   |   |   |   |   |   |
 |        7 |ON |ON |   |   |   |   |   |   |
 |----------|---|---|---|---|---|---|---|---|
-|CABINET     TABLE*|OFF|   |   |   |   |   |
-|          UPRIGHT |ON |   |   |   |   |   |
+|CABINET   UPRIGHT*|OFF|   |   |   |   |   |
+|            TABLE |ON |   |   |   |   |   |
 |------------------|---|---|---|---|---|---|
 |BONUS 1ST/2ND         |   |   |   |   |   |
 |          20000/70000 |OFF|OFF|   |   |   |
@@ -3125,9 +3139,9 @@ void nemesis_state::bubsys_twinbeeb_init()
 	bubsys_init();
 }
 
-GAME( 1985, bubsys,   0,         bubsys,    bubsys, nemesis_state, bubsys_init, ROT0,   "Konami", "Bubble System BIOS", MACHINE_IS_BIOS_ROOT )
-GAME( 1985, gradiusb, bubsys,    bubsys,    bubsys, nemesis_state, bubsys_init, ROT0,   "Konami", "Gradius (Bubble System)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1985, twinbeeb, bubsys,    bubsys,    bubsys, nemesis_state, bubsys_twinbeeb_init, ROT90,   "Konami", "TwinBee (Bubble System)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1985, bubsys,   0,         bubsys,    bubsys,   nemesis_state, bubsys_init, ROT0,   "Konami", "Bubble System BIOS", MACHINE_IS_BIOS_ROOT )
+GAME( 1985, gradiusb, bubsys,    bubsys,    gradiusb, nemesis_state, bubsys_init, ROT0,   "Konami", "Gradius (Bubble System)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1985, twinbeeb, bubsys,    bubsys,    twinbeeb, nemesis_state, bubsys_twinbeeb_init, ROT90,   "Konami", "TwinBee (Bubble System)", MACHINE_UNEMULATED_PROTECTION )
 // Bubble System RF2
 // Bubble System Galactic Warriors
 // Bubble System Attack Rush

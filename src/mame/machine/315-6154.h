@@ -38,7 +38,7 @@ protected:
 private:
 	address_space_config m_configuration_config;
 	address_space_config m_memory_config;
-	address_space *m_configuration;
+	address_space *m_configuration = nullptr;
 
 	u32 m_registers[0x100 / 4];
 	u32 m_bases[4 * 3];

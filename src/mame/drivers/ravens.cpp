@@ -9,8 +9,8 @@ the entire thing (including the circuit boards) yourself.
 
 
 https://web.archive.org/web/20160321001634/http://petersieg.bplaced.com/?2650_Computer:2650_Selbstbaucomputer
-        2013-04-23 Skeleton driver.
 
+2013-04-23 Skeleton driver.
 
 No instructions, no schematics - it's all guesswork.
 
@@ -144,8 +144,8 @@ private:
 	u8 port07_r();
 	void port1b_w(u8 data);
 	void port1c_w(u8 data);
-	u8 m_term_out;
-	u8 m_term_in;
+	u8 m_term_out = 0U;
+	u8 m_term_in = 0U;
 	required_device<generic_terminal_device> m_terminal;
 };
 

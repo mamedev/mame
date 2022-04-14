@@ -37,78 +37,65 @@ Basic display of LEDs for the SITCOM85
 		</led7seg>
 	</element>
 
-	<element name="background">
-		<rect>
-			<bounds left="0" top="0" right="1" bottom="1" />
-			<color red="0.0" green="0.0" blue="0.0" />
-		</rect>
+	<element name="rect">
+		<rect />
 	</element>
 
 	<view name="Default Layout">
 		<!-- Black background -->
-		<element ref="background">
-			<bounds left="34" top="60" right="341" bottom="200" />
+		<element ref="rect">
+			<bounds left="34" top="60" right="341" bottom="170" />
+			<color red="0.0" green="0.0" blue="0.0" />
 		</element>
 
 		<element name="sod_led" ref="a_led">
-			<bounds left="46" top="90" right="56" bottom="100" />
+			<bounds x="46" y="80" width="10" height="10" />
 		</element>
 
 		<element name="test_led" ref="b_led">
-			<bounds left="46" top="160" right="56" bottom="170" />
+			<bounds x="46" y="130" width="10" height="10" />
 		</element>
 
-		<!-- DL1414 left -->
-		<element name="digit3" ref="a_digit">
-			<bounds left="65" top="70" right="90" bottom="120" />
-		</element>
-		<element name="digit2" ref="a_digit">
-			<bounds left="99" top="70" right="124" bottom="120" />
-		</element>
-		<element name="digit1" ref="a_digit">
-			<bounds left="133" top="70" right="158" bottom="120" />
-		</element>
-		<element name="digit0" ref="a_digit">
-			<bounds left="167" top="70" right="192" bottom="120" />
-		</element>
-
-		<!-- DL1414 right -->
-		<element name="digit7" ref="a_digit">
-			<bounds left="204" top="70" right="229" bottom="120" />
-		</element>
-		<element name="digit6" ref="a_digit">
-			<bounds left="238" top="70" right="263" bottom="120" />
-		</element>
-		<element name="digit5" ref="a_digit">
-			<bounds left="272" top="70" right="297" bottom="120" />
-		</element>
-		<element name="digit4" ref="a_digit">
-			<bounds left="306" top="70" right="331" bottom="120" />
-		</element>
+		<!-- DL1414 left/right -->
+		<repeat count="2">
+			<param name="moduleno" start="3" increment="4" />
+			<param name="modulex" start="65" increment="139" />
+			<repeat count="4">
+				<param name="digitno" start="~moduleno~" increment="-1" />
+				<param name="digitx" start="~modulex~" increment="34" />
+				<element name="digit~digitno~" ref="a_digit">
+					<bounds x="~digitx~" y="70" width="25" height="30" />
+				</element>
+			</repeat>
+		</repeat>
 
 		<!-- DL1414 remote -->
-		<element name="digit11" ref="a_digit">
-			<bounds left="65" top="140" right="90" bottom="190" />
-		</element>
-		<element name="digit10" ref="a_digit">
-			<bounds left="99" top="140" right="124" bottom="190" />
-		</element>
-		<element name="digit9" ref="a_digit">
-			<bounds left="133" top="140" right="158" bottom="190" />
-		</element>
-		<element name="digit8" ref="a_digit">
-			<bounds left="167" top="140" right="192" bottom="190" />
-		</element>
+		<repeat count="4">
+			<param name="digitno" start="11" increment="-1" />
+			<param name="digitx" start="65" increment="34" />
+			<element name="digit~digitno~" ref="a_digit">
+				<bounds x="~digitx~" y="120" width="25" height="30" />
+			</element>
+		</repeat>
 
 		<!-- meter -->
 		<element name="digit14" ref="b_digit">
-			<bounds left="238" top="140" right="263" bottom="190" />
+			<bounds x="248" y="120" width="20" height="30" />
 		</element>
 		<element name="digit13" ref="b_digit">
-			<bounds left="272" top="140" right="297" bottom="190" />
+			<bounds x="277" y="120" width="20" height="30" />
 		</element>
 		<element name="digit12" ref="b_digit">
-			<bounds left="306" top="140" right="331" bottom="190" />
+			<bounds x="306" y="120" width="20" height="30" />
+		</element>
+		<element ref="rect">
+			<bounds x="248" y="156" width="78" height="4" />
+			<color red="0.12549" green="0.0" blue="0.0" />
+		</element>
+		<element name="dac" ref="rect">
+			<bounds state="0" x="248" y="156" width="1" height="4" />
+			<bounds state="255" x="248" y="156" width="78" height="4" />
+			<color red="1.0" green="0.0" blue="0.0" />
 		</element>
 	</view>
 

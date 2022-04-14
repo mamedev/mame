@@ -4,8 +4,6 @@
 
     Sinclair QL
 
-    MESS Driver by Curt Coder
-
 */
 
 /*
@@ -88,7 +86,7 @@
 #include "video/zx8301.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

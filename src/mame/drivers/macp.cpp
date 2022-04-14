@@ -44,10 +44,10 @@ public:
 	macp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_ay8910(*this, "ay%u", 0U)
-		, m_io_keyboard(*this, "X%u", 0)
-		, m_digits(*this, "digit%u", 0U)
-		, m_io_outputs(*this, "out%u", 0U)
+		, m_ay8910(*this, "ay%d", 0U)
+		, m_io_keyboard(*this, "X%d", 0U)
+		, m_digits(*this, "digit%d", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 		{ }
 
 	void mac16k(machine_config &config);
@@ -68,11 +68,11 @@ private:
 	void ay1_b_w(u8);
 	u8 ay1_b_r();
 	u8 kbd_r();
-	u8 m_t_c = 0;
-	u8 m_digit = 0;
-	u8 m_ay1_b = 0;
-	u8 m_ay1_a = 0;
-	u8 m_relay_ctrl = 0;
+	u8 m_t_c = 0U;
+	u8 m_digit = 0U;
+	u8 m_ay1_b = 0U;
+	u8 m_ay1_a = 0U;
+	u8 m_relay_ctrl = 0U;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<z80_device> m_maincpu;
@@ -330,6 +330,9 @@ void macp_state::machine_start()
 void macp_state::machine_reset()
 {
 	genpin_class::machine_reset();
+
+	for (u8 i = 0; i < m_io_outputs.size(); i++)
+		m_io_outputs[i] = 0;
 	m_t_c = 0;
 	m_relay_ctrl = 0;
 }
@@ -354,7 +357,7 @@ void macp_state::mac16k(machine_config &config)
 	kbdc.out_sl_callback().set(FUNC(macp_state::scanlines_w));    // scan SL lines
 	kbdc.out_disp_callback().set(FUNC(macp_state::digit_w));      // display A&B
 	kbdc.in_rl_callback().set(FUNC(macp_state::kbd_r));           // kbd RL lines
-	kbdc.out_irq_callback().set(FUNC(macp_state::irq_w)); 
+	kbdc.out_irq_callback().set(FUNC(macp_state::irq_w));
 
 	/* sound hardware */
 	genpin_audio(config);
@@ -388,6 +391,12 @@ ROM_START(macgalxy)
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("galaxy1.bin", 0x0000, 0x2000, CRC(00c71e67) SHA1(c1ad1dacae2b90f516c732bfdf8244908f67e15a))
 	ROM_LOAD("galaxy2.bin", 0x2000, 0x2000, CRC(f0efb723) SHA1(697b3c9f3ebedca1087354eda5dfe9719d497045))
+ROM_END
+
+ROM_START(macgalxyb)
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("system_iv_fabricante_m-73_macsa_galaxy_m5_6.bin",    0x0000, 0x2000, CRC(38319685) SHA1(54e979bba16d79d3589b3ae3f9e8e29071ef5b36))
+	ROM_LOAD("modelo_a-01202_fabricante_m-73_macsa_galaxy_05.bin", 0x2000, 0x2000, CRC(c1f40cbf) SHA1(566d962f55367379346155f2078b92b4e1e6a79d))
 ROM_END
 
 ROM_START(macjungl)
@@ -460,16 +469,17 @@ ROM_END
 } // Anonymous namespace
 
 // MAC S.A. pinballs
-GAME( 1986, macgalxy,         0, mac16k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "MAC's Galaxy",                        MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, macjungl,         0, mac16k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "MAC Jungle",                          MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, spctrain,         0, mac32k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "Space Train (Pinball)",               MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, spctraino, spctrain, mac16k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "Space Train (Pinball, old hardware)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1988, spcpnthr,         0, mac32k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "Space Panther",                       MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 19??, mac_1808,         0, mac32k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "unknown game (MAC #1808)",            MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1995, macjungn,         0, mac32k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "MAC Jungle (New version)",            MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1996, nbamac,           0, mac32k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "NBA MAC",                             MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, macgalxy,         0, mac16k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "MAC's Galaxy (yellow version, M.6)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, macgalxyb, macgalxy, mac16k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "MAC's Galaxy (blue version, M.042)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, macjungl,         0, mac16k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "MAC Jungle",                          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, spctrain,         0, mac32k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "Space Train (Pinball)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, spctraino, spctrain, mac16k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "Space Train (Pinball, old hardware)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, spcpnthr,         0, mac32k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "Space Panther",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 19??, mac_1808,         0, mac32k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "unknown game (MAC #1808)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, macjungn,         0, mac32k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "MAC Jungle (New version)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, nbamac,           0, mac32k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "NBA MAC",                             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
 // CICPlay pinballs
-GAME( 1985, glxplay,          0, mac16k,  cicplay, macp_state, empty_init, ROT0, "CICPlay", "Galaxy Play",                          MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1986, kidnap,           0, mac16k,  cicplay, macp_state, empty_init, ROT0, "CICPlay", "Kidnap",                               MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, glxplay2,         0, mac16k,  cicplay, macp_state, empty_init, ROT0, "CICPlay", "Galaxy Play 2",                        MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1985, glxplay,          0, mac16k,  cicplay, macp_state, empty_init, ROT0, "CICPlay", "Galaxy Play",                          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kidnap,           0, mac16k,  cicplay, macp_state, empty_init, ROT0, "CICPlay", "Kidnap",                               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, glxplay2,         0, mac16k,  cicplay, macp_state, empty_init, ROT0, "CICPlay", "Galaxy Play 2",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

@@ -76,7 +76,7 @@ void k007232_device::device_start()
 	{
 		m_channel[i].addr = 0;
 		m_channel[i].start = 0;
-		m_channel[i].counter = 0x200;
+		m_channel[i].counter = 0x1000;
 		m_channel[i].step = 0;
 		m_channel[i].play = 0;
 		m_channel[i].bank = 0;
@@ -151,7 +151,8 @@ void k007232_device::write(offs_t offset, u8 data)
 		{
 		case 0: // address step, LSB
 		case 1: // address step, MSB
-			channel->step = (BIT(m_wreg[reg_index + 1], 0) << 8) | m_wreg[reg_index];
+			channel->step = (BIT(m_wreg[reg_index + 1], 0, 4) << 8) | m_wreg[reg_index];
+			// TODO: Bit 4-5 is frequency divider, but not implemented now
 			break;
 		case 2:
 		case 3:
@@ -164,7 +165,7 @@ void k007232_device::write(offs_t offset, u8 data)
 			{
 				channel->play = true;
 				channel->addr = channel->start;
-				channel->counter = 0x200;
+				channel->counter = 0x1000;
 			}
 			break;
 		}
@@ -185,7 +186,7 @@ u8 k007232_device::read(offs_t offset)
 		{
 			channel->play = true;
 			channel->addr = channel->start;
-			channel->counter = 0x200;
+			channel->counter = 0x1000;
 		}
 	}
 	return 0;
@@ -251,7 +252,7 @@ void k007232_device::sound_stream_update(sound_stream &stream, std::vector<read_
 				int vol_b = channel->vol[1] * 2;
 
 				u32 addr = channel->addr & 0x1ffff;
-				while (channel->counter <= channel->step) // result : clock / (4 * (512 - frequency))
+				while (channel->counter <= channel->step) // result : clock / (4 * (4096 - frequency))
 				{
 					if (BIT(read_sample(i, addr++), 7) || addr >= m_pcmlimit)
 					{
@@ -268,7 +269,7 @@ void k007232_device::sound_stream_update(sound_stream &stream, std::vector<read_
 							break;
 						}
 					}
-					channel->counter += (0x200 - channel->step);
+					channel->counter += (0x1000 - channel->step);
 				}
 				channel->addr = addr;
 

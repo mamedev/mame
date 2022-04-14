@@ -114,7 +114,7 @@ void scc8530_legacy_device::resetchannel(int ch)
     scc8530_baud_expire - baud rate timer expiry
 -------------------------------------------------*/
 
-void scc8530_legacy_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void scc8530_legacy_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	Chan *pChan = &channel[id];
 	int brconst = pChan->reg_val[13]<<8 | pChan->reg_val[14];

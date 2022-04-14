@@ -15,8 +15,8 @@ Custom ICs:
 13XX     dual scrolling tilemap address generator
 98XX     lamp/coin output
 99XX     sound volume
-CUS27    clock divider
-CUS29    sprite line buffer and sprite/tilemap mixer
+CUS27    ULA clock divider
+CUS29    ULA sprite line buffer and sprite/tilemap mixer
 CUS30    sound control
 CUS34A   address decoder
 CUS36    dual tilemap generator

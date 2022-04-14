@@ -30,8 +30,8 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
-	tilemap_t*             m_bg_tilemap;
-	int                  m_flipscreen;
+	tilemap_t*             m_bg_tilemap = nullptr;
+	int                  m_flipscreen = 0;
 	void m57_videoram_w(offs_t offset, uint8_t data);
 	void m57_flipscreen_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);

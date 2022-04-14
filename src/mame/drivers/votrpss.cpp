@@ -408,10 +408,10 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	uint8_t m_term_data;
-	uint8_t m_porta;
-	uint8_t m_portb;
-	uint8_t m_portc;
+	uint8_t m_term_data = 0U;
+	uint8_t m_porta = 0U;
+	uint8_t m_portb = 0U;
+	uint8_t m_portc = 0U;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;

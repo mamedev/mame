@@ -215,7 +215,7 @@ void i8087_device::device_start()
 	build_opcode_table();
 }
 
-void i8087_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void i8087_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_busy_handler(1);
 }

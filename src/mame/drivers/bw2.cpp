@@ -28,7 +28,7 @@
 #include "includes/bw2.h"
 #include "bus/rs232/rs232.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 
 //**************************************************************************
@@ -477,7 +477,7 @@ WRITE_LINE_MEMBER( bw2_state::mtron_w )
 }
 
 //-------------------------------------------------
-//  floppy_format_type floppy_formats
+//  floppy_formats
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( bw2_state::fdc_drq_w )

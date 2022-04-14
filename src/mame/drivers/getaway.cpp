@@ -13,10 +13,19 @@ Hardware notes:
 - 2KB SRAM(4*TMS4045), 24KB DRAM(48*TMS4030)
 - discrete sound
 
+Japanese-language flyers show an upright cabinet with a start button, steering
+wheel and a control lever marked LOW at the upper end of the range and HIGH at
+the lower end.  It appears to be spring-returned to the LOW position.  The
+cabinet appears to have the position where an accelerator pedal would be
+located covered with a panel.  The dumped set seems to be designed for this
+cabinet.
+
+English-language flyers show a sit-down cabinet with a gear shift lever,
+accelerator pedal, and digital displays for high scores.  The set dumped set
+doesn't have support for the additional I/O.
+
 TODO:
-- flyer mentions a gear shifter. Then I'd expect it at 0x30/0x31, but the game
-  never reads from there;
-- unknown dipswitches, and verify factory defaults;
+- unknown DIP switches, and verify factory defaults;
 - several unknowns in the video emulation:
   - score layer is a simplification hack, it is unknown how it should really
     cope RMW-wise against main layer. It also has wrong colors (different color
@@ -33,9 +42,7 @@ TODO:
   - miscellanea, cfr. in documentation;
 - sound emulation;
 - lamps;
-- 7seg panel for highscores? (you can see it on deluxe cab, but I don't see any
-  I/O writes that look like 7seg data);
-- undumped proms?
+- undumped PROMs?
 
 ******************************************************************************/
 
@@ -350,7 +357,7 @@ static INPUT_PORTS_START( getaway )
 	PORT_START("WHEEL")
 	PORT_BIT( 0xff, 0x08, IPT_PADDLE ) PORT_MINMAX(0x00, 0x10) PORT_SENSITIVITY(5) PORT_KEYDELTA(15)
 
-	PORT_START("DSW.0") // DTS-8 dipswitch @ location k6
+	PORT_START("DSW.0") // DTS-8 DIP switch @ location k6
 	// TODO: defaults for these two, assume they have different quotas?
 	PORT_DIPNAME( 0x07, 0x02, "Extended Play" )
 	PORT_DIPSETTING(    0x00, "None" )
@@ -377,7 +384,7 @@ static INPUT_PORTS_START( getaway )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("DSW.1") // DNS04 dipswitch @ location m7
+	PORT_START("DSW.1") // DNS04 DIP switch @ location m7
 	// credit display is shown if both extended plays are on "None"
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
@@ -446,5 +453,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME     PARENT  MACHINE  INPUT    CLASS          INIT        SCREEN  COMPANY      FULLNAME     FLAGS
-GAME( 1979, getaway, 0,      getaway, getaway, getaway_state, empty_init, ROT270, "Universal", "Get A Way", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS )
+//    YEAR  NAME     PARENT  MACHINE  INPUT    CLASS          INIT        SCREEN  COMPANY      FULLNAME               FLAGS
+GAME( 1979, getaway, 0,      getaway, getaway, getaway_state, empty_init, ROT270, "Universal", "Get A Way (upright)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )

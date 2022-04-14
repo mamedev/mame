@@ -24,6 +24,7 @@ pushed in to hide the chessboard display.
 
 TODO:
 - fart noise at boot if maestroa module is inserted
+- weird beep at boot if sparc module is inserted (related to above?)
 - make it a subdriver of saitek_leonardo.cpp? or too many differences
 - same TODO list as saitek_leonardo.cpp
 
@@ -199,7 +200,7 @@ u8 ren_state::control_r()
 
 void ren_state::exp_rts_w(int state)
 {
-	// NAND with ACK-P (not used by module)
+	// NAND with ACK-P (not used by chesscomputer?)
 }
 
 
@@ -360,7 +361,7 @@ void ren_state::ren(machine_config &config)
 	m_maincpu->in_p6_cb().set(FUNC(ren_state::p6_r));
 	m_maincpu->out_p6_cb().set(FUNC(ren_state::p6_w));
 
-	INPUT_MERGER_ANY_LOW(config, m_stb).initial_state(~u32(3));
+	INPUT_MERGER_ANY_LOW(config, m_stb);
 	m_stb->output_handler().set_inputline(m_maincpu, M6801_IS_LINE);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));

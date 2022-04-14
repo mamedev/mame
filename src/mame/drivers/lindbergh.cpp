@@ -397,32 +397,32 @@ void lindbergh_state::lindbergh(machine_config &config)
 {
 	PENTIUM4(config, "maincpu", 28000000U*5); /* Actually Celeron D at 2,8 GHz */
 
-	PCI_ROOT                (config, ":pci",           0);
-	I82875P_HOST            (config, ":pci:00.0",      0,                   0x103382c0, "maincpu", 512*1024*1024);
-	I82875P_AGP             (config, ":pci:01.0",      0);
-	GEFORCE_7600GS          (config, ":pci:01.0:00.0", 0,                   0x10de02e1);
-	I82875P_OVERFLOW        (config, ":pci:06.0",      0,                   0x103382c0);
-	PCI_BRIDGE              (config, ":pci:1c.0",      0, 0x808625ae, 0x02);
-	I82541                  (config, ":pci:1c.0:00.0", 0,                   0x103382c0);
-	USB_UHCI                (config, ":pci:1d.0",      0, 0x808625a9, 0x02, 0x103382c0);
-	USB_UHCI                (config, ":pci:1d.1",      0, 0x808625aa, 0x02, 0x103382c0);
-	I6300ESB_WATCHDOG       (config, ":pci:1d.4",      0,                   0x103382c0);
-	APIC                    (config, ":pci:1d.5",      0, 0x808625ac, 0x02, 0x103382c0);
-	USB_EHCI                (config, ":pci:1d.7",      0, 0x808625ad, 0x02, 0x103382c0);
-	PCI_BRIDGE              (config, ":pci:1e.0",      0, 0x8086244e, 0x0a);
-	SB0400                  (config, ":pci:1e.0:02.0", 0,                   0x11021101);
-	SEGA_LINDBERGH_BASEBOARD(config, ":pci:1e.0:03.0", 0);
-	I6300ESB_LPC            (config, ":pci:1f.0",      0);
-	LPC_ACPI                (config, ":pci:1f.0:acpi", 0);
-	LPC_RTC                 (config, ":pci:1f.0:rtc",  0);
-	LPC_PIT                 (config, ":pci:1f.0:pit",  0);
-	SATA                    (config, ":pci:1f.2",      0, 0x808625a3, 0x02, 0x103382c0);
-	SMBUS                   (config, ":pci:1f.3",      0, 0x808625a4, 0x02, 0x103382c0);
-	AC97                    (config, ":pci:1f.5",      0, 0x808625a6, 0x02, 0x103382c0);
+	PCI_ROOT                (config, "pci",           0);
+	I82875P_HOST            (config, "pci:00.0",      0,                   0x103382c0, "maincpu", 512*1024*1024);
+	I82875P_AGP             (config, "pci:01.0",      0);
+	GEFORCE_7600GS          (config, "pci:01.0:00.0", 0,                   0x10de02e1);
+	I82875P_OVERFLOW        (config, "pci:06.0",      0,                   0x103382c0);
+	PCI_BRIDGE              (config, "pci:1c.0",      0, 0x808625ae, 0x02);
+	I82541                  (config, "pci:1c.0:00.0", 0,                   0x103382c0);
+	USB_UHCI                (config, "pci:1d.0",      0, 0x808625a9, 0x02, 0x103382c0);
+	USB_UHCI                (config, "pci:1d.1",      0, 0x808625aa, 0x02, 0x103382c0);
+	I6300ESB_WATCHDOG       (config, "pci:1d.4",      0,                   0x103382c0);
+	APIC                    (config, "pci:1d.5",      0, 0x808625ac, 0x02, 0x103382c0);
+	USB_EHCI                (config, "pci:1d.7",      0, 0x808625ad, 0x02, 0x103382c0);
+	PCI_BRIDGE              (config, "pci:1e.0",      0, 0x8086244e, 0x0a);
+	SB0400                  (config, "pci:1e.0:02.0", 0,                   0x11021101);
+	SEGA_LINDBERGH_BASEBOARD(config, "pci:1e.0:03.0", 0);
+	I6300ESB_LPC            (config, "pci:1f.0",      0);
+	LPC_ACPI                (config, "pci:1f.0:acpi", 0);
+	LPC_RTC                 (config, "pci:1f.0:rtc",  0);
+	LPC_PIT                 (config, "pci:1f.0:pit",  0);
+	SATA                    (config, "pci:1f.2",      0, 0x808625a3, 0x02, 0x103382c0);
+	SMBUS                   (config, "pci:1f.3",      0, 0x808625a4, 0x02, 0x103382c0);
+	AC97                    (config, "pci:1f.5",      0, 0x808625a6, 0x02, 0x103382c0);
 }
 
 #define LINDBERGH_BIOS \
-	ROM_REGION32_LE(0x100000, ":pci:1f.0", 0) /* PC bios, location 3j7 */ \
+	ROM_REGION32_LE(0x100000, "pci:1f.0", 0) /* PC bios, location 3j7 */ \
 	ROM_SYSTEM_BIOS(0, "bios0", "6.0.0010 alternate version") \
 	ROMX_LOAD("6.0.0010a.bin", 0x00000, 0x100000, CRC(10dd9b76) SHA1(1fdf1f921bc395846a7c3180fbdbc4ca287a9670), ROM_BIOS(0) ) \
 	ROM_SYSTEM_BIOS(1, "bios1", "6.0.0009") \
@@ -430,10 +430,10 @@ void lindbergh_state::lindbergh(machine_config &config)
 	ROM_SYSTEM_BIOS(2, "bios2", "6.0.0010") \
 	ROMX_LOAD("6.0.0010.bin",  0x00000, 0x100000, CRC(ea2bf888) SHA1(c9c5b6f0d4f4f36620939b15dd2f128a74347e37), ROM_BIOS(2) ) \
 	\
-	ROM_REGION(0x400000, ":pci:1e.0:03.0", 0) /* Baseboard MPC firmware */ \
+	ROM_REGION(0x400000, "pci:1e.0:03.0", 0) /* Baseboard MPC firmware */ \
 	ROM_LOAD("fpr-24370b.ic6", 0x000000, 0x400000, CRC(c3b021a4) SHA1(1b6938a50fe0e4ae813864649eb103838c399ac0)) \
 	\
-	ROM_REGION32_LE(0x10000, ":pci:01.0:00.0", 0) /* Geforce bios extension (custom for the card) */ \
+	ROM_REGION32_LE(0x10000, "pci:01.0:00.0", 0) /* Geforce bios extension (custom for the card) */ \
 	ROM_LOAD("vid_bios.u504", 0x00000, 0x10000, CRC(f78d14d7) SHA1(f129787e487984edd23bf344f2e9500c85052275)) \
 	DISK_REGION("cf") \
 	DISK_IMAGE_READONLY("mda-c0004a_revb_lindyellow_v2.4.20_mvl31a_boot_2.01", 0, SHA1(e13da5f827df852e742b594729ee3f933b387410))

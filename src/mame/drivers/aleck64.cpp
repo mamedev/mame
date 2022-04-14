@@ -1235,6 +1235,21 @@ ROM_START( srmvs )
 	PIF_BOOTROM
 
 	ROM_REGION32_BE( 0x4000000, "user2", 0 )
+	ROM_LOAD16_WORD_SWAP( "nus-zsej-1.u2", 0x000000, 0x2000000, CRC(dd7dd81f) SHA1(ff020fa957a11bf0f18819d16a010f51b4a4cda4) )
+
+	ROM_REGION16_BE( 0x80, "normpoint", 0 )
+	ROM_LOAD( "normpnt.rom", 0x00, 0x80, CRC(e7f2a005) SHA1(c27b4a364a24daeee6e99fd286753fd6216362b4) )
+
+	ROM_REGION16_BE( 0x80, "normslope", 0 )
+	ROM_LOAD( "normslp.rom", 0x00, 0x80, CRC(4f2ae525) SHA1(eab43f8cc52c8551d9cff6fced18ef80eaba6f05) )
+
+ROM_END
+
+ROM_START( srmvsa )
+	ROM_REGION32_BE( 0x800, "user1", ROMREGION_ERASE00 )
+	PIF_BOOTROM
+
+	ROM_REGION32_BE( 0x4000000, "user2", 0 )
 	ROM_LOAD16_WORD_SWAP( "nus-zsej-0.u2", 0x000000, 0x2000000, CRC(44f40102) SHA1(a78de955f2fcd99dda14e782984368b320eb5415) )
 
 	ROM_REGION16_BE( 0x80, "normpoint", 0 )
@@ -1408,7 +1423,8 @@ GAME( 1998, 11beat,   aleck64, aleck64, 11beat,   aleck64_state, init_aleck64, R
 GAME( 1998, mtetrisc, aleck64, a64_e90, mtetrisc, aleck64_state, init_aleck64, ROT0, "Capcom",                  "Magical Tetris Challenge (981009 Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS ) // missing E90 gfxs (playfield)
 GAME( 1998, starsldr, aleck64, aleck64, starsldr, aleck64_state, init_aleck64, ROT0, "Hudson / Seta",           "Star Soldier: Vanishing Earth", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, vivdolls, aleck64, aleck64, vivdolls, aleck64_state, init_aleck64, ROT0, "Visco",                   "Vivid Dolls", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, srmvs,    aleck64, aleck64, srmvs,    aleck64_state, init_aleck64, ROT0, "Seta",                    "Super Real Mahjong VS", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, srmvs,    aleck64, aleck64, srmvs,    aleck64_state, init_aleck64, ROT0, "Seta",                    "Super Real Mahjong VS (Rev A)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, srmvsa,   srmvs,   aleck64, srmvs,    aleck64_state, init_aleck64, ROT0, "Seta",                    "Super Real Mahjong VS", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2000, mayjin3,  aleck64, aleck64, aleck64,  aleck64_state, init_aleck64, ROT0, "Seta / Able Corporation", "Mayjinsen 3", MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2003, twrshaft, aleck64, aleck64, twrshaft, aleck64_state, init_aleck64, ROT0, "Aruze",                   "Tower & Shaft", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2003, hipai,    aleck64, aleck64, hipai,    aleck64_state, init_aleck64, ROT0, "Aruze / Seta",            "Hi Pai Paradise", MACHINE_IMPERFECT_GRAPHICS )

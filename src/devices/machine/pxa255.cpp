@@ -1567,7 +1567,7 @@ void pxa255_periphs_device::device_reset()
 	memset(&m_clocks_regs, 0, sizeof(m_clocks_regs));
 }
 
-void pxa255_periphs_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pxa255_periphs_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id < TIMER_OSTIMER0)
 		dma_end_tick(id);

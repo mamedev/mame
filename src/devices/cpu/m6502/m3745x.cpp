@@ -64,7 +64,7 @@ void m3745x_device::device_start()
 
 	for (int i = 0; i < NUM_TIMERS; i++)
 	{
-		m_timers[i] = timer_alloc(i, nullptr);
+		m_timers[i] = timer_alloc(i);
 	}
 
 	m740_device::device_start();
@@ -116,7 +116,7 @@ void m3745x_device::device_reset()
 	m_last_all_ints = 0;
 }
 
-void m3745x_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void m3745x_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

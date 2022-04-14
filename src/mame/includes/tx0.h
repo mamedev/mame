@@ -10,130 +10,129 @@
 
 #pragma once
 
-#include "video/crt.h"
 #include "cpu/tx0/tx0.h"
+#include "video/crt.h"
+
 #include "emupal.h"
-
-enum state_t
-{
-	MTS_UNSELECTED,
-	MTS_SELECTING,
-	MTS_SELECTED,
-	MTS_UNSELECTING
-};
-
-enum backspace_state_t
-{
-	MTBSS_STATE0,
-	MTBSS_STATE1,
-	MTBSS_STATE2,
-	MTBSS_STATE3,
-	MTBSS_STATE4,
-	MTBSS_STATE5,
-	MTBSS_STATE6
-};
-
-enum state_2_t
-{
-	MTRDS_STATE0,
-	MTRDS_STATE1,
-	MTRDS_STATE2,
-	MTRDS_STATE3,
-	MTRDS_STATE4,
-	MTRDS_STATE5,
-	MTRDS_STATE6
-};
-
-enum state_3_t
-{
-	MTWTS_STATE0,
-	MTWTS_STATE1,
-	MTWTS_STATE2,
-	MTWTS_STATE3
-};
-
-enum irg_pos_t
-{
-	MTIRGP_START,
-	MTIRGP_ENDMINUS1,
-	MTIRGP_END
-};
-
-
-
-/* tape reader registers */
-struct tx0_tape_reader_t
-{
-	device_image_interface *fd; /* file descriptor of tape image */
-
-	int motor_on;   /* 1-bit reader motor on */
-
-	int rcl;        /* 1-bit reader clutch */
-	int rc;         /* 2-bit reader counter */
-
-	emu_timer *timer;   /* timer to simulate reader timing */
-};
-
-
-
-/* tape puncher registers */
-struct tape_puncher_t
-{
-	device_image_interface *fd; /* file descriptor of tape image */
-
-	emu_timer *timer;   /* timer to generate completion pulses */
-};
-
-
-
-/* typewriter registers */
-struct tx0_typewriter_t
-{
-	device_image_interface *fd; /* file descriptor of output image */
-
-	emu_timer *prt_timer;/* timer to generate completion pulses */
-};
-
-
-/* magnetic tape unit registers */
-struct magtape_t
-{
-	device_image_interface *img;        /* image descriptor */
-
-	state_t state;
-
-	int command;
-	int binary_flag;
-
-	union
-	{
-		backspace_state_t backspace_state;
-		struct
-		{
-			state_2_t state;
-			int space_flag;
-		} read;
-		struct
-		{
-			state_3_t state;
-			int counter;
-		} write;
-	} u;
-
-	int sel_pending;
-	int cpy_pending;
-
-	irg_pos_t irg_pos;          /* position relative to inter-record gap */
-
-	int long_parity;
-
-	emu_timer *timer;   /* timer to simulate reader timing */
-};
 
 
 class tx0_state : public driver_device
 {
 public:
+	enum state_t
+	{
+		MTS_UNSELECTED,
+		MTS_SELECTING,
+		MTS_SELECTED,
+		MTS_UNSELECTING
+	};
+
+	enum backspace_state_t
+	{
+		MTBSS_STATE0,
+		MTBSS_STATE1,
+		MTBSS_STATE2,
+		MTBSS_STATE3,
+		MTBSS_STATE4,
+		MTBSS_STATE5,
+		MTBSS_STATE6
+	};
+
+	enum state_2_t
+	{
+		MTRDS_STATE0,
+		MTRDS_STATE1,
+		MTRDS_STATE2,
+		MTRDS_STATE3,
+		MTRDS_STATE4,
+		MTRDS_STATE5,
+		MTRDS_STATE6
+	};
+
+	enum state_3_t
+	{
+		MTWTS_STATE0,
+		MTWTS_STATE1,
+		MTWTS_STATE2,
+		MTWTS_STATE3
+	};
+
+	enum irg_pos_t
+	{
+		MTIRGP_START,
+		MTIRGP_ENDMINUS1,
+		MTIRGP_END
+	};
+
+
+	/* tape reader registers */
+	struct tx0_tape_reader_t
+	{
+		device_image_interface *fd = nullptr; /* file descriptor of tape image */
+
+		int motor_on = 0;   /* 1-bit reader motor on */
+
+		int rcl = 0;        /* 1-bit reader clutch */
+		int rc = 0;         /* 2-bit reader counter */
+
+		emu_timer *timer = nullptr;   /* timer to simulate reader timing */
+	};
+
+
+	/* tape puncher registers */
+	struct tape_puncher_t
+	{
+		device_image_interface *fd = nullptr; /* file descriptor of tape image */
+
+		emu_timer *timer = nullptr;   /* timer to generate completion pulses */
+	};
+
+
+	/* typewriter registers */
+	struct tx0_typewriter_t
+	{
+		device_image_interface *fd = nullptr; /* file descriptor of output image */
+
+		emu_timer *prt_timer = nullptr;/* timer to generate completion pulses */
+	};
+
+
+	/* magnetic tape unit registers */
+	struct magtape_t
+	{
+		device_image_interface *img = nullptr;        /* image descriptor */
+
+		state_t state;
+
+		int command = 0;
+		int binary_flag = 0;
+
+		union
+		{
+			backspace_state_t backspace_state;
+			struct
+			{
+				state_2_t state;
+				int space_flag;
+			} read;
+			struct
+			{
+				state_3_t state;
+				int counter;
+			} write;
+		} u;
+
+		int sel_pending = 0;
+		int cpy_pending = 0;
+
+		irg_pos_t irg_pos;          /* position relative to inter-record gap */
+
+		int long_parity = 0;
+
+		emu_timer *timer = nullptr;   /* timer to simulate reader timing */
+	};
+
+
 	tx0_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -161,15 +160,15 @@ public:
 	void schedule_unselect();
 
 protected:
-	int m_old_typewriter_keys[4];
-	int m_old_control_keys;
-	int m_old_tsr_keys;
-	int m_tsr_index;
-	int m_typewriter_color;
+	int m_old_typewriter_keys[4]{};
+	int m_old_control_keys = 0;
+	int m_old_tsr_keys = 0;
+	int m_tsr_index = 0;
+	int m_typewriter_color = 0;
 	bitmap_ind16 m_panel_bitmap;
 	bitmap_ind16 m_typewriter_bitmap;
-	int m_pos;
-	int m_case_shift;
+	int m_pos = 0;
+	int m_case_shift = 0;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -191,6 +190,7 @@ protected:
 	void tx0_draw_char(bitmap_ind16 &bitmap, char character, int x, int y, int color);
 	void tx0_draw_string(bitmap_ind16 &bitmap, const char *buf, int x, int y, int color);
 	void tx0_draw_vline(bitmap_ind16 &bitmap, int x, int y, int height, int color);
+	[[maybe_unused]] void tx0_draw_hline(bitmap_ind16 &bitmap, int x, int y, int width, int color);
 	void tx0_draw_panel_backdrop(bitmap_ind16 &bitmap);
 	void tx0_draw_panel(bitmap_ind16 &bitmap);
 	void tx0_typewriter_linefeed();

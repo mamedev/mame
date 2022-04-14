@@ -108,7 +108,7 @@ protected:
 		TIMER_SCANLINE
 	};
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -297,7 +297,7 @@ uint8_t beezer_state::line_r()
 //  AUDIO
 //**************************************************************************
 
-void beezer_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void beezer_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

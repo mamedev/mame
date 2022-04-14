@@ -31,6 +31,7 @@
 #include "machine/bankdev.h"
 
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -324,7 +325,7 @@ void elwro800_state::elwro800jr_io_w(offs_t offset, uint8_t data)
 	if (!BIT(cs,0))
 	{
 		// CFE
-		spectrum_port_fe_w(offset, data);
+		spectrum_ula_w(offset, data);
 	}
 	else if (!BIT(cs,1))
 	{
@@ -577,7 +578,6 @@ void elwro800_state::elwro800(machine_config &config)
 	screen.set_raw(14_MHz_XTAL / 2, 448, 0, SPEC_SCREEN_WIDTH, 312, 0, SPEC_SCREEN_HEIGHT);
 	// Sync and interrupt timings determined by 2716 EPROM
 	screen.set_screen_update(FUNC(elwro800_state::screen_update_spectrum));
-	screen.screen_vblank().set(FUNC(elwro800_state::screen_vblank_spectrum));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(elwro800_state::spectrum_palette), 16);

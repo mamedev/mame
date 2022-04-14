@@ -8,6 +8,7 @@
 #include "diablo.h"
 
 #include "emuopts.h"
+#include "fileio.h"
 #include "harddisk.h"
 #include "romload.h"
 
@@ -34,8 +35,7 @@ DEFINE_DEVICE_TYPE(DIABLO, diablo_image_device, "diablo_image", "Diablo")
 //-------------------------------------------------
 
 diablo_image_device::diablo_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DIABLO, tag, owner, clock),
-		device_image_interface(mconfig, *this),
+	: harddisk_image_base_device(mconfig, DIABLO, tag, owner, clock),
 		m_chd(nullptr),
 		m_hard_disk_handle(nullptr),
 		m_device_image_load(*this),
@@ -83,7 +83,7 @@ void diablo_image_device::device_start()
 	chd_file *handle = machine().rom_load().get_disk_handle(tag());
 	if (handle != nullptr)
 	{
-		m_hard_disk_handle = hard_disk_open(handle);
+		m_hard_disk_handle = new hard_disk_file(handle);
 	}
 	else
 	{
@@ -94,7 +94,7 @@ void diablo_image_device::device_start()
 void diablo_image_device::device_stop()
 {
 	if (m_hard_disk_handle)
-		hard_disk_close(m_hard_disk_handle);
+		delete m_hard_disk_handle;
 }
 
 image_init_result diablo_image_device::call_load()
@@ -154,7 +154,7 @@ void diablo_image_device::call_unload()
 
 	if (m_hard_disk_handle != nullptr)
 	{
-		hard_disk_close(m_hard_disk_handle);
+		delete m_hard_disk_handle;
 		m_hard_disk_handle = nullptr;
 	}
 
@@ -213,7 +213,7 @@ image_init_result diablo_image_device::internal_load_dsk()
 	m_chd = nullptr;
 
 	if (m_hard_disk_handle)
-		hard_disk_close(m_hard_disk_handle);
+		delete m_hard_disk_handle;
 
 	/* open the CHD file */
 	if (loaded_through_softlist())
@@ -249,7 +249,7 @@ image_init_result diablo_image_device::internal_load_dsk()
 	if (m_chd != nullptr)
 	{
 		/* open the hard disk file */
-		m_hard_disk_handle = hard_disk_open(m_chd);
+		m_hard_disk_handle = new hard_disk_file(m_chd);
 		if (m_hard_disk_handle != nullptr)
 			return image_init_result::PASS;
 	}
@@ -261,20 +261,4 @@ image_init_result diablo_image_device::internal_load_dsk()
 	seterror(err, nullptr);
 
 	return image_init_result::FAIL;
-}
-
-/*************************************
- *
- *  Get the CHD file (from the src/chd.c core)
- *  after an image has been opened with the hd core
- *
- *************************************/
-
-chd_file *diablo_image_device::get_chd_file()
-{
-	chd_file *result = nullptr;
-	hard_disk_file *hd_file = get_hard_disk_file();
-	if (hd_file)
-		result = hard_disk_get_chd(hd_file);
-	return result;
 }

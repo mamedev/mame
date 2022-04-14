@@ -3115,7 +3115,7 @@ void spcenctr_audio_device::device_start()
 
 	save_item(NAME(m_strobe_enable));
 
-	strobe_callback(nullptr, 0U);
+	strobe_callback(0);
 }
 
 TIMER_CALLBACK_MEMBER(spcenctr_audio_device::strobe_callback)

@@ -88,9 +88,9 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	bool m_kbd_ack;
-	bool m_vdp_int;
-	u8 m_term_data;
+	bool m_kbd_ack = 0;
+	bool m_vdp_int = 0;
+	u8 m_term_data = 0U;
 	required_device<tms9995_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;

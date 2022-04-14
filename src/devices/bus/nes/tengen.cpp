@@ -65,18 +65,6 @@ nes_tengen037_device::nes_tengen037_device(const machine_config &mconfig, const 
 
 
 
-void nes_tengen008_device::device_start()
-{
-	common_start();
-}
-
-void nes_tengen008_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
 void nes_tengen032_device::device_start()
 {
 	common_start();
@@ -181,7 +169,7 @@ inline void nes_tengen032_device::irq_clock(int blanked)
 // we use the HBLANK IRQ latch from PPU for the scanline based IRQ mode
 // and a timer for the cycle based IRQ mode, which both call irq_clock
 
-void nes_tengen032_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_tengen032_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{

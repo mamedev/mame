@@ -541,18 +541,24 @@ void bq48x2_device::nvram_default()
 	std::fill_n(m_sram.get(), m_memsize, 0);
 }
 
-void bq48x2_device::nvram_read(emu_file &file)
+bool bq48x2_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_sram.get(), m_memsize);
+	size_t actual;
+	if (file.read(m_sram.get(), m_memsize, actual) || actual != m_memsize)
+		return false;
 
 	transfer_to_access();  // Transfer the system time into the readable registers
 
 	// Clear the saved flags
 	set_register(reg_flags, 0xf8, true);
+
+	return true;
 }
 
-void bq48x2_device::nvram_write(emu_file &file)
+bool bq48x2_device::nvram_write(util::write_stream &file)
 {
 	transfer_to_access();
-	file.write(m_sram.get(), m_memsize);
+
+	size_t actual;
+	return !file.write(m_sram.get(), m_memsize, actual) && actual == m_memsize;
 }

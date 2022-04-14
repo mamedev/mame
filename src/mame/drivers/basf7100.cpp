@@ -61,6 +61,7 @@
 #include "machine/basf7100_kbd.h"
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 
 
 namespace {

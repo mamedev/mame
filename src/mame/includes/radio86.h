@@ -81,7 +81,7 @@ protected:
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
 
-	memory_passthrough_handler *m_rom_shadow_tap;
+	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	optional_device<generic_slot_device> m_cart;    // for ROMDisk - only Radio86K & Orion?
@@ -97,11 +97,11 @@ protected:
 	optional_region_ptr<uint8_t> m_chargen;
 
 private:
-	int m_keyboard_mask;
-	std::unique_ptr<uint8_t[]> m_radio_ram_disk;
-	uint8_t m_romdisk_lsb;
-	uint8_t m_romdisk_msb;
-	uint8_t m_disk_sel;
+	int m_keyboard_mask = 0;
+	std::unique_ptr<uint8_t[]> m_radio_ram_disk{};
+	uint8_t m_romdisk_lsb = 0;
+	uint8_t m_romdisk_msb = 0;
+	uint8_t m_disk_sel = 0;
 	void radio86_pagesel(uint8_t data);
 	uint8_t kr03_8255_portb_r2();
 	uint8_t radio86rom_romdisk_porta_r();

@@ -20216,6 +20216,7 @@ void m68000_base_device::x4e7b_movec_l_4()
 			{
 				m_pmmu_enabled = 0;
 			}
+			m_instruction_restart = m_pmmu_enabled || m_emmu_enabled;
 			break;
 		case 0x004:         /* ITT0 */
 			m_mmu_itt0 = REG_DA()[(word2 >> 12) & 15];
@@ -26542,16 +26543,12 @@ void m68000_base_device::x4e73_rte_l_71()
 			m_instr_mode = INSTRUCTION_YES;
 			m_run_mode = RUN_MODE_NORMAL;
 		} else {
-			if (format_word == 0x8) /* type 1000 stack frame */
+			if (format_word == 0x8) /* 68010 - type 1000 stack frame */
 			{
 				new_sr = m68ki_pull_16();
 				new_pc = m68ki_pull_32();
-				m68ki_fake_pull_16();   /* format word */
-				m68ki_jump(new_pc);
-				m68ki_set_sr(new_sr);
-				m_instr_mode = INSTRUCTION_YES;
-				m_run_mode = RUN_MODE_NORMAL;
-				m68ki_fake_pull_16();  /* special status */
+				m68ki_fake_pull_16();  /* format word */
+				m68ki_fake_pull_16();  /* special status word */
 				m68ki_fake_pull_32();  /* fault address */
 				m68ki_fake_pull_32();  /* reserved and data output buffer */
 				m68ki_fake_pull_32();  /* reserved and data input buffer */
@@ -26564,6 +26561,10 @@ void m68000_base_device::x4e73_rte_l_71()
 				m68ki_fake_pull_32();
 				m68ki_fake_pull_32();
 				m68ki_fake_pull_32();
+				m68ki_jump(new_pc);
+				m68ki_set_sr(new_sr);
+				m_instr_mode = INSTRUCTION_YES;
+				m_run_mode = RUN_MODE_NORMAL;
 			}
 			else
 			{
@@ -30364,12 +30365,14 @@ void m68000_base_device::x50fc_trapt_234fc()
 }
 void m68000_base_device::x50fa_trapt_w_234fc()
 {
+	m_pc += 2; // increase before else stackframe & return addresses are incorrect
 	m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
 
 
 }
 void m68000_base_device::x50fb_trapt_l_234fc()
 {
+	m_pc += 4; // increase before else stackframe & return addresses are incorrect
 	m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
 
 
@@ -30491,280 +30494,252 @@ void m68000_base_device::x5ffc_traple_234fc()
 }
 void m68000_base_device::x52fa_traphi_w_234fc()
 {
+	m_pc += 2;    /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_HI()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 2;
 	}
 
 
 }
 void m68000_base_device::x53fa_trapls_w_234fc()
 {
+	m_pc += 2;    /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_LS()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 2;
 	}
 
 
 }
 void m68000_base_device::x54fa_trapcc_w_234fc()
 {
+	m_pc += 2;    /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_CC()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 2;
 	}
 
 
 }
 void m68000_base_device::x55fa_trapcs_w_234fc()
 {
+	m_pc += 2;    /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_CS()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 2;
 	}
 
 
 }
 void m68000_base_device::x56fa_trapne_w_234fc()
 {
+	m_pc += 2;    /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_NE()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 2;
 	}
 
 
 }
 void m68000_base_device::x57fa_trapeq_w_234fc()
 {
+	m_pc += 2;    /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_EQ()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 2;
 	}
 
 
 }
 void m68000_base_device::x58fa_trapvc_w_234fc()
 {
+	m_pc += 2;    /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_VC()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 2;
 	}
 
 
 }
 void m68000_base_device::x59fa_trapvs_w_234fc()
 {
+	m_pc += 2;    /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_VS()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 2;
 	}
 
 
 }
 void m68000_base_device::x5afa_trappl_w_234fc()
 {
+	m_pc += 2;    /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_PL()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 2;
 	}
 
 
 }
 void m68000_base_device::x5bfa_trapmi_w_234fc()
 {
+	m_pc += 2;    /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_MI()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 2;
 	}
 
 
 }
 void m68000_base_device::x5cfa_trapge_w_234fc()
 {
+	m_pc += 2;    /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_GE()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 2;
 	}
 
 
 }
 void m68000_base_device::x5dfa_traplt_w_234fc()
 {
+	m_pc += 2;    /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_LT()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 2;
 	}
 
 
 }
 void m68000_base_device::x5efa_trapgt_w_234fc()
 {
+	m_pc += 2;    /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_GT()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 2;
 	}
 
 
 }
 void m68000_base_device::x5ffa_traple_w_234fc()
 {
+	m_pc += 2;    /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_LE()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 2;
 	}
 
 
 }
 void m68000_base_device::x52fb_traphi_l_234fc()
 {
+	m_pc += 4;  /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_HI()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 4;
 	}
 
 
 }
 void m68000_base_device::x53fb_trapls_l_234fc()
 {
+	m_pc += 4;  /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_LS()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 4;
 	}
 
 
 }
 void m68000_base_device::x54fb_trapcc_l_234fc()
 {
+	m_pc += 4;  /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_CC()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 4;
 	}
 
 
 }
 void m68000_base_device::x55fb_trapcs_l_234fc()
 {
+	m_pc += 4;  /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_CS()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 4;
 	}
 
 
 }
 void m68000_base_device::x56fb_trapne_l_234fc()
 {
+	m_pc += 4;  /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_NE()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 4;
 	}
 
 
 }
 void m68000_base_device::x57fb_trapeq_l_234fc()
 {
+	m_pc += 4;  /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_EQ()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 4;
 	}
 
 
 }
 void m68000_base_device::x58fb_trapvc_l_234fc()
 {
+	m_pc += 4;  /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_VC()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 4;
 	}
 
 
 }
 void m68000_base_device::x59fb_trapvs_l_234fc()
 {
+	m_pc += 4;  /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_VS()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 4;
 	}
 
 
 }
 void m68000_base_device::x5afb_trappl_l_234fc()
 {
+	m_pc += 4;  /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_PL()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 4;
 	}
 
 
 }
 void m68000_base_device::x5bfb_trapmi_l_234fc()
 {
+	m_pc += 4;  /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_MI()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 4;
 	}
 
 
 }
 void m68000_base_device::x5cfb_trapge_l_234fc()
 {
+	m_pc += 4;  /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_GE()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 4;
 	}
 
 
 }
 void m68000_base_device::x5dfb_traplt_l_234fc()
 {
+	m_pc += 4;  /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_LT()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 4;
 	}
 
 
 }
 void m68000_base_device::x5efb_trapgt_l_234fc()
 {
+	m_pc += 4;  /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_GT()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 4;
 	}
 
 
 }
 void m68000_base_device::x5ffb_traple_l_234fc()
 {
+	m_pc += 4;  /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_LE()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 4;
 	}
 
 

@@ -86,7 +86,7 @@ void null_modem_device::device_reset()
 	queue();
 }
 
-void null_modem_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void null_modem_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

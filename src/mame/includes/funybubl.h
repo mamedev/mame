@@ -44,7 +44,7 @@ private:
 	required_memory_bank m_okibank;
 
 	/* video-related */
-	tilemap_t     *m_tilemap;
+	tilemap_t     *m_tilemap = nullptr;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

@@ -4,6 +4,7 @@
     Ensoniq panel/display device
 */
 #include "emu.h"
+#include "http.h"
 #include "esqpanel.h"
 
 #define ESQPANEL_EXTERNAL_TIMER_ID 47000
@@ -483,7 +484,7 @@ void esqpanel_device::device_stop()
 	m_external_panel_server = nullptr;
 }
 
-void esqpanel_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void esqpanel_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (ESQPANEL_EXTERNAL_TIMER_ID == id)
 	{

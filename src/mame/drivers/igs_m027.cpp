@@ -985,6 +985,24 @@ ROM_START( qlgs )
 	ROM_LOAD( "sp_u5.u5", 0x00000, 0x200000, CRC(6049b892) SHA1(f87285a288bd3fd169080045f70ff15181661582) ) // 11xxxxxxxxxxxxxxxxxxx = 0x00
 ROM_END
 
+ROM_START( extradrw ) // IGS PCB 0326-05-DV-1
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal rom of IGS027A ARM based MCU
+	ROM_LOAD( "extradrw_igs027a", 0x00000, 0x4000, NO_DUMP ) // has a 'E1' sticker
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg?
+	ROM_LOAD( "u21", 0x00000, 0x80000, CRC(c1641b14) SHA1(bd2525a5b38d4d8a39e99e43ef62e1d2fd3c044d) ) // 1ST AND 2ND HALF IDENTICAL, label not readable
+
+	ROM_REGION( 0x280000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "u12",           0x000000, 0x200000, CRC(642247fb) SHA1(69c01c3551551120a3786522b28a80621a0d5082) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF, label not readable
+	ROM_LOAD( "igs m3001.u4",  0x000000, 0x080000, CRC(d161f8f7) SHA1(4b495197895fd805979c5d5c5a4b7f07a68f4171) ) // label barely readable
+
+	ROM_REGION( 0x100000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "u3", 0x000000, 0x80000, CRC(97227767) SHA1(c6a1916c0df1aceafbd488ecace5794390058c49) ) // FIXED BITS (xxxxxxx0xxxxxxxx), label not readable
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "igs s3002.u18", 0x00000, 0x200000, CRC(48601c32) SHA1(8ef3bad80931f4b1badf0598463e15508602f104) ) // BADADDR   --xxxxxxxxxxxxxxxxxxx
+ROM_END
 
 void igs_m027_state::pgm_create_dummy_internal_arm_region()
 {
@@ -1144,10 +1162,11 @@ GAME( 2002, sdwx,      0,        igs_mahjong, sdwx, igs_m027_state, init_sdwx,  
 GAME( 2002, amazoni2,  0,        igs_mahjong, sdwx, igs_m027_state, init_amazoni2, ROT0, "IGS", "Amazonia King II (V202BR)", MACHINE_IS_SKELETON )
 GAME( 200?, sddz,      0,        igs_mahjong, sdwx, igs_m027_state, init_sddz,     ROT0, "IGS", "Super Dou Di Zhu",  MACHINE_IS_SKELETON )
 GAME( 2000, zhongguo,  0,        igs_mahjong, sdwx, igs_m027_state, init_zhongguo, ROT0, "IGS", "Zhong Guo Chu Da D",  MACHINE_IS_SKELETON )
-GAME( 200?, lhzb3,     0,        igs_mahjong, sdwx, igs_m027_state, init_lhzb3,    ROT0, "IGS", "Long Hu Zheng Ba 3", MACHINE_IS_SKELETON )
-GAME( 200?, lhzb4,     0,        igs_mahjong, sdwx, igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zheng Ba 4", MACHINE_IS_SKELETON )
+GAME( 200?, lhzb3,     0,        igs_mahjong, sdwx, igs_m027_state, init_lhzb3,    ROT0, "IGS", "Long Hu Zhengba III", MACHINE_IS_SKELETON ) // 龙虎争霸Ⅲ
+GAME( 200?, lhzb4,     0,        igs_mahjong, sdwx, igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zhengba 4", MACHINE_IS_SKELETON ) // 龙虎争霸4
 GAME( 200?, klxyj,     0,        igs_mahjong, sdwx, igs_m027_state, init_klxyj,    ROT0, "IGS", "Kuai Le Xi You Ji",  MACHINE_IS_SKELETON )
 GAME( 2000, mgfx,      0,        igs_mahjong, sdwx, igs_m027_state, init_mgfx,     ROT0, "IGS", "Man Guan Fu Xing",   MACHINE_IS_SKELETON )
 GAME( 200?, gonefsh2,  0,        igs_mahjong, sdwx, igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2",   MACHINE_IS_SKELETON )
 GAME( 2002, chessc2,   0,        igs_mahjong, sdwx, igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II",   MACHINE_IS_SKELETON )
 GAME( 200?, haunthig,  0,        igs_mahjong, sdwx, igs_m027_state, init_hauntedh, ROT0, "IGS", "Haunted House (IGS)",   MACHINE_IS_SKELETON )
+GAME( 200?, extradrw,  0,        igs_mahjong, sdwx, igs_m027_state, init_qlgs,     ROT0, "IGS", "Extra Draw",   MACHINE_IS_SKELETON )

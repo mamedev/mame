@@ -2,23 +2,23 @@
 // copyright-holders:Miodrag Milanovic, Robbbert
 /***************************************************************************
 
-        Pyldin-601
+Pyldin-601
 
-        12/05/2009 Skeleton driver.
-        22/04/2012 Added sound, fixed keyboard, marked as working [Robbbert]
+2009-05-12 Skeleton driver.
+2012-04-22 Added sound, fixed keyboard, marked as working [Robbbert]
 
-        ToDo?
-        - PYL601 - command 'MODE80' does nothing
+ToDo?
+- PYL601 - command 'MODE80' does nothing
 
-        - PYL601a - most software looks odd (unplayable) because of the
-          different design of the screen.
-        - PYL601A - command 'MODE40' doesn't go to 40-columns, instead
-          there is a space between each letter.
+- PYL601a - most software looks odd (unplayable) because of the
+            different design of the screen.
+- PYL601A - command 'MODE40' doesn't go to 40-columns, instead
+            there is a space between each letter.
 
 
-        The BASIC
-        - to get back to dos, enter SYSTEM
-        - It has its own internal monitor: MON to enter, Q to exit.
+The BASIC
+- to get back to dos, enter SYSTEM
+- It has its own internal monitor: MON to enter, Q to exit.
 
 
 
@@ -44,7 +44,7 @@
 #include "video/mc6845.h"
 
 #include "emupal.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -54,14 +54,14 @@
 class pyl601_state : public driver_device
 {
 public:
-	pyl601_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_speaker(*this, "speaker"),
-		m_fdc(*this, "upd765"),
-		m_floppy(*this, "upd765:%u", 0U),
-		m_ram(*this, RAM_TAG),
-		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette")
+	pyl601_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_speaker(*this, "speaker")
+		, m_fdc(*this, "upd765")
+		, m_floppy(*this, "upd765:%u", 0U)
+		, m_ram(*this, RAM_TAG)
+		, m_maincpu(*this, "maincpu")
+		, m_palette(*this, "palette")
 	{ }
 
 	void pyl601(machine_config &config);
@@ -95,13 +95,13 @@ private:
 	static void floppy_formats(format_registration &fr);
 	void mem_map(address_map &map);
 
-	uint8_t m_rom_page;
-	uint32_t m_vdisk_addr;
-	uint8_t m_key_code;
-	uint8_t m_keyboard_clk;
-	uint8_t m_video_mode;
-	uint8_t m_tick50_mark;
-	uint8_t m_floppy_ctrl;
+	uint8_t m_rom_page = 0U;
+	uint32_t m_vdisk_addr = 0U;
+	uint8_t m_key_code = 0U;
+	uint8_t m_keyboard_clk = 0U;
+	uint8_t m_video_mode = 0U;
+	uint8_t m_tick50_mark = 0U;
+	uint8_t m_floppy_ctrl = 0U;
 
 	required_device<speaker_sound_device> m_speaker;
 	required_device<upd765a_device> m_fdc;

@@ -33,11 +33,13 @@
 #include "emuopts.h"
 #include "mameopts.h"
 #include "drivenum.h"
+#include "fileio.h"
 #include "natkeyboard.h"
 #include "render.h"
 #include "cheat.h"
 #include "rendfont.h"
 #include "romload.h"
+#include "screen.h"
 #include "uiinput.h"
 
 #include "../osd/modules/lib/osdobj_common.h"
@@ -117,7 +119,6 @@ std::string mame_ui_manager::messagebox_poptext;
 
 // slider info
 std::vector<ui::menu_item> mame_ui_manager::slider_list;
-slider_state *mame_ui_manager::slider_current;
 
 
 /***************************************************************************
@@ -182,6 +183,7 @@ mame_ui_manager::mame_ui_manager(running_machine &machine)
 	, m_target_font_height(0)
 	, m_has_warnings(false)
 	, m_unthrottle_mute(false)
+	, m_image_display_enabled(true)
 	, m_machine_info()
 	, m_unemulated_features()
 	, m_imperfect_features()
@@ -345,14 +347,6 @@ void mame_ui_manager::initialize(running_machine &machine)
 
 	// initialize the on-screen display system
 	slider_list = slider_init(machine);
-	if (slider_list.size() > 0)
-	{
-		slider_current = reinterpret_cast<slider_state *>(slider_list[0].ref);
-	}
-	else
-	{
-		slider_current = nullptr;
-	}
 
 	// if no test switch found, assign its input sequence to a service mode DIP
 	if (!m_machine_info->has_test_switch() && m_machine_info->has_dips())
@@ -360,7 +354,7 @@ void mame_ui_manager::initialize(running_machine &machine)
 		const char *const service_mode_dipname = ioport_configurer::string_from_token(DEF_STR(Service_Mode));
 		for (auto &port : machine.ioport().ports())
 			for (ioport_field &field : port.second->fields())
-				if (field.type() == IPT_DIPSWITCH && strcmp(field.name(), service_mode_dipname) == 0)
+				if ((field.type() == IPT_DIPSWITCH) && (field.name() == service_mode_dipname)) // FIXME: probably breaks with localisation, also issues with multiple devices
 					field.set_defseq(machine.ioport().type_seq(IPT_SERVICE));
 	}
 
@@ -1189,7 +1183,7 @@ void mame_ui_manager::start_load_state()
 void mame_ui_manager::image_handler_ingame()
 {
 	// run display routine for devices
-	if (machine().phase() == machine_phase::RUNNING)
+	if (m_image_display_enabled && machine().phase() == machine_phase::RUNNING)
 	{
 		auto layout = create_layout(machine().render().ui_container());
 
@@ -1605,13 +1599,9 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 	std::vector<ui::menu_item> items;
 	for (auto &slider : m_sliders)
 	{
-		ui::menu_item item;
-		item.text = slider->description;
-		item.subtext = "";
-		item.flags = 0;
-		item.ref = slider.get();
-		item.type = ui::menu_item_type::SLIDER;
-		items.push_back(item);
+		ui::menu_item item(ui::menu_item_type::SLIDER, slider.get());
+		item.set_text(slider->description);
+		items.emplace_back(std::move(item));
 	}
 
 	return items;

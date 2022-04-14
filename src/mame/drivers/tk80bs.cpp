@@ -57,7 +57,7 @@ private:
 	uint8_t port_b_r();
 	uint32_t screen_update_tk80bs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mem_map(address_map &map);
-	uint8_t m_term_data;
+	uint8_t m_term_data = 0U;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi;
@@ -68,16 +68,13 @@ private:
 
 uint32_t tk80bs_state::screen_update_tk80bs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
-	int count;
+	u16 count = 0;
 
-	count = 0;
-
-	for(y=0;y<16;y++)
+	for(u8 y = 0; y < 16; y++)
 	{
-		for(x=0;x<32;x++)
+		for(u8 x = 0; x < 32; x++)
 		{
-			int tile = m_p_videoram[count++];
+			u8 tile = m_p_videoram[count++];
 
 			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8, y*8);
 		}

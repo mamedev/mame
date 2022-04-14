@@ -690,7 +690,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void tra_complete() override;
 	virtual void tra_callback() override;
@@ -755,7 +755,7 @@ void funcube_touchscreen_device::device_reset()
 	m_tx_cb(1);
 }
 
-void funcube_touchscreen_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void funcube_touchscreen_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if(!id) {
 		uint8_t button_state = m_btn->read();

@@ -150,7 +150,7 @@ WRITE_LINE_MEMBER(m68sfdc_device::handle_nmi)
 	m_nmi_handler(state);
 }
 
-void m68sfdc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void m68sfdc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

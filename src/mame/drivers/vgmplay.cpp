@@ -49,6 +49,7 @@
 
 #include "vgmplay.lh"
 #include "debugger.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include <zlib.h>
@@ -305,24 +306,24 @@ private:
 
 	struct stream
 	{
-		uint8_t byte_depth;
-		uint32_t position;
-		emu_timer *timer;
+		uint8_t byte_depth = 0;
+		uint32_t position = 0;
+		emu_timer *timer = nullptr;
 		// stream control
 		vgm_chip chip_type;
-		uint8_t port;
-		uint8_t reg;
+		uint8_t port = 0;
+		uint8_t reg = 0;
 		// stream data
-		uint8_t bank;
-		uint8_t step_size;
-		uint8_t step_base;
+		uint8_t bank = 0;
+		uint8_t step_size = 0;
+		uint8_t step_base = 0;
 		// frequency
-		uint32_t frequency;
+		uint32_t frequency = 0;
 		// start stream
-		uint32_t offset;
-		uint32_t length;
-		bool loop;
-		bool reverse;
+		uint32_t offset = 0;
+		uint32_t length = 0;
+		bool loop = false;
+		bool reverse = false;
 	};
 
 	TIMER_CALLBACK_MEMBER(stream_timer_expired);
@@ -386,9 +387,9 @@ private:
 	uint32_t m_okim6295_bank[2];
 	uint32_t m_okim6295_nmk112_bank[2][4];
 
-	C140_TYPE m_c140_bank[2];
+	C140_TYPE m_c140_bank[2]{};
 
-	int m_sega32x_channel_hack;
+	int m_sega32x_channel_hack = 0;
 	int m_nes_apu_channel_hack[2];
 	uint8_t m_c6280_channel[2];
 
@@ -472,7 +473,7 @@ public:
 private:
 	virtual void machine_start() override;
 
-	uint32_t m_held_clock;
+	uint32_t m_held_clock = 0;
 	std::vector<uint8_t> m_file_data;
 	required_device<vgmplay_device> m_vgmplay;
 	required_device<vgmviz_device> m_mixer;
@@ -2981,9 +2982,12 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state::load_file)
 		m_okim6295[0]->set_pin7(m_okim6295_pin7[0] ? okim6295_device::PIN7_HIGH : okim6295_device::PIN7_LOW);
 		m_okim6295[1]->set_pin7(m_okim6295_pin7[1] ? okim6295_device::PIN7_HIGH : okim6295_device::PIN7_LOW);
 
-		if (setup_device(*m_k051649[0], 0, CT_K051649, 0x9c, 0x161) ||
-			setup_device(*m_k051649[1], 1, CT_K051649, 0x9c, 0x161))
-			osd_printf_warning("Warning: file requests an unsupported Konami SCC\n");
+		setup_device(*m_k051649[0], 0, CT_K051649, 0x9c, 0x161);
+		setup_device(*m_k051649[1], 1, CT_K051649, 0x9c, 0x161);
+
+		// HACK: Some VGMs contain the halved clock speed of the sound core inside the SCC
+		m_k051649[0]->set_clock_scale(m_k051649[0]->unscaled_clock() < 2097152 ? 2.0 : 1.0);
+		m_k051649[1]->set_clock_scale(m_k051649[1]->unscaled_clock() < 2097152 ? 2.0 : 1.0);
 
 		setup_device(*m_k054539[0], 0, CT_K054539, 0xa0, 0x161);
 		setup_device(*m_k054539[1], 1, CT_K054539, 0xa0, 0x161);

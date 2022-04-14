@@ -160,21 +160,21 @@ private:
 	TILEMAP_MAPPER_MEMBER(tile_scan_layer0);
 	TILEMAP_MAPPER_MEMBER(tile_scan_layer1);
 
-	uint16_t m_dsp_ram[0x1000];
-	uint16_t m_io_share_ram[0x2000];
+	uint16_t m_dsp_ram[0x1000]{};
+	uint16_t m_io_share_ram[0x2000]{};
 
 	std::unique_ptr<uint32_t[]> m_screen_ram;
 	std::unique_ptr<uint32_t[]> m_pal_ram;
 
-	tilemap_t *m_tilemap[2];
+	tilemap_t *m_tilemap[2]{};
 
-	uint32_t m_video_address;
+	uint32_t m_video_address = 0;
 
-	uint32_t m_dsp_rom_address;
-	int m_scroll_x;
-	int m_scroll_y;
+	uint32_t m_dsp_rom_address = 0;
+	int m_scroll_x = 0;
+	int m_scroll_y = 0;
 
-	uint32_t m_tlcs_sound_ptr;
+	uint32_t m_tlcs_sound_ptr = 0;
 
 	void mn10200_map(address_map &map);
 	void ppc603e_mem(address_map &map);

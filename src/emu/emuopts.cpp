@@ -205,7 +205,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_RAMSIZE ";ram",                             nullptr,     OPTION_STRING,     "size of RAM (if supported by driver)" },
 	{ OPTION_CONFIRM_QUIT,                               "0",         OPTION_BOOLEAN,    "ask for confirmation before exiting" },
 	{ OPTION_UI_MOUSE,                                   "1",         OPTION_BOOLEAN,    "display UI mouse cursor" },
-	{ OPTION_LANGUAGE ";lang",                           "English",   OPTION_STRING,     "set UI display language" },
+	{ OPTION_LANGUAGE ";lang",                           "",          OPTION_STRING,     "set UI display language" },
 	{ OPTION_NVRAM_SAVE ";nvwrite",                      "1",         OPTION_BOOLEAN,    "save NVRAM data on exit" },
 
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "SCRIPTING OPTIONS" },

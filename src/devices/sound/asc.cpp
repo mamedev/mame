@@ -66,7 +66,7 @@ void asc_device::device_start()
 
 	memset(m_regs, 0, sizeof(m_regs));
 
-	m_timer = timer_alloc(0, nullptr);
+	m_timer = timer_alloc(0);
 
 	save_item(NAME(m_fifo_a_rdptr));
 	save_item(NAME(m_fifo_b_rdptr));
@@ -107,7 +107,7 @@ void asc_device::device_reset()
 //  device_timer - called when our device timer expires
 //-------------------------------------------------
 
-void asc_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void asc_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
 {
 	m_stream->update();
 }

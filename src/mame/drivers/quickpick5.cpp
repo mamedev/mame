@@ -614,12 +614,11 @@ void quickpick5_state::quickpick5(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	K051649(config, m_k051649, XTAL(32'000'000)/18);  // xtal is verified, divider is not
+	K051649(config, m_k051649, XTAL(32'000'000)/9);  // xtal is verified, divider is not
 	m_k051649->add_route(ALL_OUTPUTS, "mono", 0.45);
 
 	OKIM6295(config, m_oki, XTAL(32'000'000)/18, okim6295_device::PIN7_HIGH);
-	m_oki->add_route(0, "mono", 1.0);
-	m_oki->add_route(1, "mono", 1.0);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void quickpick5_state::waijockey(machine_config &config)

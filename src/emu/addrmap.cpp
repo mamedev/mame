@@ -38,6 +38,7 @@ address_map_entry::address_map_entry(device_t &device, address_map &map, offs_t 
 	, m_addrselect(0)
 	, m_mask(0)
 	, m_cswidth(0)
+	, m_flags(0)
 	, m_share(nullptr)
 	, m_region(nullptr)
 	, m_rgnoffs(0)
@@ -815,7 +816,7 @@ address_map::address_map(device_t &device, address_map_entry *entry)
 //  address_map - constructor dynamic device mapping case
 //----------------------------------------------------------
 
-address_map::address_map(const address_space &space, offs_t start, offs_t end, u64 unitmask, int cswidth, device_t &device, address_map_constructor submap_delegate)
+address_map::address_map(const address_space &space, offs_t start, offs_t end, u64 unitmask, int cswidth, u16 flags, device_t &device, address_map_constructor submap_delegate)
 	: m_spacenum(space.spacenum()),
 		m_device(&device),
 		m_view(nullptr),
@@ -823,7 +824,7 @@ address_map::address_map(const address_space &space, offs_t start, offs_t end, u
 		m_unmapval(space.unmap()),
 		m_globalmask(space.addrmask())
 {
-	(*this)(start, end).m(DEVICE_SELF, submap_delegate).umask64(unitmask).cswidth(cswidth);
+	(*this)(start, end).m(DEVICE_SELF, submap_delegate).umask64(unitmask).cswidth(cswidth).flags(flags);
 }
 
 
@@ -995,6 +996,7 @@ void address_map::import_submaps(running_machine &machine, device_t &owner, int 
 						subentry->m_mask = entry->m_mask;
 
 					subentry->m_cswidth = std::max(subentry->m_cswidth, entry->m_cswidth);
+					subentry->m_flags = subentry->m_flags | entry->m_flags;
 
 					if (subentry->m_addrend > max_end)
 						subentry->m_addrend = max_end;

@@ -47,9 +47,9 @@ protected:
 	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
 
 	// passthru
-	virtual void post_opcode_fetch(offs_t offset) override { m_exp->post_opcode_fetch(offset); };
-	virtual void pre_data_fetch(offs_t offset) override { m_exp->pre_data_fetch(offset); };
-	virtual void post_data_fetch(offs_t offset) override { m_exp->post_data_fetch(offset); };
+	virtual void post_opcode_fetch(offs_t offset) override { m_exp->post_opcode_fetch(offset); }
+	virtual void pre_data_fetch(offs_t offset) override { m_exp->pre_data_fetch(offset); }
+	virtual void post_data_fetch(offs_t offset) override { m_exp->post_data_fetch(offset); }
 	virtual void mreq_w(offs_t offset, uint8_t data) override { if (m_exp->romcs()) m_exp->mreq_w(offset, data); }
 
 	required_memory_region m_rom;

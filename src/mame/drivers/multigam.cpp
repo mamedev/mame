@@ -126,7 +126,8 @@ public:
 		m_dsw(*this, "DSW"),
 		m_bank_gfx(*this, "bank_gfx"),
 		m_bank_ppu(*this, "bank_ppu_%u", 1U),
-		m_bank_ram(*this, "bank_ram")
+		m_bank_ram(*this, "bank_ram"),
+		m_nt_page(*this, "nt_page%u", 0U)
 	{ }
 
 	void multigam(machine_config &config);
@@ -154,10 +155,10 @@ private:
 	memory_bank_creator m_bank_gfx;
 	memory_bank_array_creator<8> m_bank_ppu;
 	optional_memory_bank m_bank_ram;
+	required_memory_bank_array<4> m_nt_page;
 
 	std::unique_ptr<uint8_t[]> m_nt_ram;
 	std::unique_ptr<uint8_t[]> m_vram;
-	uint8_t* m_nt_page[4];
 	uint32_t m_in_0;
 	uint32_t m_in_1;
 	uint32_t m_in_0_shift;
@@ -190,8 +191,6 @@ private:
 	uint8_t m_supergm3_prg_bank;
 	uint8_t m_supergm3_chr_bank;
 
-	void multigam_nt_w(offs_t offset, uint8_t data);
-	uint8_t multigam_nt_r(offs_t offset);
 	void sprite_dma_w(address_space &space, uint8_t data);
 	uint8_t multigam_IN0_r();
 	void multigam_IN0_w(uint8_t data);
@@ -208,6 +207,7 @@ private:
 	void supergm3_prg_bank_w(uint8_t data);
 	void supergm3_chr_bank_w(uint8_t data);
 	void set_mirroring(int mirroring);
+	void common_start();
 	DECLARE_MACHINE_START(multigm3);
 	DECLARE_MACHINE_RESET(multigm3);
 	DECLARE_MACHINE_START(supergm3);
@@ -224,6 +224,7 @@ private:
 	void multigm3_map(address_map &map);
 	void multigmt_map(address_map &map);
 	void supergm3_map(address_map &map);
+	void ppu_map(address_map &map);
 };
 
 
@@ -238,54 +239,32 @@ void multigam_state::set_mirroring(int mirroring)
 {
 	switch(mirroring)
 	{
-	case PPU_MIRROR_LOW:
-		m_nt_page[0] = m_nt_page[1] = m_nt_page[2] = m_nt_page[3] = m_nt_ram.get();
-		break;
-	case PPU_MIRROR_HIGH:
-		m_nt_page[0] = m_nt_page[1] = m_nt_page[2] = m_nt_page[3] = m_nt_ram.get() + 0x400;
-		break;
-	case PPU_MIRROR_HORZ:
-		m_nt_page[0] = m_nt_ram.get();
-		m_nt_page[1] = m_nt_ram.get();
-		m_nt_page[2] = m_nt_ram.get() + 0x400;
-		m_nt_page[3] = m_nt_ram.get() + 0x400;
-		break;
-	case PPU_MIRROR_VERT:
-		m_nt_page[0] = m_nt_ram.get();
-		m_nt_page[1] = m_nt_ram.get() + 0x400;
-		m_nt_page[2] = m_nt_ram.get();
-		m_nt_page[3] = m_nt_ram.get() + 0x400;
-		break;
-	case PPU_MIRROR_NONE:
-	default:
-		m_nt_page[0] = m_nt_ram.get();
-		m_nt_page[1] = m_nt_ram.get() + 0x400;
-		m_nt_page[2] = m_nt_ram.get() + 0x800;
-		m_nt_page[3] = m_nt_ram.get() + 0xc00;
-		break;
+		case PPU_MIRROR_LOW:
+			for (int i = 0; i < 4; i++)
+				m_nt_page[i]->set_entry(0);
+			break;
+		case PPU_MIRROR_HIGH:
+			for (int i = 0; i < 4; i++)
+				m_nt_page[i]->set_entry(1);
+			break;
+		case PPU_MIRROR_HORZ:
+			for (int i = 0; i < 4; i++)
+				m_nt_page[i]->set_entry(BIT(i, 1));
+			break;
+		case PPU_MIRROR_VERT:
+		default:
+			for (int i = 0; i < 4; i++)
+				m_nt_page[i]->set_entry(i & 1);
+			break;
 	}
-}
-
-void multigam_state::multigam_nt_w(offs_t offset, uint8_t data)
-{
-	int page = ((offset & 0xc00) >> 10);
-	m_nt_page[page][offset & 0x3ff] = data;
-}
-
-
-uint8_t multigam_state::multigam_nt_r(offs_t offset)
-{
-	int page = ((offset & 0xc00) >> 10);
-	return m_nt_page[page][offset & 0x3ff];
 }
 
 void multigam_state::set_videorom_bank( int start, int count, int bank, int bank_size_in_kb)
 {
-	int i;
 	int offset = bank * (bank_size_in_kb * 0x400);
 	/* bank_size_in_kb is used to determine how large the "bank" parameter is */
 	/* count determines the size of the area mapped in KB */
-	for (i = 0; i < count; i++, offset += 0x400)
+	for (int i = 0; i < count; i++, offset += 0x400)
 	{
 		m_bank_ppu[i + start]->set_base(memregion("gfx1")->base() + offset);
 	}
@@ -293,11 +272,10 @@ void multigam_state::set_videorom_bank( int start, int count, int bank, int bank
 
 void multigam_state::set_videoram_bank( int start, int count, int bank, int bank_size_in_kb)
 {
-	int i;
 	int offset = bank * (bank_size_in_kb * 0x400);
 	/* bank_size_in_kb is used to determine how large the "bank" parameter is */
 	/* count determines the size of the area mapped in KB */
-	for (i = 0; i < count; i++, offset += 0x400)
+	for (int i = 0; i < count; i++, offset += 0x400)
 	{
 		m_bank_ppu[i + start]->set_base(m_vram.get() + offset);
 	}
@@ -444,6 +422,16 @@ void multigam_state::multigmt_map(address_map &map)
 	map(0x5fff, 0x5fff).portr("IN0");
 	map(0x6000, 0x7fff).rom();
 	map(0x8000, 0xffff).rom().w(FUNC(multigam_state::multigam_mapper2_w));
+}
+
+void multigam_state::ppu_map(address_map &map)
+{
+	// map(0x0000, 0x1fff)
+	map(0x2000, 0x23ff).mirror(0x1000).bankrw(m_nt_page[0]);
+	map(0x2400, 0x27ff).mirror(0x1000).bankrw(m_nt_page[1]);
+	map(0x2800, 0x2bff).mirror(0x1000).bankrw(m_nt_page[2]);
+	map(0x2c00, 0x2fff).mirror(0x1000).bankrw(m_nt_page[3]);
+	map(0x3f00, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::palette_read), FUNC(ppu2c0x_device::palette_write));
 }
 
 /******************************************************
@@ -1157,29 +1145,29 @@ MACHINE_RESET_MEMBER(multigam_state,multigm3)
 	multigm3_switch_prg_rom(space, 0x01 );
 }
 
+void multigam_state::common_start()
+{
+	m_nt_ram = std::make_unique<u8[]>(0x800);
+
+	for (int i = 0; i < 4; i++)
+		m_nt_page[i]->configure_entries(0, 2, m_nt_ram.get(), 0x400);
+
+	set_mirroring(PPU_MIRROR_VERT);
+}
+
 void multigam_state::machine_start()
 {
-	m_nt_ram = std::make_unique<uint8_t[]>(0x1000);
-	m_nt_page[0] = m_nt_ram.get();
-	m_nt_page[1] = m_nt_ram.get() + 0x400;
-	m_nt_page[2] = m_nt_ram.get() + 0x800;
-	m_nt_page[3] = m_nt_ram.get() + 0xc00;
+	common_start();
 
-	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8sm_delegate(*this, FUNC(multigam_state::multigam_nt_r)), write8sm_delegate(*this, FUNC(multigam_state::multigam_nt_w)));
 	m_ppu->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, m_bank_gfx);
 	m_bank_gfx->set_base(memregion("gfx1")->base());
 }
 
 MACHINE_START_MEMBER(multigam_state,multigm3)
 {
-	m_nt_ram = std::make_unique<uint8_t[]>(0x1000);
-	m_nt_page[0] = m_nt_ram.get();
-	m_nt_page[1] = m_nt_ram.get() + 0x400;
-	m_nt_page[2] = m_nt_ram.get() + 0x800;
-	m_nt_page[3] = m_nt_ram.get() + 0xc00;
+	common_start();
 
-	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8sm_delegate(*this, FUNC(multigam_state::multigam_nt_r)), write8sm_delegate(*this, FUNC(multigam_state::multigam_nt_w)));
-	for(int i=0; i<8; i++)
+	for (int i = 0; i < 8; i++)
 		m_ppu->space(AS_PROGRAM).install_read_bank(0x0000 + 0x400*i, 0x03ff + 0x400*i, m_bank_ppu[i]);
 
 	set_videorom_bank(0, 8, 0, 8);
@@ -1187,13 +1175,7 @@ MACHINE_START_MEMBER(multigam_state,multigm3)
 
 MACHINE_START_MEMBER(multigam_state,supergm3)
 {
-	m_nt_ram = std::make_unique<uint8_t[]>(0x1000);
-	m_nt_page[0] = m_nt_ram.get();
-	m_nt_page[1] = m_nt_ram.get() + 0x400;
-	m_nt_page[2] = m_nt_ram.get() + 0x800;
-	m_nt_page[3] = m_nt_ram.get() + 0xc00;
-
-	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8sm_delegate(*this, FUNC(multigam_state::multigam_nt_r)), write8sm_delegate(*this, FUNC(multigam_state::multigam_nt_w)));
+	common_start();
 
 	m_vram = std::make_unique<uint8_t[]>(0x2000);
 	m_multigmc_mmc3_6000_ram = std::make_unique<uint8_t[]>(0x2000);
@@ -1213,6 +1195,7 @@ void multigam_state::multigam(machine_config &config)
 	screen.set_screen_update("ppu", FUNC(ppu2c0x_device::screen_update));
 
 	PPU_2C02(config, m_ppu);
+	m_ppu->set_addrmap(0, &multigam_state::ppu_map);
 	m_ppu->set_cpu_tag("maincpu");
 	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 

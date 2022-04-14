@@ -14,10 +14,10 @@ copyright-holders:Robbbert
 
 	<element name="P0"><text string="Ball / Match"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="P1"><text string="Credits"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-	<element name="P3"><text string="Player 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-	<element name="P4"><text string="Player 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-	<element name="P5"><text string="Player 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-	<element name="P6"><text string="Player 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P3"><text state="0" string="Player 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P4"><text state="0" string="Player 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P5"><text state="0" string="Player 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P6"><text state="0" string="Player 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 
 	<view name="Default Layout">
 

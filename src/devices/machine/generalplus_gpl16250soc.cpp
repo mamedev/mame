@@ -46,20 +46,107 @@ generalplus_gpspispi_device::generalplus_gpspispi_device(const machine_config &m
 }
 
 
+void generalplus_gpspi_direct_device::ramwrite_w(offs_t offset, uint16_t data)
+{
+	// TODO: Gross hack, it puts some self-check code in RAM at startup, this replaces those calls with retf.
+	if (offset == 0x100 && data == 0xf14c) data = 0x9a90;
+	if (offset == 0x00 && data == 0x9311) data = 0x9a90;
+
+	m_mainram[offset] = data;
+}
+
+uint16_t generalplus_gpspi_direct_device::ramread_r(offs_t offset)
+{
+	return m_mainram[offset];
+}
+
 uint16_t generalplus_gpspi_direct_device::spi_direct_7b40_r()
+{
+	return 0xffff; // doesn't care for now
+}
+
+uint16_t generalplus_gpspi_direct_device::spi_direct_79f5_r()
+{
+	return 0xffff; // hangs if returning 0
+}
+
+uint16_t generalplus_gpspi_direct_device::spi_direct_7b46_r()
+{
+	int i = machine().rand();
+
+	if (i & 1) return 0x01;
+	else return 0x02;
+}
+
+uint16_t generalplus_gpspi_direct_device::spi_direct_79f4_r()
+{
+	// status bits?
+	return machine().rand();
+}
+
+
+uint16_t generalplus_gpspi_direct_device::spi_direct_7af0_r()
+{
+	return m_7af0;
+}
+
+void generalplus_gpspi_direct_device::spi_direct_7af0_w(uint16_t data)
+{
+	// words read from ROM are written here during the checksum routine in RAM, and must
+	// be shifted for the checksum to pass.
+	m_7af0 = data >> 8;
+}
+
+
+uint16_t generalplus_gpspi_direct_device::spi_direct_78e8_r()
 {
 	return machine().rand();
 }
 
+void generalplus_gpspi_direct_device::device_start()
+{
+	sunplus_gcm394_base_device::device_start();
+	save_item(NAME(m_7af0));
+}
+
+void generalplus_gpspi_direct_device::device_reset()
+{
+	sunplus_gcm394_base_device::device_reset();
+	m_7af0 = 0;
+}
+
+void generalplus_gpspi_direct_device::spi_direct_78e8_w(uint16_t data)
+{
+	logerror("%s: spi_direct_78e8_w %04x\n", machine().describe_context(), data);
+}
 
 void generalplus_gpspi_direct_device::gpspi_direct_internal_map(address_map& map)
 {
 	sunplus_gcm394_base_device::base_internal_map(map);
 
-	map(0x0079f4, 0x0079f4).r(FUNC(generalplus_gpspi_direct_device::spi_direct_7b40_r));
-	map(0x0079f5, 0x0079f5).r(FUNC(generalplus_gpspi_direct_device::spi_direct_7b40_r));
+	map(0x000000, 0x0027ff).rw(FUNC(generalplus_gpspi_direct_device::ramread_r), FUNC(generalplus_gpspi_direct_device::ramwrite_w));
+	// TODO: RAM is only 0x2800 on this, like earlier SPG2xx models? unmap the extra from the base_internal_map?
+
+	map(0x00780b, 0x00780b).nopw();
+
+	map(0x0078e8, 0x0078e8).rw(FUNC(generalplus_gpspi_direct_device::spi_direct_78e8_r), FUNC(generalplus_gpspi_direct_device::spi_direct_78e8_w));
+
+	map(0x0079f4, 0x0079f4).r(FUNC(generalplus_gpspi_direct_device::spi_direct_79f4_r));
+	map(0x0079f5, 0x0079f5).r(FUNC(generalplus_gpspi_direct_device::spi_direct_79f5_r));
+
+	map(0x007af0, 0x007af0).rw(FUNC(generalplus_gpspi_direct_device::spi_direct_7af0_r), FUNC(generalplus_gpspi_direct_device::spi_direct_7af0_w));
 
 	map(0x007b40, 0x007b40).r(FUNC(generalplus_gpspi_direct_device::spi_direct_7b40_r));
+//  map(0x007b46, 0x007b46).r(FUNC(generalplus_gpspi_direct_device::spi_direct_7b46_r));
+	map(0x007b40, 0x007b40).nopw();
+	map(0x007b41, 0x007b41).nopw();
+	map(0x007b42, 0x007b42).nopw();
+
+	map(0x007b46, 0x007b46).ram(); // values must be written and read from here, but is there any transformation?
+	map(0x007b47, 0x007b47).nopw();
+	map(0x007b48, 0x007b48).nopw();
+
+	map(0x007b49, 0x007b49).ram();
 
 	map(0x009000, 0x3fffff).rom().region("spidirect", 0);
 }
@@ -192,7 +279,7 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(int channel)
 	else if ((mode & 0x50) == 0x10)
 		destdelta = -1;
 
-	LOGMASKED(LOG_GCM394_SYSDMA, "%s:possible DMA operation with params mode:%04x source:%08x (word offset) dest:%08x (word offset) length:%08x (words) while csbank is %02x\n", machine().describe_context().c_str(), mode, source, dest, length, m_membankswitch_7810 );
+	LOGMASKED(LOG_GCM394_SYSDMA, "%s:possible DMA operation with params mode:%04x source:%08x (word offset) dest:%08x (word offset) length:%08x (words) while csbank is %02x\n", machine().describe_context(), mode, source, dest, length, m_membankswitch_7810 );
 
 	// wrlshunt transfers ROM to RAM, all RAM write addresses have 0x800000 in the destination set
 
@@ -1698,7 +1785,7 @@ void sunplus_gcm394_base_device::checkirq6()
 */
 
 
-void sunplus_gcm394_base_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void sunplus_gcm394_base_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

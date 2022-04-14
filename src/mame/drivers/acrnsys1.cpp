@@ -66,7 +66,6 @@ public:
 		, m_ttl74145(*this, "ic8_7445")
 		, m_cass(*this, "cassette")
 		, m_display(*this, "digit%u", 0U)
-		, m_digit(0)
 	{ }
 
 	void acrnsys1(machine_config &config);
@@ -84,10 +83,10 @@ private:
 	required_device<ttl74145_device> m_ttl74145;
 	required_device<cassette_image_device> m_cass;
 	output_finder<9> m_display;
-	uint8_t m_digit;
-	uint8_t m_cass_data[4];
-	bool m_cassbit;
-	bool m_cassold;
+	uint8_t m_digit = 0;
+	uint8_t m_cass_data[4]{};
+	bool m_cassbit = 0;
+	bool m_cassold = 0;
 };
 
 

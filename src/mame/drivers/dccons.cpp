@@ -20,6 +20,15 @@
 
     TODO:
     - RTC error always pops up at start-up, no flash plus bug with ticks (needs rewrite)
+    - cfr. naomi.cpp header for general DC notes;
+    - https://github.com/flyinghead/flycast/blob/master/docs/Notable%20game%20bugs.md
+      For a comprehensive list of issues to be verified;
+    - Fix Check-GD disk usability, cfr. notes in dc.xml;
+    - G1 i/f for GD-ROM needs to be converted in device class and hunted for unsupported features;
+    - VMU;
+    - Modem;
+
+    Old TODO (to be rechecked and moved in XML notes):
     - Inputs doesn't work most of the time;
     - Candy Stripe: fills the log with "ATAPI_FEATURES_FLAG_OVL not supported", black screen
     - Carrier: Jaleco logo uses YUV, but y size is halved?
@@ -34,229 +43,6 @@
     Notes:
     - 0x1a002 of flash ROM returns the region type (0x30=Japan, 0x31=USA, 0x32=Europe). Amusingly, if the value
       on a non-jp console is different than these ones, the system shows a black swirl (and nothing boots).
-    - gdi file for DCLP (a Dreamcast tester) doesn't have first two tracks info, they are:
-      1 0 4 2048 FILE0001.DUP 0
-      2 1798 0 2352 FILE0002.DUP 0
-      serial i/o also fails on that, work ram addresses that needs to be patched with 0x0009 (nop) are:
-      0xc0196da
-      0xc0196ec
-      Testers may be run in different modes if hold controller buttons while booting (A+B, Right+X, Left+X, Down+A+B+X, Down+X, Up+X and few others),
-       require emulated Maple DMA "swap endian" mode (SB_MMSEL register = 0).
-    SH4 TEST:
-        UBC test (0101):
-            ok
-        FPU test (0201):
-            NG
-        0xc03fe24 work ram flag check (1=error, 0=ok)
-        Cache test (03xx):
-            Cache Read/Write test (0301)
-            NG
-            Cache RAM mode Check (0305)
-            NG
-        MMU test (04xx):
-            asserts
-        TMU test (0501):
-            *_reg check -> ok
-            TCNT* reload -> NG
-            TCNT* underflow irq -> NG
-        MULT test (0601)
-            ok
-        DIVU test (0701)
-            ok
-        Store Queue test (0801):
-            ok
-        SCIF test (0901)
-            NG
-        Private Instruction test (0a01)
-            NG
-        Critical test (0dxx)
-            Critical (Store Queue) test (0d01):
-                ok
-            Critical (Write back) test (0d02):
-                ok
-            Critical (ADD,CMP/EQ) test (0d03):
-                ok
-            Critical (OC_OIX) test (0d04):
-                NG
-            Critical (MAX current) test (0d05):
-                ok (very slow!)
-            Critical (IC Cross Talk) test (0d06):
-                NG
-            Critical (Cache D-array) test (0d07):
-                NG
-        SH-4 BUG (0exx)
-            SH4_BUG 64bit FMOV
-                ok
-            SH4 BUG FIX (64bitFMOV)
-                ok
-    MEM TEST:
-        AICA (0102)
-            ok
-        Work RAM (0204):
-            ok
-        PV64 area (0303):
-            ok
-        PV32 area (0403):
-            ok
-    CLX TEST:
-        CLX internal RAM (0101):
-            ok
-        <Torus> check (0401):
-            (sets up RGB888 mode 2, assuming it's critically failed)
-    TA TEST:
-        TA_YUVINT (0101):
-            ok -> IST_EOXFER_YUV
-        TA_OENDINT (0102):
-            ok -> IST_EOXFER_OPLST
-        TA_OMENDINT (0103):
-            ok -> IST_EOXFER_OPMV
-        TA_TENDINT (0104):
-            ok -> IST_EOXFER_TRLST
-        TA_TMENDINT (0105):
-            ok -> IST_EOXFER_TRMV
-        TA_PTENDINT (0106):
-            ok -> IST_EOXFER_PTLST
-        TA_ISPINT (0107):
-            NG -> ISP/TSP Parameter Overflow (error)
-        TA_OBJINT (0108):
-            NG -> OBJect list pointer Overflow (error)
-        TA_IPINT (0109):
-            NG -> TA: Illegal parameter (error)
-        YUV Converter (0201):
-            ok
-    DDT i/f TEST:
-        Sort, Normal DMA (1) (0101)
-            hangs (wants Sort DMA irq, of course)
-        Sort, Normal DMA (2)
-            ...
-        Through
-            NG, hangs again
-        DC_DEINT (0201)
-            ok
-        DC_SDTEINT (0202)
-            ok
-        DC_SDTERINT (0203)
-            ok (but returns error count ++, think it's a bug in the SW)
-    G2 TEST
-        DMA (0101):
-            G2 EXT AREA DETECT:
-            "!!!! ch00 ERROR DETECT !!!!"
-        Interrupt (0301):
-            G2 EXT AREA DETECT
-            DMA END INT
-                hangs
-        Ext Interrupt (06xx)
-            AICA INT  (0601)
-                error detect
-            Modem INT (0602)
-                error detect
-    AICA TEST
-        Sound RAM (01xx)
-            Pattern R/W check (0101)
-                ok
-        Register (02xx)
-            CH Data (0201)
-                ok
-            EXT Input (0202)
-                ok
-            DSP Data (0203)
-                ok
-        S_Clock (03xx)
-            50MSEC (0301)
-                NG -> ~0xa58 in 0x702814, must be > 0x889 and < 0x8b0
-            25MSEC (0302)
-                NG -> ~0x372 in 0x702814, must be > 0x443 and < 0x45a
-        Timer (04xx)
-            Timer A (0401)
-                NG
-            Timer B (0402)
-                NG
-            Timer C (0403)
-                NG
-        DMA (05xx)
-            SRAM -> CH Reg (0501)
-                ok
-            SRAM -> Comm Reg (0502)
-                ok
-            SRAM -> DSP Reg (0503)
-                ok
-            CH Reg -> SRAM (0504)
-                ok
-            Comm Reg -> SRAM (0505)
-                ok
-            DSP Reg -> SRAM (0506)
-                ok
-            Clear SRAM (0507)
-                ok
-            Clear CH Reg (0508)
-                ok
-            Clear Comm Reg (0509)
-                ok
-            Clear DSP Reg (050a)
-                ok
-        Interrupt (06xx)
-            Sampling clock (0601)
-                NG (irq 0x400)
-            Timer A (0602)
-                randomly NG/ok
-            Timer B (0603)
-                ok
-            Timer C (0604)
-                ok
-            DMA End (0605)
-                ok
-            Midi Out (0606)
-                NG
-            Main CPU (0607)
-                ok
-        RTC (07xx)
-            Write Protect (0701)
-                ok
-            RW Comp (0702)
-                ok
-            Clock (0703)
-                NG
-        ARM7 (08xx)
-            Load & Start (0801)
-                NG
-            Timer & Intr (0802)
-                NG
-            DMA (0803)
-                NG
-            Ch-Reg R/W (0804)
-                ok
-            SRAM incr (0805)
-                NG
-            SRAM pattern (0806)
-                ok
-        EG (09xx)
-            LSA-Reg Left (0901)
-                ok/NG
-            LSA-Reg Right (0902)
-                ok/NG
-            LSA-Reg Left & Right (0903)
-                ok/NG
-        MIDI (0axx)
-            OEMP bit (0a01)
-                NG
-            OFLL bit (0a02)
-                NG
-    PVRi/f test
-        DMA (01xx)
-            CPU trig (0101)
-                ok
-            INT trig
-                ok
-        Interrupt (02xx)
-            PVR DMA end Int (0201)
-                ok
-            PVR DMA IA Int (0202)
-                NG
-            PVR DMA end (0203)
-                NG
-    Flash test:
-        (SH-4 jumps to la la land as soon as this is started)
-
 
 */
 
@@ -271,30 +57,14 @@
 #include "machine/dc-ctrl.h"
 #include "machine/gdrom.h"
 
-#include "emupal.h"
+//#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "softlist.h"
 
 #define CPU_CLOCK (200000000)
-
-uint64_t dc_cons_state::dcus_idle_skip_r()
-{
-	//if (m_maincpu->pc()==0xc0ba52a)
-	//  m_maincpu->spin_until_time(attotime::from_usec(2500));
-	//  device_spinuntil_int(m_maincpu);
-
-	return dc_ram[0x2303b0/8];
-}
-
-uint64_t dc_cons_state::dcjp_idle_skip_r()
-{
-	//if (m_maincpu->pc()==0xc0bac62)
-	//  m_maincpu->spin_until_time(attotime::from_usec(2500));
-	//  device_spinuntil_int(m_maincpu);
-
-	return dc_ram[0x2302f8/8];
-}
+// cfr. sh4.cpp m_mmuhack
+#define DC_MMU_HACK_MODE (1)
 
 void dc_cons_state::init_dc()
 {
@@ -302,20 +72,6 @@ void dc_cons_state::init_dc()
 	m_maincpu->sh2drc_add_fastram(0x00000000, 0x001fffff, true, memregion("maincpu")->base());
 	m_maincpu->sh2drc_add_fastram(0x0c000000, 0x0cffffff, false, dc_ram);
 	dreamcast_atapi_init();
-}
-
-void dc_cons_state::init_dcus()
-{
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2303b0, 0xc2303b7, read64smo_delegate(*this, FUNC(dc_cons_state::dcus_idle_skip_r)));
-
-	init_dc();
-}
-
-void dc_cons_state::init_dcjp()
-{
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2302f8, 0xc2302ff, read64smo_delegate(*this, FUNC(dc_cons_state::dcjp_idle_skip_r)));
-
-	init_dc();
 }
 
 void dc_cons_state::init_tream()
@@ -327,7 +83,7 @@ void dc_cons_state::init_tream()
 	rom[0x523] |= 0x40;
 	rom[0x531] |= 0x40;
 
-	init_dcus();
+	init_dc();
 }
 
 uint64_t dc_cons_state::dc_pdtra_r()
@@ -351,10 +107,12 @@ uint64_t dc_cons_state::dc_pdtra_r()
 		}
 	}
 
-	/*
-	cable setting, (0) VGA, (2) TV RGB (3) TV VBS/Y + S/C.
-	Note: several games doesn't like VGA setting (i.e. Idol Janshi wo Tsukucchaou, Airforce Delta), default to composite.
-	*/
+
+	// cable setting, (0) VGA, (2) TV RGB (3) TV VBS/Y + S/C.
+	// Note: several games doesn't like VGA setting,
+	// default to composite for max possible compatibility
+	// (i.e. Idol Janshi wo Tsukucchaou, Airforce Delta)
+	// TODO: identify via script
 	out |= ioport("SCREEN_TYPE")->read() << 8;
 
 	return out;
@@ -385,16 +143,16 @@ void dc_cons_state::dc_map(address_map &map)
 	map(0x005f7000, 0x005f701f).rw(m_ata, FUNC(ata_interface_device::cs1_r), FUNC(ata_interface_device::cs1_w)).umask64(0x0000ffff0000ffff);
 	map(0x005f7080, 0x005f709f).rw(m_ata, FUNC(ata_interface_device::cs0_r), FUNC(ata_interface_device::cs0_w)).umask64(0x0000ffff0000ffff);
 	map(0x005f7400, 0x005f74ff).rw(FUNC(dc_cons_state::dc_mess_g1_ctrl_r), FUNC(dc_cons_state::dc_mess_g1_ctrl_w));
-	map(0x005f7800, 0x005f78ff).rw(FUNC(dc_cons_state::dc_g2_ctrl_r), FUNC(dc_cons_state::dc_g2_ctrl_w));
+	map(0x005f7800, 0x005f78ff).m(m_g2if, FUNC(dc_g2if_device::amap));
 	map(0x005f7c00, 0x005f7cff).m(m_powervr2, FUNC(powervr2_device::pd_dma_map));
 	map(0x005f8000, 0x005f9fff).m(m_powervr2, FUNC(powervr2_device::ta_map));
 	map(0x00600000, 0x006007ff).rw(FUNC(dc_cons_state::dc_modem_r), FUNC(dc_cons_state::dc_modem_w));
 	map(0x00700000, 0x00707fff).rw(FUNC(dc_cons_state::dc_aica_reg_r), FUNC(dc_cons_state::dc_aica_reg_w));
 	map(0x00710000, 0x0071000f).mirror(0x02000000).rw("aicartc", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask64(0x0000ffff0000ffff);
-	map(0x00800000, 0x009fffff).rw(FUNC(dc_cons_state::soundram_r), FUNC(dc_cons_state::soundram_w));
+	map(0x00800000, 0x009fffff).mirror(0x02000000).rw(FUNC(dc_cons_state::soundram_r), FUNC(dc_cons_state::soundram_w));
 //  map(0x01000000, 0x01ffffff) G2 Ext Device #1
 //  map(0x02700000, 0x02707fff) AICA reg mirror
-//  map(0x02800000, 0x02ffffff) AICA wave mem mirror
+//  map(0x02800000, 0x02ffffff) AICA wave mem mirror (loopchk g2 bus DMA test)
 
 //  map(0x03000000, 0x03ffffff) G2 Ext Device #2
 
@@ -422,6 +180,8 @@ void dc_cons_state::dc_map(address_map &map)
 	map(0x8c000000, 0x8cffffff).ram().share("dc_ram");  // another RAM mirror
 
 	map(0xa0000000, 0xa01fffff).rom().region("maincpu", 0);
+
+	map(0xf4000000, 0xf4003fff).noprw(); // SH-4 operand cache address array
 }
 
 void dc_cons_state::dc_port(address_map &map)
@@ -579,11 +339,6 @@ static INPUT_PORTS_START( dc )
 
 	//A4 - A5, second analog stick, unused on DC
 
-	PORT_START("MAMEDEBUG")
-	PORT_CONFNAME( 0x01, 0x00, "Bilinear Filtering" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
-
 	PORT_START("SCREEN_TYPE")
 	PORT_CONFNAME( 0x03, 0x03, "Screen Connection Type" )
 	PORT_CONFSETTING(    0x00, "VGA" )
@@ -601,11 +356,6 @@ static INPUT_PORTS_START( dcfish )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("A")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("B")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("MAMEDEBUG")
-	PORT_CONFNAME( 0x01, 0x00, "Bilinear Filtering" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 
 	PORT_START("SCREEN_TYPE")
 	PORT_CONFNAME( 0x03, 0x03, "Screen Connection Type" )
@@ -637,8 +387,11 @@ void dc_cons_state::dc_base(machine_config &config)
 	m_maincpu->set_sh4_clock(CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dc_cons_state::dc_map);
 	m_maincpu->set_addrmap(AS_IO, &dc_cons_state::dc_port);
+	m_maincpu->set_mmu_hacktype(DC_MMU_HACK_MODE);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(dc_state::dc_scanline), "screen", 0, 1);
+
+	system_bus_config(config, "maincpu");
 
 	ARM7(config, m_soundcpu, ((XTAL(33'868'800)*2)/3)/8);   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
 	m_soundcpu->set_addrmap(AS_PROGRAM, &dc_cons_state::dc_audio_map);
@@ -652,9 +405,10 @@ void dc_cons_state::dc_base(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(13458568*2, 857, 0, 640, 524, 0, 480); /* TODO: where pclk actually comes? */
+	// TODO: find exact pclk source
+	screen.set_raw(13458568*2, 857, 0, 640, 524, 0, 480);
 	screen.set_screen_update("powervr2", FUNC(powervr2_device::screen_update));
-	PALETTE(config, "palette").set_entries(0x1000);
+
 	POWERVR2(config, m_powervr2, 0);
 	m_powervr2->irq_callback().set(FUNC(dc_state::pvr_irq));
 
@@ -843,9 +597,9 @@ ROM_START( dcdev )
 ROM_END
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS          INIT       COMPANY FULLNAME */
-CONS( 1999, dc,      dcjp,   0,      dc,      dc,    dc_cons_state, init_dcus, "Sega", "Dreamcast (USA, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1998, dcjp,    0,      0,      dc,      dc,    dc_cons_state, init_dcjp, "Sega", "Dreamcast (Japan, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1999, dceu,    dcjp,   0,      dc,      dc,    dc_cons_state, init_dcus, "Sega", "Dreamcast (Europe, PAL)", MACHINE_NOT_WORKING )
+CONS( 1999, dc,      dcjp,   0,      dc,      dc,    dc_cons_state, init_dc,   "Sega", "Dreamcast (USA, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1998, dcjp,    0,      0,      dc,      dc,    dc_cons_state, init_dc,   "Sega", "Dreamcast (Japan, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1999, dceu,    dcjp,   0,      dc,      dc,    dc_cons_state, init_dc,   "Sega", "Dreamcast (Europe, PAL)", MACHINE_NOT_WORKING )
 CONS( 200?, dctream, dcjp,   0,      dc,      dc,    dc_cons_state, init_tream,"<unknown>", "Treamcast", MACHINE_NOT_WORKING )
 CONS( 1998, dcdev,   0,      0,      dc,      dc,    dc_cons_state, init_dc,   "Sega", "HKT-0120 Sega Dreamcast Development Box", MACHINE_NOT_WORKING )
 
@@ -909,4 +663,4 @@ ROM_START( dcfish )
 ROM_END
 
 /*    YEAR  NAME     PARENT  MACHINE  INPUT  CLASS          INIT       ROT   COMPANY FULLNAME */
-GAME( 2000, dcfish,  0,      dc_fish, dcfish,dc_cons_state, init_dcjp, ROT0, "Sega", "Fish Life Amazon Playful Edition (Japan)", MACHINE_NOT_WORKING )
+GAME( 2000, dcfish,  0,      dc_fish, dcfish,dc_cons_state, init_dc, ROT0, "Sega", "Fish Life Amazon Playful Edition (Japan)", MACHINE_NOT_WORKING )

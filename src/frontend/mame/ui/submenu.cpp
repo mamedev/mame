@@ -36,12 +36,12 @@ std::vector<submenu::option> submenu::misc_options()
 			{ option_type::UI,   N_("Enlarge images in the right panel"),       OPTION_ENLARGE_SNAPS },
 			{ option_type::EMU,  N_("Cheats"),                                  OPTION_CHEAT },
 			{ option_type::EMU,  N_("Show mouse pointer"),                      OPTION_UI_MOUSE },
-			{ option_type::EMU,  N_("Confirm quit from machines"),              OPTION_CONFIRM_QUIT },
-			{ option_type::EMU,  N_("Skip information screen at startup"),      OPTION_SKIP_GAMEINFO },
+			{ option_type::EMU,  N_("Confirm quit from emulation"),             OPTION_CONFIRM_QUIT },
+			{ option_type::EMU,  N_("Skip system information screen"),          OPTION_SKIP_GAMEINFO },
 			{ option_type::UI,   N_("Force 4:3 aspect for snapshot display"),   OPTION_FORCED4X3 },
 			{ option_type::UI,   N_("Use image as background"),                 OPTION_USE_BACKGROUND },
 			{ option_type::UI,   N_("Skip BIOS selection menu"),                OPTION_SKIP_BIOS_MENU },
-			{ option_type::UI,   N_("Skip software parts selection menu"),      OPTION_SKIP_PARTS_MENU },
+			{ option_type::UI,   N_("Skip software part selection menu"),       OPTION_SKIP_PARTS_MENU },
 			{ option_type::UI,   N_("Info auto audit"),                         OPTION_INFO_AUTO_AUDIT },
 			{ option_type::UI,   N_("Hide romless machine from available list"),OPTION_HIDE_ROMLESS } };
 }
@@ -88,11 +88,11 @@ std::vector<submenu::option> submenu::advanced_options()
 			{ option_type::EMU,  N_("Multi-mouse"),                             OPTION_MULTIMOUSE },
 			{ option_type::EMU,  N_("Steadykey"),                               OPTION_STEADYKEY },
 			{ option_type::EMU,  N_("UI active"),                               OPTION_UI_ACTIVE },
-			{ option_type::EMU,  N_("Offscreen reload"),                        OPTION_OFFSCREEN_RELOAD },
+			{ option_type::EMU,  N_("Off-screen reload"),                       OPTION_OFFSCREEN_RELOAD },
 			{ option_type::EMU,  N_("Joystick deadzone"),                       OPTION_JOYSTICK_DEADZONE },
 			{ option_type::EMU,  N_("Joystick saturation"),                     OPTION_JOYSTICK_SATURATION },
 			{ option_type::EMU,  N_("Natural keyboard"),                        OPTION_NATURAL_KEYBOARD },
-			{ option_type::EMU,  N_("Simultaneous contradictory"),              OPTION_JOYSTICK_CONTRADICTORY },
+			{ option_type::EMU,  N_("Allow contradictory joystick inputs"),     OPTION_JOYSTICK_CONTRADICTORY },
 			{ option_type::EMU,  N_("Coin impulse"),                            OPTION_COIN_IMPULSE } };
 }
 
@@ -103,7 +103,7 @@ std::vector<submenu::option> submenu::control_options()
 			{ option_type::EMU,  N_("Lightgun Device Assignment"),              OPTION_LIGHTGUN_DEVICE },
 			{ option_type::EMU,  N_("Trackball Device Assignment"),             OPTION_TRACKBALL_DEVICE },
 			{ option_type::EMU,  N_("Pedal Device Assignment"),                 OPTION_PEDAL_DEVICE },
-			{ option_type::EMU,  N_("Adstick Device Assignment"),               OPTION_ADSTICK_DEVICE },
+			{ option_type::EMU,  N_("AD Stick Device Assignment"),              OPTION_ADSTICK_DEVICE },
 			{ option_type::EMU,  N_("Paddle Device Assignment"),                OPTION_PADDLE_DEVICE },
 			{ option_type::EMU,  N_("Dial Device Assignment"),                  OPTION_DIAL_DEVICE },
 			{ option_type::EMU,  N_("Positional Device Assignment"),            OPTION_POSITIONAL_DEVICE },

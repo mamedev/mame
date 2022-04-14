@@ -240,7 +240,7 @@ void ym2154_device::device_clock_changed()
 //  sound_stream_update - generate sound data
 //-------------------------------------------------
 
-void ym2154_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ym2154_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	update_irq_state(1);
 	m_timer->adjust((2048 - m_timer_count) * attotime::from_hz(sample_rate()));

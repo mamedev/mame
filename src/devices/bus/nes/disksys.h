@@ -33,7 +33,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -55,7 +55,8 @@ private:
 	void unload_disk(device_image_interface &image);
 
 	uint16_t m_irq_count, m_irq_count_latch;
-	int m_irq_enable, m_irq_transfer;
+	int m_irq_enable, m_irq_repeat, m_irq_transfer;
+	int m_disk_reg_enable;
 	bool m_sound_en;
 
 	uint8_t m_fds_motor_on;

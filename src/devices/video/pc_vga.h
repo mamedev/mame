@@ -39,6 +39,7 @@ public:
 	virtual TIMER_CALLBACK_MEMBER(vblank_timer_cb);
 
 	void set_offset(uint16_t val) { vga.crtc.offset = val; }
+	void set_vram_size(size_t vram_size) { vga.svga_intf.vram_size = vram_size; }
 
 protected:
 	enum
@@ -122,7 +123,7 @@ protected:
 			int crtc_regcount;
 		} svga_intf;
 
-		std::vector<uint8_t> memory;
+		std::unique_ptr<uint8_t []> memory;
 		uint32_t pens[16]; /* the current 16 pens */
 
 		uint8_t miscellaneous_output;

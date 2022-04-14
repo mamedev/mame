@@ -12,6 +12,31 @@ Undumped cards:
   -> see https://www.playkeyboardnow.com/Roland_D70_Soundbanks/page63/index.html
 
 Release dates were taken from http://www.rolandmuseum.de/z_syn_wc.php
+
+
+address/data line scrambling (same as SN-R8):
+
+     address              data
+external internal   external internal
+   A0 - - -  A0        D0 - - - D2
+   A1 - - -  A5        D1 - - - D7
+   A2 - - -  A4        D2 - - - D6
+   A3 - - -  A6        D3 - - - D4
+   A4 - - -  A1        D4 - - - D1
+   A5 - - -  A2        D5 - - - D3
+   A6 - - -  A3        D6 - - - D0
+   A7 - - - A15        D7 - - - D5
+   A8 - - - A13
+   A9 - - - A10
+  A10 - - - A14
+  A11 - - -  A7
+  A12 - - - A12
+  A13 - - - A11
+  A14 - - - A16
+  A15 - - -  A9
+  A16 - - -  A8
+  A17 - - - A17
+  A18 - - - A18
 -->
 
 <softwarelist name="u110_card" description="Roland U-110 PCM memory cards">

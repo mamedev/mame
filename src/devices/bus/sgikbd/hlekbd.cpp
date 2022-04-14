@@ -247,7 +247,7 @@ void hle_device::device_reset()
 	start_processing(attotime::from_hz(600));
 }
 
-void hle_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void hle_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

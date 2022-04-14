@@ -14,8 +14,8 @@ copyright-holders:Robbbert
 	<element name="P0"><text string="Ball"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="P1"><text string="Credits"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="P2"><text string="Match"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-	<element name="P3"><text string="Player 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-	<element name="P4"><text string="Player 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P3"><text state="1" string="Player 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P4"><text state="1" string="Player 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 
 	<view name="Default Layout">
 		<bounds left="0" top="0" right="674" bottom="194" />
@@ -72,7 +72,7 @@ copyright-holders:Robbbert
 		<element ref="P0"><bounds left="120" right="160" top="110" bottom="135" /></element>
 		<element ref="P1"><bounds left="320" right="380" top="110" bottom="135" /></element>
 		<element ref="P2"><bounds left="520" right="570" top="110" bottom="135" /></element>
-		<element ref="P3"><bounds left="100" right="200" top="10" bottom="35" /></element>
-		<element ref="P4"><bounds left="500" right="600" top="10" bottom="35" /></element>
+		<element name="out60" ref="P3"><bounds left="100" right="200" top="10" bottom="35" /></element>
+		<element name="out61" ref="P4"><bounds left="500" right="600" top="10" bottom="35" /></element>
 	</view>
 </mamelayout>

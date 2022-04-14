@@ -55,8 +55,8 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 	u8 convert_key(u8 data);
-	bool m_cassinbit, m_cassoutbit, m_cassold;
-	u8 m_cass_data[4];
+	bool m_cassinbit = 0, m_cassoutbit = 0, m_cassold = 0;
+	u8 m_cass_data[4]{};
 
 	void mem_map(address_map &map);
 

@@ -8,6 +8,30 @@
 #include "mmc1.h"
 
 
+// ======================> nes_bmc_jy012005_device
+
+class nes_bmc_jy012005_device : public nes_sxrom_device
+{
+public:
+	// construction/destruction
+	nes_bmc_jy012005_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_m(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+	virtual void set_prg() override;
+	virtual void set_chr() override;
+
+private:
+	u8 m_latch0;
+};
+
+
 // ======================> nes_bmc_jy820845c_device
 
 class nes_bmc_jy820845c_device : public nes_sxrom_device
@@ -149,6 +173,7 @@ private:
 
 
 // device type definition
+DECLARE_DEVICE_TYPE(NES_BMC_JY012005,  nes_bmc_jy012005_device)
 DECLARE_DEVICE_TYPE(NES_BMC_JY820845C, nes_bmc_jy820845c_device)
 DECLARE_DEVICE_TYPE(NES_FARID_SLROM,   nes_farid_slrom_device)
 DECLARE_DEVICE_TYPE(NES_NINJARYU,      nes_ninjaryu_device)

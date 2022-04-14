@@ -168,7 +168,7 @@ protected:
 	required_device<cpu_device> m_subcpu;
 	required_device<am9519_device> m_uic;
 
-	uint16_t m_ual;
+	uint16_t m_ual = 0;
 	uint8_t m_limit[2];
 	uint8_t m_offset[2];
 };

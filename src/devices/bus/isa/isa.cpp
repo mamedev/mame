@@ -361,6 +361,11 @@ void isa8_device::install_bank(offs_t start, offs_t end, uint8_t *data)
 	m_memspace->install_ram(start, end, data);
 }
 
+void isa8_device::install_bank(offs_t start, offs_t end, memory_bank *bank)
+{
+	m_memspace->install_readwrite_bank(start, end, bank);
+}
+
 void isa8_device::unmap_bank(offs_t start, offs_t end)
 {
 	m_memspace->unmap_readwrite(start, end);

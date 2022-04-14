@@ -47,9 +47,9 @@ private:
 	void latch_1f001_w(u8 data);
 	void kbd_put(u8 data);
 	void mem_map(address_map &map);
-	uint8_t m_term_data;
-	uint8_t m_latch_1e001;
-	uint8_t m_latch_1f001;
+	uint8_t m_term_data = 0U;
+	uint8_t m_latch_1e001 = 0U;
+	uint8_t m_latch_1f001 = 0U;
 	void machine_reset() override;
 	void machine_start() override;
 	required_shared_ptr<uint16_t> m_ram;

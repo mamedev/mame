@@ -790,8 +790,6 @@ void homedata_state::pteacher_blitter_start_w(uint8_t data)
 
 uint32_t homedata_state::screen_update_mrokumei(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int flags,width;
-
 	/* blank screen */
 	if (m_vreg[0x3] == 0xc1 && m_vreg[0x4] == 0xc0 && m_vreg[0x5] == 0xff)
 	{
@@ -799,13 +797,14 @@ uint32_t homedata_state::screen_update_mrokumei(screen_device &screen, bitmap_in
 		return 0;
 	}
 
-	flags = (m_vreg[1] & 0x80) ? (TILE_FLIPX | TILE_FLIPY) : 0;
+	int const flags = (m_vreg[1] & 0x80) ? (TILE_FLIPX | TILE_FLIPY) : 0;
 	if (flags != m_flipscreen)
 	{
 		m_flipscreen = flags;
 		machine().tilemap().mark_all_dirty();
 	}
 
+	int width;
 	switch (m_vreg[0x3])
 	{
 		case 0xb7: width = 54; break;   // mjclinic
@@ -828,14 +827,14 @@ uint32_t homedata_state::screen_update_mrokumei(screen_device &screen, bitmap_in
 
 	m_bg_tilemap[m_visible_page][0]->draw(screen, bitmap, cliprect, 0, 0);
 	m_bg_tilemap[m_visible_page][1]->draw(screen, bitmap, cliprect, 0, 0);
+
 	return 0;
 }
 
-#ifdef UNUSED_FUNCTION
 uint32_t homedata_state::screen_update_reikaids(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int flags;
-	static const int pritable[8][4] =
+#if 0
+	static constexpr int pritable[8][4] =
 	{
 		{ 3,1,0,2 },
 		{ 1,3,0,2 },
@@ -846,77 +845,56 @@ uint32_t homedata_state::screen_update_reikaids(screen_device &screen, bitmap_in
 		{ 2,3,1,0 },    // (bg color should be taken from 1)
 		{ 3,1,2,0 },    // (bg color should be taken from 1)
 	};
-	int pri, i;
-
-
-	flags = (m_vreg[1] & 0x80) ? (TILE_FLIPX | TILE_FLIPY) : 0;
-	if (flags != m_flipscreen)
+#else
+	static constexpr int pritable[2][8][4] =    /* table of priorities derived from the PROM */
 	{
-		m_flipscreen = flags;
-		machine().tilemap().mark_all_dirty();
-	}
-
-
-	bitmap.fill(m_palette->black_pen(), cliprect);
-
-	pri = (m_bank & 0x70) >> 4;
-	for (i = 0; i < 4; i++)
-		m_bg_tilemap[m_visible_page][pritable[pri][3 - i]]->draw(bitmap, cliprect, 0, 0);
-	return 0;
-}
+		{
+			{ 3,1,0,2 },
+			{ 1,3,0,2 },
+			{ 0,3,1,2 },
+			{ 0,1,3,2 },
+			{ 3,0,1,2 },
+			{ 1,0,3,2 },
+			{ 2,3,1,0 },    // (bg color should be taken from 1)
+			{ 3,1,2,0 }     // (bg color should be taken from 1)
+		},
+		{
+			{ 2,3,0,1 },
+			{ 2,0,3,1 },
+			{ 3,0,2,1 },
+			{ 0,3,2,1 },
+			{ 3,0,1,2 },
+			{ 2,1,3,0 },
+			{ 0,2,3,1 },
+			{ 3,2,0,1 }
+		}
+	};
 #endif
 
-uint32_t homedata_state::screen_update_reikaids(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	int flags;
-	static const int pritable[2][8][4] =    /* table of priorities derived from the PROM */
-	{
-	{
-		{ 3,1,0,2 },
-		{ 1,3,0,2 },
-		{ 0,3,1,2 },
-		{ 0,1,3,2 },
-		{ 3,0,1,2 },
-		{ 1,0,3,2 },
-		{ 2,3,1,0 },    // (bg color should be taken from 1)
-		{ 3,1,2,0 } // (bg color should be taken from 1)
-	},
-	{
-		{2,3,0,1},
-		{2,0,3,1},
-		{3,0,2,1},
-		{0,3,2,1},
-		{3,0,1,2},
-		{2,1,3,0},
-		{0,2,3,1},
-		{3,2,0,1}
-	},
-	};
-
-	int pri, i;
-
-	flags = (m_vreg[1] & 0x80) ? (TILE_FLIPX | TILE_FLIPY) : 0;
+	int const flags = (m_vreg[1] & 0x80) ? (TILE_FLIPX | TILE_FLIPY) : 0;
 	if (flags != m_flipscreen)
 	{
 		m_flipscreen = flags;
 		machine().tilemap().mark_all_dirty();
 	}
 
-
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	pri = (m_blitter_bank & 0x70) >> 4;
-	for (i = 0; i < 4; i++)
+	int const pri = (m_blitter_bank & 0x70) >> 4;
+#if 0
+	for (int i = 0; i < 4; i++)
+		m_bg_tilemap[m_visible_page][pritable[pri][3 - i]]->draw(bitmap, cliprect, 0, 0);
+#else
+	for (int i = 0; i < 4; i++)
 		m_bg_tilemap[m_visible_page][pritable[m_priority][pri][3 - i]]->draw(screen, bitmap, cliprect, 0, 0);
+#endif
+
 	return 0;
 }
 
 
 uint32_t homedata_state::screen_update_pteacher(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int flags, scroll_low, scroll_high;
-
-
 	/* blank screen */
 	if (m_vreg[0x3] == 0xc1 && m_vreg[0x4] == 0xc0 && m_vreg[0x5] == 0xff)
 	{
@@ -924,7 +902,7 @@ uint32_t homedata_state::screen_update_pteacher(screen_device &screen, bitmap_in
 		return 0;
 	}
 
-	flags = (m_vreg[1] & 0x80) ? (TILE_FLIPX | TILE_FLIPY) : 0;
+	int const flags = (m_vreg[1] & 0x80) ? (TILE_FLIPX | TILE_FLIPY) : 0;
 	if (flags != m_flipscreen)
 	{
 		m_flipscreen = flags;
@@ -957,6 +935,7 @@ uint32_t homedata_state::screen_update_pteacher(screen_device &screen, bitmap_in
 	   blanked = c1 c0 ff --
 	  */
 
+	int scroll_low;
 	if (m_blitter_bank & 0x04)
 	{
 		if (m_vreg[0x4] == 0xae || m_vreg[0x4] == 0xb8)
@@ -998,13 +977,14 @@ uint32_t homedata_state::screen_update_pteacher(screen_device &screen, bitmap_in
 			scroll_low = 7 - (m_vreg[0x4] & 0x0f);
 		}
 	}
-	scroll_high = m_vreg[0xb] >> 2;
+	int const scroll_high = m_vreg[0xb] >> 2;
 
 	m_bg_tilemap[m_visible_page][0]->set_scrollx(0, scroll_high * 8 + scroll_low);
 	m_bg_tilemap[m_visible_page][1]->set_scrollx(0, scroll_high * 8 + scroll_low);
 
 	m_bg_tilemap[m_visible_page][0]->draw(screen, bitmap, cliprect, 0, 0);
 	m_bg_tilemap[m_visible_page][1]->draw(screen, bitmap, cliprect, 0, 0);
+
 	return 0;
 }
 

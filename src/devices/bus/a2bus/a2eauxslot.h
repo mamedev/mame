@@ -117,17 +117,24 @@ public:
 
 	device_a2eauxslot_card_interface *next() const { return m_next; }
 
-	void set_a2eauxslot_device(a2eauxslot_device *a2eauxslot);
+	// inline configuration
+	void set_a2eauxslot(a2eauxslot_device *a2eauxslot, const char *slottag) { m_a2eauxslot = a2eauxslot; m_a2eauxslot_slottag = slottag; }
+	template <typename T> void set_onboard(T &&a2eauxslot) { m_a2eauxslot_finder.set_tag(std::forward<T>(a2eauxslot)); m_a2eauxslot_slottag = device().tag(); }
 
 	void raise_slot_irq() { m_a2eauxslot->set_irq_line(ASSERT_LINE); }
 	void lower_slot_irq() { m_a2eauxslot->set_irq_line(CLEAR_LINE); }
 	void raise_slot_nmi() { m_a2eauxslot->set_nmi_line(ASSERT_LINE); }
 	void lower_slot_nmi() { m_a2eauxslot->set_nmi_line(CLEAR_LINE); }
 
+	virtual void interface_validity_check(validity_checker &valid) const override;
+	virtual void interface_pre_start() override;
+
 protected:
 	device_a2eauxslot_card_interface(const machine_config &mconfig, device_t &device);
 
+	optional_device<a2eauxslot_device> m_a2eauxslot_finder;
 	a2eauxslot_device  *m_a2eauxslot;
+	const char *m_a2eauxslot_slottag;
 	int m_slot;
 	device_a2eauxslot_card_interface *m_next;
 };

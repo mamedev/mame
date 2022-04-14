@@ -112,12 +112,12 @@ license:CC0
 	<element name="text_s3"><text string="Take Back" align="1"><color red="0.55" green="0.55" blue="0.55" /></text></element>
 	<element name="text_s4"><text string="Clear" align="1"><color red="0.55" green="0.55" blue="0.55" /></text></element>
 
-	<element name="text_r11"><image file="chess/wp.svg"><color alpha="0.8" /></image></element>
-	<element name="text_r21"><image file="chess/wn.svg"><color alpha="0.8" /></image></element>
-	<element name="text_r31"><image file="chess/wb.svg"><color alpha="0.8" /></image></element>
-	<element name="text_r41"><image file="chess/wr.svg"><color alpha="0.8" /></image></element>
-	<element name="text_r51"><image file="chess/wq.svg"><color alpha="0.8" /></image></element>
-	<element name="text_r61"><image file="chess/wk.svg"><color alpha="0.8" /></image></element>
+	<element name="text_r11"><image file="chess/wp.svg"><color alpha="0.78" /></image></element>
+	<element name="text_r21"><image file="chess/wn.svg"><color alpha="0.78" /></image></element>
+	<element name="text_r31"><image file="chess/wb.svg"><color alpha="0.78" /></image></element>
+	<element name="text_r41"><image file="chess/wr.svg"><color alpha="0.78" /></image></element>
+	<element name="text_r51"><image file="chess/wq.svg"><color alpha="0.78" /></image></element>
+	<element name="text_r61"><image file="chess/wk.svg"><color alpha="0.78" /></image></element>
 	<element name="text_r71"><text string="W"><color red="0.81" green="0.8" blue="0.79" /></text></element> <!-- White -->
 	<element name="text_r81"><text string="B"><color red="0.81" green="0.8" blue="0.79" /></text></element> <!-- Black -->
 
@@ -199,7 +199,7 @@ license:CC0
 
 		<disk state="27">
 			<bounds x="0.12" y="0.12" width="0.76" height="0.76" />
-			<color red="0.28" green="0.165" blue="0.06" />
+			<color red="0" green="0" blue="0" alpha="0.5" />
 		</disk>
 		<disk state="27">
 			<bounds x="0.16" y="0.16" width="0.68" height="0.68" />
@@ -207,7 +207,7 @@ license:CC0
 		</disk>
 		<disk state="28">
 			<bounds x="0.12" y="0.12" width="0.76" height="0.76" />
-			<color red="0.28" green="0.165" blue="0.06" />
+			<color red="0" green="0" blue="0" alpha="0.5" />
 		</disk>
 	</element>
 

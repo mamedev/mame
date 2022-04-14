@@ -133,7 +133,7 @@ It's a very rare computer. It has 2 processors, Z80 and 8088, so it can run both
 #include "bus/centronics/printer.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -233,7 +233,7 @@ private:
 	void octopus_sub_mem(address_map &map);
 	void octopus_vram(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -369,7 +369,7 @@ static INPUT_PORTS_START( octopus )
 	PORT_DIPSETTING( 0x80, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
-void octopus_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void octopus_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{

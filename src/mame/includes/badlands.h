@@ -89,8 +89,8 @@ private:
 	void main_map(address_map &map);
 
 private:
-	uint8_t           m_pedal_value[2];
-	uint8_t           m_playfield_tile_bank;
+	uint8_t           m_pedal_value[2]{};
+	uint8_t           m_playfield_tile_bank = 0U;
 };
 
 class badlandsbl_state : public badlands_state
@@ -121,7 +121,7 @@ private:
 	required_shared_ptr<uint8_t> m_b_sharedram;
 	required_shared_ptr<uint16_t> m_spriteram;
 
-	uint8_t m_sound_response;
+	uint8_t m_sound_response = 0U;
 };
 
 

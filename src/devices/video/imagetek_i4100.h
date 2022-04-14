@@ -75,7 +75,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void update_irq_state();
 
@@ -232,7 +232,7 @@ public:
 
 	// needed by Blazing Tornado / Grand Striker 2 for mixing with PSAC
 	// (it's unknown how the chip enables external sync)
-	u32 get_background_pen() { return m_palette->pen(m_background_color); };
+	u32 get_background_pen() { return m_palette->pen(m_background_color); }
 
 	void v2_map(address_map &map);
 };

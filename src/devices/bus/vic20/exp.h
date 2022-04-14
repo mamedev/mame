@@ -36,7 +36,7 @@
 
 #pragma once
 
-#include "softlist_dev.h"
+#include "imagedev/cartrom.h"
 
 
 //**************************************************************************
@@ -49,7 +49,7 @@ class device_vic20_expansion_card_interface;
 
 class vic20_expansion_slot_device : public device_t,
 									public device_single_card_slot_interface<device_vic20_expansion_card_interface>,
-									public device_image_interface
+									public device_cartrom_image_interface
 {
 public:
 	// construction/destruction
@@ -86,14 +86,7 @@ protected:
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
-
-	virtual bool is_readable()  const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return false; }
-	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "vic1001_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "20,40,60,70,a0,b0,crt"; }
@@ -120,8 +113,8 @@ public:
 	// construction/destruction
 	virtual ~device_vic20_expansion_card_interface();
 
-	virtual uint8_t vic20_cd_r(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) { return data; };
-	virtual void vic20_cd_w(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) { };
+	virtual uint8_t vic20_cd_r(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) { return data; }
+	virtual void vic20_cd_w(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) { }
 
 protected:
 	device_vic20_expansion_card_interface(const machine_config &mconfig, device_t &device);

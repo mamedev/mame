@@ -52,18 +52,18 @@ private:
 	required_device_array<ay8910_device, 2> m_ay;
 
 	/* video-related */
-	bitmap_ind16 m_pixbitmap;
-	tilemap_t   *m_bg_tilemap;
-	std::unique_ptr<uint8_t[]>     m_bitmapram;
-	int       m_bm_plane;
-	int       m_pixcolor;
-	int       m_scroll[4];
-	int       m_lastflip;
-	int       m_lastpixcolor;
+	bitmap_ind16 m_pixbitmap{};
+	tilemap_t   *m_bg_tilemap = nullptr;
+	std::unique_ptr<uint8_t[]>     m_bitmapram{};
+	int       m_bm_plane = 0;
+	int       m_pixcolor = 0;
+	int       m_scroll[4]{};
+	int       m_lastflip = 0;
+	int       m_lastpixcolor = 0;
 
 	/* sound-related */
-	int       m_soundlatch;
-	int       m_last_snd_ctrl;
+	int       m_soundlatch = 0;
+	int       m_last_snd_ctrl = 0;
 
 	void subirqtrigger_w(uint8_t data);
 	void sub_irqack_w(uint8_t data);

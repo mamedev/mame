@@ -52,7 +52,7 @@ void tvc_sound_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void tvc_sound_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void tvc_sound_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_write_sndint(1);
 }

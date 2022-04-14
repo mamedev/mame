@@ -405,7 +405,7 @@ void pico_state::pico(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE( pico_state, pico )
 
-	PICO_CART_SLOT(config, m_picocart, pico_cart, nullptr);
+	PICO_CART_SLOT(config, m_picocart, pico_cart, nullptr).set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("pico");
 
 	SEGA_315_5641_PCM(config, m_sega_315_5641_pcm, upd7759_device::STANDARD_CLOCK*2);
@@ -425,7 +425,7 @@ void pico_state::picopal(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE( pico_state, pico )
 
-	PICO_CART_SLOT(config, m_picocart, pico_cart, nullptr);
+	PICO_CART_SLOT(config, m_picocart, pico_cart, nullptr).set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("pico");
 
 	SEGA_315_5641_PCM(config, m_sega_315_5641_pcm, upd7759_device::STANDARD_CLOCK*2);
@@ -623,7 +623,7 @@ void copera_state::copera(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE( copera_state, copera )
 
-	COPERA_CART_SLOT(config, m_picocart, copera_cart, nullptr);
+	COPERA_CART_SLOT(config, m_picocart, copera_cart, nullptr).set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("copera");
 
 	SEGA_315_5641_PCM(config, m_sega_315_5641_pcm, upd7759_device::STANDARD_CLOCK);

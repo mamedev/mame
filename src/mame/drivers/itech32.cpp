@@ -20,7 +20,7 @@
         * Shuffleshot (5 sets)
         * Golden Tee 3D Golf (12 sets)
         * Golden Tee Golf '97 (7 sets)
-        * Golden Tee Golf '98 (6 sets)
+        * Golden Tee Golf '98 (7 sets)
         * Golden Tee Golf '99 (4 sets)
         * Golden Tee Golf 2K (5 sets)
         * Golden Tee Classic (3 sets)
@@ -1696,13 +1696,19 @@ static INPUT_PORTS_START( gt97s )
 INPUT_PORTS_END
 
 
+/*
+For GT98 v1.00 & v1.00C:
+  Selecting Upright ignores the "number of trackballs" settings and only uses P1's controls for all game play
+  Selecting Cocktail with 1 trackball results in P2's controls not screen flipped in service mode, but game play works as expected
+  Starting with GT98 v1.10, you can select Upright with 2 trackballs and play a side by side 2 player game
+*/
 static INPUT_PORTS_START( gt98 )
 	PORT_INCLUDE(gt3d)
 
 	PORT_MODIFY("DIPS")
-	PORT_DIPNAME( 0x00200000, 0x00000000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")    /* Seem to have no effect on the game */
-	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00200000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00200000, 0x00000000, DEF_STR( Controls ) ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(          0x00000000, "One Trackball" )
+	PORT_DIPSETTING(          0x00200000, "Two Trackballs" )
 	PORT_DIPNAME( 0x00400000, 0x00000000, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Upright ) )
 	PORT_DIPSETTING(          0x00400000, DEF_STR( Cocktail ) )
@@ -1746,7 +1752,7 @@ static INPUT_PORTS_START( aama )
 	PORT_DIPSETTING(          0x00000000, "Normal Mount" )                      /* The manual says "Always on (default)" and "Off -- UNUSED --" */
 	PORT_DIPSETTING(          0x00100000, "45 Degree Angle" )
 	PORT_DIPNAME( 0x00200000, 0x00000000, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(          0x00000000, DEF_STR( Upright ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( Upright ) )                  /* Two Trackballs will work with Upright for "side by side" controls */
 	PORT_DIPSETTING(          0x00200000, DEF_STR( Cocktail ) )                 /* Cocktail mode REQUIRES "Controls" to be set to "Two Trackballs" */
 INPUT_PORTS_END
 
@@ -2200,7 +2206,44 @@ ROM_START( bloodstm )
 	ROM_LOAD16_BYTE( "bssrom2.bin",  0x300000, 0x40000, CRC(8aee1e77) SHA1(f949fa89ee7d59f457ce89c72d461cecd0cface3) )
 ROM_END
 
-ROM_START( bloodstm22 )
+ROM_START( bloodstm221 ) // this board had generic stickers
+	ROM_REGION16_BE( 0x80000, "user1", 0 )
+	ROM_LOAD16_BYTE( "bld00_v21.u83", 0x00000, 0x40000, CRC(01907aec) SHA1(a954366f2374c0836140e3b75a55ff47e4cfa645) )
+	ROM_LOAD16_BYTE( "bld01_v21.u88", 0x00001, 0x40000, CRC(eeae123e) SHA1(9fdd53d6651cac16402a9c3fe0ae15c9b1baa0db) )
+
+	ROM_REGION( 0x28000, "soundcpu", 0 )
+	ROM_LOAD( "bldsnd_v10.u17", 0x10000, 0x18000, CRC(dddeedbb) SHA1(f8ea786836630fc44bba968845fd2cb42cd81592) )
+	ROM_CONTINUE(               0x08000, 0x08000 )
+
+	ROM_REGION( 0x880000, "gfx1", 0 )
+	ROM_LOAD32_BYTE( "bsgrom0.bin",  0x000000, 0x080000, CRC(4e10b8c1) SHA1(b80f7dbf32faa97829c735da6dc0ee424dc9ecec) )
+	ROM_LOAD32_BYTE( "bsgrom5.bin",  0x000001, 0x080000, CRC(6333b6ce) SHA1(53b884e09d198f8f53449bd011ba743c28b2c934) )
+	ROM_LOAD32_BYTE( "bsgrom10.bin", 0x000002, 0x080000, CRC(a972a65c) SHA1(7772c2e0aaa0b3183c6287125b95fd1cd0c3775a) )
+	ROM_LOAD32_BYTE( "bsgrom15.bin", 0x000003, 0x080000, CRC(9a8f54aa) SHA1(3a2f99c28324ba1fcfb652bdc596d94c90637b72) )
+	ROM_LOAD32_BYTE( "bsgrom1.bin",  0x200000, 0x080000, CRC(10abf660) SHA1(e5b28ee12972abbcd883d702f496feae62d19e07) )
+	ROM_LOAD32_BYTE( "bsgrom6.bin",  0x200001, 0x080000, CRC(06a260d5) SHA1(f506b799bbb5d4465a4ab564cfd276877b8a52e9) )
+	ROM_LOAD32_BYTE( "bsgrom11.bin", 0x200002, 0x080000, CRC(f2cab3c7) SHA1(eecb1f2f8a3f3b1663a51c343e28e1b2078da5f4) )
+	ROM_LOAD32_BYTE( "bsgrom16.bin", 0x200003, 0x080000, CRC(403aef7b) SHA1(0a2a61480cddd020bfbad01c6c328dfa6760bddd) )
+	ROM_LOAD32_BYTE( "bsgrom2.bin",  0x400000, 0x080000, CRC(488200b1) SHA1(ae25bb5e9a836ae362d88de4e392ff46ff93c636) )
+	ROM_LOAD32_BYTE( "bsgrom7.bin",  0x400001, 0x080000, CRC(5bb19727) SHA1(fd8aa73ff0606ac86f054794f6abc42f99b4f856) )
+	ROM_LOAD32_BYTE( "bsgrom12.bin", 0x400002, 0x080000, CRC(b10d674f) SHA1(f5c713480deac44b86173ca9ac3aeea8a4d2ac85) )
+	ROM_LOAD32_BYTE( "bsgrom17.bin", 0x400003, 0x080000, CRC(7119df7e) SHA1(67acb0525f21d5cd174528fb0fa72c7101deb5eb) )
+	ROM_LOAD32_BYTE( "bsgrom3.bin",  0x600000, 0x080000, CRC(2378792e) SHA1(8cf1040a86ce7b6be3f56d144d4a17b7a888a648) )
+	ROM_LOAD32_BYTE( "bsgrom8.bin",  0x600001, 0x080000, CRC(3640ca2e) SHA1(1fbc8306c7310ab23d40887c16f80e2dc3d730f8) )
+	ROM_LOAD32_BYTE( "bsgrom13.bin", 0x600002, 0x080000, CRC(bd4a071d) SHA1(f25483591659d7424a4c62d0093fa56e5d337bf3) )
+	ROM_LOAD32_BYTE( "bsgrom18.bin", 0x600003, 0x080000, CRC(12959bb8) SHA1(f74d407004ccbf461f749672e4e57a5f0b6b549f) )
+	ROM_FILL(                        0x800000, 0x080000, 0xff )
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "ensoniq.2m", 0x000000, 0x200000, CRC(9fdc4825) SHA1(71e5255c66d9010be7e6f27916b605441fc53839) )
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.2", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "bssrom0.bin",  0x000000, 0x80000, CRC(ee4570c8) SHA1(73dd292224bf182770b3cc2d90eb52b7d7b24378) )
+	ROM_LOAD16_BYTE( "bssrom1.bin",  0x100000, 0x80000, CRC(b0f32ec5) SHA1(666f904b31cdef12cbf1dbb43a7d3ff7c2903260) )
+	ROM_LOAD16_BYTE( "bssrom2.bin",  0x300000, 0x40000, CRC(8aee1e77) SHA1(f949fa89ee7d59f457ce89c72d461cecd0cface3) )
+ROM_END
+
+ROM_START( bloodstm220 )
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
 	ROM_LOAD16_BYTE( "bld00_v22.u83", 0x00000, 0x40000, CRC(904e9208) SHA1(12e96027724b905140250db969130d90b1afec83) ) /* Labeled BLD00 V2.2 (U83) */
 	ROM_LOAD16_BYTE( "bld01_v22.u88", 0x00001, 0x40000, CRC(78336a7b) SHA1(76002ce4a2d83ceae10d9c9c123013832a081150) ) /* Labeled BLD01 V2.2 (U88) */
@@ -2237,7 +2280,7 @@ ROM_START( bloodstm22 )
 	ROM_LOAD16_BYTE( "bssrom2.bin",  0x300000, 0x40000, CRC(8aee1e77) SHA1(f949fa89ee7d59f457ce89c72d461cecd0cface3) )
 ROM_END
 
-ROM_START( bloodstm21 )
+ROM_START( bloodstm210 )
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
 	ROM_LOAD16_BYTE( "bld00_v21.u83", 0x00000, 0x40000, CRC(71215c8e) SHA1(ee0f94c3a2619d7e3cc1ba5e1888a97b0c75a3ae) ) /* Labeled BLD00 V2.1 (U83) */
 	ROM_LOAD16_BYTE( "bld01_v21.u88", 0x00001, 0x40000, CRC(da403da6) SHA1(0f09f38ae932acb4ddbb6323bce58be7284cb24b) ) /* Labeled BLD01 V2.1 (U88) */
@@ -2274,7 +2317,7 @@ ROM_START( bloodstm21 )
 	ROM_LOAD16_BYTE( "bssrom2.bin",  0x300000, 0x40000, CRC(8aee1e77) SHA1(f949fa89ee7d59f457ce89c72d461cecd0cface3) )
 ROM_END
 
-ROM_START( bloodstm11 )
+ROM_START( bloodstm110 )
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
 	ROM_LOAD16_BYTE( "bld00_v11.u83", 0x00000, 0x40000, CRC(4fff8f9b) SHA1(90f450497935322b0082a70e10abf758fc441dd0) ) /* Labeled BLD00 V1.1 (U83) */
 	ROM_LOAD16_BYTE( "bld01_v11.u88", 0x00001, 0x40000, CRC(59ce23ea) SHA1(6aa02fff07f5ec6dff4f6db9ea7878a722079f81) ) /* Labeled BLD01 V1.1 (U88) */
@@ -2311,7 +2354,7 @@ ROM_START( bloodstm11 )
 	ROM_LOAD16_BYTE( "bssrom2.bin",  0x300000, 0x40000, CRC(8aee1e77) SHA1(f949fa89ee7d59f457ce89c72d461cecd0cface3) )
 ROM_END
 
-ROM_START( bloodstm10 )
+ROM_START( bloodstm104 )
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
 	ROM_LOAD16_BYTE( "bld00_v10.u83", 0x00000, 0x40000, CRC(a0982119) SHA1(7a55f662db062488714b42aedea56eea3b80aed5) ) /* Labeled BLD00 V1.0 (U83) */
 	ROM_LOAD16_BYTE( "bld01_v10.u88", 0x00001, 0x40000, CRC(65800339) SHA1(379e57bd2c31180fa077b9a6e9fcffacde95280c) ) /* Labeled BLD01 V1.0 (U88) */
@@ -4137,6 +4180,36 @@ ROM_START( gt98v100 )   /* Version 1.00 */
 	ROM_LOAD16_BYTE( "gt98_srom1_nr.srom1", 0x200000, 0x080000, CRC(1b3f18b6) SHA1(3b65de6a90c5ede183b5f8ca1875736bc1425772) )
 ROM_END
 
+ROM_START( gt98c100 )   /* Version 1.00C */
+	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
+	ROM_LOAD32_BYTE( "gt98_prom0_v1.00c.prom0", 0x00000, 0x80000, CRC(bb508580) SHA1(6ba243386a32dbe9b14b3cef8d9ce9fac8ec4b28) )
+	ROM_LOAD32_BYTE( "gt98_prom1_v1.00c.prom1", 0x00001, 0x80000, CRC(0e414c17) SHA1(08dae822c4e0b3c5c7e7f09e77e01d3663067927) )
+	ROM_LOAD32_BYTE( "gt98_prom2_v1.00c.prom2", 0x00002, 0x80000, CRC(628e84eb) SHA1(b31b74bee1ab4eda7c8f1c4e62bd61837b2c9f1f) )
+	ROM_LOAD32_BYTE( "gt98_prom3_v1.00c.prom3", 0x00003, 0x80000, CRC(870f2464) SHA1(d84fdb28bcf5767a539d11fb21df0fe2973daa43) )
+
+	ROM_REGION( 0x28000, "soundcpu", 0 )
+	ROM_LOAD( "gt98nr_u88_v1.0.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
+	ROM_CONTINUE(                    0x08000, 0x08000 )
+
+	ROM_REGION( 0x600000, "gfx1", 0 )
+	ROM_LOAD32_BYTE( "gt98_grom0_0.grm0_0", 0x000000, 0x80000, CRC(2d79492b) SHA1(16d66d937c34ddf616f31cba0d285326a31cad85) )
+	ROM_LOAD32_BYTE( "gt98_grom0_1.grm0_1", 0x000001, 0x80000, CRC(79afda1a) SHA1(77a9883f14b58ceece9c76ce88bb900bc4accf25) )
+	ROM_LOAD32_BYTE( "gt98_grom0_2.grm0_2", 0x000002, 0x80000, CRC(8c381f56) SHA1(41a5b70f9e524a1cade031f864350ec75c08c956) )
+	ROM_LOAD32_BYTE( "gt98_grom0_3.grm0_3", 0x000003, 0x80000, CRC(46c35ba6) SHA1(a1976dd8710442cdb92c47f778acacba4380731b) )
+	ROM_LOAD32_BYTE( "gt98_grom1_0.grm1_0", 0x200000, 0x80000, CRC(b07bc634) SHA1(48a9aeafaf844374d129d209884ec3a23abe249f) )
+	ROM_LOAD32_BYTE( "gt98_grom1_1.grm1_1", 0x200001, 0x80000, CRC(b23d59a7) SHA1(be68da263691e297b266e81485f5f28a5a5ad2f2) )
+	ROM_LOAD32_BYTE( "gt98_grom1_2.grm1_2", 0x200002, 0x80000, CRC(9c113abc) SHA1(8cb23da237dce73bbd283662c6344876d1c352f3) )
+	ROM_LOAD32_BYTE( "gt98_grom1_3.grm1_3", 0x200003, 0x80000, CRC(231bbe58) SHA1(b662a2ffd881a22ec0503810dca8bd61a4994463) )
+	ROM_LOAD32_BYTE( "gt98_grom2_0.grm2_0", 0x400000, 0x80000, CRC(db5cec87) SHA1(831cebd0c90c118d007b737b2eb5fb374a86cf4b) )
+	ROM_LOAD32_BYTE( "gt98_grom2_1.grm2_1", 0x400001, 0x80000, CRC(c74fc7d3) SHA1(38581876d4557f79acbc2c639bd4188a49d3b7cc) )
+	ROM_LOAD32_BYTE( "gt98_grom2_2.grm2_2", 0x400002, 0x80000, CRC(1227609d) SHA1(5a586d2383c9090ff3847abd2c645354dacd400f) )
+	ROM_LOAD32_BYTE( "gt98_grom2_3.grm2_3", 0x400003, 0x80000, CRC(78745131) SHA1(c430be4cb650f1f6265406ca8fcad8df809282f5) )
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "gt98_srom0_nr.srom0", 0x000000, 0x100000, CRC(44983bd7) SHA1(a6ac966ec113b079434d7f871e4ce7266206d234) )
+	ROM_LOAD16_BYTE( "gt98_srom1_nr.srom1", 0x200000, 0x080000, CRC(1b3f18b6) SHA1(3b65de6a90c5ede183b5f8ca1875736bc1425772) )
+ROM_END
+
 ROM_START( gt98s100 ) /* Version 1.00S for the 3 tier type PCB with short ROM board P/N 1088 Rev 0 */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "gt98_prom0_v1.00s.prom0", 0x00000, 0x80000, CRC(962ff444) SHA1(f9abefaee82f811ef1d3df45782edd5bcb1da23a) )
@@ -5058,10 +5131,11 @@ GAME( 1993, hardyard11,   hardyard, bloodstm, hardyard, itech32_state,  init_har
 GAME( 1993, hardyard10,   hardyard, bloodstm, hardyard, itech32_state,  init_hardyard, ROT0, "Strata/Incredible Technologies",   "Hard Yardage (v1.00)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1994, bloodstm,     0,        bloodstm, bloodstm, itech32_state,  init_bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v2.22)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, bloodstm22,   bloodstm, bloodstm, bloodstm, itech32_state,  init_bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v2.20)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, bloodstm21,   bloodstm, bloodstm, bloodstm, itech32_state,  init_bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v2.10)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, bloodstm11,   bloodstm, bloodstm, bloodstm, itech32_state,  init_bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v1.10)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, bloodstm10,   bloodstm, bloodstm, bloodstm, itech32_state,  init_bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v1.04)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bloodstm221,  bloodstm, bloodstm, bloodstm, itech32_state,  init_bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v2.21)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bloodstm220,  bloodstm, bloodstm, bloodstm, itech32_state,  init_bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v2.20)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bloodstm210,  bloodstm, bloodstm, bloodstm, itech32_state,  init_bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v2.10)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bloodstm110,  bloodstm, bloodstm, bloodstm, itech32_state,  init_bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v1.10)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bloodstm104,  bloodstm, bloodstm, bloodstm, itech32_state,  init_bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v1.04)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1994, pairs,        0,        bloodstm, pairs,    itech32_state,  init_bloodstm, ROT0, "Strata/Incredible Technologies",   "Pairs (V1.2, 09/30/94)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, pairsa,       pairs,    bloodstm, pairs,    itech32_state,  init_bloodstm, ROT0, "Strata/Incredible Technologies",   "Pairs (V1, 09/07/94)", MACHINE_SUPPORTS_SAVE )
@@ -5163,6 +5237,7 @@ GAME( 1997, gt97t240,  gt97,     tourny, gt97o, itech32_state, init_aamat,     R
 
 GAME( 1998, gt98,      0,        sftm,   aama,  itech32_state, init_aama,      ROT0, "Incredible Technologies", "Golden Tee '98 (v1.10)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITGF98 */
 GAME( 1998, gt98v100,  gt98,     sftm,   gt98,  itech32_state, init_aama,      ROT0, "Incredible Technologies", "Golden Tee '98 (v1.00)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITGF98 */
+GAME( 1998, gt98c100,  gt98,     sftm,   gt98,  itech32_state, init_aama,      ROT0, "Incredible Technologies", "Golden Tee '98 (v1.00C)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITGF98 */
 GAME( 1998, gt98s100,  gt98,     sftm,   gt98s, itech32_state, init_s_ver,     ROT0, "Incredible Technologies", "Golden Tee '98 (v1.00S)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITGF98-M */
 GAME( 1998, gt98t303,  gt98,     tourny, gt98s, itech32_state, init_aamat,     ROT0, "Incredible Technologies", "Golden Tee '98 Tournament (v3.03)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITGF98 */
 GAME( 1998, gt98t302,  gt98,     tourny, gt98s, itech32_state, init_aamat,     ROT0, "Incredible Technologies", "Golden Tee '98 Tournament (v3.02)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITGF98 */

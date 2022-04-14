@@ -39,7 +39,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	enum
@@ -80,11 +80,11 @@ private:
 
 	required_ioport_array<4> m_joy;
 
-	int m_da_latch;
-	int m_collision[4];
-	tilemap_t* m_playfield;
+	int m_da_latch = 0;
+	int m_collision[4]{};
+	tilemap_t* m_playfield = nullptr;
 	bitmap_ind16 m_helper;
-	emu_timer *m_nmi_timer;
+	emu_timer *m_nmi_timer = nullptr;
 };
 
 #endif // MAME_INCLUDES_ULTRATNK_H

@@ -80,7 +80,7 @@ protected:
 	// address maps
 	void cpu_map(address_map &map);
 
-	void pit_timer(void *ptr, int param) { LOG("pit_timer<%d> expired\n", param); }
+	void pit_timer(int param) { LOG("pit_timer<%d> expired\n", param); }
 
 	template <unsigned N> u32 pit_cnt_r() { return m_pit[N]->enabled() ? m_pit[N]->elapsed().as_ticks(m_cpu->clock()) : 0; }
 	template <unsigned N> u32 pit_sts_r() { return m_pit_cmd[N]; }
@@ -121,11 +121,11 @@ private:
 
 	memory_view m_mbus;
 
-	u32 m_ucs;
+	u32 m_ucs = 0;
 
-	emu_timer *m_pit[4];
+	emu_timer *m_pit[4]{};
 
-	u32 m_pit_cmd[4];
+	u32 m_pit_cmd[4]{};
 	u32 m_pit_cnt[4] = {};
 };
 

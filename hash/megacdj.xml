@@ -1141,7 +1141,7 @@ license:CC0
 		<rom name="Lunar - Eternal Blue (Japan) (Track 3).bin" size="11769408" crc="ad7b04a0" />
 		<rom name="Lunar - Eternal Blue (Japan) (Track 4).bin" size="1608768" crc="cb94bee5" />
 		-->
-		<description>Lunar - Eternal Blue (Jpn, Set 1)</description>
+		<description>Lunar - Eternal Blue (Jpn, set 1)</description>
 		<year>1994</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45074"/>
@@ -1510,7 +1510,7 @@ license:CC0
 		<rom name="Quiz Scramble Special (Japan) (Rev B) (Track 40).bin" size="1067808" crc="81bb73c2" />
 		<rom name="Quiz Scramble Special (Japan) (Rev B) (Track 41).bin" size="1176000" crc="36cf78ed" />
 		-->
-		<description>Quiz Scramble Special (Jpn, Rev. B)</description>
+		<description>Quiz Scramble Special (Jpn, rev. B)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6003"/>
@@ -3878,7 +3878,7 @@ license:CC0
 		<rom name="Lunar - Eternal Blue (1994)(Game Arts)(NTSC)(JP)(Track 3 of 4)[!][T-45074P-00271-R1M].wav" size="11769452" crc="022a2281" />
 		<rom name="Lunar - Eternal Blue (1994)(Game Arts)(NTSC)(JP)(Track 4 of 4)[!][T-45074P-00271-R1M].wav" size="1608812" crc="794d7aa9" />
 		-->
-		<description>Lunar - Eternal Blue (Jpn, Set 2)</description>
+		<description>Lunar - Eternal Blue (Jpn, set 2)</description>
 		<year>1994</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45074"/>
@@ -3900,7 +3900,7 @@ license:CC0
 		<rom name="Lunar - Eternal Blue (1994)(Game Arts)(NTSC)(JP)(Track 3 of 4)[!][T-45074P-00271A-R1M].wav" size="11769452" crc="da19c77a" />
 		<rom name="Lunar - Eternal Blue (1994)(Game Arts)(NTSC)(JP)(Track 4 of 4)[!][T-45074P-00271A-R1M].wav" size="1608812" crc="c980f230" />
 		-->
-		<description>Lunar - Eternal Blue (Jpn, Set 3)</description>
+		<description>Lunar - Eternal Blue (Jpn, set 3)</description>
 		<year>1994</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45074"/>
@@ -5160,7 +5160,7 @@ license:CC0
 		<rom name="Lodoss Tou Senki - Eiyuu Sensou - Record of Lodoss War (demo) (1994)(Sega)(NTSC)(JP)(Track 13 of 14)[!].wav" size="1472396" crc="993eaa8f" />
 		<rom name="Lodoss Tou Senki - Eiyuu Sensou - Record of Lodoss War (demo) (1994)(Sega)(NTSC)(JP)(Track 14 of 14)[!].wav" size="20638844" crc="8a53ec78" />
 		-->
-		<description>Lodoss Tou Senki - Eiyuu Sensou - Record of Lodoss War (Jpn, Demo)</description>
+		<description>Lodoss Tou Senki - Eiyuu Sensou - Record of Lodoss War (Jpn, demo)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">

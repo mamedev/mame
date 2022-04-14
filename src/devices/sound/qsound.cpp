@@ -358,12 +358,12 @@ u16 qsound_device::dsp_pio_r()
 	}
 }
 
-void qsound_device::set_dsp_ready(void *ptr, s32 param)
+void qsound_device::set_dsp_ready(s32 param)
 {
 	m_dsp_ready = 1U;
 }
 
-void qsound_device::set_cmd(void *ptr, s32 param)
+void qsound_device::set_cmd(s32 param)
 {
 	/*
 	 *  I don't believe the data word is actually double-buffered in

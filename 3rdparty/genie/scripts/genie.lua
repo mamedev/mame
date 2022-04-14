@@ -77,6 +77,9 @@
 			links        { "m" }
 			linkoptions  { "-rdynamic" }
 
+		configuration "linux"
+			define       { "_FILE_OFFSET_BITS=64" }
+
 		configuration "macosx"
 			targetdir   "../bin/darwin"
 			defines     { "LUA_USE_MACOSX" }

@@ -55,7 +55,7 @@ protected:
 	static const device_timer_id TIMER_SYNC = 0;
 private:
 	// overrides
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// members
 	devcb_write_line m_syncq_cb;

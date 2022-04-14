@@ -1193,7 +1193,7 @@ uint8_t m58817_device::status_r()
 
 ******************************************************************************/
 
-void tms5110_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void tms5110_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_romclk_hack_state = !m_romclk_hack_state;
 }
@@ -1322,7 +1322,7 @@ void tmsprom_device::update_prom_cnt()
 		m_prom_cnt &= 0x0f;
 }
 
-void tmsprom_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void tmsprom_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	/* only 16 bytes needed ... The original dump is bad. This
 	 * is what is needed to get speech to work. The prom data has

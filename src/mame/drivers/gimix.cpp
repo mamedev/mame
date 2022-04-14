@@ -35,7 +35,7 @@
 #include "machine/ram.h"
 #include "formats/flex_dsk.h"
 #include "formats/os9_dsk.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 #define DMA_DRQ         (m_dma_status & 0x80)
 #define DMA_INTRQ       (m_dma_status & 0x40)

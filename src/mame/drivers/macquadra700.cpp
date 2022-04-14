@@ -46,7 +46,7 @@
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #define C7M (7833600)
@@ -116,18 +116,18 @@ private:
 	TIMER_CALLBACK_MEMBER(dafb_vbl_tick);
 	TIMER_CALLBACK_MEMBER(dafb_cursor_tick);
 
-	u32 *m_ram_ptr, *m_rom_ptr;
-	u32 m_ram_mask, m_ram_size, m_rom_size;
+	u32 *m_ram_ptr = nullptr, *m_rom_ptr = nullptr;
+	u32 m_ram_mask = 0, m_ram_size = 0, m_rom_size = 0;
 
-	emu_timer *m_vbl_timer, *m_cursor_timer, *m_6015_timer;
+	emu_timer *m_vbl_timer = nullptr, *m_cursor_timer = nullptr, *m_6015_timer = nullptr;
 
-	uint16_t m_cursor_line;
-	uint16_t m_dafb_int_status;
-	int m_dafb_scsi1_drq, m_dafb_scsi2_drq;
-	uint8_t m_dafb_mode;
-	uint32_t m_dafb_base, m_dafb_stride;
-	uint32_t m_dafb_colors[3], m_dafb_count, m_dafb_clutoffs, m_dafb_montype, m_dafb_vbltime;
-	uint32_t m_dafb_palette[256];
+	uint16_t m_cursor_line = 0;
+	uint16_t m_dafb_int_status = 0;
+	int m_dafb_scsi1_drq = 0, m_dafb_scsi2_drq = 0;
+	uint8_t m_dafb_mode = 0;
+	uint32_t m_dafb_base = 0, m_dafb_stride = 0;
+	uint32_t m_dafb_colors[3]{}, m_dafb_count = 0, m_dafb_clutoffs = 0, m_dafb_montype = 0, m_dafb_vbltime = 0;
+	uint32_t m_dafb_palette[256]{};
 
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_9_w);
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_a_w);
@@ -136,18 +136,18 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_d_w);
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_e_w);
 	void nubus_slot_interrupt(uint8_t slot, uint32_t state);
-	int m_via2_ca1_hack, m_nubus_irq_state;
+	int m_via2_ca1_hack = 0, m_nubus_irq_state = 0;
 
 	WRITE_LINE_MEMBER(adb_irq_w) { m_adb_irq_pending = state; }
-	int m_adb_irq_pending;
+	int m_adb_irq_pending = 0;
 
 	DECLARE_WRITE_LINE_MEMBER(irq_539x_1_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_539x_2_w);
 	DECLARE_WRITE_LINE_MEMBER(drq_539x_1_w);
 	DECLARE_WRITE_LINE_MEMBER(drq_539x_2_w);
 
-	floppy_image_device *m_cur_floppy;
-	int m_hdsel;
+	floppy_image_device *m_cur_floppy = nullptr;
+	int m_hdsel = 0;
 
 	uint16_t mac_via_r(offs_t offset);
 	void mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask);
@@ -167,11 +167,11 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(mac_via2_irq);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
 	WRITE_LINE_MEMBER(via_cb2_w) { m_macadb->adb_data_w(state); }
-	int m_via_interrupt, m_via2_interrupt, m_scc_interrupt, m_last_taken_interrupt;
-	int m_irq_count, m_ca2_data;
+	int m_via_interrupt = 0, m_via2_interrupt = 0, m_scc_interrupt = 0, m_last_taken_interrupt = 0;
+	int m_irq_count = 0, m_ca2_data = 0;
 
 	uint32_t rom_switch_r(offs_t offset);
-	bool m_overlay;
+	bool m_overlay = 0;
 
 	uint16_t mac_scc_r(offs_t offset)
 	{

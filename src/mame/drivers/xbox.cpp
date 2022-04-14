@@ -167,12 +167,12 @@ void xbox_state::xbox(machine_config &config)
 	xbox_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &xbox_state::xbox_map);
 
-	subdevice<ide_controller_32_device>(":pci:09.0:ide1")->options(xbox_ata_devices, "hdd", "cdrom", true);
+	subdevice<ide_controller_32_device>("pci:09.0:ide1")->options(xbox_ata_devices, "hdd", "cdrom", true);
 
-	OHCI_USB_CONNECTOR(config, ":pci:02.0:port1", usb_xbox, nullptr, false);
-	OHCI_USB_CONNECTOR(config, ":pci:02.0:port2", usb_xbox, nullptr, false);
-	OHCI_USB_CONNECTOR(config, ":pci:02.0:port3", usb_xbox, "xbox_controller", false);
-	OHCI_USB_CONNECTOR(config, ":pci:02.0:port4", usb_xbox, nullptr, false);
+	OHCI_USB_CONNECTOR(config, "pci:02.0:port1", usb_xbox, nullptr, false);
+	OHCI_USB_CONNECTOR(config, "pci:02.0:port2", usb_xbox, nullptr, false);
+	OHCI_USB_CONNECTOR(config, "pci:02.0:port3", usb_xbox, "xbox_controller", false);
+	OHCI_USB_CONNECTOR(config, "pci:02.0:port4", usb_xbox, nullptr, false);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

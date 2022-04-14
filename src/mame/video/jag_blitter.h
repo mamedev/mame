@@ -41,7 +41,7 @@ protected:
 	//virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual space_config_vector memory_space_config() const override;
 
 	const address_space_config m_space_config;
@@ -60,7 +60,7 @@ private:
 	void count_inner_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	// timer setups
-	emu_timer *m_command_timer;
+	emu_timer *m_command_timer = nullptr;
 	inline void command_start();
 	inline void command_run();
 	inline void command_done();
@@ -81,8 +81,7 @@ private:
 	struct {
 		u32 base;
 		s16 xstep, ystep;
-
-		u32 ptr; /**< Current pixel address */
+		u32 ptr = 0; /**< Current pixel address */
 	} m_a1;
 };
 

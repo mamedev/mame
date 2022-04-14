@@ -122,6 +122,12 @@ function osdmodulesbuild()
 		ext_includedir("asio"),
 	}
 
+	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") then
+		buildoptions {
+			"-Wno-unused-private-field",
+		}
+	end
+
 	if _OPTIONS["targetos"]=="windows" then
 		includedirs {
 			MAME_DIR .. "3rdparty/winpcap/Include",

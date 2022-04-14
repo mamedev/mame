@@ -40,7 +40,7 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	u8 m_framecnt;
+	u8 m_framecnt = 0U;
 	void machine_start() override;
 	void machine_reset() override;
 	required_device<cpu_device> m_maincpu;

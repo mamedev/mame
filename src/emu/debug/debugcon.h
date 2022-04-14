@@ -23,8 +23,7 @@
     CONSTANTS
 ***************************************************************************/
 
-#define MAX_COMMAND_LENGTH                  4096
-#define MAX_COMMAND_PARAMS                  128
+constexpr int MAX_COMMAND_PARAMS            = 128;
 
 // flags for command parsing
 constexpr u32 CMDFLAG_NONE                  = 0x0000;
@@ -79,11 +78,12 @@ class debugger_console
 {
 public:
 	debugger_console(running_machine &machine);
+	~debugger_console();
 
 	// command handling
-	CMDERR          execute_command(const std::string &command, bool echo);
-	CMDERR          validate_command(const char *command);
-	void            register_command(const char *command, u32 flags, int minparams, int maxparams, std::function<void (const std::vector<std::string> &)> &&handler);
+	CMDERR          execute_command(std::string_view command, bool echo);
+	CMDERR          validate_command(std::string_view command);
+	void            register_command(std::string_view command, u32 flags, int minparams, int maxparams, std::function<void (const std::vector<std::string> &)> &&handler);
 	void            source_script(const char *file);
 	void            process_source_file();
 
@@ -122,16 +122,16 @@ private:
 	void execute_help_custom(const std::vector<std::string> &params);
 	void execute_condump(const std::vector<std::string>& params);
 
-	void trim_parameter(char **paramptr, bool keep_quotes);
-	CMDERR internal_execute_command(bool execute, int params, char **param);
-	CMDERR internal_parse_command(const std::string &original_command, bool execute);
+	[[nodiscard]] static std::string_view trim_parameter(std::string_view param, bool keep_quotes);
+	CMDERR internal_execute_command(bool execute, std::vector<std::string_view> &params);
+	CMDERR internal_parse_command(std::string_view command, bool execute);
 
 	void print_core(std::string_view text);                   // core text output
 	void print_core_wrap(std::string_view text, int wrapcol); // core text output
 
 	struct debug_command
 	{
-		debug_command(const char *_command, u32 _flags, int _minparams, int _maxparams, std::function<void (const std::vector<std::string> &)> &&_handler);
+		debug_command(std::string_view _command, u32 _flags, int _minparams, int _maxparams, std::function<void (const std::vector<std::string> &)> &&_handler);
 
 		struct compare
 		{

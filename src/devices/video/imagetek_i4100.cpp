@@ -522,7 +522,7 @@ void imagetek_i4300_device::update_irq_state()
 	m_irq_cb(level);
 }
 
-void imagetek_i4100_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void imagetek_i4100_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

@@ -7,9 +7,9 @@ copyright-holders:Robbbert
 <mamelayout version="2">
 
 	<element name="digit" defstate="0">
-		<led7seg>
+		<led14segsc>
 			<color red="1.0" green="0.0" blue="0.0" />
-		</led7seg>
+		</led14segsc>
 	</element>
 	<element name="diag" defstate="0">
 		<led7seg>
@@ -70,7 +70,7 @@ copyright-holders:Robbbert
 			<bounds left="54" top="345" right="88" bottom="384" />
 		</element>
 		<element name="digit60" ref="diag">
-			<bounds left="142" top="345" right="176" bottom="384" />
+			<bounds left="142" top="345" right="159" bottom="364" />
 		</element>
 		<element name="digit0" ref="digit">
 			<bounds left="186" top="345" right="220" bottom="384" />

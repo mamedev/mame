@@ -1,0 +1,1267 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="vis" description="Tandy/Memorex Video Information System CD-ROM images">
+
+	<!-- Some images only fill half the screen -->
+	<software name="amherit" supported="partial">
+		<!--
+		Origin: redump.org
+		<rom name="American Heritage - Illustrated Encyclopedic Dictionary (USA).bin" size="437163888" crc="4f245ee3" sha1="4b12b3686c109a82d86f76394f8f6c4513ce4911"/>
+		<rom name="American Heritage - Illustrated Encyclopedic Dictionary (USA).cue" size="150" crc="8335bffa" sha1="ca8774f5c04801203c99cfdbe2867c13afbc260a"/>
+		-->
+		<description>American Heritage - Illustrated Encyclopedic Dictionary</description>
+		<year>1992</year>
+		<publisher>Xiphias</publisher>
+		<info name="serial" value="25-6100"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="American Heritage - Illustrated Encyclopedic Dictionary (USA)" sha1="aa708c6fc807a4cf9f5b255674ddcd421ba82a51"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="amparks">
+		<!--
+		Origin: redump.org
+		<rom name="America's National Parks (USA).bin" size="565855920" crc="383b22e0" sha1="025351481a5ab366d9def2554d49e55427d4b494"/>
+		<rom name="America's National Parks (USA).cue" size="96" crc="3f5d2467" sha1="dd1332f68cddb465f5108b8c23b3a62689dbeb69"/>
+		-->
+		<description>America's National Parks</description>
+		<year>1992</year>
+		<publisher>Multicom Publishing</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="America's National Parks (USA)" sha1="7f38820e6f690903f2c0fe2ff1f8dcec3831d553"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="amspace">
+		<!--
+		Origin: redump.org
+		<rom name="Americans in Space (USA).bin" size="709057440" crc="37ed9e1a" sha1="b05862291f097a569eeafb847b14ea187d50dd54"/>
+		<rom name="Americans in Space (USA).cue" size="90" crc="423c2916" sha1="ce15ce30bce3c3f4edcd6a92a65743dce305dcea"/>
+		-->
+		<description>Americans in Space</description>
+		<year>1992</year>
+		<publisher>Multicom Publishing</publisher>
+		<info name="serial" value="25-6203 / CDRM1047200"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Americans in Space (USA)" sha1="31a960a4d6f0f5a37fe5f16a54e1ca91c92f6b34"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="amvista">
+		<!--
+		Origin: redump.org
+		<rom name="American Vista (USA).bin" size="311186064" crc="35068b38" sha1="b2bccf3547a2544f8c24851ba3f391a28319b288"/>
+		<rom name="American Vista (USA).cue" size="86" crc="4e6d5b01" sha1="96eb4d153fa47703a115f33202ef53b7ffeefe7d"/>
+		-->
+		<description>American Vista</description>
+		<year>1992</year>
+		<publisher>Applied Optical Media</publisher>
+		<info name="serial" value="25-6105"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="American Vista (USA)" sha1="572b8ade674a6599a34007a80a0f360c9abaef0b"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="animals">
+		<!--
+		Origin: redump.org
+		<rom name="Multimedia Animals Encyclopedia (USA).bin" size="302965824" crc="9ac834bc" sha1="f5e0eebd7aab13ec87cc4f9d3773de391c0863ed"/>
+		<rom name="Multimedia Animals Encyclopedia (USA).cue" size="103" crc="0cddb168" sha1="e987061d23d32322f177278be3cde12d64b7f95e"/>
+		-->
+		<description>Multimedia Animals Encyclopedia</description>
+		<year>1993</year>
+		<publisher>Applied Optical Media</publisher>
+		<info name="serial" value="25-6186"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Multimedia Animals Encyclopedia (USA)" sha1="5bc378803dfa6546b5519ce8239c4bc0f189395f"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="astrology">
+		<!--
+		Origin: redump.org
+		<rom name="Astrology Source (USA).bin" size="181607328" crc="5c550def" sha1="8ef52c827ae642a68a810edf8709f897941b5bfd"/>
+		<rom name="Astrology Source (USA).cue" size="88" crc="f7bf7a0b" sha1="320d281b19d90d1b6d589952caeb0a2db17eb28f"/>
+		-->
+		<description>Astrology Source</description>
+		<year>1992</year>
+		<publisher>Multicom</publisher>
+		<info name="serial" value="25-6141 / CDRM1047090"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Astrology Source (USA)" sha1="9d31f8eb99078393f5c660a9a704d756eab622ff"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="atlaspres">
+		<!--
+		Origin: redump.org
+		<rom name="Atlas of U.S. Presidents (USA).bin" size="79984464" crc="efc2c141" sha1="d579ec6f1f6dff857c543abed29ef1490c99b88d"/>
+		<rom name="Atlas of U.S. Presidents (USA).cue" size="96" crc="c59da217" sha1="392d4561436b7a56b43cafaabd710d94860a43c9"/>
+		-->
+		<description>Atlas of U.S. Presidents</description>
+		<year>1992</year>
+		<publisher>Applied Optical Media</publisher>
+		<info name="serial" value="25-6106"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Atlas of U.S. Presidents (USA)" sha1="a4798f33305d53384ab62cf63da5ea3501901430"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="biblelands">
+		<!--
+		Origin: redump.org
+		<rom name="Bible Lands, Bible Stories (USA).bin" size="195192480" crc="326b3856" sha1="4f46122e51b10d20e4a913d337dc863318524910"/>
+		<rom name="Bible Lands, Bible Stories (USA).cue" size="98" crc="db0461b4" sha1="6686c8d3f1dd9e8a0b97bcbb77d3a2ae938f66f5"/>
+		-->
+		<description>Bible Lands, Bible Stories</description>
+		<year>1992</year>
+		<publisher>Context Systems</publisher>
+		<info name="serial" value="25-6157"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Bible Lands, Bible Stories (USA)" sha1="d8f7b27a73aa5813517c570e28bbb53282db6f1d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Some images only fill half the screen -->
+	<software name="columbus" supported="partial">
+		<!--
+		Origin: redump.org
+		<rom name="Sail with Columbus (USA).bin" size="392929824" crc="2521d521" sha1="109b605bf3614e8a4cb8334645b758d533afab3e"/>
+		<rom name="Sail with Columbus (USA).cue" size="90" crc="d9f7f839" sha1="651cf6935a66dbffe705f24668b98bf65424a144"/>
+		-->
+		<description>Sail with Columbus</description>
+		<year>1992</year>
+		<publisher>Parallax Publishing</publisher>
+		<info name="serial" value="25-6181"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Sail with Columbus (USA)" sha1="4dd3f5b59ece8073cccff0e1d5066941125b7200"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="comptons">
+		<!--
+		Origin: redump.org
+		<rom name="Compton's MultiMedia Encyclopedia VIS Edition (USA).bin" size="613425120" crc="ad4f347d" sha1="50d489f67e67a39832d42cfee1f8a3530edcd85e"/>
+		<rom name="Compton's MultiMedia Encyclopedia VIS Edition (USA).cue" size="117" crc="af040fa6" sha1="3532e78b804460a476606293fda5d9db3561534a"/>
+		-->
+		<description>Compton's MultiMedia Encyclopedia VIS Edition</description>
+		<year>1992</year>
+		<publisher>Compton's NewMedia</publisher>
+		<info name="serial" value="CDRM1030360"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Compton's MultiMedia Encyclopedia VIS Edition (USA)" sha1="0b0b98498c77949700763709b8f4e092f814d645"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dec24">
+		<!--
+		Origin: redump.org
+		<rom name="December 24th (USA).bin" size="32669280" crc="df09ca12" sha1="2eb4cdbe6443dfe53a9b49057f399f3ff8939a0e"/>
+		<rom name="December 24th (USA).cue" size="108" crc="8b7b43b8" sha1="4bceaed10b2be37c099763f0d2d3afb70e70ab1d"/>
+		-->
+		<description>December 24th</description>
+		<year>1992</year>
+		<publisher>Macmillan New Media</publisher>
+		<info name="serial" value="25-6182"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="December 24th (USA)" sha1="cd94ab849aa9d185df052a7219f3450b0a35b474"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="discis_cask">
+		<!--
+		Origin: redump.org
+		<rom name="Discis Books Multimedia - The Cask of Amontillado - Edgar Allan Poe (USA) (En,Es).bin" size="613156992" crc="48c9bd76" sha1="30a2284858239bc795b053a4d307c0f680032571"/>
+		<rom name="Discis Books Multimedia - The Cask of Amontillado - Edgar Allan Poe (USA) (En,Es).cue" size="170" crc="fa7b855f" sha1="80921f97a3807594d046541d6557ab3cc4756011"/>
+		-->
+		<description>Discis Books Multimedia - The Cask of Amontillado</description>
+		<year>1992</year>
+		<publisher>Discis Knowledge Research</publisher>
+		<info name="serial" value="25-6138 / CDRM1046160"/>
+		<info name="book_author" value="Edgar Allan Poe"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Discis Books Multimedia - The Cask of Amontillado - Edgar Allan Poe (USA) (En,Es)" sha1="781bde92ff6df9e0051ae8c42bdf553cb2361ceb"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="discis_necklace">
+		<!--
+		Origin: redump.org
+		<rom name="Discis Books Multimedia - The Necklace - Guy de Maupassant (USA) (En,Es).bin" size="647952480" crc="0496038e" sha1="208bd307dfff1081ddbbc9bc2c29655786829cbd"/>
+		<rom name="Discis Books Multimedia - The Necklace - Guy de Maupassant (USA) (En,Es).cue" size="138" crc="c6ac4102" sha1="0da01592272c6bd7fdfbb15329542a86b77aca83"/>
+		-->
+		<description>Discis Books Multimedia - The Necklace</description>
+		<year>1993</year>
+		<publisher>Discis Knowledge Research</publisher>
+		<info name="serial" value="25-6139 / CDRM1046150"/>
+		<info name="book_author" value="Guy de Maupassant"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Discis Books Multimedia - The Necklace - Guy de Maupassant (USA) (En,Es)" sha1="a387503f794270552bad6adf0124c21b68877141"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="discis_ttheart">
+		<!--
+		Origin: redump.org
+		<rom name="Discis Books Multimedia - The Tell-Tale Heart - Edgar Allan Poe (USA) (En,Es).bin" size="545807472" crc="4d4af009" sha1="3fe7d7f1b0fb18d166ce24c0a0ce2b64616e9e39"/>
+		<rom name="Discis Books Multimedia - The Tell-Tale Heart - Edgar Allan Poe (USA) (En,Es).cue" size="166" crc="0f5bca69" sha1="4d8628eddcf9f4604a10753864f3e2231e4dc20b"/>
+		-->
+		<description>Discis Books Multimedia - The Tell-Tale Heart</description>
+		<year>1992</year>
+		<publisher>Discis Knowledge Research</publisher>
+		<info name="serial" value="25-6137 / CDRM1045010"/>
+		<info name="book_author" value="Edgar Allan Poe"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Discis Books Multimedia - The Tell-Tale Heart - Edgar Allan Poe (USA) (En,Es)" sha1="4700e7c8f45ed4414a3483187d663315b8adf79f"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="fitness">
+		<!--
+		Origin: redump.org
+		<rom name="Fitness Partner (USA).bin" size="70082544" crc="5d37533d" sha1="4ae07249b47084e2e3aa3e8d9dd4288db1ac4292"/>
+		<rom name="Fitness Partner (USA).cue" size="87" crc="2e5c7aa4" sha1="7324b895107f1894b8ca0a17e0650f6aae5b28c7"/>
+		-->
+		<description>Fitness Partner</description>
+		<year>1993</year>
+		<publisher>Computer Directions</publisher>
+		<info name="serial" value="25-6150"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Fitness Partner (USA)" sha1="39453577fd164118a637753aa4eecebf477f744d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="grandma">
+		<!--
+		Origin: redump.org
+		<rom name="Mercer Mayer's Just Grandma and Me (USA) (En,Ja,Es) (Track 1).bin" size="100230480" crc="b2f78b3f" sha1="1a11fd435f8370c47f91172c696f52e1f1651aa2"/>
+		<rom name="Mercer Mayer's Just Grandma and Me (USA) (En,Ja,Es) (Track 2).bin" size="21062160" crc="75284ac5" sha1="e223b90d4de8b1d95419a204fbaab7ac8d24ba0d"/>
+		<rom name="Mercer Mayer's Just Grandma and Me (USA) (En,Ja,Es) (Track 3).bin" size="25413360" crc="802983f2" sha1="7781f1ae659cbcf22a753f7291ca8fc3face2088"/>
+		<rom name="Mercer Mayer's Just Grandma and Me (USA) (En,Ja,Es).cue" size="417" crc="158d48c0" sha1="4bc9aae038671e4ccf168e52cf846d21fbbe7260"/>
+		-->
+		<description>Mercer Mayer's Just Grandma and Me</description>
+		<year>1992</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="serial" value="25-6158 / CDAC 030800"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Mercer Mayer's Just Grandma and Me (USA) (En,Ja,Es)" sha1="a6357a6e3d3973eb2a394284b67f24285a2eca5e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="greatlives">
+		<!--
+		Origin: redump.org
+		<rom name="Great Lives Series - Interactive Biographies of American Heroes Vol. 1 (USA).bin" size="164809344" crc="51e8333f" sha1="cf78bcaad0b8b8351a38c052b0da3281ef9bcf33"/>
+		<rom name="Great Lives Series - Interactive Biographies of American Heroes Vol. 1 (USA).cue" size="142" crc="55c21fb8" sha1="ac8f821bceab044688eea9aa683b9a7e0ec1be33"/>
+		-->
+		<description>Great Lives Series - Interactive Biographies of American Heroes Vol. 1</description>
+		<year>1992</year>
+		<publisher>The JLR Group</publisher>
+		<info name="serial" value="25-6148 / CDRM GL001"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Great Lives Series - Interactive Biographies of American Heroes Vol. 1 (USA)" sha1="71d59116e03b3b844b08edcc3dc7b815ae932208"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="healcook">
+		<!--
+		Origin: redump.org
+		<rom name="Better Homes and Gardens - Healthy Cooking (USA).bin" size="473010720" crc="ab5d7814" sha1="e150086a5613060cc6dfd672a60ddbab65d5b774"/>
+		<rom name="Better Homes and Gardens - Healthy Cooking (USA).cue" size="114" crc="ae3900a9" sha1="7771e1c7e52ce0253d211423e82ef01ca95a9f53"/>
+		-->
+		<description>Better Homes and Gardens - Healthy Cooking</description>
+		<year>1992</year>
+		<publisher>Multicom Publishing</publisher>
+		<info name="serial" value="25-6142 / CDRM1033540"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Better Homes and Gardens - Healthy Cooking (USA)" sha1="f276ebdeb929d42b0d0e21f45499d676a6611903"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hmfirst">
+		<!--
+		Origin: redump.org
+		<rom name="Henry and Mudge - The First Book (USA).bin" size="50422176" crc="aaf9d2ca" sha1="4499624227f3fdcc56e59f26989e34ba25c276e6"/>
+		<rom name="Henry and Mudge - The First Book (USA).cue" size="127" crc="7331b288" sha1="98cf9c52b32f614a20e5da19a969d02c8f74c88b"/>
+		-->
+		<description>Henry and Mudge - The First Book</description>
+		<year>1992</year>
+		<publisher>Macmillan New Media</publisher>
+		<info name="serial" value="25-6174"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Henry and Mudge - The First Book (USA)" sha1="ceac6bee16c9f3cdb7f5f56d28724a2912f1c759"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hmsparkle">
+		<!--
+		Origin: redump.org
+		<rom name="Henry and Mudge in the Sparkle Days (USA).bin" size="45247776" crc="19b2b4a1" sha1="a04419222b64ccd02e4b4f15ce2af72615cfe0d0"/>
+		<rom name="Henry and Mudge in the Sparkle Days (USA).cue" size="130" crc="8abbdd60" sha1="f2266289ed3dc17861582b61565e008a1a5a8264"/>
+		-->
+		<description>Henry and Mudge in the Sparkle Days</description>
+		<year>1992</year>
+		<publisher>Macmillan New Media</publisher>
+		<info name="serial" value="25-6175"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Henry and Mudge in the Sparkle Days (USA)" sha1="6cc1b5da528c4d0d3ba862a9865e1a911c27f2e4"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hosea">
+		<!--
+		Origin: redump.org
+		<rom name="Secrets of Hosea Freeman, The (USA).bin" size="271954704" crc="8f329088" sha1="af36afe5264edd811f07e7ba4dcfcd345455f872"/>
+		<rom name="Secrets of Hosea Freeman, The (USA).cue" size="101" crc="d48a80c0" sha1="deba547154e9c093c8547281cbeee940aa77bd84"/>
+		-->
+		<description>The Secrets of Hosea Freeman</description>
+		<year>1992</year>
+		<publisher>Top Ten Software</publisher>
+		<info name="serial" value="25-6144 / CDRM1045620"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Secrets of Hosea Freeman, The (USA)" sha1="45576e1186fe0f9ef7f06b29e40decfaa9bd2736"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="jb_wear">
+		<!--
+		Origin: redump.org
+		<rom name="Jesse Bear, What Will You Wear (USA).bin" size="30825312" crc="a81570ff" sha1="7ddecceeefbb15da2551333726e80ae5b04cf726"/>
+		<rom name="Jesse Bear, What Will You Wear (USA).cue" size="125" crc="2b2436d3" sha1="02c649884364e70c5bb3b36c0aef5987ea113cc7"/>
+		-->
+		<description>Jesse Bear, What Will You Wear</description>
+		<year>1992</year>
+		<publisher>Macmillan New Media</publisher>
+		<info name="serial" value="25-6200"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Jesse Bear, What Will You Wear (USA)" sha1="419a54d761f4e0b6b37b2292140d8e290ac733a9"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="jb_wet">
+		<!--
+		Origin: redump.org
+		<rom name="Better Not Get Wet, Jesse Bear (USA).bin" size="41588064" crc="d2f72d74" sha1="cfde460ddc495751a99ca388db740e6afc872e3a"/>
+		<rom name="Better Not Get Wet, Jesse Bear (USA).cue" size="125" crc="9a8e54c8" sha1="61f590400a6df445e3faf87bb4b68fbcffb7c0b4"/>
+		-->
+		<description>Better Not Get Wet, Jesse Bear</description>
+		<year>1992</year>
+		<publisher>Macmillan New Media</publisher>
+		<info name="serial" value="25-6201"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Better Not Get Wet, Jesse Bear (USA)" sha1="ff0d36c1b272ca289fa88dfbaf6b26149046d7d8"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="kidfun">
+		<!--
+		Origin: redump.org
+		<rom name="Kid-Fun (USA).bin" size="238504560" crc="6013c44b" sha1="b8f3f5afde8768cf93e9b6a653a0e430c32114a2"/>
+		<rom name="Kid-Fun (USA).cue" size="79" crc="ae1feb71" sha1="898e82f09b2eb5cb7509a9eb03cb4e383df7989b"/>
+		-->
+		<description>Kid-Fun</description>
+		<year>1992</year>
+		<publisher>Mindplay</publisher>
+		<info name="serial" value="25-6164 / 960035-CD"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Kid-Fun (USA)" sha1="f73ce8fb7be6b9302fb6260590a0259bdb719304"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="kids_aesop">
+		<!--
+		Origin: redump.org
+		<rom name="Kids Can Read! Aesop's Fables (USA) (En,Es).bin" size="406289184" crc="fc53ee74" sha1="7fe0d9a3d916a0185470316a319011b70e5fa755"/>
+		<rom name="Kids Can Read! Aesop's Fables (USA) (En,Es).cue" size="109" crc="d177f86f" sha1="fa483faef3d939fce7de132a6cb1d9cd20335796"/>
+		-->
+		<description>Kids Can Read! Aesop's Fables</description>
+		<year>1992</year>
+		<publisher>Discis Knowledge Research</publisher>
+		<info name="serial" value="25-6136 / CDRM1024490"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Kids Can Read Aesop's Fables (USA) (En,Es)" sha1="854414cc423f23216662277352659ab3b4325ea9"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="kids_benjamin">
+		<!--
+		Origin: redump.org
+		<rom name="Kids Can Read! The Tale of Benjamin Bunny - Beatrix Potter (USA) (En,Es).bin" size="370639920" crc="1c493070" sha1="2857e3b5f9c96c301369fcdbbe36da497be8f242"/>
+		<rom name="Kids Can Read! The Tale of Benjamin Bunny - Beatrix Potter (USA) (En,Es).cue" size="138" crc="1ee42b4c" sha1="12a03a16a29d24ab81eaf63b0aa84bbceede9442"/>
+		-->
+		<description>Kids Can Read! The Tale of Benjamin Bunny</description>
+		<year>1992</year>
+		<publisher>Discis Knowledge Research</publisher>
+		<info name="serial" value="25-6126 / CDRM1024470"/>
+		<info name="book_author" value="Beatrix Potter"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Kids Can Read The Tale of Benjamin Bunny - Beatrix Potter (USA) (En,Es)" sha1="84e56efabed860a77303685a3670979cdb3e4fd9"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="kids_cinder">
+		<!--
+		Origin: redump.org
+		<rom name="Kids Can Read! Cinderella - The Original Fairy Tale (USA) (En,Es).bin" size="560293440" crc="23683b22" sha1="96fdd436de5a51606b20a551f086e3bd28cad638"/>
+		<rom name="Kids Can Read! Cinderella - The Original Fairy Tale (USA) (En,Es).cue" size="131" crc="6e0f6066" sha1="84b7b512c7bd7fb07bc5602890bf7fa2aa605049"/>
+		-->
+		<description>Kids Can Read! Cinderella - The Original Fairy Tale</description>
+		<year>1992</year>
+		<publisher>Discis Knowledge Research</publisher>
+		<info name="serial" value="25-6131 / CDRM1024480"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Kids Can Read Cinderella - The Original Fairy Tale (USA) (En,Es)" sha1="d74cd19296d8007ce93f97a66d4775ddbb449db0"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="kids_homerun">
+		<!--
+		Origin: redump.org
+		<rom name="Kids Can Read! Heather Hits Her First Home Run by Ted Planos (USA) (En,Es).bin" size="317520000" crc="acdd851f" sha1="49174711e4f19a5ef2fed5d02df18b3edf14c028"/>
+		<rom name="Kids Can Read! Heather Hits Her First Home Run by Ted Planos (USA) (En,Es).cue" size="140" crc="a9be62c4" sha1="b47c7107c29488a8bb0c91a141570e405635d107"/>
+		-->
+		<description>Kids Can Read! Heather Hits Her First Home Run</description>
+		<year>1992</year>
+		<publisher>Discis Knowledge Research</publisher>
+		<info name="serial" value="25-6133 / CDRM1024500"/>
+		<info name="book_author" value="Ted Plantos"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Kids Can Read Heather Hits Her First Home Run by Ted Planos (USA) (En,Es)" sha1="ef3d050d90686f4f21d3a74acf506094557146a5"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="kids_nightbc">
+		<!--
+		Origin: redump.org
+		<rom name="Kids Can Read! The Night Before Christmas - Clement C. Moore LLD (USA) (En,Es).bin" size="289197216" crc="f87ea0be" sha1="f14526fdf81dcfc541c08f0c67bff593b7ee5ad9"/>
+		<rom name="Kids Can Read! The Night Before Christmas - Clement C. Moore LLD (USA) (En,Es).cue" size="144" crc="772af51b" sha1="b04450b5b1545a7071b4d006ea2a7c2a47600b8a"/>
+		-->
+		<description>Kids Can Read! The Night Before Christmas</description>
+		<year>1992</year>
+		<publisher>Discis Knowledge Research</publisher>
+		<info name="serial" value="25-6135 / CDRM1024580"/>
+		<info name="book_author" value="Clement C. Moore LLD"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Kids Can Read The Night Before Christmas - Clement C. Moore LLD (USA) (En,Es)" sha1="8d04cf6d3847b5c82d1b3271e3f0f3bf2cf06c51"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="kids_paperbag">
+		<!--
+		Origin: redump.org
+		<rom name="Kids Can Read! The Paper Bag Princess - Robert N. Munsch (USA) (En,Es).bin" size="287797776" crc="5d6f9120" sha1="79579e11027766cdc07f6a804d06da075efb34fe"/>
+		<rom name="Kids Can Read! The Paper Bag Princess - Robert N. Munsch (USA) (En,Es).cue" size="136" crc="a25822ea" sha1="519e7a9eec0cd0476f74cf84679b0e5eb0087b62"/>
+		-->
+		<description>Kids Can Read! The Paper Bag Princess</description>
+		<year>1992</year>
+		<publisher>Discis Knowledge Research</publisher>
+		<info name="serial" value="25-6127 / CDRM1024530"/>
+		<info name="book_author" value="Robert N. Munsch"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Kids Can Read The Paper Bag Princess - Robert N. Munsch (USA) (En,Es)" sha1="896ef1fba1de510f6024ad5ae22b601d30bf1bd4"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="kids_peter">
+		<!--
+		Origin: redump.org
+		<rom name="Kids Can Read! The Tale of Peter Rabbit - Beatrix Potter (USA) (En,Es).bin" size="339473568" crc="d78898b0" sha1="cfc24625e685d95a789ca8d1797ad4e73b998e11"/>
+		<rom name="Kids Can Read! The Tale of Peter Rabbit - Beatrix Potter (USA) (En,Es).cue" size="136" crc="e9535e2d" sha1="9600cc06f194f4e986173d4785bd78d50899ac05"/>
+		-->
+		<description>Kids Can Read! The Tale of Peter Rabbit</description>
+		<year>1992</year>
+		<publisher>Discis Knowledge Research</publisher>
+		<info name="serial" value="25-6125 / CDRM1024540"/>
+		<info name="book_author" value="Beatrix Potter"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Kids Can Read The Tale of Peter Rabbit - Beatrix Potter (USA) (En,Es)" sha1="66c896197ad8082b05d9196483b09673ffbead9b"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="kids_puddle">
+		<!--
+		Origin: redump.org
+		<rom name="Kids Can Read! Mud Puddle - Robert N. Munsch (USA) (En,Es).bin" size="304174752" crc="2e2949fd" sha1="f1c77360418e68f85b1c1670947ba9aad8df0a3f"/>
+		<rom name="Kids Can Read! Mud Puddle - Robert N. Munsch (USA) (En,Es).cue" size="124" crc="f1eff5ba" sha1="dbcbad05214cea8c07aa7c89912a73a5ae62c4e5"/>
+		-->
+		<description>Kids Can Read! Mud Puddle</description>
+		<year>1992</year>
+		<publisher>Discis Knowledge Research</publisher>
+		<info name="serial" value="25-6128 / CDRM1024510"/>
+		<info name="book_author" value="Robert N. Munsch"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Kids Can Read Mud Puddle - Robert N. Munsch (USA) (En,Es)" sha1="87d8bdde798bb347edf92b1be9bafc8739089c09"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="kids_ranch">
+		<!--
+		Origin: redump.org
+		<rom name="Kids Can Read! A Long Hard Day at the Ranch - Audrey Nelson (USA) (En,Es).bin" size="284634336" crc="be686fd2" sha1="34678e1046e6d1acb7256915b73162b3766ed312"/>
+		<rom name="Kids Can Read! A Long Hard Day at the Ranch - Audrey Nelson (USA) (En,Es).cue" size="139" crc="6b7b747b" sha1="ce1ccd679f871170312517784cd8d7ffe8d255ec"/>
+		-->
+		<description>Kids Can Read! A Long Hard Day at the Ranch</description>
+		<year>1992</year>
+		<publisher>Discis Knowledge Research</publisher>
+		<info name="serial" value="25-6132 / CDRM1024550"/>
+		<info name="book_author" value="Audrey Nelson"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Kids Can Read A Long Hard Day at the Ranch - Audrey Nelson (USA) (En,Es)" sha1="3e5bd6a383e3f37e0cb7614604482e4b5c32c19f"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="kids_rotten">
+		<!--
+		Origin: redump.org
+		<rom name="Kids Can Read! Scary Poems for Rotten Kids written by Sean O Huigin (USA) (En,Es).bin" size="506110416" crc="3aead446" sha1="b088b24e5fd665c6aef317314b066078fbbb85bf"/>
+		<rom name="Kids Can Read! Scary Poems for Rotten Kids written by Sean O Huigin (USA) (En,Es).cue" size="147" crc="20adf688" sha1="607ab2632c949f96518acc720f7081bfb5f53841"/>
+		-->
+		<description>Kids Can Read! Scary Poems for Rotten Kids</description>
+		<year>1992</year>
+		<publisher>Discis Knowledge Research</publisher>
+		<info name="serial" value="25-6130 / CDRM1024560"/>
+		<info name="book_author" value="Sean O Huigin"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Kids Can Read Scary Poems for Rotten Kids written by Sean O Huigin (USA) (En,Es)" sha1="8ea2018f9a0ed288e91eca9f9981dd1a16850ede"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="kids_snowsuit">
+		<!--
+		Origin: redump.org
+		<rom name="Kids Can Read! Thomas' Snowsuit - R. Munsch (USA) (En,Es).bin" size="308700000" crc="ee0f8c42" sha1="53e4d136c46af051900607f1f93a638091cf3ef3"/>
+		<rom name="Kids Can Read! Thomas' Snowsuit - R. Munsch (USA) (En,Es).cue" size="123" crc="0675a5d5" sha1="33d19b30daf6b4a86fcb36643b7a886e9749a4e7"/>
+		-->
+		<description>Kids Can Read! Thomas' Snowsuit</description>
+		<year>1992</year>
+		<publisher>Discis Knowledge Research</publisher>
+		<info name="serial" value="25-6129 / CDRM1024570"/>
+		<info name="book_author" value="Robert N. Munsch"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Kids Can Read Thomas' Snowsuit - R. Munsch (USA) (En,Es)" sha1="94f3187f2ce8164d958f66a3453b90e66cac3849"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="kids_stomach">
+		<!--
+		Origin: redump.org
+		<rom name="Kids Can Read! Moving Gives Me a Stomach Ache - Story by Heather McKend (USA) (En,Es).bin" size="300679680" crc="6dbbcdf5" sha1="ab7293093bbdf907ab3aeddd31ff50278e237a27"/>
+		<rom name="Kids Can Read! Moving Gives Me a Stomach Ache - Story by Heather McKend (USA) (En,Es).cue" size="151" crc="ebfce707" sha1="e0d84762c23d6ed45a8ef724620b2f71e2ce1862"/>
+		-->
+		<description>Kids Can Read! Moving Gives Me a Stomach Ache</description>
+		<year>1992</year>
+		<publisher>Discis Knowledge Research</publisher>
+		<info name="serial" value="25-6134 / CDRM1024520"/>
+		<info name="book_author" value="Heather McKend"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Kids Can Read Moving Gives Me a Stomach Ache - Story by Heather McKend (USA) (En,Es)" sha1="31bd18f53549f3fb2ddb2b453a6ab6f57020767d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="lguitar">
+		<!--
+		Origin: redump.org
+		<rom name="Learn to Play Guitar Volume 1 (USA) (Track 01).bin" size="56812560" crc="9223be52" sha1="570f3205b44455e760d10d6a5ff2c318259cebcd"/>
+		<rom name="Learn to Play Guitar Volume 1 (USA) (Track 02).bin" size="47298720" crc="e217d726" sha1="d05cbedb9d630954033eb78eb8c71f5cde2e51f7"/>
+		<rom name="Learn to Play Guitar Volume 1 (USA) (Track 03).bin" size="46647216" crc="6e2b264e" sha1="00d9f2ca27304319d4dae5fcd1f6f33d13d06050"/>
+		<rom name="Learn to Play Guitar Volume 1 (USA) (Track 04).bin" size="46675440" crc="3fc45e44" sha1="d52bb755b9a96e752d3b32f5da22c0e9d6d0b132"/>
+		<rom name="Learn to Play Guitar Volume 1 (USA) (Track 05).bin" size="46809504" crc="faab0c88" sha1="dd547b01b47353ab8c986b5ccd3422717462c863"/>
+		<rom name="Learn to Play Guitar Volume 1 (USA) (Track 06).bin" size="46576656" crc="d309227d" sha1="875227193dcb3b3255ec9f572df357a945a1f7a6"/>
+		<rom name="Learn to Play Guitar Volume 1 (USA) (Track 07).bin" size="46616640" crc="53409149" sha1="c52ca1118b8bc5b2c59dd474d13254d6d1da2005"/>
+		<rom name="Learn to Play Guitar Volume 1 (USA) (Track 08).bin" size="38212944" crc="01982a0c" sha1="df7b6496644d8b36aa3ca6cade4521064b8ba38f"/>
+		<rom name="Learn to Play Guitar Volume 1 (USA) (Track 09).bin" size="38455200" crc="be76fe94" sha1="25c135f77700af5e80d001d956c8bed6941f7286"/>
+		<rom name="Learn to Play Guitar Volume 1 (USA) (Track 10).bin" size="38203536" crc="c2c0a516" sha1="b6d85b7b6edf0198ead380813aeaed681f8e81af"/>
+		<rom name="Learn to Play Guitar Volume 1 (USA) (Track 11).bin" size="38506944" crc="9f36f619" sha1="4caaf892cba8208625c6e2bdb8cbecd9ea460cc1"/>
+		<rom name="Learn to Play Guitar Volume 1 (USA) (Track 12).bin" size="37827216" crc="598c2032" sha1="7893d5f18b8361a208e455bc1b3bd0fb1cb09a07"/>
+		<rom name="Learn to Play Guitar Volume 1 (USA) (Track 13).bin" size="38377584" crc="07393697" sha1="531ac748e2920fa2887f22ea94351c96bf33b579"/>
+		<rom name="Learn to Play Guitar Volume 1 (USA).cue" size="1672" crc="5fe098ec" sha1="b10ca271a0141b265890beea7fc6210efbd9ca66"/>
+		-->
+		<description>Learn to Play Guitar Volume 1</description>
+		<year>1993</year>
+		<publisher>Parallax Publishing</publisher>
+		<info name="serial" value="25-6177"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Learn to Play Guitar Volume 1 (USA)" sha1="99af8977c036979df3062c17f8f0f97025130d00"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="links">
+		<!--
+		Origin: redump.org
+		<rom name="Links - The Challenge of Golf (USA).bin" size="3939600" crc="2aea7253" sha1="c1726c131b93addb2f588d636080e7dfe5640527"/>
+		<rom name="Links - The Challenge of Golf (USA).cue" size="101" crc="de6770aa" sha1="a032cdf3320cbec2a8a531ba6ef0d19ed64a3a21"/>
+		-->
+		<description>Links - The Challenge of Golf</description>
+		<year>1992</year>
+		<publisher>Access Software</publisher>
+		<info name="serial" value="25-6114"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Links - The Challenge of Golf (USA)" sha1="4db0f7818f6099b95712f9c28df2f505643a536b"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="manhole">
+		<!--
+		Origin: redump.org
+		<rom name="Manhole, The - New and Enhanced! (USA) (Track 01).bin" size="20109600" crc="340ac00b" sha1="a6dd42a5f94afcf576b3516add857990a486c4e6"/>
+		<rom name="Manhole, The - New and Enhanced! (USA) (Track 02).bin" size="8079120" crc="55e778fe" sha1="f5d60061b2dfd5041c38cc2c0fb36206eca5691a"/>
+		<rom name="Manhole, The - New and Enhanced! (USA) (Track 03).bin" size="8396640" crc="7c0fceef" sha1="5275dd23f80d562c310553ca5e3706da068bae66"/>
+		<rom name="Manhole, The - New and Enhanced! (USA) (Track 04).bin" size="12453840" crc="a1164e2b" sha1="d87d2acf104008e466b767977b8b682359da0f81"/>
+		<rom name="Manhole, The - New and Enhanced! (USA) (Track 05).bin" size="13253520" crc="3b292c9d" sha1="37f9e4c16ffa9418a9ba79e31f5d45559b2be38e"/>
+		<rom name="Manhole, The - New and Enhanced! (USA) (Track 06).bin" size="6973680" crc="576fc62b" sha1="d8674dac1ddaae9db7b3f642e0400829b0afa685"/>
+		<rom name="Manhole, The - New and Enhanced! (USA) (Track 07).bin" size="7608720" crc="bf5038f6" sha1="4a3531bb9a1d4b87d31d4a82d6108863a260f672"/>
+		<rom name="Manhole, The - New and Enhanced! (USA) (Track 08).bin" size="9702000" crc="b27ed835" sha1="cb9229f8df11798f9812e606d79705a326149f0a"/>
+		<rom name="Manhole, The - New and Enhanced! (USA) (Track 09).bin" size="10760400" crc="59765fe4" sha1="5284fb8a5dd6778c1233f19c8180644c28ced444"/>
+		<rom name="Manhole, The - New and Enhanced! (USA) (Track 10).bin" size="12383280" crc="32f35a55" sha1="8b5e1f8fea0ae4757ccd2e59deee1a609ebf0c6f"/>
+		<rom name="Manhole, The - New and Enhanced! (USA) (Track 11).bin" size="25048800" crc="e2aa33fc" sha1="ca6984c0a91625bab0a2259d9e556b6b178e5f6d"/>
+		<rom name="Manhole, The - New and Enhanced! (USA) (Track 12).bin" size="11560080" crc="cc45532a" sha1="41721c9e46293c23a5922efb6f928f478d0eb68c"/>
+		<rom name="Manhole, The - New and Enhanced! (USA) (Track 13).bin" size="19027680" crc="9ca0a70a" sha1="ec4f2a185c6d83cc37032060ba2357bf9d519f38"/>
+		<rom name="Manhole, The - New and Enhanced! (USA) (Track 14).bin" size="9149280" crc="da330183" sha1="0de9e3892e08e59eb40a9164cd93b2d80d412315"/>
+		<rom name="Manhole, The - New and Enhanced! (USA) (Track 15).bin" size="18298560" crc="7d21facb" sha1="6fab2478affd3105fe21ddcac5e89e8c1250ac7b"/>
+		<rom name="Manhole, The - New and Enhanced! (USA) (Track 16).bin" size="13194720" crc="88484785" sha1="1037076a1bf3b8f138fac5f062860e222b6efbcd"/>
+		<rom name="Manhole, The - New and Enhanced! (USA) (Track 17).bin" size="15429120" crc="dfaf66aa" sha1="78a758b39e871bdc89293b30bacc8fbfe5f036ff"/>
+		<rom name="Manhole, The - New and Enhanced! (USA) (Track 18).bin" size="11689440" crc="9f773a41" sha1="4ff20f8be2cf9c17daf8d43774adada3a72ea2ea"/>
+		<rom name="Manhole, The - New and Enhanced! (USA) (Track 19).bin" size="12500880" crc="878c4ce1" sha1="592f5f271c9f6f140b7c78a993b554c1f27eece4"/>
+		<rom name="Manhole, The - New and Enhanced! (USA) (Track 20).bin" size="10478160" crc="9f767807" sha1="7e0c7d25ea0b350cc49e328041749bdacf776b04"/>
+		<rom name="Manhole, The - New and Enhanced! (USA) (Track 21).bin" size="9831360" crc="4d10e364" sha1="0470648fc2105a53338d6b90f76d018010a1763f"/>
+		<rom name="Manhole, The - New and Enhanced! (USA) (Track 22).bin" size="11266080" crc="656b7668" sha1="4f098bfd1cc0889aeb43f1b27ffb73e9e2696af5"/>
+		<rom name="Manhole, The - New and Enhanced! (USA) (Track 23).bin" size="7232400" crc="0e86339b" sha1="3a676e04b60ad2f107a7ceae5e92cf086780c87e"/>
+		<rom name="Manhole, The - New and Enhanced! (USA) (Track 24).bin" size="5292000" crc="0b65dfc8" sha1="969c7d57e08b47609246534c4d0a7532cca029c4"/>
+		<rom name="Manhole, The - New and Enhanced! (USA) (Track 25).bin" size="3457440" crc="9431586c" sha1="57b5a42162a96ae5dc66c714b184848050fa8462"/>
+		<rom name="Manhole, The - New and Enhanced! (USA) (Track 26).bin" size="4233600" crc="50a6276c" sha1="5ae7ee4884870490b0c726f1c92440ce22cf31c8"/>
+		<rom name="Manhole, The - New and Enhanced! (USA) (Track 27).bin" size="15170400" crc="09e482cd" sha1="dfb80bf335c1f46dd5473f5baff37992859544f0"/>
+		<rom name="Manhole, The - New and Enhanced! (USA).cue" size="3596" crc="02ba7e10" sha1="3161ba7fa77b50033b096fe0234c68ed5964ccb6"/>
+		-->
+		<description>The Manhole - New and Enhanced!</description>
+		<year>1992</year>
+		<publisher>Activision</publisher>
+		<info name="serial" value="25-6155"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Manhole, The - New and Enhanced (USA)" sha1="8815e1a7fec5fffc4a5a3e2f4f109bee8430bca1"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="meetminds">
+		<!--
+		Origin: redump.org
+		<rom name="Meeting of Minds Series, The - Interactive Games of History, Art, Music, and Ideas (USA).bin" size="106169280" crc="7fe5db02" sha1="0ba50f1a58ea7ab6d38fa8d9b1805ff74c96f1b8"/>
+		<rom name="Meeting of Minds Series, The - Interactive Games of History, Art, Music, and Ideas (USA).cue" size="154" crc="538d19e9" sha1="a1185eed7e185aee900204d2944afc7bf1ea955c"/>
+		-->
+		<description>The Meeting of Minds Series - Interactive Games of History, Art, Music, and Ideas</description>
+		<year>1992</year>
+		<publisher>The JLR Group</publisher>
+		<info name="serial" value="25-6147 / CDRM MOM001"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Meeting of Minds Series, The - Interactive Games of History, Art, Music, and Ideas (USA)" sha1="1fb95b15acf87cd65d30ef2c75e78bc712977815"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="mosaic">
+		<!--
+		Origin: redump.org
+		<rom name="Mosaic Magic (USA).bin" size="54547584" crc="36d803c3" sha1="a87f40f8a78a31460f3829a93d7cfa0f9bd38760"/>
+		<rom name="Mosaic Magic (USA).cue" size="84" crc="4a147ac2" sha1="b8770d8fdc74305733df4a2ea6a95657458f4daa"/>
+		-->
+		<description>Mosaic Magic</description>
+		<year>1993</year>
+		<publisher>KinderMagic Software</publisher>
+		<info name="serial" value="25-6123"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Mosaic Magic (USA)" sha1="6ec11cb7b8129d3e27a0a600e7b2f45b45ec82ac"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="mutamath">
+		<!--
+		Origin: redump.org
+		<rom name="Mutanoid Math Challenge (USA).bin" size="18126864" crc="94692c17" sha1="519d04323f66c545f209fab5e6ecaf552358f435"/>
+		<rom name="Mutanoid Math Challenge (USA).cue" size="95" crc="9d376231" sha1="dc2df16d299d97a89380e01769460f48abc35455"/>
+		-->
+		<description>Mutanoid Math Challenge</description>
+		<year>1992</year>
+		<publisher>Legacy Software</publisher>
+		<info name="serial" value="25-6169"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Mutanoid Math Challenge (USA)" sha1="c47fbffa32507739ca5950f538bfc1110843defd"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="mutaword">
+		<!--
+		Origin: redump.org
+		<rom name="Mutanoid Word Challenge (USA) (Track 01).bin" size="4003104" crc="6223a654" sha1="deb62c101b98f207ae61c4e8658569d64cb45f4c"/>
+		<rom name="Mutanoid Word Challenge (USA) (Track 02).bin" size="15876000" crc="9feca6c9" sha1="0a49d30cbfdf345cd8ae4f86b660fc5d2844e37d"/>
+		<rom name="Mutanoid Word Challenge (USA) (Track 03).bin" size="12618480" crc="38362c0b" sha1="a2978356a18ba02b6f0bbeaa65d25e2143ff98ad"/>
+		<rom name="Mutanoid Word Challenge (USA) (Track 04).bin" size="18180960" crc="e0ca2f64" sha1="6b43641eda5d36bfda58a39b3a2b2ee1ef7c8541"/>
+		<rom name="Mutanoid Word Challenge (USA) (Track 05).bin" size="17063760" crc="efaf1000" sha1="16f37ce3690e021ca65feef453cde1acc581cb78"/>
+		<rom name="Mutanoid Word Challenge (USA) (Track 06).bin" size="16358160" crc="fee6a6a9" sha1="07bd3287a3280b06711468ff37269ef9e9cf741e"/>
+		<rom name="Mutanoid Word Challenge (USA) (Track 07).bin" size="14605920" crc="9bebfe9d" sha1="baebaa41361829e02687832c282ad74e2c0b3c71"/>
+		<rom name="Mutanoid Word Challenge (USA) (Track 08).bin" size="17839920" crc="096d3d8e" sha1="772032eebaae62f9cc98c37de0d940b8e718d3b7"/>
+		<rom name="Mutanoid Word Challenge (USA) (Track 09).bin" size="12531456" crc="a1e9a6f5" sha1="8ebef5e935e8711f52ebe59273c94ef59d6cc03b"/>
+		<rom name="Mutanoid Word Challenge (USA) (Track 10).bin" size="24354960" crc="ea26435c" sha1="489c3c36b3971edadc84285d99e2543da2b30d31"/>
+		<rom name="Mutanoid Word Challenge (USA) (Track 11).bin" size="16703904" crc="5b0269f4" sha1="725a1cdfe079590c6e9f6e687d677dd9949c7b89"/>
+		<rom name="Mutanoid Word Challenge (USA) (Track 12).bin" size="20003760" crc="97685750" sha1="64f9fcebfa7e3a1d2bcea4c1fe6df21a578cf6fd"/>
+		<rom name="Mutanoid Word Challenge (USA) (Track 13).bin" size="15781920" crc="92c665bc" sha1="47c07d643ba689832e41f84b7b97c7f0b079b194"/>
+		<rom name="Mutanoid Word Challenge (USA) (Track 14).bin" size="13072416" crc="0e71194d" sha1="f891857e70bd9a7c8051e9e3d80a36935404b643"/>
+		<rom name="Mutanoid Word Challenge (USA).cue" size="1718" crc="c146fd57" sha1="47affbaab850bf49e4b4a6ca9be33175936c5a3e"/>
+		-->
+		<description>Mutanoid Word Challenge</description>
+		<year>1992</year>
+		<publisher>Legacy Software</publisher>
+		<info name="serial" value="25-6170"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Mutanoid Word Challenge (USA)" sha1="ec98b10465cd111dc5094b84cd36df708ebf18cd"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="mypaint">
+		<!--
+		Origin: redump.org
+		<rom name="My Paint (USA).bin" size="44452800" crc="43fd933a" sha1="2a2ecae9e5efc2ecacb0f5e15411c170a236c1db"/>
+		<rom name="My Paint (USA).cue" size="80" crc="fe1aa71f" sha1="0ed7428c2374379a7d11e006c05b1b002126800a"/>
+		-->
+		<description>My Paint</description>
+		<year>1992</year>
+		<publisher>Saddleback Graphics</publisher>
+		<info name="serial" value="25-6122"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="My Paint (USA)" sha1="f56bb111099c751b1fc4c3cdfce0fb5a6a91d327"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="nbcook">
+		<!--
+		Origin: redump.org
+		<rom name="New Basics Electronic Cookbook, The (USA).bin" size="182559888" crc="0899cd26" sha1="135c54f4c88663af6c8cae1a4ac69599cb0d7b30"/>
+		<rom name="New Basics Electronic Cookbook, The (USA).cue" size="130" crc="12fca6a6" sha1="897607dd231704d75fb368756102ada5574c8de9"/>
+		-->
+		<description>The New Basics Electronic Cookbook</description>
+		<year>1992</year>
+		<publisher>Xiphias</publisher>
+		<info name="serial" value="25-6101"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="New Basics Electronic Cookbook, The (USA)" sha1="5c67f9ad9cfc3738806bdbb2b27244b8325284d3"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ourhouse">
+		<!--
+		Origin: redump.org
+		<rom name="Our House featuring The Family Circus (USA).bin" size="359061024" crc="de12f16b" sha1="43c2b6e5ca13492a291fce352c20535c6c1d6791"/>
+		<rom name="Our House featuring The Family Circus (USA).cue" size="109" crc="fb591092" sha1="d64bda6b5738253e8d97c5b8a3415d28fc2b4e1b"/>
+		-->
+		<description>Our House featuring The Family Circus</description>
+		<year>1992</year>
+		<publisher>Context Systems</publisher>
+		<info name="serial" value="25-6146"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Our House featuring The Family Circus (USA)" sha1="a4d4041fa48d119f9c45d345c41c335fa8d2c09b"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="peterwolf">
+		<!--
+		Origin: redump.org
+		<rom name="Peter and the Wolf - A Multimedia Storybook (USA) (Track 1).bin" size="7890960" crc="7b7175ed" sha1="bed37f3d9944540e4b088c80923e4d2599bdbd74"/>
+		<rom name="Peter and the Wolf - A Multimedia Storybook (USA) (Track 2).bin" size="296060352" crc="aa50926d" sha1="5dfaeadac48925802a4e2f36bcb6942f687ac636"/>
+		<rom name="Peter and the Wolf - A Multimedia Storybook (USA).cue" size="291" crc="eeb33662" sha1="71606795c9cc70ffc3984af087f3b655913bd923"/>
+		-->
+		<description>Peter and the Wolf - A Multimedia Storybook</description>
+		<year>1992</year>
+		<publisher>Ebook</publisher>
+		<info name="serial" value="25-6154 / PTW-92V"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Peter and the Wolf - A Multimedia Storybook (USA)" sha1="87ec23b384562439b956a6a9f7e45a77d6d0ca37"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="plang_e">
+		<!--
+		Origin: redump.org
+		<rom name="Playing with Language - Games in English (USA).bin" size="112190400" crc="c3910612" sha1="3761280c794667fb8a6f8b12770b3f622556d40b"/>
+		<rom name="Playing with Language - Games in English (USA).cue" size="112" crc="c7287e9a" sha1="cedc5898b800b27d328e3c85d16cad4aa31134da"/>
+		-->
+		<description>Playing with Language - Games in English</description>
+		<year>1992</year>
+		<publisher>Syracuse Language Systems</publisher>
+		<info name="serial" value="25-6120 / IG 4"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Playing with Language - Games in English (USA)" sha1="9d3450559b98a286217b568f3e3e85cdf1af98ff"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="plang_f">
+		<!--
+		Origin: redump.org
+		<rom name="Playing with Language - Games in French (USA).bin" size="118651344" crc="e45c2861" sha1="328ed886824b2a9f72850de037957d89055abbed"/>
+		<rom name="Playing with Language - Games in French (USA).cue" size="111" crc="7a10afcf" sha1="5cf938a0ac6b7d649b4ae86944ad35c9c0d2a182"/>
+		-->
+		<description>Playing with Language - Games in French</description>
+		<year>1992</year>
+		<publisher>Syracuse Language Systems</publisher>
+		<info name="serial" value="25-6119 / IG 3"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Playing with Language - Games in French (USA)" sha1="bd71c3f6a76544bcbfbf9b61ea739077607053c9"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="plang_g">
+		<!--
+		Origin: redump.org
+		<rom name="Playing with Language - Games in German (USA).bin" size="119839104" crc="9914e013" sha1="d2831b0403debec5ff47b9a2c3f13288f2d9c35c"/>
+		<rom name="Playing with Language - Games in German (USA).cue" size="111" crc="45c6e3fe" sha1="8b443dd607166515b01875db2b05b4544162be0b"/>
+		-->
+		<description>Playing with Language - Games in German</description>
+		<year>1992</year>
+		<publisher>Syracuse Language Systems</publisher>
+		<info name="serial" value="25-6118 / IG 1"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Playing with Language - Games in German (USA)" sha1="e758892f26d64da02fcea4a3405794c1f23cf2b0"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="plang_j">
+		<!--
+		Origin: redump.org
+		<rom name="Playing with Language - Games in Japanese (USA).bin" size="138662160" crc="97353aa9" sha1="e80fd6702e7871368c0e718f9e92a66f1ba8a619"/>
+		<rom name="Playing with Language - Games in Japanese (USA).cue" size="113" crc="ff253102" sha1="5daee37ceecab94d8ba665b2c043a382e93f7d32"/>
+		-->
+		<description>Playing with Language - Games in Japanese</description>
+		<year>1992</year>
+		<publisher>Syracuse Language Systems</publisher>
+		<info name="serial" value="25-6185 / IG 5"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Playing with Language - Games in Japanese (USA)" sha1="6c33072af27ac5c0e97204ffc34152367c24b7cd"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="plang_s">
+		<!--
+		Origin: redump.org
+		<rom name="Playing with Language - Games in Spanish (USA).bin" size="125015856" crc="9685a133" sha1="f1d3803a234c1dd065f0f3aa26ec391266721c37"/>
+		<rom name="Playing with Language - Games in Spanish (USA).cue" size="112" crc="272a80e2" sha1="4eba4d5053367e8ae0450b0982332ed10754fa79"/>
+		-->
+		<description>Playing with Language - Games in Spanish</description>
+		<year>1992</year>
+		<publisher>Syracuse Language Systems</publisher>
+		<info name="serial" value="25-6117 / IG 2"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Playing with Language - Games in Spanish (USA)" sha1="ecd4298d5812e1318a4fffafc979fe0aae319180"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="raceclock">
+		<!--
+		Origin: redump.org
+		<rom name="Race the Clock (USA) (En,Es).bin" size="433132560" crc="fcfbc855" sha1="95f950fe625d0e375f325d033673ef876f75555c"/>
+		<rom name="Race the Clock (USA) (En,Es).cue" size="94" crc="f9fffc4c" sha1="bbe5dd6612c4dbb4e3c23c2766d7783959759348"/>
+		-->
+		<description>Race the Clock</description>
+		<year>1992</year>
+		<publisher>Mindplay</publisher>
+		<info name="serial" value="25-6163 / 040035-CD"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Race the Clock (USA) (En,Es)" sha1="8a6fb5991c64fbba64545a3e40fbafbff4ce7d48"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="rickribbit">
+		<!--
+		Origin: redump.org
+		<rom name="Rick Ribbit - Adventures in Early Learning (USA).bin" size="34390944" crc="a79510c7" sha1="089052ac80a25880d6aba860dc4014dc9e7e2633"/>
+		<rom name="Rick Ribbit - Adventures in Early Learning (USA).cue" size="114" crc="f89e2813" sha1="7248e1d44de6b1e80fc6a6e7443fc62c40913307"/>
+		-->
+		<description>Rick Ribbit - Adventures in Early Learning</description>
+		<year>1992</year>
+		<publisher>Tadpole Productions</publisher>
+		<info name="serial" value="25-6172 / TPRR1D"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Rick Ribbit - Adventures in Early Learning (USA)" sha1="60c9ec812d937ce20b5cd9501b679aca6c61390c"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="rodney">
+		<!--
+		Origin: redump.org
+		<rom name="Rodney's Funscreen (USA).bin" size="6449184" crc="af8a8200" sha1="608d7181dd65d4e5ac5a79ab319e3280fc5f5b77"/>
+		<rom name="Rodney's Funscreen (USA).cue" size="113" crc="36bfadaa" sha1="20b0ede2e25fad5a367bf1c9093dfc812c92b868"/>
+		-->
+		<description>Rodney's Funscreen</description>
+		<year>1992</year>
+		<publisher>Activision</publisher>
+		<info name="serial" value="25-6152"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Rodney's Funscreen (USA)" sha1="29ca62059dd3d347641387a5cda08c6f2de0ed4b"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- FMV playback only fills half the screen -->
+	<software name="sampler" supported="partial">
+		<!--
+		Origin: redump.org
+		<rom name="Title Sampler (USA).bin" size="64122576" crc="36b14611" sha1="8f55bc5b71ce9634e3114daff9b4c26f1a720540"/>
+		<rom name="Title Sampler (USA).cue" size="85" crc="473d133e" sha1="5ce61415e93805027c3efbb6121963918d865033"/>
+		-->
+		<description>Title Sampler</description>
+		<year>1992</year>
+		<publisher>Tandy</publisher>
+		<info name="serial" value="CDRM1030350"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Title Sampler (USA)" sha1="0a7fea2619c8a1952be305f2a1f088280a32b3ea"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="searchsea">
+		<!--
+		Origin: redump.org
+		<rom name="Search for the Sea (USA).bin" size="72728544" crc="20422ad7" sha1="5a59eeac650bdaa78791defb5534bb085c1a9197"/>
+		<rom name="Search for the Sea (USA).cue" size="90" crc="a491d265" sha1="1304a2ee5d9ca55bc4aacc69a8b09fec7cd54055"/>
+		-->
+		<description>Search for the Sea</description>
+		<year>1992</year>
+		<publisher>Multicom Publishing</publisher>
+		<info name="serial" value="25-6143 / CDRM1038600"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Search for the Sea (USA)" sha1="1a2de1f5983c61da78ea0e6e52b46edaa9e44a5e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sherlock1">
+		<!--
+		Origin: redump.org
+		<rom name="Sherlock Holmes - Consulting Detective Volume I (USA).bin" size="512745408" crc="ef3ae128" sha1="66a20865ab247d3917944241c94d682e23bee6ae"/>
+		<rom name="Sherlock Holmes - Consulting Detective Volume I (USA).cue" size="119" crc="0ec313e9" sha1="38594b7eac5f38a11a111dcfa4787257556972ac"/>
+		-->
+		<description>Sherlock Holmes - Consulting Detective Volume I</description>
+		<year>1992</year>
+		<publisher>ICOM Simulations</publisher>
+		<info name="serial" value="25-6183 / CDRM1038390"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Sherlock Holmes - Consulting Detective Volume I (USA)" sha1="babc7f220fcf40f937a8f8462773849d032c158f"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sherlock2">
+		<!--
+		Origin: redump.org
+		<rom name="Sherlock Holmes - Consulting Detective Volume II (USA).bin" size="462819504" crc="d84be8bc" sha1="a45a0c1fe64f3b08e748a168fe82cd13936f8491"/>
+		<rom name="Sherlock Holmes - Consulting Detective Volume II (USA).cue" size="120" crc="d0a51dfb" sha1="e75634f52a488f19e1fe89ff1e4477bdc88b192e"/>
+		-->
+		<description>Sherlock Holmes - Consulting Detective Volume II</description>
+		<year>1992</year>
+		<publisher>ICOM Simulations</publisher>
+		<info name="serial" value="25-6184 / CDRM1038400"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Sherlock Holmes - Consulting Detective Volume II (USA)" sha1="8b3483a71d3ea20bfe010be786a3e45c27f65d39"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="smartkids">
+		<!--
+		Origin: redump.org
+		<rom name="SmartKids Challenge One (USA).bin" size="11294304" crc="c65cf459" sha1="b8d74c5b8515cefcf6ac55e92da5c27523c83cbe"/>
+		<rom name="SmartKids Challenge One (USA).cue" size="95" crc="f01eb386" sha1="7c9537d2c9f34cd32148312f843d66c261c64d07"/>
+		-->
+		<description>SmartKids Challenge One</description>
+		<year>1992</year>
+		<publisher>Arkeo Software</publisher>
+		<info name="serial" value="25-6176"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="SmartKids Challenge One (USA)" sha1="2eb59e6e8425d1d7ce9646bf067e75f5c529b3d8"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="survey">
+		<!--
+		Origin: redump.org
+		<rom name="Survey of Western Art, A - The Electronic Library of Art (USA).bin" size="184549680" crc="4c46180f" sha1="025d34e55785ba2dbd118e68b5b339ec81c51156"/>
+		<rom name="Survey of Western Art, A - The Electronic Library of Art (USA).cue" size="151" crc="9d38ad0f" sha1="dff5fa9b9f8cf7578d15c18ac44a01f281be67a8"/>
+		-->
+		<description>A Survey of Western Art - The Electronic Library of Art</description>
+		<year>1993</year>
+		<publisher>Ebook</publisher>
+		<info name="serial" value="25-6153 / ELASWI-92V"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Survey of Western Art, A - The Electronic Library of Art (USA)" sha1="45c747e2416624d170472e06f97b3717101ac380"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="stepstones">
+		<!--
+		Origin: redump.org
+		<rom name="Talking Stepping Stones - Bonus Pack (USA).bin" size="3697344" crc="3de7af11" sha1="29d7eaa479fd5fb0d8fa3d637c517a7400fa83fc"/>
+		<rom name="Talking Stepping Stones - Bonus Pack (USA).cue" size="108" crc="bcada806" sha1="1ba0a9dddbaf8447b735e8947f11585916d6e567"/>
+		-->
+		<description>Talking Stepping Stones - Bonus Pack</description>
+		<year>1992</year>
+		<publisher>Compu-Teach</publisher>
+		<info name="serial" value="25-6113 / 600146-D100"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Talking Stepping Stones - Bonus Pack (USA)" sha1="4516b74244f0ddd398d2d64553656c1716901b4f"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="time92">
+		<!--
+		Origin: redump.org
+		<rom name="Time Magazine Compact Almanac 1992 (USA).bin" size="450666720" crc="1650c69e" sha1="393a4235bc0c87911ad14d2c58bf46e0b9232fe3"/>
+		<rom name="Time Magazine Compact Almanac 1992 (USA).cue" size="129" crc="4949bf9b" sha1="2ffc91d8ab3cd7f3af101906e071ba4a6e50214d"/>
+		-->
+		<description>Time Magazine Compact Almanac 1992</description>
+		<year>1993</year>
+		<publisher>Compact Publishing</publisher>
+		<info name="serial" value="25-6204"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Time Magazine Compact Almanac 1992 (USA)" sha1="ce176f9f433724d2cbbbb6dd93e5759f9dd90b6b"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="tth_arts">
+		<!--
+		Origin: redump.org
+		<rom name="Time Table of History - Arts and Entertainment - 1993 Edition (USA).bin" size="339873408" crc="d1adeeca" sha1="41bfb7d7566167a040322eca0a05ad5355f3ab7b"/>
+		<rom name="Time Table of History - Arts and Entertainment - 1993 Edition (USA).cue" size="156" crc="5f7d4d8c" sha1="e6520951b0c3a5a0dca949e57175578744264d44"/>
+		-->
+		<description>Time Table of History - Arts and Entertainment - 1993 Edition</description>
+		<year>1993</year>
+		<publisher>Xiphias</publisher>
+		<info name="serial" value="25-6102"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Time Table of History - Arts and Entertainment - 1993 Edition (USA)" sha1="4fa1e6138661a40b7837a94c7590cce3fc3ee0b6"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="tth_business">
+		<!--
+		Origin: redump.org
+		<rom name="Time Table of History - Business, Politics &amp; Media - 1993 Edition (USA).bin" size="280666512" crc="bab59b4e" sha1="8d81fb925c3a314f3948c76b13c916452ebbf7c6"/>
+		<rom name="Time Table of History - Business, Politics &amp; Media - 1993 Edition (USA).cue" size="160" crc="204ec513" sha1="9c6e6c43a2dc82dde2e89b2478675a3a75cf9850"/>
+		-->
+		<description>Time Table of History - Business, Politics &amp; Media - 1993 Edition</description>
+		<year>1993</year>
+		<publisher>Xiphias</publisher>
+		<info name="serial" value="25-6103"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Time Table of History - Business, Politics &amp; Media - 1993 Edition (USA)" sha1="26294c12e1fbaf0b3ea87b9823829e68b073caad"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="tth_science">
+		<!--
+		Origin: redump.org
+		<rom name="Time Table of History - Science and Innovation - 1993 Edition (USA).bin" size="286936944" crc="ba7fe268" sha1="d172c4a54ee2d6bccbb701ce701e6eb1bb859923"/>
+		<rom name="Time Table of History - Science and Innovation - 1993 Edition (USA).cue" size="156" crc="efc144ef" sha1="1fa7fd10cad26f014f0148419ca302e945f2289a"/>
+		-->
+		<description>Time Table of History - Science and Innovation - 1993 Edition</description>
+		<year>1993</year>
+		<publisher>Xiphias</publisher>
+		<info name="serial" value="25-6104"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Time Table of History - Science and Innovation - 1993 Edition (USA)" sha1="26c661c0ac8e848155b032968c82fee2af37bcb3"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="vampcoff">
+		<!--
+		Origin: redump.org
+		<rom name="Adventures of Victor Vector &amp; Yondo, The - Adventure No. 1 - The Vampire's Coffin (USA).bin" size="113594544" crc="57a66cea" sha1="0fdac03b71f739091522bda371aa0cdbe9fc52df"/>
+		<rom name="Adventures of Victor Vector &amp; Yondo, The - Adventure No. 1 - The Vampire's Coffin (USA).cue" size="153" crc="98689c02" sha1="33512e536aa24fb6985e1f5ecfe5da957280156e"/>
+		-->
+		<description>The Adventures of Victor Vector &amp; Yondo - Adventure No. 1 - The Vampire's Coffin</description>
+		<year>1992</year>
+		<publisher>Sanctuary Woods</publisher>
+		<info name="serial" value="25-6115 / VVY1-VIS1"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Adventures of Victor Vector &amp; Yondo, The - Adventure No. 1 - The Vampire's Coffin (USA)" sha1="a8a78996139dc133bfb9c1c43ff1d0ebc7d29bb4"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="visbible">
+		<!--
+		Origin: redump.org
+		<rom name="Vision - Multimedia Bible for the Entire Family (USA).bin" size="243502560" crc="cc7b1650" sha1="4e278d39878c3e6d2c0e4705ef07239370e1b0db"/>
+		<rom name="Vision - Multimedia Bible for the Entire Family (USA).cue" size="119" crc="6e0b29a8" sha1="7a4e52cb7a6f7a99cc6897dff103be7a311e3b4c"/>
+		-->
+		<description>Vision - Multimedia Bible for the Entire Family</description>
+		<year>1992</year>
+		<publisher>Candlelight Publishing</publisher>
+		<info name="serial" value="25-6162"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Vision - Multimedia Bible for the Entire Family (USA)" sha1="649ce7ea268c086478a2eb7bf0c689a22a27e5fe"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="wildanim">
+		<!--
+		Origin: redump.org
+		<rom name="Wild Animals! (USA).bin" size="112420896" crc="2c3e6df4" sha1="bc46ed5cda64e34c070a9637c33e9b2609404e4f"/>
+		<rom name="Wild Animals! (USA).cue" size="108" crc="80208277" sha1="c60d1ef14cc3e6cc101823f5c181dada40033a60"/>
+		-->
+		<description>Wild Animals!</description>
+		<year>1993</year>
+		<publisher>Optic Moon</publisher>
+		<info name="serial" value="25-6159"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Wild Animals (USA)" sha1="8cac5012e7b602a254def914b9abbc2cb2cd2dcf"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="worldvista">
+		<!--
+		Origin: redump.org
+		<rom name="World Vista (USA).bin" size="375002880" crc="b3a5e29b" sha1="fc326862dc7512039337d3ebfc2e08754fdab930"/>
+		<rom name="World Vista (USA).cue" size="83" crc="0c2662cb" sha1="d8c3676f4002824727e161cfcb112f3be447ad3a"/>
+		-->
+		<description>World Vista</description>
+		<year>1992</year>
+		<publisher>Applied Optical Media</publisher>
+		<info name="serial" value="25-6107"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="World Vista (USA)" sha1="b430a43910375c8305067eefd146961c89511431"/>
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

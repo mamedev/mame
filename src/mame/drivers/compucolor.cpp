@@ -30,7 +30,7 @@
 #include "video/tms9927.h"
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 #define I8080_TAG   "ua2"
 #define TMS5501_TAG "ud2"

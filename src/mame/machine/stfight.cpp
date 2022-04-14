@@ -109,7 +109,7 @@ void stfight_state::stfight_bank_w(uint8_t data)
  *      CPU 1 timed interrupt - 60Hz???
  */
 
-void stfight_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void stfight_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

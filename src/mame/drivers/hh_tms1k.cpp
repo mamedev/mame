@@ -14,6 +14,50 @@ part of a series is (or will be) in its own driver, see:
 - tispellb: TI Spelling B series gen. 1
 - tispeak: TI Speak & Spell series gen. 1
 
+About the approximated MCU frequency everywhere: The RC osc. is not that
+stable on most of these handhelds. When comparing multiple video recordings
+of the same game, it shows(and sounds) that the frequency range can differ
+up to 50kHz. This is probably exaggerated due to components getting worn out
+after many decades. TMS1000 RC curve is documented in the data manual, but
+not for newer ones (rev. E or TMS1400 MCUs). TMS0970/0980 osc. is on-die.
+
+ROM source notes when dumped from another publisher, but confident it's the same:
+- arrball: Tandy Zingo
+- bcheetah: Fundimensions Incredible Brain Buggy
+- cmsport: Conic Basketball
+- cnbaskb: Cardinal Electronic Basketball
+- cnfball: Elecsonic Football
+- copycat: Sears Follow Me
+- ditto: Tandy Electronic Pocket Repeat
+- fxmcr165: Tandy Science Fair Microcomputer Trainer
+- ginv1000: Tandy Cosmic 1000 Fire Away
+- gjackpot: Entex Electronic Jackpot: Gin Rummy & Black Jack
+- gpoker: Entex Electronic Poker
+- matchnum: LJN Electronic Concentration
+- palmf31: Toshiba BC-8018B
+- ti1250: Texas Instruments TI-1200
+- ti25503: Texas Instruments TI-1265
+- ti5100: loose 1979 TMS1073NL chip
+
+TODO:
+- Verify output PLA and microinstructions PLA for MCUs that have been dumped
+  electronically (mpla is usually the default, opla is often custom).
+- unknown MCU clocks for some, especially if no YouTube videos are found
+- Fake-press ON button when emulation starts for machines that have it on the
+  button matrix (doesn't look like any relies on it though).
+- t7in1ss: in 2-player mode, game select and skill select can be configured after
+  selecting a game? Possibly BTANB, players are expected to quickly press the
+  "First Up" button after the alarm sound.
+- bship discrete sound, netlist is documented
+- finish bshipb SN76477 sound
+- redo internal artwork for the baseball games (embedded SVG for diamond shapes)
+- improve elecbowl driver
+- tithermos temperature sensor comparator (right now just the digital clock works)
+- is alphie(patent) the same as the final version?
+- is starwbcp the same as MP3438? (starwbc is MP3438A)
+
+============================================================================
+
 Let's use this driver for a list of known devices and their serials,
 excluding most of TI's own products(they normally didn't use "MP" codes).
 For TI's calculators, a comprehensive list of MCU serials is available
@@ -31,7 +75,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP0168   TMS1000   1979, Conic Multisport/Tandy Sports Arena (model 60-2158)
  @MP0170   TMS1000   1979, Conic Football
  *MP0220   TMS1000   1980, Tomy Teacher
- *MP0230   TMS1000   1980, Entex Blast It (6015)
+ @MP0230   TMS1000   1980, Entex Blast It (6015)
  @MP0271   TMS1000   1982, Radio Shack Monkey See
  @MP0907   TMS1000   1979, Conic Basketball (101-006)
  @MP0908   TMS1000   1979, Conic Electronic I.Q.
@@ -48,18 +92,18 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP1180   TMS1100   1980, Tomy Power House Pinball
  @MP1181   TMS1100   1979, Conic Football 2
  @MP1183   TMS1100   1980, E.R.S. Superbowl XV Football/Tandy Championship Football (model 60-2151)
- @MP1185   TMS1100   1979, Fonas 3-in-1: Football, Basketball, Soccer
+ @MP1185   TMS1100   1979, Fonas 3 in 1: Football, Basketball, Soccer
  @MP1193   TMS1100   1980, Tandy Championship Football (model 60-2150)
  @MP1204   TMS1100   1980, Entex Baseball 3 (6007)
  *MP1209   TMS1100   1980, U.S. Games Space Cruiser/Strategy Football
  @MP1211   TMS1100   1980, Entex Space Invader (6012)
- *MP1215   TMS1100   1980, Tiger Playmaker
+ @MP1215   TMS1100   1980, Tiger Playmaker
  @MP1218   TMS1100   1980, Entex Basketball 2 (6010)
  @MP1219   TMS1100   1980, U.S. Games Super Sports-4
  @MP1221   TMS1100   1980, Entex Raise The Devil (6011)
- *MP1231   TMS1100   1983, Tandy 3-in-1 Sports Arena (model 60-2178)
+ @MP1231   TMS1100   1984, Tandy 3 in 1 Sports Arena (model 60-2178)
  @MP1296   TMS1100   1982, Entex Black Knight Pinball (6081)
- *MP1311   TMS1100   1981, Bandai TC7: Air Traffic Control
+ @MP1311   TMS1100   1981, Bandai TC7: Air Traffic Control
  @MP1312   TMS1100   1983, Gakken FX-Micom R-165/Radio Shack Science Fair Microcomputer Trainer
  *MP1359   TMS1100?  1985, Capsela CRC2000
  @MP1525   TMS1170   1980, Coleco Head to Head: Electronic Baseball
@@ -80,6 +124,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP3260   TMS1000   1979, Electroplay Quickfire
  @MP3300   TMS1000   1979, Milton Bradley Simon (Rev F)
  @MP3301A  TMS1000   1979, Milton Bradley Big Trak
+ *MP3312   TMS1000   1980, Nathan Mega 10000
  @MP3320A  TMS1000   1979, Coleco Head to Head: Electronic Basketball
  @MP3321A  TMS1000   1979, Coleco Head to Head: Electronic Hockey
  @MP3352   TMS1200   1979, Tiger Sub Wars (model 7-490)
@@ -103,7 +148,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP3476   TMS1100   1979, Milton Bradley Super Simon
   MP3479   TMS1100   1980, Microvision cartridge: Baseball
   MP3481   TMS1100   1979, Microvision cartridge: Connect Four
- *MP3489   TMS1100   1980, Kenner Live Action Football
+ @MP3489   TMS1100   1980, Kenner Live Action Football
  @MP3491   TMS1100   1979, Mattel Thoroughbred Horse Race Analyzer
  *MP3493   TMS1100   1980, Milton Bradley OMNI Entertainment System (1/2)
  *MP3494   TMS1100   1980, Milton Bradley OMNI Entertainment System (2/2)
@@ -122,8 +167,8 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP6100A  TMS0980   1979, Ideal Electronic Detective
  @MP6101B  TMS0980   1979, Parker Brothers Stop Thief
  *MP6354   ?         1982, Tsukuda The Dracula (? note: 40-pin, VFD-capable)
- *MP6361   ?         1983, Defender Strikes (? note: VFD-capable)
- *MP7302   TMS1400   1980, Tiger Deluxe Football with Instant Replay
+ *MP6361   ?         1983, <unknown> Defender Strikes (? note: VFD-capable)
+ @MP7302   TMS1400   1980, Tiger Deluxe Football with Instant Replay
  @MP7304   TMS1400   1982, Tiger 7 in 1 Sports Stadium (model 7-555)
  @MP7313   TMS1400   1980, Parker Brothers Bank Shot
  @MP7314   TMS1400   1980, Parker Brothers Split Second
@@ -144,41 +189,6 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 
   (* means undumped unless noted, @ denotes it's in this driver)
 
-============================================================================
-
-ROM source notes when dumped from another publisher, but confident it's the same:
-- arrball: Tandy Zingo
-- bcheetah: Fundimensions Incredible Brain Buggy
-- cmsport: Conic Basketball
-- cnbaskb: Cardinal Electronic Basketball
-- cnfball: Elecsonic Football
-- copycat: Sears Follow Me
-- ditto: Tandy Electronic Pocket Repeat
-- fxmcr165: Tandy Science Fair Microcomputer Trainer
-- ginv1000: Tandy Cosmic 1000 Fire Away
-- gjackpot: Entex Electronic Jackpot: Gin Rummy & Black Jack
-- gpoker: Entex Electronic Poker
-- matchnum: LJN Electronic Concentration
-- palmf31: Toshiba BC-8018B
-- ti1250: Texas Instruments TI-1200
-- ti25503: Texas Instruments TI-1265
-- ti5100: loose 1979 TMS1073NL chip
-
-TODO:
-- verify output PLA and microinstructions PLA for MCUs that have been dumped
-  electronically (mpla is usually the default, opla is often custom)
-- unknown MCU clocks for some: TMS1000 RC curve is documented in the data manual,
-  but not for newer ones (rev. E or TMS1400 MCUs). TMS0970/0980 osc. is on-die.
-- fake-press ON button when emulation starts for machines that have it on the button matrix
-  (doesn't look like any relies on it though)
-- 7in1ss: in 2-player mode, game select and skill select can be configured after selecting a game?
-  Possibly BTANB, players are expected to quickly press the "First Up" button after the alarm sound.
-- bship discrete sound, netlist is documented
-- finish bshipb SN76477 sound
-- improve elecbowl driver
-- tithermos temperature sensor comparator (right now just the digital clock works)
-- is alphie(patent) the same as the final version?
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -196,12 +206,12 @@ TODO:
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "screen.h"
 #include "speaker.h"
 
 // internal artwork
-#include "7in1ss.lh"
+#include "t7in1ss.lh"
 #include "alphie.lh"
 #include "amaztron.lh" // clickable
 #include "arcmania.lh" // clickable
@@ -210,6 +220,7 @@ TODO:
 #include "bankshot.lh"
 #include "bcheetah.lh"
 #include "bigtrak.lh"
+#include "blastit.lh"
 #include "bship.lh" // clickable
 #include "cmsport.lh"
 #include "cnbaskb.lh"
@@ -221,6 +232,7 @@ TODO:
 #include "copycatm2.lh" // clickable
 #include "dataman.lh"
 #include "ditto.lh" // clickable
+#include "dxfootb.lh"
 #include "cqback.lh"
 #include "ebball.lh"
 #include "ebball2.lh"
@@ -245,6 +257,7 @@ TODO:
 #include "h2hfootb.lh"
 #include "h2hhockey.lh"
 #include "horseran.lh"
+#include "liveafb.lh"
 #include "lostreas.lh" // clickable
 #include "matchnum.lh" // clickable
 #include "mathmagi.lh"
@@ -258,6 +271,7 @@ TODO:
 #include "palmmd8.lh"
 #include "pbmastm.lh"
 #include "phpball.lh"
+#include "playmaker.lh"
 #include "qfire.lh" // clickable
 #include "quizwizc.lh"
 #include "raisedvl.lh"
@@ -269,9 +283,11 @@ TODO:
 #include "starwbc.lh" // clickable
 #include "stopthief.lh" // clickable
 #include "subwars.lh"
+#include "t3in1sa.lh"
 #include "tandy12.lh" // clickable
 #include "tbreakup.lh"
 #include "tc4.lh"
+#include "tc7atc.lh"
 #include "tcfball.lh"
 #include "tcfballa.lh"
 #include "ti1250.lh"
@@ -296,14 +312,6 @@ void hh_tms1k_state::machine_start()
 {
 	// resolve handlers
 	m_out_power.resolve();
-
-	// zerofill
-	m_o = 0;
-	m_r = 0;
-	m_inp_mux = 0;
-	m_power_on = false;
-	m_grid = 0;
-	m_plate = 0;
 
 	// register for savestates
 	save_item(NAME(m_o));
@@ -430,11 +438,13 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void matchnum(machine_config &config);
+
+private:
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void matchnum(machine_config &config);
 };
 
 // handlers
@@ -514,18 +524,18 @@ INPUT_PORTS_END
 
 void matchnum_state::matchnum(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1000(config, m_maincpu, 325000); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->k().set(FUNC(matchnum_state::read_k));
 	m_maincpu->r().set(FUNC(matchnum_state::write_r));
 	m_maincpu->o().set(FUNC(matchnum_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 8);
 	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_matchnum);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
@@ -571,11 +581,13 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void arrball(machine_config &config);
+
+private:
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void arrball(machine_config &config);
 };
 
 // handlers
@@ -625,19 +637,19 @@ INPUT_PORTS_END
 
 void arrball_state::arrball(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1000(config, m_maincpu, 325000); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->k().set(FUNC(arrball_state::read_k));
 	m_maincpu->r().set(FUNC(arrball_state::write_r));
 	m_maincpu->o().set(FUNC(arrball_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(7, 7);
 	m_display->set_segmask(0x10, 0x7f);
 	m_display->set_segmask(0x20, 0x06); // left digit only segments B and C
 	config.set_default_layout(layout_arrball);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
@@ -691,11 +703,13 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void mathmagi(machine_config &config);
+
+private:
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void mathmagi(machine_config &config);
 };
 
 // handlers
@@ -734,7 +748,7 @@ u8 mathmagi_state::read_k()
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
     ON     ONE       [SEL] [NXT] [?]   [/]
      |      |        [7]   [8]   [9]   [x]
@@ -792,19 +806,19 @@ static const u16 mathmagi_output_pla[0x20] =
 
 void mathmagi_state::mathmagi(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1100(config, m_maincpu, 175000); // approximation - RC osc. R=68K, C=82pF
 	m_maincpu->set_output_pla(mathmagi_output_pla);
 	m_maincpu->k().set(FUNC(mathmagi_state::read_k));
 	m_maincpu->r().set(FUNC(mathmagi_state::write_r));
 	m_maincpu->o().set(FUNC(mathmagi_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(11, 7);
 	m_display->set_segmask(0xff, 0x7f);
 	config.set_default_layout(layout_mathmagi);
 
-	/* no sound! */
+	// no sound!
 }
 
 // roms
@@ -932,16 +946,15 @@ INPUT_PORTS_END
 
 void bcheetah_state::bcheetah(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1000(config, m_maincpu, 100000); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->k().set(FUNC(bcheetah_state::read_k));
 	m_maincpu->r().set(FUNC(bcheetah_state::write_r));
 	m_maincpu->o().set(FUNC(bcheetah_state::write_o));
 
-	/* no visual feedback! */
 	config.set_default_layout(layout_bcheetah);
 
-	/* no sound! */
+	// no sound!
 }
 
 // roms
@@ -954,6 +967,132 @@ ROM_START( bcheetah )
 	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1000_bcheetah_output.pla", 0, 365, CRC(cc6d1ecd) SHA1(b0635a841d8850c36c1f414abe0571b81884b972) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Bandai TC7: Air Traffic Control
+  * TMS1100 MCU, label MP1311 (die label 1100E, MP1311)
+  * 4-digit 7seg LED display, 40 other LEDs, 1-bit sound
+
+  It is a very complicated game, refer to the manual on how to play.
+
+***************************************************************************/
+
+class tc7atc_state : public hh_tms1k_state
+{
+public:
+	tc7atc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void tc7atc(machine_config &config);
+
+private:
+	void update_display();
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
+};
+
+// handlers
+
+void tc7atc_state::update_display()
+{
+	m_display->matrix(m_r, m_o);
+}
+
+void tc7atc_state::write_r(u16 data)
+{
+	// R5: speaker out
+	m_speaker->level_w(BIT(data, 5));
+
+	// R0-R4: input mux, led select
+	// R6-R9: digit select
+	m_inp_mux = m_r = data;
+	update_display();
+}
+
+void tc7atc_state::write_o(u16 data)
+{
+	// O0-O7: led data
+	m_o = data;
+	update_display();
+}
+
+u8 tc7atc_state::read_k()
+{
+	// K: multiplexed inputs
+	return read_inputs(5);
+}
+
+// config
+
+static INPUT_PORTS_START( tc7atc )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("High Score")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("Hazard")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Clear")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("West")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("East")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Arrive")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Depart")
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Flight Path A / Level 1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("Flight Path B / Level 2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Flight Path C / Level 3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Flight Path D / Level 4")
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Altitude Descend")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("Altitude Ascend")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("Air Speed Decrease")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("Air Speed Increase")
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_NAME("10%")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_NAME("20%")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_NAME("40%")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_NAME("80%")
+INPUT_PORTS_END
+
+void tc7atc_state::tc7atc(machine_config &config)
+{
+	// basic machine hardware
+	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=68K, C=47pF
+	m_maincpu->k().set(FUNC(tc7atc_state::read_k));
+	m_maincpu->r().set(FUNC(tc7atc_state::write_r));
+	m_maincpu->o().set(FUNC(tc7atc_state::write_o));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(10, 8);
+	m_display->set_segmask(0x3c0, 0x7f);
+	config.set_default_layout(layout_tc7atc);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( tc7atc )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1311", 0x0000, 0x0800, CRC(704f5e1b) SHA1(765dce31798640480eab7576550c5378d6351b65) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_tc7atc_output.pla", 0, 365, CRC(0e6e3096) SHA1(375beb43657af0cc3070e581b42e501878c0eaaa) )
 ROM_END
 
 
@@ -1098,18 +1237,18 @@ INPUT_PORTS_END
 
 void palmf31_state::palmf31(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1040(config, m_maincpu, 250000); // approximation
 	m_maincpu->k().set(FUNC(palmf31_state::read_k));
 	m_maincpu->o().set(FUNC(palmf31_state::write_o));
 	m_maincpu->r().set(FUNC(palmf31_state::write_r));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	m_display->set_segmask(0x1ff, 0xff);
 	config.set_default_layout(layout_palmf31);
 
-	/* no sound! */
+	// no sound!
 }
 
 // roms
@@ -1266,18 +1405,18 @@ INPUT_PORTS_END
 
 void palmmd8_state::palmmd8(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1070(config, m_maincpu, 250000); // approximation - RC osc. R=56K, C=68pf
 	m_maincpu->k().set(FUNC(palmmd8_state::read_k));
 	m_maincpu->o().set(FUNC(palmmd8_state::write_o));
 	m_maincpu->r().set(FUNC(palmmd8_state::write_r));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(21, 8);
 	m_display->set_segmask(0xfffff, 0xff);
 	config.set_default_layout(layout_palmmd8);
 
-	/* no sound! */
+	// no sound!
 }
 
 // roms
@@ -1315,11 +1454,13 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void amaztron(machine_config &config);
+
+private:
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void amaztron(machine_config &config);
 };
 
 // handlers
@@ -1407,18 +1548,18 @@ INPUT_PORTS_END
 
 void amaztron_state::amaztron(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1100(config, m_maincpu, 300000); // approximation - RC osc. R=33K?, C=100pF
 	m_maincpu->k().set(FUNC(amaztron_state::read_k));
 	m_maincpu->r().set(FUNC(amaztron_state::write_r));
 	m_maincpu->o().set(FUNC(amaztron_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 7);
 	m_display->set_segmask(0xc, 0x7f);
 	config.set_default_layout(layout_amaztron);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -1458,11 +1599,13 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void zodiac(machine_config &config);
+
+private:
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void zodiac(machine_config &config);
 };
 
 // handlers
@@ -1517,6 +1660,7 @@ the letter buttons from it, the 8-character encoding for date input uses
 letters and digits in combination. This fact and the use of the P key are
 why the digit buttons are mapped here as keyboard inputs rather than as a
 keypad.
+
 */
 
 static INPUT_PORTS_START( zodiac )
@@ -1560,18 +1704,18 @@ INPUT_PORTS_END
 
 void zodiac_state::zodiac(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1100(config, m_maincpu, 500000); // approximation - RC osc. R=18K, C=100pF
 	m_maincpu->k().set(FUNC(zodiac_state::read_k));
 	m_maincpu->r().set(FUNC(zodiac_state::write_r));
 	m_maincpu->o().set(FUNC(zodiac_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
 	m_display->set_segmask(0xff, 0x7f);
 	config.set_default_layout(layout_zodiac);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -1615,11 +1759,13 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void cqback(machine_config &config);
+
+private:
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void cqback(machine_config &config);
 };
 
 // handlers
@@ -1664,10 +1810,10 @@ u8 cqback_state::read_k()
 
 static INPUT_PORTS_START( cqback )
 	PORT_START("IN.0") // K1
-	PORT_BIT( 0x01, 0x01, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // left/right
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Forward")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Kick/Pass")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Kick/Pass")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Display")
 
 	PORT_START("IN.1") // K2
@@ -1683,27 +1829,23 @@ static INPUT_PORTS_START( cqback )
 	PORT_CONFNAME( 0x01, 0x00, "Factory Test" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) ) // TP1-TP2
-
-	PORT_START("FAKE") // fake port for left/right combination
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("P1 Left/Right")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("P1 Left/Right")
 INPUT_PORTS_END
 
 void cqback_state::cqback(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1100(config, m_maincpu, 310000); // approximation - RC osc. R=33K, C=100pF
 	m_maincpu->k().set(FUNC(cqback_state::read_k));
 	m_maincpu->r().set(FUNC(cqback_state::write_r));
 	m_maincpu->o().set(FUNC(cqback_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 11);
 	m_display->set_segmask(0x1ff, 0xff);
 	m_display->set_bri_levels(0.003, 0.03); // offense leds are brighter
 	config.set_default_layout(layout_cqback);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -1747,11 +1889,13 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void h2hfootb(machine_config &config);
+
+private:
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void h2hfootb(machine_config &config);
 };
 
 // handlers
@@ -1806,36 +1950,32 @@ static INPUT_PORTS_START( h2hfootb )
 	PORT_CONFSETTING(    0x02, "2" )
 
 	PORT_START("IN.3") // K8
-	PORT_BIT( 0x001, 0x001, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // left/right
+	PORT_BIT( 0x001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Forward")
 	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
 	PORT_BIT( 0x004, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
-	PORT_BIT( 0x008, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Kick/Pass")
+	PORT_BIT( 0x008, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Kick/Pass")
 	PORT_BIT( 0x010, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Display")
 	PORT_BIT( 0x020, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL PORT_16WAY
 	PORT_BIT( 0x040, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY
 	PORT_BIT( 0x080, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY
 	PORT_BIT( 0x100, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY
-
-	PORT_START("FAKE") // fake port for left/right combination
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("P1 Left/Right")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("P1 Left/Right")
 INPUT_PORTS_END
 
 void h2hfootb_state::h2hfootb(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1100(config, m_maincpu, 310000); // approximation - RC osc. R=39K, C=100pF
 	m_maincpu->k().set(FUNC(h2hfootb_state::read_k));
 	m_maincpu->r().set(FUNC(h2hfootb_state::write_r));
 	m_maincpu->o().set(FUNC(h2hfootb_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 9);
 	m_display->set_segmask(0x1ff, 0x7f);
 	m_display->set_bri_levels(0.003, 0.03); // offense leds are brighter
 	config.set_default_layout(layout_h2hfootb);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -1880,30 +2020,29 @@ public:
 		m_cap_empty_timer(*this, "cap_empty")
 	{ }
 
-	required_device<timer_device> m_cap_empty_timer;
-	TIMER_DEVICE_CALLBACK_MEMBER(cap_empty_callback);
-	bool m_cap_state;
-	attotime m_cap_charge;
-
-	void update_display();
-	void write_r(u16 data);
-	void write_o(u16 data);
-	u8 read_k();
 	void h2hbaskb(machine_config &config);
 	void h2hhockey(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
+
+private:
+	required_device<timer_device> m_cap_empty_timer;
+	TIMER_DEVICE_CALLBACK_MEMBER(cap_empty_callback);
+	bool m_cap_state = false;
+	attotime m_cap_charge = attotime::zero;
+
+	void update_display();
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 };
 
 void h2hbaskb_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
 
-	// zerofill/register for savestates
-	m_cap_state = false;
-	m_cap_charge = attotime::zero;
-
+	// register for savestates
 	save_item(NAME(m_cap_state));
 	save_item(NAME(m_cap_charge));
 }
@@ -2010,7 +2149,7 @@ INPUT_PORTS_END
 
 void h2hbaskb_state::h2hbaskb(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1000(config, m_maincpu, 375000); // approximation - RC osc. R=43K, C=100pF
 	m_maincpu->k().set(FUNC(h2hbaskb_state::read_k));
 	m_maincpu->r().set(FUNC(h2hbaskb_state::write_r));
@@ -2018,12 +2157,12 @@ void h2hbaskb_state::h2hbaskb(machine_config &config)
 
 	TIMER(config, "cap_empty").configure_generic(FUNC(h2hbaskb_state::cap_empty_callback));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(6+6, 7);
 	m_display->set_segmask(0xc0, 0x7f);
 	config.set_default_layout(layout_h2hbaskb);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -2081,17 +2220,19 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void h2hbaseb(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(skill_switch) { set_clock(); }
+
+protected:
+	virtual void machine_reset() override;
+
+private:
+	void set_clock();
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-
-	void set_clock();
-	DECLARE_INPUT_CHANGED_MEMBER(skill_switch) { set_clock(); }
-	void h2hbaseb(machine_config &config);
-
-protected:
-	virtual void machine_reset() override;
 };
 
 void h2hbaseb_state::machine_reset()
@@ -2175,18 +2316,18 @@ INPUT_PORTS_END
 
 void h2hbaseb_state::h2hbaseb(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1170(config, m_maincpu, 350000); // see set_clock
 	m_maincpu->k().set(FUNC(h2hbaseb_state::read_k));
 	m_maincpu->r().set(FUNC(h2hbaseb_state::write_r));
 	m_maincpu->o().set(FUNC(h2hbaseb_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 9);
 	m_display->set_segmask(0x1ff, 0x7f);
 	config.set_default_layout(layout_h2hbaseb);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -2225,11 +2366,13 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void h2hboxing(machine_config &config);
+
+private:
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void h2hboxing(machine_config &config);
 };
 
 // handlers
@@ -2300,18 +2443,18 @@ INPUT_PORTS_END
 
 void h2hboxing_state::h2hboxing(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=39K, C=100pF
 	m_maincpu->k().set(FUNC(h2hboxing_state::read_k));
 	m_maincpu->r().set(FUNC(h2hboxing_state::write_r));
 	m_maincpu->o().set(FUNC(h2hboxing_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(11, 8);
 	m_display->set_segmask(0x600, 0x7f);
 	config.set_default_layout(layout_h2hboxing);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -2362,21 +2505,22 @@ class quizwizc_state : public hh_tms1k_state
 {
 public:
 	quizwizc_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_tms1k_state(mconfig, type, tag),
-		m_pinout(0)
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void quizwizc(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-	u16 m_pinout; // cartridge R pins
+	u16 m_pinout = 0x07; // cartridge R pins
 
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void quizwizc(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
 };
 
 void quizwizc_state::machine_start()
@@ -2398,9 +2542,15 @@ DEVICE_IMAGE_LOAD_MEMBER(quizwizc_state::cart_load)
 	}
 
 	// get cartridge pinout K1 to R connections
-	std::string pinout(image.get_feature("pinout"));
-	m_pinout = std::stoul(pinout, nullptr, 2) & 0xe7;
+	const char *pinout = image.get_feature("pinout");
+	m_pinout = pinout ? strtoul(pinout, nullptr, 2) & 0xe7 : 0;
 	m_pinout = bitswap<8>(m_pinout,4,3,7,5,2,1,6,0) << 4;
+
+	if (m_pinout == 0)
+	{
+		image.seterror(image_error::INVALIDIMAGE, "Invalid cartridge pinout");
+		return image_init_result::FAIL;
+	}
 
 	return image_init_result::PASS;
 }
@@ -2482,23 +2632,23 @@ INPUT_PORTS_END
 
 void quizwizc_state::quizwizc(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1000(config, m_maincpu, 300000); // approximation - RC osc. R=43K, C=100pF
 	m_maincpu->k().set(FUNC(quizwizc_state::read_k));
 	m_maincpu->r().set(FUNC(quizwizc_state::write_r));
 	m_maincpu->o().set(FUNC(quizwizc_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10+1, 8);
 	m_display->set_segmask(0x3c0, 0x7f);
 	config.set_default_layout(layout_quizwizc);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	/* cartridge */
+	// cartridge
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "quizwiz_cart"));
 	cartslot.set_must_be_loaded(true);
 	cartslot.set_device_load(FUNC(quizwizc_state::cart_load));
@@ -2550,21 +2700,22 @@ class tc4_state : public hh_tms1k_state
 {
 public:
 	tc4_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_tms1k_state(mconfig, type, tag),
-		m_pinout(0)
+		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void tc4(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-	u8 m_pinout; // cartridge K pins
+	u8 m_pinout = 0xf; // cartridge K pins
 
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void tc4(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
 };
 
 void tc4_state::machine_start()
@@ -2586,8 +2737,8 @@ DEVICE_IMAGE_LOAD_MEMBER(tc4_state::cart_load)
 	}
 
 	// get cartridge pinout R9 to K connections
-	std::string pinout(image.get_feature("pinout"));
-	m_pinout = std::stoul(pinout, nullptr, 0) & 0xf;
+	const char *pinout = image.get_feature("pinout");
+	m_pinout = pinout ? strtoul(pinout, nullptr, 0) & 0xf : 0xf;
 
 	return image_init_result::PASS;
 }
@@ -2669,24 +2820,24 @@ INPUT_PORTS_END
 
 void tc4_state::tc4(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1400(config, m_maincpu, 450000); // approximation - RC osc. R=27.3K, C=100pF
 	m_maincpu->k().set(FUNC(tc4_state::read_k));
 	m_maincpu->r().set(FUNC(tc4_state::write_r));
 	m_maincpu->o().set(FUNC(tc4_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 9);
 	m_display->set_segmask(0x3a0, 0x7f);
 	m_display->set_bri_levels(0.005, 0.05); // offense leds are brighter
 	config.set_default_layout(layout_tc4);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	/* cartridge */
+	// cartridge
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "tc4_cart"));
 	cartslot.set_must_be_loaded(true); // system won't power on without cartridge
 	cartslot.set_device_load(FUNC(tc4_state::cart_load));
@@ -2733,11 +2884,13 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void cnbaskb(machine_config &config);
+
+private:
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void cnbaskb(machine_config &config);
 };
 
 // handlers
@@ -2799,19 +2952,19 @@ INPUT_PORTS_END
 
 void cnbaskb_state::cnbaskb(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1000(config, m_maincpu, 375000); // approximation - RC osc. R=39K, C=47pF
 	m_maincpu->k().set(FUNC(cnbaskb_state::read_k));
 	m_maincpu->r().set(FUNC(cnbaskb_state::write_r));
 	m_maincpu->o().set(FUNC(cnbaskb_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
 	m_display->set_segmask(0x180, 0x7f);
 	m_display->set_bri_levels(0.01, 0.1); // player led is brighter
 	config.set_default_layout(layout_cnbaskb);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -2858,11 +3011,13 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void cmsport(machine_config &config);
+
+private:
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void cmsport(machine_config &config);
 };
 
 // handlers
@@ -2926,19 +3081,19 @@ INPUT_PORTS_END
 
 void cmsport_state::cmsport(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1000(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->k().set(FUNC(cmsport_state::read_k));
 	m_maincpu->r().set(FUNC(cmsport_state::write_r));
 	m_maincpu->o().set(FUNC(cmsport_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	m_display->set_segmask(0x60, 0x7f);
 	m_display->set_bri_levels(0.01, 0.1); // player led is brighter
 	config.set_default_layout(layout_cmsport);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -2988,6 +3143,9 @@ public:
 		m_ds8874(*this, "ds8874")
 	{ }
 
+	void cnfball(machine_config &config);
+
+private:
 	required_device<ds8874_device> m_ds8874;
 	void ds8874_output_w(u16 data);
 
@@ -2995,7 +3153,6 @@ public:
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void cnfball(machine_config &config);
 };
 
 // handlers
@@ -3049,31 +3206,27 @@ static INPUT_PORTS_START( cnfball )
 	PORT_START("IN.0") // R9
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
-	PORT_BIT( 0x04, 0x04, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // left/right
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Forward")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // R10
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Kick")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Kick")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("Score")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Status")
 	PORT_CONFNAME( 0x08, 0x08, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x08, "1" ) // college
 	PORT_CONFSETTING(    0x00, "2" ) // professional
-
-	PORT_START("FAKE") // fake port for left/right combination
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("P1 Left/Right")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("P1 Left/Right")
 INPUT_PORTS_END
 
 void cnfball_state::cnfball(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1000(config, m_maincpu, 350000); // approximation - RC osc. R=39K, C=47pF
 	m_maincpu->k().set(FUNC(cnfball_state::read_k));
 	m_maincpu->r().set(FUNC(cnfball_state::write_r));
 	m_maincpu->o().set(FUNC(cnfball_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	DS8874(config, m_ds8874).write_output().set(FUNC(cnfball_state::ds8874_output_w));
 	PWM_DISPLAY(config, m_display).set_size(9, 8+3);
 	m_display->set_segmask(0xc3, 0x7f);
@@ -3081,7 +3234,7 @@ void cnfball_state::cnfball(machine_config &config)
 	m_display->set_bri_levels(0.01, 0.1); // player led is brighter
 	config.set_default_layout(layout_cnfball);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
@@ -3128,11 +3281,13 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void cnfball2(machine_config &config);
+
+private:
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void cnfball2(machine_config &config);
 };
 
 // handlers
@@ -3201,18 +3356,18 @@ INPUT_PORTS_END
 
 void cnfball2_state::cnfball2(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1100(config, m_maincpu, 325000); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->k().set(FUNC(cnfball2_state::read_k));
 	m_maincpu->r().set(FUNC(cnfball2_state::write_r));
 	m_maincpu->o().set(FUNC(cnfball2_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 11);
 	m_display->set_segmask(0x1ff, 0xff);
 	config.set_default_layout(layout_cnfball2);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -3260,11 +3415,13 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void eleciq(machine_config &config);
+
+private:
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void eleciq(machine_config &config);
 };
 
 // handlers
@@ -3350,18 +3507,18 @@ INPUT_PORTS_END
 
 void eleciq_state::eleciq(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1000(config, m_maincpu, 325000); // approximation - RC osc. R=47K, C=50pF
 	m_maincpu->k().set(FUNC(eleciq_state::read_k));
 	m_maincpu->r().set(FUNC(eleciq_state::write_r));
 	m_maincpu->o().set(FUNC(eleciq_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
 	m_display->set_segmask(0x180, 0x7f);
 	config.set_default_layout(layout_eleciq);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -3402,10 +3559,12 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void qfire(machine_config &config);
+
+private:
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void qfire(machine_config &config);
 };
 
 // handlers
@@ -3464,18 +3623,18 @@ INPUT_PORTS_END
 
 void qfire_state::qfire(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1000(config, m_maincpu, 375000); // approximation - RC osc. R=39K, C=47pF
 	m_maincpu->k().set(FUNC(qfire_state::read_k));
 	m_maincpu->r().set(FUNC(qfire_state::write_r));
 	m_maincpu->o().set(FUNC(qfire_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(3, 7);
 	m_display->set_segmask(3, 0x7f);
 	config.set_default_layout(layout_qfire);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -3500,7 +3659,7 @@ ROM_END
 /***************************************************************************
 
   Entex (Electronic) Soccer
-  * TMS1000NL MP0158 (die label same)
+  * TMS1000NL MP0158 (die label 1000B, MP0158)
   * 2 7seg LEDs, 30 other LEDs, 1-bit sound
 
   known releases:
@@ -3516,11 +3675,13 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void esoccer(machine_config &config);
+
+private:
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void esoccer(machine_config &config);
 };
 
 // handlers
@@ -3562,14 +3723,14 @@ u8 esoccer_state::read_k()
 static INPUT_PORTS_START( esoccer )
 	PORT_START("IN.0") // R0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
 
 	PORT_START("IN.1") // R1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL PORT_16WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY
 
 	PORT_START("IN.2") // R2
@@ -3582,19 +3743,19 @@ INPUT_PORTS_END
 
 void esoccer_state::esoccer(machine_config &config)
 {
-	/* basic machine hardware */
-	TMS1000(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=33pF
+	// basic machine hardware
+	TMS1000(config, m_maincpu, 475000); // approximation - RC osc. R=47K, C=33pF
 	m_maincpu->k().set(FUNC(esoccer_state::read_k));
 	m_maincpu->r().set(FUNC(esoccer_state::write_r));
 	m_maincpu->o().set(FUNC(esoccer_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 7);
 	m_display->set_segmask(0x300, 0x7f);
-	m_display->set_bri_levels(0.01, 0.1); // player led is brighter
+	m_display->set_bri_levels(0.008, 0.08); // player led is brighter
 	config.set_default_layout(layout_esoccer);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -3654,11 +3815,13 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void ebball(machine_config &config);
+
+private:
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void ebball(machine_config &config);
 };
 
 // handlers
@@ -3730,18 +3893,18 @@ INPUT_PORTS_END
 
 void ebball_state::ebball(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1000(config, m_maincpu, 375000); // approximation - RC osc. R=43K, C=47pF
 	m_maincpu->k().set(FUNC(ebball_state::read_k));
 	m_maincpu->r().set(FUNC(ebball_state::write_r));
 	m_maincpu->o().set(FUNC(ebball_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
 	m_display->set_segmask(0x100, 0x7f);
 	config.set_default_layout(layout_ebball);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -3797,11 +3960,13 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void ebball2(machine_config &config);
+
+private:
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void ebball2(machine_config &config);
 };
 
 // handlers
@@ -3866,18 +4031,18 @@ INPUT_PORTS_END
 
 void ebball2_state::ebball2(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1000(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->k().set(FUNC(ebball2_state::read_k));
 	m_maincpu->r().set(FUNC(ebball2_state::write_r));
 	m_maincpu->o().set(FUNC(ebball2_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
 	m_display->set_segmask(7, 0x7f);
 	config.set_default_layout(layout_ebball2);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -3938,17 +4103,19 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void ebball3(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(skill_switch) { set_clock(); }
+
+protected:
+	virtual void machine_reset() override;
+
+private:
+	void set_clock();
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-
-	void set_clock();
-	DECLARE_INPUT_CHANGED_MEMBER(skill_switch) { set_clock(); }
-	void ebball3(machine_config &config);
-
-protected:
-	virtual void machine_reset() override;
 };
 
 void ebball3_state::machine_reset()
@@ -4007,7 +4174,7 @@ u8 ebball3_state::read_k()
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
     main device (batter side):            remote pitcher:
 
@@ -4035,32 +4202,32 @@ static INPUT_PORTS_START( ebball3 )
 
 	PORT_START("IN.2") // R2
 	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Players ) )
-	PORT_CONFSETTING(    0x01, "1" ) // Auto
-	PORT_CONFSETTING(    0x00, "2" ) // Manual
+	PORT_CONFSETTING(    0x01, "1" ) // AUTO
+	PORT_CONFSETTING(    0x00, "2" ) // MAN
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Bunt")
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.3") // fake
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, ebball3_state, skill_switch, 0)
-	PORT_CONFSETTING(    0x00, "Amateur" )
-	PORT_CONFSETTING(    0x01, "Professional" )
+	PORT_CONFSETTING(    0x00, "1" ) // AM
+	PORT_CONFSETTING(    0x01, "2" ) // PRO
 INPUT_PORTS_END
 
 void ebball3_state::ebball3(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1100(config, m_maincpu, 340000); // see set_clock
 	m_maincpu->k().set(FUNC(ebball3_state::read_k));
 	m_maincpu->r().set(FUNC(ebball3_state::write_r));
 	m_maincpu->o().set(FUNC(ebball3_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10+2, 7);
 	m_display->set_segmask(3, 0x7f);
 	m_display->set_segmask(0xc00, 0x22);
 	config.set_default_layout(layout_ebball3);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -4112,11 +4279,13 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void esbattle(machine_config &config);
+
+private:
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void esbattle(machine_config &config);
 };
 
 // handlers
@@ -4173,18 +4342,18 @@ INPUT_PORTS_END
 
 void esbattle_state::esbattle(machine_config &config)
 {
-	/* basic machine hardware */
-	TMS1000(config, m_maincpu, 425000); // approximation - RC osc. R=47K, C=33pF
+	// basic machine hardware
+	TMS1000(config, m_maincpu, 450000); // approximation - RC osc. R=47K, C=33pF
 	m_maincpu->k().set(FUNC(esbattle_state::read_k));
 	m_maincpu->r().set(FUNC(esbattle_state::write_r));
 	m_maincpu->o().set(FUNC(esbattle_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
 	m_display->set_segmask(0x300, 0x7f);
 	config.set_default_layout(layout_esbattle);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -4200,6 +4369,112 @@ ROM_START( esbattle )
 	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1000_esbattle_output.pla", 0, 365, CRC(861b45a2) SHA1(a5a9dc9bef8adb761845ad548058b55e970517d3) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Entex Blast It
+  * TMS1000 MP0230 (die label 1000B, MP0230)
+  * 3 7seg LEDs, 49 other LEDs (both under an overlay mask), 1-bit sound
+
+***************************************************************************/
+
+class blastit_state : public hh_tms1k_state
+{
+public:
+	blastit_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void blastit(machine_config &config);
+
+private:
+	void update_display();
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
+};
+
+// handlers
+
+void blastit_state::update_display()
+{
+	m_display->matrix(m_r >> 1, m_o);
+}
+
+void blastit_state::write_r(u16 data)
+{
+	// R3: input mux
+	m_inp_mux = data >> 3 & 1;
+
+	// R0: speaker out
+	m_speaker->level_w(data & 1);
+
+	// R1-R7: led select
+	// R8-R10: digit select
+	m_r = data;
+	update_display();
+}
+
+void blastit_state::write_o(u16 data)
+{
+	// O0-O6: led state
+	m_o = data;
+	update_display();
+}
+
+u8 blastit_state::read_k()
+{
+	// K: multiplexed inputs
+	return read_inputs(1);
+}
+
+// config
+
+static INPUT_PORTS_START( blastit )
+	PORT_START("IN.0") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_CONFNAME( 0x08, 0x08, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x08, "1" ) // AM
+	PORT_CONFSETTING(    0x00, "2" ) // PRO
+INPUT_PORTS_END
+
+void blastit_state::blastit(machine_config &config)
+{
+	// basic machine hardware
+	TMS1000(config, m_maincpu, 425000); // approximation - RC osc. R=47K, C=33pF
+	m_maincpu->k().set(FUNC(blastit_state::read_k));
+	m_maincpu->r().set(FUNC(blastit_state::write_r));
+	m_maincpu->o().set(FUNC(blastit_state::write_o));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(10, 7);
+	m_display->set_segmask(0x380, 0x7f);
+	m_display->set_bri_levels(0.01, 0.115); // ball/paddle is slightly brighter
+	config.set_default_layout(layout_blastit);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( blastit )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp0230", 0x0000, 0x0400, CRC(1eb5f473) SHA1(76cd8c0e04368aa2150d428018643e1d0b9adda0) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_blastit_output.pla", 0, 365, CRC(fa8081df) SHA1(99706d5ad58a76d47446576fac18964e602171c8) )
 ROM_END
 
 
@@ -4225,16 +4500,17 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void update_display();
-	void write_r(u16 data);
-	void write_o(u16 data);
-
-	void set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(skill_switch) { set_clock(); }
 	void einvader(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;
+
+private:
+	void set_clock();
+	void update_display();
+	void write_r(u16 data);
+	void write_o(u16 data);
 };
 
 void einvader_state::machine_reset()
@@ -4284,19 +4560,19 @@ static INPUT_PORTS_START( einvader )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 	PORT_CONFNAME( 0x08, 0x00, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, einvader_state, skill_switch, 0)
-	PORT_CONFSETTING(    0x00, "Amateur" )
-	PORT_CONFSETTING(    0x08, "Professional" )
+	PORT_CONFSETTING(    0x00, "1" ) // amateur
+	PORT_CONFSETTING(    0x08, "2" ) // professional
 INPUT_PORTS_END
 
 void einvader_state::einvader(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1100(config, m_maincpu, 320000); // see set_clock
 	m_maincpu->k().set_ioport("IN.0");
 	m_maincpu->r().set(FUNC(einvader_state::write_r));
 	m_maincpu->o().set(FUNC(einvader_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	screen_device &mask(SCREEN(config, "mask", SCREEN_TYPE_SVG));
 	mask.set_refresh_hz(60);
 	mask.set_size(945, 1080);
@@ -4307,7 +4583,7 @@ void einvader_state::einvader(machine_config &config)
 	m_display->set_bri_levels(0.01, 0.1); // ufo/player explosion is brighter
 	config.set_default_layout(layout_einvader);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -4349,11 +4625,13 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void efootb4(machine_config &config);
+
+private:
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void efootb4(machine_config &config);
 };
 
 // handlers
@@ -4421,21 +4699,21 @@ static INPUT_PORTS_START( efootb4 )
 	PORT_CONFSETTING(    0x01, "1" ) // Auto
 	PORT_CONFSETTING(    0x00, "2" ) // Manual
 	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Difficulty ) )
-	PORT_CONFSETTING(    0x00, "Amateur" )
-	PORT_CONFSETTING(    0x02, "Professional" )
+	PORT_CONFSETTING(    0x00, "1" ) // amateur
+	PORT_CONFSETTING(    0x02, "2" ) // professional
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Status")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 void efootb4_state::efootb4(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1670(config, m_maincpu, 400000); // approximation - RC osc. R=42K, C=47pF
 	m_maincpu->k().set(FUNC(efootb4_state::read_k));
 	m_maincpu->r().set(FUNC(efootb4_state::write_r));
 	m_maincpu->o().set(FUNC(efootb4_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	screen_device &mask(SCREEN(config, "mask", SCREEN_TYPE_SVG));
 	mask.set_refresh_hz(60);
 	mask.set_size(1920, 904);
@@ -4445,7 +4723,7 @@ void efootb4_state::efootb4(machine_config &config)
 	m_display->set_segmask(0xfc00, 0x7f);
 	config.set_default_layout(layout_efootb4);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -4497,11 +4775,13 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void ebaskb2(machine_config &config);
+
+private:
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void ebaskb2(machine_config &config);
 };
 
 // handlers
@@ -4543,8 +4823,8 @@ u8 ebaskb2_state::read_k()
 static INPUT_PORTS_START( ebaskb2 )
 	PORT_START("IN.0") // R6
 	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Difficulty ) )
-	PORT_CONFSETTING(    0x01, "Amateur" )
-	PORT_CONFSETTING(    0x00, "Professional" )
+	PORT_CONFSETTING(    0x01, "1" ) // amateur
+	PORT_CONFSETTING(    0x00, "2" ) // professional
 	PORT_CONFNAME( 0x02, 0x02, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x02, "1" ) // Auto
 	PORT_CONFSETTING(    0x00, "2" ) // Manual
@@ -4571,19 +4851,19 @@ INPUT_PORTS_END
 
 void ebaskb2_state::ebaskb2(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1100(config, m_maincpu, 360000); // approximation - RC osc. R=33K, C=82pF
 	m_maincpu->k().set(FUNC(ebaskb2_state::read_k));
 	m_maincpu->r().set(FUNC(ebaskb2_state::write_r));
 	m_maincpu->o().set(FUNC(ebaskb2_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 7);
 	m_display->set_segmask(0xf, 0x7f);
 	m_display->set_bri_levels(0.01, 0.1); // ball carrier led is brighter
 	config.set_default_layout(layout_ebaskb2);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -4640,18 +4920,20 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void raisedvl(machine_config &config);
+	void ebknight(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(skill_switch) { set_clock(); }
+
+protected:
+	virtual void machine_reset() override;
+
+private:
+	void set_clock();
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-
-	void set_clock();
-	DECLARE_INPUT_CHANGED_MEMBER(skill_switch) { set_clock(); }
-	void raisedvl(machine_config &config);
-	void ebknight(machine_config &config);
-
-protected:
-	virtual void machine_reset() override;
 };
 
 void raisedvl_state::machine_reset()
@@ -4725,18 +5007,18 @@ INPUT_PORTS_END
 
 void raisedvl_state::raisedvl(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1100(config, m_maincpu, 350000); // see set_clock
 	m_maincpu->k().set(FUNC(raisedvl_state::read_k));
 	m_maincpu->r().set(FUNC(raisedvl_state::write_r));
 	m_maincpu->o().set(FUNC(raisedvl_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 7);
 	m_display->set_segmask(7, 0x7f);
 	config.set_default_layout(layout_raisedvl);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -4777,6 +5059,7 @@ ROM_END
 /***************************************************************************
 
   Fonas 2 Player Baseball
+  * PCB label CA-014 (probably Cassia)
   * TMS1000NLL MP0154 (die label 1000B, MP0154)
   * 4 7seg LEDs, 37 other LEDs, 1-bit sound
 
@@ -4807,11 +5090,13 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void f2pbball(machine_config &config);
+
+private:
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void f2pbball(machine_config &config);
 };
 
 // handlers
@@ -4877,18 +5162,18 @@ INPUT_PORTS_END
 
 void f2pbball_state::f2pbball(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1000(config, m_maincpu, 325000); // approximation - RC osc. R=51K, C=39pF
 	m_maincpu->k().set(FUNC(f2pbball_state::read_k));
 	m_maincpu->r().set(FUNC(f2pbball_state::write_r));
 	m_maincpu->o().set(FUNC(f2pbball_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	m_display->set_segmask(0x1e0, 0x7f);
 	config.set_default_layout(layout_f2pbball);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -4913,6 +5198,7 @@ ROM_END
 /***************************************************************************
 
   Fonas 3 in 1: Football, Basketball, Soccer
+  * PCB label HP-801
   * TMS1100NLL MP1185
   * 4 7seg LEDs, 40 other LEDs, 1-bit sound
 
@@ -4929,17 +5215,19 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void f3in1(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(skill_switch) { set_clock(); }
+
+protected:
+	virtual void machine_reset() override;
+
+private:
+	void set_clock();
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-
-	void set_clock();
-	DECLARE_INPUT_CHANGED_MEMBER(skill_switch) { set_clock(); }
-	void f3in1(machine_config &config);
-
-protected:
-	virtual void machine_reset() override;
 };
 
 void f3in1_state::machine_reset()
@@ -5016,25 +5304,25 @@ static INPUT_PORTS_START( f3in1 )
 
 	PORT_START("IN.4") // fake
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, f3in1_state, skill_switch, 0)
-	PORT_CONFSETTING(    0x00, "Regular" ) // REG
-	PORT_CONFSETTING(    0x01, "Professional" ) // PROF
+	PORT_CONFSETTING(    0x00, "1" ) // REG
+	PORT_CONFSETTING(    0x01, "2" ) // PROF
 INPUT_PORTS_END
 
 void f3in1_state::f3in1(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1100(config, m_maincpu, 300000); // see set_clock
 	m_maincpu->k().set(FUNC(f3in1_state::read_k));
 	m_maincpu->r().set(FUNC(f3in1_state::write_r));
 	m_maincpu->o().set(FUNC(f3in1_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
 	m_display->set_segmask(0x3c0, 0x7f);
 	m_display->set_bri_levels(0.003, 0.05); // player led is brighter
 	config.set_default_layout(layout_f3in1);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -5077,23 +5365,16 @@ public:
 		m_beeper(*this, "beeper")
 	{ }
 
+	void gpoker(machine_config &config);
+
+protected:
 	required_device<beep_device> m_beeper;
 
 	void update_display();
 	virtual void write_r(u16 data);
 	virtual void write_o(u16 data);
 	virtual u8 read_k();
-	void gpoker(machine_config &config);
-
-protected:
-	virtual void machine_reset() override;
 };
-
-void gpoker_state::machine_reset()
-{
-	hh_tms1k_state::machine_reset();
-	m_beeper->set_state(0);
-}
 
 // handlers
 
@@ -5132,7 +5413,7 @@ u8 gpoker_state::read_k()
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
     [7]   [8]   [9]   [DL]   | (on/off switch)
     [4]   [5]   [6]   [BT]
@@ -5185,18 +5466,18 @@ INPUT_PORTS_END
 
 void gpoker_state::gpoker(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1370(config, m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->k().set(FUNC(gpoker_state::read_k));
 	m_maincpu->r().set(FUNC(gpoker_state::write_r));
 	m_maincpu->o().set(FUNC(gpoker_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(11, 14);
 	m_display->set_segmask(0x7ff, 0x20ff); // 7seg + bottom-right diagonal
 	config.set_default_layout(layout_gpoker);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 2400); // astable multivibrator - C1 and C2 are 0.003uF, R1 and R4 are 1K, R2 and R3 are 100K
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -5238,8 +5519,10 @@ public:
 		gpoker_state(mconfig, type, tag)
 	{ }
 
-	virtual void write_r(u16 data) override;
 	void gjackpot(machine_config &config);
+
+private:
+	virtual void write_r(u16 data) override;
 };
 
 // handlers
@@ -5253,7 +5536,7 @@ void gjackpot_state::write_r(u16 data)
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
   (note: on dual-function buttons, upper label=Gin, lower label=Black Jack)
 
                        BJ --o GIN
@@ -5314,11 +5597,11 @@ void gjackpot_state::gjackpot(machine_config &config)
 {
 	gpoker(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1670(config.replace(), m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(gpoker_state::read_k));
+	m_maincpu->k().set(FUNC(gjackpot_state::read_k));
 	m_maincpu->r().set(FUNC(gjackpot_state::write_r));
-	m_maincpu->o().set(FUNC(gpoker_state::write_o));
+	m_maincpu->o().set(FUNC(gjackpot_state::write_o));
 
 	config.set_default_layout(layout_gjackpot);
 }
@@ -5364,11 +5647,13 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void ginv(machine_config &config);
+
+private:
 	void update_display();
 	virtual void write_r(u16 data);
 	virtual void write_o(u16 data);
 	virtual u8 read_k();
-	void ginv(machine_config &config);
 };
 
 // handlers
@@ -5428,13 +5713,13 @@ INPUT_PORTS_END
 
 void ginv_state::ginv(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1370(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->k().set(FUNC(ginv_state::read_k));
 	m_maincpu->r().set(FUNC(ginv_state::write_r));
 	m_maincpu->o().set(FUNC(ginv_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(236, 1080);
@@ -5442,7 +5727,7 @@ void ginv_state::ginv(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(9, 12);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -5488,11 +5773,13 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void ginv1000(machine_config &config);
+
+private:
 	void update_display();
 	virtual void write_r(u16 data);
 	virtual void write_o(u16 data);
 	virtual u8 read_k();
-	void ginv1000(machine_config &config);
 };
 
 // handlers
@@ -5553,13 +5840,13 @@ INPUT_PORTS_END
 
 void ginv1000_state::ginv1000(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1370(config, m_maincpu, 350000); // approximation
 	m_maincpu->k().set(FUNC(ginv1000_state::read_k));
 	m_maincpu->r().set(FUNC(ginv1000_state::write_r));
 	m_maincpu->o().set(FUNC(ginv1000_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(226, 1080);
@@ -5567,7 +5854,7 @@ void ginv1000_state::ginv1000(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(10, 12);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -5614,6 +5901,9 @@ public:
 		m_expander(*this, "expander")
 	{ }
 
+	void ginv2000(machine_config &config);
+
+private:
 	required_device<tms1024_device> m_expander;
 	void expander_w(offs_t offset, u8 data);
 
@@ -5621,7 +5911,6 @@ public:
 	virtual void write_r(u16 data);
 	virtual void write_o(u16 data);
 	virtual u8 read_k();
-	void ginv2000(machine_config &config);
 };
 
 // handlers
@@ -5689,7 +5978,7 @@ INPUT_PORTS_END
 
 void ginv2000_state::ginv2000(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1370(config, m_maincpu, 425000); // approximation - RC osc. R=36K, C=47pF
 	m_maincpu->k().set(FUNC(ginv2000_state::read_k));
 	m_maincpu->r().set(FUNC(ginv2000_state::write_r));
@@ -5701,7 +5990,7 @@ void ginv2000_state::ginv2000(machine_config &config)
 	m_expander->write_port6_callback().set(FUNC(ginv2000_state::expander_w));
 	m_expander->write_port7_callback().set(FUNC(ginv2000_state::expander_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(364, 1080);
@@ -5709,7 +5998,7 @@ void ginv2000_state::ginv2000(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(10, 16);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -5759,11 +6048,13 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void fxmcr165(machine_config &config);
+
+private:
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void fxmcr165(machine_config &config);
 };
 
 // handlers
@@ -5808,7 +6099,7 @@ u8 fxmcr165_state::read_k()
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
     [C]   [D]   [E]   [F]   [ADR SET]
     [8]   [9]   [A]   [B]   [INCR]
@@ -5850,18 +6141,18 @@ INPUT_PORTS_END
 
 void fxmcr165_state::fxmcr165(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1100(config, m_maincpu, 400_kHz_XTAL);
 	m_maincpu->k().set(FUNC(fxmcr165_state::read_k));
 	m_maincpu->r().set(FUNC(fxmcr165_state::write_r));
 	m_maincpu->o().set(FUNC(fxmcr165_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1+1, 7);
 	m_display->set_segmask(1, 0x7f);
 	config.set_default_layout(layout_fxmcr165);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -5905,10 +6196,12 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void elecdet(machine_config &config);
+
+private:
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void elecdet(machine_config &config);
 };
 
 // handlers
@@ -5940,7 +6233,7 @@ u8 elecdet_state::read_k()
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
     [1]   [2]   [3]   [SUSPECT]
     [4]   [5]   [6]   [PRIVATE QUESTION]
@@ -5989,19 +6282,19 @@ INPUT_PORTS_END
 
 void elecdet_state::elecdet(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS0980(config, m_maincpu, 425000); // approximation
 	m_maincpu->k().set(FUNC(elecdet_state::read_k));
 	m_maincpu->r().set(FUNC(elecdet_state::write_r));
 	m_maincpu->o().set(FUNC(elecdet_state::write_o));
-	m_maincpu->power_off().set(FUNC(hh_tms1k_state::auto_power_off));
+	m_maincpu->power_off().set(FUNC(elecdet_state::auto_power_off));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(7, 7);
 	m_display->set_segmask(0x7f, 0x7f);
 	config.set_default_layout(layout_elecdet);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	static const double speaker_levels[4] = { 0.0, 0.5, 0.5, 1.0};
@@ -6032,7 +6325,7 @@ ROM_END
 /***************************************************************************
 
   Kenner Star Wars - Electronic Battle Command
-  * TMS1100 MCU, label MP3438A
+  * TMS1100 MCU, label MP3438A (die label 1100B, MP3438A)
   * 4x4 LED grid display + 2 separate LEDs and 2-digit 7segs, 1-bit sound
 
   This is a small tabletop space-dogfighting game. To start the game,
@@ -6048,11 +6341,13 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void starwbc(machine_config &config);
+
+private:
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void starwbc(machine_config &config);
 };
 
 // handlers
@@ -6091,7 +6386,7 @@ u8 starwbc_state::read_k()
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
     (reconnnaissance=yellow)        (tactical reaction=green)
     [MAGNA] [ENEMY]                 [EM]       [BS]   [SCR]
@@ -6135,18 +6430,18 @@ INPUT_PORTS_END
 
 void starwbc_state::starwbc(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=51K, C=47pF
 	m_maincpu->k().set(FUNC(starwbc_state::read_k));
 	m_maincpu->r().set(FUNC(starwbc_state::write_r));
 	m_maincpu->o().set(FUNC(starwbc_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
 	m_display->set_segmask(0x140, 0x7f);
 	config.set_default_layout(layout_starwbc);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -6180,9 +6475,157 @@ ROM_END
 
 /***************************************************************************
 
+  Kenner Live Action Football
+  * TMS1100NLL MCU, label MP3489-N2 (die label 1100E, MP3489)
+  * 6-digit 7seg LED display, other LEDs under overlay, 1-bit sound
+
+  The LEDs are inside reflective domes, with an overlay mask on top of that.
+  It is done with an SVG screen on MAME. In reality, the display is not as
+  sharp or as evenly lit as MAME suggests it to be.
+
+  It has a 1-bit roller controller. Half of the axis connects to the input
+  (eg. 1 rising edge per full rotation), so there's no difference between
+  rotating left or right.
+
+***************************************************************************/
+
+class liveafb_state : public hh_tms1k_state
+{
+public:
+	liveafb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void liveafb(machine_config &config);
+
+private:
+	void update_display();
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
+};
+
+// handlers
+
+void liveafb_state::update_display()
+{
+	u8 d = (~m_r & 0x100) ? (m_r & 0x3f) : 0; // digit select
+	u8 l = (m_r & 0x100) ? (m_r & 0xf) : 0; // led select
+	m_display->matrix(d | l << 6 | BIT(m_r, 6) << 10 | BIT(m_r, 8, 3) << 11, m_o | (m_r << 4 & 0x300));
+}
+
+void liveafb_state::write_r(u16 data)
+{
+	// R0-R3: input mux
+	m_inp_mux = data & 0xf;
+
+	// R7(+R8): speaker out
+	m_speaker->level_w(BIT(data, 7) & BIT(data, 8));
+
+	// R8: enable digit or led select
+	// R0-R3: led select
+	// R0-R5: digit select
+	// R4,R5: led data high
+	// R6,R8-R10: direct leds
+	m_r = data & ~0x80;
+	update_display();
+}
+
+void liveafb_state::write_o(u16 data)
+{
+	// O0-O7: led data low
+	m_o = data;
+	update_display();
+}
+
+u8 liveafb_state::read_k()
+{
+	// K: multiplexed inputs
+	return read_inputs(4);
+}
+
+// config
+
+static INPUT_PORTS_START( liveafb )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x04, 0x04, IPT_CUSTOM ) PORT_CONDITION("ROLLER", 0x7f, LESSTHAN, 0x40)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Tackle")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Pass")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Punt")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Field Goal")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("Skill / Score")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Action")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x08, 0x08, DEF_STR( Players ) )
+	PORT_CONFSETTING(    0x08, "1" )
+	PORT_CONFSETTING(    0x00, "2" )
+
+	PORT_START("ROLLER")
+	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
+INPUT_PORTS_END
+
+void liveafb_state::liveafb(machine_config &config)
+{
+	// basic machine hardware
+	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=33K, C=100pF
+	m_maincpu->k().set(FUNC(liveafb_state::read_k));
+	m_maincpu->r().set(FUNC(liveafb_state::write_r));
+	m_maincpu->o().set(FUNC(liveafb_state::write_o));
+
+	// video hardware
+	screen_device &mask(SCREEN(config, "mask", SCREEN_TYPE_SVG));
+	mask.set_refresh_hz(60);
+	mask.set_size(1834, 1080);
+	mask.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(6+4+4, 8+2);
+	m_display->set_segmask(0x3f, 0x7f);
+	m_display->set_segmask(0x20, 0xff); // only one digit has DP
+	config.set_default_layout(layout_liveafb);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( liveafb )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp3489", 0x0000, 0x0800, CRC(1fe05ab3) SHA1(a8d7dfed61a6397b7af1d3fcf17b26d5d917b4f0) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_liveafb_output.pla", 0, 365, CRC(a7bc9384) SHA1(fab458de394eeddbf5ba0830853a915e51f909c6) )
+
+	ROM_REGION( 162058, "mask", 0)
+	ROM_LOAD( "liveafb.svg", 0, 162058, CRC(046078d0) SHA1(68a5775f4f9a1258c06b76839e1cfdab69b61920) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Kosmos Astro
   * TMS1470NLHL MP1133 (die label TMS1400 MP1133)
-  * 9digit 7seg VFD display + 8 LEDs(4 green, 4 yellow), no sound
+  * 9-digit 7seg VFD display + 8 LEDs(4 green, 4 yellow), no sound
 
   This is an astrological calculator, and also supports 4-function
   calculations. Refer to the official manual on how to use this device.
@@ -6196,11 +6639,13 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void astro(machine_config &config);
+
+private:
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void astro(machine_config &config);
 };
 
 // handlers
@@ -6285,18 +6730,18 @@ INPUT_PORTS_END
 
 void astro_state::astro(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1470(config, m_maincpu, 450000); // approximation - RC osc. R=4.7K, C=33pF
 	m_maincpu->k().set(FUNC(astro_state::read_k));
 	m_maincpu->r().set(FUNC(astro_state::write_r));
 	m_maincpu->o().set(FUNC(astro_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
 	m_display->set_segmask(0x3ff, 0xff);
 	config.set_default_layout(layout_astro);
 
-	/* no sound! */
+	// no sound!
 }
 
 // roms
@@ -6348,11 +6793,13 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void elecbowl(machine_config &config);
+
+private:
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void elecbowl(machine_config &config);
 };
 
 // handlers
@@ -6446,20 +6893,20 @@ static const u16 elecbowl_output_pla[0x20] =
 
 void elecbowl_state::elecbowl(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=33K, C=100pF
 	m_maincpu->set_output_pla(elecbowl_output_pla);
 	m_maincpu->k().set(FUNC(elecbowl_state::read_k));
 	m_maincpu->r().set(FUNC(elecbowl_state::write_r));
 	m_maincpu->o().set(FUNC(elecbowl_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(7, 8);
 	m_display->set_segmask(0xf, 0x7f);
 	m_display->set_segmask(0x10, 0x06); // 1
 	config.set_default_layout(layout_elecbowl);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -6504,12 +6951,14 @@ public:
 		m_lcd(*this, "lcd")
 	{ }
 
+	void horseran(machine_config &config);
+
+private:
 	required_device<hlcd0569_device> m_lcd;
 
 	void lcd_output_w(offs_t offset, u32 data);
 	void write_r(u16 data);
 	u8 read_k();
-	void horseran(machine_config &config);
 };
 
 // handlers
@@ -6549,7 +6998,7 @@ u8 horseran_state::read_k()
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
     [PURSE]      [DIST.]      [P. POSN.]   [DAYS]       [R.S.L.]     [7]     [8]     [9]
     [RACES]      [WINS]       [PLACES]     [SHOWS]      [EARNINGS]   [4]     [5]     [6]
@@ -6612,12 +7061,12 @@ INPUT_PORTS_END
 
 void horseran_state::horseran(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1100(config, m_maincpu, 300000); // approximation - RC osc. R=56K, C=47pF
 	m_maincpu->k().set(FUNC(horseran_state::read_k));
 	m_maincpu->r().set(FUNC(horseran_state::write_r));
 
-	/* video hardware */
+	// video hardware
 	HLCD0569(config, m_lcd, 1100); // C=0.022uF
 	m_lcd->write_cols().set(FUNC(horseran_state::lcd_output_w));
 
@@ -6625,7 +7074,7 @@ void horseran_state::horseran(machine_config &config)
 	m_display->set_segmask(0x3f<<3, 0x7f);
 	config.set_default_layout(layout_horseran);
 
-	/* no sound! */
+	// no sound!
 }
 
 // roms
@@ -6662,10 +7111,12 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void mdndclab(machine_config &config);
+
+private:
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void mdndclab(machine_config &config);
 };
 
 // handlers
@@ -6805,16 +7256,15 @@ INPUT_PORTS_END
 
 void mdndclab_state::mdndclab(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1100(config, m_maincpu, 475000); // approximation - RC osc. R=27K, C=100pF
 	m_maincpu->k().set(FUNC(mdndclab_state::read_k));
 	m_maincpu->r().set(FUNC(mdndclab_state::write_r));
 	m_maincpu->o().set(FUNC(mdndclab_state::write_o));
 
-	/* no visual feedback! */
 	config.set_default_layout(layout_mdndclab); // playing board
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -6861,10 +7311,12 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void comp4(machine_config &config);
+
+private:
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void comp4(machine_config &config);
 };
 
 // handlers
@@ -6920,17 +7372,17 @@ INPUT_PORTS_END
 
 void comp4_state::comp4(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS0970(config, m_maincpu, 250000); // approximation
 	m_maincpu->k().set(FUNC(comp4_state::read_k));
 	m_maincpu->r().set(FUNC(comp4_state::write_r));
 	m_maincpu->o().set(FUNC(comp4_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 11);
 	config.set_default_layout(layout_comp4);
 
-	/* no sound! */
+	// no sound!
 }
 
 // roms
@@ -6981,10 +7433,12 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void bship(machine_config &config);
+
+private:
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void bship(machine_config &config);
 };
 
 // handlers
@@ -7087,17 +7541,17 @@ INPUT_PORTS_END
 
 void bship_state::bship(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1000(config, m_maincpu, 200000); // approximation - RC osc. R=100K, C=47pF
 	m_maincpu->k().set(FUNC(bship_state::read_k));
 	m_maincpu->r().set(FUNC(bship_state::write_r));
 	m_maincpu->o().set(FUNC(bship_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 1);
 	config.set_default_layout(layout_bship);
 
-	/* sound hardware */
+	// sound hardware
 	// TODO
 }
 
@@ -7137,12 +7591,14 @@ public:
 		m_sn(*this, "sn76477")
 	{ }
 
+	void bshipb(machine_config &config);
+
+private:
 	required_device<sn76477_device> m_sn;
 
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void bshipb(machine_config &config);
 };
 
 // handlers
@@ -7203,17 +7659,17 @@ u8 bshipb_state::read_k()
 
 void bshipb_state::bshipb(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1000(config, m_maincpu, 200000); // approximation - RC osc. R=100K, C=47pF
 	m_maincpu->k().set(FUNC(bshipb_state::read_k));
 	m_maincpu->r().set(FUNC(bshipb_state::write_r));
 	m_maincpu->o().set(FUNC(bshipb_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 1);
 	config.set_default_layout(layout_bship);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SN76477(config, m_sn);
 	m_sn->set_noise_params(RES_K(47), RES_K(100), CAP_P(47));   // R18, R17, C8
@@ -7271,9 +7727,11 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void simon(machine_config &config);
+
+private:
 	void write_r(u16 data);
 	u8 read_k();
-	void simon(machine_config &config);
 };
 
 // handlers
@@ -7340,16 +7798,16 @@ INPUT_PORTS_END
 
 void simon_state::simon(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1000(config, m_maincpu, 350000); // approximation - RC osc. R=33K, C=100pF
 	m_maincpu->k().set(FUNC(simon_state::read_k));
 	m_maincpu->r().set(FUNC(simon_state::write_r));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 4);
 	config.set_default_layout(layout_simon);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -7399,15 +7857,17 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void write_r(u16 data);
-	u8 read_k();
-
-	void set_clock();
-	DECLARE_INPUT_CHANGED_MEMBER(speed_switch) { set_clock(); }
 	void ssimon(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(speed_switch) { set_clock(); }
 
 protected:
 	virtual void machine_reset() override;
+
+private:
+	void set_clock();
+	void write_r(u16 data);
+	u8 read_k();
 };
 
 void ssimon_state::machine_reset()
@@ -7507,16 +7967,16 @@ INPUT_PORTS_END
 
 void ssimon_state::ssimon(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1100(config, m_maincpu, 275000); // see set_clock
 	m_maincpu->k().set(FUNC(ssimon_state::read_k));
 	m_maincpu->r().set(FUNC(ssimon_state::write_r));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 4);
 	config.set_default_layout(layout_ssimon);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -7577,7 +8037,7 @@ private:
 	void write_o(u16 data);
 	u8 read_k();
 
-	int m_gearbox_pos;
+	int m_gearbox_pos = 0;
 	bool sensor_state() { return m_gearbox_pos < 0 && m_display->element_on(0, 0); }
 	TIMER_DEVICE_CALLBACK_MEMBER(gearbox_sim_tick);
 
@@ -7592,14 +8052,14 @@ void bigtrak_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
 
+	// resolve handlers
 	m_left_motor_forward.resolve();
 	m_left_motor_reverse.resolve();
 	m_right_motor_forward.resolve();
 	m_right_motor_reverse.resolve();
 	m_ext_out.resolve();
 
-	// zerofill/register for savestates
-	m_gearbox_pos = 0;
+	// register for savestates
 	save_item(NAME(m_gearbox_pos));
 }
 
@@ -7660,7 +8120,7 @@ u8 bigtrak_state::read_k()
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
         USA version:                          UK version:
 
@@ -7717,7 +8177,7 @@ INPUT_PORTS_END
 
 void bigtrak_state::bigtrak(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1000(config, m_maincpu, 200000); // approximation - RC osc. R=83K, C=100pF
 	m_maincpu->k().set(FUNC(bigtrak_state::read_k));
 	m_maincpu->r().set(FUNC(bigtrak_state::write_r));
@@ -7725,11 +8185,11 @@ void bigtrak_state::bigtrak(machine_config &config)
 
 	TIMER(config, "gearbox").configure_periodic(FUNC(bigtrak_state::gearbox_sim_tick), attotime::from_msec(1));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 2);
 	config.set_default_layout(layout_bigtrak);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	static const double speaker_levels[8] = { 0.0, 1.0/3.0, 1.0/3.0, 2.0/3.0, 1.0/3.0, 2.0/3.0, 2.0/3.0, 1.0 };
@@ -7795,11 +8255,11 @@ private:
 	output_finder<> m_card_pos_out;
 	output_finder<> m_motor_on_out;
 
-	int m_motor_pos;
-	int m_motor_pos_prev;
-	int m_motor_decay;
-	bool m_motor_on;
-	bool m_sensor_blind;
+	int m_motor_pos = 0;
+	int m_motor_pos_prev = -1;
+	int m_motor_decay = 0;
+	bool m_motor_on = false;
+	bool m_sensor_blind = false;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(motor_sim_tick);
 
@@ -7815,13 +8275,6 @@ void mbdtower_state::machine_start()
 	m_motor_pos_out.resolve();
 	m_card_pos_out.resolve();
 	m_motor_on_out.resolve();
-
-	// zerofill
-	m_motor_pos = 0;
-	m_motor_pos_prev = -1;
-	m_motor_decay = 0;
-	m_motor_on = false;
-	m_sensor_blind = false;
 
 	// register for savestates
 	save_item(NAME(m_motor_pos));
@@ -7931,7 +8384,7 @@ u8 mbdtower_state::read_k()
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
     (green)     (l.blue)    (red)
     [YES/       [REPEAT]    [NO/
@@ -7971,7 +8424,7 @@ INPUT_PORTS_END
 
 void mbdtower_state::mbdtower(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1400(config, m_maincpu, 425000); // approximation - RC osc. R=43K, C=56pF
 	m_maincpu->k().set(FUNC(mbdtower_state::read_k));
 	m_maincpu->r().set(FUNC(mbdtower_state::write_r));
@@ -7979,12 +8432,12 @@ void mbdtower_state::mbdtower(machine_config &config)
 
 	TIMER(config, "tower_motor").configure_periodic(FUNC(mbdtower_state::motor_sim_tick), attotime::from_msec(3500/0x80)); // ~3.5sec for a full rotation
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(3, 7);
 	m_display->set_segmask(6, 0x7f);
 	config.set_default_layout(layout_mbdtower);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -8024,10 +8477,12 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void arcmania(machine_config &config);
+
+private:
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void arcmania(machine_config &config);
 };
 
 // handlers
@@ -8059,7 +8514,7 @@ u8 arcmania_state::read_k()
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
     (orange)    (orange)    (orange)
     [1]         [2]         [3]
@@ -8095,17 +8550,17 @@ INPUT_PORTS_END
 
 void arcmania_state::arcmania(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1100(config, m_maincpu, 250000); // approximation - RC osc. R=56K, C=100pF
 	m_maincpu->k().set(FUNC(arcmania_state::read_k));
 	m_maincpu->r().set(FUNC(arcmania_state::write_r));
 	m_maincpu->o().set(FUNC(arcmania_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 9);
 	config.set_default_layout(layout_arcmania);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	static const double speaker_levels[8] = { 0.0, 1.0/3.0, 1.0/3.0, 2.0/3.0, 1.0/3.0, 2.0/3.0, 2.0/3.0, 1.0 };
@@ -8148,10 +8603,12 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void cnsector(machine_config &config);
+
+private:
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void cnsector(machine_config &config);
 };
 
 // handlers
@@ -8180,7 +8637,7 @@ u8 cnsector_state::read_k()
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
              COMBAT INFORMATION CENTER
     [NEXT SHIP]       [RECALL]    [MOVE SHIP]
@@ -8227,18 +8684,18 @@ INPUT_PORTS_END
 
 void cnsector_state::cnsector(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS0970(config, m_maincpu, 250000); // approximation
 	m_maincpu->k().set(FUNC(cnsector_state::read_k));
 	m_maincpu->r().set(FUNC(cnsector_state::write_r));
 	m_maincpu->o().set(FUNC(cnsector_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
 	m_display->set_segmask(0x3f, 0xff);
 	config.set_default_layout(layout_cnsector);
 
-	/* no sound! */
+	// no sound!
 }
 
 // roms
@@ -8264,7 +8721,7 @@ ROM_END
 /***************************************************************************
 
   Parker Brothers Merlin handheld game, by Bob Doyle
-  * TMS1100NLL MP3404A-N2
+  * TMS1100NLL MP3404 or MP3404A-N2
   * 11 LEDs behind buttons, 3-level sound
 
   Also published in Japan by Tomy as "Dr. Smith", white case instead of red.
@@ -8290,10 +8747,12 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void merlin(machine_config &config);
+
+protected:
 	virtual void write_r(u16 data);
 	virtual void write_o(u16 data);
 	virtual u8 read_k();
-	void merlin(machine_config &config);
 };
 
 // handlers
@@ -8357,17 +8816,17 @@ INPUT_PORTS_END
 
 void merlin_state::merlin(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=33K, C=100pF
 	m_maincpu->k().set(FUNC(merlin_state::read_k));
 	m_maincpu->r().set(FUNC(merlin_state::write_r));
 	m_maincpu->o().set(FUNC(merlin_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 11);
 	config.set_default_layout(layout_merlin);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	static const double speaker_levels[8] = { 0.0, 1.0/3.0, 1.0/3.0, 2.0/3.0, 1.0/3.0, 2.0/3.0, 2.0/3.0, 1.0 };
@@ -8379,7 +8838,17 @@ void merlin_state::merlin(machine_config &config)
 
 ROM_START( merlin )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "mp3404", 0x0000, 0x0800, CRC(7515a75d) SHA1(76ca3605d3fde1df62f79b9bb1f534c2a2ae0229) )
+	ROM_LOAD( "mp3404a", 0x0000, 0x0800, CRC(7515a75d) SHA1(76ca3605d3fde1df62f79b9bb1f534c2a2ae0229) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common3_micro.pla", 0, 867, CRC(03574895) SHA1(04407cabfb3adee2ee5e4218612cb06c12c540f4) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_merlin_output.pla", 0, 365, CRC(3921b074) SHA1(12bd58e4d6676eb8c7059ef53598279e4f1a32ea) )
+ROM_END
+
+ROM_START( merlina )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp3404", 0x0000, 0x0800, CRC(9362d9f9) SHA1(266d2a4a98cc33944a4fc7ed073ba9321bba8e05) ) // 1 bit different
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common3_micro.pla", 0, 867, CRC(03574895) SHA1(04407cabfb3adee2ee5e4218612cb06c12c540f4) )
@@ -8438,7 +8907,7 @@ void mmerlin_state::mmerlin(machine_config &config)
 {
 	merlin(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1400(config.replace(), m_maincpu, 425000); // approximation - RC osc. R=30K, C=100pF
 	m_maincpu->k().set(FUNC(mmerlin_state::read_k));
 	m_maincpu->r().set(FUNC(mmerlin_state::write_r));
@@ -8482,10 +8951,12 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void pbmastm(machine_config &config);
+
+private:
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void pbmastm(machine_config &config);
 };
 
 // handlers
@@ -8550,17 +9021,17 @@ INPUT_PORTS_END
 
 void pbmastm_state::pbmastm(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1000(config, m_maincpu, 300000); // approximation - RC osc. R=56K, C=47pF
 	m_maincpu->k().set(FUNC(pbmastm_state::read_k));
 	m_maincpu->r().set(FUNC(pbmastm_state::write_r));
 	m_maincpu->o().set(FUNC(pbmastm_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 10);
 	config.set_default_layout(layout_pbmastm);
 
-	/* no sound! */
+	// no sound!
 }
 
 // roms
@@ -8599,10 +9070,12 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void stopthief(machine_config &config);
+
+private:
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void stopthief(machine_config &config);
 };
 
 // handlers
@@ -8637,7 +9110,7 @@ u8 stopthief_state::read_k()
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
     [1] [2] [OFF]
     [3] [4] [ON]
@@ -8672,19 +9145,19 @@ INPUT_PORTS_END
 
 void stopthief_state::stopthief(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS0980(config, m_maincpu, 425000); // approximation
 	m_maincpu->k().set(FUNC(stopthief_state::read_k));
 	m_maincpu->r().set(FUNC(stopthief_state::write_r));
 	m_maincpu->o().set(FUNC(stopthief_state::write_o));
-	m_maincpu->power_off().set(FUNC(hh_tms1k_state::auto_power_off));
+	m_maincpu->power_off().set(FUNC(stopthief_state::auto_power_off));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(3, 7);
 	m_display->set_segmask(7, 0x7f);
 	config.set_default_layout(layout_stopthief);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	static const double speaker_levels[7] = { 1.0/7.0, 1.0/6.0, 1.0/5.0, 1.0/4.0, 1.0/3.0, 1.0/2.0, 1.0 };
@@ -8752,11 +9225,13 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void bankshot(machine_config &config);
+
+private:
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void bankshot(machine_config &config);
 };
 
 // handlers
@@ -8794,7 +9269,7 @@ u8 bankshot_state::read_k()
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
   (note: remember that you can rotate the display in MAME)
 
     [SELECT  [BALL UP] [BALL OVER]
@@ -8822,18 +9297,18 @@ INPUT_PORTS_END
 
 void bankshot_state::bankshot(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1400(config, m_maincpu, 475000); // approximation - RC osc. R=24K, C=100pF
 	m_maincpu->k().set(FUNC(bankshot_state::read_k));
 	m_maincpu->r().set(FUNC(bankshot_state::write_r));
 	m_maincpu->o().set(FUNC(bankshot_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(11, 8);
 	m_display->set_bri_levels(0.01, 0.08); // cue ball is brigher
 	config.set_default_layout(layout_bankshot);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -8894,11 +9369,13 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void splitsec(machine_config &config);
+
+private:
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void splitsec(machine_config &config);
 };
 
 // handlers
@@ -8953,17 +9430,17 @@ INPUT_PORTS_END
 
 void splitsec_state::splitsec(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1400(config, m_maincpu, 475000); // approximation - RC osc. R=24K, C=100pF
 	m_maincpu->k().set(FUNC(splitsec_state::read_k));
 	m_maincpu->r().set(FUNC(splitsec_state::write_r));
 	m_maincpu->o().set(FUNC(splitsec_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8, 7);
 	config.set_default_layout(layout_splitsec);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -9003,10 +9480,12 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void lostreas(machine_config &config);
+
+private:
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void lostreas(machine_config &config);
 };
 
 // handlers
@@ -9037,7 +9516,7 @@ u8 lostreas_state::read_k()
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
   (note: Canadian version differs slightly to accomodoate dual-language)
 
     [N-S(gold)]    [1] [2] [3]    [AIR]
@@ -9078,17 +9557,17 @@ INPUT_PORTS_END
 
 void lostreas_state::lostreas(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1100(config, m_maincpu, 425000); // approximation - RC osc. R=39K, C=47pF
 	m_maincpu->k().set(FUNC(lostreas_state::read_k));
 	m_maincpu->r().set(FUNC(lostreas_state::write_r));
 	m_maincpu->o().set(FUNC(lostreas_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 11);
 	config.set_default_layout(layout_lostreas);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -9141,10 +9620,12 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void alphie(machine_config &config);
+
+private:
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void alphie(machine_config &config);
 };
 
 // handlers
@@ -9223,18 +9704,18 @@ static const u16 alphie_output_pla[0x20] =
 
 void alphie_state::alphie(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1000(config, m_maincpu, 350000); // approximation
 	m_maincpu->set_output_pla(alphie_output_pla);
 	m_maincpu->k().set(FUNC(alphie_state::read_k));
 	m_maincpu->r().set(FUNC(alphie_state::write_r));
 	m_maincpu->o().set(FUNC(alphie_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 5);
 	config.set_default_layout(layout_alphie);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -9275,11 +9756,13 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void tcfball(machine_config &config);
+
+protected:
 	void update_display();
 	virtual void write_r(u16 data);
 	virtual void write_o(u16 data);
 	virtual u8 read_k();
-	void tcfball(machine_config &config);
 };
 
 // handlers
@@ -9344,20 +9827,20 @@ INPUT_PORTS_END
 
 void tcfball_state::tcfball(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=56K, C=24pF
 	m_maincpu->k().set(FUNC(tcfball_state::read_k));
 	m_maincpu->r().set(FUNC(tcfball_state::write_r));
 	m_maincpu->o().set(FUNC(tcfball_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(11, 8);
 	m_display->set_segmask(0x77, 0x7f);
 	m_display->set_segmask(0x08, 0xff); // R3 has DP
 	m_display->set_bri_levels(0.003, 0.03); // offense leds are brighter
 	config.set_default_layout(layout_tcfball);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -9420,7 +9903,7 @@ void tcfballa_state::tcfballa(machine_config &config)
 {
 	tcfball(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_clock(375000); // approximation - RC osc. R=47K, C=50pF
 
 	config.set_default_layout(layout_tcfballa);
@@ -9447,12 +9930,14 @@ ROM_END
 
 /***************************************************************************
 
-  Tandy Computerized Arcade (1981, 1982, 1995)
+  Tandy Computerized Arcade (model 60-2159 or 60-2159A)
   * TMS1100 MCU, label CD7282SL
   * 12 lamps behind buttons, 1-bit sound
 
   known releases:
   - World: Tandy-12: Computerized Arcade, published by Tandy
+  - World: Computerized Arcade, published by Tandy, Radio Shack brand.
+    This one is model 60-2495 from the mid-90s, perhaps different hardware!
   - Mexico: Fabuloso Fred, published by Ensueño Toys (also released as
     9-button version, a clone of Mego Fabulous Fred)
 
@@ -9479,11 +9964,13 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void tandy12(machine_config &config);
+
+private:
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void tandy12(machine_config &config);
 };
 
 // handlers
@@ -9521,7 +10008,7 @@ u8 tandy12_state::read_k()
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
         REPEAT-2              SPACE-2
           [O]     OFF--ON       [O]
@@ -9589,18 +10076,18 @@ static const u16 tandy12_output_pla[0x20] =
 
 void tandy12_state::tandy12(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1100(config, m_maincpu, 400000); // approximation - RC osc. R=39K, C=47pF
 	m_maincpu->set_output_pla(tandy12_output_pla);
 	m_maincpu->k().set(FUNC(tandy12_state::read_k));
 	m_maincpu->r().set(FUNC(tandy12_state::write_r));
 	m_maincpu->o().set(FUNC(tandy12_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 13);
 	config.set_default_layout(layout_tandy12);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -9645,10 +10132,12 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void monkeysee(machine_config &config);
+
+private:
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void monkeysee(machine_config &config);
 };
 
 // handlers
@@ -9711,17 +10200,17 @@ INPUT_PORTS_END
 
 void monkeysee_state::monkeysee(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1000(config, m_maincpu, 250000); // approximation - RC osc. R=68K, C=47pF
 	m_maincpu->k().set(FUNC(monkeysee_state::read_k));
 	m_maincpu->r().set(FUNC(monkeysee_state::write_r));
 	m_maincpu->o().set(FUNC(monkeysee_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 2);
 	config.set_default_layout(layout_monkeysee);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -9737,6 +10226,173 @@ ROM_START( monkeysee )
 	ROM_LOAD( "tms1000_monkeysee_micro.pla", 0, 867, CRC(368d878f) SHA1(956e700a04f453c1610cfdb974fce898ba4cf01f) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1000_monkeysee_output.pla", 0, 365, CRC(8a010e89) SHA1(3ffbabc5d6c9b34cc06d290817d15b2be42d8b17) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Tandy 3 in 1 Sports Arena (model 60-2178)
+  * PCB label HP-804
+  * TMS1100 (just a datestamp label (8331), die label 1100B MP1231)
+  * 2x2-digit 7seg LED display + 47 other LEDs, 1-bit sound
+
+  For Tandy Sports Arena (model 60-2158), see cmsport, this is a different game.
+  This version is very similar to ssports4 released a few years earlier.
+
+  3 overlays were included for the games (Tandy calls them graphic sheets),
+  MAME external artwork is needed for those.
+
+  It is always in 2-player head-to-head mode, the Player switch is just meant
+  for allowing the other player to have full control over 2 defense spots.
+
+***************************************************************************/
+
+class t3in1sa_state : public hh_tms1k_state
+{
+public:
+	t3in1sa_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void t3in1sa(machine_config &config);
+
+private:
+	void update_display();
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
+};
+
+// handlers
+
+void t3in1sa_state::update_display()
+{
+	m_display->matrix(m_r, m_o | (m_r << 6 & 0x100));
+}
+
+void t3in1sa_state::write_r(u16 data)
+{
+	// R10: speaker out
+	m_speaker->level_w(data >> 10 & 1);
+
+	// R0,R1,R5,R7-R9: input mux
+	m_inp_mux = (data & 3) | (data >> 3 & 4) | (data >> 4 & 0x38);
+
+	// R2: led data high
+	// R3-R7: led select
+	// R0,R1,R8,R9: digit select
+	m_r = data;
+	update_display();
+}
+
+void t3in1sa_state::write_o(u16 data)
+{
+	// O0-O7: led data low
+	m_o = data;
+	update_display();
+}
+
+u8 t3in1sa_state::read_k()
+{
+	// K: multiplexed inputs
+	return read_inputs(6);
+}
+
+// config
+
+/* physical button layout and labels are like this:
+
+                  ↑
+     [ ]         [ ]         [ ]
+  TEAM-MATE                  PASS
+          ←[ ]         [ ]→  shoot
+        ↗                   ↖
+     [ ]         [ ]         [ ]
+    STATUS        ↓          KICK
+                             pass
+                             shoot
+
+Game and difficulty switches are under the yellow buttons,
+player switch is under the red buttons. P1 is yellow, P2 is red.
+
+*/
+
+static INPUT_PORTS_START( t3in1sa )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY
+
+	PORT_START("IN.2") // R5
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x00, "1" ) // AMATEUR
+	PORT_CONFSETTING(    0x01, "2" ) // PRO
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x08, 0x08, DEF_STR( Players ) )
+	PORT_CONFSETTING(    0x08, "1" )
+	PORT_CONFSETTING(    0x00, "2" )
+
+	PORT_START("IN.3") // R7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x0e, 0x08, "Game Select" )
+	PORT_CONFSETTING(    0x08, "Football" ) // F
+	PORT_CONFSETTING(    0x04, "Basketball" ) // B
+	PORT_CONFSETTING(    0x02, "Soccer" ) // S
+
+	PORT_START("IN.4") // R8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 Up-Left / Kick")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Up-Right / Status")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Pass / Shoot")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Team-Mate")
+
+	PORT_START("IN.5") // R9
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_COCKTAIL PORT_NAME("P2 Up-Left / Kick")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_COCKTAIL PORT_NAME("P2 Up-Right / Status")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Pass / Shoot")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Team-Mate")
+INPUT_PORTS_END
+
+void t3in1sa_state::t3in1sa(machine_config &config)
+{
+	// basic machine hardware
+	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
+	m_maincpu->k().set(FUNC(t3in1sa_state::read_k));
+	m_maincpu->r().set(FUNC(t3in1sa_state::write_r));
+	m_maincpu->o().set(FUNC(t3in1sa_state::write_o));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(10, 9);
+	m_display->set_segmask(0x303, 0x7f);
+	m_display->set_bri_levels(0.005, 0.05); // offense leds are brighter
+	config.set_default_layout(layout_t3in1sa);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( t3in1sa )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1231", 0x0000, 0x0800, CRC(1c24e5c2) SHA1(0b6c2edea27eba15e890d82475b91a5e9ef6c4b9) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_t3in1sa_output.pla", 0, 365, CRC(de82a294) SHA1(7187666a510919b90798b92b9104ac5d6820d559) )
 ROM_END
 
 
@@ -9764,13 +10420,15 @@ public:
 		m_speech(*this, "speech")
 	{ }
 
+	void speechp(machine_config &config);
+
+private:
 	required_device<s14001a_device> m_speech;
 
 	void update_display();
 	virtual void write_r(u16 data);
 	virtual void write_o(u16 data);
 	virtual u8 read_k();
-	void speechp(machine_config &config);
 };
 
 // handlers
@@ -9872,18 +10530,18 @@ INPUT_PORTS_END
 
 void speechp_state::speechp(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1000(config, m_maincpu, 400000); // approximation - RC osc. R=39K, C=47pF
 	m_maincpu->k().set(FUNC(speechp_state::read_k));
 	m_maincpu->r().set(FUNC(speechp_state::write_r));
 	m_maincpu->o().set(FUNC(speechp_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	m_display->set_segmask(0x1ff, 0xff);
 	config.set_default_layout(layout_speechp);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	S14001A(config, m_speech, 25000); // approximation
 	m_speech->add_route(ALL_OUTPUTS, "mono", 0.75);
@@ -9927,11 +10585,13 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void tisr16(machine_config &config);
+
+private:
 	void update_display();
 	void write_o(u16 data);
 	void write_r(u16 data);
 	u8 read_k();
-	void tisr16(machine_config &config);
 };
 
 // handlers
@@ -10106,18 +10766,18 @@ INPUT_PORTS_END
 
 void tisr16_state::tisr16(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1000(config, m_maincpu, 300000); // approximation - RC osc. R=43K, C=68pf (note: tisr16ii MCU RC osc. is different: R=30K, C=100pf, same freq)
 	m_maincpu->k().set(FUNC(tisr16_state::read_k));
 	m_maincpu->o().set(FUNC(tisr16_state::write_o));
 	m_maincpu->r().set(FUNC(tisr16_state::write_r));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(12, 8);
 	m_display->set_segmask(0xfff, 0xff);
 	config.set_default_layout(layout_tisr16);
 
-	/* no sound! */
+	// no sound!
 }
 
 // roms
@@ -10269,26 +10929,26 @@ INPUT_PORTS_END
 
 void ti1250_state::ti1250(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS0950(config, m_maincpu, 200000); // approximation - RC osc. R=68K, C=68pf
 	m_maincpu->k().set(FUNC(ti1250_state::read_k));
 	m_maincpu->o().set(FUNC(ti1250_state::write_o));
 	m_maincpu->r().set(FUNC(ti1250_state::write_r));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	m_display->set_segmask(0xff, 0xff);
 	m_display->set_segmask(0x100, 0x40); // R8 only has segment G connected
 	config.set_default_layout(layout_ti1250);
 
-	/* no sound! */
+	// no sound!
 }
 
 void ti1250_state::ti1270(machine_config &config)
 {
 	ti1250(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS0970(config.replace(), m_maincpu, 250000); // approximation
 	m_maincpu->k().set(FUNC(ti1250_state::read_k));
 	m_maincpu->o().set(FUNC(ti1250_state::write_o));
@@ -10446,18 +11106,18 @@ INPUT_PORTS_END
 
 void ti25503_state::ti25503(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1040(config, m_maincpu, 250000); // approximation
 	m_maincpu->k().set(FUNC(ti25503_state::read_k));
 	m_maincpu->o().set(FUNC(ti25503_state::write_o));
 	m_maincpu->r().set(FUNC(ti25503_state::write_r));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	m_display->set_segmask(0x1ff, 0xff);
 	config.set_default_layout(layout_ti25503);
 
-	/* no sound! */
+	// no sound!
 }
 
 // roms
@@ -10598,18 +11258,18 @@ INPUT_PORTS_END
 
 void ti5100_state::ti5100(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1070(config, m_maincpu, 250000); // approximation
 	m_maincpu->k().set(FUNC(ti5100_state::read_k));
 	m_maincpu->o().set(FUNC(ti5100_state::write_o));
 	m_maincpu->r().set(FUNC(ti5100_state::write_r));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(11, 9);
 	m_display->set_segmask(0x7ff, 0xff);
 	config.set_default_layout(layout_ti5100);
 
-	/* no sound! */
+	// no sound!
 }
 
 // roms
@@ -10868,20 +11528,20 @@ INPUT_PORTS_END
 
 void ti30_state::ti30(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS0980(config, m_maincpu, 400000); // guessed
 	m_maincpu->k().set(FUNC(ti30_state::read_k));
 	m_maincpu->o().set(FUNC(ti30_state::write_o));
 	m_maincpu->r().set(FUNC(ti30_state::write_r));
-	m_maincpu->power_off().set(FUNC(hh_tms1k_state::auto_power_off));
+	m_maincpu->power_off().set(FUNC(ti30_state::auto_power_off));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	m_display->set_segmask(0x1fe, 0xff);
 	m_display->set_segmask(0x001, 0xe2); // 1st digit only has segments B,F,G,DP
 	config.set_default_layout(layout_ti30);
 
-	/* no sound! */
+	// no sound!
 }
 
 // roms
@@ -11017,18 +11677,18 @@ INPUT_PORTS_END
 
 void ti1000_state::ti1000(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1990(config, m_maincpu, 250000); // approximation
 	m_maincpu->k().set(FUNC(ti1000_state::read_k));
 	m_maincpu->o().set(FUNC(ti1000_state::write_o));
 	m_maincpu->r().set(FUNC(ti1000_state::write_r));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8, 8);
 	m_display->set_segmask(0xff, 0xff);
 	config.set_default_layout(layout_ti1270);
 
-	/* no sound! */
+	// no sound!
 }
 
 // roms
@@ -11068,6 +11728,7 @@ public:
 
 	void wizatron(machine_config &config);
 
+protected:
 	virtual void write_o(u16 data);
 	virtual void write_r(u16 data);
 	virtual u8 read_k();
@@ -11134,19 +11795,19 @@ INPUT_PORTS_END
 
 void wizatron_state::wizatron(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS0970(config, m_maincpu, 250000); // approximation
 	m_maincpu->k().set(FUNC(wizatron_state::read_k));
 	m_maincpu->o().set(FUNC(wizatron_state::write_o));
 	m_maincpu->r().set(FUNC(wizatron_state::write_r));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
 	m_display->set_segmask(0x1ff^8, 0x7f);
 	m_display->set_segmask(8, 0x41); // equals sign
 	config.set_default_layout(layout_wizatron);
 
-	/* no sound! */
+	// no sound!
 }
 
 // roms
@@ -11231,7 +11892,7 @@ void lilprof_state::lilprof(machine_config &config)
 {
 	wizatron(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->k().set(FUNC(lilprof_state::read_k));
 	m_maincpu->o().set(FUNC(lilprof_state::write_o));
 }
@@ -11350,18 +12011,18 @@ INPUT_PORTS_END
 
 void lilprof78_state::lilprof78(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1990(config, m_maincpu, 250000); // approximation
 	m_maincpu->k().set(FUNC(lilprof78_state::read_k));
 	m_maincpu->o().set(FUNC(lilprof78_state::write_o));
 	m_maincpu->r().set(FUNC(lilprof78_state::write_r));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
 	m_display->set_segmask(0x1ff, 0x7f);
 	config.set_default_layout(layout_wizatron);
 
-	/* no sound! */
+	// no sound!
 }
 
 // roms
@@ -11404,9 +12065,10 @@ public:
 		m_ram(*this, "ram")
 	{ }
 
-	required_device<tmc0999_device> m_ram;
-
 	void ti1680(machine_config &config);
+
+private:
+	required_device<tmc0999_device> m_ram;
 
 	virtual void update_display();
 	virtual void write_o(u16 data);
@@ -11495,21 +12157,21 @@ INPUT_PORTS_END
 
 void ti1680_state::ti1680(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1980(config, m_maincpu, 300000); // approximation
 	m_maincpu->k().set(FUNC(ti1680_state::read_k));
 	m_maincpu->o().set(FUNC(ti1680_state::write_o));
 	m_maincpu->r().set(FUNC(ti1680_state::write_r));
-	m_maincpu->power_off().set(FUNC(hh_tms1k_state::auto_power_off));
+	m_maincpu->power_off().set(FUNC(ti1680_state::auto_power_off));
 
 	TMC0999(config, m_ram);
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 9);
 	m_display->set_segmask(0x1fe, 0xff);
 	config.set_default_layout(layout_ti1680);
 
-	/* no sound! */
+	// no sound!
 }
 
 // roms
@@ -11547,6 +12209,7 @@ public:
 
 	void dataman(machine_config &config);
 
+protected:
 	virtual void update_display();
 	virtual void write_o(u16 data);
 	virtual void write_r(u16 data);
@@ -11626,19 +12289,19 @@ INPUT_PORTS_END
 
 void dataman_state::dataman(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1980(config, m_maincpu, 300000); // patent says 300kHz
 	m_maincpu->k().set(FUNC(dataman_state::read_k));
 	m_maincpu->o().set(FUNC(dataman_state::write_o));
 	m_maincpu->r().set(FUNC(dataman_state::write_r));
-	m_maincpu->power_off().set(FUNC(hh_tms1k_state::auto_power_off));
+	m_maincpu->power_off().set(FUNC(dataman_state::auto_power_off));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	m_display->set_segmask(0x1ff, 0x7f);
 	config.set_default_layout(layout_dataman);
 
-	/* no sound! */
+	// no sound!
 }
 
 // roms
@@ -11713,12 +12376,12 @@ void mathmarv_state::mathmarv(machine_config &config)
 {
 	dataman(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->r().set(FUNC(mathmarv_state::write_r));
 
 	config.set_default_layout(layout_mathmarv);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -11765,10 +12428,12 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void timaze(machine_config &config);
+
+private:
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void timaze(machine_config &config);
 };
 
 // handlers
@@ -11803,18 +12468,18 @@ INPUT_PORTS_END
 
 void timaze_state::timaze(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1000(config, m_maincpu, 200000); // approximation - RC osc. R=80K, C=27pF
 	m_maincpu->k().set(FUNC(timaze_state::read_k));
 	m_maincpu->r().set(FUNC(timaze_state::write_r));
 	m_maincpu->o().set(FUNC(timaze_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 8);
 	m_display->set_segmask(1, 0x5c);
 	config.set_default_layout(layout_timaze);
 
-	/* no sound! */
+	// no sound!
 }
 
 // roms
@@ -11853,13 +12518,14 @@ public:
 		m_60hz(*this, "ac_line")
 	{ }
 
-	void write_r(u16 data);
-	void write_o(u16 data);
-	u8 read_k();
 	void tithermos(machine_config &config);
 
 private:
 	required_device<clock_device> m_60hz;
+
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 };
 
 // handlers
@@ -11958,7 +12624,7 @@ INPUT_PORTS_END
 
 void tithermos_state::tithermos(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS0970(config, m_maincpu, 250000); // approximation
 	m_maincpu->k().set(FUNC(tithermos_state::read_k));
 	m_maincpu->r().set(FUNC(tithermos_state::write_r));
@@ -11966,12 +12632,12 @@ void tithermos_state::tithermos(machine_config &config)
 
 	CLOCK(config, "ac_line", 60);
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 7);
 	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_tithermos);
 
-	/* no sound! */
+	// no sound!
 }
 
 // roms
@@ -12015,10 +12681,12 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void subwars(machine_config &config);
+
+private:
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
-	void subwars(machine_config &config);
 };
 
 // handlers
@@ -12058,18 +12726,18 @@ INPUT_PORTS_END
 
 void subwars_state::subwars(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1200(config, m_maincpu, 550000); // approximation - RC osc. R=24K, C=47pF
 	m_maincpu->k().set_ioport("IN.0");
 	m_maincpu->r().set(FUNC(subwars_state::write_r));
 	m_maincpu->o().set(FUNC(subwars_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(13, 7);
 	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_subwars);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -12085,6 +12753,302 @@ ROM_START( subwars )
 	ROM_LOAD( "tms1000_common1_micro.pla", 0, 867, CRC(4becec19) SHA1(3c8a9be0f00c88c81f378b76886c39b10304f330) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1000_subwars_output.pla", 0, 365, CRC(372b9bbc) SHA1(06a875e114b7757c6f4f1727416d1739ebe60931) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Tiger Playmaker: Hockey, Soccer, Basketball (model 7-540 or 7-540A)
+  * TMS1100 MP1215 (die label 1100B MP1215)
+  * 2-digit 7seg LED display + 40 other LEDs, 1-bit sound
+
+  The games are on playcards(Tiger calls them that), the hardware detects which
+  game is inserted from a notch at the lower-right. The playcards also function
+  as an overlay. MAME external artwork is needed for those.
+
+  Booting the handheld with no playcard inserted will initiate a halftime show.
+
+  "Playmaker" is actually Tiger's trademark for the d-pad controller, this
+  controller term was also used in for example Deluxe Football, and 7 in 1 Sports
+  Stadium. The d-pad has a ball shape at the bottom that sits on a concave base.
+  It is patented under US4256931 (mid-1979, a couple of years before Nintendo's
+  Game & Watch d-pad with US4687200).
+
+***************************************************************************/
+
+class playmaker_state : public hh_tms1k_state
+{
+public:
+	playmaker_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void playmaker(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+	u8 m_notch = 0; // cartridge K1/K2
+
+	void update_display();
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
+};
+
+void playmaker_state::machine_start()
+{
+	hh_tms1k_state::machine_start();
+
+	// register for savestates
+	save_item(NAME(m_notch));
+}
+
+// handlers
+
+DEVICE_IMAGE_LOAD_MEMBER(playmaker_state::cart_load)
+{
+	if (!image.loaded_through_softlist())
+	{
+		image.seterror(image_error::UNSUPPORTED, "Can only load through softwarelist");
+		return image_init_result::FAIL;
+	}
+
+	// get cartridge notch
+	const char *notch = image.get_feature("notch");
+	m_notch = notch ? strtoul(notch, nullptr, 0) & 3 : 0;
+
+	return image_init_result::PASS;
+}
+
+void playmaker_state::update_display()
+{
+	m_display->matrix(m_r, m_o);
+}
+
+void playmaker_state::write_r(u16 data)
+{
+	// R10: speaker out
+	m_speaker->level_w(data >> 10 & 1);
+
+	// R0-R3: input mux
+	m_inp_mux = data & 0xf;
+
+	// R0-R7: led select
+	// R8,R9: digit select
+	m_r = data;
+	update_display();
+}
+
+void playmaker_state::write_o(u16 data)
+{
+	// O0-O6: led data
+	m_o = data;
+	update_display();
+}
+
+u8 playmaker_state::read_k()
+{
+	// K: multiplexed inputs, cartridge notch from R3
+	return read_inputs(3) | ((m_inp_mux & 8) ? m_notch : 0);
+}
+
+// config
+
+static INPUT_PORTS_START( playmaker )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Shoot")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Pass")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Shoot / P1 Skill")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Pass / P2 Skill")
+INPUT_PORTS_END
+
+void playmaker_state::playmaker(machine_config &config)
+{
+	// basic machine hardware
+	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=20K, C=250pF
+	m_maincpu->k().set(FUNC(playmaker_state::read_k));
+	m_maincpu->r().set(FUNC(playmaker_state::write_r));
+	m_maincpu->o().set(FUNC(playmaker_state::write_o));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(10, 7);
+	m_display->set_segmask(0x300, 0x7f);
+	m_display->set_bri_levels(0.004, 0.04); // player 1 leds are brighter
+	config.set_default_layout(layout_playmaker);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+
+	// cartridge
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "playmaker_cart"));
+	cartslot.set_must_be_loaded(false);
+	cartslot.set_device_load(FUNC(playmaker_state::cart_load));
+
+	SOFTWARE_LIST(config, "cart_list").set_original("playmaker");
+}
+
+// roms
+
+ROM_START( playmaker )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1215", 0x0000, 0x0800, CRC(bfc7b6c8) SHA1(33f6e2b86fae2fd9e4b0a4b8dc842c257ca3047d) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_playmaker_output.pla", 0, 365, CRC(0cd484d6) SHA1(4a9af9f3d18af504145690cb0f6444ff1aef26ca) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Tiger Deluxe Football with Instant Replay (model 7-550)
+  * TMS1400NLL MP7302 (die label TMS1400 MP7302)
+  * 4-digit 7seg LED display, 80 red/green LEDs, 1-bit sound
+
+  According to the manual, player 1 is green, player 2 is red. But when
+  playing a 1-player game, the CPU controls green, so on MAME, player 1
+  is the red side.
+
+  Booting the handheld with the Score and Replay buttons held down will
+  initiate a halftime show.
+
+***************************************************************************/
+
+class dxfootb_state : public hh_tms1k_state
+{
+public:
+	dxfootb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void dxfootb(machine_config &config);
+
+private:
+	void update_display();
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
+};
+
+// handlers
+
+void dxfootb_state::update_display()
+{
+	// 2 led groups (double multiplexed)
+	u16 g1 = (m_r & 0x100) ? 0x7f : 0;
+	u16 g2 = (m_r & 0x80) ? 0x7f << 7 : 0;
+	m_display->matrix((m_r & g1) | (m_r << 7 & g2), m_o);
+}
+
+void dxfootb_state::write_r(u16 data)
+{
+	// R9,R10: speaker out
+	m_speaker->level_w(data >> 9 & 3);
+
+	// R3-R6: input mux
+	m_inp_mux = data >> 3 & 0xf;
+
+	// R0-R6: led select
+	// R7,R8: group select
+	m_r = data;
+	update_display();
+}
+
+void dxfootb_state::write_o(u16 data)
+{
+	// O0-O7: led data
+	m_o = data;
+	update_display();
+}
+
+u8 dxfootb_state::read_k()
+{
+	// K: multiplexed inputs
+	return read_inputs(4);
+}
+
+// config
+
+static INPUT_PORTS_START( dxfootb )
+	PORT_START("IN.0") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("Replay / Skill (Green)")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Score / Skill (Red)")
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Kick")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Pass")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Kick")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Pass")
+
+	PORT_START("IN.2") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL
+
+	PORT_START("IN.3") // R6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+INPUT_PORTS_END
+
+void dxfootb_state::dxfootb(machine_config &config)
+{
+	// basic machine hardware
+	TMS1400(config, m_maincpu, 425000); // approximation - RC osc. R=47K, C=47pF
+	m_maincpu->k().set(FUNC(dxfootb_state::read_k));
+	m_maincpu->r().set(FUNC(dxfootb_state::write_r));
+	m_maincpu->o().set(FUNC(dxfootb_state::write_o));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(7+7, 8);
+	m_display->set_segmask(0x3c00, 0x7f);
+	config.set_default_layout(layout_dxfootb);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0 };
+	m_speaker->set_levels(4, speaker_levels);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( dxfootb )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mp7302", 0x0000, 0x1000, CRC(a8077062) SHA1(c1318fe5c8f2db021d7d1264fc70158944045fa3) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 557, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1400_dxfootb_output.pla", 0, 557, CRC(a1b3d2c0) SHA1(8030e6dcd3878b58668c98cff36d93b764e1d67f) )
 ROM_END
 
 
@@ -12112,10 +13076,12 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void copycat(machine_config &config);
+
+private:
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void copycat(machine_config &config);
 };
 
 // handlers
@@ -12175,17 +13141,17 @@ INPUT_PORTS_END
 
 void copycat_state::copycat(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1000(config, m_maincpu, 320000); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->k().set(FUNC(copycat_state::read_k));
 	m_maincpu->r().set(FUNC(copycat_state::write_r));
 	m_maincpu->o().set(FUNC(copycat_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 4);
 	config.set_default_layout(layout_copycat);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
@@ -12234,9 +13200,11 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void copycatm2(machine_config &config);
+
+private:
 	void write_r(u16 data);
 	void write_o(u16 data);
-	void copycatm2(machine_config &config);
 };
 
 // handlers
@@ -12265,17 +13233,17 @@ INPUT_PORTS_END
 
 void copycatm2_state::copycatm2(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1730(config, m_maincpu, 275000); // approximation - RC osc. R=100K, C=47pF
 	m_maincpu->k().set_ioport("IN.0");
 	m_maincpu->r().set(FUNC(copycatm2_state::write_r));
 	m_maincpu->o().set(FUNC(copycatm2_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 4);
 	config.set_default_layout(layout_copycatm2);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0 };
@@ -12319,9 +13287,11 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void ditto(machine_config &config);
+
+private:
 	void write_r(u16 data);
 	void write_o(u16 data);
-	void ditto(machine_config &config);
 };
 
 // handlers
@@ -12350,17 +13320,17 @@ INPUT_PORTS_END
 
 void ditto_state::ditto(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1700(config, m_maincpu, 275000); // approximation - RC osc. R=100K, C=47pF
 	m_maincpu->k().set_ioport("IN.0");
 	m_maincpu->r().set(FUNC(ditto_state::write_r));
 	m_maincpu->o().set(FUNC(ditto_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 4);
 	config.set_default_layout(layout_ditto);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0 };
@@ -12400,28 +13370,30 @@ ROM_END
 
 ***************************************************************************/
 
-class ss7in1_state : public hh_tms1k_state
+class t7in1ss_state : public hh_tms1k_state
 {
 public:
-	ss7in1_state(const machine_config &mconfig, device_type type, const char *tag) :
+	t7in1ss_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void t7in1ss(machine_config &config);
+
+private:
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void ss7in1(machine_config &config);
 };
 
 // handlers
 
-void ss7in1_state::update_display()
+void t7in1ss_state::update_display()
 {
 	m_display->matrix(m_r, m_o);
 }
 
-void ss7in1_state::write_r(u16 data)
+void t7in1ss_state::write_r(u16 data)
 {
 	// R9: speaker out
 	m_speaker->level_w(data >> 9 & 1);
@@ -12430,19 +13402,19 @@ void ss7in1_state::write_r(u16 data)
 	m_inp_mux = (data & 7) | (data >> 7 & 8);
 
 	// R0-R3: digit select
-	// R4-R9: led select
+	// R4-R8: led select
 	m_r = data;
 	update_display();
 }
 
-void ss7in1_state::write_o(u16 data)
+void t7in1ss_state::write_o(u16 data)
 {
 	// O0-O7: led data
 	m_o = data;
 	update_display();
 }
 
-u8 ss7in1_state::read_k()
+u8 t7in1ss_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(4);
@@ -12450,7 +13422,7 @@ u8 ss7in1_state::read_k()
 
 // config
 
-static INPUT_PORTS_START( ss7in1 )
+static INPUT_PORTS_START( t7in1ss )
 	PORT_START("IN.0") // R0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL
@@ -12477,21 +13449,21 @@ static INPUT_PORTS_START( ss7in1 )
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-void ss7in1_state::ss7in1(machine_config &config)
+void t7in1ss_state::t7in1ss(machine_config &config)
 {
-	/* basic machine hardware */
-	TMS1400(config, m_maincpu, 450000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(ss7in1_state::read_k));
-	m_maincpu->r().set(FUNC(ss7in1_state::write_r));
-	m_maincpu->o().set(FUNC(ss7in1_state::write_o));
+	// basic machine hardware
+	TMS1400(config, m_maincpu, 425000); // approximation - RC osc. R=47K, C=47pF
+	m_maincpu->k().set(FUNC(t7in1ss_state::read_k));
+	m_maincpu->r().set(FUNC(t7in1ss_state::write_r));
+	m_maincpu->o().set(FUNC(t7in1ss_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	m_display->set_segmask(0xf, 0x7f);
-	m_display->set_bri_levels(0.005, 0.05); // player led is brighter
-	config.set_default_layout(layout_7in1ss);
+	m_display->set_bri_levels(0.004, 0.04); // player led is brighter
+	config.set_default_layout(layout_t7in1ss);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -12499,14 +13471,14 @@ void ss7in1_state::ss7in1(machine_config &config)
 
 // roms
 
-ROM_START( 7in1ss )
+ROM_START( t7in1ss )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mp7304", 0x0000, 0x1000, CRC(2a1c8390) SHA1(fa10e60686af6828a61f05046abc3854ab49af95) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
 	ROM_REGION( 557, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1400_7in1ss_output.pla", 0, 557, CRC(6b7660f7) SHA1(bb7d58fa04e7606ccdf5b209e1b089948bdd1e7c) )
+	ROM_LOAD( "tms1400_t7in1ss_output.pla", 0, 557, CRC(6b7660f7) SHA1(bb7d58fa04e7606ccdf5b209e1b089948bdd1e7c) )
 ROM_END
 
 
@@ -12556,30 +13528,29 @@ public:
 		m_expander(*this, "expander")
 	{ }
 
-	required_device<tms1025_device> m_expander;
-	u8 m_exp_port[7];
-	void expander_w(offs_t offset, u8 data);
-
-	void update_display();
-	void write_r(u16 data);
-	void write_o(u16 data);
-	u8 read_k();
-
-	void set_clock();
-	DECLARE_INPUT_CHANGED_MEMBER(skill_switch) { set_clock(); }
 	void tbreakup(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(skill_switch) { set_clock(); }
 
 protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
+
+private:
+	required_device<tms1025_device> m_expander;
+	u8 m_exp_port[7] = { };
+	void expander_w(offs_t offset, u8 data);
+
+	void set_clock();
+	void update_display();
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
 };
 
 void tbreakup_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
-
-	// zerofill/register for savestates
-	memset(m_exp_port, 0, sizeof(m_exp_port));
 	save_item(NAME(m_exp_port));
 }
 
@@ -12673,7 +13644,7 @@ INPUT_PORTS_END
 
 void tbreakup_state::tbreakup(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1040(config, m_maincpu, 325000); // see set_clock
 	m_maincpu->k().set(FUNC(tbreakup_state::read_k));
 	m_maincpu->r().set(FUNC(tbreakup_state::write_r));
@@ -12688,12 +13659,12 @@ void tbreakup_state::tbreakup(machine_config &config)
 	m_expander->write_port6_callback().set(FUNC(tbreakup_state::expander_w));
 	m_expander->write_port7_callback().set(FUNC(tbreakup_state::expander_w));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(2+6+6, 8);
 	m_display->set_segmask(3, 0x7f);
 	config.set_default_layout(layout_tbreakup);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -12751,13 +13722,15 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void phpball(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(flipper_button) { update_display(); }
+
+private:
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-
-	DECLARE_INPUT_CHANGED_MEMBER(flipper_button) { update_display(); }
-	void phpball(machine_config &config);
 };
 
 // handlers
@@ -12813,18 +13786,18 @@ INPUT_PORTS_END
 
 void phpball_state::phpball(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->k().set(FUNC(phpball_state::read_k));
 	m_maincpu->r().set(FUNC(phpball_state::write_r));
 	m_maincpu->o().set(FUNC(phpball_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(11, 7);
 	m_display->set_segmask(7, 0x7f);
 	config.set_default_layout(layout_phpball);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -12852,10 +13825,12 @@ ROM_END
   * TMS1100 MP1219 (no decap)
   * 4 7seg LEDs, 49 other LEDs, 1-bit sound
 
+  The game is very similar to t3in1sa, even parts of the ROM match. But by
+  the time that one was released (in 1983 or 1984), U.S. Games did not exist
+  anymore. I suspect t3in1sa was programmed by the same (Hong Kong) company.
+
   This handheld includes 4 games: Basketball, Football, Soccer, Hockey.
   MAME external artwork is needed for the switchable overlays.
-
-  The later Coleco Total Control 4 is clearly based on this.
 
 ***************************************************************************/
 
@@ -12866,11 +13841,13 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void ssports4(machine_config &config);
+
+private:
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void ssports4(machine_config &config);
 };
 
 // handlers
@@ -12931,14 +13908,14 @@ static INPUT_PORTS_START( ssports4 )
 	PORT_CONFSETTING(    0x00, "2" )
 
 	PORT_START("IN.3") // R8
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_16WAY PORT_NAME("P1 Kick") // or diagonal up-left
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_16WAY PORT_NAME("P1 Info") // or diagonal up-right
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_16WAY PORT_NAME("P1 Up-Left / Kick")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_16WAY PORT_NAME("P1 Up-Right / Info")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_16WAY PORT_NAME("P1 Pass")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_16WAY PORT_NAME("P1 O.P.") // offensive player (modifier button)
 
 	PORT_START("IN.4") // R9
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Kick")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Info")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Up-Left / Kick")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Up-Right / Info")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Pass")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 O.P.")
 
@@ -12953,19 +13930,19 @@ INPUT_PORTS_END
 
 void ssports4_state::ssports4(machine_config &config)
 {
-	/* basic machine hardware */
-	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
+	// basic machine hardware
+	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->k().set(FUNC(ssports4_state::read_k));
 	m_maincpu->r().set(FUNC(ssports4_state::write_r));
 	m_maincpu->o().set(FUNC(ssports4_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 9);
 	m_display->set_segmask(0x303, 0x7f);
-	m_display->set_bri_levels(0.003, 0.03); // offense leds are brighter
+	m_display->set_bri_levels(0.005, 0.05); // offense leds are brighter
 	config.set_default_layout(layout_ssports4);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -13008,17 +13985,19 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void update_halt();
+	void xl25(machine_config &config);
+
 	DECLARE_INPUT_CHANGED_MEMBER(k4_button) { update_halt(); }
 
+protected:
+	virtual void machine_reset() override;
+
+private:
+	void update_halt();
 	void update_display();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
-	void xl25(machine_config &config);
-
-protected:
-	virtual void machine_reset() override;
 };
 
 void xl25_state::machine_reset()
@@ -13135,17 +14114,17 @@ INPUT_PORTS_END
 
 void xl25_state::xl25(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1000C(config, m_maincpu, 300000); // approximation - RC osc. R=5.6K, C=47pF
 	m_maincpu->k().set(FUNC(xl25_state::read_k));
 	m_maincpu->r().set(FUNC(xl25_state::write_r));
 	m_maincpu->o().set(FUNC(xl25_state::write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 3);
 	config.set_default_layout(layout_xl25);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -13180,6 +14159,7 @@ CONS( 1980, arrball,    0,         0, arrball,   arrball,   arrball_state,   emp
 COMP( 1980, mathmagi,   0,         0, mathmagi,  mathmagi,  mathmagi_state,  empty_init, "APF Electronics Inc.", "Mathemagician", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 CONS( 1979, bcheetah,   0,         0, bcheetah,  bcheetah,  bcheetah_state,  empty_init, "Bandai", "System Control Car: Cheetah", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_MECHANICAL ) // ***
+CONS( 1981, tc7atc,     0,         0, tc7atc,    tc7atc,    tc7atc_state,    empty_init, "Bandai", "TC7: Air Traffic Control", MACHINE_SUPPORTS_SAVE )
 
 COMP( 1977, palmf31,    0,         0, palmf31,   palmf31,   palmf31_state,   empty_init, "Canon", "Palmtronic F-31", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1977, palmmd8,    0,         0, palmmd8,   palmmd8,   palmmd8_state,   empty_init, "Canon", "Palmtronic MD-8 (Multi 8)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
@@ -13208,6 +14188,7 @@ CONS( 1979, ebball,     0,         0, ebball,    ebball,    ebball_state,    emp
 CONS( 1979, ebball2,    0,         0, ebball2,   ebball2,   ebball2_state,   empty_init, "Entex", "Electronic Baseball 2 (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, ebball3,    0,         0, ebball3,   ebball3,   ebball3_state,   empty_init, "Entex", "Electronic Baseball 3 (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, esbattle,   0,         0, esbattle,  esbattle,  esbattle_state,  empty_init, "Entex", "Space Battle (Entex)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, blastit,    0,         0, blastit,   blastit,   blastit_state,   empty_init, "Entex", "Blast It", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, einvader,   0,         0, einvader,  einvader,  einvader_state,  empty_init, "Entex", "Space Invader (Entex, TMS1100 version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, efootb4 ,   0,         0, efootb4,   efootb4,   efootb4_state,   empty_init, "Entex", "Color Football 4 (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, ebaskb2 ,   0,         0, ebaskb2,   ebaskb2,   ebaskb2_state,   empty_init, "Entex", "Electronic Basketball 2 (Entex)", MACHINE_SUPPORTS_SAVE )
@@ -13228,13 +14209,14 @@ CONS( 1979, elecdet,    0,         0, elecdet,   elecdet,   elecdet_state,   emp
 
 CONS( 1979, starwbc,    0,         0, starwbc,   starwbc,   starwbc_state,   empty_init, "Kenner", "Star Wars - Electronic Battle Command", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, starwbcp,   starwbc,   0, starwbc,   starwbc,   starwbc_state,   empty_init, "Kenner", "Star Wars - Electronic Battle Command (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, liveafb,    0,         0, liveafb,   liveafb,   liveafb_state,   empty_init, "Kenner", "Live Action Football", MACHINE_SUPPORTS_SAVE )
 
 COMP( 1979, astro,      0,         0, astro,     astro,     astro_state,     empty_init, "Kosmos", "Astro", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 CONS( 1978, elecbowl,   0,         0, elecbowl,  elecbowl,  elecbowl_state,  empty_init, "Marx", "Electronic Bowling (Marx)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_CONTROLS | MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // ***
 
-COMP( 1979, horseran,   0,         0, horseran,  horseran,  horseran_state,  empty_init, "Mattel", "Thoroughbred Horse Race Analyzer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-CONS( 1980, mdndclab,   0,         0, mdndclab,  mdndclab,  mdndclab_state,  empty_init, "Mattel", "Dungeons & Dragons - Computer Labyrinth Game", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // ***
+COMP( 1979, horseran,   0,         0, horseran,  horseran,  horseran_state,  empty_init, "Mattel Electronics", "Thoroughbred Horse Race Analyzer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+CONS( 1980, mdndclab,   0,         0, mdndclab,  mdndclab,  mdndclab_state,  empty_init, "Mattel Electronics", "Dungeons & Dragons - Computer Labyrinth Game", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // ***
 
 CONS( 1977, comp4,      0,         0, comp4,     comp4,     comp4_state,     empty_init, "Milton Bradley", "Comp IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
 CONS( 1977, bship,      0,         0, bship,     bship,     bship_state,     empty_init, "Milton Bradley", "Electronic Battleship (1977 version, model 4750A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // ***
@@ -13247,7 +14229,8 @@ CONS( 1981, mbdtower,   0,         0, mbdtower,  mbdtower,  mbdtower_state,  emp
 CONS( 1983, arcmania,   0,         0, arcmania,  arcmania,  arcmania_state,  empty_init, "Milton Bradley", "Electronic Arcade Mania (Arcade Machine)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK ) // ***
 
 CONS( 1977, cnsector,   0,         0, cnsector,  cnsector,  cnsector_state,  empty_init, "Parker Brothers", "Code Name: Sector", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // ***
-CONS( 1978, merlin,     0,         0, merlin,    merlin,    merlin_state,    empty_init, "Parker Brothers", "Merlin - The Electronic Wizard", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1978, merlin,     0,         0, merlin,    merlin,    merlin_state,    empty_init, "Parker Brothers", "Merlin - The Electronic Wizard (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1978, merlina,    merlin,    0, merlin,    merlin,    merlin_state,    empty_init, "Parker Brothers", "Merlin - The Electronic Wizard (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1978, pbmastm,    0,         0, pbmastm,   pbmastm,   pbmastm_state,   empty_init, "Parker Brothers", "Electronic Master Mind (Parker Brothers)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // ***
 CONS( 1979, stopthief,  0,         0, stopthief, stopthief, stopthief_state, empty_init, "Parker Brothers", "Stop Thief - Electronic Cops and Robbers (Electronic Crime Scanner)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 CONS( 1979, stopthiefp, stopthief, 0, stopthief, stopthief, stopthief_state, empty_init, "Parker Brothers", "Stop Thief - Electronic Cops and Robbers (Electronic Crime Scanner) (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
@@ -13262,6 +14245,7 @@ CONS( 1980, tcfball,    0,         0, tcfball,   tcfball,   tcfball_state,   emp
 CONS( 1980, tcfballa,   tcfball,   0, tcfballa,  tcfballa,  tcfballa_state,  empty_init, "Tandy Corporation", "Championship Football (model 60-2151)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, tandy12,    0,         0, tandy12,   tandy12,   tandy12_state,   empty_init, "Tandy Corporation", "Tandy-12: Computerized Arcade", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
 CONS( 1982, monkeysee,  0,         0, monkeysee, monkeysee, monkeysee_state, empty_init, "Tandy Corporation", "Monkey See (1982 version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1984, t3in1sa,    0,         0, t3in1sa,   t3in1sa,   t3in1sa_state,   empty_init, "Tandy Corporation", "3 in 1 Sports Arena", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 COMP( 1976, speechp,    0,         0, speechp,   speechp,   speechp_state,   empty_init, "Telesensory Systems, Inc.", "Speech+", MACHINE_SUPPORTS_SAVE )
 
@@ -13286,10 +14270,12 @@ CONS( 1979, timaze,     0,         0, timaze,    timaze,    timaze_state,    emp
 SYST( 1979, tithermos,  0,         0, tithermos, tithermos, tithermos_state, empty_init, "Texas Instruments", "Electronic Digital Thermostat", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 
 CONS( 1979, subwars,    0,         0, subwars,   subwars,   subwars_state,   empty_init, "Tiger Electronics", "Sub Wars (LED version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, playmaker,  0,         0, playmaker, playmaker, playmaker_state, empty_init, "Tiger Electronics", "Playmaker: Hockey, Soccer, Basketball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1980, dxfootb,    0,         0, dxfootb,   dxfootb,   dxfootb_state,   empty_init, "Tiger Electronics", "Deluxe Football with Instant Replay", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, copycat,    0,         0, copycat,   copycat,   copycat_state,   empty_init, "Tiger Electronics", "Copy Cat (model 7-520)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1989, copycatm2,  copycat,   0, copycatm2, copycatm2, copycatm2_state, empty_init, "Tiger Electronics", "Copy Cat (model 7-522)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1981, ditto,      0,         0, ditto,     ditto,     ditto_state,     empty_init, "Tiger Electronics", "Ditto", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1982, 7in1ss,     0,         0, ss7in1,    ss7in1,    ss7in1_state,    empty_init, "Tiger Electronics", "7 in 1 Sports Stadium", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1982, t7in1ss,    0,         0, t7in1ss,   t7in1ss,   t7in1ss_state,   empty_init, "Tiger Electronics", "7 in 1 Sports Stadium", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 CONS( 1979, tbreakup,   0,         0, tbreakup,  tbreakup,  tbreakup_state,  empty_init, "Tomy", "Break Up (Tomy)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, phpball,    0,         0, phpball,   phpball,   phpball_state,   empty_init, "Tomy", "Power House Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

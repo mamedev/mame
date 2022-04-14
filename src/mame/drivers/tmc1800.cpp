@@ -728,7 +728,7 @@ void tmc2000_state::machine_reset()
 
 // OSCOM Nano
 
-void nano_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nano_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -927,7 +927,7 @@ ROM_END
 
 /* Driver Initialization */
 
-void tmc1800_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void tmc1800_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

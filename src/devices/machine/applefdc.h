@@ -83,7 +83,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// other protecteds
 	virtual void iwm_modereg_w(uint8_t data);

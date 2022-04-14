@@ -80,10 +80,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(aes_jp1);
 
 	// neoCD
-	uint8_t m_system_region;
-	int32_t m_active_transfer_area;
-	int32_t m_sprite_transfer_bank;
-	int32_t m_adpcm_transfer_bank;
+	uint8_t m_system_region = 0;
+	int32_t m_active_transfer_area = 0;
+	int32_t m_sprite_transfer_bank = 0;
+	int32_t m_adpcm_transfer_bank = 0;
 	int32_t m_dma_address1;
 	int32_t m_dma_address2;
 	int32_t m_dma_value1;
@@ -109,9 +109,9 @@ public:
 	void interrupt_callback_type2(void);
 	void interrupt_callback_type3(void);
 
-	uint8_t m_transfer_write_enable;
+	uint8_t m_transfer_write_enable = 0;
 
-	bool prohibit_cdc_irq; // hack?
+	bool prohibit_cdc_irq = false; // hack?
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
-//  consolewininfo.c - Win32 debug window handling
+//  consolewininfo.cpp - Win32 debug window handling
 //
 //============================================================
 
@@ -19,6 +19,8 @@
 
 #include "strconv.h"
 #include "winutf8.h"
+
+#include "softlist_dev.h"
 
 
 consolewin_info::consolewin_info(debugger_windows_interface &debugger) :

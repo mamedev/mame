@@ -102,23 +102,23 @@ private:
 	void timer_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void ramdac_w(offs_t offset, uint8_t data);
 
-	uint32_t scr1;
-	uint32_t scr2;
-	uint32_t irq_status;
-	uint32_t irq_mask;
-	int irq_level;
+	uint32_t scr1 = 0;
+	uint32_t scr2 = 0;
+	uint32_t irq_status = 0;
+	uint32_t irq_mask = 0;
+	int irq_level = 0;
 	required_shared_ptr<uint32_t> vram;
-	uint8_t scsictrl, scsistat;
+	uint8_t scsictrl = 0, scsistat = 0;
 
-	uint32_t phy[2];
+	uint32_t phy[2]{};
 
 	attotime timer_tbase;
-	uint16_t timer_vbase;
-	uint32_t timer_data, timer_next_data;
-	uint32_t timer_ctrl;
-	emu_timer *timer_tm;
+	uint16_t timer_vbase = 0;
+	uint32_t timer_data = 0, timer_next_data = 0;
+	uint32_t timer_ctrl = 0;
+	emu_timer *timer_tm = nullptr;
 
-	uint32_t eventc_latch;
+	uint32_t eventc_latch = 0;
 
 	DECLARE_WRITE_LINE_MEMBER(scc_irq);
 	DECLARE_WRITE_LINE_MEMBER(keyboard_irq);
@@ -155,9 +155,9 @@ private:
 	void next_mem(address_map &map);
 
 	struct dma_slot {
-		uint32_t start, limit, chain_start, chain_limit, current;
-		uint8_t state;
-		bool supdate, restart, drq;
+		uint32_t start = 0, limit = 0, chain_start = 0, chain_limit = 0, current = 0;
+		uint8_t state = 0;
+		bool supdate = false, restart = false, drq = false;
 	};
 
 	enum {
@@ -184,16 +184,16 @@ private:
 	static int const scsi_clocks[4];
 
 	dma_slot dma_slots[0x20];
-	uint32_t esp;
+	uint32_t esp = 0;
 
-	int screen_sx, screen_sy, screen_skip;
-	bool screen_color;
-	bool vbl_enabled;
+	int screen_sx = 0, screen_sy = 0, screen_skip = 0;
+	bool screen_color = false;
+	bool vbl_enabled = false;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	void timer_start();
 	void timer_update();
 

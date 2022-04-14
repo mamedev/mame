@@ -527,18 +527,18 @@ void pcipc_state::pcipc(machine_config &config)
 	maincpu.set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
 	maincpu.smiact().set("pci:00.0", FUNC(i82439hx_host_device::smi_act_w));
 
-	PCI_ROOT(config, ":pci", 0);
-	I82439HX(config, ":pci:00.0", 0, "maincpu", 256*1024*1024);
+	PCI_ROOT(config, "pci", 0);
+	I82439HX(config, "pci:00.0", 0, "maincpu", 256*1024*1024);
 
-	i82371sb_isa_device &isa(I82371SB_ISA(config, ":pci:07.0", 0));
+	i82371sb_isa_device &isa(I82371SB_ISA(config, "pci:07.0", 0));
 	isa.boot_state_hook().set(FUNC(pcipc_state::boot_state_phoenix_ver40_rev6_w));
-	isa.smi().set_inputline(":maincpu", INPUT_LINE_SMI);
+	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
 
-	i82371sb_ide_device &ide(I82371SB_IDE(config, ":pci:07.1", 0));
-	ide.irq_pri().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq14_w));
-	ide.irq_sec().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_mirq0_w));
-//  MGA2064W(config, ":pci:12.0", 0);
-	VIRGE_PCI(config, ":pci:12.0", 0);   // use VIRGEDX_PCI for its VESA 2.0 BIOS
+	i82371sb_ide_device &ide(I82371SB_IDE(config, "pci:07.1", 0));
+	ide.irq_pri().set("pci:07.0", FUNC(i82371sb_isa_device::pc_irq14_w));
+	ide.irq_sec().set("pci:07.0", FUNC(i82371sb_isa_device::pc_mirq0_w));
+//  MGA2064W(config, "pci:12.0", 0);
+	VIRGE_PCI(config, "pci:12.0", 0);   // use VIRGEDX_PCI for its VESA 2.0 BIOS
 
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", superio_config);
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
@@ -567,17 +567,17 @@ void pcipc_state::pcipctx(machine_config &config)
 	pentium_device &maincpu(PENTIUM(config, "maincpu", 60000000));
 	maincpu.set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	PCI_ROOT(config, ":pci", 0);
-	I82439TX(config, ":pci:00.0", 0, ":maincpu", 256*1024*1024);
+	PCI_ROOT(config, "pci", 0);
+	I82439TX(config, "pci:00.0", 0, "maincpu", 256*1024*1024);
 
-	i82371sb_isa_device &isa(I82371SB_ISA(config, ":pci:07.0", 0));
+	i82371sb_isa_device &isa(I82371SB_ISA(config, "pci:07.0", 0));
 	isa.boot_state_hook().set(FUNC(pcipc_state::boot_state_award_w));
-//  IDE_PCI(config, ":pci:07.1", 0, 0x80867010, 0x03, 0x00000000);
-	MGA2064W(config, ":pci:12.0", 0);
+//  IDE_PCI(config, "pci:07.1", 0, 0x80867010, 0x03, 0x00000000);
+	MGA2064W(config, "pci:12.0", 0);
 }
 
 ROM_START(pcipc)
-	ROM_REGION32_LE(0x40000, ":pci:07.0", 0) /* PC bios */
+	ROM_REGION32_LE(0x40000, "pci:07.0", 0) /* PC bios */
 	ROM_SYSTEM_BIOS(0, "m55ns04", "m55ns04") // Micronics M55HI-Plus with no sound
 	ROMX_LOAD("m55-04ns.rom", 0x20000, 0x20000, CRC(0116b2b0) SHA1(19b0203decfd4396695334517488d488aec3ccde), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "m55s04", "m55s04") // with sound
@@ -591,7 +591,7 @@ ROM_START(pcipc)
 ROM_END
 
 ROM_START(pcipctx)
-	ROM_REGION32_LE(0x40000, ":pci:07.0", 0) /* PC bios */
+	ROM_REGION32_LE(0x40000, "pci:07.0", 0) /* PC bios */
 	ROM_SYSTEM_BIOS(0, "ga586t2", "Gigabyte GA-586T2") // ITE 8679 I/O
 	ROMX_LOAD("gb_ga586t2.bin",  0x20000, 0x20000, CRC(3a50a6e1) SHA1(dea859b4f1492d0d08aacd260ed1e83e00ebac08), ROM_BIOS(0))
 
@@ -602,5 +602,5 @@ ROM_END
 static INPUT_PORTS_START(pcipc)
 INPUT_PORTS_END
 
-COMP(1998, pcipc,   0, 0, pcipc,   pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (440HX)", MACHINE_NO_SOUND)
-COMP(1998, pcipctx, 0, 0, pcipctx, pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (440TX)", MACHINE_NO_SOUND)
+COMP(1998, pcipc,   0, 0, pcipc,   pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX)", MACHINE_NO_SOUND)
+COMP(1998, pcipctx, 0, 0, pcipctx, pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430TX)", MACHINE_NO_SOUND)

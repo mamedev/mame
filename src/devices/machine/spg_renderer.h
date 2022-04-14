@@ -53,7 +53,7 @@ public:
 	uint16_t get_video_reg_7f(void) { return m_video_regs_7f; }
 
 	auto space_read_callback() { return m_space_read_cb.bind(); }
-	void set_video_spaces(address_space* cpuspace, address_space* cs_space, int csbase) { m_cpuspace = cpuspace; m_cs_space = cs_space; m_csbase = csbase; }
+	void set_video_spaces(address_space* cpuspace, address_space* cs_space, uint32_t csbase) { m_cpuspace = cpuspace; m_cs_space = cs_space; m_csbase = csbase; }
 
 protected:
 
@@ -109,7 +109,7 @@ private:
 
 	address_space* m_cpuspace;
 	address_space* m_cs_space;
-	int m_csbase;
+	uint32_t m_csbase;
 	bool m_brightness_or_saturation_dirty;
 	void update_palette_lookup(void);
 	uint16_t m_linebuf[640];

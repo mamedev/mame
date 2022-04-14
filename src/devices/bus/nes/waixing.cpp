@@ -45,7 +45,6 @@ DEFINE_DEVICE_TYPE(NES_WAIXING_I,     nes_waixing_i_device,     "nes_waixing_i",
 DEFINE_DEVICE_TYPE(NES_WAIXING_J,     nes_waixing_j_device,     "nes_waixing_j",     "NES Cart Waixing Type J PCB")
 DEFINE_DEVICE_TYPE(NES_WAIXING_SH2,   nes_waixing_sh2_device,   "nes_waixing_sh2",   "NES Cart Waixing SH2 PCB")
 DEFINE_DEVICE_TYPE(NES_WAIXING_SEC,   nes_waixing_sec_device,   "nes_waixing_sec",   "NES Cart Waixing Security Chip PCB")
-DEFINE_DEVICE_TYPE(NES_WAIXING_SGZ,   nes_waixing_sgz_device,   "nes_waixing_sgz",   "NES Cart Waixing San Guo Zhi PCB")
 DEFINE_DEVICE_TYPE(NES_WAIXING_SGZLZ, nes_waixing_sgzlz_device, "nes_waixing_sgzlz", "NES Cart Waixing San Guo Zhong Lie Zhuan PCB")
 DEFINE_DEVICE_TYPE(NES_WAIXING_FFV,   nes_waixing_ffv_device,   "nes_waixing_ffv",   "NES Cart Waixing Final Fantasy V PCB")
 DEFINE_DEVICE_TYPE(NES_WAIXING_WXZS,  nes_waixing_wxzs_device,  "nes_waixing_wxzs",  "NES Cart Waixing Wai Xing Zhan Shi PCB")
@@ -131,11 +130,6 @@ nes_waixing_sh2_device::nes_waixing_sh2_device(const machine_config &mconfig, co
 
 nes_waixing_sec_device::nes_waixing_sec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_txrom_device(mconfig, NES_WAIXING_SEC, tag, owner, clock), m_reg(0)
-{
-}
-
-nes_waixing_sgz_device::nes_waixing_sgz_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_WAIXING_SGZ, tag, owner, clock), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), m_irq_enable_latch(0)
 {
 }
 
@@ -265,31 +259,6 @@ void nes_waixing_sec_device::pcb_reset()
 	mmc3_common_initialize(0xff, 0xff, 0);
 }
 
-void nes_waixing_sgz_device::device_start()
-{
-	common_start();
-	save_item(NAME(m_irq_enable));
-	save_item(NAME(m_irq_enable_latch));
-	save_item(NAME(m_irq_count));
-	save_item(NAME(m_irq_count_latch));
-	save_item(NAME(m_mmc_vrom_bank));
-}
-
-void nes_waixing_sgz_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg16_89ab(0);
-	prg16_cdef(m_prg_chunks - 1);
-	chr8(0, m_chr_source);
-
-	m_irq_enable = 0;
-	m_irq_enable_latch = 0;
-	m_irq_count = 0;
-	m_irq_count_latch = 0;
-
-	std::fill(std::begin(m_mmc_vrom_bank), std::end(m_mmc_vrom_bank), 0x00);
-}
-
 void nes_waixing_sgzlz_device::device_start()
 {
 	common_start();
@@ -319,35 +288,6 @@ void nes_waixing_ffv_device::pcb_reset()
 	chr8(0, m_chr_source);
 
 	m_reg[0] = m_reg[1] = 0;
-}
-
-void nes_waixing_wxzs_device::device_start()
-{
-	common_start();
-}
-
-void nes_waixing_wxzs_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_waixing_dq8_device::device_start()
-{
-	common_start();
-}
-
-void nes_waixing_dq8_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_waixing_wxzs2_device::device_start()
-{
-	common_start();
 }
 
 void nes_waixing_wxzs2_device::pcb_reset()
@@ -957,81 +897,6 @@ void nes_waixing_sec_device::write_l(offs_t offset, uint8_t data)
 
 /*-------------------------------------------------
 
- Waixing San Guo Zhi Board
-
- Games: San Guo Zhi
-
- This board uses Konami IRQ
-
- iNES: mapper 252
-
- In MESS: Unsupported.
-
- -------------------------------------------------*/
-
-// same as Konami IRQ
-void nes_waixing_sgz_device::hblank_irq(int scanline, int vblank, int blanked)
-{
-	/* Increment & check the IRQ scanline counter */
-	if (m_irq_enable && (++m_irq_count == 0x100))
-	{
-		m_irq_count = m_irq_count_latch;
-		m_irq_enable = m_irq_enable_latch;
-		hold_irq_line();
-	}
-}
-
-void nes_waixing_sgz_device::write_h(offs_t offset, uint8_t data)
-{
-	uint8_t helper, bank;
-	LOG_MMC(("waixing_sgz write_h, offset: %04x, data: %02x\n", offset, data));
-
-	switch (offset & 0x7000)
-	{
-		case 0x0000:
-			prg8_89(data);
-			break;
-		case 0x2000:
-			prg8_ab(data);
-			break;
-		case 0x3000:
-		case 0x4000:
-		case 0x5000:
-		case 0x6000:
-			bank = ((offset & 0x7000) - 0x3000) / 0x0800 + ((offset & 0x0008) >> 3);
-			helper = offset & 0x04;
-			if (helper)
-				m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0x0f) | ((data & 0x0f) << 4);
-			else
-				m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0xf0) | (data & 0x0f);
-			chr1_x(bank, m_mmc_vrom_bank[bank], CHRROM);
-			break;
-		case 0x7000:
-			switch (offset & 0x0c)
-			{
-				case 0x00:
-					m_irq_count_latch = (m_irq_count_latch & 0xf0) | (data & 0x0f);
-					break;
-				case 0x04:
-					m_irq_count_latch = (m_irq_count_latch & 0x0f) | ((data & 0x0f) << 4);
-					break;
-				case 0x08:
-					m_irq_enable = data & 0x02;
-					m_irq_count_latch = data & 0x01;
-					if (data & 0x02)
-						m_irq_count = m_irq_count_latch;
-					break;
-				case 0x0c:
-					m_irq_enable = m_irq_enable_latch;
-					break;
-			}
-			break;
-	}
-}
-
-
-/*-------------------------------------------------
-
  Waixing San Guo Zhong Lie Zhuan Board
 
  Games: Fan Kong Jing Ying, San Guo Zhong Lie Zhuan, Xing
@@ -1219,8 +1084,8 @@ void nes_waixing_dq8_device::write_h(offs_t offset, uint8_t data)
 
 void nes_waixing_wxzs2_device::write_h(offs_t offset, uint8_t data)
 {
-	uint8_t flip = (data & 0x80) >> 7;
-	uint8_t helper = (data & 0x7f) << 1;
+	uint8_t flip = BIT(data, 7);
+	uint8_t helper = data << 1;
 
 	LOG_MMC(("waixing_wxzs2 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -1273,13 +1138,12 @@ void nes_waixing_wxzs2_device::write_h(offs_t offset, uint8_t data)
 void nes_waixing_fs304_device::write_l(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("fs304 write_l, offset: %04x, data: %02x\n", offset, data));
-	int bank;
-	offset += 0x100;
 
+	offset += 0x100;
 	if (offset >= 0x1000)
 	{
-		m_reg[(offset >> 8) & 3] = data;
-		bank = ((m_reg[2] & 0x0f) << 4) | BIT(m_reg[1], 1) | (m_reg[0] & 0x0e);
+		m_reg[BIT(offset, 8, 2)] = data;
+		int bank = ((m_reg[2] & 0x0f) << 4) | BIT(m_reg[1], 1) | (m_reg[0] & 0x0e);
 		prg32(bank);
 		chr8(0, CHRRAM);
 	}

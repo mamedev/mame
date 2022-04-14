@@ -24,7 +24,6 @@ ToDo:
 - Schematic shows sound rom banking, but no machine has those roms, so not coded.
 - xforce: sound rom is missing
 - spcteam: Bad display - can't tell if keys are doing anything.
-- spcteam: randomly, lots of unmapped reads by the audiocpu from 0x20D8,9.
 
 ***********************************************************************************/
 
@@ -48,9 +47,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_dac(*this, "dac")
-		, m_io_keyboard(*this, "X%u", 0)
-		, m_digits(*this, "digit%u", 0U)
-		, m_io_outputs(*this, "out%u", 0U)
+		, m_io_keyboard(*this, "X%d", 0U)
+		, m_digits(*this, "digit%d", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
 	void techno(machine_config &config);
@@ -81,7 +80,7 @@ private:
 	void audio_map(address_map &map);
 	void cpu_space_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -92,16 +91,16 @@ private:
 	output_finder<48> m_digits;
 	output_finder<96> m_io_outputs;   // 64 lamps + 32 solenoids
 
-	emu_timer *m_irq_set_timer;
-	emu_timer *m_irq_advance_timer;
+	emu_timer *m_irq_set_timer = 0;
+	emu_timer *m_irq_advance_timer = 0;
 
-	bool m_digwait = 0;
-	u8 m_keyrow = 0;
-	u16 m_digit = 0;
-	u8 m_vector = 0;
-	u8 m_snd_cmd = 0;
-	bool m_snd_ack = 0;
-	u32 m_last_solenoid = 0;
+	bool m_digwait = false;
+	u8 m_keyrow = 0U;
+	u16 m_digit = 0U;
+	u8 m_vector = 0U;
+	u8 m_snd_cmd = 0U;
+	bool m_snd_ack = false;
+	u32 m_last_solenoid = 0U;
 };
 
 
@@ -315,7 +314,7 @@ static INPUT_PORTS_START( techno )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Fix top left target middle")
 INPUT_PORTS_END
 
-void techno_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void techno_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == IRQ_ADVANCE_TIMER)
 	{
@@ -435,5 +434,5 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(1987,  xforce,  0,  techno,  techno, techno_state, empty_init, ROT0, "Tecnoplay", "X Force",    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1988,  spcteam, 0,  techno,  techno, techno_state, empty_init, ROT0, "Tecnoplay", "Space Team", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987,  xforce,  0,  techno,  techno, techno_state, empty_init, ROT0, "Tecnoplay", "X Force",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1988,  spcteam, 0,  techno,  techno, techno_state, empty_init, ROT0, "Tecnoplay", "Space Team", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

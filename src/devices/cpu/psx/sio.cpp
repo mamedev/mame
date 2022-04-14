@@ -138,7 +138,7 @@ void psxsio_device::sio_timer_adjust()
 	m_timer->adjust( n_time );
 }
 
-void psxsio_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void psxsio_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
 {
 	verboselog( *this, 2, "sio tick\n" );
 

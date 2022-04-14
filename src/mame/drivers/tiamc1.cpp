@@ -552,4 +552,4 @@ GAME( 198?, sosterm,  0, tiamc1, tiamc1,  tiamc1_state, empty_init, ROT0, "Termi
 GAME( 198?, koroleva, 0, tiamc1, tiamc1,  tiamc1_state, empty_init, ROT0, "Terminal", "Snezhnaja Koroleva", MACHINE_SUPPORTS_SAVE )
 GAME( 198?, bilyard,  0, tiamc1, tiamc1,  tiamc1_state, empty_init, ROT0, "Terminal", "Billiard",           MACHINE_SUPPORTS_SAVE )
 GAME( 198?, gorodki,  0, tiamc1, gorodki, tiamc1_state, empty_init, ROT0, "Terminal", "Gorodki",            MACHINE_SUPPORTS_SAVE )
-GAME( 198?, kot,      0, kot,    kot,     tiamc1_state, empty_init, ROT0, "Terminal", "Kot-Rybolov",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 198?, kot,      0, kot,    kot,     tiamc1_state, empty_init, ROT0, "Terminal", "Kot-Rybolov (Terminal)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)

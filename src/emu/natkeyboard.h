@@ -109,7 +109,7 @@ private:
 	bool can_post_alternate(char32_t ch);
 	attotime choose_delay(char32_t ch);
 	void internal_post(char32_t ch);
-	void timer(void *ptr, int param);
+	void timer(s32 param);
 	std::string unicode_to_string(char32_t ch) const;
 	const keycode_map_entry *find_code(char32_t ch) const;
 

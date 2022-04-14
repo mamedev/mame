@@ -58,7 +58,7 @@ public:
 	uint8_t port2_r();
 	void barata(machine_config &config);
 private:
-	unsigned char row_selection;
+	unsigned char row_selection = 0;
 	void fpga_send(unsigned char cmd);
 	virtual void machine_start() override { m_digits.resolve(); m_lamps.resolve(); }
 	required_device<i8051_device> m_maincpu;

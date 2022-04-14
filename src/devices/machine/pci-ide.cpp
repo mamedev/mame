@@ -12,8 +12,7 @@ ide_pci_device::ide_pci_device(const machine_config &mconfig, const char *tag, d
 	m_irq_handler(*this),
 	m_legacy_top(0x000),
 	m_pif(0x8a),
-	m_bus_master_tag(":pci:00.0"),
-	m_bus_master_space(AS_DATA)
+	m_bus_master_space(*this, ":pci:00.0", AS_DATA)
 {
 }
 
@@ -58,11 +57,11 @@ void ide_pci_device::device_add_mconfig(machine_config &config)
 {
 	BUS_MASTER_IDE_CONTROLLER(config, m_ide).options(ata_devices, "hdd", "cdrom", true);
 	m_ide->irq_handler().set(FUNC(ide_pci_device::ide_interrupt));
-	m_ide->set_bus_master_space(m_bus_master_tag, m_bus_master_space);
+	m_ide->set_bus_master_space(m_bus_master_space);
 
 	BUS_MASTER_IDE_CONTROLLER(config, m_ide2).options(ata_devices, "hdd", "cdrom", true);
 	m_ide2->irq_handler().set(FUNC(ide_pci_device::ide_interrupt));
-	m_ide2->set_bus_master_space(m_bus_master_tag, m_bus_master_space);
+	m_ide2->set_bus_master_space(m_bus_master_space);
 }
 
 void ide_pci_device::device_start()

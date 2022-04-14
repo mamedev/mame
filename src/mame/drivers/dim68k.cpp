@@ -57,7 +57,7 @@
 #include "bus/rs232/rs232.h"
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 class dim68k_state : public driver_device
@@ -99,9 +99,9 @@ private:
 
 	void mem_map(address_map &map);
 
-	bool m_speaker_bit;
-	u8 m_video_control;
-	u8 m_fdc_irq;
+	bool m_speaker_bit = 0;
+	u8 m_video_control = 0U;
+	u8 m_fdc_irq = 0U;
 	void machine_reset() override;
 	void machine_start() override;
 

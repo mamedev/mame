@@ -12,7 +12,7 @@
 #include "bus/generic/carts.h"
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -38,12 +38,12 @@ private:
 	// internal state
 	struct
 	{
-		uint32_t  count;
-		uint16_t  period;
-		uint8_t   val;
+		uint32_t  count = 0;
+		uint16_t  period = 0;
+		uint8_t   val = 0;
 	}       m_voice[4];
 
-	sound_stream    *m_sh_channel;
+	sound_stream    *m_sh_channel = nullptr;
 };
 
 DEFINE_DEVICE_TYPE(PV1000, pv1000_sound_device, "pv1000_sound", "NEC D65010G031")
@@ -150,17 +150,17 @@ private:
 	void io_w(offs_t offset, uint8_t data);
 	uint8_t io_r(offs_t offset);
 	void gfxram_w(offs_t offset, uint8_t data);
-	uint8_t   m_io_regs[8];
-	uint8_t   m_fd_data;
+	uint8_t   m_io_regs[8]{};
+	uint8_t   m_fd_data = 0;
 
-	emu_timer       *m_irq_on_timer;
-	emu_timer       *m_irq_off_timer;
-	uint8_t m_pcg_bank;
-	uint8_t m_force_pattern;
-	uint8_t m_fd_buffer_flag;
-	uint8_t m_border_col;
+	emu_timer       *m_irq_on_timer = nullptr;
+	emu_timer       *m_irq_off_timer = nullptr;
+	uint8_t m_pcg_bank = 0;
+	uint8_t m_force_pattern = 0;
+	uint8_t m_fd_buffer_flag = 0;
+	uint8_t m_border_col = 0;
 
-	uint8_t * m_gfxram;
+	uint8_t * m_gfxram = nullptr;
 	void pv1000_postload();
 
 	required_device<cpu_device> m_maincpu;

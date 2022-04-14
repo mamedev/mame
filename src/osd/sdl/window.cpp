@@ -29,6 +29,7 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "render.h"
+#include "screen.h"
 #include "ui/uimain.h"
 
 // OSD headers
@@ -91,25 +92,55 @@ bool sdl_osd_interface::window_init()
 {
 	osd_printf_verbose("Enter sdlwindow_init\n");
 
-	// initialize the drawers
-
-	switch (video_config.mode)
-	{
-		case VIDEO_MODE_BGFX:
-			renderer_bgfx::init(machine());
-			break;
-#if (USE_OPENGL)
-		case VIDEO_MODE_OPENGL:
-			renderer_ogl::init(machine());
-			break;
+	// initialize the renderer
+	const int fallbacks[VIDEO_MODE_COUNT] = {
+		-1,                     // NONE -> no fallback
+		-1,                     // No GDI on Linux
+#if defined(USE_OPENGL) && USE_OPENGL
+		VIDEO_MODE_OPENGL,      // BGFX -> OpenGL
+		-1,                     // OpenGL -> no fallback
+#else
+		VIDEO_MODE_SDL2ACCEL,   // BGFX -> SDL2Accel
 #endif
-		case VIDEO_MODE_SDL2ACCEL:
-			renderer_sdl2::init(machine());
+		-1,                     // SDL2ACCEL -> no fallback
+		-1,                     // No D3D on Linux
+		-1,                     // SOFT -> no fallback
+	};
+
+	int current_mode = video_config.mode;
+	while (current_mode != VIDEO_MODE_NONE)
+	{
+		bool error = false;
+		switch(current_mode)
+		{
+			case VIDEO_MODE_BGFX:
+				error = renderer_bgfx::init(machine());
+				break;
+#if defined(USE_OPENGL) && USE_OPENGL
+			case VIDEO_MODE_OPENGL:
+				renderer_ogl::init(machine());
+				break;
+#endif
+			case VIDEO_MODE_SDL2ACCEL:
+				renderer_sdl2::init(machine());
+				break;
+			case VIDEO_MODE_SOFT:
+				renderer_sdl1::init(machine());
+				break;
+			default:
+				fatalerror("Unknown video mode.");
+				break;
+		}
+		if (error)
+		{
+			current_mode = fallbacks[current_mode];
+		}
+		else
+		{
 			break;
-		case VIDEO_MODE_SOFT:
-			renderer_sdl1::init(machine());
-			break;
+		}
 	}
+	video_config.mode = current_mode;
 
 	/* We may want to set a number of the hints SDL2 provides.
 	 * The code below will document which hints were set.
@@ -966,6 +997,10 @@ osd_rect sdl_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 	// compute the visible area based on the proposed rectangle
 	target()->compute_visible_area(propwidth, propheight, pixel_aspect, target()->orientation(), viswidth, visheight);
 
+	// clamp visable area to the proposed rectangle
+	viswidth = std::min(viswidth, propwidth);
+	visheight = std::min(visheight, propheight);
+
 	// compute the adjustments we need to make
 	adjwidth = (viswidth + extrawidth) - rect.width();
 	adjheight = (visheight + extraheight) - rect.height();
@@ -1013,6 +1048,12 @@ osd_dim sdl_window_info::get_min_bounds(int constrain)
 
 	// get the minimum target size
 	target()->compute_minimum_size(minwidth, minheight);
+
+	// check if visible area is bigger
+	int32_t viswidth, visheight;
+	target()->compute_visible_area(minwidth, minheight, monitor()->aspect(), target()->orientation(), viswidth, visheight);
+	minwidth = std::max(viswidth, minwidth);
+	minheight = std::max(visheight, minheight);
 
 	// expand to our minimum dimensions
 	if (minwidth < MIN_WINDOW_DIM)

@@ -155,7 +155,7 @@ ROM sockets:  UA3   2K or 4K character
 #include "emu.h"
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"

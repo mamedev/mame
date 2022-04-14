@@ -84,7 +84,7 @@ private:
 	TIMER_CALLBACK_MEMBER(quarter_callback);
 
 	void flyball_map(address_map &map);
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -104,20 +104,20 @@ private:
 	output_finder<> m_lamp;
 
 	/* video-related */
-	tilemap_t  *m_tmap;
-	uint8_t    m_pitcher_vert;
-	uint8_t    m_pitcher_horz;
-	uint8_t    m_pitcher_pic;
-	uint8_t    m_ball_vert;
-	uint8_t    m_ball_horz;
+	tilemap_t  *m_tmap = nullptr;
+	uint8_t    m_pitcher_vert = 0;
+	uint8_t    m_pitcher_horz = 0;
+	uint8_t    m_pitcher_pic = 0;
+	uint8_t    m_ball_vert = 0;
+	uint8_t    m_ball_horz = 0;
 
 	/* misc */
-	uint8_t    m_potmask;
-	uint8_t    m_potsense;
+	uint8_t    m_potmask = 0;
+	uint8_t    m_potsense = 0;
 
-	emu_timer *m_pot_assert_timer[64];
-	emu_timer *m_pot_clear_timer;
-	emu_timer *m_quarter_timer;
+	emu_timer *m_pot_assert_timer[64]{};
+	emu_timer *m_pot_clear_timer = nullptr;
+	emu_timer *m_quarter_timer = nullptr;
 };
 
 
@@ -181,18 +181,18 @@ uint32_t flyball_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-void flyball_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void flyball_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_POT_ASSERT:
-		joystick_callback(ptr, param);
+		joystick_callback(param);
 		break;
 	case TIMER_POT_CLEAR:
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 		break;
 	case TIMER_QUARTER:
-		quarter_callback(ptr, param);
+		quarter_callback(param);
 		break;
 
 	default:

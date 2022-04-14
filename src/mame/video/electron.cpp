@@ -4,10 +4,6 @@
 
     Acorn Electron driver
 
-    MESS Driver By:
-
-    Wilbert Pol
-
 ******************************************************************************/
 
 #include "emu.h"

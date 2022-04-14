@@ -104,7 +104,7 @@ void rtc4543_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void rtc4543_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void rtc4543_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	advance_seconds();
 }

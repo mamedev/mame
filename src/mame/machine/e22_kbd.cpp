@@ -248,10 +248,15 @@ void e22_kbd_hle_device::received_byte(uint8_t byte)
 	switch (byte)
 	{
 		case 0x02: break; // keyclick on
-		case 0x06: transmit_byte(0x01); break; // can't be 0x00
-		case 0x07: transmit_byte(0x02); break; // can't be 0x00
+		case 0x06: transmit_byte(0x01); break; // keyboard model, can't be 0
+		case 0x07: transmit_byte(0x02); break; // read 3 times, can't be 0 in total
 		case 0x09: break; // bell?
 		case 0x12: break; // keyclick off
+		case 0xf8: logerror("Key repeat disabled\n"); break;
+		case 0xf9: logerror("Key repeat 6 cps\n"); break;
+		case 0xfa: logerror("Key repeat 12 cps\n"); break;
+		case 0xfb: logerror("Key repeat 24 cps\n"); break;
+		case 0xfc: logerror("Key repeat 30 cps\n"); break;
 	}
 }
 

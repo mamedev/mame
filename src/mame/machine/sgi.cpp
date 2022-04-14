@@ -721,7 +721,7 @@ void sgi_mc_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 	}
 }
 
-void sgi_mc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void sgi_mc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_RPSS)
 	{

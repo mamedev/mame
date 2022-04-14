@@ -54,7 +54,7 @@ device_adam_expansion_slot_card_interface::device_adam_expansion_slot_card_inter
 adam_expansion_slot_device::adam_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ADAM_EXPANSION_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_adam_expansion_slot_card_interface>(mconfig, *this),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	m_write_irq(*this), m_card(nullptr)
 {
 }

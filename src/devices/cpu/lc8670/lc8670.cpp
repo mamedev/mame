@@ -16,7 +16,6 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "lc8670.h"
 #include "lc8670dsm.h"
 
@@ -332,7 +331,7 @@ void lc8670_cpu_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void lc8670_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void lc8670_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{

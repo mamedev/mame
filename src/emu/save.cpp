@@ -208,7 +208,7 @@ void save_manager::save_memory(device_t *device, const char *module, const char 
 //  state
 //-------------------------------------------------
 
-save_error save_manager::check_file(running_machine &machine, emu_file &file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...))
+save_error save_manager::check_file(running_machine &machine, util::core_file &file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...))
 {
 	// if we want to validate the signature, compute it
 	u32 sig;
@@ -217,7 +217,8 @@ save_error save_manager::check_file(running_machine &machine, emu_file &file, co
 	// seek to the beginning and read the header
 	file.seek(0, SEEK_SET);
 	u8 header[HEADER_SIZE];
-	if (file.read(header, sizeof(header)) != sizeof(header))
+	size_t actual(0);
+	if (file.read(header, sizeof(header), actual) || actual != sizeof(header))
 	{
 		if (errormsg != nullptr)
 			(*errormsg)("Could not read %s save file header",emulator_info::get_appname());
@@ -257,7 +258,7 @@ void save_manager::dispatch_presave()
 //  write_file - writes the data to a file
 //-------------------------------------------------
 
-save_error save_manager::write_file(emu_file &file)
+save_error save_manager::write_file(util::core_file &file)
 {
 	util::write_stream::ptr writer;
 	save_error err = do_write(
@@ -290,7 +291,7 @@ save_error save_manager::write_file(emu_file &file)
 //  read_file - read the data from a file
 //-------------------------------------------------
 
-save_error save_manager::read_file(emu_file &file)
+save_error save_manager::read_file(util::core_file &file)
 {
 	util::read_stream::ptr reader;
 	return do_read(

@@ -98,16 +98,16 @@ private:
 	required_memory_bank m_bank3;
 
 	// memory state
-	int m_mode;
-	int m_bank;
+	int m_mode = 0;
+	int m_bank = 0;
 
 	// floppy state
-	bool m_fdc_irq;
-	bool m_fdc_drq;
-	int m_fdc_dden;
+	bool m_fdc_irq = false;
+	bool m_fdc_drq = false;
+	int m_fdc_dden = 0;
 
-	int m_centronics_busy;
-	int m_centronics_select;
+	int m_centronics_busy = 0;
+	int m_centronics_select = 0;
 };
 
 #endif // MAME_INCLUDES_XOR100_H

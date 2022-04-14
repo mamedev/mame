@@ -31,20 +31,20 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	required_device<m6502_device> m_cpu;
 	required_device<address_map_bank_device> m_bank;
 
-	uint8_t m_intmask[2];
+	uint8_t m_intmask[2]{};
 
-	int m_custom_irq;
-	int m_custom_nmi;
-	uint16_t m_custom_irq_vector;
-	uint16_t m_custom_nmi_vector;
+	int m_custom_irq = 0;
+	int m_custom_nmi = 0;
+	uint16_t m_custom_irq_vector = 0;
+	uint16_t m_custom_nmi_vector = 0;
 
-	uint8_t m_rombank_hi;
-	uint8_t m_rombank_lo;
+	uint8_t m_rombank_hi = 0;
+	uint8_t m_rombank_lo = 0;
 
 	bool m_is_pal; // this is usually a jumper connected to the chip that the software can read (clocks also differ on PAL units)
 	bool m_allow_timer_irq;
@@ -60,9 +60,9 @@ private:
 	uint8_t elan_eu3a05_pal_ntsc_r();
 	void elan_eu3a05_500b_unk_w(uint8_t data);
 
-	uint8_t radica_5009_unk_r() { return machine().rand(); };
+	uint8_t radica_5009_unk_r() { return machine().rand(); }
 
-	emu_timer *m_unk_timer;
+	emu_timer *m_unk_timer = nullptr;
 	static const device_timer_id TIMER_UNK = 0;
 	int m_whichtimer;
 

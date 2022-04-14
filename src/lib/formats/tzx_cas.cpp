@@ -570,7 +570,7 @@ static int tzx_cas_do_work( int16_t **buffer )
 			if (pause_time == 0)
 			{
 				/* pause = 0 is used to let an emulator automagically stop the tape
-				   in MESS we do not do that, so we insert a 5 second pause. */
+				   in MAME we do not do that, so we insert a 5 second pause. */
 				pause_time = 5000;
 			}
 			size += tzx_cas_handle_block(buffer, cur_block, pause_time, 0, 0, 0, 0, 0, 0, 0, 0);

@@ -35,7 +35,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void execute_run() override;
 
 	int m_icount;
@@ -122,7 +122,7 @@ private:
 	void tc_return();
 	void tc_int();
 	void illegal();
-	const char* disassemble_scripts();
+	std::string disassemble_scripts();
 
 
 	// SCSI registers

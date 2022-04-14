@@ -30,7 +30,7 @@ public:
 
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
-	DECLARE_INPUT_CHANGED_MEMBER(nmi_button) { m_slot->nmi_w(newval ? ASSERT_LINE : CLEAR_LINE); };
+	DECLARE_INPUT_CHANGED_MEMBER(nmi_button) { m_slot->nmi_w(newval ? ASSERT_LINE : CLEAR_LINE); }
 
 protected:
 	// device-level overrides
@@ -45,8 +45,8 @@ protected:
 
 	void fetch(offs_t offset);
 
-	virtual void pre_opcode_fetch(offs_t offset) override { fetch(offset); };
-	virtual void pre_data_fetch(offs_t offset) override { fetch(offset); };
+	virtual void pre_opcode_fetch(offs_t offset) override { fetch(offset); }
+	virtual void pre_data_fetch(offs_t offset) override { fetch(offset); }
 	virtual uint8_t mreq_r(offs_t offset) override;
 	virtual uint8_t iorq_r(offs_t offset) override;
 	virtual void iorq_w(offs_t offset, uint8_t data) override;

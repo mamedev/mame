@@ -98,7 +98,7 @@ private:
 	static constexpr int TT5665_VOICES = 4;
 
 	tt5665_voice    m_voice[TT5665_VOICES * 2]; // separated voice for left and right output
-	s32             m_command[2];               // seperated command for left and right output
+	s32             m_command[2];               // separated command for left and right output
 	sound_stream*   m_stream;
 	s32             m_daol_output;
 	int             m_daol_timing;

@@ -29,6 +29,7 @@ menu_textbox::menu_textbox(mame_ui_manager &mui, render_container &container)
 	, m_layout_width(-1.0f)
 	, m_desired_width(-1.0f)
 	, m_desired_lines(-1)
+	, m_window_lines(0)
 	, m_top_line(0)
 {
 }
@@ -141,7 +142,7 @@ void menu_textbox::draw(uint32_t flags)
 
 	// get width required to draw the sole menu item
 	menu_item const &pitem = item(0);
-	std::string_view const itemtext = pitem.text;
+	std::string_view const itemtext = pitem.text();
 	float const itemwidth = gutter_width + ui().get_string_width(itemtext) + gutter_width;
 	float const draw_width = std::min(maximum_width, std::max(itemwidth, m_desired_width));
 

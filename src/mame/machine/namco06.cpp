@@ -106,23 +106,16 @@ TIMER_CALLBACK_MEMBER( namco_06xx_device::nmi_generate )
 	//
 	// During reads, the first NMI pulse is supressed to give the chip a
 	// cycle to write.
-	//
-	// If the control register is written while CS is asserted, RW won't be
-	// changed until the next rising edge.
 
-	if (m_rw_change && m_next_timer_state)
+	if (m_next_timer_state)
 	{
-		if (!m_rw_stretch)
-		{
-			m_rw[0](0, BIT(m_control, 4));
-			m_rw[1](0, BIT(m_control, 4));
-			m_rw[2](0, BIT(m_control, 4));
-			m_rw[3](0, BIT(m_control, 4));
-			m_rw_change = false;
-		}
+		m_rw[0](0, BIT(m_control, 4));
+		m_rw[1](0, BIT(m_control, 4));
+		m_rw[2](0, BIT(m_control, 4));
+		m_rw[3](0, BIT(m_control, 4));
 	}
 
-	if (m_next_timer_state && !m_nmi_stretch )
+	if (m_next_timer_state && !m_read_stretch)
 	{
 		set_nmi(ASSERT_LINE);
 	}
@@ -130,6 +123,7 @@ TIMER_CALLBACK_MEMBER( namco_06xx_device::nmi_generate )
 	{
 		set_nmi(CLEAR_LINE);
 	}
+	m_read_stretch = false;
 
 	m_chipsel[0](0, BIT(m_control, 0) && m_next_timer_state);
 	m_chipsel[1](0, BIT(m_control, 1) && m_next_timer_state);
@@ -137,8 +131,6 @@ TIMER_CALLBACK_MEMBER( namco_06xx_device::nmi_generate )
 	m_chipsel[3](0, BIT(m_control, 3) && m_next_timer_state);
 
 	m_next_timer_state = !m_next_timer_state;
-	m_nmi_stretch = false;
-	m_rw_stretch = false;
 }
 
 uint8_t namco_06xx_device::data_r(offs_t offset)
@@ -162,15 +154,20 @@ uint8_t namco_06xx_device::data_r(offs_t offset)
 
 void namco_06xx_device::data_w(offs_t offset, uint8_t data)
 {
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_06xx_device::write_sync),this), data);
+}
+
+TIMER_CALLBACK_MEMBER( namco_06xx_device::write_sync )
+{
 	if (BIT(m_control, 4))
 	{
 		logerror("%s: 06XX '%s' write in read mode %02x\n",machine().describe_context(),tag(),m_control);
 		return;
 	}
-	if (BIT(m_control, 0)) m_write[0](0, data);
-	if (BIT(m_control, 1)) m_write[1](0, data);
-	if (BIT(m_control, 2)) m_write[2](0, data);
-	if (BIT(m_control, 3)) m_write[3](0, data);
+	if (BIT(m_control, 0)) m_write[0](0, param);
+	if (BIT(m_control, 1)) m_write[1](0, param);
+	if (BIT(m_control, 2)) m_write[2](0, param);
+	if (BIT(m_control, 3)) m_write[3](0, param);
 }
 
 
@@ -181,34 +178,56 @@ uint8_t namco_06xx_device::ctrl_r()
 
 void namco_06xx_device::ctrl_w(uint8_t data)
 {
-	m_control = data;
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_06xx_device::ctrl_w_sync),this), data);
+}
+
+TIMER_CALLBACK_MEMBER( namco_06xx_device::ctrl_w_sync )
+{
+	m_control = param;
 
 	// The upper 3 control bits are the clock divider.
 	if ((m_control & 0xe0) == 0)
 	{
 		m_nmi_timer->adjust(attotime::never);
+		m_next_timer_state = true;
 		set_nmi(CLEAR_LINE);
 		m_chipsel[0](0, CLEAR_LINE);
 		m_chipsel[1](0, CLEAR_LINE);
 		m_chipsel[2](0, CLEAR_LINE);
 		m_chipsel[3](0, CLEAR_LINE);
-		// Setting this to true makes the next RW change not stretch.
-		m_next_timer_state = true;
+		// RW is left as-is
 	}
 	else
 	{
-		m_rw_stretch = !m_next_timer_state;
-		m_rw_change = true;
-		m_next_timer_state = true;
-		m_nmi_stretch = BIT(m_control, 4);
-		// NMI is cleared immediately if its to be stretched.
-		if (m_nmi_stretch) set_nmi(CLEAR_LINE);
+		// NMI is cleared immediately if this is a read
+		// It will be supressed the next clock cycle.
+		if (BIT(m_control, 4))
+		{
+			set_nmi(CLEAR_LINE);
+			m_read_stretch = true;
+		} else {
+			m_read_stretch = false;
+		}
+
 
 		uint8_t num_shifts = (m_control & 0xe0) >> 5;
 		uint8_t divisor = 1 << num_shifts;
-		// The next change should happen on the next clock falling edge.
-		// Xevious' race causes this to bootloopsif it isn't 0.
-		m_nmi_timer->adjust(attotime::zero, 0, attotime::from_hz(clock() / divisor) / 2);
+		attotime period = attotime::from_hz(clock() / divisor) / 2;
+		// This delay should be the next falling clock.
+		// That's complicated to get, as it's derived from the master
+		// clock. The CPU uses this same clock, so writes will come at
+		// a specific pace.
+		// Instead, just approximate a quarter cycle.
+		// Xevious is very sensitive to this. It will bootloop if it
+		// isn't correct.
+		attotime delay = attotime::from_hz(clock()) / 4; // average of one clock
+		if (!m_next_timer_state)
+		{
+			// NMI is asserted, wait one additional clock to start
+			m_nmi_timer->adjust(delay + attotime::from_hz(clock() / divisor), 0, period);
+		} else {
+			m_nmi_timer->adjust(delay, 0, period);
+		}
 	}
 }
 
@@ -228,9 +247,7 @@ namco_06xx_device::namco_06xx_device(const machine_config &mconfig, const char *
 	: device_t(mconfig, NAMCO_06XX, tag, owner, clock)
 	, m_control(0)
 	, m_next_timer_state(false)
-	, m_nmi_stretch(false)
-	, m_rw_stretch(false)
-	, m_rw_change(false)
+	, m_read_stretch(false)
 	, m_nmicpu(*this, finder_base::DUMMY_TAG)
 	, m_chipsel(*this)
 	, m_rw(*this)
@@ -255,9 +272,7 @@ void namco_06xx_device::device_start()
 
 	save_item(NAME(m_control));
 	save_item(NAME(m_next_timer_state));
-	save_item(NAME(m_nmi_stretch));
-	save_item(NAME(m_rw_stretch));
-	save_item(NAME(m_rw_change));
+	save_item(NAME(m_read_stretch));
 }
 
 //-------------------------------------------------

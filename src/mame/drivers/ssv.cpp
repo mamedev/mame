@@ -398,9 +398,7 @@ void ssv_state::dsp_w(offs_t offset, uint16_t data)
 
 ***************************************************************************/
 
-#ifdef UNUSED_FUNCTION
-uint16_t ssv_state::fake_r(offs_t offset){   return ssv_scroll[offset];  }
-#endif
+uint16_t ssv_state::fake_r(offs_t offset) { return m_scroll[offset]; }
 
 void ssv_state::ssv_map(address_map &map, u32 rom)
 {
@@ -553,7 +551,7 @@ void ssv_state::hypreac2_map(address_map &map)
 
 
 /***************************************************************************
-                                Jan Jan Simasyo
+                                Jan Jan Shimasho
 ***************************************************************************/
 
 

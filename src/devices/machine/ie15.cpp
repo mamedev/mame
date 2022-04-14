@@ -231,7 +231,7 @@ uint8_t ie15_device::kb_s_lin_r()
 
 /* serial port */
 
-void ie15_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ie15_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -677,7 +677,7 @@ GFXDECODE_END
 void ie15_device::ie15core(machine_config &config)
 {
 	/* Basic machine hardware */
-	IE15_CPU(config, m_maincpu, XTAL(30'800'000)/10);
+	IE15_CPU(config, m_maincpu, XTAL(30'800'000) / 10);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ie15_device::ie15_mem);
 	m_maincpu->set_addrmap(AS_IO, &ie15_device::ie15_io);
 

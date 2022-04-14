@@ -25,6 +25,7 @@ public:
 	auto centronics_fault() { return m_write_centronics_fault.bind(); }
 	auto centronics_select() { return m_write_centronics_select.bind(); }
 	auto cpu_reset() { return m_write_cpu_reset.bind(); }
+	auto ready_led() { return m_write_ready_led.bind(); }
 
 	void write(offs_t offset, uint8_t data);
 	uint8_t read(offs_t offset);
@@ -41,7 +42,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( centronics_input_data6 ) { if (state) m_centronics_data |= 0x40; else m_centronics_data &= ~0x40; }
 	DECLARE_WRITE_LINE_MEMBER( centronics_input_data7 ) { if (state) m_centronics_data |= 0x80; else m_centronics_data &= ~0x80; }
 
-		int ready_led() { return !m_centronics_busy; }
+	int get_ready_led() { return !m_centronics_busy; }
 
 protected:
 	// device-level overrides
@@ -60,6 +61,7 @@ private:
 	devcb_write_line m_write_centronics_fault;
 	devcb_write_line m_write_centronics_select;
 	devcb_write_line m_write_cpu_reset;
+	devcb_write_line m_write_ready_led;
 
 	void update_printhead(int pos, uint8_t data);
 	void update_pf_stepper(uint8_t data);

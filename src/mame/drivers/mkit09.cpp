@@ -66,8 +66,8 @@ public:
 protected:
 	u8 pa_r();
 	u8 pb_r();
-	u8 m_digit;
-	u8 m_seg;
+	u8 m_digit = 0U;
+	u8 m_seg = 0U;
 	void machine_reset() override;
 	void machine_start() override;
 	required_device<pia6821_device> m_pia;

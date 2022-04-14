@@ -54,7 +54,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_rtc_interface overrides
 	virtual bool rtc_feature_leap_year() const override { return true; }
@@ -63,8 +63,8 @@ protected:
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
-	virtual void nvram_read(emu_file &file) override;
-	virtual void nvram_write(emu_file &file) override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 	virtual bool nvram_can_write() override { return m_battery_backed; }
 
 private:

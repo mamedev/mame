@@ -127,17 +127,17 @@ private:
 	optional_ioport_array<2> m_io_pad;
 	optional_ioport m_eepromout;
 
-	s8 m_old_p1_paddle_h; /* For Ghox */
-	s8 m_old_p2_paddle_h;
-	u8 m_sound_reset_bit; /* 0x20 for dogyuun/batsugun, 0x10 for vfive, 0x08 for fixeight */
-	u8 m_sndirq_line;        /* IRQ4 for batrider, IRQ2 for bbakraid */
-	u8 m_z80_busreq;
-	u16 m_gfxrom_bank[8];       /* Batrider object bank */
+	s8 m_old_p1_paddle_h = 0; /* For Ghox */
+	s8 m_old_p2_paddle_h = 0;
+	u8 m_sound_reset_bit = 0; /* 0x20 for dogyuun/batsugun, 0x10 for vfive, 0x08 for fixeight */
+	u8 m_sndirq_line = 0;        /* IRQ4 for batrider, IRQ2 for bbakraid */
+	u8 m_z80_busreq = 0;
+	u16 m_gfxrom_bank[8]{};       /* Batrider object bank */
 
 	bitmap_ind8 m_custom_priority_bitmap;
 	bitmap_ind16 m_secondary_render_bitmap;
 
-	tilemap_t *m_tx_tilemap;    /* Tilemap for extra-text-layer */
+	tilemap_t *m_tx_tilemap = nullptr;    /* Tilemap for extra-text-layer */
 	u16 video_count_r();
 	void coin_w(u8 data);
 	void coin_sound_reset_w(u8 data);

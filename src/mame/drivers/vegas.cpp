@@ -272,6 +272,7 @@
 **************************************************************************/
 
 #include "emu.h"
+
 #include "audio/dcs.h"
 
 #include "bus/ata/idehd.h"
@@ -279,14 +280,16 @@
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/mips/mips3.h"
 #include "machine/idectrl.h"
+#include "machine/input_merger.h"
 #include "machine/ins8250.h"
 #include "machine/midwayic.h"
+#include "machine/pci-ide.h"
+#include "machine/pci.h"
 #include "machine/smc91c9x.h"
 #include "machine/timekpr.h"
-#include "machine/pci.h"
 #include "machine/vrc5074.h"
-#include "machine/pci-ide.h"
 #include "video/voodoo_pci.h"
+
 #include "screen.h"
 
 #include "sf2049.lh"
@@ -309,15 +312,15 @@ namespace {
  *
  *************************************/
 
-#define PCI_ID_NILE     ":pci:00.0"
-#define PCI_ID_VIDEO    ":pci:03.0"
-#define PCI_ID_IDE      ":pci:05.0"
+#define PCI_ID_NILE     "pci:00.0"
+#define PCI_ID_VIDEO    "pci:03.0"
+#define PCI_ID_IDE      "pci:05.0"
 
 class vegas_state : public driver_device
 {
 public:
-	vegas_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	vegas_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_nile(*this, PCI_ID_NILE),
 		m_timekeeper(*this, "timekeeper") ,
@@ -334,6 +337,7 @@ public:
 		m_io_gearshift(*this, "GEAR"),
 		m_io_system(*this, "SYSTEM"),
 		m_io_dips(*this, "DIPS"),
+		m_system_led(*this, "system_led"),
 		m_wheel_driver(*this, "wheel"),
 		m_lamps(*this, "lamp%u", 0U),
 		m_a2d_shift(0)
@@ -405,6 +409,7 @@ private:
 	optional_ioport m_io_gearshift;
 	optional_ioport m_io_system;
 	optional_ioport m_io_dips;
+	output_finder<> m_system_led;
 	output_finder<1> m_wheel_driver;
 	output_finder<16> m_lamps;
 
@@ -467,6 +472,8 @@ private:
 	void vegas_cs6_map(address_map &map);
 	void vegas_cs7_map(address_map &map);
 	void vegas_cs8_map(address_map &map);
+
+	static void hdd_config(device_t* device);
 };
 
 /*************************************
@@ -478,8 +485,12 @@ private:
 void vegas_state::machine_start()
 {
 	/* set the fastest DRC options, but strict verification */
-	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
+	/* need to check the current options since some drivers add options in their init */
+	uint32_t new_options = m_maincpu->mips3drc_get_options();
+	new_options |= MIPS3DRC_FASTEST_OPTIONS | MIPS3DRC_STRICT_VERIFY;
+	m_maincpu->mips3drc_set_options(new_options);
 
+	m_system_led.resolve();
 	m_wheel_driver.resolve();
 	m_lamps.resolve();
 
@@ -536,12 +547,6 @@ void vegas_state::machine_reset()
 	m_wheel_offset = 0;
 	m_wheel_calibrated = false;
 
-	// Set the disk dma transfer speed
-	auto *hdd = subdevice<ide_hdd_device>(PCI_ID_IDE":ide:0:hdd");
-	hdd->set_dma_transfer_time(attotime::from_usec(15));
-	// Allow ultra dma
-	//uint16_t *identify_device = hdd->identify_device_buffer();
-	//identify_device[88] = 0x7f;
 }
 
 /*************************************
@@ -873,34 +878,35 @@ void vegas_state::cpu_io_w(offs_t offset, uint8_t data)
 	switch (offset) {
 	case 0:
 	{
-		char digit = 'U';
-		switch (data & 0xff) {
-		case 0xc0: digit = '0'; break;
-		case 0xf9: digit = '1'; break;
-		case 0xa4: digit = '2'; break;
-		case 0xb0: digit = '3'; break;
-		case 0x99: digit = '4'; break;
-		case 0x92: digit = '5'; break;
-		case 0x82: digit = '6'; break;
-		case 0xf8: digit = '7'; break;
-		case 0x80: digit = '8'; break;
-		case 0x90: digit = '9'; break;
-		case 0x88: digit = 'A'; break;
-		case 0x83: digit = 'B'; break;
-		case 0xc6: digit = 'C'; break;
-		case 0xa7: digit = 'c'; break;
-		case 0xa1: digit = 'D'; break;
-		case 0x86: digit = 'E'; break;
-		case 0x87: digit = 'F'; break;
-		case 0x7f: digit = '.'; break;
-		case 0xf7: digit = '_'; break;
-		case 0xbf: digit = '|'; break;
-		case 0xfe: digit = '-'; break;
-		case 0xff: digit = 'Z'; break;
-		}
+		m_system_led = ~data & 0xff;
 		if (LOG_SIO) {
-			popmessage("System LED: %C", digit);
-			//logerror("%s: cpu_io_w System LED offset %X = %02X '%c'\n", machine().describe_context(), offset, data, digit);
+			char digit = 'U';
+			switch (data & 0xff) {
+			case 0xc0: digit = '0'; break;
+			case 0xf9: digit = '1'; break;
+			case 0xa4: digit = '2'; break;
+			case 0xb0: digit = '3'; break;
+			case 0x99: digit = '4'; break;
+			case 0x92: digit = '5'; break;
+			case 0x82: digit = '6'; break;
+			case 0xf8: digit = '7'; break;
+			case 0x80: digit = '8'; break;
+			case 0x90: digit = '9'; break;
+			case 0x88: digit = 'A'; break;
+			case 0x83: digit = 'B'; break;
+			case 0xc6: digit = 'C'; break;
+			case 0xa7: digit = 'c'; break;
+			case 0xa1: digit = 'D'; break;
+			case 0x86: digit = 'E'; break;
+			case 0x87: digit = 'F'; break;
+			case 0x7f: digit = '.'; break;
+			case 0xf7: digit = '_'; break;
+			case 0xbf: digit = '|'; break;
+			case 0xfe: digit = '-'; break;
+			case 0xff: digit = 'Z'; break;
+			}
+			//popmessage("System LED: %C", digit);
+			logerror("%s: cpu_io_w System LED offset %X = %02X '%c'\n", machine().describe_context(), offset, data, digit);
 		}
 	}
 		break;
@@ -1905,7 +1911,7 @@ void vegas_state::vegascore(machine_config &config)
 	m_maincpu->set_system_clock(vegas_state::SYSTEM_CLOCK);
 
 	// PCI Bus Devices
-	PCI_ROOT(config, ":pci", 0);
+	PCI_ROOT(config, "pci", 0);
 
 	VRC5074(config, m_nile, 100000000, m_maincpu);
 	m_nile->set_sdram_size(0, 0x00800000);
@@ -1919,6 +1925,7 @@ void vegas_state::vegascore(machine_config &config)
 	ide_pci_device &ide(IDE_PCI(config, PCI_ID_IDE, 0, 0x10950646, 0x05, 0x0));
 	ide.irq_handler().set(PCI_ID_NILE, FUNC(vrc5074_device::pci_intr_d));
 	//ide.set_pif(0x8f);
+	ide.subdevice<bus_master_ide_controller_device>("ide")->slot(0).set_option_machine_config("hdd", hdd_config);
 
 	// video hardware
 	voodoo_2_pci_device &voodoo(VOODOO_2_PCI(config, PCI_ID_VIDEO, 0, m_maincpu, "screen"));
@@ -1941,6 +1948,16 @@ void vegas_state::vegascore(machine_config &config)
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640 - 1, 0, 480 - 1);
 	screen.set_screen_update(PCI_ID_VIDEO, FUNC(voodoo_pci_device::screen_update));
+}
+
+void vegas_state::hdd_config(device_t* device)
+{
+	// Set the disk dma transfer speed
+	static_cast<ide_hdd_device*>(device)->set_dma_transfer_time(attotime::from_usec(15));
+	// Allow ultra dma
+	//uint16_t *identify_device = static_cast<ide_hdd_device*>(device)->identify_device_buffer();
+	//identify_device[88] = 0x7f;
+
 }
 
 
@@ -2006,26 +2023,28 @@ void vegas_state::denver(machine_config &config)
 	subdevice<generic_voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(vegas_state::vblank_assert));
 
 	// TL16C552 UART
+	INPUT_MERGER_ANY_HIGH(config, "duart_irq").output_handler().set(FUNC(vegas_state::duart_irq_cb));
+
 	NS16550(config, m_uart1, XTAL(1'843'200));
 	m_uart1->out_tx_callback().set("ttys01", FUNC(rs232_port_device::write_txd));
 	m_uart1->out_dtr_callback().set("ttys01", FUNC(rs232_port_device::write_dtr));
 	m_uart1->out_rts_callback().set("ttys01", FUNC(rs232_port_device::write_rts));
-	m_uart1->out_int_callback().set(FUNC(vegas_state::duart_irq_cb));
+	m_uart1->out_int_callback().set("duart_irq", FUNC(input_merger_device::in_w<0>));
 
 	NS16550(config, m_uart2, XTAL(1'843'200));
-	m_uart1->out_tx_callback().set("ttys02", FUNC(rs232_port_device::write_txd));
-	m_uart1->out_dtr_callback().set("ttys02", FUNC(rs232_port_device::write_dtr));
-	m_uart1->out_rts_callback().set("ttys02", FUNC(rs232_port_device::write_rts));
-	m_uart1->out_int_callback().set(FUNC(vegas_state::duart_irq_cb));
+	m_uart2->out_tx_callback().set("ttys02", FUNC(rs232_port_device::write_txd));
+	m_uart2->out_dtr_callback().set("ttys02", FUNC(rs232_port_device::write_dtr));
+	m_uart2->out_rts_callback().set("ttys02", FUNC(rs232_port_device::write_rts));
+	m_uart2->out_int_callback().set("duart_irq", FUNC(input_merger_device::in_w<1>));
 
-	rs232_port_device &ttys01(RS232_PORT(config, "ttys01", 0));
+	rs232_port_device &ttys01(RS232_PORT(config, "ttys01", default_rs232_devices, nullptr));
 	ttys01.rxd_handler().set(m_uart1, FUNC(ins8250_uart_device::rx_w));
 	ttys01.dcd_handler().set(m_uart1, FUNC(ins8250_uart_device::dcd_w));
 	ttys01.dsr_handler().set(m_uart1, FUNC(ins8250_uart_device::dsr_w));
 	ttys01.ri_handler().set(m_uart1, FUNC(ins8250_uart_device::ri_w));
 	ttys01.cts_handler().set(m_uart1, FUNC(ins8250_uart_device::cts_w));
 
-	rs232_port_device &ttys02(RS232_PORT(config, "ttys02", 0));
+	rs232_port_device &ttys02(RS232_PORT(config, "ttys02", default_rs232_devices, nullptr));
 	ttys02.rxd_handler().set(m_uart2, FUNC(ins8250_uart_device::rx_w));
 	ttys02.dcd_handler().set(m_uart2, FUNC(ins8250_uart_device::dcd_w));
 	ttys02.dsr_handler().set(m_uart2, FUNC(ins8250_uart_device::dsr_w));
@@ -2501,6 +2520,9 @@ ROM_START( sf2049 )
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Guts 1.03 9/3/1999 Game 9/8/1999
 	DISK_IMAGE( "sf2049", 0, SHA1(9e0661b8566a6c78d18c59c11cd3a6628d025405) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", ROMREGION_ERASEFF ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "336_rush_2049.u18", 0x0000, 0x1000, CRC(e258c3ff) SHA1(c78f739638a0775e4075c6a460c70dafbcf08fd5) )
 ROM_END
 
 
@@ -2516,6 +2538,9 @@ ROM_START( sf2049se )
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
 	DISK_IMAGE( "sf2049se", 0, SHA1(7b27a8ce2a953050ce267548bb7160b41f3e8054) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", ROMREGION_ERASEFF ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "352_rush_2049_se.u18", 0x0000, 0x1007, CRC(6120c20d) SHA1(9bd76514de261aa7957f896c1ea0b3f91d4cb5d6) ) // is this original or bootleg ? PIC timestamp is 1 Jan 1980 and SN# very small number
 ROM_END
 
 
@@ -2528,6 +2553,9 @@ ROM_START( sf2049te )
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
 	DISK_IMAGE( "sf2049te", 0, SHA1(625aa36436587b7bec3e7db1d19793b760e2ea51) ) // GUTS 1.61 Game Apr 2, 2001 13:07:21
+
+	ROM_REGION( 0x2000, "serial_security_pic", ROMREGION_ERASEFF ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "352_rush_2049_se.u18", 0x0000, 0x1007, CRC(6120c20d) SHA1(9bd76514de261aa7957f896c1ea0b3f91d4cb5d6) ) // SE PIC is fine for TE too
 ROM_END
 
 ROM_START( sf2049tea )
@@ -2539,6 +2567,9 @@ ROM_START( sf2049tea )
 	// All 7 courses are unlocked
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
 	DISK_IMAGE( "sf2049tea", 0, SHA1(8d6badf1159903bf44d9a9c7570d4f2417398a93) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", ROMREGION_ERASEFF ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "352_rush_2049_se.u18", 0x0000, 0x1007, CRC(6120c20d) SHA1(9bd76514de261aa7957f896c1ea0b3f91d4cb5d6) ) // SE PIC is fine for TE too
 ROM_END
 
 /*************************************
@@ -2593,11 +2624,13 @@ void vegas_state::init_roadburn()
 
 void vegas_state::init_nbashowt()
 {
+	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS | MIPS3DRC_STRICT_VERIFY | MIPS3DRC_EXTRA_INSTR_CHECK);
 }
 
 
 void vegas_state::init_nbanfl()
 {
+	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS | MIPS3DRC_STRICT_VERIFY | MIPS3DRC_EXTRA_INSTR_CHECK);
 	// The first three bytes of the blitz00_nov30_1999.u27 ROM are FF's which breaks the reset vector.
 	// These bytes are from blitz00_sep22_1999.u27 which allows the other ROM to start.
 	// The last byte which is part of the checksum is also FF. By changing it to 0x01 the 4 byte checksum matches with the other 3 changes.
@@ -2611,6 +2644,7 @@ void vegas_state::init_nbanfl()
 
 void vegas_state::init_nbagold()
 {
+	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS | MIPS3DRC_STRICT_VERIFY | MIPS3DRC_EXTRA_INSTR_CHECK);
 }
 
 

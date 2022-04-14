@@ -196,9 +196,9 @@ public:
 	uint16_t*     get_tmem16() { return (uint16_t*)m_tmem.get(); }
 
 	// YUV Factors
-	void        set_yuv_factors(color_t k023, color_t k1, color_t k4, color_t k5) { m_k023 = k023; m_k1 = k1; m_k4 = k4; m_k5 = k5; }
-	color_t&    get_k023() { return m_k023; }
-	color_t&    get_k1() { return m_k1; }
+	void        set_yuv_factors(color_t k02, color_t k13, color_t k4, color_t k5) { m_k02 = k02; m_k13 = k13; m_k4 = k4; m_k5 = k5; }
+	color_t&    get_k02() { return m_k02; }
+	color_t&    get_k13() { return m_k13; }
 
 	// Blender-related (move into RDP::Blender)
 	void        set_blender_input(int32_t cycle, int32_t which, color_t** input_rgb, color_t** input_a, int32_t a, int32_t b, rdp_span_aux* userdata);
@@ -371,8 +371,8 @@ private:
 	std::unique_ptr<uint8_t[]>  m_tmem;
 
 	// YUV factors
-	color_t m_k023;
-	color_t m_k1;
+	color_t m_k02;
+	color_t m_k13;
 	color_t m_k4;
 	color_t m_k5;
 

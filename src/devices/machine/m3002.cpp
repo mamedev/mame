@@ -110,9 +110,10 @@ void m3002_device::device_clock_changed()
 //  nvram_read - read NVRAM from the file
 //-------------------------------------------------
 
-void m3002_device::nvram_read(emu_file &file)
+bool m3002_device::nvram_read(util::read_stream &file)
 {
-	file.read(&m_ram[0], 0x10);
+	size_t actual;
+	return !file.read(&m_ram[0], 0x10, actual) && actual == 0x10;
 }
 
 
@@ -120,9 +121,10 @@ void m3002_device::nvram_read(emu_file &file)
 //  nvram_write - write NVRAM to the file
 //-------------------------------------------------
 
-void m3002_device::nvram_write(emu_file &file)
+bool m3002_device::nvram_write(util::write_stream &file)
 {
-	file.write(&m_ram[0], 0x10);
+	size_t actual;
+	return !file.write(&m_ram[0], 0x10, actual) && actual == 0x10;
 }
 
 

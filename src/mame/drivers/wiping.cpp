@@ -353,11 +353,11 @@ ROM_START( wiping )
 	ROM_LOAD( "wip-f4.bin",   0x0020, 0x0100, CRC(3f56c8d5) SHA1(7d279b2f29911c44b4136068770accf7196057d7) )    /* char lookup table */
 	ROM_LOAD( "wip-e11.bin",  0x0120, 0x0100, CRC(e7400715) SHA1(c67193e5f0a43942ddf03058a0bb8b3275308459) )    /* sprite lookup table */
 
-	ROM_REGION( 0x4000, "samples", 0 )  /* samples */
+	ROM_REGION( 0x4000, "wiping:samples", 0 )
 	ROM_LOAD( "rugr5c8",      0x0000, 0x2000, CRC(67bafbbf) SHA1(2085492b58ce44f61a42320c54595b79fdf7a91c) )
 	ROM_LOAD( "rugr6c9",      0x2000, 0x2000, CRC(cac84a87) SHA1(90f6c514d0cdbeb4c8c979597db79ebcdf443df4) )
 
-	ROM_REGION( 0x0200, "soundproms", 0 )   /* 4bit->8bit sample expansion PROMs */
+	ROM_REGION( 0x0200, "wiping:soundproms", 0 )   /* 4bit->8bit sample expansion PROMs */
 	ROM_LOAD( "wip-e8.bin",   0x0000, 0x0100, CRC(bd2c080b) SHA1(9782bb5001e96db56bc29df398187f700bce4f8e) )    /* low 4 bits */
 	ROM_LOAD( "wip-e9.bin",   0x0100, 0x0100, CRC(4017a2a6) SHA1(dadef2de7a1119758c8e6d397aa42815b0218889) )    /* high 4 bits */
 ROM_END
@@ -382,11 +382,11 @@ ROM_START( rugrats )
 	ROM_LOAD( "eiif4.4f",  0x0020, 0x0100, CRC(cfc90f3d) SHA1(99f7dc0d14c62d4c676c96310c219c696c9a7897) )    /* char lookup table */
 	ROM_LOAD( "eiif4.11e", 0x0120, 0x0100, CRC(cfc90f3d) SHA1(99f7dc0d14c62d4c676c96310c219c696c9a7897) )    /* sprite lookup table */
 
-	ROM_REGION( 0x4000, "samples", 0 )  /* samples */
+	ROM_REGION( 0x4000, "wiping:samples", 0 )
 	ROM_LOAD( "5.8c",      0x0000, 0x2000, CRC(67bafbbf) SHA1(2085492b58ce44f61a42320c54595b79fdf7a91c) )
 	ROM_LOAD( "6.9c",      0x2000, 0x2000, CRC(cac84a87) SHA1(90f6c514d0cdbeb4c8c979597db79ebcdf443df4) )
 
-	ROM_REGION( 0x0200, "soundproms", 0 )   /* 4bit->8bit sample expansion PROMs */
+	ROM_REGION( 0x0200, "wiping:soundproms", 0 )   /* 4bit->8bit sample expansion PROMs */
 	ROM_LOAD( "e8.8e",     0x0000, 0x0100, CRC(bd2c080b) SHA1(9782bb5001e96db56bc29df398187f700bce4f8e) )    /* low 4 bits */
 	ROM_LOAD( "e9.9e",     0x0100, 0x0100, CRC(4017a2a6) SHA1(dadef2de7a1119758c8e6d397aa42815b0218889) )    /* high 4 bits */
 ROM_END

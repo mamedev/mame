@@ -139,7 +139,7 @@ private:
 
 	bool keypad_key_pressed();
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	uint8_t m_segment;
 	uint8_t m_digit;
 	virtual void machine_start() override;
@@ -240,7 +240,7 @@ INPUT_PORTS_END
 
 ************************************************************/
 
-void mekd5_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mekd5_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

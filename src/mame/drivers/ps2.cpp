@@ -81,7 +81,7 @@ void ps2_state::machine_start()
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
 
-	/* MESS managed RAM */
+	/* managed RAM */
 	membank("bank10")->set_base(m_ram->pointer());
 
 	if (m_ram->size() > 0xa0000)

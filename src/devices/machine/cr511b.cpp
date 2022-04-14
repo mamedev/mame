@@ -71,7 +71,7 @@ void cr511b_device::device_start()
 	m_scor_handler.resolve_safe();
 	m_xaen_handler.resolve_safe();
 
-	m_frame_timer = timer_alloc(0, nullptr);
+	m_frame_timer = timer_alloc(0);
 	m_frame_timer->adjust(attotime::never);
 }
 
@@ -87,7 +87,7 @@ void cr511b_device::device_reset()
 //  device_timer - device-specific timer events
 //-------------------------------------------------
 
-void cr511b_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void cr511b_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
 {
 }
 

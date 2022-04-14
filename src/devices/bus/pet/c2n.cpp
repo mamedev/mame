@@ -93,7 +93,7 @@ void c2n_device::device_start()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void c2n_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void c2n_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (m_motor)
 	{

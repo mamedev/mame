@@ -178,7 +178,7 @@ void cop452_device::device_reset()
 	m_timers[ 1 ]->reset();
 }
 
-void cop452_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void cop452_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (m_mode) {
 	case MODE_DUAL_FREQ:

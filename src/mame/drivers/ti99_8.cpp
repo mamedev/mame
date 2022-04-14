@@ -2,7 +2,7 @@
 // copyright-holders:Michael Zapf
 /****************************************************************************
 
-    The MESS TI-99/8 emulation driver
+    TI-99/8
 
     The TI-99/8 was the envisaged successor to the TI-99/4A but never passed
     its prototype state. Only a few dozen consoles were built. The ROMs
@@ -176,7 +176,7 @@ Known Issues (MZ, 2019-05-10)
 #include "bus/ti99/joyport/joyport.h"
 #include "bus/ti99/internal/ioport.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 // Debugging
@@ -270,14 +270,14 @@ private:
 
 	// Keyboard support
 	void    set_keyboard_column(int number, int data);
-	int     m_keyboard_column;
+	int     m_keyboard_column = 0;
 
 	// READY handling
-	int m_ready_old;
+	int m_ready_old = 0;
 
 	// Latch for 9901 INT2, INT1 lines
-	int  m_int1;
-	int  m_int2;
+	int  m_int1 = 0;
+	int  m_int2 = 0;
 
 	// Connected devices
 	required_device<tms9995_device>     m_cpu;

@@ -221,12 +221,12 @@ TIMER_CALLBACK_MEMBER( t5182_device::setirq_callback )
 		m_ourcpu->set_input_line(0,ASSERT_LINE);
 }
 
-void t5182_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void t5182_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case SETIRQ_CB:
-		setirq_callback(ptr, param);
+		setirq_callback(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in t5182_device::device_timer");

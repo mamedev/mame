@@ -53,7 +53,7 @@ public:
 
 	void init_bebox();
 
-	int m_dma_channel; // TODO: move to private once possible
+	int m_dma_channel = 0; // TODO: move to private once possible
 
 protected:
 	virtual void machine_start() override;
@@ -64,7 +64,7 @@ protected:
 		TIMER_GET_DEVICES
 	};
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	required_device_array<ppc_device, 2> m_ppc;
@@ -77,12 +77,12 @@ private:
 	required_device<fujitsu_29f016a_device> m_flash;
 	required_device<pci_bus_device> m_pcibus;
 	required_device<vga_device> m_vga;
-	uint32_t m_cpu_imask[2];
-	uint32_t m_interrupts;
-	uint32_t m_crossproc_interrupts;
-	uint16_t m_dma_offset[2][4];
-	uint8_t m_at_pages[0x10];
-	uint32_t m_scsi53c810_data[0x100 / 4];
+	uint32_t m_cpu_imask[2]{};
+	uint32_t m_interrupts = 0U;
+	uint32_t m_crossproc_interrupts = 0U;
+	uint16_t m_dma_offset[2][4]{};
+	uint8_t m_at_pages[0x10]{};
+	uint32_t m_scsi53c810_data[0x100 / 4]{};
 	DECLARE_WRITE_LINE_MEMBER(bebox_pic8259_master_set_int_line);
 	DECLARE_WRITE_LINE_MEMBER(bebox_pic8259_slave_set_int_line);
 	DECLARE_WRITE_LINE_MEMBER(bebox_dma_hrq_changed);

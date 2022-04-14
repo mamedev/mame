@@ -41,7 +41,7 @@ public:
 
 	void ram_w(offs_t offset, uint8_t data) { m_wave_ram[offset & 0x7ff] = data; }
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 protected:
 	// device-level overrides

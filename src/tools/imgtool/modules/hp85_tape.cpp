@@ -115,9 +115,9 @@ private:
 	// Content
 	std::vector<sif_file_ptr_t> content;
 	// First file on track 1
-	file_no_t file_track_1;
+	file_no_t file_track_1{};
 	// No. of first record on track 1
-	uint16_t record_track_1;
+	uint16_t record_track_1 = 0;
 
 	bool dec_rec_header(const tape_word_t *hdr , file_no_t& file_no , uint16_t& rec_no , bool& has_body , unsigned& body_len);
 	bool load_whole_tape();

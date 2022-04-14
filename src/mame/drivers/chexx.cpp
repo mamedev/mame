@@ -131,7 +131,7 @@ protected:
 		TIMER_UPDATE
 	};
 
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void update();
 
@@ -180,8 +180,8 @@ protected:
 	void mem(address_map &map);
 
 	required_device<ay8910_device> m_aysnd; // only faceoffh
-	uint8_t m_ay_cmd;
-	uint8_t m_ay_data;
+	uint8_t m_ay_cmd = 0;
+	uint8_t m_ay_data = 0;
 };
 
 
@@ -283,7 +283,7 @@ void chexx_state::mem(address_map &map)
 	map(0xf800, 0xffff).rom().region("maincpu", 0);
 }
 
-void chexx_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void chexx_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

@@ -1936,21 +1936,21 @@ void antic_device::linerefresh()
 #define ANTIC_TIME_FROM_CYCLES(cycles)  \
 (attotime)(screen().scan_period() * (cycles) / CYCLES_PER_LINE)
 
-void antic_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void antic_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 		case TIMER_CYCLE_STEAL:
-			steal_cycles(ptr, param);
+			steal_cycles(param);
 			break;
 		case TIMER_ISSUE_DLI:
-			issue_dli(ptr, param);
+			issue_dli(param);
 			break;
 		case TIMER_LINE_REND:
-			scanline_render(ptr, param);
+			scanline_render(param);
 			break;
 		case TIMER_LINE_DONE:
-			line_done(ptr, param);
+			line_done(param);
 			break;
 	}
 }

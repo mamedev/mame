@@ -256,6 +256,10 @@ void swp30_device::device_start()
 	save_item(NAME(m_internal_adr));
 
 	save_item(NAME(m_program_address));
+	save_item(NAME(m_waverom_adr));
+	save_item(NAME(m_waverom_mode));
+	save_item(NAME(m_waverom_access));
+	save_item(NAME(m_waverom_val));
 }
 
 void swp30_device::device_reset()
@@ -291,6 +295,10 @@ void swp30_device::device_reset()
 	memset(m_routing, 0, sizeof(m_routing));
 
 	m_program_address = 0;
+	m_waverom_adr = 0;
+	m_waverom_mode = 0;
+	m_waverom_access = 0;
+	m_waverom_val = 0;
 }
 
 void swp30_device::rom_bank_updated()
@@ -341,7 +349,14 @@ void swp30_device::map(address_map &map)
 	// 00-01 missing
 	rctrl(map, 0x02).rw(FUNC(swp30_device::internal_adr_r), FUNC(swp30_device::internal_adr_w));
 	rctrl(map, 0x03).r (FUNC(swp30_device::internal_r));
-	// 04-0b missing
+	rctrl(map, 0x04).rw(FUNC(swp30_device::waverom_adr_r<1>), FUNC(swp30_device::waverom_adr_w<1>));
+	rctrl(map, 0x05).rw(FUNC(swp30_device::waverom_adr_r<0>), FUNC(swp30_device::waverom_adr_w<0>));
+	rctrl(map, 0x06).rw(FUNC(swp30_device::waverom_mode_r<1>), FUNC(swp30_device::waverom_mode_w<1>));
+	rctrl(map, 0x07).rw(FUNC(swp30_device::waverom_mode_r<0>), FUNC(swp30_device::waverom_mode_w<0>));
+	rctrl(map, 0x08).rw(FUNC(swp30_device::waverom_access_r), FUNC(swp30_device::waverom_access_w));
+	rctrl(map, 0x09).r (FUNC(swp30_device::waverom_busy_r));
+	rctrl(map, 0x0a).r (FUNC(swp30_device::waverom_val_r<1>));
+	rctrl(map, 0x0b).r (FUNC(swp30_device::waverom_val_r<0>));
 	rctrl(map, 0x0c).rw(FUNC(swp30_device::keyon_mask_r<3>), FUNC(swp30_device::keyon_mask_w<3>));
 	rctrl(map, 0x0d).rw(FUNC(swp30_device::keyon_mask_r<2>), FUNC(swp30_device::keyon_mask_w<2>));
 	rctrl(map, 0x0e).rw(FUNC(swp30_device::keyon_mask_r<1>), FUNC(swp30_device::keyon_mask_w<1>));
@@ -451,6 +466,58 @@ template<int sel> u16 swp30_device::map_r()
 template<int sel> void swp30_device::map_w(u16 data)
 {
 	m_meg->map_w(sel, data);
+}
+
+
+template<int sel> void swp30_device::waverom_adr_w(u16 data)
+{
+	if(sel)
+		m_waverom_adr = (m_waverom_adr & 0x0000ffff) | (data << 16);
+	else
+		m_waverom_adr = (m_waverom_adr & 0xffff0000) |  data;
+}
+
+template<int sel> u16 swp30_device::waverom_adr_r()
+{
+	return m_waverom_adr >> (16*sel);
+}
+
+template<int sel> void swp30_device::waverom_mode_w(u16 data)
+{
+	if(sel)
+		m_waverom_mode = (m_waverom_mode & 0x0000ffff) | (data << 16);
+	else
+		m_waverom_mode = (m_waverom_mode & 0xffff0000) |  data;
+}
+
+template<int sel> u16 swp30_device::waverom_mode_r()
+{
+	return m_waverom_mode >> (16*sel);
+}
+
+void swp30_device::waverom_access_w(u16 data)
+{
+	m_waverom_access = data;
+	if(data == 0x8000) {
+		m_waverom_val = read_dword(m_waverom_adr << 2);
+		logerror("waverom read adr=%08x mode=%08x -> %08x\n", m_waverom_adr, m_waverom_mode, m_waverom_val);
+	}
+}
+
+u16 swp30_device::waverom_access_r()
+{
+	return m_waverom_access;
+}
+
+u16 swp30_device::waverom_busy_r()
+{
+	// 0 = busy reading the rom, non-0 = finished
+	return 0xffff;
+}
+
+template<int sel> u16 swp30_device::waverom_val_r()
+{
+	return m_waverom_val >> (16*sel);
 }
 
 

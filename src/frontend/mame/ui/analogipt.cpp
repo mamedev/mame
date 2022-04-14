@@ -189,6 +189,13 @@ void menu_analog::custom_render(void *selectedref, float top, float bottom, floa
 }
 
 
+void menu_analog::menu_activated()
+{
+	// scripts could have changed something in the mean time
+	reset(reset_options::REMEMBER_POSITION);
+}
+
+
 void menu_analog::handle(event const *ev)
 {
 	// handle events
@@ -313,9 +320,11 @@ void menu_analog::handle(event const *ev)
 					case ANALOG_ITEM_SENSITIVITY:   settings.sensitivity = newval;  break;
 				}
 				data.field.get().set_user_settings(settings);
+				data.cur = newval;
 
-				// rebuild the menu
-				reset(reset_options::REMEMBER_POSITION);
+				// update the menu item
+				ev->item->set_subtext(item_text(data.type, newval));
+				ev->item->set_flags((data.cur <= data.min) ? FLAG_RIGHT_ARROW : (data.cur >= data.max) ? FLAG_LEFT_ARROW : FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW);
 			}
 		}
 	}
@@ -334,7 +343,6 @@ void menu_analog::populate(float &customtop, float &custombottom)
 
 	// add the items
 	std::string text;
-	std::string subtext;
 	for (item_data &data : m_item_data)
 	{
 		// get the user settings
@@ -359,38 +367,31 @@ void menu_analog::populate(float &customtop, float &custombottom)
 		default:
 		case ANALOG_ITEM_KEYSPEED:
 			text = string_format(_("%1$s Increment/Decrement Speed"), field->name());
-			subtext = string_format("%d", settings.delta);
 			data.cur = settings.delta;
 			break;
 
 		case ANALOG_ITEM_CENTERSPEED:
 			text = string_format(_("%1$s Auto-centering Speed"), field->name());
-			subtext = string_format("%d", settings.centerdelta);
 			data.cur = settings.centerdelta;
 			break;
 
 		case ANALOG_ITEM_REVERSE:
 			text = string_format(_("%1$s Reverse"), field->name());
-			subtext.assign(settings.reverse ? "On" : "Off");
 			data.cur = settings.reverse;
 			break;
 
 		case ANALOG_ITEM_SENSITIVITY:
 			text = string_format(_("%1$s Sensitivity"), field->name());
-			subtext = string_format("%d", settings.sensitivity);
 			data.cur = settings.sensitivity;
 			break;
 		}
 
-		// put on arrows
-		uint32_t flags(0U);
-		if (data.cur > data.min)
-			flags |= FLAG_LEFT_ARROW;
-		if (data.cur < data.max)
-			flags |= FLAG_RIGHT_ARROW;
-
 		// append a menu item
-		item_append(std::move(text), std::move(subtext), flags, &data);
+		item_append(
+				std::move(text),
+				item_text(data.type, data.cur),
+				(data.cur <= data.min) ? FLAG_RIGHT_ARROW : (data.cur >= data.max) ? FLAG_LEFT_ARROW : FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW,
+				&data);
 	}
 
 	item_append(menu_item_type::SEPARATOR);
@@ -452,6 +453,26 @@ void menu_analog::find_fields()
 		m_visible_fields = unsigned(0.4f / ui().get_line_height());
 	else
 		m_visible_fields = m_field_data.size();
+}
+
+
+std::string menu_analog::item_text(int type, int value)
+{
+	switch (type)
+	{
+	default:
+	case ANALOG_ITEM_KEYSPEED:
+		return string_format("%d", value);
+
+	case ANALOG_ITEM_CENTERSPEED:
+		return string_format("%d", value);
+
+	case ANALOG_ITEM_REVERSE:
+		return value ? _("On") : _("Off");
+
+	case ANALOG_ITEM_SENSITIVITY:
+		return string_format("%d", value);
+	}
 }
 
 } // namespace ui

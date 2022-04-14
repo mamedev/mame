@@ -43,4 +43,4 @@ const nanos_format::format nanos_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_NANOS_FORMAT = &floppy_image_format_creator<nanos_format>;
+const nanos_format FLOPPY_NANOS_FORMAT;

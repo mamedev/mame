@@ -20,7 +20,8 @@
 #define LOG_DBG(...) LOGMASKED(LOG_DBG_MASK, __VA_ARGS__)
 #undef VERBOSE
 //#define VERBOSE (LOG_GENERAL | LOG_REG_MASK | LOG_DBG_MASK)
-#define VERBOSE (LOG_GENERAL)
+//#define VERBOSE (LOG_GENERAL)
+#define VERBOSE (LOG_GENERAL | LOG_DBG_MASK)
 
 // Bit manipulation
 namespace {
@@ -80,6 +81,7 @@ hp9825_tape_device::hp9825_tape_device(const machine_config &mconfig, const char
 	, m_sts_handler(*this)
 	, m_dmar_handler(*this)
 	, m_led_handler(*this)
+	, m_cart_in_handler(*this)
 	, m_tape(*this , "drive")
 	, m_short_gap_timer(*this , "short_tmr")
 	, m_long_gap_timer(*this , "long_tmr")
@@ -119,10 +121,12 @@ void hp9825_tape_device::device_add_mconfig(machine_config &config)
 
 void hp9825_tape_device::device_start()
 {
+	LOG_DBG("start\n");
 	m_flg_handler.resolve_safe();
 	m_sts_handler.resolve_safe();
 	m_dmar_handler.resolve_safe();
 	m_led_handler.resolve_safe();
+	m_cart_in_handler.resolve_safe();
 
 	save_item(NAME(m_cmd_reg));
 	save_item(NAME(m_stat_reg));
@@ -143,6 +147,7 @@ void hp9825_tape_device::device_start()
 
 void hp9825_tape_device::device_reset()
 {
+	LOG_DBG("reset\n");
 	clear_state();
 }
 
@@ -326,6 +331,8 @@ WRITE_LINE_MEMBER(hp9825_tape_device::cart_out_w)
 	} else {
 		BIT_CLR(m_stat_reg, STAT_REG_WPR_BIT);
 	}
+
+	m_cart_in_handler(!state);
 
 	update_sts();
 }

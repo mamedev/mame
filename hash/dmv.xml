@@ -110,7 +110,7 @@ license:CC0
 		<publisher>NCR Corporation</publisher>
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="209158">
-				<rom name="dmv_cpm80_2.2_supplement.td0" size="209158" crc="a19b1e40" sha1="50eec5ff3c4eab1ee27640fe2428b0a4265f2efb"/> <!-- MESS fails to load this disk -->
+				<rom name="dmv_cpm80_2.2_supplement.td0" size="209158" crc="a19b1e40" sha1="50eec5ff3c4eab1ee27640fe2428b0a4265f2efb"/> <!-- MAME fails to load this disk -->
 			</dataarea>
 		</part>
 	</software>
@@ -1434,7 +1434,7 @@ license:CC0
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="279617">
-				<rom name="dmv_bds_c_disk1.td0" size="279617" crc="536e37af" sha1="489b8499f38780c072fdfade9347bac9c7cb23ef"/> <!-- MESS fails to load this disk -->
+				<rom name="dmv_bds_c_disk1.td0" size="279617" crc="536e37af" sha1="489b8499f38780c072fdfade9347bac9c7cb23ef"/> <!-- MAME fails to load this disk -->
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
@@ -1450,7 +1450,7 @@ license:CC0
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="153353">
-				<rom name="dmv_cpm86_assembler.td0" size="153353" crc="91043ed0" sha1="df55fe94d3ecea474c24221103b92ee9431686cc"/> <!-- MESS fails to load this disk -->
+				<rom name="dmv_cpm86_assembler.td0" size="153353" crc="91043ed0" sha1="df55fe94d3ecea474c24221103b92ee9431686cc"/> <!-- MAME fails to load this disk -->
 			</dataarea>
 		</part>
 	</software>
@@ -1461,7 +1461,7 @@ license:CC0
 		<publisher>Microsoft</publisher>
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="53010">
-				<rom name="dmv_ms-basic_5.21_check.td0" size="53010" crc="8e4a29a4" sha1="7d13dd3c997ab20ddf7db11a16a4f44b656868a0"/> <!-- MESS fails to load this disk -->
+				<rom name="dmv_ms-basic_5.21_check.td0" size="53010" crc="8e4a29a4" sha1="7d13dd3c997ab20ddf7db11a16a4f44b656868a0"/> <!-- MAME fails to load this disk -->
 			</dataarea>
 		</part>
 	</software>

@@ -113,17 +113,7 @@ void nes_dorepiano_device::device_start()
 	save_item(NAME(m_cur_port));
 	save_item(NAME(m_latch));
 	save_item(NAME(m_mask));
-}
 
-
-//-------------------------------------------------
-//  device_reset
-//-------------------------------------------------
-
-void nes_dorepiano_device::device_reset()
-{
-	m_cur_port = 0;
-	m_latch = 0;
 	m_mask = 0x0f;
 }
 

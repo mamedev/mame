@@ -183,8 +183,8 @@ private:
 	void mcu_portb_w(uint8_t data);
 
 	/* machine state */
-	uint8_t  m_68705_porta_out;
-	uint8_t  m_coinctrl;
+	uint8_t  m_68705_porta_out = 0;
+	uint8_t  m_coinctrl = 0;
 };
 
 class zookeep_state : public qixmcu_state

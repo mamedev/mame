@@ -72,22 +72,22 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	uint8_t m_steer_last;
-	uint8_t m_steer_delta;
-	int16_t m_steer_accum;
-	int16_t m_last_result;
-	int8_t m_last_signed;
-	uint8_t m_last_unsigned;
-	int m_adc_input;
-	int m_auto_start_mask;
+	uint8_t m_steer_last = 0;
+	uint8_t m_steer_delta = 0;
+	int16_t m_steer_accum = 0;
+	int16_t m_last_result = 0;
+	int8_t m_last_signed = 0;
+	uint8_t m_last_unsigned = 0;
+	int m_adc_input = 0;
+	int m_auto_start_mask = 0;
 
 	uint16_t m_vertical_position_modifier[256];
-	uint16_t m_road16_vscroll;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_tx_tilemap;
-	int m_chacl;
-	uint16_t m_scroll;
-	uint8_t m_sub_irq_mask;
+	uint16_t m_road16_vscroll = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_tx_tilemap = nullptr;
+	int m_chacl = 0;
+	uint16_t m_scroll = 0;
+	uint8_t m_sub_irq_mask = 0;
 
 	uint16_t polepos2_ic25_r(offs_t offset);
 	uint8_t analog_r();

@@ -30,7 +30,7 @@
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "bus/generic/carts.h"
@@ -61,13 +61,13 @@ private:
 	optional_device<generic_slot_device> m_card2;
 	required_ioport_array<13> m_io_keyboard;
 
-	emu_timer *m_kb_timer;
-	uint8_t m_kb_matrix;
-	uint8_t m_gatearray[2];
+	emu_timer *m_kb_timer = nullptr;
+	uint8_t m_kb_matrix = 0;
+	uint8_t m_gatearray[2]{};
 
-	memory_region *m_rom_reg;
-	memory_region *m_card1_reg;
-	memory_region *m_card2_reg;
+	memory_region *m_rom_reg = nullptr;
+	memory_region *m_card1_reg = nullptr;
+	memory_region *m_card2_reg = nullptr;
 
 	virtual void machine_start() override;
 	void gatearray_w(offs_t offset, uint16_t data);

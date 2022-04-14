@@ -41,7 +41,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	enum
@@ -160,12 +160,12 @@ MC6845_UPDATE_ROW( mjsister_state::crtc_update_row )
  *
  *************************************/
 
-void mjsister_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mjsister_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{
 	case TIMER_DAC:
-		dac_callback(ptr, param);
+		dac_callback(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in mjsister_state::device_timer");

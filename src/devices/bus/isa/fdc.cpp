@@ -192,8 +192,8 @@ void isa8_fdc_xt_device::device_add_mconfig(machine_config &config)
 	upd765a_device &upd765a(UPD765A(config, m_fdc, 8'000'000, false, false));
 	upd765a.intrq_wr_callback().set(FUNC(isa8_fdc_xt_device::fdc_irq_w));
 	upd765a.drq_wr_callback().set(FUNC(isa8_fdc_xt_device::fdc_drq_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", pc_dd_floppies, "525dd", isa8_fdc_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", pc_dd_floppies, "525dd", isa8_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", pc_dd_floppies, "525dd", isa8_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", pc_dd_floppies, "525dd", isa8_fdc_device::floppy_formats).enable_sound(true);
 }
 
 void isa8_fdc_xt_device::device_start()
@@ -231,8 +231,8 @@ void isa8_fdc_at_device::device_add_mconfig(machine_config &config)
 	upd765a_device &upd765a(UPD765A(config, m_fdc, 8'000'000, false, false));
 	upd765a.intrq_wr_callback().set(FUNC(isa8_fdc_at_device::fdc_irq_w));
 	upd765a.drq_wr_callback().set(FUNC(isa8_fdc_at_device::fdc_drq_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats).enable_sound(true);
 }
 
 // Decoding is through a PAL, so presumably complete
@@ -261,8 +261,8 @@ void isa8_fdc_smc_device::device_add_mconfig(machine_config &config)
 	smc37c78_device &smc(SMC37C78(config, m_fdc, 24'000'000));
 	smc.intrq_wr_callback().set(FUNC(isa8_fdc_device::irq_w));
 	smc.drq_wr_callback().set(FUNC(isa8_fdc_device::drq_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats).enable_sound(true);
 }
 
 void isa8_fdc_smc_device::device_start()
@@ -282,8 +282,8 @@ void isa8_fdc_ps2_device::device_add_mconfig(machine_config &config)
 	n82077aa.set_mode(n82077aa_device::mode_t::PS2);
 	n82077aa.intrq_wr_callback().set(FUNC(isa8_fdc_device::irq_w));
 	n82077aa.drq_wr_callback().set(FUNC(isa8_fdc_device::drq_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats).enable_sound(true);
 }
 
 void isa8_fdc_ps2_device::device_start()
@@ -302,8 +302,8 @@ void isa8_fdc_superio_device::device_add_mconfig(machine_config &config)
 	pc_fdc_superio_device &superio(PC_FDC_SUPERIO(config, m_fdc, 24'000'000));
 	superio.intrq_wr_callback().set(FUNC(isa8_fdc_device::irq_w));
 	superio.drq_wr_callback().set(FUNC(isa8_fdc_device::drq_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats).enable_sound(true);
 }
 
 void isa8_fdc_superio_device::device_start()

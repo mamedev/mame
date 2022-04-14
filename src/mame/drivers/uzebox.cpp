@@ -22,7 +22,7 @@
 #include "bus/snes_ctrl/ctrl.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 // overclocked to 8 * NTSC burst frequency
@@ -71,13 +71,13 @@ private:
 	void data_map(address_map &map);
 	void prg_map(address_map &map);
 
-	int               m_vpos;
-	uint64_t          m_line_start_cycles;
-	uint32_t          m_line_pos_cycles;
-	uint8_t           m_port_a;
-	uint8_t           m_port_b;
-	uint8_t           m_port_c;
-	uint8_t           m_port_d;
+	int               m_vpos = 0;
+	uint64_t          m_line_start_cycles = 0;
+	uint32_t          m_line_pos_cycles = 0;
+	uint8_t           m_port_a = 0;
+	uint8_t           m_port_b = 0;
+	uint8_t           m_port_c = 0;
+	uint8_t           m_port_d = 0;
 	bitmap_rgb32      m_bitmap;
 };
 

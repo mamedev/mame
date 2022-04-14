@@ -41,11 +41,11 @@ private:
 	required_shared_ptr<uint8_t> m_bgvideoram;
 
 	/* video-related */
-	tilemap_t      *m_bg_tilemap;
-	tilemap_t      *m_fg_tilemap;
+	tilemap_t      *m_bg_tilemap = nullptr;
+	tilemap_t      *m_fg_tilemap = nullptr;
 
 	/* misc */
-	int            m_prot_val;
+	int            m_prot_val = 0;
 
 	void protection_w(uint8_t data);
 	uint8_t protection_r();

@@ -18,6 +18,7 @@
 
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 
 #include "formats/tzx_cas.h"
 #include "formats/zx81_p.h"
@@ -35,14 +36,7 @@ public:
 		m_speaker(*this, "speaker"),
 		m_region_maincpu(*this, "maincpu"),
 		m_region_gfx1(*this, "gfx1"),
-		m_io_row0(*this, "ROW0"),
-		m_io_row1(*this, "ROW1"),
-		m_io_row2(*this, "ROW2"),
-		m_io_row3(*this, "ROW3"),
-		m_io_row4(*this, "ROW4"),
-		m_io_row5(*this, "ROW5"),
-		m_io_row6(*this, "ROW6"),
-		m_io_row7(*this, "ROW7"),
+		m_io_row(*this, "ROW%u", 0U),
 		m_io_config(*this, "CONFIG"),
 		m_screen(*this, "screen")
 	{ }
@@ -98,34 +92,28 @@ private:
 	optional_device<speaker_sound_device> m_speaker;
 	required_memory_region m_region_maincpu;
 	optional_memory_region m_region_gfx1;
-	required_ioport m_io_row0;
-	required_ioport m_io_row1;
-	required_ioport m_io_row2;
-	required_ioport m_io_row3;
-	required_ioport m_io_row4;
-	required_ioport m_io_row5;
-	required_ioport m_io_row6;
-	required_ioport m_io_row7;
+	required_ioport_array<8> m_io_row;
 	optional_ioport m_io_config;
 	required_device<screen_device> m_screen;
 
-	address_space *m_program;
-	emu_timer *m_tape_input, *m_ula_hsync;
+	address_space *m_program = nullptr;
+	emu_timer *m_tape_input = nullptr, *m_ula_hsync = nullptr;
 
-	bool m_vsync_active, m_hsync_active, m_nmi_on, m_nmi_generator_active;
-	uint64_t m_base_vsync_clock, m_vsync_start_time;
-	uint32_t m_ypos;
+	bool m_vsync_active = false, m_hsync_active = false;
+	bool m_nmi_on = false, m_nmi_generator_active = false;
+	uint64_t m_base_vsync_clock = 0, m_vsync_start_time = 0;
+	uint32_t m_ypos = 0;
 
-	uint8_t m_prev_refresh;
-	uint8_t m_speaker_state;
+	uint8_t m_prev_refresh = 0;
+	uint8_t m_speaker_state = 0;
 
 	std::unique_ptr<bitmap_ind16> m_bitmap_render;
 	std::unique_ptr<bitmap_ind16> m_bitmap_buffer;
 
-	uint16_t m_ula_char_buffer;
-	double m_cassette_cur_level;
+	uint16_t m_ula_char_buffer = 0;
+	double m_cassette_cur_level = 0;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void drop_sync();
 	void recalc_hsync();

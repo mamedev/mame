@@ -56,6 +56,7 @@ ToDo:
 #include "includes/special.h"
 
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

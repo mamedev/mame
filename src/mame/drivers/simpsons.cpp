@@ -149,7 +149,7 @@ void simpsons_state::z80_bankswitch_w(uint8_t data)
 }
 
 
-void simpsons_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void simpsons_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

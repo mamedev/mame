@@ -164,7 +164,7 @@ void k053260_device::rom_bank_updated()
 }
 
 
-void k053260_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void k053260_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(m_timer_state) {
 	case 0: m_sh1_cb(ASSERT_LINE); break;

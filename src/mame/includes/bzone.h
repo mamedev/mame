@@ -55,7 +55,7 @@ protected:
 	output_finder<> m_startled;
 
 private:
-	uint8_t m_analog_data;
+	uint8_t m_analog_data = 0U;
 };
 
 
@@ -87,7 +87,7 @@ private:
 	required_device<er2055_device> m_earom;
 	required_device<redbaron_sound_device> m_redbaronsound;
 	required_ioport_array<2> m_fake_ports;
-	uint8_t m_rb_input_select;
+	uint8_t m_rb_input_select = 0U;
 };
 
 #endif // MAME_INCLUDES_BZONE_H

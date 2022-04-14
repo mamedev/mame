@@ -109,7 +109,7 @@ void r10788_device::device_reset()
  * @param param parameter
  * @param ptr pointer parameter
  */
-void r10788_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void r10788_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	uint8_t data;
 	switch (id)

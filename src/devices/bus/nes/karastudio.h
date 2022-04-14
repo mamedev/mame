@@ -6,7 +6,7 @@
 #pragma once
 
 #include "nxrom.h"
-#include "softlist_dev.h"
+#include "imagedev/cartrom.h"
 
 
 //-----------------------------------------
@@ -43,7 +43,7 @@ protected:
 class nes_karaokestudio_device;
 
 class nes_kstudio_slot_device : public device_t,
-									public device_image_interface,
+									public device_cartrom_image_interface,
 									public device_single_card_slot_interface<kstudio_cart_interface>
 {
 	friend class nes_karaokestudio_device;
@@ -65,11 +65,6 @@ public:
 	// image-level overrides
 	virtual image_init_result call_load() override;
 
-	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return false; }
-	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "ks_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "bin"; }
@@ -83,9 +78,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-
-	// device_image_interface implementation
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	kstudio_cart_interface*      m_cart;
 };

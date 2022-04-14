@@ -67,7 +67,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_config_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -101,8 +101,8 @@ private:
 	int m_vsync;                    // vertical sync
 	int m_vda;                      // valid data address
 
-	emu_timer *m_vsync_timer;       // vertical sync timer
-	emu_timer *m_flash_timer;       // flash timer
+	emu_timer *m_vsync_timer = nullptr;       // vertical sync timer
+	emu_timer *m_flash_timer = nullptr;       // flash timer
 };
 
 

@@ -66,7 +66,7 @@ protected:
 	// device-level overrides
 	virtual void device_start(void) override;
 	virtual void device_reset(void) override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_pre_save(void) override;
 	virtual void device_post_load(void) override;
 	virtual ioport_constructor device_input_ports() const override;

@@ -112,7 +112,7 @@ protected:
 	virtual void device_reset() override;
 	uint8_t dack_r(int line);
 	void dack_w(int line, uint8_t data);
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void drq16_w(int state) { }
 	virtual void drq_w(int state) { }
 	virtual void irq_w(int state, int source) { }

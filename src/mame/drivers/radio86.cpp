@@ -15,6 +15,7 @@
 #include "cpu/i8085/i8085.h"
 
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/rk_cas.h"

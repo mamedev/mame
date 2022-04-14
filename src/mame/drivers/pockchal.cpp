@@ -29,7 +29,7 @@ Cart sizes: 1MB, 2MB, 4MB
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 
 namespace {
@@ -57,7 +57,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
-	uint32_t m_rom_size;
+	uint32_t m_rom_size = 0;
 };
 
 

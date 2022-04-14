@@ -25,7 +25,7 @@
 #include "bus/generic/carts.h"
 #include "cpu/arm7/arm7.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 #include "screen.h"
 

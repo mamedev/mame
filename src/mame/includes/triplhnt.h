@@ -53,7 +53,7 @@ public:
 	void init_triplhnt();
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
@@ -96,15 +96,15 @@ private:
 	required_shared_ptr<uint8_t> m_code_ram;
 	output_finder<> m_lamp;
 
-	uint8_t m_cmos[16];
-	uint8_t m_da_latch;
-	uint8_t m_cmos_latch;
-	uint8_t m_hit_code;
-	int m_sprite_zoom;
-	int m_sprite_bank;
+	uint8_t m_cmos[16]{};
+	uint8_t m_da_latch = 0;
+	uint8_t m_cmos_latch = 0;
+	uint8_t m_hit_code = 0;
+	int m_sprite_zoom = 0;
+	int m_sprite_bank = 0;
 	bitmap_ind16 m_helper;
-	emu_timer *m_hit_timer;
-	tilemap_t* m_bg_tilemap;
+	emu_timer *m_hit_timer = nullptr;
+	tilemap_t* m_bg_tilemap = nullptr;
 };
 
 /*----------- defined in audio/triplhnt.cpp -----------*/

@@ -106,15 +106,15 @@ private:
 	optional_region_ptr<uint8_t> m_user1_ptr;
 	output_finder<2> m_leds;
 
-	uint8_t *m_spriteram;
-	int m_wdog;
-	int m_tilebank;
+	uint8_t *m_spriteram = nullptr;
+	int m_wdog = 0;
+	int m_tilebank = 0;
 	int m_xscroll[4];
 	int m_yscroll[4];
-	tilemap_t *m_bg_tilemap[4];
-	int m_backcolor;
-	const uint8_t *m_tile_address_prom;
-	int m_copy_sprites;
+	tilemap_t *m_bg_tilemap[4]{};
+	int m_backcolor = 0;
+	const uint8_t *m_tile_address_prom = nullptr;
+	int m_copy_sprites = 0;
 
 	inline void get_tile_info(tile_data &tileinfo,int tile_index,int layer,uint8_t *vram);
 	void set_scroll(int layer);

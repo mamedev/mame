@@ -32,7 +32,7 @@ an exception.
 #include "video/pwm.h"
 #include "sound/spkrdev.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "sag.lh"

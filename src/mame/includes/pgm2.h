@@ -124,8 +124,8 @@ private:
 
 	void decrypt_kov3_module(u32 addrxor, u16 dataxor);
 
-	tilemap_t    *m_fg_tilemap;
-	tilemap_t    *m_bg_tilemap;
+	tilemap_t    *m_fg_tilemap = nullptr;
+	tilemap_t    *m_bg_tilemap = nullptr;
 
 	bitmap_ind16 m_sprite_bitmap;
 
@@ -139,32 +139,32 @@ private:
 	void copy_sprites_from_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, u16 pri);
 
 	void common_encryption_init();
-	u8 m_encryption_table[0x100];
-	bool m_has_decrypted;    // so we only do it once.
-	bool m_has_decrypted_kov3_module;
-	u32 m_spritekey;
-	u32 m_realspritekey;
-	bool m_sprite_predecrypted;
+	u8 m_encryption_table[0x100]{};
+	bool m_has_decrypted = false;    // so we only do it once.
+	bool m_has_decrypted_kov3_module = false;
+	u32 m_spritekey = 0;
+	u32 m_realspritekey = 0;
+	bool m_sprite_predecrypted = false;
 
-	u8 m_shareram[0x100];
-	u16 m_share_bank;
-	u32 m_mcu_regs[8];
-	u32 m_mcu_result0;
-	u32 m_mcu_result1;
-	u8 m_mcu_last_cmd;
+	u8 m_shareram[0x100]{};
+	u16 m_share_bank = 0;
+	u32 m_mcu_regs[8]{};
+	u32 m_mcu_result0 = 0;
+	u32 m_mcu_result1 = 0;
+	u8 m_mcu_last_cmd = 0;
 	void mcu_command(bool is_command);
 
 	std::vector<u8> m_encrypted_copy;
 
-	u32 m_pio_out_data;
-	const kov3_module_key *module_key;
-	bool module_sum_read;
-	u32 module_in_latch;
-	u32 module_out_latch;
-	int module_prev_state;
-	int module_clk_cnt;
-	u8 module_rcv_buf[10];
-	u8 module_send_buf[9];
+	u32 m_pio_out_data = 0;
+	const kov3_module_key *module_key = nullptr;
+	bool module_sum_read = false;
+	u32 module_in_latch = 0;
+	u32 module_out_latch = 0;
+	int module_prev_state = 0;
+	int module_clk_cnt = 0;
+	u8 module_rcv_buf[10]{};
+	u8 module_send_buf[9]{};
 
 	// devices
 	required_device<cpu_device> m_maincpu;

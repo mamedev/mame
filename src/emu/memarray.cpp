@@ -90,11 +90,6 @@ void memory_array::set(void *base, u32 bytes, int membits, endianness_t endianne
 //  set - additional setter variants
 //-------------------------------------------------
 
-void memory_array::set(const address_space &space, void *base, u32 bytes, int bpe)
-{
-	set(base, bytes, space.data_width(), space.endianness(), bpe);
-}
-
 void memory_array::set(const memory_share &share, int bpe)
 {
 	set(share.ptr(), share.bytes(), share.bitwidth(), share.endianness(), bpe);

@@ -42,7 +42,7 @@ protected:
 	// device-level overrides (none are required, but these are common)
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	// internal device state goes here

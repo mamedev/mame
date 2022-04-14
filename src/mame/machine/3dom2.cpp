@@ -314,7 +314,7 @@ void m2_bda_device::device_add_mconfig(machine_config &config)
 //  device_timer - device-specific timers
 //-------------------------------------------------
 
-void m2_bda_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void m2_bda_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -864,7 +864,7 @@ void m2_vdu_device::device_reset()
 //  device_timer - device-specific timers
 //-------------------------------------------------
 
-void m2_vdu_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void m2_vdu_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -1571,7 +1571,7 @@ void m2_cde_device::device_post_load()
 //  device_timer - a timer
 //-------------------------------------------------
 
-void m2_cde_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void m2_cde_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

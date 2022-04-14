@@ -55,13 +55,14 @@ public:
 	paula_8364_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	auto mem_read_cb() { return m_mem_r.bind(); }
+	auto mem_read_cb() { return m_chipmem_r.bind(); }
 	auto int_cb() { return m_int_w.bind(); }
 
-	uint16_t reg_r(offs_t offset);
-	void reg_w(offs_t offset, uint16_t data);
-
 	void update();
+
+	template <u8 ch> void audio_channel_map(address_map &map);
+	void dmacon_set(u16 data);
+	void adkcon_set(u16 data);
 
 protected:
 	// device-level overrides
@@ -72,46 +73,12 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
-	enum
-	{
-		CHAN_0 = 0,
-		CHAN_1 = 1,
-		CHAN_2 = 2,
-		CHAN_3 = 3
-	};
-
-	enum
-	{
-		REG_DMACONR = 0x02/2,
-		REG_ADKCONR = 0x10/2,
-		REG_DMACON  = 0x96/2,
-		REG_INTREQ  = 0x9c/2,
-		REG_ADKCON  = 0x9e/2,
-		REG_AUD0LCH = 0xa0/2,  // to be moved, not part of paula
-		REG_AUD0LCL = 0xa2/2,  // to be moved, not part of paula
-		REG_AUD0LEN = 0xa4/2,
-		REG_AUD0PER = 0xa6/2,
-		REG_AUD0VOL = 0xa8/2,
-		REG_AUD0DAT = 0xaa/2,
-		REG_AUD1LCH = 0xb0/2,  // to be moved, not part of paula
-		REG_AUD1LCL = 0xb2/2,  // to be moved, not part of paula
-		REG_AUD1LEN = 0xb4/2,
-		REG_AUD1PER = 0xb6/2,
-		REG_AUD1VOL = 0xb8/2,
-		REG_AUD1DAT = 0xba/2,
-		REG_AUD2LCH = 0xc0/2,  // to be moved, not part of paula
-		REG_AUD2LCL = 0xc2/2,  // to be moved, not part of paula
-		REG_AUD2LEN = 0xc4/2,
-		REG_AUD2PER = 0xc6/2,
-		REG_AUD2VOL = 0xc8/2,
-		REG_AUD2DAT = 0xca/2,
-		REG_AUD3LCH = 0xd0/2,  // to be moved, not part of paula
-		REG_AUD3LCL = 0xd2/2,  // to be moved, not part of paula
-		REG_AUD3LEN = 0xd4/2,
-		REG_AUD3PER = 0xd6/2,
-		REG_AUD3VOL = 0xd8/2,
-		REG_AUD3DAT = 0xda/2
-	};
+	template <u8 ch> void audxlch_w(u16 data);
+	template <u8 ch> void audxlcl_w(u16 data);
+	template <u8 ch> void audxlen_w(u16 data);
+	template <u8 ch> void audxper_w(u16 data);
+	template <u8 ch> void audxvol_w(u16 data);
+	template <u8 ch> void audxdat_w(u16 data);
 
 	static constexpr int CLOCK_DIVIDER = 16;
 
@@ -132,17 +99,17 @@ private:
 		uint16_t per;
 		uint16_t vol;
 		uint16_t dat;
+		bool atper;
+		bool atvol;
 	};
+
+	bool m_dma_master_enable;
 
 	void dma_reload(audio_channel *chan, bool startup);
 
 	// callbacks
-	devcb_read16 m_mem_r;
+	devcb_read16 m_chipmem_r;
 	devcb_write8 m_int_w;
-
-	// internal state
-	uint16_t m_dmacon;
-	uint16_t m_adkcon;
 
 	audio_channel m_channel[4];
 	sound_stream *m_stream;

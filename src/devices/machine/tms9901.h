@@ -89,7 +89,7 @@ public:
 private:
 	static constexpr device_timer_id DECREMENTER = 0;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	void soft_reset();
 
 	void device_start() override;

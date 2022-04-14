@@ -492,7 +492,7 @@ void leland_80186_sound_device::command_hi_w(u8 data)
  *
  *************************************/
 
-void leland_80186_sound_device::delayed_response_r(void *ptr, int param)
+void leland_80186_sound_device::delayed_response_r(int param)
 {
 	int checkpc = param;
 	int pc = m_master->pc();

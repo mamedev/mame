@@ -412,6 +412,8 @@ offs_t tms9900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	case format_2a:     /* jump instructions */
 		displacement = (signed char)BITS(OP,8,15);
 		util::stream_format(stream, "%-4s >%04x", mnemonic, 0xffff & (PC + displacement * 2));
+		if (opc != _jmp)
+			dasmflags |= STEP_COND;
 		break;
 
 	case format_2b:     /* bit I/O instructions */

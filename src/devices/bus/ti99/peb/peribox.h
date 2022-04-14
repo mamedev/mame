@@ -179,7 +179,7 @@ public:
 	virtual void write(offs_t offset, uint8_t data) = 0;
 	virtual void crureadz(offs_t offset, uint8_t *value) = 0;
 	virtual void cruwrite(offs_t offset, uint8_t data) = 0;
-	virtual void setaddress_dbin(offs_t offset, int state) { };
+	virtual void setaddress_dbin(offs_t offset, int state) { }
 
 	virtual DECLARE_WRITE_LINE_MEMBER(clock_in) { }
 	virtual DECLARE_WRITE_LINE_MEMBER(reset_in) { }

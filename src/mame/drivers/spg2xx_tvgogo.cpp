@@ -6,6 +6,7 @@
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "softlist_dev.h"
 
 
 class tvgogo_state : public spg2xx_game_state
@@ -20,7 +21,7 @@ public:
 	void tvgogo(machine_config &config);
 
 private:
-	uint8_t m_i2cunk;
+	uint8_t m_i2cunk = 0;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

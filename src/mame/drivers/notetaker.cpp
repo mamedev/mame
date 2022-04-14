@@ -185,50 +185,50 @@ private:
 	void ep_mainram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	//variables
 	//  IPConReg
-	uint8_t m_BootSeqDone;
-	uint8_t m_ProcLock;
-	uint8_t m_CharCtr;
-	uint8_t m_DisableROM;
-	uint8_t m_CorrOn_q;
-	uint8_t m_LedInd6;
-	uint8_t m_LedInd7;
-	uint8_t m_LedInd8;
+	uint8_t m_BootSeqDone = 0;
+	uint8_t m_ProcLock = 0;
+	uint8_t m_CharCtr = 0;
+	uint8_t m_DisableROM = 0;
+	uint8_t m_CorrOn_q = 0;
+	uint8_t m_LedInd6 = 0;
+	uint8_t m_LedInd7 = 0;
+	uint8_t m_LedInd8 = 0;
 	//  FIFOReg
-	uint8_t m_TabletYOn;
-	uint8_t m_TabletXOn;
-	uint8_t m_FrSel2;
-	uint8_t m_FrSel1;
-	uint8_t m_FrSel0;
-	uint8_t m_SHConB;
-	uint8_t m_SHConA;
-	uint8_t m_SetSH;
+	uint8_t m_TabletYOn = 0;
+	uint8_t m_TabletXOn = 0;
+	uint8_t m_FrSel2 = 0;
+	uint8_t m_FrSel1 = 0;
+	uint8_t m_FrSel0 = 0;
+	uint8_t m_SHConB = 0;
+	uint8_t m_SHConA = 0;
+	uint8_t m_SetSH = 0;
 	// DiskReg
-	uint8_t m_ADCSpd0;
-	uint8_t m_ADCSpd1;
-	uint8_t m_StopWordClock_q;
-	uint8_t m_ClrDiskCont_q;
-	uint8_t m_ProgBitClk1;
-	uint8_t m_ProgBitClk2;
-	uint8_t m_ProgBitClk3;
-	uint8_t m_AnSel4;
-	uint8_t m_AnSel2;
-	uint8_t m_AnSel1;
-	uint8_t m_DriveSel1;
-	uint8_t m_DriveSel2;
-	uint8_t m_DriveSel3;
-	uint8_t m_SideSelect;
-	uint8_t m_Disk5VOn;
-	uint8_t m_Disk12VOn;
+	uint8_t m_ADCSpd0 = 0;
+	uint8_t m_ADCSpd1 = 0;
+	uint8_t m_StopWordClock_q = 0;
+	uint8_t m_ClrDiskCont_q = 0;
+	uint8_t m_ProgBitClk1 = 0;
+	uint8_t m_ProgBitClk2 = 0;
+	uint8_t m_ProgBitClk3 = 0;
+	uint8_t m_AnSel4 = 0;
+	uint8_t m_AnSel2 = 0;
+	uint8_t m_AnSel1 = 0;
+	uint8_t m_DriveSel1 = 0;
+	uint8_t m_DriveSel2 = 0;
+	uint8_t m_DriveSel3 = 0;
+	uint8_t m_SideSelect = 0;
+	uint8_t m_Disk5VOn = 0;
+	uint8_t m_Disk12VOn = 0;
 	// output fifo, for DAC
 	uint16_t m_outfifo[16]; // technically three 74LS225 5bit*16stage FIFO chips, arranged as a 16 stage, 12-bit wide fifo (one bit unused per chip)
-	uint8_t m_outfifo_count;
-	uint8_t m_outfifo_tail_ptr;
-	uint8_t m_outfifo_head_ptr;
+	uint8_t m_outfifo_count = 0;
+	uint8_t m_outfifo_tail_ptr = 0;
+	uint8_t m_outfifo_head_ptr = 0;
 	// fifo timer
-	emu_timer *m_FIFO_timer;
+	emu_timer *m_FIFO_timer = nullptr;
 	TIMER_CALLBACK_MEMBER(timer_fifoclk);
 	// framebuffer display starting address
-	uint16_t m_DispAddr;
+	uint16_t m_DispAddr = 0;
 
 // separate cpu resets
 	void iop_reset();
@@ -243,15 +243,15 @@ private:
 	void ep_io(address_map &map);
 	void ep_mem(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
-void notetaker_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void notetaker_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_FIFOCLK:
-		timer_fifoclk(ptr, param);
+		timer_fifoclk(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in notetaker_state::device_timer");

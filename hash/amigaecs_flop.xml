@@ -19,7 +19,12 @@ license:CC0
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1997</year>
 		<publisher>Eidos Interactive</publisher>
-		<info name="usage" value="Requires ECS" />  <!-- This was sold as A1200 game, but it only requires ECS -->
+		<notes><![CDATA[
+black screen, [FDC] dsksync
+Throws a "please insert disk 4" error while creating a disk 4
+]]></notes>
+		<!-- This was sold as A1200 game, but it only requires ECS -->
+		<info name="usage" value="Requires ECS, requires 2 Megs of RAM, requires 2 blank disks" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1032864">
@@ -41,23 +46,32 @@ license:CC0
 		<!-- (Amiga, ECS,AGA, PAL) -->
 		<year>1995</year>
 		<publisher>Empire Interactive</publisher>
-		<info name="usage" value="Requires ECS" />
+		<notes><![CDATA[
+Throws a coala/coala "Program error #80000004" on login screen (a500p, a600)
+Crashing into land draws missing polygons for heli (a1200), [Blitter] lines?
+]]></notes>
+		<!-- find 0,0x100000,"Supervisor" once login screen appears -->
+		<!-- wpset <first entry>,0xa00,r -->
+		<!-- Insert Supervisor as password (a wrong word may make the game to crash) -->
+		<!-- Checkout offset at last three entries, wpdis then memory view the pointer and insert it as password -->
+		<info name="usage" value="Requires ECS, sports login copy-protection (username password match)" />
+		<!-- Omake: has green tone color setup by pressing backslash during gameplay -->
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Program Disk" />
+			<dataarea name="flop" size="1049180">
+				<rom name="(sps242)coala_programdisk.ipf" size="1049180" crc="60ec0f35" sha1="226951589bef83a368d9961f70d83fbc4d674d35"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk AGA" />
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps242)coala_datadiskaga.ipf" size="1049180" crc="4eea11cb" sha1="ba37c92d89901e1244790597362c992118fc940c"/>
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
+		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk ECS" />
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps242)coala_datadiskecs.ipf" size="1049180" crc="6db4cc54" sha1="6506666c04371255b52e45fe35a547b4177d9973"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Program Disk" />
-			<dataarea name="flop" size="1049180">
-				<rom name="(sps242)coala_programdisk.ipf" size="1049180" crc="60ec0f35" sha1="226951589bef83a368d9961f70d83fbc4d674d35"/>
 			</dataarea>
 		</part>
 	</software>
@@ -69,6 +83,11 @@ license:CC0
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1992</year>
 		<publisher>Ocean</publisher>
+		<notes><![CDATA[
+Very unresponsive keyboard control on login system [CIA] (a500p), keyboard is too responsive on (a1200)
+Does not draw status bars for throttle etc. during gameplay
+]]></notes>
+		<!-- CHECKME: Sports a login system after title screen, doesn't seem to be copy protection? -->
 		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -97,6 +116,9 @@ license:CC0
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1995</year>
 		<publisher>Domark</publisher>
+		<notes><![CDATA[
+Flashing "IO Error: 4; Disk May Be Corrupt" at initial boot, [FDC] dsksync
+]]></notes>
 		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
@@ -105,13 +127,17 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="fatman" supported="no">
+	<software name="fatman" supported="partial">
 		<!-- SPS (CAPS) release 943 -->
 		<description>Fatman - The Caped Consumer (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1994</year>
 		<publisher>Black Legend</publisher>
+		<notes><![CDATA[
+Grandslam logo has wrong [Denise] colors (a600)
+Doesn't show cursor on main menu [Lisa]
+]]></notes>
 		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -146,17 +172,26 @@ license:CC0
 		<!-- (Amiga, ECS,AGA, PAL) -->
 		<year>1996</year>
 		<publisher>Guildhall</publisher>
-		<info name="usage" value="Requires ECS" />
+		<notes><![CDATA[
+Throws a Recoverable Alert when loaded from stand-alone then throws a ramlib "Program failed #80000004" (a500p, btanb)
+Throws a playgloom "Program failed #80000004" when is launched from HDD Workbench (a600, btanb)
+Crashes when attempting to save configuration from floppy (a1200)
+Cutoff [Denise] DDFSTOP portion on intermission and gameplay screens (a1200)
+Unemulated link option
+Unemulated I-Glasses support
+]]></notes>
+		<!-- cfr. read.me.eventually file (de facto this is an AGA game ...) -->
+		<info name="usage" value="Requires ECS, requires 68020, requires 2 megs RAM" />
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Data Disk" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps1330)gloomdeluxe_datadisk.ipf" size="1049612" crc="fb9287b6" sha1="6410c550ab20e9adf09d364d52323ba4b00a70d3"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1330)gloomdeluxe_programdisk.ipf" size="1049612" crc="bff6d892" sha1="4310358ed992038523b4cbbb29f4ef811ba4954e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Data Disk" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps1330)gloomdeluxe_datadisk.ipf" size="1049612" crc="fb9287b6" sha1="6410c550ab20e9adf09d364d52323ba4b00a70d3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -168,7 +203,10 @@ license:CC0
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1993</year>
 		<publisher>Blue Byte</publisher>
-		<info name="usage" value="Requires ECS" />
+		<notes><![CDATA[
+No mouse cursor on gameplay (a500p, a600), single long vertical line on (a1200)
+]]></notes>
+		<info name="usage" value="Requires ECS, insert disk 7 to skip intro" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -324,6 +362,9 @@ license:CC0
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1994</year>
 		<publisher>Silmarils</publisher>
+		<notes><![CDATA[
+Mouse cursor is uncontrollable, [joytest] reset counter
+]]></notes>
 		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
@@ -403,36 +444,44 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mandoubl" supported="no">
+	<software name="mandoubl" supported="partial">
 		<!-- SPS (CAPS) release 1851 -->
 		<description>Manchester United - The Double (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1995</year>
 		<publisher>Krisalis</publisher>
+		<notes><![CDATA[
+Has GFX small glitch on main menu, [Denise] sprite
+May draw a garbage line on gameplay (emu unthrottled?), [Denise] sprite
+]]></notes>
 		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Data Disk" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps1851)manchesterunited-thedouble_datadisk.ipf" size="1049612" crc="32055500" sha1="1bb97b89ce7e2f4b27c44986be65a45c19bfea70"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1851)manchesterunited-thedouble_programdisk.ipf" size="1049612" crc="ee64a3cd" sha1="12aa705ba33b1b2db23e430c560705752eb60b49"/>
 			</dataarea>
 		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Data Disk" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps1851)manchesterunited-thedouble_datadisk.ipf" size="1049612" crc="32055500" sha1="1bb97b89ce7e2f4b27c44986be65a45c19bfea70"/>
+			</dataarea>
+		</part>
 	</software>
 
 
-	<software name="produzen" supported="no">
+	<software name="produzen" supported="partial">
 		<!-- SPS (CAPS) release 558 -->
 		<description>Der Produzent - Die Welt des Films (Ger)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1996</year>
 		<publisher>Games 4 Europe</publisher>
+		<notes><![CDATA[
+Has sprite garbage strips on right portions at random times (title screen, gameplay)
+Not extensively tested (German language)
+]]></notes>
 		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -458,6 +507,7 @@ license:CC0
 				<rom name="(sps558)produzent,der_disk4.ipf" size="1049612" crc="05579db3" sha1="588c06dcafeb5d3723bb1bccb1216b0007d1a835"/>
 			</dataarea>
 		</part>
+		<!-- Spielstandsdiskette -->
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 5" />
 			<dataarea name="flop" size="1049612">
@@ -473,6 +523,11 @@ license:CC0
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1994</year>
 		<publisher>Flair Software</publisher>
+		<notes><![CDATA[
+Black screen, [FDC] in-flight DMAs with adkcon set
+Returns a [FDC] disk block 1730 error
+Stalls at now loading screen
+]]></notes>
 		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -500,48 +555,51 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="reunion" supported="no">
+	<software name="reunion" supported="partial">
 		<!-- SPS (CAPS) release 569 -->
 		<description>Reunion (Ger)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1994</year>
 		<publisher>Grandslam</publisher>
+		<notes><![CDATA[
+boot OK, not extensively tested (German language)
+]]></notes>
 		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Main Disk" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps569)reunion_maindisk.ipf" size="1049612" crc="7d25a6b8" sha1="45e0f1ec6a12bde7fe5f43bc11366e9c7c74b3fc"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps569)reunion_disk1.ipf" size="1049612" crc="1744c014" sha1="bc41d2592854c864556d1bd8bba892003abae202"/>
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
+		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps569)reunion_disk2.ipf" size="1049612" crc="96b49ab9" sha1="035fe6a4353eaddb2e9f73fbe65e44e814af27aa"/>
 			</dataarea>
 		</part>
-		<part name="flop3" interface="floppy_3_5">
+		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps569)reunion_disk3.ipf" size="1049612" crc="caf5a44b" sha1="88505a7ce593043cdd12f611750389f9c4bbc7f7"/>
 			</dataarea>
 		</part>
-		<part name="flop4" interface="floppy_3_5">
+		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 4" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps569)reunion_disk4.ipf" size="1049612" crc="73ddb39d" sha1="bc84ceb391f1f70fd56d2fbe7988dce00c3896ad"/>
 			</dataarea>
 		</part>
-		<part name="flop5" interface="floppy_3_5">
+		<part name="flop6" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 5" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps569)reunion_disk5.ipf" size="1049612" crc="0577609d" sha1="4ced88302024ca4e36c90fc901e4264f72057550"/>
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_3_5">
-			<feature name="part_id" value="Main Disk" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps569)reunion_maindisk.ipf" size="1049612" crc="7d25a6b8" sha1="45e0f1ec6a12bde7fe5f43bc11366e9c7c74b3fc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -553,6 +611,10 @@ license:CC0
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1994</year>
 		<publisher>Mirage</publisher>
+		<notes><![CDATA[
+Red screen when SmartDos logo displays, [FDC] dsksync
+Empty stripes on player sprite when it hits left edge of screen, [Denise] DDFSTRT
+]]></notes>
 		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -624,6 +686,9 @@ license:CC0
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1992</year>
 		<publisher>System 3</publisher>
+		<notes><![CDATA[
+Black screen, [FDC] dsksync
+]]></notes>
 		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -645,7 +710,6 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- boot OK -->
 	<software name="snapper" supported="yes">
 		<!-- SPS (CAPS) release 2534 -->
 		<description>Snapperazzi (Euro)</description>
@@ -653,6 +717,9 @@ license:CC0
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1993</year>
 		<publisher>Alternative Software</publisher>
+		<notes><![CDATA[
+boot OK
+]]></notes>
 		<!-- TODO: is this truly a ECS exclusive game? Reports indicates this being OCS as well, it also works on vanilla a500 -->
 		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
@@ -676,7 +743,11 @@ license:CC0
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1992</year>
 		<publisher>Domark</publisher>
-		<info name="usage" value="Requires ECS, includes Amiga Text" />
+		<notes><![CDATA[
+Doesn't show mouse pointer (a600)
+boot OK (a1200)
+]]></notes>
+		<info name="usage" value="Requires ECS, requires HDD install, includes AmigaText" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -698,6 +769,11 @@ license:CC0
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1995</year>
 		<publisher>Arcane Entertainment</publisher>
+		<notes><![CDATA[
+Black screen on garage screen (a500p only)
+Doesn't draw player sprite on gameplay (a500, a500p), works in a1200
+Unemulated link option
+]]></notes>
 		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -726,6 +802,9 @@ license:CC0
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1995</year>
 		<publisher>Flair Software</publisher>
+		<notes><![CDATA[
+Doesn't surpass the initial Whizz logo screen, [FDC] dsksync
+]]></notes>
 		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />

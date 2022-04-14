@@ -39,16 +39,19 @@ X - Test off-board memory banks
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
+#include "machine/com8116.h"
+#include "machine/i8255.h"
+#include "machine/msm5832.h"
+#include "machine/wd_fdc.h"
 #include "machine/z80daisy.h"
 #include "machine/z80sio.h"
-#include "machine/msm5832.h"
-#include "machine/i8255.h"
-#include "machine/com8116.h"
-#include "machine/wd_fdc.h"
 
+
+namespace {
 
 class pulsar_state : public driver_device
 {
@@ -80,7 +83,7 @@ private:
 	void mem_map(address_map &map);
 
 	floppy_image_device *m_floppy;
-	memory_passthrough_handler *m_rom_shadow_tap;
+	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;
@@ -191,20 +194,22 @@ void pulsar_state::machine_reset()
 
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_rom(0x0000, 0x07ff, m_rom);   // do it here for F3
-	m_rom_shadow_tap = program.install_read_tap(0xf800, 0xffff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
-	{
-		if (!machine().side_effects_disabled())
-		{
-			// delete this tap
-			m_rom_shadow_tap->remove();
+	m_rom_shadow_tap.remove();
+	m_rom_shadow_tap = program.install_read_tap(
+			0xf800, 0xffff,
+			"rom_shadow_r",
+			[this] (offs_t offset, u8 &data, u8 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					// delete this tap
+					m_rom_shadow_tap.remove();
 
-			// reinstall ram over the rom shadow
-			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
-		}
-
-		// return the original data
-		return data;
-	});
+					// reinstall ram over the rom shadow
+					m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
+				}
+			},
+			&m_rom_shadow_tap);
 }
 
 void pulsar_state::machine_start()
@@ -263,6 +268,8 @@ ROM_START( pulsarlb )
 	ROM_SYSTEM_BIOS(1, "mon6", "LBOOT6") // Blank screen until floppy boots
 	ROMX_LOAD( "lboot6.u2", 0x0000, 0x0800, CRC(3bca9096) SHA1(ff99288e51a9e832785ce8e3ab5a9452b1064231), ROM_BIOS(1))
 ROM_END
+
+} // anonymous namespace
 
 /* Driver */
 

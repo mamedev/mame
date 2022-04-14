@@ -47,7 +47,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	//virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	//virtual void device_timer(emu_timer &timer, device_timer_id id, int param);
 
 	inline uint16_t readword(offs_t address);
 	inline void writeword(offs_t address, uint16_t data);

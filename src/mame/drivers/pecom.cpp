@@ -27,6 +27,7 @@ TODO:
 
 #include "emu.h"
 #include "includes/pecom.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

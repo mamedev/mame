@@ -48,7 +48,7 @@ private:
 	void portc_w(uint8_t data);
 	uint8_t porta_r();
 	uint8_t portc_r();
-	uint8_t m_irq_state;
+	uint8_t m_irq_state = 0U;
 	void machine_start() override;
 	void sm1800_palette(palette_device &palette) const;
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);

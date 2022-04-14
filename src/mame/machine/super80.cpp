@@ -91,7 +91,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( super80_state::kansas_r )
 TIMER_DEVICE_CALLBACK_MEMBER( super80_state::timer_h )
 {
 	uint8_t go_fast = 0;
-	if ( (!BIT(m_portf0, 2)) | (!BIT(m_io_config->read(), 1)) )    // bit 2 of port F0 is low, OR user turned on config switch
+	if ( (!BIT(m_portf0, 2)) || (!BIT(m_io_config->read(), 1)) )    // bit 2 of port F0 is low, OR user turned on config switch
 		go_fast++; // must be 1 at boot so banking works correctly
 
 	/* code to slow down computer to 1 MHz by halting cpu on every second frame */
@@ -230,20 +230,22 @@ void super80_state::machine_reset_common()
 
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_rom(0x0000, 0x0fff, m_rom);   // do it here for F3
-	m_rom_shadow_tap = program.install_read_tap(0xc000, 0xcfff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
-	{
-		if (!machine().side_effects_disabled())
-		{
-			// delete this tap
-			m_rom_shadow_tap->remove();
+	m_rom_shadow_tap.remove();
+	m_rom_shadow_tap = program.install_read_tap(
+			0xc000, 0xcfff,
+			"rom_shadow_r",
+			[this] (offs_t offset, u8 &data, u8 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					// delete this tap
+					m_rom_shadow_tap.remove();
 
-			// reinstall ram over the rom shadow
-			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x0fff, m_ram);
-		}
-
-		// return the original data
-		return data;
-	});
+					// reinstall RAM over the ROM shadow
+					m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x0fff, m_ram);
+				}
+			},
+			&m_rom_shadow_tap);
 }
 
 void super80_state::machine_reset()

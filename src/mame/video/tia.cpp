@@ -117,7 +117,7 @@ void tia_ntsc_video_device::init_palette()
 	values of red may appear too pinkish - Too much blue to red.
 	This is not the same as a traditional tint-hue control adjustment;
 	rather, can be demonstrated by changing the blue ratio values
-	via MESS HLSL settings.
+	via MAME HLSL settings.
 
 	Lastly, the Atari 5200 & 7800 NTSC color palettes hold the same
 	hue structure order and have similar appearance differences that

@@ -96,13 +96,13 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	u8 m_digit;
-	u8 m_segment;
-	u8 m_irq_ctl;
-	bool m_ff_b;
-	u8 m_cass_data[4];
-	bool m_cassbit;
-	bool m_cassold;
+	u8 m_digit = 0U;
+	u8 m_segment = 0U;
+	u8 m_irq_ctl = 0U;
+	bool m_ff_b = 0;
+	u8 m_cass_data[4]{};
+	bool m_cassbit = 0;
+	bool m_cassold = 0;
 
 	required_device<i8080_cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;

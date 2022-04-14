@@ -88,6 +88,7 @@ TODO :  Add cartridge functionality
 #include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 #include "formats/hect_dsk.h"
 #include "formats/hect_tap.h"

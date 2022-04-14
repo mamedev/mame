@@ -2,8 +2,6 @@
 // copyright-holders:Wilbert Pol, Kevin Thacker
 /******************************************************************************
 
-        nc.cpp
-
         NC100/NC150/NC200 Notepad computer
 
         system driver
@@ -83,15 +81,11 @@
         Self Test:
 
         - requires memory save and real time clock save to be working!
-        (i.e. for MESS nc100 driver, nc100.nv can be created)
+        (i.e. for MAME nc100 driver, nc100.nv can be created)
         - turn off nc (use NMI button)
         - reset+FUNCTION+SYMBOL must be pressed together.
 
         Note: NC200 Self test does not test disc hardware :(
-
-
-
-        Kevin Thacker [MESS driver]
 
  ******************************************************************************/
 
@@ -562,28 +556,16 @@ uint8_t nc_state::nc_key_data_in_r(offs_t offset)
 
 void nc_state::nc_sound_update(int channel)
 {
-	int on;
-	int frequency;
-	int period;
-	beep_device *beeper_device = nullptr;
+	channel &= 1;
+	beep_device *beeper_device = channel ? m_beeper2 : m_beeper1;
 
-	switch(channel)
-	{
-		case 0:
-			beeper_device = m_beeper1;
-			break;
-		case 1:
-			beeper_device = m_beeper2;
-			break;
-	}
-
-	period = m_sound_channel_periods[channel];
+	int period = m_sound_channel_periods[channel];
 
 	/* if top bit is 0, sound is on */
-	on = ((period & (1<<15))==0);
+	int on = ((period & (1<<15))==0);
 
 	/* calculate frequency from period */
-	frequency = (int)(1000000.0f/((float)((period & 0x07fff)<<1) * 1.6276f));
+	int frequency = (int)(1000000.0f/((float)((period & 0x07fff)<<1) * 1.6276f));
 
 	/* set state */
 	beeper_device->set_state(on);
@@ -985,11 +967,11 @@ INPUT_PORTS_END
 #if 0
 void nc_state::nc150_init_machine()
 {
-		m_membank_internal_ram_mask = 7;
+	m_membank_internal_ram_mask = 7;
 
-		m_membank_card_ram_mask = 0x03f;
+	m_membank_card_ram_mask = 0x03f;
 
-		nc_state::machine_reset();
+	nc_state::machine_reset();
 }
 #endif
 
@@ -998,18 +980,16 @@ void nc_state::nc150_init_machine()
 /**********************************************************************************************************/
 /* NC200 hardware */
 
-#ifdef UNUSED_FUNCTION
 void nc200_state::nc200_display_memory_start_w(uint8_t data)
 {
 	/* bit 7: A15 */
 	/* bit 6: A14 */
 	/* bit 5: A13 */
 	/* bit 4-0: not used */
-	m_display_memory_start = (data & 0x0e0)<<(12-4);
+	m_display_memory_start = (data & 0x0e0) << (12 - 4);
 
 	LOG("disp memory w: %04x\n", m_display_memory_start);
 }
-#endif
 
 
 WRITE_LINE_MEMBER(nc200_state::write_nc200_centronics_ack)
@@ -1085,15 +1065,13 @@ WRITE_LINE_MEMBER(nc200_state::nc200_fdc_interrupt)
 	nc_update_interrupts();
 }
 
-#ifdef UNUSED_FUNCTION
-void nc_state::nc200_floppy_drive_index_callback(int drive_id)
+void nc200_state::nc200_floppy_drive_index_callback(int drive_id)
 {
 	LOGDEBUG("nc200 index pulse\n");
 //  m_irq_status |= (1<<4);
 
 //  nc_update_interrupts(Machine);
 }
-#endif
 
 void nc200_state::machine_reset()
 {
@@ -1523,4 +1501,4 @@ ROM_END
 COMP( 1992, nc100, 0,      0,      nc100,   nc100, nc100_state, init_nc, "Amstrad plc",          "NC100",           0 )
 COMP( 1992, dw225, nc100,  0,      nc100,   nc100, nc100_state, init_nc, "NTS Computer Systems", "DreamWriter 225", 0 )
 COMP( 1992, nc150, nc100,  0,      nc100,   nc100, nc100_state, init_nc, "Amstrad plc",          "NC150",           0 )
-COMP( 1993, nc200, 0,      0,      nc200,   nc200, nc200_state, init_nc, "Amstrad plc",          "NC200",           MACHINE_NOT_WORKING ) // boot hangs while checking the MC146818 UIP (update in progress) bit
+COMP( 1993, nc200, 0,      0,      nc200,   nc200, nc200_state, init_nc, "Amstrad plc",          "NC200",           0 )

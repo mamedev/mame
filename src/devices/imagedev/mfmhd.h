@@ -52,7 +52,7 @@ private:
 	running_machine &           m_machine;
 };
 
-class mfm_harddisk_device : public harddisk_image_device
+class mfm_harddisk_device : public device_t, public device_image_interface
 {
 public:
 	~mfm_harddisk_device();
@@ -60,6 +60,14 @@ public:
 	typedef delegate<void (mfm_harddisk_device*, int)> index_pulse_cb;
 	typedef delegate<void (mfm_harddisk_device*, int)> ready_cb;
 	typedef delegate<void (mfm_harddisk_device*, int)> seek_complete_cb;
+
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *image_type_name() const noexcept override { return "harddisk"; }
+	virtual const char *image_brief_type_name() const noexcept override { return "hard"; }
+	virtual const char *file_extensions() const noexcept override { return "chd"; }
 
 	void setup_index_pulse_cb(index_pulse_cb cb);
 	void setup_ready_cb(ready_cb cb);
@@ -107,12 +115,10 @@ public:
 protected:
 	mfm_harddisk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	void                device_start() override;
-	void                device_stop() override;
-	void                device_reset() override;
-	void                device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-	std::string         tts(const attotime &t);
+	virtual void        device_start() override;
+	virtual void        device_stop() override;
+	virtual void        device_reset() override;
+	virtual void        device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	emu_timer           *m_index_timer, *m_spinup_timer, *m_seek_timer, *m_cache_timer;
 	index_pulse_cb      m_index_pulse_cb;
@@ -158,7 +164,7 @@ private:
 
 	std::unique_ptr<mfmhd_trackimage_cache> m_cache;
 	mfmhd_image_format_t*   m_format;
-
+	chd_file   *m_chd;
 	void        head_move();
 	void        recalibrate();
 

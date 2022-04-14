@@ -1,6 +1,6 @@
+/build
+/build_*
+/tools/asmdb
 .vscode
 .kdev4
 *.kdev4
-build
-build_*
-tools/asmdb

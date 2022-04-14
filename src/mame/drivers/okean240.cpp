@@ -68,36 +68,36 @@ ToDo:
 - 80 column mode (used in Turbo Monitor)
 
 Keyboard:
-- okean240 - external ascii keyboard
+- okean240  - external ascii keyboard
 - okean240a - internal keyboard
 - okean240t - serial keyboard & screen
 
 **********************************************************************************************/
 
 #include "emu.h"
+
+#include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/keyboard.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
+#include "machine/keyboard.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "bus/rs232/rs232.h"
 #include "machine/timer.h"
-#include "emupal.h"
-#include "screen.h"
 
+#include "screen.h"
+#include "emupal.h"
+
+
+namespace {
 
 class okean240_state : public driver_device
 {
 public:
 	okean240_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_term_data(0)
-		, m_j(0)
-		, m_scroll(0)
-		, m_tog(0)
 		, m_p_videoram(*this, "videoram")
-		, m_io_keyboard(*this, "X%d", 0)
+		, m_io_keyboard(*this, "X%d", 0U)
 		, m_io_modifiers(*this, "MODIFIERS")
 		, m_maincpu(*this, "maincpu")
 		, m_rom(*this, "maincpu")
@@ -127,16 +127,16 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
-	u8 m_term_data;
-	u8 m_j;
-	u8 m_scroll;
-	u8 m_tog;
-	bool m_key_pressed;
-	u8 m_kbd_row;
+	u8 m_term_data = 0U;
+	u8 m_j = 0U;
+	u8 m_scroll = 0U;
+	u8 m_tog = 0U;
+	bool m_key_pressed = false;
+	u8 m_kbd_row = 0U;
 	required_shared_ptr<u8> m_p_videoram;
 	optional_ioport_array<11> m_io_keyboard;
 	optional_ioport m_io_modifiers;
-	memory_passthrough_handler *m_rom_shadow_tap;
+	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<i8080_cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;
@@ -403,20 +403,22 @@ void okean240_state::machine_reset()
 
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_rom(0x0000, 0x07ff, m_rom+0x2000);   // do it here for F3
-	m_rom_shadow_tap = program.install_read_tap(0xe000, 0xe7ff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
-	{
-		if (!machine().side_effects_disabled())
-		{
-			// delete this tap
-			m_rom_shadow_tap->remove();
+	m_rom_shadow_tap.remove();
+	m_rom_shadow_tap = program.install_read_tap(
+			0xe000, 0xe7ff,
+			"rom_shadow_r",
+			[this] (offs_t offset, u8 &data, u8 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					// delete this tap
+					m_rom_shadow_tap.remove();
 
-			// reinstall ram over the rom shadow
-			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
-		}
-
-		// return the original data
-		return data;
-	});
+					// reinstall RAM over the ROM shadow
+					m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
+				}
+			},
+			&m_rom_shadow_tap);
 }
 
 u32 okean240_state::screen_update_okean240(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -557,6 +559,8 @@ ROM_START( okean240t )
 	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "test.bin",    0x2000, 0x0800, CRC(e9e2b7b9) SHA1(e4e0b6984a2514b6ba3e97500d487ea1a68b7577) )
 ROM_END
+
+} // anonymous namespace
 
 /* Driver */
 

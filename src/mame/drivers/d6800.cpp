@@ -55,6 +55,7 @@
 #include "sound/beep.h"
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -91,10 +92,10 @@ private:
 
 	void d6800_map(address_map &map);
 
-	bool m_cb2;
-	bool m_cassold;
-	uint8_t m_cass_data[4];
-	uint8_t m_portb;
+	bool m_cb2 = 0;
+	bool m_cassold = 0;
+	uint8_t m_cass_data[4]{};
+	uint8_t m_portb = 0U;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;

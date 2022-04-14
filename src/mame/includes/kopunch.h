@@ -63,10 +63,10 @@ private:
 	output_finder<> m_lamp;
 
 	/* video-related */
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
-	uint8_t m_gfxbank;
-	uint8_t m_scrollx;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	uint8_t m_gfxbank = 0U;
+	uint8_t m_scrollx = 0U;
 };
 
 #endif // MAME_INCLUDES_KOPUNCH_H

@@ -73,7 +73,7 @@ void device_scv_cart_interface::ram_alloc(uint32_t size)
 //-------------------------------------------------
 scv_cart_slot_device::scv_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SCV_CART_SLOT, tag, owner, clock),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_scv_cart_interface>(mconfig, *this),
 	m_type(SCV_8K), m_cart(nullptr)
 {

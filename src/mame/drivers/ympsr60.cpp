@@ -683,7 +683,7 @@ void psr60_state::psr_common(machine_config &config)
 	m_ym3533->add_route(1, m_rmixer, 0.22);
 	m_ym3533->add_route(1, m_ic204a, 1.0);      // routed to BBD via filters
 
-	YM2154(config, m_ryp4, 2250000);
+	YM2154(config, m_ryp4, 2.25_MHz_XTAL);
 	m_ryp4->irq_handler().set(FUNC(psr60_state::ryp4_irq_w));
 	m_ryp4->io_read_handler().set(FUNC(psr60_state::ryp4_an_r));
 	m_ryp4->io_write_handler().set(FUNC(psr60_state::ryp4_out_w));

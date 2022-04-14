@@ -45,7 +45,8 @@ spectrum_expansion_slot_device::spectrum_expansion_slot_device(const machine_con
 	device_single_card_slot_interface<device_spectrum_expansion_interface>(mconfig, *this),
 	m_card(nullptr),
 	m_irq_handler(*this),
-	m_nmi_handler(*this)
+	m_nmi_handler(*this),
+	m_fb_r_handler(*this)
 {
 }
 
@@ -61,6 +62,7 @@ void spectrum_expansion_slot_device::device_start()
 	// resolve callbacks
 	m_irq_handler.resolve_safe();
 	m_nmi_handler.resolve_safe();
+	m_fb_r_handler.resolve_safe(0xff);
 }
 
 //-------------------------------------------------
@@ -112,7 +114,7 @@ uint8_t spectrum_expansion_slot_device::iorq_r(offs_t offset)
 	if (m_card)
 		return m_card->iorq_r(offset);
 	else
-		return 0xff;
+		return offset & 1 ? fb_r() : 0xff;
 }
 
 //-------------------------------------------------
@@ -169,6 +171,7 @@ void spectrum_expansion_slot_device::mreq_w(offs_t offset, uint8_t data)
 #include "mface.h"
 #include "mgt.h"
 #include "mikroplus.h"
+#include "mpoker.h"
 #include "opus.h"
 #include "plus2test.h"
 #include "protek.h"
@@ -176,6 +179,7 @@ void spectrum_expansion_slot_device::mreq_w(offs_t offset, uint8_t data)
 #include "sixword.h"
 #include "specdrum.h"
 #include "speccydos.h"
+#include "specmate.h"
 #include "uslot.h"
 #include "usource.h"
 #include "uspeech.h"
@@ -206,9 +210,14 @@ void spectrum_expansion_devices(device_slot_interface &device)
 	device.option_add("lprint", SPECTRUM_LPRINT);
 	device.option_add("lprint3", SPECTRUM_LPRINT3);
 	device.option_add("melodik", SPECTRUM_MELODIK);
+	device.option_add("mface1v1", SPECTRUM_MFACE1V1);
+	device.option_add("mface1v2", SPECTRUM_MFACE1V2);
+	device.option_add("mface1v3", SPECTRUM_MFACE1V3);
 	device.option_add("mface1", SPECTRUM_MFACE1);
+	device.option_add("mface128v1", SPECTRUM_MFACE128V1);
 	device.option_add("mface128", SPECTRUM_MFACE128);
 	device.option_add("mikroplus", SPECTRUM_MIKROPLUS);
+	device.option_add("mpoker", SPECTRUM_MPOKER);
 	device.option_add("mprint", SPECTRUM_MPRINT);
 	device.option_add("opus", SPECTRUM_OPUS);
 	device.option_add("plusd", SPECTRUM_PLUSD);
@@ -218,6 +227,7 @@ void spectrum_expansion_devices(device_slot_interface &device)
 	device.option_add("speccydos", SPECTRUM_SPECCYDOS);
 	device.option_add("spdos", SPECTRUM_SPDOS);
 	device.option_add("specdrum", SPECTRUM_SPECDRUM);
+	device.option_add("specmate", SPECTRUM_SPECMATE);
 	device.option_add("swiftdisc", SPECTRUM_SWIFTDISC);
 	device.option_add("swiftdisc2", SPECTRUM_SWIFTDISC2);
 	device.option_add("uslot", SPECTRUM_USLOT);
@@ -233,6 +243,7 @@ void spec128_expansion_devices(device_slot_interface &device)
 	device.option_add("intf1", SPECTRUM_INTF1);
 	device.option_add("intf2", SPECTRUM_INTF2);
 	device.option_add("kempjoy", SPECTRUM_KEMPJOY);
+	device.option_add("mface128v1", SPECTRUM_MFACE128V1);
 	device.option_add("mface128", SPECTRUM_MFACE128);
 	device.option_add("mikroplus", SPECTRUM_MIKROPLUS);
 	device.option_add("mprint", SPECTRUM_MPRINT);
@@ -249,6 +260,7 @@ void spec128_expansion_devices(device_slot_interface &device)
 
 void specpls3_expansion_devices(device_slot_interface &device)
 {
+	device.option_add("kempjoy", SPECTRUM_KEMPJOY);
 	device.option_add("mface3", SPECTRUM_MFACE3);
 }
 

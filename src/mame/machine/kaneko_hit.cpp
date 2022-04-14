@@ -20,7 +20,7 @@
 
    suprnova.c also has a similar device, the implementation hasn't been fully compared
 
-  CALC1 is a 40 pin DIP MCU of unknown type with unknown internal rom
+  CALC1 is a 40 pin DIP ULA with no internal ROM
 
 */
 

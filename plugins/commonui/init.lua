@@ -82,7 +82,7 @@ function commonui.input_selection_menu(action, title, filter)
 		local selection = index_first_choice
 		for index, field in ipairs(choices) do
 			if field then
-				table.insert(items, { _p('input-name', field.name), '', '' })
+				table.insert(items, { field.name, '', '' })
 				if initial_selection and (field.port.tag == initial_selection.port.tag) and (field.mask == initial_selection.mask) and (field.type == initial_selection.type) then
 					selection = #items
 					initial_selection = nil

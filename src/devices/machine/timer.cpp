@@ -37,7 +37,6 @@ timer_device::timer_device(const machine_config &mconfig, const char *tag, devic
 	: device_t(mconfig, TIMER, tag, owner, clock),
 		m_type(TIMER_TYPE_GENERIC),
 		m_callback(*this),
-		m_ptr(nullptr),
 		m_start_delay(attotime::zero),
 		m_period(attotime::zero),
 		m_param(0),
@@ -158,7 +157,7 @@ void timer_device::device_reset()
 //  device_timer - handle timer expiration events
 //-------------------------------------------------
 
-void timer_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void timer_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (m_type)
 	{
@@ -166,7 +165,7 @@ void timer_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		case TIMER_TYPE_GENERIC:
 		case TIMER_TYPE_PERIODIC:
 			if (!m_callback.isnull())
-				(m_callback)(*this, m_ptr, param);
+				(m_callback)(*this, param);
 			break;
 
 		// scanline timers have to do some additional bookkeeping
@@ -181,7 +180,7 @@ void timer_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 				// call the real callback
 				int vpos = m_screen->vpos();
 				if (!m_callback.isnull())
-					(m_callback)(*this, m_ptr, vpos);
+					(m_callback)(*this, vpos);
 
 				// advance by the increment only if we will still be within the screen bounds
 				if (m_increment != 0 && (vpos + m_increment) < m_screen->height())

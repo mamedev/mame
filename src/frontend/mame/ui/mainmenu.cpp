@@ -120,7 +120,7 @@ void menu_main::populate(float &customtop, float &custombottom)
 
 	item_append(_("Input (general)"), 0, (void *)INPUT_GROUPS);
 
-	item_append(_("Input (this Machine)"), 0, (void *)INPUT_SPECIFIC);
+	item_append(_("Input (this machine)"), 0, (void *)INPUT_SPECIFIC);
 
 	if (ui().machine_info().has_analog())
 		item_append(_("Analog Controls"), 0, (void *)ANALOG);
@@ -152,7 +152,7 @@ void menu_main::populate(float &customtop, float &custombottom)
 		item_append(_("Tape Control"), 0, (void *)TAPE_CONTROL);
 
 	if (pty_interface_enumerator(machine().root_device()).first() != nullptr)
-		item_append(_("Pseudo terminals"), 0, (void *)PTY_INFO);
+		item_append(_("Pseudo Terminals"), 0, (void *)PTY_INFO);
 
 	if (ui().machine_info().has_bioses())
 		item_append(_("BIOS Selection"), 0, (void *)BIOS_SELECTION);
@@ -197,7 +197,7 @@ void menu_main::populate(float &customtop, float &custombottom)
 
 	item_append(menu_item_type::SEPARATOR);
 
-	item_append(string_format(_("About %s"), emulator_info::get_appname()), 0, (void *)ABOUT);
+	item_append(string_format(_("About %1$s"), emulator_info::get_appname()), 0, (void *)ABOUT);
 
 	item_append(menu_item_type::SEPARATOR);
 

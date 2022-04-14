@@ -1,4 +1,4 @@
-.. _universal-command-line:
+.. _mame-commandline-universal:
 
 Universal Commandline Options
 =============================
@@ -18,6 +18,8 @@ distribution such as **romcmp** and **srcclean**.
 Verbs are actions to take upon something with the command (e.g.
 **mame -validate pacman** has *mame* as a command and *-validate* as a verb)
 
+
+.. _mame-commandline-patterns:
 
 Patterns
 --------
@@ -80,6 +82,8 @@ Terminal window, set the working directory to the location of the script
 (i.e. the folder containing MAME), and then start MAME.
 
 
+.. _mame-commandline-coreverbs:
+
 Core Verbs
 ----------
 
@@ -136,6 +140,9 @@ Core Verbs
             apple2_flop_orig.xml(137.3): mismatched tag
 
 
+
+.. _mame-commandline-configverbs:
+
 Configuration Verbs
 -------------------
 
@@ -174,6 +181,8 @@ Configuration Verbs
     not mentioned here, the short summary given by "mame -showusage" is usually
     a sufficient description.
 
+
+.. _mame-commandline-fronendverbs:
 
 Frontend Verbs
 --------------
@@ -664,8 +673,8 @@ overwritten.
             romset apple2_flop_orig:autobahn is good
             ...
 
-.. _osd-commandline-options:
 
+.. _mame-commandline-osdoptions:
 
 OSD-related Options
 -------------------
@@ -919,8 +928,10 @@ Example:
          supporting both XInput and DirectInput controllers.
 
 
-OSD CLI Options
----------------
+.. _mame-commandline-cliverbs:
+
+OSD CLI Verbs
+-------------
 
 .. _mame-commandline-listmidi:
 
@@ -961,6 +972,8 @@ OSD CLI Options
          any network adapters.
 
 
+.. _mame-commandline-osdoutput:
+
 OSD Output Options
 ------------------
 
@@ -986,6 +999,8 @@ OSD Output Options
             led0 = 1
             led0 = 0
 
+
+.. _mame-commandline-configoptions:
 
 Configuration Options
 ---------------------
@@ -1024,6 +1039,8 @@ Configuration Options
 
             mame apple2ee -noreadconfig -sl6 diskii -sl7 cffa2 -hard1 TotalReplay.2mg
 
+
+.. _mame-commandline-pathoptions:
 
 Core Search Path Options
 ------------------------
@@ -1235,6 +1252,8 @@ Core Search Path Options
             mame -swpath c:\mame\software;c:\emu\mydisks
 
 
+.. _mame-commandline-coreoutdir:
+
 Core Output Directory Options
 -----------------------------
 
@@ -1361,6 +1380,8 @@ Core Output Directory Options
 
             mame -comment_directory c:\mame\comments
 
+
+.. _mame-commandline-savestate:
 
 Core State/Playback Options
 ---------------------------
@@ -1706,6 +1727,8 @@ Core State/Playback Options
             mame neogeo -burnin
 
 
+.. _mame-commandline-perf:
+
 Core Performance Options
 ------------------------
 
@@ -1862,7 +1885,7 @@ Core Performance Options
 
 .. _mame-commandline-lowlatency:
 
-**-lowlatency**
+**-[no]lowlatency**
 
     This tells MAME to draw a new frame before throttling to reduce input
     latency.  This is particularly effective with VRR (Variable Refresh Rate)
@@ -1877,6 +1900,8 @@ Core Performance Options
 
             mame bgaregga -lowlatency
 
+
+.. _mame-commandline-rotation:
 
 Core Rotation Options
 ---------------------
@@ -1977,6 +2002,8 @@ Core Rotation Options
 
             mame -flipy suprmrio
 
+
+.. _mame-commandline-videooptions:
 
 Core Video Options
 ------------------
@@ -2232,6 +2259,8 @@ Core Video Options
             mame dkong -nounevenstretch
 
 
+.. _mame-commandline-fullscreen:
+
 Core Full Screen Options
 ------------------------
 
@@ -2256,6 +2285,8 @@ Core Full Screen Options
 
             mame kof97 -video d3d -switchres -resolution 1280x1024
 
+
+.. _mame-commandline-windowoptions:
 
 Core Per-Window Options
 -----------------------
@@ -2422,6 +2453,8 @@ Core Per-Window Options
             mame contra -view native
 
 
+.. _mame-commandline-artwork:
+
 Core Artwork Options
 --------------------
 
@@ -2474,6 +2507,8 @@ Core Artwork Options
 
             mame galaga -override_artwork puckman
 
+
+.. _mame-commandline-screenoptions:
 
 Core Screen Options
 -------------------
@@ -2569,6 +2604,8 @@ Core Screen Options
             mame pacman -effect scanlines
 
 
+.. _mame-commandline-vectoroptions:
+
 Core Vector Options
 -------------------
 
@@ -2649,12 +2686,14 @@ Core Vector Options
             mame asteroid -flicker 0.15
 
 
-Core Video OpenGL Debugging Options
------------------------------------
+.. _mame-commandline-opengloptions:
+
+Core Video OpenGL Feature Options
+---------------------------------
 
 These options are for compatibility in **-video opengl**.  If you report
-rendering artifacts you may be asked to try messing with them by the devs, but
-normally they should be left at their defaults which results in the best
+rendering artifacts you may be asked to try messing with them by the developers,
+but normally they should be left at their defaults which results in the best
 possible video performance.
 
 .. Tip:: Examples are not provided for these options as MAMEdev will provide
@@ -2693,16 +2732,18 @@ possible video performance.
     The default is ON. (**-gl_pbo**)
 
 
+.. _mame-commandline-openglglsl:
+
 Core Video OpenGL GLSL Options
 ------------------------------
 
 .. _mame-commandline-glglsl:
 
-**-gl_glsl**
+**-[no]gl_glsl**
 
     Enable OpenGL GLSL, if available.
 
-    The default is OFF.
+    The default is OFF (**-nogl_glsl**).
 
     Example:
         .. code-block:: bash
@@ -2765,19 +2806,7 @@ Core Video OpenGL GLSL Options
             mame suprmrio -gl_glsl -glsl_shader_screen0 gaussx -glsl_shader_screen1 gaussy -glsl_shader_screen2 CRT-geom-halation
 
 
-.. _mame-commandline-glglslvidattr:
-
-**-gl_glsl_vid_attr**
-
-    Enable OpenGL GLSL handling of brightness and contrast.
-    Better RGB system performance.
-
-    Default is ``on``.
-
-    Example:
-        .. code-block:: bash
-
-            mame pacman -gl_glsl -gl_glsl_vid_attr off
+.. _mame-commandline-soundoptions:
 
 Core Sound Options
 ------------------
@@ -2904,7 +2933,7 @@ Core Sound Options
 
     The default is ``1``.
 
-    | For PortAudio, see the section on :ref:`-pa_latency <mame-commandline-pa-latency>`.
+    | For PortAudio, see the section on :ref:`-pa_latency <mame-commandline-palatency>`.
     | XAudio2 calculates audio_latency as 10ms steps.
     | DSound calculates audio_latency as 10ms steps.
     | CoreAudio calculates audio_latency as 25ms steps.
@@ -2915,6 +2944,8 @@ Core Sound Options
 
             mame galaga -audio_latency 1
 
+
+.. _mame-commandline-inputoptions:
 
 Core Input Options
 ------------------
@@ -3256,7 +3287,7 @@ Core Input Options
 
 .. _mame-commandline-natural:
 
-**\-natural**
+**\-[no]natural**
 
     Allows user to specify whether or not to use a natural keyboard or not.
     This allows you to start your system in a 'native' mode, depending on your
@@ -3290,7 +3321,7 @@ Core Input Options
 
 .. _mame-commandline-joystickcontradictory:
 
-**-joystick_contradictory**
+**-[no]joystick_contradictory**
 
     Enable contradictory direction digital joystick input at the same time such
     as **Left and Right** or **Up and Down** at the same time.
@@ -3316,6 +3347,8 @@ Core Input Options
 
             mame contra -coin_impulse 1
 
+
+.. _mame-commandline-inputenable:
 
 Core Input Automatic Enable Options
 -----------------------------------
@@ -3367,6 +3400,8 @@ Core Input Automatic Enable Options
 .. Tip:: Note that these controls override the values of **-[no]mouse**,
          **-[no]joystick**, etc.
 
+
+.. _mame-commandline-debugging:
 
 Debugging Options
 -----------------
@@ -3570,6 +3605,8 @@ Debugging Options
             mame marble -debug -debugger_font "Comic Sans MS" -debugger_font_size 16
 
 
+.. _mame-commandline-commoptions:
+
 Core Communication Options
 --------------------------
 
@@ -3645,6 +3682,8 @@ Core Communication Options
             mame arescue -comm_remotehost 192.168.1.3 -comm_remoteport 30100 -comm_framesync
 
 
+.. _mame-commandline-miscoptions:
+
 Core Misc Options
 -----------------
 
@@ -3663,7 +3702,7 @@ Core Misc Options
 
 .. _mame-commandline-drcusec:
 
-**\-drc_use_c**
+**\-[no]drc_use_c**
 
     Force DRC to use the C code backend.
 
@@ -3676,7 +3715,7 @@ Core Misc Options
 
 .. _mame-commandline-drcloguml:
 
-**\-drc_log_uml**
+**\-[no]drc_log_uml**
 
     Write DRC UML disassembly log.
 
@@ -3689,7 +3728,7 @@ Core Misc Options
 
 .. _mame-commandline-drclognative:
 
-**\-drc_log_native**
+**\-[no]drc_log_native**
 
     Write DRC native disassembly log.
 
@@ -3788,7 +3827,7 @@ Core Misc Options
 
 .. _mame-commandline-confirmquit:
 
-**\-confirm_quit**
+**\-[no]confirm_quit**
 
     Display a Confirm Quit dialog to screen on exit, requiring one extra step
     to exit MAME.
@@ -3802,7 +3841,7 @@ Core Misc Options
 
 .. _mame-commandline-uimouse:
 
-**\-ui_mouse**
+**\-[no]ui_mouse**
 
     Displays a mouse cursor when using the built-in UI for MAME.
 
@@ -3840,6 +3879,8 @@ Core Misc Options
 
             mame galaga88 -nonvram_save
 
+
+.. _mame-commandline-scripting:
 
 Scripting Options
 -----------------
@@ -3930,8 +3971,11 @@ Scripting Options
             mame alcon -noplugin cheat
 
 
+.. _mame-commandline-webserver:
+
 HTTP Server Options
 -------------------
+
 .. _mame-commandline-http:
 
 **-[no]http**
@@ -3972,10 +4016,12 @@ HTTP Server Options
             mame apple2 -http -http_port 6502 -http_root c:\users\me\appleweb\root
 
 
+.. _mame-commandline-portaudio:
+
 PortAudio Options
 -----------------
 
-.. _mame-commandline-pa-api:
+.. _mame-commandline-paapi:
 
 **-pa_api** *API*
 
@@ -4031,7 +4077,7 @@ PortAudio Options
 
             mame suprmrio -sound portaudio -pa_api "Windows WASAPI"
 
-.. _mame-commandline-pa-device:
+.. _mame-commandline-padevice:
 
 **-pa_device** *device*
 
@@ -4045,7 +4091,7 @@ PortAudio Options
 
             mame suprmrio -sound portaudio -pa_api "Windows WASAPI" -pa_device "NX-EDG27 (NVIDIA High Definition Audio)"
 
-.. _mame-commandline-pa-latency:
+.. _mame-commandline-palatency:
 
 **-pa_latency** *latency*
 

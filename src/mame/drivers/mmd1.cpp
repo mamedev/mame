@@ -120,9 +120,9 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	u8 m_cass_data[4];
-	bool m_cassinbit, m_cassoutbit, m_cassold;
-	u8 m_return_code;
+	u8 m_cass_data[4]{};
+	bool m_cassinbit = 0, m_cassoutbit = 0, m_cassold = 0;
+	u8 m_return_code = 0U;
 
 	required_device<i8080_cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;

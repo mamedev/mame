@@ -58,12 +58,12 @@ private:
 	void dlart_w(offs_t, u8);
 	void kbd_put(u8 data);
 
-	u8 m_term_data;
-	u8 m_seg_lower;
-	u8 m_seg_upper;
-	u8 m_portc;
-	u16 m_irqs;
-	bool m_dlart_maintmode;
+	u8 m_term_data = 0U;
+	u8 m_seg_lower = 0U;
+	u8 m_seg_upper = 0U;
+	u8 m_portc = 0U;
+	u16 m_irqs = 0U;
+	bool m_dlart_maintmode = 0;
 
 	void mem_map(address_map &map);
 

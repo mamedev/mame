@@ -288,7 +288,7 @@ protected:
 	int m_md[9];
 	int m_clock;
 
-	// hack 1 = Naomi hack, hack 2 = Work in Progress implementation
+	// hack 1 = Naomi hack, hack 2 = WIP implementation
 	int m_mmuhack;
 
 	uint32_t  m_exception_priority[128];
@@ -377,8 +377,7 @@ protected:
 
 	//void    (*m_ftcsr_read_callback)(uint32_t data);
 
-	/* This MMU simulation is good for the simple remap used on Naomi GD-ROM SQ access *ONLY* */
-	uint8_t m_sh4_mmu_enabled;
+	bool m_sh4_mmu_enabled;
 
 	// sh3 internal
 	uint32_t  m_sh3internal_upper[0x3000/4];

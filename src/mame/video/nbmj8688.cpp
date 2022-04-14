@@ -261,7 +261,7 @@ void nbmj8688_state::writeram_high(int x, int y, int color)
 	update_pixel(x, y);
 }
 
-void nbmj8688_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nbmj8688_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

@@ -20,6 +20,7 @@
 #include "audit.h"
 #include "drivenum.h"
 #include "emuopts.h"
+#include "fileio.h"
 #include "mame.h"
 #include "uiinput.h"
 

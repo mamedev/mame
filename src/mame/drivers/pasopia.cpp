@@ -31,7 +31,7 @@
 #include "speaker.h"
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 class pasopia_state : public driver_device
 {
@@ -83,17 +83,17 @@ private:
 	void pasopia_io(address_map &map);
 	void pasopia_map(address_map &map);
 
-	u8 m_hblank;
-	u16 m_vram_addr;
-	u16 m_vram_latch;
-	u8 m_gfx_mode;
-	u8 m_mux_data;
-	u8 m_porta_2;
-	bool m_video_wl;
-	bool m_ram_bank;
-	bool m_spr_sw;
-	u8 m_dclr;
-	emu_timer *m_pio_timer;
+	u8 m_hblank = 0;
+	u16 m_vram_addr = 0;
+	u16 m_vram_latch = 0;
+	u8 m_gfx_mode = 0;
+	u8 m_mux_data = 0;
+	u8 m_porta_2 = 0;
+	bool m_video_wl = false;
+	bool m_ram_bank = false;
+	bool m_spr_sw = false;
+	u8 m_dclr = 0;
+	emu_timer *m_pio_timer = nullptr;
 	std::unique_ptr<u16[]> m_p_vram;
 
 	required_device<z80_device> m_maincpu;

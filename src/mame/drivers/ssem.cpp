@@ -11,6 +11,8 @@
 #include "imagedev/snapquik.h"
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
+#include <sstream>
 
 
 class ssem_state : public driver_device
@@ -34,7 +36,7 @@ private:
 	uint32_t screen_update_ssem(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	inline uint32_t reverse(uint32_t v);
-	std::string read_line(device_image_interface *image);
+	std::string read_line(device_image_interface &image);
 
 	void ssem_map(address_map &map);
 
@@ -45,7 +47,7 @@ private:
 	required_shared_ptr<uint8_t> m_store;
 	required_device<screen_device> m_screen;
 
-	uint8_t m_store_line;
+	uint8_t m_store_line = 0;
 
 	util::ovectorstream m_glyph_print_buf;
 };
@@ -515,25 +517,26 @@ uint32_t ssem_state::screen_update_ssem(screen_device &screen, bitmap_rgb32 &bit
 * Image helper functions                             *
 \****************************************************/
 
-std::string ssem_state::read_line(device_image_interface *image)
+std::string ssem_state::read_line(device_image_interface &image)
 {
-	std::string holder;
+	std::ostringstream stream;
 	for (u8 i = 0; i < 100; i++)
 	{
-		char c = image->fgetc();
+		char c = 0;
+		if (image.fread(&c, 1) != 1)
+			break;
 		// convert opcode to lower case
 		if (c >= 'A' && c <= 'Z')
 			c += 32;
 		if (c >= 32)
-			holder.push_back(c);
+			stream << c;
 		else
 		{
-			c = image->fgetc(); // skip LF
+			image.fread(&c, 1); // skip LF
 			break;
 		}
 	}
-	holder.push_back(0);
-	return holder;
+	return std::move(stream).str();
 }
 
 
@@ -547,7 +550,7 @@ QUICKLOAD_LOAD_MEMBER(ssem_state::quickload_cb)
 	std::string buffer;
 	u32 num_lines = 0;
 
-	std::string image_line = read_line(&image);
+	std::string image_line = read_line(image);
 	if (image_line.empty())
 	{
 		image.message("No data in line 1");
@@ -565,10 +568,10 @@ QUICKLOAD_LOAD_MEMBER(ssem_state::quickload_cb)
 	for (u32 i = 0; i < num_lines; i++)
 	{
 		u32 line = 0, word = 0;
-		image_line = read_line(&image);
+		image_line = read_line(image);
 		u32 length = image_line.length();
 
-		if (length < 9)
+		if (length < 8)
 		{
 			image.message("Bad data (%s) in line %d",image_line.c_str(),i+2);
 			return image_init_result::FAIL;
@@ -580,7 +583,7 @@ QUICKLOAD_LOAD_MEMBER(ssem_state::quickload_cb)
 
 		if (image.is_filetype("snp"))
 		{
-			if (length < 38)
+			if (length < 37)
 			{
 				image.message("Bad data (%s) in line %d",image_line.c_str(),i+2);
 				return image_init_result::FAIL;

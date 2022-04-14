@@ -877,7 +877,7 @@ Night Gal
 OSC:20MHz
 CPU:Z80
 SND:AY-3-8910
-ETC:CUSTOM(The surface of the chip is scrached, so the name of the chip is unknown), MemoryBackup
+ETC:CUSTOM(The surface of the chip is scratched, so the name of the chip is unknown), MemoryBackup
 
 NGAL_01.BIN graphic
 NGAL_02.BIN graphic
@@ -929,7 +929,7 @@ Night Bunny
 CPU: Z80
 Sound: AY-3-8910
 OSC: 20.000MHz
-Other: surface scrached DIP40 (NB1413M3?)
+Other: surface scratched DIP40 (NB1413M3?)
 
 ROMs:
 1.3A

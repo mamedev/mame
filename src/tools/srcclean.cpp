@@ -186,7 +186,7 @@ private:
 
 	// output state management
 	unsigned                    m_output_column = 0U;
-	unsigned                    m_indent;
+	unsigned                    m_indent        = 0U;
 	unsigned                    m_tab_limit     = std::numeric_limits<unsigned>::max();
 	std::vector<char32_t>       m_whitespace;
 

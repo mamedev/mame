@@ -76,7 +76,7 @@ private:
 	void piaset_w(offs_t, u8);
 	bool m_cassbit = 0;
 	bool m_cassold = 0;
-	u8 m_cass_data[4] = { 0, };
+	u8 m_cass_data[4]{};
 	void machine_start() override;
 	void machine_reset() override;
 	required_device<cpu_device> m_maincpu;

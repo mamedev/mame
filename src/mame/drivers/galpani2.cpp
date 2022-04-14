@@ -692,6 +692,7 @@ void galpani2_state::galpani2(machine_config &config)
 //galpani2g= 15A3                bkg layer offset
 //galpani2i= 54FC                bkg layer offset
 //galpani2t= 18A3                bkg layer offset
+//galpani2k= DE53                bkg layer offset
 //galpani2j= 08E1 / A582         bkg layer OK          has demo
 //gp2quiz  = 78D6 / 84A0         bkg layer OK          has demo
 //gp2se    = 6D8C / FCE4 (Japan) bkg layer unknown
@@ -1169,6 +1170,48 @@ ROM_START( galpani2t )
 	ROM_CONTINUE(            0x200000, 0x080000 )
 ROM_END
 
+
+ROM_START( galpani2k ) // Kaneko Z04G2-004 single PCB
+	ROM_REGION( 0x100000, "maincpu", 0 )            /* CPU#1 Code */
+	ROM_LOAD16_BYTE( "27c040.u165", 0x000000, 0x080000, CRC(152bbddf) SHA1(b5cb78f7aef145bf37c1252959b479e948e09df4) ) // No labels, but likely different to the PCB layout in header
+	ROM_LOAD16_BYTE( "27c040.u164", 0x000001, 0x080000, CRC(906d72af) SHA1(fb57d371d6fa3efeee38ca3e89f3d2725dada0bf) ) // No labels, but likely different to the PCB layout in header
+
+	ROM_REGION( 0x40000, "sub", 0 )         /* CPU#2 Code */
+	ROM_LOAD16_BYTE( "27c010.u64", 0x000000, 0x020000, CRC(4fa04a29) SHA1(5819b6e6a845e16cc26704bc465b1bb807b4573d) ) // No labels, but likely different to the PCB layout in header
+	ROM_LOAD16_BYTE( "27c010.u63", 0x000001, 0x020000, CRC(c74f6763) SHA1(e39063ec1789fbacfaba6e97031247222f7b206d) ) // No labels, but likely different to the PCB layout in header
+
+	ROM_REGION16_BE( 0x2000000, "subdata", ROMREGION_ERASEFF )    /* Backgrounds (CPU2) */
+	ROM_LOAD16_BYTE( "gp2-300a-k_0067.u175", 0x000000, 0x100000, CRC(68145adc) SHA1(6d8ab1f344adf2f0ec79aad7bb3c7977c5229651) ) // KANEKO GP2-300A-K 0067
+	ROM_LOAD16_BYTE( "gp2-300b-k_0068.u176", 0x000001, 0x100000, CRC(e77af845) SHA1(c88cc93f718b3057120c81403cd0b1659305008b) ) // KANEKO GP2-300B-K 0068
+	ROM_LOAD16_BYTE( "gp2-301a-k_0069.u177", 0x200000, 0x100000, CRC(b6610c77) SHA1(8f53360bde92de24fc8154718aece497cd9178d3) ) // KANEKO GP2-301A-K 0069
+	ROM_LOAD16_BYTE( "gp2-301b-k_0070.u178", 0x200001, 0x100000, CRC(71969a41) SHA1(337d18caf57bca8025669cdcc11e16c49e7fe854) ) // KANEKO GP2-301B-K 0070
+	ROM_LOAD16_BYTE( "gp2-302a_0057.u179",   0x400000, 0x100000, CRC(311fa273) SHA1(c2adeac45be701f6f474841755fac4347d44f844) ) // KANEKO GP2-302A 0057
+	ROM_LOAD16_BYTE( "gp2-302b_0058.u180",   0x400001, 0x100000, CRC(80cb211b) SHA1(7567c9d1309edddb9c1fa68346506de48e91ca6a) ) // KANEKO GP2-302B 0058
+	ROM_LOAD16_BYTE( "gp2-303a_0063.u181",   0x600000, 0x100000, CRC(162d83b7) SHA1(16daf2ba09e63eaca5e50c944472773b1774c946) ) // KANEKO GP2-303A 0063
+	ROM_LOAD16_BYTE( "gp2-303b_0064.u182",   0x600001, 0x100000, CRC(458a1fbc) SHA1(971548ec8cce592773e762a0c972264013b7cb8d) ) // KANEKO GP2-303B 0064
+	/* For this PCB set, GROM21L / GROM21U & GROM22L / GROM22U were unpopulated. Unlike what's shown in the PCB layout in the header */
+
+	ROM_REGION( 0x480000, "kan_spr", 0 )   /* Sprites */
+	ROM_LOAD( "gp2-200_0046.u189",  0x080000, 0x080000, CRC(11b49470) SHA1(d11c2374a7c9b9b0d1f27c29759b16630700561d) ) // KANEKO GP2-200 0046
+	ROM_CONTINUE(                   0x000000, 0x080000)
+	ROM_LOAD( "gp2-201_0047.u171",  0x180000, 0x080000, CRC(2f6392b4) SHA1(67446974c00481a7a806f4bc5b10eb6e442a1186) ) // KANEKO GP2-201 0047
+	ROM_CONTINUE(                   0x100000, 0x080000)
+	ROM_LOAD( "gp2-202_0048.u121",  0x280000, 0x080000, CRC(c8177181) SHA1(30d0a49334e370eb1b45d2eb6501df3f857a95d5) ) // KANEKO GP2-202 0048
+	ROM_CONTINUE(                   0x200000, 0x080000)
+	ROM_LOAD( "gp2-203_0049.u102",  0x380000, 0x080000, CRC(14e0cb38) SHA1(d9a778ebf0c6b67bee5f6f7016cb9ead96c6a992) ) // KANEKO GP2-203 0049
+	ROM_CONTINUE(                   0x300000, 0x080000)
+	ROM_LOAD16_BYTE( "27c020.u169", 0x400000, 0x040000, CRC(048c0ea6) SHA1(6585b0f20135e0b731f7fb801fbb6cb538763069) ) // No labels, but likely different to the PCB layout in header
+	ROM_LOAD16_BYTE( "27c020.u170", 0x400001, 0x040000, CRC(15f5012d) SHA1(65aa84e25cb83887ac64b0ae27ea08582133430f) ) // No labels, but likely different to the PCB layout in header
+
+	ROM_REGION( 0x140000, "oki1", 0 )   /* Samples */
+	ROM_LOAD( "gp2-100-k.u61", 0x040000, 0x100000, CRC(665ae0a2) SHA1(fa67a49eb4cb67f4f7f51bc70bce58fe9baff57b) )
+	ROM_COPY( "oki1", 0x0c0000, 0, 0x40000 )
+
+	ROM_REGION( 0x300000, "oki2", 0 )   /* Samples - Soldered in, NOT dumped from this PCB, taken from the set below */
+	ROM_LOAD( "gp2-102_0045.u59",  0x000000, 0x200000, CRC(1bed6ecd) SHA1(3208aacac64ac95fcb6eeef59986c3154c1c415b) ) // KANEKO GP2-102 0045
+	ROM_LOAD( "gp2-101_0044.u60",  0x200000, 0x100000, CRC(3c45134f) SHA1(a5362bfcc6beb6e776c1bce4544475f8947fccea) ) // KANEKO GP2-101 0044
+ROM_END
+
 /*
 
 Gals Panic II - Quiz Version (c) 1993 Kaneko
@@ -1295,6 +1338,7 @@ GAME( 1993, galpani2i2, galpani2, galpani2, galpani2, galpani2_state, empty_init
 GAME( 1993, galpani2i,  galpani2, galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (Italy, single PCB)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, galpani2gs, galpani2, galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (Germany, single PCB)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, galpani2t,  galpani2, galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (Taiwan, 2 PCB ver.)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, galpani2k,  galpani2, galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko (Karam Trading Co., Ltd. license)", "Gals Panic II (Korea, single PCB)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, galpani2j,  galpani2, galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (Japan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // it is a 'quiz edition' but the title screen doesn't say, maybe all Japanese versions have the Quiz
 
 GAME( 1993, gp2quiz,    0,        galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II - Quiz Version", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // this one has 'quiz edition' on the title screen

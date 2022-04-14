@@ -281,7 +281,7 @@ public:
 		} else
 		{
 			if (m_zeusbase[0x57] & 0x4)
-					m_frameColor[addr + 1] = m_zeusbase[0x59];
+				m_frameColor[addr + 1] = m_zeusbase[0x59];
 			if (m_zeusbase[0x57] & 0x10)
 				*(uint32_t*)&m_frameDepth[addr] = m_zeusbase[0x5a];
 		}
@@ -300,13 +300,11 @@ public:
 		return WAVERAM_BLOCK0(blocknum);
 	}
 
-#ifdef UNUSED_FUNCTION
-	inline void *waveram0_ptr_from_texture_addr(uint32_t addr, int width)
+	[[maybe_unused]] inline void *waveram0_ptr_from_texture_addr(uint32_t addr, int width)
 	{
 		uint32_t blocknum = ((addr & ~1) * width) / 8;
 		return WAVERAM_BLOCK0(blocknum);
 	}
-#endif
 
 	/*************************************
 	*  Inlines for rendering
@@ -328,51 +326,51 @@ public:
 		result |= ((((color) << 6) & 0xc0) | (((color) << 4) & 0x30) | (((color) << 2) & 0x0c) | (((color) << 0) & 0x03)) << 0;
 		return result;
 	}
-#ifdef UNUSED_FUNCTION
-	inline void WAVERAM_plot(int y, int x, uint32_t color)
-	{
-		if (zeus_cliprect.contains(x, y))
-			WAVERAM_WRITEPIX(zeus_renderbase, y, x, color);
-	}
-#endif
 
-#ifdef UNUSED_FUNCTION
-	inline void waveram_plot_depth(int y, int x, uint32_t color, uint16_t depth)
+	[[maybe_unused]] inline void WAVERAM_plot(int y, int x, uint32_t color)
 	{
 		if (zeus_cliprect.contains(x, y))
 		{
-			WAVERAM_WRITEPIX(zeus_renderbase, y, x, color);
-			WAVERAM_WRITEDEPTH(zeus_renderbase, y, x, depth);
+			uint32_t addr = frame_addr_from_xy(x, y, true);
+			m_frameColor[addr] = color;
 		}
 	}
-#endif
 
-#ifdef UNUSED_FUNCTION
-	inline void waveram_plot_check_depth(int y, int x, uint32_t color, uint16_t depth)
+	[[maybe_unused]] inline void waveram_plot_depth(int y, int x, uint32_t color, int32_t depth)
 	{
 		if (zeus_cliprect.contains(x, y))
 		{
-			uint16_t *depthptr = WAVERAM_PTRDEPTH(zeus_renderbase, y, x);
+			uint32_t addr = frame_addr_from_xy(x, y, true);
+			m_frameColor[addr] = color;
+			m_frameDepth[addr] = depth;
+		}
+	}
+
+	[[maybe_unused]] inline void waveram_plot_check_depth(int y, int x, uint32_t color, int32_t depth)
+	{
+		if (zeus_cliprect.contains(x, y))
+		{
+			uint32_t addr = frame_addr_from_xy(x, y, true);
+			int32_t *depthptr = &m_frameDepth[addr];
 			if (depth <= *depthptr)
 			{
-				WAVERAM_WRITEPIX(zeus_renderbase, y, x, color);
+				m_frameColor[addr] = color;
 				*depthptr = depth;
 			}
 		}
 	}
-#endif
 
-#ifdef UNUSED_FUNCTION
-	inline void waveram_plot_check_depth_nowrite(int y, int x, uint32_t color, uint16_t depth)
+	[[maybe_unused]] inline void waveram_plot_check_depth_nowrite(int y, int x, uint32_t color, int32_t depth)
 	{
 		if (zeus_cliprect.contains(x, y))
 		{
-			uint16_t *depthptr = WAVERAM_PTRDEPTH(zeus_renderbase, y, x);
+			uint32_t addr = frame_addr_from_xy(x, y, true);
+			int32_t *depthptr = &m_frameDepth[addr];
 			if (depth <= *depthptr)
-				WAVERAM_WRITEPIX(zeus_renderbase, y, x, color);
+				m_frameColor[addr] = color;
 		}
 	}
-#endif
+
 	/*************************************
 	*  Inlines for texel accesses
 	*************************************/

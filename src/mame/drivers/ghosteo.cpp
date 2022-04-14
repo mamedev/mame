@@ -81,10 +81,10 @@ enum nand_mode_t
 
 struct nand_t
 {
-	nand_mode_t mode;
-	int page_addr;
-	int byte_addr;
-	int addr_load_ptr;
+	nand_mode_t mode{};
+	int page_addr = 0;
+	int byte_addr = 0;
+	int addr_load_ptr = 0;
 };
 
 
@@ -125,8 +125,8 @@ private:
 	required_region_ptr<uint8_t> m_flash;
 	memory_bank_creator m_qs1000_bank;
 
-	int m_security_count;
-	uint32_t m_bballoon_port[20];
+	int m_security_count = 0;
+	uint32_t m_bballoon_port[20]{};
 	struct nand_t m_nand;
 	uint32_t bballoon_speedup_r(offs_t offset, uint32_t mem_mask = ~0);
 	uint32_t touryuu_port_10000000_r();
@@ -135,7 +135,7 @@ private:
 	void qs1000_p2_w(uint8_t data);
 	void qs1000_p3_w(uint8_t data);
 
-	int m_rom_pagesize;
+	int m_rom_pagesize = 0;
 	uint32_t s3c2410_gpio_port_r(offs_t offset);
 	void s3c2410_gpio_port_w(offs_t offset, uint32_t data);
 	uint32_t s3c2410_core_pin_r(offs_t offset);

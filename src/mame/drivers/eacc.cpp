@@ -85,10 +85,10 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(cb1_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer);
 	void mem_map(address_map &map);
-	uint8_t m_digit;
-	bool m_cb1;
-	bool m_cb2;
-	bool m_nmi;
+	uint8_t m_digit = 0U;
+	bool m_cb1 = 0;
+	bool m_cb2 = 0;
+	bool m_nmi = 0;
 
 	required_device<m6802_cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;

@@ -99,12 +99,12 @@ license:CC0
 		<text string="H"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 
-	<element name="text_r11"><text string="[K]"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_r21"><text string="[Q]"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_r31"><text string="[R]"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_r41"><text string="[B]"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_r51"><text string="[N]"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_r61"><text string="[P]"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_r11"><image file="chess/wk.svg"><color alpha="0.78" /></image></element>
+	<element name="text_r21"><image file="chess/wq.svg"><color alpha="0.78" /></image></element>
+	<element name="text_r31"><image file="chess/wr.svg"><color alpha="0.78" /></image></element>
+	<element name="text_r41"><image file="chess/wb.svg"><color alpha="0.78" /></image></element>
+	<element name="text_r51"><image file="chess/wn.svg"><color alpha="0.78" /></image></element>
+	<element name="text_r61"><image file="chess/wp.svg"><color alpha="0.78" /></image></element>
 
 	<element name="text_r12"><text string="PB" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_r22"><text string="PV" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
@@ -465,12 +465,12 @@ license:CC0
 
 	<!-- right side -->
 
-		<element ref="text_r11"><bounds x="91.6" y="29.65" width="2.5" height="1.5" /></element>
-		<element ref="text_r21"><bounds x="91.6" y="32.15" width="2.5" height="1.5" /></element>
-		<element ref="text_r31"><bounds x="91.6" y="34.65" width="2.5" height="1.5" /></element>
-		<element ref="text_r41"><bounds x="91.6" y="37.15" width="2.5" height="1.5" /></element>
-		<element ref="text_r51"><bounds x="91.6" y="39.65" width="2.5" height="1.5" /></element>
-		<element ref="text_r61"><bounds x="91.6" y="42.15" width="2.5" height="1.5" /></element>
+		<element ref="text_r11"><bounds x="91.8" y="29.45" width="2" height="2" /></element>
+		<element ref="text_r21"><bounds x="91.8" y="31.95" width="2" height="2" /></element>
+		<element ref="text_r31"><bounds x="91.8" y="34.45" width="2" height="2" /></element>
+		<element ref="text_r41"><bounds x="91.8" y="36.95" width="2" height="2" /></element>
+		<element ref="text_r51"><bounds x="91.8" y="39.45" width="2" height="2" /></element>
+		<element ref="text_r61"><bounds x="91.8" y="41.95" width="2" height="2" /></element>
 
 		<element ref="text_r12"><bounds x="96.8" y="29.65" width="10" height="1.5" /></element>
 		<element ref="text_r22"><bounds x="96.8" y="32.15" width="10" height="1.5" /></element>

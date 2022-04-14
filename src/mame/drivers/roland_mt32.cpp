@@ -224,11 +224,11 @@ private:
 
 	void mt32_map(address_map &map);
 
-	uint8_t lcd_data_buffer[256];
-	int lcd_data_buffer_pos;
-	uint8_t midi;
-	int midi_pos;
-	uint8_t port0;
+	uint8_t lcd_data_buffer[256]{};
+	int lcd_data_buffer_pos = 0;
+	uint8_t midi = 0;
+	int midi_pos = 0;
+	uint8_t port0 = 0;
 };
 
 mt32_state::mt32_state(const machine_config &mconfig, device_type type, const char *tag) :

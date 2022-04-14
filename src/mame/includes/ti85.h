@@ -34,15 +34,15 @@ enum ti85_model {
 	TI84PSE
 };
 
-typedef struct
+struct ti83pse_timer
 {
-	uint8_t loop;
-	uint8_t setup;
-	float divsor;
-	bool interrupt;
-	uint8_t max;
-	uint8_t count;
-} ti83pse_timer;
+	uint8_t loop = 0;
+	uint8_t setup = 0;
+	float divsor = 1;
+	bool interrupt = false;
+	uint8_t max = 0;
+	uint8_t count = 0;
+};
 
 typedef enum TI83PSE_CTIMER
 {
@@ -87,44 +87,44 @@ private:
 	optional_device<intelfsh8_device> m_flash;
 	optional_device_array<address_map_bank_device, 4> m_membank;
 
-	ti85_model m_model;
+	ti85_model m_model{};
 
-	uint8_t m_LCD_memory_base;
-	uint8_t m_LCD_contrast;
-	uint8_t m_LCD_status;
-	uint8_t m_timer_interrupt_mask;
-	uint8_t m_timer_interrupt_status;
-	uint8_t m_ctimer_interrupt_status;
-	uint8_t m_ON_interrupt_mask;
-	uint8_t m_ON_interrupt_status;
-	uint8_t m_ON_pressed;
-	uint8_t m_flash_unlocked;
-	uint8_t m_ti8x_memory_page_1;
-	uint8_t m_ti8x_memory_page_2;
-	uint8_t m_ti8x_memory_page_3;
-	bool m_booting;
-	uint8_t m_LCD_mask;
-	uint8_t m_power_mode;
-	uint8_t m_cpu_speed;
-	uint8_t m_keypad_mask;
-	uint8_t m_video_buffer_width;
-	uint8_t m_interrupt_speed;
-	uint8_t m_port4_bit0;
-	uint8_t m_ti81_port_7_data;
+	uint8_t m_LCD_memory_base = 0;
+	uint8_t m_LCD_contrast = 0;
+	uint8_t m_LCD_status = 0;
+	uint8_t m_timer_interrupt_mask = 0;
+	uint8_t m_timer_interrupt_status = 0;
+	uint8_t m_ctimer_interrupt_status = 0;
+	uint8_t m_ON_interrupt_mask = 0;
+	uint8_t m_ON_interrupt_status = 0;
+	uint8_t m_ON_pressed = 0;
+	uint8_t m_flash_unlocked = 0;
+	uint8_t m_ti8x_memory_page_1 = 0;
+	uint8_t m_ti8x_memory_page_2 = 0;
+	uint8_t m_ti8x_memory_page_3 = 0;
+	bool m_booting = false;
+	uint8_t m_LCD_mask = 0;
+	uint8_t m_power_mode = 0;
+	uint8_t m_cpu_speed = 0;
+	uint8_t m_keypad_mask = 0;
+	uint8_t m_video_buffer_width = 0;
+	uint8_t m_interrupt_speed = 0;
+	uint8_t m_port4_bit0 = 0;
+	uint8_t m_ti81_port_7_data = 0;
 	std::unique_ptr<uint8_t[]> m_ti8x_ram;
-	uint8_t m_PCR;
-	uint8_t m_ti8x_port2;
-	uint8_t m_ti83p_port4;
-	uint8_t m_ti83pse_port21;
-	int m_ti_video_memory_size;
-	int m_ti_screen_x_size;
-	int m_ti_screen_y_size;
-	int m_ti_number_of_frames;
+	uint8_t m_PCR = 0;
+	uint8_t m_ti8x_port2 = 0;
+	uint8_t m_ti83p_port4 = 0;
+	uint8_t m_ti83pse_port21 = 0;
+	int m_ti_video_memory_size = 0;
+	int m_ti_screen_x_size = 0;
+	int m_ti_screen_y_size = 0;
+	int m_ti_number_of_frames = 0;
 	std::unique_ptr<uint8_t[]> m_frames;
-	uint8_t * m_bios;
-	emu_timer *m_ti85_timer;
-	emu_timer *m_ti83_1st_timer;
-	emu_timer *m_ti83_2nd_timer;
+	uint8_t * m_bios = nullptr;
+	emu_timer *m_ti85_timer = nullptr;
+	emu_timer *m_ti83_1st_timer = nullptr;
+	emu_timer *m_ti83_2nd_timer = nullptr;
 	uint8_t ti85_port_0000_r();
 	uint8_t ti8x_keypad_r();
 	uint8_t ti85_port_0006_r();
@@ -197,12 +197,12 @@ private:
 	TIMER_CALLBACK_MEMBER(ti83_timer2_callback);
 
 	//crystal timers
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	void ti83pse_count(uint8_t timer, uint8_t data);
 
-	emu_timer *m_crystal_timer1;
-	emu_timer *m_crystal_timer2;
-	emu_timer *m_crystal_timer3;
+	emu_timer *m_crystal_timer1 = nullptr;
+	emu_timer *m_crystal_timer2 = nullptr;
+	emu_timer *m_crystal_timer3 = nullptr;
 	uint8_t ti83pse_ctimer1_setup_r();
 	void ti83pse_ctimer1_setup_w(uint8_t data);
 	uint8_t ti83pse_ctimer1_loop_r();

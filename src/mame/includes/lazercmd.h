@@ -64,13 +64,13 @@ private:
 	required_device<palette_device> m_palette;
 
 	/* video-related */
-	uint8_t m_marker_x;
-	uint8_t m_marker_y;
+	uint8_t m_marker_x = 0U;
+	uint8_t m_marker_y = 0U;
 
 	/* misc */
-	int m_timer_count;
-	uint8_t m_sense_state;
-	uint8_t m_attract;
+	int m_timer_count = 0;
+	uint8_t m_sense_state = 0U;
+	uint8_t m_attract = 0U;
 
 	void lazercmd_ctrl_port_w(uint8_t data);
 	uint8_t lazercmd_ctrl_port_r();

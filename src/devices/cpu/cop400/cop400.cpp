@@ -57,7 +57,6 @@
 */
 
 #include "emu.h"
-#include "debugger.h"
 #include "cop400.h"
 #include "cop410ds.h"
 #include "cop420ds.h"
@@ -110,10 +109,10 @@ DEFINE_DEVICE_TYPE(COP446C, cop446c_cpu_device, "cop446c", "National Semiconduct
 #define IN_IN()         (m_in_mask ? m_read_in(0, 0xff) : 0)
 
 #define OUT_G(v)        m_write_g(0, (v) & m_g_mask, 0xff)
-#define OUT_L(v)        m_write_l(0, v, 0xff)
+#define OUT_L(v)        m_write_l(0, m_l_output = v, 0xff)
 #define OUT_D(v)        m_write_d(0, (v) & m_d_mask, 0xff)
-#define OUT_SK(v)       m_write_sk(v)
-#define OUT_SO(v)       m_write_so(v)
+#define OUT_SK(v)       m_write_sk(m_sk_output = v)
+#define OUT_SO(v)       m_write_so(m_so_output = v)
 
 #define PC              m_pc
 #define A               m_a
@@ -1062,7 +1061,7 @@ void cop400_cpu_device::inil_tick()
     INITIALIZATION
 ***************************************************************************/
 
-void cop400_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void cop400_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -1113,12 +1112,15 @@ void cop400_cpu_device::device_start()
 	save_item(NAME(m_q));
 	save_item(NAME(m_en));
 	save_item(NAME(m_sio));
+	save_item(NAME(m_si));
+	save_item(NAME(m_so_output));
+	save_item(NAME(m_sk_output));
+	save_item(NAME(m_l_output));
 	save_item(NAME(m_skl));
 	save_item(NAME(m_t));
 	save_item(NAME(m_skip));
 	save_item(NAME(m_skip_lbi));
 	save_item(NAME(m_skt_latch));
-	save_item(NAME(m_si));
 	save_item(NAME(m_last_skip));
 	save_item(NAME(m_in));
 	save_item(NAME(m_halt));
@@ -1161,6 +1163,9 @@ void cop400_cpu_device::device_start()
 	m_il = 0;
 	m_in[0] = m_in[1] = m_in[2] = m_in[3] = 0;
 	m_si = 0;
+	m_so_output = 0;
+	m_sk_output = 0;
+	m_l_output = 0;
 	m_skip_lbi = 0;
 	m_last_skip = false;
 	m_skip = false;
@@ -1386,16 +1391,16 @@ std::unique_ptr<util::disasm_interface> cop400_cpu_device::create_disassembler()
 		return std::make_unique<cop410_disassembler>();
 }
 
-uint8_t cop400_cpu_device::microbus_rd()
+uint8_t cop400_cpu_device::microbus_r()
 {
-	if (LOG_MICROBUS) logerror("%s %s MICROBUS RD %02x\n", machine().time().as_string(), machine().describe_context(), Q);
+	if (LOG_MICROBUS) logerror("%s %s MICROBUS R %02x\n", machine().time().as_string(), machine().describe_context(), Q);
 
 	return Q;
 }
 
-void cop400_cpu_device::microbus_wr(uint8_t data)
+void cop400_cpu_device::microbus_w(uint8_t data)
 {
-	if (LOG_MICROBUS) logerror("%s %s MICROBUS WR %02x\n", machine().time().as_string(), machine().describe_context(), data);
+	if (LOG_MICROBUS) logerror("%s %s MICROBUS W %02x\n", machine().time().as_string(), machine().describe_context(), data);
 
 	WRITE_G(G & 0xe);
 

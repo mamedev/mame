@@ -29,7 +29,7 @@
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "imagedev/snapquik.h"
 #include "speaker.h"
 
@@ -127,30 +127,30 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	uint8_t *m_ipl_rom;
+	uint8_t *m_ipl_rom = nullptr;
 	std::unique_ptr<uint8_t[]> m_work_ram;
 	std::unique_ptr<uint8_t[]> m_vram;
 	std::unique_ptr<uint8_t[]> m_attr;
 	std::unique_ptr<uint8_t[]> m_gvram;
 	std::unique_ptr<uint8_t[]> m_pcg;
 
-	uint8_t m_keyb_press;
-	uint8_t m_keyb_press_flag;
-	uint8_t m_shift_press_flag;
-	uint8_t m_backdrop_pen;
-	uint8_t m_display_reg;
-	uint8_t m_fdc_irq_flag;
-	uint8_t m_fdc_drq_flag;
-	uint8_t m_system_data;
-	struct { uint8_t r,g,b; } m_pal;
-	uint8_t m_raminh,m_raminh_pending_change; //bankswitch
-	uint8_t m_raminh_prefetch;
-	uint8_t m_pal_mode;
-	uint8_t m_keyb_cmd;
-	uint8_t m_crtc_vreg[0x20];
-	uint8_t m_crtc_addr;
-	bool m_vsync_idf;
-	bool m_vsync_ief;
+	uint8_t m_keyb_press = 0;
+	uint8_t m_keyb_press_flag = 0;
+	uint8_t m_shift_press_flag = 0;
+	uint8_t m_backdrop_pen = 0;
+	uint8_t m_display_reg = 0;
+	uint8_t m_fdc_irq_flag = 0;
+	uint8_t m_fdc_drq_flag = 0;
+	uint8_t m_system_data = 0;
+	struct { uint8_t r = 0, g = 0, b = 0; } m_pal;
+	uint8_t m_raminh = 0, m_raminh_pending_change = 0; //bankswitch
+	uint8_t m_raminh_prefetch = 0;
+	uint8_t m_pal_mode = 0;
+	uint8_t m_keyb_cmd = 0;
+	uint8_t m_crtc_vreg[0x20]{};
+	uint8_t m_crtc_addr = 0;
+	bool m_vsync_idf = false;
+	bool m_vsync_ief = false;
 };
 
 

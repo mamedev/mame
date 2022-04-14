@@ -87,8 +87,8 @@ private:
 	void video_data_map(address_map &map);
 	void video_mem_map(address_map &map);
 
-	u8 m_key_row;
-	u8 m_2;
+	u8 m_key_row = 0U;
+	u8 m_2 = 0U;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;

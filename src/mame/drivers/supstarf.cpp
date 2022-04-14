@@ -65,9 +65,9 @@ private:
 	required_device_array<ay8910_device, 2> m_psg;
 	required_device_array<i8212_device, 2> m_soundlatch;
 
-	u8 m_port1_data;
-	bool m_pcs[2];
-	bool m_latch_select;
+	u8 m_port1_data = 0;
+	bool m_pcs[2]{};
+	bool m_latch_select = false;
 };
 
 void supstarf_state::main_map(address_map &map)
@@ -270,4 +270,4 @@ ROM_START(supstarf)
 	ROM_LOAD("2532.ic4", 0x0000, 0x1000, CRC(b6ef3c7a) SHA1(aabb6f8569685fc3a917a7bb5ebfcc4b20086b15) BAD_DUMP) // D6 stuck high and probably totally garbage
 ROM_END
 
-GAME( 1986, supstarf, 0, supstarf, supstarf, supstarf_state, empty_init, ROT0, "Recreativos Franco", "Super Star (Recreativos Franco)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, supstarf, 0, supstarf, supstarf, supstarf_state, empty_init, ROT0, "Recreativos Franco", "Super Star (Recreativos Franco)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

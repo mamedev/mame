@@ -68,7 +68,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -85,8 +85,8 @@ protected:
 	bitmap_ind16 m_bitmap;
 	required_region_ptr<uint8_t> m_cgrom;          // internal chargen ROM
 
-	emu_timer    *m_vblank_timer;
-	sound_stream *m_stream;
+	emu_timer    *m_vblank_timer = nullptr;
+	sound_stream *m_stream = nullptr;
 
 	int m_audiocnt;
 	int m_audioval;

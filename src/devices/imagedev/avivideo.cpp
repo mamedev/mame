@@ -58,7 +58,7 @@ void avivideo_image_device::device_reset()
 	m_frame_num = 0;
 }
 
-void avivideo_image_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void avivideo_image_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_FRAME)
 	{

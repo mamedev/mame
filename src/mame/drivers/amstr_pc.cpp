@@ -200,6 +200,8 @@ Notes:
 #include "machine/pc_lpt.h"
 #include "machine/ram.h"
 
+#include "softlist_dev.h"
+
 
 namespace {
 
@@ -250,16 +252,16 @@ private:
 	[[maybe_unused]] uint8_t pc1640_port278_r(offs_t offset);
 
 	struct {
-		uint8_t x,y; //byte clipping needed
+		uint8_t x = 0, y = 0; //byte clipping needed
 	} m_mouse;
 
 	// 64 system status register?
-	uint8_t m_port60;
-	uint8_t m_port61;
-	uint8_t m_port62;
-	uint8_t m_port65;
+	uint8_t m_port60 = 0;
+	uint8_t m_port61 = 0;
+	uint8_t m_port62 = 0;
+	uint8_t m_port65 = 0;
 
-	uint8_t m_dipstate;
+	uint8_t m_dipstate = 0;
 	static void cfg_com(device_t *device);
 	static void cfg_fdc(device_t *device);
 
@@ -720,6 +722,9 @@ void amstrad_pc_state::pc200(machine_config &config)
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("640K").set_extra_options("512K");
+
+	/* software lists */
+	SOFTWARE_LIST(config, "disk_list").set_original("pc200");
 }
 
 void amstrad_pc_state::pc2086(machine_config &config)

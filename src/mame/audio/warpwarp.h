@@ -29,14 +29,14 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	// internal state
 	std::unique_ptr<int16_t[]> m_decay;
 	sound_stream *m_channel;
-	u32 m_clock_16h;
-	u32 m_clock_1v;
+	u32 m_clock_16h = 0;
+	u32 m_clock_1v = 0;
 	int m_sound_latch;
 	int m_music1_latch;
 	int m_music2_latch;

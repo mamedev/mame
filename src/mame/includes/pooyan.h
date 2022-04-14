@@ -37,10 +37,10 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram2;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
+	tilemap_t  *m_bg_tilemap = nullptr;
 
 	/* misc */
-	uint8_t    m_irq_enable;
+	uint8_t    m_irq_enable = 0;
 
 	DECLARE_WRITE_LINE_MEMBER(irq_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);

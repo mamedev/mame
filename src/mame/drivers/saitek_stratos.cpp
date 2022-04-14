@@ -59,7 +59,7 @@ very few bytes difference between revisions. The first Corona is engine version 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 // internal artwork

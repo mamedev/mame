@@ -36,14 +36,14 @@ public:
 	required_shared_ptr<uint8_t> m_videoram;
 
 	/* video-related */
-	tilemap_t     *m_layer0;
-	int         m_flipscreen;
+	tilemap_t     *m_layer0 = nullptr;
+	int         m_flipscreen = 0;
 
-	int m_irq_enable_a;
-	int m_irq_enable_b;
-	int m_firq_old_data_a;
-	int m_firq_old_data_b;
-	int m_i8039_status;
+	int m_irq_enable_a = 0;
+	int m_irq_enable_b = 0;
+	int m_firq_old_data_a = 0;
+	int m_firq_old_data_b = 0;
+	int m_i8039_status = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

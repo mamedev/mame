@@ -30,6 +30,7 @@ public:
 	auto sts() { return m_sts_handler.bind(); }
 	auto dmar() { return m_dmar_handler.bind(); }
 	auto led() { return m_led_handler.bind(); }
+	auto cart_in() { return m_cart_in_handler.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(short_gap_w);
 	DECLARE_WRITE_LINE_MEMBER(long_gap_w);
@@ -52,6 +53,7 @@ private:
 	devcb_write_line m_sts_handler;
 	devcb_write_line m_dmar_handler;
 	devcb_write_line m_led_handler;
+	devcb_write_line m_cart_in_handler;
 
 	required_device<hp_dc100_tape_device> m_tape;
 	required_device<ttl74123_device> m_short_gap_timer; // U43a

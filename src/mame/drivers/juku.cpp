@@ -38,6 +38,7 @@
 #include "machine/wd_fdc.h"
 #include "imagedev/floppy.h"
 #include "formats/juku_dsk.h"
+#include "softlist_dev.h"
 #include "screen.h"
 
 

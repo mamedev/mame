@@ -49,12 +49,12 @@ private:
 	required_memory_bank m_gfxbank;
 	required_memory_bank_array<4> m_ymf_bank;
 
-	uint16_t m_gfx_max_bank;
-	uint8_t m_ymf_max_bank;
-	uint8_t m_io_select;
+	uint16_t m_gfx_max_bank = 0;
+	uint8_t m_ymf_max_bank = 0;
+	uint8_t m_io_select = 0;
 
 	/* video-related */
-	double         m_oldbrt[2];
+	double         m_oldbrt[2]{};
 
 	/* devices */
 	required_device<sh2_device> m_maincpu;

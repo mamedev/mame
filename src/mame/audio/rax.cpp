@@ -236,9 +236,9 @@ TIMER_DEVICE_CALLBACK_MEMBER( acclaim_rax_device::dma_timer_callback )
 void acclaim_rax_device::update_data_ram_bank()
 {
 	if (m_dmovlay_val == 0)
-		membank("databank")->set_entry(0);
+		m_adsp_data_bank->set_entry(0);
 	else
-		membank("databank")->set_entry(1 + m_data_bank);
+		m_adsp_data_bank->set_entry(1 + m_data_bank);
 }
 
 void acclaim_rax_device::ram_bank_w(uint16_t data)
@@ -281,7 +281,7 @@ void acclaim_rax_device::adsp_program_map(address_map &map)
 void acclaim_rax_device::adsp_data_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x1fff).bankrw("databank");
+	map(0x0000, 0x1fff).bankrw(m_adsp_data_bank);
 	map(0x2000, 0x3fdf).ram(); // Internal RAM
 	map(0x3fe0, 0x3fff).rw(FUNC(acclaim_rax_device::adsp_control_r), FUNC(acclaim_rax_device::adsp_control_w));
 }
@@ -302,7 +302,7 @@ void acclaim_rax_device::device_start()
 
 	// 1 bank for internal
 	m_banked_ram = make_unique_clear<uint16_t[]>(0x2000 * 5);
-	membank("databank")->configure_entries(0, 5, &m_banked_ram[0], 0x2000*sizeof(uint16_t));
+	m_adsp_data_bank->configure_entries(0, 5, &m_banked_ram[0], 0x2000*sizeof(uint16_t));
 }
 
 void acclaim_rax_device::device_reset()

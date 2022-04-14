@@ -78,9 +78,9 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	uint16_t m_tty_data_out;
-	uint8_t m_tty_data_in;
-	int m_tty_cnt;
+	uint16_t m_tty_data_out = 0U;
+	uint8_t m_tty_data_in = 0U;
+	int m_tty_cnt = 0;
 	void machine_start() override;
 	required_device<teleprinter_device> m_teleprinter;
 	required_device<cpu_device> m_maincpu;
@@ -122,6 +122,7 @@ void mod8_state::mem_map(address_map &map)
 void mod8_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
+	map.global_mask(0x1f);
 	map(0x00, 0x00).r(FUNC(mod8_state::tty_r));
 	map(0x0a, 0x0a).w(FUNC(mod8_state::out_w));
 	map(0x0b, 0x0b).w(FUNC(mod8_state::tty_w));

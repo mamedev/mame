@@ -222,10 +222,10 @@ void menu_confswitch::handle(event const *ev)
 					{
 						if (!found_break)
 						{
-							if (!item(--current).ref)
+							if (!item(--current).ref())
 								found_break = true;
 						}
-						else if (!item(current - 1).ref)
+						else if (!item(current - 1).ref())
 						{
 							set_selected_index(current);
 							set_top_line(current - 1);
@@ -245,9 +245,9 @@ void menu_confswitch::handle(event const *ev)
 					auto current = selected_index();
 					while (item_count() > ++current)
 					{
-						if (!item(current).ref)
+						if (!item(current).ref())
 						{
-							if ((item_count() > (current + 1)) && (uintptr_t(item(current + 1).ref) != 1))
+							if ((item_count() > (current + 1)) && (uintptr_t(item(current + 1).ref()) != 1))
 							{
 								set_selected_index(current + 1);
 								set_top_line(current);

@@ -50,6 +50,7 @@ To Do:
 #include "sound/beep.h"
 #include "video/dp8350.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 #include <algorithm>
 
@@ -117,14 +118,14 @@ private:
 	void sub_io_map(address_map &map);
 	void sub_mem_map(address_map &map);
 
-	bool m_busak;
-	u8 m_keydown;
-	u8 m_porta;
-	u8 m_portb;
-	u8 m_portc;
-	u8 m_port10;
-	u8 m_key_data;
-	u8 m_framecnt;
+	bool m_busak = false;
+	u8 m_keydown = 0U;
+	u8 m_porta = 0U;
+	u8 m_portb = 0U;
+	u8 m_portc = 0U;
+	u8 m_port10 = 0U;
+	u8 m_key_data = 0U;
+	u8 m_framecnt = 0U;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;

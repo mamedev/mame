@@ -176,7 +176,7 @@ private:
 	virtual void lcd_data_w(u8 data) override;
 
 	TIMER_CALLBACK_MEMBER(beep) { m_beeper->set_state(param); }
-	emu_timer *m_beeptimer;
+	emu_timer *m_beeptimer = nullptr;
 };
 
 void sforte_state::machine_start()

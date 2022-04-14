@@ -76,7 +76,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -291,7 +291,7 @@ void popper_state::popper_palette(palette_device &palette) const
 //  VIDEO EMULATION
 //**************************************************************************
 
-void popper_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void popper_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	int y = m_screen->vpos();
 

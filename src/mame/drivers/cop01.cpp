@@ -233,7 +233,9 @@ static INPUT_PORTS_START( cop01 )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_6C ) )
-	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x10, 0x10, "Invulnerability (Cheat, 1/2)" ) // Undocumented invulnerability cheat (both DIP switches need to be ON)
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
@@ -273,7 +275,9 @@ static INPUT_PORTS_START( cop01 )
 	PORT_DIPSETTING(    0x20, "30k 80k 50k+" )
 	PORT_DIPSETTING(    0x40, "30k 130k 100k+" )
 	PORT_DIPSETTING(    0x00, "30k 180k 150k+" )
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x80, 0x80, "Invulnerability (Cheat, 2/2)" ) // Undocumented invulnerability cheat (both DIP switches need to be ON)
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 /* There is an ingame bug at 0x00e4 to 0x00e6 that performs 3 times 'rrca' instead of 'rlca'
@@ -372,28 +376,6 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
-static const gfx_layout tilelayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 4+8*0, 0+8*0, 4+8*1, 0+8*1, 4+8*2, 0+8*2, 4+8*3, 0+8*3 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
 static const gfx_layout spritelayout =
 {
 	16,16,
@@ -414,9 +396,9 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_cop01 )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,         0,  1 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,        16,  8 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 16+8*16, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_lsb,  0,  1 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_lsb, 16,  8 )
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,   16+8*16, 16 )
 GFXDECODE_END
 
 

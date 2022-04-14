@@ -35,7 +35,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	enum
@@ -65,15 +65,15 @@ private:
 	void pcfx_mem(address_map &map);
 
 	// Interrupt controller (component unknown)
-	uint16_t m_irq_mask;
-	uint16_t m_irq_pending;
-	uint8_t m_irq_priority[8];
+	uint16_t m_irq_mask = 0;
+	uint16_t m_irq_pending = 0;
+	uint8_t m_irq_priority[8]{};
 
 	struct pcfx_pad_t
 	{
-		uint8_t ctrl[2];
-		uint8_t status[2];
-		uint32_t latch[2];
+		uint8_t ctrl[2]{};
+		uint8_t status[2]{};
+		uint32_t latch[2]{};
 	};
 
 	pcfx_pad_t m_pad;
@@ -141,12 +141,12 @@ uint16_t pcfx_state::pad_r(offs_t offset)
 	return res;
 }
 
-void pcfx_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pcfx_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_PAD_FUNC:
-		pad_func(ptr, param);
+		pad_func(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in pcfx_state::device_timer");

@@ -5,7 +5,7 @@
 
     by Mariusz Wojcieszek
 
-    Based on Atari 400/800 MESS Driver by Juergen Buchmueller
+    Based on Atari 400/800 MAME Driver by Juergen Buchmueller
 
     TODO:
     - fix LCD digits display controlling

@@ -323,7 +323,7 @@ bool mb8795_device::recv_is_multicast()
 	return rxbuf[0] & 0x01;
 }
 
-void mb8795_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mb8795_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if(id == TIMER_TX) {
 		drq_tx = true;

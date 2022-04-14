@@ -35,6 +35,7 @@ Wicat - various systems.
 #include "video/i8275.h"
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 
 #include "wicat.lh"
 
@@ -109,7 +110,7 @@ private:
 	required_device<fd1795_device> m_fdc;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return 0; }
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void main_mem(address_map &map);
 	void video_io(address_map &map);
@@ -304,7 +305,7 @@ void wicat_state::machine_reset()
 		elem = 0;
 }
 
-void wicat_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void wicat_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

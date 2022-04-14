@@ -34,6 +34,7 @@ ToDo:
 #include "formats/gtp_cas.h"
 #include "sound/ay8910.h"
 #include "emupal.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

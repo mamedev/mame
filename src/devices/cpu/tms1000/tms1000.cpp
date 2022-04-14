@@ -13,7 +13,6 @@
 #include "emu.h"
 #include "tms1000.h"
 #include "tms1k_dasm.h"
-#include "debugger.h"
 
 // TMS1000
 // - 64x4bit RAM array at the bottom-left

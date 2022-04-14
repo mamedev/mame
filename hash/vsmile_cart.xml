@@ -166,7 +166,7 @@ Regular game cartridges
 |   XX   | 80-092062-123(NL) | Winnie de Poeh - De wonderwereld van Poeh (rev. 123, labeled as "My Friends Tigger and Pooh", 52-092062(NL) on back label)
 |        | 80-092063(UK)     | Winnie The Pooh: The Honey Hunt                                                                |
 |   XX   | 80-092064(GE)     | Pooh - Die Honigjagd                                                                           |
-|        | 80-092064(GE)     | Pooh - Die Honigjagd (alt, no# on label)                                                       |
+|   XX   | 80-092064(GE)     | Winnie Puuh - Winnie Puuh auf der Honigjagd                                                    |
 |        | 80-092064(GE)     | My Friends Tigger and Pooh - Die Honigjagd                                                     |
 |   XX   | 80-092064-104(GE) | My Friends Tigger and Pooh - Die Honigjagd (rev. 104)                                          |
 |   XX   | 80-092065(FR)     | Winnie l'Ourson - La Chasse au miel de Winnie                                                  |
@@ -365,6 +365,7 @@ Regular game cartridges
 |   XX   | 80-092344(GE)     | Thomas and Seine Freunde - Freunde Halten Zusammen                                             |
 |   XX   | 80-092344(GE)     | Thomas and Seine Freunde - Freunde Halten Zusammen (alt)                                       |
 |   XX   | 80-092344-104(GE) | Thomas and Seine Freunde - Freunde Halten Zusammen (rev. 104)                                  |
+|   XX   | 80-092344-104(GE) | Thomas and Seine Freunde - Freunde Halten Zusammen (rev. 104, alt)                             |
 |   XX   | 80-092345(FR)     | Thomas et ses Amis - Les locomotives s'entraident                                              |
 |        | 80-092347(SP)     | Thomas and Friends - Juego de Aprendizaje                                                      |
 |        |          (DK)     | Thomas and Friends - Togene arbejder sammen                                                    |
@@ -682,9 +683,24 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
-			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<feature name="u1" value="U1" />
 			<dataarea name="rom" size="8388608">
 				<rom name="vsmile92000-2.bin" size="8388608" crc="e432b85e" sha1="b11e6eb1c20f9db01df28e7169590ddfb95fee43" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alphaprkr101a" cloneof="alphaprkr101">
+		<description>Alphabet Park Adventure (USA, rev. 101, alt)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092000-101(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="U1" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Alphabet Park Adventure 52-092000-101(US) [ALT].bin" size="8388608" crc="d8583aa2" sha1="5b83f4c7fed4f86182ae3cd2b25ec403d129b81b" />
 			</dataarea>
 		</part>
 	</software>
@@ -738,6 +754,23 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="vsmile92000.bin" size="8388608" crc="e491b4fc" sha1="511d7807df753e8d89547040af2019629f056371" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alphaprka2" cloneof="alphaprkr101">
+		<description>Alphabet Park Adventure (USA, alt 2, two chips)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092000(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Alphabet Park Adventure 92000(US) [TWO CHIP] LOW.bin" size="0x400000" crc="402681b7" sha1="5ff1ba9a016d10e09408b5638aaf759cac2cc97a" offset="0x000000" />
+				<rom name="Alphabet Park Adventure 92000(US) [TWO CHIP] HIGH.bin" size="0x200000" crc="2feee80a" sha1="d1ca700602c3b2bce2a8920f017370cb0ef322de" offset="0x400000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1336,6 +1369,36 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="092660.u1" size="8388608" crc="ff65d967" sha1="27b229b6e308dfc0cea7e594c7b006f27961c05f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carsa" cloneof="carsr201">
+		<description>Disney/Pixar Cars - Rev It Up in Radiator Springs (USA, alt)</description>
+		<year>2006?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092660(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Cars - Rev It Up in Radiator Springs 092660(US) [ALT].bin" size="8388608" crc="31c1df9c" sha1="14b028e5911d26eec8644ee19da8825d8386244c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carsa2" cloneof="carsr201">
+		<description>Disney/Pixar Cars - Rev It Up in Radiator Springs (USA, alt 2)</description>
+		<year>2006?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092660(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Cars - Rev It Up in Radiator Springs 092660(US).bin" size="8388608" crc="ed8ee40a" sha1="e111f257447d64ded47a57d80174ced1bca0cb14" />
 			</dataarea>
 		</part>
 	</software>
@@ -4213,6 +4276,21 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
+	<software name="thomasger104a" cloneof="thomas">
+		<description>Thomas &amp; seine Freunde - Freunde Halten Zusammen (Germany, rev. 104, alt)</description>
+		<year>2007</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092344-104(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="092344-104 - Thomas and seine Freunde - Freunde halten zusammen (GER).bin" size="8388608" crc="11a81943" sha1="54c6afbea80c157858c12c6e813a8f88b82f2a92" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="thomasge" cloneof="thomas">
 		<description>Thomas &amp; seine Freunde - Freunde Halten Zusammen (Germany)</description>
 		<year>2005</year>
@@ -4608,6 +4686,21 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="92064.u1" size="8388608" crc="38a17e7e" sha1="434849ba8867d0bfb16b0fb5abfec86286390c07" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohgea" cloneof="pooh">
+		<description>Disney's Winnie Puuh - Winnie Puuh auf der Honigjagd (Germany, alt title)</description>
+		<year>2004?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092064(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="092064 - Winnie the Pooh - Die Honigjagd (GER).bin" size="8388608" crc="2decf812" sha1="9d9116c6b77775c3263f0b8bdfab35e1fea2fc55" />
 			</dataarea>
 		</part>
 	</software>

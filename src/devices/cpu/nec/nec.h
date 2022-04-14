@@ -53,7 +53,7 @@ protected:
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-	virtual int get_mode() const override { return m_MF; };
+	virtual int get_mode() const override { return m_MF; }
 
 	virtual u8 io_read_byte(offs_t a) { return m_io->read_byte(a); }
 	virtual u16 io_read_word(offs_t a) { return m_io->read_word_unaligned(a); }

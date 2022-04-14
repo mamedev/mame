@@ -1077,6 +1077,9 @@ void z80scc_channel::device_start()
 	m_tx_fifo_sz = (m_uart->m_variant & z80scc_device::SET_ESCC) ? 4 : 1;
 	m_tx_fifo_wp = m_tx_fifo_rp = 0;
 
+	m_rxc   = 0x00;
+	m_txc   = 0x00;
+
 #if Z80SCC_USE_LOCAL_BRG
 	// baudrate clocks and timers
 	baudtimer = timer_alloc(TIMER_ID_BAUD);
@@ -1137,6 +1140,11 @@ void z80scc_channel::device_start()
 	save_item(NAME(m_rts));
 	save_item(NAME(m_tx_int_disarm));
 	save_item(NAME(m_sync_pattern));
+	save_item(NAME(m_rxd));
+	save_item(NAME(m_rcv_mode));
+	save_item(NAME(m_index));
+	save_item(NAME(m_brg_rate));
+	save_item(NAME(m_delayed_tx_brg_change));
 }
 
 
@@ -1185,7 +1193,7 @@ void z80scc_channel::device_reset()
 	m_extint_states = m_rr0;
 }
 
-void z80scc_channel::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void z80scc_channel::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 //  LOG("%s %d\n", FUNCNAME, id);
 

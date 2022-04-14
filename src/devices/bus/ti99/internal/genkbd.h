@@ -30,19 +30,18 @@ public:
 
 protected:
 	// device-level overrides
-	void device_start() override;
-	void device_reset() override;
-	ioport_constructor device_input_ports() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_pc_kbd_interface overrides
-	DECLARE_WRITE_LINE_MEMBER( clock_write ) override;
-	DECLARE_WRITE_LINE_MEMBER( data_write ) override;
+	virtual DECLARE_WRITE_LINE_MEMBER( clock_write ) override;
+	virtual DECLARE_WRITE_LINE_MEMBER( data_write ) override;
 
 private:
 	emu_timer   *m_poll_timer;
 	emu_timer   *m_send_timer;
-
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	static constexpr unsigned KEYQUEUESIZE = 256;
 	static constexpr unsigned MAXKEYMSGLENGTH = 10;

@@ -15,6 +15,7 @@
 #include "machine/pit8253.h"
 
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/rk_cas.h"
@@ -39,7 +40,7 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	uint8_t m_mikrosha_font_page;
+	uint8_t m_mikrosha_font_page = 0;
 };
 
 void mikrosha_state::machine_reset()

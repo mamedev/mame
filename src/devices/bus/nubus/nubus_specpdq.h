@@ -33,7 +33,7 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	uint32_t specpdq_r(offs_t offset, uint32_t mem_mask = ~0);

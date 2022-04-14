@@ -179,7 +179,7 @@ A=AMA, P=PRO, these keys don't exist, and so the games cannot be played.
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

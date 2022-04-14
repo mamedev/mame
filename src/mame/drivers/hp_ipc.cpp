@@ -356,28 +356,30 @@ Software to look for
 ******************************************************************************/
 
 #include "emu.h"
+#include "machine/hp_ipc_optrom.h"
 
-#include "bus/hp_hil/hp_hil.h"
 #include "bus/hp_hil/hil_devices.h"
+#include "bus/hp_hil/hp_hil.h"
+#include "bus/hp_ipc_io/hp_ipc_io.h"
+#include "bus/ieee488/ieee488.h"
 #include "cpu/m68000/m68000.h"
-#include "formats/hp_ipc_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/bankdev.h"
+#include "machine/cop452.h"
+#include "machine/input_merger.h"
 #include "machine/mm58167.h"
 #include "machine/ram.h"
-#include "machine/wd_fdc.h"
-#include "video/hp1ll3.h"
 #include "machine/tms9914.h"
-#include "bus/ieee488/ieee488.h"
-#include "machine/cop452.h"
-#include "speaker.h"
+#include "machine/wd_fdc.h"
+#include "softlist_dev.h"
 #include "sound/dac.h"
-#include "machine/input_merger.h"
-#include "bus/hp_ipc_io/hp_ipc_io.h"
-#include "machine/hp_ipc_optrom.h"
+#include "video/hp1ll3.h"
+
+#include "formats/hp_ipc_dsk.h"
 
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 
 
 namespace {
@@ -411,7 +413,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	uint16_t mem_r(offs_t offset, uint16_t mem_mask);
@@ -436,7 +438,7 @@ private:
 	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(irq_6);
 	DECLARE_WRITE_LINE_MEMBER(irq_7);
 
-	emu_timer *m_bus_error_timer;
+	emu_timer *m_bus_error_timer = nullptr;
 
 	void hp_ipc_mem_inner_base(address_map &map);
 	void hp_ipc_mem_inner_9807a(address_map &map);
@@ -460,11 +462,11 @@ private:
 	required_device<hp_ipc_io_slot_device> m_io_slot_b;
 	required_device_array<hp_ipc_optrom_device , 2> m_rom_slots;
 
-	uint32_t m_mmu[4], m_lowest_ram_addr;
-	uint16_t *m_internal_ram;
-	int m_fc;
+	uint32_t m_mmu[4]{}, m_lowest_ram_addr = 0;
+	uint16_t *m_internal_ram = nullptr;
+	int m_fc = 0;
 
-	floppy_image_device *m_floppy;
+	floppy_image_device *m_floppy = nullptr;
 
 	inline uint32_t get_ram_address(offs_t offset)
 	{
@@ -472,11 +474,11 @@ private:
 	}
 
 	void set_bus_error(uint32_t address, bool write, uint16_t mem_mask);
-	bool m_bus_error;
+	bool m_bus_error = false;
 };
 
 
-void hp_ipc_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void hp_ipc_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_bus_error = false;
 }
@@ -792,8 +794,8 @@ void hp_ipc_state::hp_ipc_base(machine_config &config)
 
 	HP1LL3(config , m_gpu , 24_MHz_XTAL / 8).set_screen("screen");
 
-	// XXX actual clock is 1MHz; remove this workaround (and change 2000 to 100 in hp_ipc_dsk.cpp)
-	// XXX when floppy code correctly handles 600 rpm drives.
+	// FIXME: actual clock is 1MHz; remove this workaround (and change 2000 to 1000 in hp_ipc_dsk.cpp)
+	// when floppy code correctly handles 600 rpm drives.
 	WD2797(config, m_fdc, 2_MHz_XTAL);
 	m_fdc->intrq_wr_callback().set(FUNC(hp_ipc_state::irq_5));
 	FLOPPY_CONNECTOR(config, "fdc:0", hp_ipc_floppies, "35dd", hp_ipc_state::floppy_formats);
@@ -880,11 +882,11 @@ void hp_ipc_state::hp_ipc(machine_config &config)
 	// horizontal time = 60 us (min)
 	// ver.refresh period = ~300 us
 	// ver.period = 16.7ms (~60 hz)
-	SCREEN(config , m_screen , SCREEN_TYPE_LCD);
-	m_screen->set_color(rgb_t::amber()); // actually a kind of EL display
+	SCREEN(config , m_screen , SCREEN_TYPE_LCD); // actually an EL display
+	m_screen->set_color(rgb_t::amber());
 	m_screen->set_screen_update("gpu" , FUNC(hp1ll3_device::screen_update));
 	m_screen->set_raw(6_MHz_XTAL * 2 , 720 , 0 , 512 , 261 , 0 , 255);
-	m_screen->screen_vblank().set("mlc", FUNC(hp_hil_mlc_device::ap_w)); // XXX actually it's driven by 555 (U59)
+	m_screen->screen_vblank().set("mlc", FUNC(hp_hil_mlc_device::ap_w)); // this signal is actually driven by a 555 (U59)
 	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
@@ -903,7 +905,7 @@ void hp_ipc_state::hp9808a(machine_config &config)
 	m_screen->set_color(rgb_t::amber()); // actually a kind of EL display
 	m_screen->set_screen_update("gpu" , FUNC(hp1ll3_device::screen_update));
 	m_screen->set_raw(6_MHz_XTAL * 2 , 880 , 0 , 640 , 425 , 0 , 400);
-	m_screen->screen_vblank().set("mlc", FUNC(hp_hil_mlc_device::ap_w)); // XXX actually it's driven by 555 (U59)
+	m_screen->screen_vblank().set("mlc", FUNC(hp_hil_mlc_device::ap_w));
 	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);

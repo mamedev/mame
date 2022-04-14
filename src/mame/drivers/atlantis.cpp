@@ -52,7 +52,6 @@
 #include "machine/pci-ide.h"
 #include "video/zeus2.h"
 #include "machine/timekpr.h"
-#include "coreutil.h"
 #include "emupal.h"
 
 
@@ -90,9 +89,9 @@ namespace {
 // IDSEL = AD22, PCI expansion
 // IDSEL = AD23, PCI expansion
 // IDSEL = AD24, PCI expansion
-#define PCI_ID_IDE      ":pci:08.0"
-#define PCI_ID_NILE     ":pci:0a.0"
-#define PCI_ID_9050     ":pci:0b.0"
+#define PCI_ID_IDE      "pci:08.0"
+#define PCI_ID_NILE     "pci:0a.0"
+#define PCI_ID_9050     "pci:0b.0"
 
 #define DEBUG_CONSOLE   (0)
 #define LOG_RTC         (0)
@@ -102,8 +101,8 @@ namespace {
 class atlantis_state : public driver_device
 {
 public:
-	atlantis_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	atlantis_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -125,7 +124,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	required_device<mips3_device> m_maincpu;
@@ -140,12 +139,12 @@ private:
 	required_device<ide_pci_device> m_ide;
 	required_device<m48t37_device> m_rtc;
 	optional_ioport_array<8> m_io_analog;
-	emu_timer *m_adc_ready_timer;
+	emu_timer *m_adc_ready_timer = nullptr;
 
 	uint8_t cmos_r(offs_t offset);
 	void cmos_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
-	uint32_t m_cmos_write_enabled;
-	uint32_t m_serial_count;
+	uint32_t m_cmos_write_enabled = 0;
+	uint32_t m_serial_count = 0;
 
 
 	[[maybe_unused]] void asic_fifo_w(uint32_t data);
@@ -155,7 +154,7 @@ private:
 
 	void user_io_output(uint32_t data);
 	uint32_t user_io_input();
-	int m_user_io_state;
+	int m_user_io_state = 0;
 
 	// Board Ctrl Reg Offsets
 	enum {
@@ -165,8 +164,8 @@ private:
 	};
 	uint32_t board_ctrl_r(offs_t offset, uint32_t mem_mask = ~0);
 	void board_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t m_irq_state;
-	uint32_t board_ctrl[CTRL_SIZE];
+	uint32_t m_irq_state = 0;
+	uint32_t board_ctrl[CTRL_SIZE]{};
 	void update_asic_irq();
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
@@ -181,8 +180,8 @@ private:
 	DECLARE_CUSTOM_INPUT_MEMBER(port_mod_r);
 	uint16_t port_ctrl_r(offs_t offset);
 	void port_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t m_port_data;
-	uint16_t m_a2d_data;
+	uint16_t m_port_data = 0;
+	uint16_t m_a2d_data = 0;
 
 	uint16_t a2d_ctrl_r();
 	void a2d_ctrl_w(offs_t offset, uint16_t data);
@@ -626,7 +625,7 @@ void atlantis_state::a2d_data_w(uint16_t data)
 void atlantis_state::machine_start()
 {
 	/* set the fastest DRC options */
-	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS);
+	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS | MIPS3DRC_STRICT_VERIFY | MIPS3DRC_EXTRA_INSTR_CHECK);
 
 	// Allocate adc timer
 	m_adc_ready_timer = timer_alloc(0);
@@ -660,7 +659,7 @@ void atlantis_state::machine_reset()
 /*************************************
 *  Timer
 *************************************/
-void atlantis_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void atlantis_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	// ADC Ready Timer
 	board_ctrl[STATUS] |= (1 << A2D_IRQ_SHIFT);
@@ -815,7 +814,7 @@ void atlantis_state::mwskins(machine_config &config)
 	m_maincpu->set_dcache_size(16384);
 	m_maincpu->set_system_clock(66666666);
 
-	PCI_ROOT(config, ":pci", 0);
+	PCI_ROOT(config, "pci", 0);
 
 	vrc4373_device &vrc4373(VRC4373(config, PCI_ID_NILE, 0, m_maincpu));
 	vrc4373.set_ram_size(0x00800000);

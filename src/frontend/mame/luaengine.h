@@ -21,7 +21,11 @@
 #include <tuple>
 #include <vector>
 
+#ifdef MAME_DEBUG
+#define SOL_ALL_SAFETIES_ON 1
+#else
 #define SOL_SAFE_USERTYPE 1
+#endif
 #include "sol/sol.hpp"
 
 struct lua_State;
@@ -43,8 +47,9 @@ public:
 	~lua_engine();
 
 	void initialize();
-	void load_script(const char *filename);
-	void load_string(const char *value);
+	sol::load_result load_script(std::string const &filename);
+	sol::load_result load_string(std::string const &value);
+	sol::environment make_environment();
 
 	bool frame_hook();
 
@@ -117,10 +122,32 @@ public:
 
 	sol::state_view &sol() const { return *m_sol_state; }
 
-private:
-	template<typename T, size_t SIZE> class enum_parser;
+	template <typename Func, typename... Params>
+	static std::decay_t<std::invoke_result_t<Func, Params...> > invoke(Func &&func, Params&&... args)
+	{
+		g_profiler.start(PROFILER_LUA);
+		try
+		{
+			auto result = func(std::forward<Params>(args)...);
+			g_profiler.stop();
+			return result;
+		}
+		catch (...)
+		{
+			g_profiler.stop();
+			throw;
+		}
+	}
 
+private:
+	template <typename T, size_t Size> class enum_parser;
+
+	class buffer_helper;
 	struct addr_space;
+	class tap_helper;
+	class addr_space_change_notif;
+	class symbol_table_wrapper;
+	class expression_wrapper;
 
 	struct save_item {
 		void *base;
@@ -159,18 +186,13 @@ private:
 	void on_machine_resume();
 	void on_machine_frame();
 
-	void resume(void *ptr, int nparam);
+	void resume(int nparam);
 	void register_function(sol::function func, const char *id);
-	int enumerate_functions(const char *id, std::function<bool(const sol::protected_function &func)> &&callback);
+	template <typename T> size_t enumerate_functions(const char *id, T &&callback);
 	bool execute_function(const char *id);
 	sol::object call_plugin(const std::string &name, sol::object in);
 
 	void close();
-
-	void run(sol::load_result res);
-
-	template <typename TFunc, typename... TArgs>
-	sol::protected_function_result invoke(TFunc &&func, TArgs&&... args);
 
 	void initialize_debug(sol::table &emu);
 	void initialize_input(sol::table &emu);

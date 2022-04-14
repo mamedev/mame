@@ -188,7 +188,7 @@ const tiny_rom_entry *kc_d004_device::device_rom_region() const
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void kc_d004_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void kc_d004_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{

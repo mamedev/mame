@@ -69,13 +69,13 @@ private:
 	required_region_ptr<u8> m_colormap;
 
 	/* video-related */
-	int            m_color_registers[2];
-	bool           m_flip_screen;
+	int            m_color_registers[2]{};
+	bool           m_flip_screen = false;
 
 	/* sound-related */
-	int            m_sound_enabled;
-	int            m_march_select;
-	int            m_gun_die_select;
+	int            m_sound_enabled = 0;
+	int            m_march_select = 0;
+	int            m_gun_die_select = 0;
 };
 
 
@@ -415,6 +415,12 @@ void cosmicg_state::init_cosmicg()
 	/* Program ROMs have data pins connected different from normal */
 	offs_t len = memregion("program")->bytes();
 	u8 *rom = memregion("program")->base();
+
+	/* convert dummy instruction to meaningful one */
+
+	rom[0x1e9b] ^= 0x20;
+	rom[0x1e9f] ^= 0x20;
+
 	for (offs_t offs = 0; offs < len; offs++)
 	{
 		u8 scrambled = rom[offs];

@@ -25,7 +25,7 @@
 #include "includes/trs80m2.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 
 #define KEYBOARD_TAG "keyboard"

@@ -123,7 +123,7 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	u16 m_input_select;
+	u16 m_input_select = 0;
 
 //  optional_ioport_array<5> m_key;
 //  optional_ioport m_special;

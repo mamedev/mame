@@ -52,7 +52,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	void cpu_map(address_map &map);
 
 	/* devices */
@@ -65,14 +65,14 @@ private:
 	required_shared_ptr<uint8_t> m_video_ram;
 
 	/* video-related */
-	tilemap_t* m_bg_tilemap;
+	tilemap_t* m_bg_tilemap = nullptr;
 
 	/* misc */
-	uint8_t m_prev;
-	uint8_t m_mask;
+	uint8_t m_prev = 0;
+	uint8_t m_mask = 0;
 	attotime m_time_pushed;
 	attotime m_time_released;
-	emu_timer *m_interrupt_timer;
+	emu_timer *m_interrupt_timer = nullptr;
 };
 
 
@@ -146,12 +146,12 @@ void mgolf_state::update_plunger(  )
 }
 
 
-void mgolf_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mgolf_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_INTERRUPT:
-		interrupt_callback(ptr, param);
+		interrupt_callback(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in mgolf_state::device_timer");

@@ -46,7 +46,7 @@
 
 /*****************************************************************************/
 
-void m92_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void m92_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -111,6 +111,17 @@ void m92_state::videocontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	    enabled.  This was one of the earlier games and could actually
 	    be a different motherboard revision (most games use M92-A-B top
 	    pcb, a M92-A-A revision could exist...).
+
+		There is a further test case with R-Type Leo. The flickering
+		invulnerability effect when you spawn does not work correctly
+		with the palette bank hooked up, and also causes a 2nd player
+		spawning in to have the incorrect palette at first.
+
+		It appears that the only games requiring the palette bank logic
+		are Major Title 2, Ninja Baseball Bat Man, Dream Soccer '94
+		and Gun Force 2.  These are also the games with the extended
+		ROM banking, suggesting a difference on those boards is a more
+		likely explanation.
 	*/
 
 	/*
@@ -128,7 +139,8 @@ void m92_state::videocontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	*/
 
 	/* Access to upper palette bank */
-	m_palette_bank = (m_videocontrol >> 1) & 1;
+	if (m_palette->entries() == 2048)
+		m_palette_bank = (m_videocontrol >> 1) & 1;
 
 //  logerror("%s: videocontrol_w %d = %02x\n",m_maincpu->pc(),offset,data);
 }
@@ -156,7 +168,7 @@ TILE_GET_INFO_MEMBER(m92_state::get_pf_tile_info)
 
 	tileinfo.set(0,
 			tile,
-			attrib & 0x7f,
+			(m_palette->entries() == 2048) ? (attrib & 0x7f) : (attrib & 0x3f),
 			TILE_FLIPYX(attrib >> 9));
 	if (attrib & 0x100) tileinfo.group = 2;
 	else if (attrib & 0x80) tileinfo.group = 1;
@@ -233,6 +245,13 @@ VIDEO_START_MEMBER(m92_state,m92)
 {
 	m_spritebuffer_timer = timer_alloc(TIMER_SPRITEBUFFER);
 
+	memset(m_pf_master_control, 0, sizeof(m_pf_master_control));
+	m_videocontrol = 0;
+	m_sprite_list = 0;
+	m_raster_irq_position = 0;
+	m_sprite_buffer_busy = 0;
+	m_palette_bank = 0;
+
 	memset(&m_pf_layer, 0, sizeof(m_pf_layer));
 	for (int laynum = 0; laynum < 3; laynum++)
 	{
@@ -304,23 +323,22 @@ VIDEO_START_MEMBER(m92_state,ppan)
 void m92_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint16_t *source = m_spriteram->buffer();
-	int offs, layer;
 
-	for (layer = 0; layer < 8; layer++)
+	for (int layer = 0; layer < 8; layer++)
 	{
-		for (offs = 0; offs < m_sprite_list; )
+		for (int offs = 0; offs < m_sprite_list; )
 		{
 			int x = source[offs+3] & 0x1ff;
 			int y = source[offs+0] & 0x1ff;
 			int code = source[offs+1];
-			int color = source[offs+2] & 0x007f;
+			int color = source[offs+2];
+			color &= (m_palette->entries() == 2048) ? 0x7f : 0x3f;
 			int pri = (~source[offs+2] >> 6) & 2;
 			int curlayer = (source[offs+0] >> 13) & 7;
 			int flipx = (source[offs+2] >> 8) & 1;
 			int flipy = (source[offs+2] >> 9) & 1;
 			int numcols = 1 << ((source[offs+0] >> 11) & 3);
 			int numrows = 1 << ((source[offs+0] >> 9) & 3);
-			int row, col, s_ptr;
 
 			offs += 4 * numcols;
 			if (layer != curlayer) continue;
@@ -330,12 +348,12 @@ void m92_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const 
 
 			if (flipx) x += 16 * (numcols - 1);
 
-			for (col = 0; col < numcols; col++)
+			for (int col = 0; col < numcols; col++)
 			{
-				s_ptr = 8 * col;
+				int s_ptr = 8 * col;
 				if (!flipy) s_ptr += numrows - 1;
 
-				for (row = 0; row < numrows; row++)
+				for (int row = 0; row < numrows; row++)
 				{
 					if (flip_screen())
 					{
@@ -528,7 +546,7 @@ uint32_t m92_state::screen_update_m92(screen_device &screen, bitmap_ind16 &bitma
 	draw_sprites(screen, bitmap, cliprect);
 
 	/* Flipscreen appears hardwired to the dipswitch - strange */
-	if (ioport("DSW")->read() & 0x100)
+	if (m_dsw->read() & 0x100)
 		flip_screen_set(0);
 	else
 		flip_screen_set(1);
@@ -545,7 +563,7 @@ uint32_t m92_state::screen_update_ppan(screen_device &screen, bitmap_ind16 &bitm
 	ppan_draw_sprites(screen, bitmap, cliprect);
 
 	/* Flipscreen appears hardwired to the dipswitch - strange */
-	if (ioport("DSW")->read() & 0x100)
+	if (m_dsw->read() & 0x100)
 		flip_screen_set(0);
 	else
 		flip_screen_set(1);

@@ -68,12 +68,12 @@ nes_ks106c_device::nes_ks106c_device(const machine_config &mconfig, const char *
 {
 }
 
-nes_ks7058_device::nes_ks7058_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_ks7058_device::nes_ks7058_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_KS7058, tag, owner, clock)
 {
 }
 
-nes_ks7022_device::nes_ks7022_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_ks7022_device::nes_ks7022_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_KS7022, tag, owner, clock), m_latch(0)
 {
 }
@@ -93,8 +93,8 @@ nes_ks202_device::nes_ks202_device(const machine_config &mconfig, const char *ta
 {
 }
 
-nes_ks7016_device::nes_ks7016_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 mask)
-	: nes_nrom_device(mconfig, type, tag, owner, clock), m_latch(0), m_mask(mask)
+nes_ks7016_device::nes_ks7016_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 a15_flip)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_latch(0), m_a15_flip(a15_flip)
 {
 }
 
@@ -108,7 +108,7 @@ nes_ks7016b_device::nes_ks7016b_device(const machine_config &mconfig, const char
 {
 }
 
-nes_ks7017_device::nes_ks7017_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_ks7017_device::nes_ks7017_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_KS7017, tag, owner, clock), m_latch(0), m_irq_count(0), m_irq_status(0), m_irq_enable(0), irq_timer(nullptr)
 {
 }
@@ -123,12 +123,12 @@ nes_ks7010_device::nes_ks7010_device(const machine_config &mconfig, const char *
 {
 }
 
-nes_ks7012_device::nes_ks7012_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_ks7012_device::nes_ks7012_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_KS7012, tag, owner, clock)
 {
 }
 
-nes_ks7013b_device::nes_ks7013b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_ks7013b_device::nes_ks7013b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_KS7013B, tag, owner, clock)
 {
 }
@@ -138,13 +138,13 @@ nes_ks7030_device::nes_ks7030_device(const machine_config &mconfig, const char *
 {
 }
 
-nes_ks7031_device::nes_ks7031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_ks7031_device::nes_ks7031_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_KS7031, tag, owner, clock)
 {
 }
 
-nes_ks7037_device::nes_ks7037_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_KS7037, tag, owner, clock)
+nes_ks7037_device::nes_ks7037_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_KS7037, tag, owner, clock), m_reg(0)
 {
 }
 
@@ -170,18 +170,6 @@ void nes_ks106c_device::pcb_reset()
 	m_latch = (m_latch + 1) & 0x03;
 }
 
-void nes_ks7058_device::device_start()
-{
-	common_start();
-}
-
-void nes_ks7058_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
 void nes_ks7022_device::device_start()
 {
 	common_start();
@@ -190,7 +178,6 @@ void nes_ks7022_device::device_start()
 
 void nes_ks7022_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -213,16 +200,15 @@ void nes_ks7032_device::device_start()
 
 void nes_ks7032_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	chr8(0, m_chr_source);
-
 	m_latch = 0;
 	m_irq_enable = 0;
 	m_irq_count = 0;
 	m_irq_count_latch = 0;
 	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
+
 	prg_update();
 	prg8_ef((m_prg_chunks << 1) - 1);
+	chr8(0, m_chr_source);
 }
 
 void nes_ks7016_device::device_start()
@@ -233,12 +219,10 @@ void nes_ks7016_device::device_start()
 
 void nes_ks7016_device::pcb_reset()
 {
-	prg8_89(0x0c ^ m_mask);
-	prg8_ab(0x0d ^ m_mask);
-	prg8_cd(0x0e ^ m_mask);
-	prg8_ef(0x0f ^ m_mask);
-	chr8(0, CHRRAM);
-	set_nt_mirroring(PPU_MIRROR_VERT);
+	prg8_89(0x0c ^ m_a15_flip);
+	prg8_ab(0x0d ^ m_a15_flip);
+	prg8_cd(0x0e ^ m_a15_flip);
+	prg8_ef(0x0f ^ m_a15_flip);
 
 	m_latch = 0;
 }
@@ -257,20 +241,13 @@ void nes_ks7017_device::device_start()
 
 void nes_ks7017_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(2);
-	chr8(0, m_chr_source);
 
 	m_latch = 0;
 	m_irq_enable = 0;
 	m_irq_count = 0;
 	m_irq_status = 0;
-}
-
-void nes_ks7021a_device::device_start()
-{
-	common_start();
 }
 
 void nes_ks7021a_device::pcb_reset()
@@ -291,34 +268,19 @@ void nes_ks7010_device::pcb_reset()
 	prg16_89ab(0x05);    // all upper banks are fixed
 	prg16_cdef(0x03);
 	chr8(0, CHRROM);
-	set_nt_mirroring(PPU_MIRROR_VERT);
 
 	m_latch = 0;
 }
 
-void nes_ks7012_device::device_start()
-{
-	common_start();
-}
-
 void nes_ks7012_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0xff);
-	chr8(0, m_chr_source);
-}
-
-void nes_ks7013b_device::device_start()
-{
-	common_start();
+	prg32((m_prg_chunks >> 1) - 1);
 }
 
 void nes_ks7013b_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
-	chr8(0, m_chr_source);
 }
 
 void nes_ks7030_device::device_start()
@@ -330,8 +292,6 @@ void nes_ks7030_device::device_start()
 void nes_ks7030_device::pcb_reset()
 {
 	prg32((m_prg_chunks >> 1) - 1);    // not really used...
-	chr8(0, CHRRAM);
-	set_nt_mirroring(PPU_MIRROR_VERT);
 
 	m_reg[0] = m_reg[1] = 0;
 }
@@ -345,18 +305,13 @@ void nes_ks7031_device::device_start()
 void nes_ks7031_device::pcb_reset()
 {
 	prg32(0);   // not really used...
-	chr8(0, CHRRAM);
 
-	m_reg[0] = 0;
-	m_reg[1] = 0;
-	m_reg[2] = 0;
-	m_reg[3] = 0;
+	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
 }
 
 void nes_ks7037_device::device_start()
 {
 	common_start();
-	save_item(NAME(m_latch));
 	save_item(NAME(m_reg));
 }
 
@@ -366,10 +321,8 @@ void nes_ks7037_device::pcb_reset()
 	prg8_ab(0x0e);
 	prg8_cd(0);
 	prg8_ef(0x0f);
-	chr8(0, CHRRAM);
 
-	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
-	m_latch = 0;
+	m_reg = 0;
 }
 
 void nes_ks7057_device::device_start()
@@ -382,7 +335,6 @@ void nes_ks7057_device::pcb_reset()
 {
 	prg8_ab(0x0d);
 	prg16_cdef(0x07);
-	chr8(0, CHRRAM);
 
 	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
 }
@@ -424,7 +376,7 @@ void nes_ks7057_device::pcb_reset()
 
  -------------------------------------------------*/
 
-void nes_ks7058_device::write_h(offs_t offset, uint8_t data)
+void nes_ks7058_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("ks7058 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -451,18 +403,17 @@ void nes_ks7058_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_ks7022_device::write_h(offs_t offset, uint8_t data)
+void nes_ks7022_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("ks7022 write_h, offset: %04x, data: %02x\n", offset, data));
 
 	if (offset == 0)
 		set_nt_mirroring(BIT(data, 2) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-
-	if (offset == 0x2000)
+	else if (offset == 0x2000)
 		m_latch = data & 0x0f;
 }
 
-uint8_t nes_ks7022_device::read_h(offs_t offset)
+u8 nes_ks7022_device::read_h(offs_t offset)
 {
 	LOG_MMC(("ks7022 read_h, offset: %04x\n", offset));
 
@@ -492,7 +443,7 @@ uint8_t nes_ks7022_device::read_h(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_ks7032_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_ks7032_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{
@@ -526,7 +477,7 @@ void nes_ks7032_device::write_h(offs_t offset, u8 data)
 		case 0x2000:
 		case 0x3000:
 		{
-			int shift = (offset >> 10);
+			int shift = 4 * BIT(offset, 12, 2);
 			m_irq_count_latch &= ~(0x000f << shift);
 			m_irq_count_latch |= (data & 0x0f) << shift;
 			break;
@@ -607,8 +558,7 @@ void nes_ks202_device::write_h(offs_t offset, u8 data)
 
 u8 nes_ks202_device::read_m(offs_t offset)
 {
-	LOG_MMC(("ks202 read_m, offset: %04x\n", offset));
-	return m_prgram[offset];
+	return device_nes_cart_interface::read_m(offset);
 }
 
 /*-------------------------------------------------
@@ -637,16 +587,16 @@ u8 nes_ks202_device::read_m(offs_t offset)
 u8 nes_ks7016_device::read_m(offs_t offset)
 {
 //  LOG_MMC(("ks7016 read_m, offset: %04x\n", offset));
-	return m_prg[m_latch * 0x2000 + offset];
+	return m_prg[(m_latch * 0x2000 + offset) & (m_prg_size - 1)];
 }
 
 void nes_ks7016_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("ks7016 write_h, offset: %04x, data: %02x\n", offset, data));
 
-	m_latch = (offset >> 2) & 0x0f;
+	m_latch = BIT(offset, 2, 4);
 	if (m_latch & 0x08)
-		m_latch = (m_latch & 0x0b) | m_mask;
+		m_latch = (m_latch & 0x0b) | m_a15_flip;
 }
 
 /*-------------------------------------------------
@@ -661,7 +611,7 @@ void nes_ks7016_device::write_h(offs_t offset, u8 data)
 
  -------------------------------------------------*/
 
-void nes_ks7017_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_ks7017_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{
@@ -677,43 +627,48 @@ void nes_ks7017_device::device_timer(emu_timer &timer, device_timer_id id, int p
 	}
 }
 
-void nes_ks7017_device::write_l(offs_t offset, uint8_t data)
+void nes_ks7017_device::write_l(offs_t offset, u8 data)
 {
 	LOG_MMC(("ks7017 write_l, offset: %04x, data: %02x\n", offset, data));
 
 	offset += 0x100;
-
-	if (offset >= 0xa00 && offset < 0xb00)
-		m_latch = ((offset >> 2) & 0x03) | ((offset >> 4) & 0x04);
-
-	if (offset >= 0x1100 && offset < 0x1200)
-		prg16_89ab(m_latch);
+	switch (offset & 0x1f00)
+	{
+		case 0x0a00:
+			m_latch = bitswap<3>(offset, 6, 3, 2);
+			break;
+		case 0x1100:
+			prg16_89ab(m_latch);
+			break;
+	}
 }
 
-void nes_ks7017_device::write_ex(offs_t offset, uint8_t data)
+void nes_ks7017_device::write_ex(offs_t offset, u8 data)
 {
 	LOG_MMC(("ks7017 write_ex, offset: %04x, data: %02x\n", offset, data));
-	offset += 0x20;
 
-	if (offset == 0x0020) // 0x4020
-		m_irq_count = (m_irq_count & 0xff00) | data;
-
-	if (offset == 0x0021) // 0x4021
+	offset += 0x4020;
+	switch (offset)
 	{
-		m_irq_count = (m_irq_count & 0x00ff) | (data << 8);
-		m_irq_enable = 1;
+		case 0x4020:
+			m_irq_count = (m_irq_count & 0xff00) | data;
+			break;
+		case 0x4021:
+			m_irq_count = (m_irq_count & 0x00ff) | (data << 8);
+			m_irq_enable = 1;
+			break;
+		case 0x4025:
+			set_nt_mirroring(BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			break;
 	}
-
-	if (offset == 0x0025) // 0x4025
-		set_nt_mirroring(BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
-uint8_t nes_ks7017_device::read_ex(offs_t offset)
+u8 nes_ks7017_device::read_ex(offs_t offset)
 {
 	LOG_MMC(("ks7017 read_ex, offset: %04x\n", offset));
-	offset += 0x20;
 
-	if (offset == 0x0030) // 0x4030
+	offset += 0x4020;
+	if (offset == 0x4030)
 	{
 		int temp = m_irq_status;
 		m_irq_status &= ~0x01;
@@ -721,7 +676,7 @@ uint8_t nes_ks7017_device::read_ex(offs_t offset)
 		return temp;
 	}
 
-	return get_open_bus();   // open bus
+	return get_open_bus();
 }
 
 /*-------------------------------------------------
@@ -747,7 +702,7 @@ void nes_ks7021a_device::write_h(offs_t offset, u8 data)
 	switch (offset & 0x7000)
 	{
 		case 0x0000:
-			prg16_89ab((data >> 1) & 0x07);
+			prg16_89ab(BIT(data, 1, 3));
 			break;
 		case 0x1000:
 			set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
@@ -779,7 +734,7 @@ void nes_ks7021a_device::write_h(offs_t offset, u8 data)
 u8 nes_ks7010_device::read_m(offs_t offset)
 {
 //  LOG_MMC(("ks7010 read_m, offset: %04x, data: %02x\n", offset, data));
-	return m_prg[m_latch * 0x2000 + offset];
+	return m_prg[(m_latch * 0x2000 + offset) & (m_prg_size - 1)];
 }
 
 u8 nes_ks7010_device::read_h(offs_t offset)
@@ -787,7 +742,7 @@ u8 nes_ks7010_device::read_h(offs_t offset)
 //  LOG_MMC(("ks7010 read_h, offset: %04x, data: %02x\n", offset, data));
 	if ((offset >= 0x4ab6 && offset <= 0x4ad6) || offset == 0x6be2 || offset == 0x6be3 || offset == 0x6e32 || offset == 0x7ffc) // HACK! FIXME
 	{
-		m_latch = (offset >> 2) & 0x0f;
+		m_latch = BIT(offset, 2, 4);
 		chr8(m_latch, CHRROM);
 	}
 
@@ -806,7 +761,7 @@ u8 nes_ks7010_device::read_h(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_ks7012_device::write_h(offs_t offset, uint8_t data)
+void nes_ks7012_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("ks7012 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -828,13 +783,13 @@ void nes_ks7012_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_ks7013b_device::write_m(offs_t offset, uint8_t data)
+void nes_ks7013b_device::write_m(offs_t offset, u8 data)
 {
 	LOG_MMC(("ks7013b write_l, offset: %04x, data: %02x\n", offset, data));
 	prg16_89ab(data);
 }
 
-void nes_ks7013b_device::write_h(offs_t offset, uint8_t data)
+void nes_ks7013b_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("ks7013b write_h, offset: %04x, data: %02x\n", offset, data));
 	set_nt_mirroring((data & 1) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
@@ -930,23 +885,23 @@ void nes_ks7030_device::write_h(offs_t offset, u8 data)
 
  -------------------------------------------------*/
 
-uint8_t nes_ks7031_device::read_m(offs_t offset)
+u8 nes_ks7031_device::read_m(offs_t offset)
 {
 //  LOG_MMC(("ks7031 read_m, offset: %04x\n", offset));
-	return m_prg[(m_reg[(offset >> 11) & 3] * 0x0800) + (offset & 0x7ff)];
+	return m_prg[(m_reg[BIT(offset, 11, 2)] * 0x0800) + (offset & 0x7ff)];
 }
 
-uint8_t nes_ks7031_device::read_h(offs_t offset)
+u8 nes_ks7031_device::read_h(offs_t offset)
 {
 	// here the first 32K are accessed, but in 16x2K blocks loaded in reverse order
-	int accessed_2k = (offset >> 11) & 0x0f;
-	return m_prg[((0x0f - accessed_2k) * 0x0800) + (offset & 0x7ff)];
+	int accessed_2k = BIT(~offset, 11, 4);
+	return m_prg[accessed_2k * 0x0800 + (offset & 0x7ff)];
 }
 
-void nes_ks7031_device::write_h(offs_t offset, uint8_t data)
+void nes_ks7031_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("ks7031 write_h, offset: %04x, data: %02x\n", offset, data));
-	m_reg[(offset >> 11) & 3] = data & 0x3f;
+	m_reg[BIT(offset, 11, 2)] = data & 0x3f;
 }
 
 /*-------------------------------------------------
@@ -966,17 +921,7 @@ void nes_ks7031_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_ks7037_device::update_prg()
-{
-	prg8_89(m_reg[6]);
-	prg8_cd(m_reg[7]);
-	set_nt_page(0, CIRAM, m_reg[2] & 1, 1);
-	set_nt_page(2, CIRAM, m_reg[3] & 1, 1);
-	set_nt_page(1, CIRAM, m_reg[4] & 1, 1);
-	set_nt_page(3, CIRAM, m_reg[5] & 1, 1);
-}
-
-uint8_t nes_ks7037_device::read_m(offs_t offset)
+u8 nes_ks7037_device::read_m(offs_t offset)
 {
 //  LOG_MMC(("ks7037 read_m, offset: %04x\n", offset));
 	if (offset < 0x1000)
@@ -985,14 +930,14 @@ uint8_t nes_ks7037_device::read_m(offs_t offset)
 		return m_prg[0x0f * 0x1000 + (offset & 0x0fff)]; // 4k PRG bank 15 is fixed
 }
 
-void nes_ks7037_device::write_m(offs_t offset, uint8_t data)
+void nes_ks7037_device::write_m(offs_t offset, u8 data)
 {
 	LOG_MMC(("ks7037 write_m, offset: %04x, data: %02x\n", offset, data));
 	if (offset < 0x1000)
 		m_prgram[offset] = data;
 }
 
-uint8_t nes_ks7037_device::read_h(offs_t offset)
+u8 nes_ks7037_device::read_h(offs_t offset)
 {
 //  LOG_MMC(("ks7037 read_h, offset: %04x\n", offset));
 
@@ -1002,24 +947,24 @@ uint8_t nes_ks7037_device::read_h(offs_t offset)
 	return hi_access_rom(offset);
 }
 
-void nes_ks7037_device::write_h(offs_t offset, uint8_t data)
+void nes_ks7037_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("ks7037 write_h, offset: %04x, data: %02x\n", offset, data));
 
-	if (offset >= 0x3000 && offset < 0x4000)
-		m_prgram[0x1000 + (offset & 0x0fff)] = data;
-	else
+	switch (offset & 0x7000)
 	{
-		switch (offset & 0x6001)
-		{
-			case 0x0000:
-				m_latch = data & 7;
-				break;
-			case 0x0001:
-				m_reg[m_latch] = data;
-				update_prg();
-				break;
-		}
+		case 0x0000:
+		case 0x1000:
+			if (!(offset & 1))
+				m_reg = data & 7;
+			else if (m_reg >= 6)
+				prg8_x((m_reg & 1) << 1, data);
+			else if (m_reg >= 2)
+				set_nt_page(bitswap<2>(m_reg, 0, 2), CIRAM, data & 1, 1);
+			break;
+		case 0x3000:
+			m_prgram[0x1000 + (offset & 0x0fff)] = data;
+			break;
 	}
 }
 
@@ -1046,14 +991,14 @@ void nes_ks7037_device::write_h(offs_t offset, uint8_t data)
 u8 nes_ks7057_device::read_m(offs_t offset)
 {
 //  LOG_MMC(("ks7057 read_m, offset: %04x\n", offset));
-	return m_prg[0x800 * m_reg[((offset >> 11) & 0x03) + 4] + (offset & 0x7ff)];
+	return m_prg[0x800 * m_reg[BIT(offset, 11, 2) + 4] + (offset & 0x7ff)];
 }
 
 u8 nes_ks7057_device::read_h(offs_t offset)
 {
 //  LOG_MMC(("ks7057 read_h, offset: %04x\n", offset));
 	if (offset < 0x2000)
-		return m_prg[0x800 * m_reg[(offset >> 11) & 0x03] + (offset & 0x7ff)];
+		return m_prg[0x800 * m_reg[BIT(offset, 11, 2)] + (offset & 0x7ff)];
 
 	return hi_access_rom(offset);
 }
@@ -1066,7 +1011,7 @@ void nes_ks7057_device::write_h(offs_t offset, u8 data)
 		set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
 	else if (offset >= 0x3000 && offset < 0x6004)
 	{
-		u8 reg = (((offset >> 11) & 0x0e) | BIT(offset, 1)) - 6;
+		u8 reg = bitswap<4>(offset, 14, 13, 12, 1) - 6;
 		if (BIT(offset, 0))
 			m_reg[reg] = (m_reg[reg] & 0x0f) | ((data & 0x03) << 4);
 		else

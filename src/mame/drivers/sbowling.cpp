@@ -72,13 +72,13 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	int m_bgmap;
-	int m_system;
-	tilemap_t *m_tilemap;
+	int m_bgmap = 0;
+	int m_system = 0;
+	tilemap_t *m_tilemap = nullptr;
 	std::unique_ptr<bitmap_ind16> m_tmpbitmap;
-	uint32_t m_color_prom_address;
-	uint8_t m_pix_sh;
-	uint8_t m_pix[2];
+	uint32_t m_color_prom_address = 0;
+	uint8_t m_pix_sh = 0;
+	uint8_t m_pix[2]{};
 
 	void videoram_w(offs_t offset, uint8_t data);
 	void pix_shift_w(uint8_t data);

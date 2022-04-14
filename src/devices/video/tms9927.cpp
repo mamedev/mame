@@ -140,7 +140,7 @@ void tms9927_device::device_stop()
 //  device_timer - handle timer events
 //-------------------------------------------------
 
-void tms9927_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void tms9927_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

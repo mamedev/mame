@@ -57,7 +57,7 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void dma_get_position(uint8_t *&base, uint32_t &limit, bool to_maincpu) = 0;
 	virtual void dma_advance(uint32_t size) = 0;

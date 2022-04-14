@@ -250,7 +250,7 @@ void cave_state::get_sprite_info_cave(int chip)
 		int x, y;
 		int total_width_f, total_height_f;
 
-		if ((m_videoregs[chip][5] & 0x3000) == 0)    // if bit 12/13 is 0 (or seperated per X and Y?)
+		if ((m_videoregs[chip][5] & 0x3000) == 0)    // if bit 12/13 is 0 (or separated per X and Y?)
 		{
 			x = (source[0] & 0x3ff) << 8;
 			y = (source[1] & 0x3ff) << 8;

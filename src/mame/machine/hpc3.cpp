@@ -218,7 +218,7 @@ void hpc3_device::map(address_map &map)
 	map(0x00060000, 0x0007ffff).rw(FUNC(hpc3_device::bbram_r), FUNC(hpc3_device::bbram_w));
 }
 
-void hpc3_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void hpc3_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -1109,7 +1109,7 @@ void hpc3_device::eeprom_w(uint32_t data)
 	m_eeprom_clk_cb(BIT(data, 2));
 }
 
-void hpc3_device::enet_transmit(void *ptr, int param)
+void hpc3_device::enet_transmit(int param)
 {
 	// save the first transmit buffer descriptor pointer
 	// TODO: not sure how cpfbdp and ppfbdp work, perhaps round-robin?

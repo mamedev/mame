@@ -21,6 +21,7 @@
 
 #include "emu.h"
 #include "tube_32016.h"
+
 #include "softlist_dev.h"
 
 
@@ -242,18 +243,23 @@ void bbc_tube_32016_device::device_reset()
 	// address map during booting
 	program.install_rom(0x000000, 0x007fff, 0xff8000, m_rom->base());
 
-	m_rom_shadow_tap = program.install_write_tap(0x000000, 0xffffff, "rom_shadow_w",[this](offs_t offset, u16 &data, u16 mem_mask)
-	{
-		// delete this tap
-		m_rom_shadow_tap->remove();
+	m_rom_shadow_tap.remove();
+	m_rom_shadow_tap = program.install_write_tap(
+			0x000000, 0xffffff,
+			"rom_shadow_w",
+			[this] (offs_t offset, u16 &data, u16 mem_mask)
+			{
+				// delete this tap
+				m_rom_shadow_tap.remove();
 
-		// address map after booting
-		m_maincpu->space(AS_PROGRAM).nop_readwrite(0x000000, 0xffffff);
-		m_maincpu->space(AS_PROGRAM).install_ram(0x000000, m_ram->mask(), 0x7fffff ^ m_ram->mask(), m_ram->pointer());
-		m_maincpu->space(AS_PROGRAM).install_rom(0xf00000, 0xf07fff, 0x038000, m_rom->base());
-		m_maincpu->space(AS_PROGRAM).install_read_port(0xf90000, 0xf90001, 0x00fffe, "CONFIG");
-		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfffff0, 0xffffff, read8sm_delegate(*m_ula, FUNC(tube_device::parasite_r)), write8sm_delegate(*m_ula, FUNC(tube_device::parasite_w)), 0xff);
-	});
+				// address map after booting
+				m_maincpu->space(AS_PROGRAM).nop_readwrite(0x000000, 0xffffff);
+				m_maincpu->space(AS_PROGRAM).install_ram(0x000000, m_ram->mask(), 0x7fffff ^ m_ram->mask(), m_ram->pointer());
+				m_maincpu->space(AS_PROGRAM).install_rom(0xf00000, 0xf07fff, 0x038000, m_rom->base());
+				m_maincpu->space(AS_PROGRAM).install_read_port(0xf90000, 0xf90001, 0x00fffe, "CONFIG");
+				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfffff0, 0xffffff, read8sm_delegate(*m_ula, FUNC(tube_device::parasite_r)), write8sm_delegate(*m_ula, FUNC(tube_device::parasite_w)), 0xff);
+			},
+			&m_rom_shadow_tap);
 }
 
 

@@ -50,12 +50,12 @@ private:
 	optional_ioport m_opt_wheel_io;
 
 	/* video-related */
-	tilemap_t     *m_tilemap[2];
+	tilemap_t     *m_tilemap[2]{};
 
 	/* input-related */
-	uint8_t       m_pot_wheel;    // blmbycar
-	uint8_t       m_old_val;  // blmbycar
-	int         m_retvalue; // waterball
+	uint8_t       m_pot_wheel = 0;    // blmbycar
+	uint8_t       m_old_val = 0;  // blmbycar
+	int         m_retvalue = 0; // waterball
 
 	// common
 	void okibank_w(uint8_t data);

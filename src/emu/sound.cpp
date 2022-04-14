@@ -885,7 +885,7 @@ void sound_stream::reprime_sync_timer()
 //  synchronous stream
 //-------------------------------------------------
 
-void sound_stream::sync_update(void *, s32)
+void sound_stream::sync_update(s32)
 {
 	update();
 	reprime_sync_timer();
@@ -1457,7 +1457,7 @@ stream_buffer::sample_t sound_manager::adjust_toward_compressor_scale(stream_buf
 //  and send it to the OSD layer
 //-------------------------------------------------
 
-void sound_manager::update(void *ptr, int param)
+void sound_manager::update(int param)
 {
 	VPRINTF(("sound_update\n"));
 

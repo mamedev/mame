@@ -1442,17 +1442,6 @@ static const gfx_layout charlayout_2bpp =
 	16*8
 };
 
-static const gfx_layout charlayout_xevious =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	8*8
-};
-
 static const gfx_layout charlayout_digdug =
 {
 	8,8,
@@ -1531,7 +1520,7 @@ static GFXDECODE_START( gfx_galaga )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_xevious )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout_xevious, 128*4+64*8,  64 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x1,          128*4+64*8,  64 )
 	GFXDECODE_ENTRY( "gfx2", 0, bgcharlayout,                0, 128 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout_xevious,    128*4,  64 )
 GFXDECODE_END
@@ -1607,7 +1596,6 @@ void bosco_state::bosco(machine_config &config)
 	namco_54xx_device &n54xx(NAMCO_54XX(config, "54xx", MASTER_CLOCK/6/2));      /* 1.536 MHz */
 	n54xx.set_discrete("discrete");
 	n54xx.set_basenote(NODE_01);
-	n54xx.set_irq_duration(attotime::from_usec(200));
 
 	namco_06xx_device &n06xx_0(NAMCO_06XX(config, "06xx_0", MASTER_CLOCK/6/64));
 	n06xx_0.set_maincpu(m_maincpu);
@@ -1615,18 +1603,19 @@ void bosco_state::bosco(machine_config &config)
 	n06xx_0.rw_callback<0>().set("51xx", FUNC(namco_51xx_device::rw));
 	n06xx_0.read_callback<0>().set("51xx", FUNC(namco_51xx_device::read));
 	n06xx_0.write_callback<0>().set("51xx", FUNC(namco_51xx_device::write));
-	n06xx_0.read_callback<2>().set("50xx_1", FUNC(namco_50xx_device::read));
 	n06xx_0.chip_select_callback<2>().set("50xx_1", FUNC(namco_50xx_device::chip_select));
 	n06xx_0.rw_callback<2>().set("50xx_1", FUNC(namco_50xx_device::rw));
+	n06xx_0.read_callback<2>().set("50xx_1", FUNC(namco_50xx_device::read));
 	n06xx_0.write_callback<2>().set("50xx_1", FUNC(namco_50xx_device::write));
-	n06xx_0.write_callback<3>().set("54xx", FUNC(namco_54xx_device::write));
 	n06xx_0.chip_select_callback<3>().set("54xx", FUNC(namco_54xx_device::chip_select));
+	n06xx_0.write_callback<3>().set("54xx", FUNC(namco_54xx_device::write));
 
-	namco_06xx_device &n06xx_1(NAMCO_06XX(config, "06xx_1", MASTER_CLOCK/6/64));
+	// The clock should be hblank, but approx with 512.
+	namco_06xx_device &n06xx_1(NAMCO_06XX(config, "06xx_1", MASTER_CLOCK/6/512));
 	n06xx_1.set_maincpu(m_subcpu);
 	n06xx_1.read_callback<0>().set("50xx_2", FUNC(namco_50xx_device::read));
 	n06xx_1.chip_select_callback<0>().set("50xx_2", FUNC(namco_50xx_device::chip_select));
-	n06xx_1.rw_callback<2>().set("50xx_2", FUNC(namco_50xx_device::rw));
+	n06xx_1.rw_callback<0>().set("50xx_2", FUNC(namco_50xx_device::rw));
 	n06xx_1.write_callback<0>().set("50xx_2", FUNC(namco_50xx_device::write));
 	n06xx_1.write_callback<1>().set("52xx", FUNC(namco_52xx_device::write));
 	n06xx_1.chip_select_callback<1>().set("52xx", FUNC(namco_52xx_device::chip_select));

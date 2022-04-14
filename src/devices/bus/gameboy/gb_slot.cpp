@@ -138,7 +138,7 @@ void device_gb_cart_interface::ram_map_setup(uint8_t banks)
 //-------------------------------------------------
 gb_cart_slot_device_base::gb_cart_slot_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_gb_cart_interface>(mconfig, *this),
 	m_type(GB_MBC_UNKNOWN),
 	m_cart(nullptr)

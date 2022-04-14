@@ -80,9 +80,13 @@ public:
 protected:
 	hdc92x4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_hdc9234);
 
-	void device_start() override;
-	void device_reset() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
+	// Timer callback
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+private:
 	const bool m_is_hdc9234;
 
 	devcb_write_line   m_out_intrq;    // INT line
@@ -95,10 +99,12 @@ protected:
 	// Internal register pointer used for sequential register loading
 	int m_register_pointer;
 
+protected:
 	// Read and write registers
 	uint8_t m_register_w[12];
 	uint8_t m_register_r[15];
 
+private:
 	// Interrupt management (outgoing INT pin)
 	void set_interrupt(line_state intr);
 
@@ -123,9 +129,11 @@ protected:
 	// Intermediate storage for register
 	uint8_t m_regvalue;
 
+protected:
 	// Drive type that has been selected in drive_select
 	int m_selected_drive_type;
 
+private:
 	// Drive numbere that has been selected in drive_select
 	int m_selected_drive_number;
 
@@ -136,9 +144,6 @@ protected:
 	emu_timer *m_timer;
 	emu_timer *m_cmd_timer;
 	// emu_timer *m_live_timer;
-
-	// Timer callback
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// Handlers for incoming signals
 	void ready_handler();
@@ -361,6 +366,7 @@ protected:
 	int m_gap3_size;
 	int m_sync_size;
 
+protected:
 	// Are we in FM mode?
 	bool fm_mode();
 
@@ -424,6 +430,7 @@ protected:
 	// Was the Bad Sector flag set for the recently read sector header?
 	bool bad_sector();
 
+private:
 	// Common subprograms READ ID, VERIFY, and DATA TRANSFER
 	void read_id(int& cont, bool implied_seek, bool wait_seek_complete);
 	void verify(int& cont);
@@ -458,8 +465,8 @@ public:
 	hdc9224_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	int step_time() override;
-	int header_length() override;
+	virtual int step_time() override;
+	virtual int header_length() override;
 };
 
 class hdc9234_device : public hdc92x4_device
@@ -468,8 +475,8 @@ public:
 	hdc9234_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	int step_time() override;
-	int header_length() override;
+	virtual int step_time() override;
+	virtual int header_length() override;
 };
 
 #endif // MAME_MACHINE_HDC92X4_H

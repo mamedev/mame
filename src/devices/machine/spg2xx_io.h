@@ -41,15 +41,15 @@ public:
 	virtual uint16_t io_extended_r(offs_t offset);
 	virtual void io_extended_w(offs_t offset, uint16_t data);
 
-	auto pal_read_callback() { return m_pal_read_cb.bind(); };
+	auto pal_read_callback() { return m_pal_read_cb.bind(); }
 
-	auto write_timer_irq_callback() { return m_timer_irq_cb.bind(); };
-	auto write_uart_adc_irq_callback() { return m_uart_adc_irq_cb.bind(); };
-	auto write_external_irq_callback() { return m_external_irq_cb.bind(); };
-	auto write_ffrq_tmr1_irq_callback() { return m_ffreq_tmr1_irq_cb.bind(); };
-	auto write_ffrq_tmr2_irq_callback() { return m_ffreq_tmr2_irq_cb.bind(); };
+	auto write_timer_irq_callback() { return m_timer_irq_cb.bind(); }
+	auto write_uart_adc_irq_callback() { return m_uart_adc_irq_cb.bind(); }
+	auto write_external_irq_callback() { return m_external_irq_cb.bind(); }
+	auto write_ffrq_tmr1_irq_callback() { return m_ffreq_tmr1_irq_cb.bind(); }
+	auto write_ffrq_tmr2_irq_callback() { return m_ffreq_tmr2_irq_cb.bind(); }
 
-	auto write_fiq_vector_callback() { return m_fiq_vector_w.bind(); };
+	auto write_fiq_vector_callback() { return m_fiq_vector_w.bind(); }
 
 	template <size_t Line> uint16_t adc_r() { return m_adc_in[Line](); }
 

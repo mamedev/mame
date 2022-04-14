@@ -5265,7 +5265,35 @@ ROM_END
 
 
 /* this expects Magic values in NVRAM to boot */
+// latest revision, BL version at 2nd ROM half was updated, require different NVRAM protection values, still display same 3-dot version text as older set
 ROM_START( ddpdojblk )
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_WORD_SWAP( "ddp3_bios.u37",    0x00000, 0x080000, CRC(b3cc5c8f) SHA1(02d9511cf71e4a0d6ca8fd9a1ef2c79b0d001824) ) // uses a standard PGM bios with the startup logos hacked out
+	ROM_LOAD16_WORD_SWAP( "ddb10_10_8_434f.u45",  0x100000, 0x200000, CRC(d21561db) SHA1(66a0103bc5f17b28736b562e32807271a5afa261) )
+
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_LOAD( "ddp3_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
+
+	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM bios
+	ROM_LOAD( "cave_t04401w064.u19", 0x180000, 0x800000, CRC(3a95f19c) SHA1(fd3c47cf0b8b1e20c6bec4be68a089fc8bbf4dbe) ) //text-1
+
+	ROM_REGION16_LE( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_LOAD( "cave_a04401w064.u7",  0x0000000, 0x0800000, CRC(ed229794) SHA1(1cf1863495a18c7c7d277a9be43ec116b00960b0) ) //image-1
+	ROM_LOAD( "cave_a04402w064.u8",  0x0800000, 0x0800000, CRC(752167b0) SHA1(c33c3398dd8e479c9d5bd348924958a6aecbf0fc) ) //image-2
+
+	ROM_REGION16_LE( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_LOAD( "cave_b04401w064.u1",  0x0000000, 0x0800000, CRC(17731c9d) SHA1(0e0aa0ec01035323985ac8e08228a0fd6edf6689) ) //bitmap-1
+
+	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
+	ROM_LOAD( "pgm_m01s.rom", 0x000000, 0x200000, CRC(45ae7159) SHA1(d3ed3ff3464557fd0df6b069b2e431528b0ebfa8) ) // same as standard PGM bios
+	ROM_LOAD( "cave_m04401b032.u17", 0x400000, 0x400000, CRC(5a0dbd76) SHA1(06ab202f6bd5ebfb35b9d8cc7a8fb83ec8840659) ) //music-1
+
+	ROM_REGION( 0x20000, "sram", 0 ) /* NVRAM with factory programmed values - needed to boot */
+	ROM_LOAD( "ddp3blk_defaults.nv",  0x0000000, 0x020000, CRC(c2282720) SHA1(80b7662a7577883dabd043b6500ae244379047c2) )
+ROM_END
+
+ROM_START( ddpdojblka )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "ddp3_bios.u37",    0x00000, 0x080000, CRC(b3cc5c8f) SHA1(02d9511cf71e4a0d6ca8fd9a1ef2c79b0d001824) ) // uses a standard PGM bios with the startup logos hacked out
 	ROM_LOAD16_WORD_SWAP( "ddb_1dot.u45",  0x100000, 0x200000, CRC(265f26cd) SHA1(91abc7fc4722f3d01d76a4c1ae14c4132e4e576c) )
@@ -5292,7 +5320,7 @@ ROM_START( ddpdojblk )
 	ROM_LOAD( "ddp3blk_defaults.nv",  0x0000000, 0x020000, CRC(a1651904) SHA1(5b80d3c4c764895c40953a66161d4dd84f742604) )
 ROM_END
 
-ROM_START( ddpdojblka )
+ROM_START( ddpdojblkb )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "ddp3_bios.u37",    0x00000, 0x080000, CRC(b3cc5c8f) SHA1(02d9511cf71e4a0d6ca8fd9a1ef2c79b0d001824) ) // uses a standard PGM bios with the startup logos hacked out
 	ROM_LOAD16_WORD_SWAP( "ddb10.u45",  0x100000, 0x200000, CRC(72b35510) SHA1(9a432e5e1ebe61aafd737b6acc905653e5af0d38) )
@@ -5512,8 +5540,9 @@ GAME( 2002, ddpdoj,       ddp3,      pgm_arm_type1_cave,     ddp3,      pgm_arm_
 GAME( 2002, ddpdoja,      ddp3,      pgm_arm_type1_cave,     ddp3,      pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (Japan, 2002.04.05.Master Ver, 68k Label V100)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 2002, ddpdojb,      ddp3,      pgm_arm_type1_cave,     ddp3,      pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (Japan, 2002.04.05 Master Ver)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 2002, ddpdojp,      ddp3,      pgm,                    ddp3,      pgm_state,           init_pgm,      ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (Japan, 2002.04.05 Master Ver, location test)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // unprotected, but still has strings related to the protection ASIC
-GAME( 2002, ddpdojblk,    ddp3,      pgm_arm_type1_cave,     ddp3,      pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou Black Label (Japan, 2002.10.07.Black Ver)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07.Black Ver" (new)
-GAME( 2002, ddpdojblka,   ddp3,      pgm_arm_type1_cave,     ddp3,      pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou Black Label (Japan, 2002.10.07 Black Ver)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07 Black Ver" (new)
+GAME( 2002, ddpdojblk,    ddp3,      pgm_arm_type1_cave,     ddp3,      pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou Black Label (Japan, 2002.10.07.Black Ver, newer)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07.Black Ver" (new)
+GAME( 2002, ddpdojblka,   ddp3,      pgm_arm_type1_cave,     ddp3,      pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou Black Label (Japan, 2002.10.07.Black Ver, older)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07.Black Ver" (new)
+GAME( 2002, ddpdojblkb,   ddp3,      pgm_arm_type1_cave,     ddp3,      pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou Black Label (Japan, 2002.10.07 Black Ver)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07 Black Ver" (new)
 GAME( 2012, ddpdojblkbl,  ddp3,      pgm_arm_type1,          pgm,       pgm_arm_type1_state, init_kovsh,    ROT270, "bootleg",            "DoDonPachi Dai-Ou-Jou Black Label (Japan, 2002.10.07 Black Ver., bootleg Knights of Valour Super Heroes conversion)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // the extra . in the revision has been added by bootlegger
 
 // the exact text of the 'version' shows which revision of the game it is; the newest has 2 '.' symbols in the string, the oldest, none.

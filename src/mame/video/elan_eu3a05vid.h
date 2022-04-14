@@ -23,9 +23,9 @@ public:
 
 	void set_is_sudoku();
 	void set_is_pvmilfin();
-	void set_use_spritepages() { m_use_spritepages = true; };
-	void set_force_transpen_ff() { m_force_transpen_ff = true; };
-	void set_force_basic_scroll() { m_force_basic_scroll = true; };
+	void set_use_spritepages() { m_use_spritepages = true; }
+	void set_force_transpen_ff() { m_force_transpen_ff = true; }
+	void set_force_basic_scroll() { m_force_basic_scroll = true; }
 
 protected:
 	// device-level overrides
@@ -38,17 +38,17 @@ private:
 	required_device<address_map_bank_device> m_bank;
 	const address_space_config      m_space_config;
 
-	uint8_t m_vidctrl;
+	uint8_t m_vidctrl = 0;
 
-	uint8_t m_tile_gfxbase_lo_data;
-	uint8_t m_tile_gfxbase_hi_data;
+	uint8_t m_tile_gfxbase_lo_data = 0;
+	uint8_t m_tile_gfxbase_hi_data = 0;
 
-	uint8_t m_sprite_gfxbase_lo_data;
-	uint8_t m_sprite_gfxbase_hi_data;
+	uint8_t m_sprite_gfxbase_lo_data = 0;
+	uint8_t m_sprite_gfxbase_hi_data = 0;
 
-	uint8_t m_tile_scroll[4*2];
+	uint8_t m_tile_scroll[4*2]{};
 
-	uint8_t m_splitpos[2];
+	uint8_t m_splitpos[2]{};
 
 	uint16_t get_scroll(int which);
 

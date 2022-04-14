@@ -68,16 +68,16 @@ private:
 	required_region_ptr<uint8_t> m_background_mixer;
 
 	// video-related
-	uint8_t    m_cocktail_flip;
-	uint8_t    m_char_palette;
-	uint8_t    m_sprite_palette;
-	uint8_t    m_char_bank;
-	std::unique_ptr<uint16_t[]>  m_background_gfx[4];
-	uint8_t    m_background_latches[13];
+	uint8_t    m_cocktail_flip = 0U;
+	uint8_t    m_char_palette = 0U;
+	uint8_t    m_sprite_palette = 0U;
+	uint8_t    m_char_bank = 0U;
+	std::unique_ptr<uint16_t[]>  m_background_gfx[4]{};
+	uint8_t    m_background_latches[13]{};
 
 	// protection?
-	uint8_t m_porta;
-	uint8_t m_portb;
+	uint8_t m_porta = 0U;
+	uint8_t m_portb = 0U;
 
 	// devices
 	required_device<cpu_device> m_maincpu;

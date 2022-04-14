@@ -136,10 +136,16 @@ protected:
 	// other execution helpers
 	bool condition(unsigned const cc);
 	void flags(u32 const src1, u32 const src2, u32 const dest, unsigned const size, bool const subtraction);
-	void interrupt(unsigned const vector, u32 const return_address, bool const trap = true);
-	u16 slave(ns32000_slave_interface *slave, addr_mode op1, addr_mode op2);
+	void interrupt(unsigned const type, u32 const return_address);
+
+	// slave protocol helpers
+	u16 slave(u8 opbyte, u16 opword, addr_mode op1, addr_mode op2);
+	u16 slave_slow(ns32000_slow_slave_interface &slave, u8 opbyte, u16 opword, addr_mode op1, addr_mode op2);
+	u16 slave_fast(ns32000_fast_slave_interface &slave, u8 opbyte, u16 opword, addr_mode op1, addr_mode op2);
 
 private:
+	u32 const m_address_mask;
+
 	// configuration
 	address_space_config m_program_config;
 	address_space_config m_iam_config;
@@ -200,8 +206,15 @@ public:
 	ns32032_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 };
 
+class ns32332_device : public ns32000_device<2>
+{
+public:
+	ns32332_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+};
+
 DECLARE_DEVICE_TYPE(NS32008, ns32008_device)
 DECLARE_DEVICE_TYPE(NS32016, ns32016_device)
 DECLARE_DEVICE_TYPE(NS32032, ns32032_device)
+DECLARE_DEVICE_TYPE(NS32332, ns32332_device)
 
 #endif // MAME_CPU_NS32000_NS32000_H

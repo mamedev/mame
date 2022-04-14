@@ -59,7 +59,7 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	u8 m_digit;
+	u8 m_digit = 0U;
 	void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;

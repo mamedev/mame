@@ -6,18 +6,23 @@
 
     Driver file for EC-184x series
 
+    To do:
+    - verify ec1840 clocks etc.
+    - did 640KB memory board exist or it's 512+128 boards?
+
 ***************************************************************************/
 
 
 #include "emu.h"
-
 #include "machine/genpc.h"
+
 #include "bus/isa/xsu_cards.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "cpu/i86/i86.h"
 #include "machine/ram.h"
-#include "softlist.h"
+
+#include "softlist_dev.h"
 
 
 //#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
@@ -25,14 +30,14 @@
 #define LOG_DEBUG     (1U <<  2)
 
 //#define VERBOSE (LOG_DEBUG)
-//#define LOG_OUTPUT_FUNC printf
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGKBD(...) LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
 #define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
 
 
-#define EC1841_MEMBOARD_SIZE    (512*1024)
+static constexpr int EC1841_MEMBOARD_SIZE = 512 * 1024;
 
 
 class ec184x_state : public driver_device
@@ -44,9 +49,8 @@ public:
 		, m_ram(*this, RAM_TAG)
 	{ }
 
-	void ec1841(machine_config &config);
-	void ec1847(machine_config &config);
 	void ec1840(machine_config &config);
+	void ec1841(machine_config &config);
 
 	void init_ec1840();
 	void init_ec1841();
@@ -60,16 +64,14 @@ private:
 	void ec1840_map(address_map &map);
 	void ec1841_io(address_map &map);
 	void ec1841_map(address_map &map);
-	void ec1847_io(address_map &map);
-	void ec1847_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 
 	struct
 	{
-		uint8_t enable[4];
-		int boards;
+		uint8_t enable[4]{};
+		int boards = 0;
 	} m_memory;
 };
 
@@ -157,7 +159,7 @@ void ec184x_state::init_ec1840()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	program.install_ram(0, m_ram->size()-1, m_ram->pointer());
+	program.install_ram(0, m_ram->size() - 1, m_ram->pointer());
 }
 
 void ec184x_state::init_ec1841()
@@ -167,10 +169,9 @@ void ec184x_state::init_ec1841()
 	m_memory.boards = m_ram->size() / EC1841_MEMBOARD_SIZE;
 	if (m_memory.boards > 4) m_memory.boards = 4;
 
-	program.install_ram(0,  EC1841_MEMBOARD_SIZE-1, m_ram->pointer());
+	program.install_ram(0, EC1841_MEMBOARD_SIZE - 1, m_ram->pointer());
 
 	// 640K configuration is special -- 512K board mapped at 0 + 128K board mapped at 512K
-	// XXX verify this was actually the case
 	if (m_ram->size() == 640 * 1024)
 	{
 		program.install_ram(EC1841_MEMBOARD_SIZE, m_ram->size() - 1, m_ram->pointer() + EC1841_MEMBOARD_SIZE);
@@ -197,12 +198,6 @@ void ec184x_state::ec1841_map(address_map &map)
 	map(0xf0000, 0xfffff).rom().region("bios", 0);
 }
 
-void ec184x_state::ec1847_map(address_map &map)
-{
-	map.unmap_value_high();
-	map(0xe0000, 0xfffff).rom().region("bios", 0);
-}
-
 void ec184x_state::ec1840_io(address_map &map)
 {
 	map.unmap_value_high();
@@ -216,15 +211,7 @@ void ec184x_state::ec1841_io(address_map &map)
 	map(0x02b0, 0x02b3).rw(FUNC(ec184x_state::memboard_r), FUNC(ec184x_state::memboard_w));
 }
 
-void ec184x_state::ec1847_io(address_map &map)
-{
-	map.unmap_value_high();
-	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
-//  map(0x0210, 0x021f).ram(); // internal (non-standard?) bus extender
-}
 
-
-// XXX verify everything
 void ec184x_state::ec1840(machine_config &config)
 {
 	I8086(config, m_maincpu, 4096000);
@@ -240,12 +227,12 @@ void ec184x_state::ec1840(machine_config &config)
 	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 
 	// FIXME: determine ISA bus clock
+	// 7-slot backplane, at least two slots are always taken by CPU and memory cards
 	ISA8_SLOT(config, "isa1", 0, "mb:isa", ec184x_isa8_cards, "ec1840.0002", false);
 	ISA8_SLOT(config, "isa2", 0, "mb:isa", ec184x_isa8_cards, "ec1840.0003", false);
-	ISA8_SLOT(config, "isa3", 0, "mb:isa", ec184x_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", ec184x_isa8_cards, "ec1840.0004", false);
 	ISA8_SLOT(config, "isa4", 0, "mb:isa", ec184x_isa8_cards, nullptr, false);
 	ISA8_SLOT(config, "isa5", 0, "mb:isa", ec184x_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa6", 0, "mb:isa", ec184x_isa8_cards, nullptr, false);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("ec1841");
 
@@ -273,9 +260,9 @@ void ec184x_state::ec1841(machine_config &config)
 	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 
 	// FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa1", 0, "mb:isa", ec184x_isa8_cards, "ec1841.0002", false);   // cga
-	ISA8_SLOT(config, "isa2", 0, "mb:isa", ec184x_isa8_cards, "ec1841.0003", false);   // fdc (IRQ6) + mouse port (IRQ2..5)
-	ISA8_SLOT(config, "isa3", 0, "mb:isa", ec184x_isa8_cards, "ec1841.0004", false);   // lpt (IRQ7||5) [+ serial (IRQx)]
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", ec184x_isa8_cards, "ec1841.0002", false); // cga
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", ec184x_isa8_cards, "ec1841.0003", false); // fdc (IRQ6) + mouse port (IRQ2..5)
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", ec184x_isa8_cards, "ec1840.0004", false); // lpt (IRQ7||5) [+ serial (IRQx)]
 	ISA8_SLOT(config, "isa4", 0, "mb:isa", ec184x_isa8_cards, "hdc", false);
 	ISA8_SLOT(config, "isa5", 0, "mb:isa", ec184x_isa8_cards, nullptr, false);
 	ISA8_SLOT(config, "isa6", 0, "mb:isa", ec184x_isa8_cards, nullptr, false);
@@ -287,36 +274,6 @@ void ec184x_state::ec1841(machine_config &config)
 	kbd.out_data_cb().set("mb", FUNC(ec1841_mb_device::keyboard_data_w));
 
 	RAM(config, m_ram).set_default_size("640K").set_extra_options("512K,1024K,1576K,2048K");
-}
-
-// XXX verify everything
-void ec184x_state::ec1847(machine_config &config)
-{
-	I8086(config, m_maincpu, 4772720);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ec184x_state::ec1847_map);
-	m_maincpu->set_addrmap(AS_IO, &ec184x_state::ec1847_io);
-	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
-
-	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb"));
-	mb.set_cputag(m_maincpu);
-	mb.int_callback().set_inputline(m_maincpu, 0);
-	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	mb.kbdclk_callback().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
-	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
-
-	// FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "hercules", false);  // cga, ega and vga(?) are options too
-	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
-	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, nullptr, false);    // native variant (wd1010 + z80) not emulated
-	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, nullptr, false);    // native serial (2x8251) not emulated
-	ISA8_SLOT(config, "isa5", 0, "mb:isa", pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa6", 0, "mb:isa", pc_isa8_cards, nullptr, false);
-
-	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270));
-	kbd.out_clock_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_clock_w));
-	kbd.out_data_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_data_w));
-
-	RAM(config, m_ram).set_default_size("640K");
 }
 
 ROM_START( ec1840 )
@@ -384,19 +341,7 @@ ROM_START( ec1845 )
 	ROMX_LOAD("184507.bin", 0xf001, 0x0800, CRC(75122203) SHA1(7b0fbdf1315230633e39574ac7360163bc7361e1), ROM_SKIP(1))
 ROM_END
 
-ROM_START( ec1847 )
-	ROM_REGION16_LE(0x20000,"bios", 0)
-	ROM_SYSTEM_BIOS(0, "vxxx", "EC-1847.0x")
-	ROMX_LOAD("308_d47_2764.bin", 0x08000, 0x2000, CRC(f06924f2) SHA1(83a5dedf1c06f875c598f087bbc087524bc9bfa3), ROM_BIOS(0))
-	ROMX_LOAD("188m_d47_2764.bin", 0x14000, 0x2000, CRC(bc8742c7) SHA1(3af09d14e891e976b7a9a2a6e1af63f0eabe5426), ROM_BIOS(0))
-	ROMX_LOAD("188m_d48_2764.bin", 0x1e000, 0x2000, CRC(7d290e95) SHA1(e73e6c8e19477fce5de3f95b89693dc6ad6781ab), ROM_BIOS(0))
-
-	ROM_REGION(0x2000,"gfx1", ROMREGION_ERASE00)
-	ROM_LOAD("317_d28_2732.bin", 0x00000, 0x1000, CRC(8939599b) SHA1(53d02460cf93596882a96758ef4bac5fa1ce55b2)) // monochrome font
-ROM_END
-
 //    YEAR  NAME    PARENT   COMPAT  MACHINE  INPUT  STATE         INIT         COMPANY      FULLNAME   FLAGS
 COMP( 1986, ec1840, ibm5150, 0,      ec1840,  0,     ec184x_state, init_ec1840, "<unknown>", "EC-1840", 0 )
 COMP( 1987, ec1841, ibm5150, 0,      ec1841,  0,     ec184x_state, init_ec1841, "<unknown>", "EC-1841", 0 )
 COMP( 1989, ec1845, ibm5150, 0,      ec1841,  0,     ec184x_state, init_ec1841, "<unknown>", "EC-1845", MACHINE_NOT_WORKING )
-COMP( 1990, ec1847, ibm5150, 0,      ec1847,  0,     ec184x_state, empty_init,  "<unknown>", "EC-1847", MACHINE_NOT_WORKING )

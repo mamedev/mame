@@ -73,12 +73,12 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
 
-	uint8_t m_sound_state[2];
-	uint8_t m_sound_rate;
-	uint16_t m_sound_addr;
-	uint8_t m_sound_data;
-	uint8_t m_square_state;
-	uint8_t m_square_count;
+	uint8_t m_sound_state[2]{};
+	uint8_t m_sound_rate = 0;
+	uint16_t m_sound_addr = 0;
+	uint8_t m_sound_data = 0;
+	uint8_t m_square_state = 0;
+	uint8_t m_square_count = 0;
 	inline void sega005_update_sound_data();
 
 private:
@@ -107,29 +107,29 @@ private:
 
 	std::vector<uint8_t> m_paletteram;
 
-	offs_t m_scrambled_write_pc;
+	offs_t m_scrambled_write_pc = 0;
 
-	segag80_decrypt_func m_decrypt;
-	uint8_t m_background_pcb;
-	double m_rweights[3];
-	double m_gweights[3];
-	double m_bweights[2];
-	uint8_t m_video_control;
-	uint8_t m_video_flip;
-	uint8_t m_vblank_latch;
-	tilemap_t *m_spaceod_bg_htilemap;
-	tilemap_t *m_spaceod_bg_vtilemap;
-	uint16_t m_spaceod_hcounter;
-	uint16_t m_spaceod_vcounter;
-	uint8_t m_spaceod_fixed_color;
-	uint8_t m_spaceod_bg_control;
-	uint8_t m_spaceod_bg_detect;
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_bg_enable;
-	uint8_t m_bg_char_bank;
-	uint16_t m_bg_scrollx;
-	uint16_t m_bg_scrolly;
-	uint8_t m_pignewt_bg_color_offset;
+	segag80_decrypt_func m_decrypt{};
+	uint8_t m_background_pcb = 0;
+	double m_rweights[3]{};
+	double m_gweights[3]{};
+	double m_bweights[2]{};
+	uint8_t m_video_control = 0;
+	uint8_t m_video_flip = 0;
+	uint8_t m_vblank_latch = 0;
+	tilemap_t *m_spaceod_bg_htilemap = nullptr;
+	tilemap_t *m_spaceod_bg_vtilemap = nullptr;
+	uint16_t m_spaceod_hcounter = 0;
+	uint16_t m_spaceod_vcounter = 0;
+	uint8_t m_spaceod_fixed_color = 0;
+	uint8_t m_spaceod_bg_control = 0;
+	uint8_t m_spaceod_bg_detect = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_bg_enable = 0;
+	uint8_t m_bg_char_bank = 0;
+	uint16_t m_bg_scrollx = 0;
+	uint16_t m_bg_scrolly = 0;
+	uint8_t m_pignewt_bg_color_offset = 0;
 
 	uint8_t g80r_opcode_r(offs_t offset);
 	void mainram_w(offs_t offset, uint8_t data);
@@ -191,8 +191,8 @@ private:
 	void sindbadm_portmap(address_map &map);
 	void sindbadm_sound_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	emu_timer *m_vblank_latch_clear_timer;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	emu_timer *m_vblank_latch_clear_timer = nullptr;
 };
 
 

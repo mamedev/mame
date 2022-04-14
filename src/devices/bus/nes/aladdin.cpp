@@ -68,7 +68,7 @@ DEFINE_DEVICE_TYPE(NES_ALADDIN_SLOT, nes_aladdin_slot_device, "nes_ade_slot", "N
 
 nes_aladdin_slot_device::nes_aladdin_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NES_ALADDIN_SLOT, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	, device_cartrom_image_interface(mconfig, *this)
 	, device_single_card_slot_interface<aladdin_cart_interface>(mconfig, *this)
 	, m_cart(nullptr)
 {
@@ -245,7 +245,7 @@ void nes_algq_rom_device::write_prg(uint32_t offset, uint8_t data)
 	// m_hibank = 3rd page inside the block
 	if (offset < 0x4000)
 	{
-		m_bank_base = ((data >> 3) & 3) << 2;
+		m_bank_base = (data & 0x18) >> 1;
 		m_lobank = m_bank_base | (m_lobank & 3);
 		m_hibank = m_bank_base | 3;
 	}

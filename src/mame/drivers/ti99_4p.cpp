@@ -64,7 +64,7 @@
     BLACK SCREEN.
 
     In the real environment, the HSGPL has usually been set up on delivery.
-    In MESS we have to create a suitable HSGPL memory content. Best practice
+    In MAME we have to create a suitable HSGPL memory content. Best practice
     is to start the TI-99/4A console with EVPC support (driver ti99_4ev) with
     a plugged-in HSGPL and to go through the setup process there.
     Finally, the nvram files of the HSGPL must be copied into this driver's nvram
@@ -97,7 +97,7 @@
     Video and sound
     ---------------
     The SGCPU relies on the EVPC or EVPC2 card to provide video capabilities.
-    This card (rel.1) is emulated in MESS and is based on the v9938 video
+    This card (rel.1) is emulated in MAME and is based on the v9938 video
     display processor.
     In order to route the VDP interrupt to the SGCPU card, the previously
     unused LCP* line in the Peripheral Expansion Box is used.

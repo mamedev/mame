@@ -64,17 +64,17 @@ private:
 	};
 
 	required_device_array<legacy_floppy_image_device, 2> m_image;
-	uint8_t m_buffer[128];
-	int m_buf_pos;
+	uint8_t m_buffer[128]{};
+	int m_buf_pos = 0;
 
-	uint16_t m_rxcs; // Command and Status Register
-	uint16_t m_rxdb; // Data Buffer Register
-	uint16_t m_rxta; // RX Track Address
-	uint16_t m_rxsa; // RX Sector Address
-	uint16_t m_rxes; // RX Error and Status
-	int m_unit;
-	int m_interrupt;
-	rx01_state m_state;
+	uint16_t m_rxcs = 0; // Command and Status Register
+	uint16_t m_rxdb = 0; // Data Buffer Register
+	uint16_t m_rxta = 0; // RX Track Address
+	uint16_t m_rxsa = 0; // RX Sector Address
+	uint16_t m_rxes = 0; // RX Error and Status
+	int m_unit = 0;
+	int m_interrupt = 0;
+	rx01_state m_state{};
 };
 
 // device type definition

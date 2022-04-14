@@ -14,8 +14,6 @@
 #include "dsppfe.h"
 #include "dsppdasm.h"
 
-#include "debugger.h"
-
 
 //**************************************************************************
 //  CONSTANTS

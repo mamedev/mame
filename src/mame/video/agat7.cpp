@@ -20,6 +20,7 @@
 *********************************************************************/
 
 #include "emu.h"
+
 #include "video/agat7.h"
 
 #include "screen.h"
@@ -52,14 +53,14 @@ void agat7video_device::device_add_mconfig(machine_config &config)
 //  LIVE DEVICE
 //**************************************************************************
 
-agat7video_device::agat7video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, AGAT7VIDEO, tag, owner, clock),
-	device_palette_interface(mconfig, *this),
-	m_ram_dev(*this, finder_base::DUMMY_TAG),
-	m_char_region(*this, finder_base::DUMMY_TAG),
-	m_char_ptr(nullptr),
-	m_char_size(0),
-	m_start_address(0)
+agat7video_device::agat7video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, AGAT7VIDEO, tag, owner, clock)
+	, device_palette_interface(mconfig, *this)
+	, m_ram_dev(*this, finder_base::DUMMY_TAG)
+	, m_char_region(*this, finder_base::DUMMY_TAG)
+	, m_char_ptr(nullptr)
+	, m_char_size(0)
+	, m_start_address(0)
 {
 }
 
@@ -123,11 +124,14 @@ void agat7video_device::do_io(int offset)
 		break;
 
 	case 2:
-		if (offset > 0x80) {
+		if (offset > 0x80)
+		{
 			m_video_mode = TEXT_HIRES;
 			m_start_address = (offset - 0x82) << 9;
 			logerror("offset %02X -> %04X, video mode 2 (TEXT_HIRES)\n", offset, m_start_address);
-		} else {
+		}
+		else
+		{
 			m_video_mode = TEXT_LORES;
 			m_start_address = (offset - 0x02) << 9;
 			logerror("offset %02X -> %04X, video mode 2 (TEXT_LORES)\n", offset, m_start_address);
@@ -153,7 +157,7 @@ void agat7video_device::plot_text_character(bitmap_ind16 &bitmap, int xpos, int 
 	{
 		for (int x = 0; x < 8; x++)
 		{
-			uint16_t const color = (chardata[y] & (1 << (7-x))) ? fg : bg;
+			uint16_t const color = (chardata[y] & (1 << (7 - x))) ? fg : bg;
 
 			for (int i = 0; i < xscale; i++)
 			{
@@ -182,10 +186,13 @@ void agat7video_device::text_update_lores(screen_device &screen, bitmap_ind16 &b
 			address = m_start_address + (col * 2) + (row * 8);
 			ch = m_ram_dev->read(address);
 			attr = m_ram_dev->read(address + 1);
-			fg = bitswap<8>(attr,7,6,5,3,4,2,1,0) & 15;
-			if (BIT(attr, 5)) {
+			fg = bitswap<8>(attr, 7, 6, 5, 3, 4, 2, 1, 0) & 15;
+			if (BIT(attr, 5))
+			{
 				plot_text_character(bitmap, col * 16, row, 2, ch, m_char_ptr, m_char_size, fg, bg);
-			} else {
+			}
+			else
+			{
 				plot_text_character(bitmap, col * 16, row, 2, ch, m_char_ptr, m_char_size, bg, fg);
 			}
 		}
@@ -202,10 +209,15 @@ void agat7video_device::text_update_hires(screen_device &screen, bitmap_ind16 &b
 	beginrow = std::max(beginrow, cliprect.top() - (cliprect.top() % 8));
 	endrow = std::min(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
-	if (m_start_address & 0x800) {
-		fg = 7; bg = 0;
-	} else {
-		fg = 0; bg = 7;
+	if (m_start_address & 0x800)
+	{
+		fg = 7;
+		bg = 0;
+	}
+	else
+	{
+		fg = 0;
+		bg = 7;
 	}
 
 	for (row = beginrow; row <= endrow; row += 8)
@@ -256,7 +268,7 @@ void agat7video_device::graph_update_hires(screen_device &screen, bitmap_ind16 &
 		uint16_t *p = &bitmap.pix(row);
 		for (int col = 0; col < 0x40; col++)
 		{
-			uint32_t const address = m_start_address + col + ((row/2) * 0x40);
+			uint32_t const address = m_start_address + col + ((row / 2) * 0x40);
 			uint8_t gfx = m_ram_dev->read(address);
 
 			for (int b = 0; b < 2; b++)
@@ -282,7 +294,7 @@ void agat7video_device::graph_update_lores(screen_device &screen, bitmap_ind16 &
 		uint16_t *p = &bitmap.pix(row);
 		for (int col = 0; col < 0x20; col++)
 		{
-			uint32_t const address = m_start_address + col + ((row/4) * 0x20);
+			uint32_t const address = m_start_address + col + ((row / 4) * 0x20);
 			uint8_t gfx = m_ram_dev->read(address);
 
 			for (int b = 0; b < 2; b++)

@@ -15,7 +15,6 @@
 
 #include "emu.h"
 #include "98034.h"
-#include "coreutil.h"
 
 // Debugging
 //#define VERBOSE 1

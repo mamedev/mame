@@ -270,26 +270,26 @@ private:
 	};
 
 	// input fifo, between m68k and tms32010
-	uint16_t m_infifo[32]; // technically eight 74LS224 4bit*16stage FIFO chips, arranged as a 32 stage, 16-bit wide fifo
-	uint8_t m_infifo_count;
-	uint8_t m_infifo_tail_ptr;
-	uint8_t m_infifo_head_ptr;
+	uint16_t m_infifo[32]{}; // technically eight 74LS224 4bit*16stage FIFO chips, arranged as a 32 stage, 16-bit wide fifo
+	uint8_t m_infifo_count = 0;
+	uint8_t m_infifo_tail_ptr = 0;
+	uint8_t m_infifo_head_ptr = 0;
 	// output fifo, between tms32010 and 10khz sample latch for dac
-	uint16_t m_outfifo[16]; // technically three 74LS224 4bit*16stage FIFO chips, arranged as a 16 stage, 12-bit wide fifo
-	uint8_t m_outfifo_count;
-	uint8_t m_outfifo_tail_ptr;
-	uint8_t m_outfifo_head_ptr;
-	bool m_infifo_semaphore; // latch for status of output fifo, d-latch 74ls74 @ E64 'lower half'
-	bool m_spc_error_latch; // latch for error status of speech dsp, d-latch 74ls74 @ E64 'upper half'
-	uint8_t m_m68k_spcflags_latch; // latch for initializing the speech dsp, d-latch 74ls74 @ E29 'lower half', AND latch for spc irq enable, d-latch 74ls74 @ E29 'upper half'; these are stored in bits 0 and 6 respectively, the rest of the bits stored here MUST be zeroed! // TODO: Split this into two separate booleans!
-	uint8_t m_m68k_tlcflags_latch; // latch for telephone interface stuff, d-latches 74ls74 @ E93 'upper half' and @ 103 'upper and lower halves' // TODO: Split this into three separate booleans!
-	bool m_simulate_outfifo_error; // simulate an error on the outfifo, which does something unusual to the dsp latches
-	bool m_tlc_tonedetect;
-	bool m_tlc_ringdetect;
-	uint8_t m_tlc_dtmf; // dtmf holding reg
-	uint8_t m_duart_inport; // low 4 bits of duart input
-	uint8_t m_duart_outport; // most recent duart output
-	bool m_hack_self_test_is_second_read; // temp variable for hack below
+	uint16_t m_outfifo[16]{}; // technically three 74LS224 4bit*16stage FIFO chips, arranged as a 16 stage, 12-bit wide fifo
+	uint8_t m_outfifo_count = 0;
+	uint8_t m_outfifo_tail_ptr = 0;
+	uint8_t m_outfifo_head_ptr = 0;
+	bool m_infifo_semaphore = false; // latch for status of output fifo, d-latch 74ls74 @ E64 'lower half'
+	bool m_spc_error_latch = false; // latch for error status of speech dsp, d-latch 74ls74 @ E64 'upper half'
+	uint8_t m_m68k_spcflags_latch = 0; // latch for initializing the speech dsp, d-latch 74ls74 @ E29 'lower half', AND latch for spc irq enable, d-latch 74ls74 @ E29 'upper half'; these are stored in bits 0 and 6 respectively, the rest of the bits stored here MUST be zeroed! // TODO: Split this into two separate booleans!
+	uint8_t m_m68k_tlcflags_latch = 0; // latch for telephone interface stuff, d-latches 74ls74 @ E93 'upper half' and @ 103 'upper and lower halves' // TODO: Split this into three separate booleans!
+	bool m_simulate_outfifo_error = 0; // simulate an error on the outfifo, which does something unusual to the dsp latches
+	bool m_tlc_tonedetect = false;
+	bool m_tlc_ringdetect = false;
+	uint8_t m_tlc_dtmf = 0; // dtmf holding reg
+	uint8_t m_duart_inport = 0; // low 4 bits of duart input
+	uint8_t m_duart_outport = 0; // most recent duart output
+	bool m_hack_self_test_is_second_read = false; // temp variable for hack below
 
 	required_device<m68000_base_device> m_maincpu;
 	required_device<tms32010_device> m_dsp;
@@ -315,7 +315,7 @@ private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	TIMER_CALLBACK_MEMBER(outfifo_read_cb);
-	emu_timer *m_outfifo_read_timer;
+	emu_timer *m_outfifo_read_timer = nullptr;
 	void outfifo_check();
 	void clear_all_fifos();
 	void dsp_semaphore_w(bool state);
@@ -326,7 +326,7 @@ private:
 	void tms32010_io(address_map &map);
 	void tms32010_mem(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 
@@ -839,12 +839,12 @@ INPUT_PORTS_END
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
-void dectalk_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void dectalk_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_OUTFIFO_READ:
-		outfifo_read_cb(ptr, param);
+		outfifo_read_cb(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in dectalk_state::device_timer");

@@ -46,7 +46,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	required_region_ptr<u16> m_palrom;
@@ -56,19 +56,19 @@ private:
 	required_ioport m_2a000e_io;
 
 	/* video-related */
-	u16   m_blitter_color[2];
-	u16   m_blitter_xparam[16];
-	u16   m_blitter_yparam[16];
-	u16   m_blitter_vidparam[32];
+	u16   m_blitter_color[2]{};
+	u16   m_blitter_xparam[16]{};
+	u16   m_blitter_yparam[16]{};
+	u16   m_blitter_vidparam[32]{};
 
 	std::unique_ptr<bitmap_ind16> m_dstbitmap;
-	emu_timer *m_blitter_timer;
-	emu_timer *m_signal_irq_timer;
+	emu_timer *m_blitter_timer = nullptr;
+	emu_timer *m_signal_irq_timer = nullptr;
 
 	/* misc */
-	u8    m_irq_state[5];
-	u8    m_sound_control;
-	u8    m_sound_msb_latch;
+	u8    m_irq_state[5]{};
+	u8    m_sound_control = 0;
+	u8    m_sound_msb_latch = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

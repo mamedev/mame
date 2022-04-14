@@ -108,15 +108,15 @@ private:
 	void aristmk6_port(address_map &map);
 
 #if 0
-	u32 m_test_x,m_test_y,m_start_offs;
-	u8 m_type;
+	u32 m_test_x = 0, m_test_y = 0, m_start_offs = 0;
+	u8 m_type = 0;
 #endif
 
-	u8 irl0pend, irl0en;
-	u8 irl1pend, irl1en;
-	u8 irl2pend, irl2en;    // UARTs ?
-	u8 irl3pend0, irl3en0;
-	u8 irl3pend1, irl3en1;
+	u8 irl0pend = 0, irl0en = 0;
+	u8 irl1pend = 0, irl1en = 0;
+	u8 irl2pend = 0, irl2en = 0;    // UARTs ?
+	u8 irl3pend0 = 0, irl3en0 = 0;
+	u8 irl3pend1 = 0, irl3en1 = 0;
 
 	required_device<sh4_device> m_maincpu;
 	required_device<ns16550_device> m_uart0;

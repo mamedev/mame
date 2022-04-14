@@ -48,6 +48,7 @@ documentation still exists.
 #include "machine/mos6551.h"
 #include "machine/ram.h"
 #include "video/mc6845.h"
+#include "softlist_dev.h"
 #include "screen.h"
 
 #include "formats/vdk_dsk.h"

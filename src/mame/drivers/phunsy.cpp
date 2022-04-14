@@ -2,26 +2,26 @@
 // copyright-holders:Wilbert Pol
 /***************************************************************************
 
-    PHUNSY (Philipse Universal System)
+PHUNSY (Philipse Universal System)
 
-    2010-11-04 Skeleton driver.
-    2012-05-24 Cassette added.
-    2014-01-13 Quickload added.
+2010-11-04 Skeleton driver.
+2012-05-24 Cassette added.
+2014-01-13 Quickload added.
 
-    http://www.tubedata.info/phunsy/index.html
+http://www.tubedata.info/phunsy/index.html
 
-    Baud Rate ~ 6000 baud
-    W command to save data, eg 800-8FFW
-    R command to read data, eg 1100R to load the file at 1100,
-       or R to load the file where it came from.
-    The tape must already be playing the leader when you press the Enter
-       key, or it errors immediately.
+Baud Rate ~ 6000 baud
+W command to save data, eg 800-8FFW
+R command to read data, eg 1100R to load the file at 1100,
+   or R to load the file where it came from.
+The tape must already be playing the leader when you press the Enter
+   key, or it errors immediately.
 
-    Rom banking (in U bank):
-    0U: RAM
-    1U: MDCR program
-    2U: Disassembler
-    3U: Label handler
+Rom banking (in U bank):
+ 0U: RAM
+ 1U: MDCR program
+ 2U: Disassembler
+ 3U: Label handler
 
 
 ****************************************************************************/
@@ -71,8 +71,8 @@ private:
 	void phunsy_io(address_map &map);
 	void phunsy_mem(address_map &map);
 
-	uint8_t       m_data_out;
-	uint8_t       m_keyboard_input;
+	uint8_t       m_data_out = 0U;
+	uint8_t       m_keyboard_input = 0U;
 	virtual void machine_reset() override;
 	required_device<s2650_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;

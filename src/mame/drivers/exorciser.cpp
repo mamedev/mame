@@ -221,7 +221,7 @@ private:
 
 	u8 m_restart_count;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void pia_dbg_pa_w(u8 data);
 	DECLARE_READ_LINE_MEMBER(pia_dbg_ca1_r);
@@ -510,7 +510,7 @@ WRITE_LINE_MEMBER(exorciser_state::pia_dbg_ca2_w)
 }
 
 
-void exorciser_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void exorciser_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

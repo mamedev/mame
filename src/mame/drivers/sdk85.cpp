@@ -50,7 +50,7 @@ Press 0 to restart.
 #include "machine/i8155.h"
 #include "machine/i8355.h"
 #include "machine/i8279.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "sdk85.lh"
 
 
@@ -66,7 +66,7 @@ public:
 		, m_ramio(*this, "ramio")
 		, m_expramio(*this, "expramio")
 		, m_tty(*this, "tty")
-		, m_keyboard(*this, "X%u", 0)
+		, m_keyboard(*this, "X%u", 0U)
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
@@ -85,7 +85,7 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	u8 m_digit;
+	u8 m_digit = 0U;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 

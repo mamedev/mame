@@ -84,7 +84,7 @@ void sed1500_device::device_start()
 //  handlers
 //-------------------------------------------------
 
-void sed1500_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void sed1500_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	u64 data = 0;
 

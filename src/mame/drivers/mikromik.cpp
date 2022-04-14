@@ -55,7 +55,7 @@
 #include "emu.h"
 #include "includes/mikromik.h"
 #include "machine/74259.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"

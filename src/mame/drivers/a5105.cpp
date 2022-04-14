@@ -86,13 +86,13 @@ private:
 	void a5105_mem(address_map &map);
 	void upd7220_map(address_map &map);
 
-	uint8_t *m_ram_base;
-	uint8_t *m_rom_base;
-	uint8_t *m_char_ram;
-	uint16_t m_pcg_addr;
-	uint16_t m_pcg_internal_addr;
-	uint8_t m_key_mux;
-	uint8_t m_memsel[4];
+	uint8_t *m_ram_base = 0;
+	uint8_t *m_rom_base = 0;
+	uint8_t *m_char_ram = 0;
+	uint16_t m_pcg_addr = 0U;
+	uint16_t m_pcg_internal_addr = 0U;
+	uint8_t m_key_mux = 0U;
+	uint8_t m_memsel[4]{};
 	required_device<z80_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<upd7220_device> m_hgdc;

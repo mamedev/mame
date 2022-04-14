@@ -52,22 +52,22 @@ private:
 	required_shared_ptr<uint16_t> m_nvram;
 	required_region_ptr<uint8_t> m_dsp_rom;
 
-	int m_iop_romaddr;
+	int m_iop_romaddr = 0;
 
-	uint8_t m_newx[3];
-	uint8_t m_newy[3];
-	uint8_t m_oldx[3];
-	uint8_t m_oldy[3];
-	int m_dx[3];
-	int m_dy[3];
+	uint8_t m_newx[3]{};
+	uint8_t m_newy[3]{};
+	uint8_t m_oldx[3]{};
+	uint8_t m_oldy[3]{};
+	int m_dx[3]{};
+	int m_dy[3]{};
 
-	uint16_t m_result;
-	uint16_t m_lastresult;
+	uint16_t m_result = 0U;
+	uint16_t m_lastresult = 0U;
 
-	uint16_t m_nvram_write_seq[NVRAM_UNLOCK_SEQ_LEN];
-	uint8_t m_nvram_write_enable;
-	bool m_old_cmd;
-	uint8_t m_same_cmd_count;
+	uint16_t m_nvram_write_seq[NVRAM_UNLOCK_SEQ_LEN]{};
+	uint8_t m_nvram_write_enable = 0U;
+	bool m_old_cmd = false;
+	uint8_t m_same_cmd_count = 0U;
 
 	void nvram_thrash_w(offs_t offset, uint16_t data);
 	void nvram_data_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

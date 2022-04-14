@@ -34,7 +34,7 @@ Lot of infos available at: http://www.classiccmp.org/cini/ht68k.htm
 #include "imagedev/floppy.h"
 #include "machine/mc68681.h"
 #include "machine/wd_fdc.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 class ht68k_state : public driver_device
 {

@@ -46,12 +46,12 @@ protected:
 	std::unique_ptr<uint8_t[]> m_spriteram[2];
 
 	// video-related
-	tilemap_t *m_bg_tilemap[2];
-	tilemap_t *m_textlayer;
-	uint8_t m_priority;
+	tilemap_t *m_bg_tilemap[2]{};
+	tilemap_t *m_textlayer = nullptr;
+	uint8_t m_priority = 0U;
 
-	uint8_t m_vreg;
-	uint8_t m_video_circuit; // 0 or 1
+	uint8_t m_vreg = 0U;
+	uint8_t m_video_circuit = 0U; // 0 or 1
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -100,11 +100,11 @@ private:
 	required_shared_ptr_array<uint8_t, 2> m_scrollram;
 	memory_view m_scroll_view;
 
-	bool m_textflip;
+	bool m_textflip = false;
 
 	// misc
-	uint8_t m_pos[4];
-	uint8_t m_sign[4];
+	uint8_t m_pos[4]{};
+	uint8_t m_sign[4]{};
 
 	void bankselect_w(uint8_t data);
 	void coin_counter_w(uint8_t data);

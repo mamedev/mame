@@ -8,20 +8,6 @@
 #include "nxrom.h"
 
 
-// ======================> nes_ntdec_2746_device
-
-class nes_ntdec_2746_device : public nes_nrom_device
-{
-public:
-	// construction/destruction
-	nes_ntdec_2746_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-	virtual void write_h(offs_t offset, u8 data) override;
-
-	virtual void pcb_reset() override;
-};
-
-
 // ======================> nes_ntdec_asder_device
 
 class nes_ntdec_asder_device : public nes_nrom_device
@@ -72,7 +58,6 @@ public:
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(NES_NTDEC_2746,    nes_ntdec_2746_device)
 DECLARE_DEVICE_TYPE(NES_NTDEC_ASDER,   nes_ntdec_asder_device)
 DECLARE_DEVICE_TYPE(NES_NTDEC_FH,      nes_ntdec_fh_device)
 DECLARE_DEVICE_TYPE(NES_NTDEC_N715021, nes_ntdec_n715021_device)

@@ -24,7 +24,7 @@ TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_scanline)
 	else
 	{
 		uint8_t const *const line = &m_p_videoram[ m_base_address + 40 * m_scanline ];
-		int pal[4];
+		int pal[4]{};
 
 		switch( m_p_ram[SM8521_LCDC] & 0x30 )
 		{

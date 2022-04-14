@@ -211,7 +211,9 @@ void magtouch_state::magtouch(machine_config &config)
 
 	/* video hardware */
 	pcvideo_trident_vga(config);
-	TVGA9000_VGA(config.replace(), "vga", 0);
+	tvga9000_device &vga(TVGA9000_VGA(config.replace(), "vga", 0));
+	vga.set_screen("screen");
+	vga.set_vram_size(0x200000);
 
 	pcat_common(config);
 

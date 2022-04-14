@@ -88,7 +88,7 @@ void tms3203x_device::unimplemented(uint32_t op)
 inline void tms3203x_device::execute_one()
 {
 	uint32_t op = ROPCODE(m_pc);
-	m_icount -= 2;  // 2 clocks per cycle
+	burn_cycle(1);
 	m_pc++;
 #if (TMS_3203X_LOG_OPCODE_USAGE)
 	m_hits[op >> 21]++;
@@ -117,6 +117,11 @@ void tms3203x_device::update_special(int dreg)
 		check_irqs();
 }
 
+
+void tms3203x_device::burn_cycle(int cycle)
+{
+	m_icount -= cycle * (m_is_lopower ? 16 : 1);
+}
 
 
 //**************************************************************************
@@ -2560,7 +2565,12 @@ void tms3203x_device::or_imm(uint32_t op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::maxspeed(uint32_t op) { unimplemented(op); }
+void tms3203x_device::maxspeed(uint32_t op)
+{
+	// 0x10800000 MAXSPEED
+	// 0x10800001 LOPOWER
+	m_is_lopower = BIT(op, 0);
+}
 
 /*-----------------------------------------------------*/
 
@@ -2695,7 +2705,7 @@ void tms3203x_device::rpts_reg(uint32_t op)
 	IREG(TMR_RS) = m_pc;
 	IREG(TMR_RE) = m_pc;
 	IREG(TMR_ST) |= RMFLAG;
-	m_icount -= 3*2;
+	burn_cycle(3);
 	m_delayed = true;
 }
 
@@ -2705,7 +2715,7 @@ void tms3203x_device::rpts_dir(uint32_t op)
 	IREG(TMR_RS) = m_pc;
 	IREG(TMR_RE) = m_pc;
 	IREG(TMR_ST) |= RMFLAG;
-	m_icount -= 3*2;
+	burn_cycle(3);
 	m_delayed = true;
 }
 
@@ -2715,7 +2725,7 @@ void tms3203x_device::rpts_ind(uint32_t op)
 	IREG(TMR_RS) = m_pc;
 	IREG(TMR_RE) = m_pc;
 	IREG(TMR_ST) |= RMFLAG;
-	m_icount -= 3*2;
+	burn_cycle(3);
 	m_delayed = true;
 }
 
@@ -2725,7 +2735,7 @@ void tms3203x_device::rpts_imm(uint32_t op)
 	IREG(TMR_RS) = m_pc;
 	IREG(TMR_RE) = m_pc;
 	IREG(TMR_ST) |= RMFLAG;
-	m_icount -= 3*2;
+	burn_cycle(3);
 	m_delayed = true;
 }
 
@@ -5514,7 +5524,7 @@ inline void tms3203x_device::execute_delayed(uint32_t newpc)
 void tms3203x_device::br_imm(uint32_t op)
 {
 	m_pc = op & 0xffffff;
-	m_icount -= 3*2;
+	burn_cycle(3);
 }
 
 void tms3203x_device::brd_imm(uint32_t op)
@@ -5528,7 +5538,7 @@ void tms3203x_device::call_imm(uint32_t op)
 {
 	WMEM(++IREG(TMR_SP), m_pc);
 	m_pc = op & 0xffffff;
-	m_icount -= 3*2;
+	burn_cycle(3);
 }
 
 /*-----------------------------------------------------*/
@@ -5538,7 +5548,7 @@ void tms3203x_device::rptb_imm(uint32_t op)
 	IREG(TMR_RS) = m_pc;
 	IREG(TMR_RE) = op & 0xffffff;
 	IREG(TMR_ST) |= RMFLAG;
-	m_icount -= 3*2;
+	burn_cycle(3);
 }
 
 /*-----------------------------------------------------*/
@@ -5552,7 +5562,7 @@ void tms3203x_device::brc_reg(uint32_t op)
 	if (condition(op >> 16))
 	{
 		m_pc = IREG(op & 31);
-		m_icount -= 3*2;
+		burn_cycle(3);
 	}
 }
 
@@ -5569,7 +5579,7 @@ void tms3203x_device::brc_imm(uint32_t op)
 	if (condition(op >> 16))
 	{
 		m_pc += (int16_t)op;
-		m_icount -= 3*2;
+		burn_cycle(3);
 	}
 }
 
@@ -5591,7 +5601,7 @@ void tms3203x_device::dbc_reg(uint32_t op)
 	if (condition(op >> 16) && !(res & 0x800000))
 	{
 		m_pc = IREG(op & 31);
-		m_icount -= 3*2;
+		burn_cycle(3);
 	}
 }
 
@@ -5614,7 +5624,7 @@ void tms3203x_device::dbc_imm(uint32_t op)
 	if (condition(op >> 16) && !(res & 0x800000))
 	{
 		m_pc += (int16_t)op;
-		m_icount -= 3*2;
+		burn_cycle(3);
 	}
 }
 
@@ -5637,7 +5647,7 @@ void tms3203x_device::callc_reg(uint32_t op)
 	{
 		WMEM(++IREG(TMR_SP), m_pc);
 		m_pc = IREG(op & 31);
-		m_icount -= 3*2;
+		burn_cycle(3);
 	}
 }
 
@@ -5647,7 +5657,7 @@ void tms3203x_device::callc_imm(uint32_t op)
 	{
 		WMEM(++IREG(TMR_SP), m_pc);
 		m_pc += (int16_t)op;
-		m_icount -= 3*2;
+		burn_cycle(3);
 	}
 }
 
@@ -5661,7 +5671,7 @@ void tms3203x_device::trap(int trapnum)
 		m_pc = RMEM(((IREG(TMR_IF) >> 16) << 8) + trapnum);
 	else
 		m_pc = RMEM(trapnum);
-	m_icount -= 4*2;
+	burn_cycle(4);
 }
 
 void tms3203x_device::trapc(uint32_t op)
@@ -5678,7 +5688,7 @@ void tms3203x_device::retic_reg(uint32_t op)
 	{
 		m_pc = RMEM(IREG(TMR_SP)--);
 		IREG(TMR_ST) |= GIEFLAG;
-		m_icount -= 3*2;
+		burn_cycle(3);
 		check_irqs();
 	}
 }
@@ -5688,7 +5698,7 @@ void tms3203x_device::retsc_reg(uint32_t op)
 	if (condition(op >> 16))
 	{
 		m_pc = RMEM(IREG(TMR_SP)--);
-		m_icount -= 3*2;
+		burn_cycle(3);
 	}
 }
 

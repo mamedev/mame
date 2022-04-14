@@ -41,7 +41,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	static const device_timer_id TIMER_ZX = 0;
 	static const device_timer_id TIMER_EOSI = 1;
@@ -79,52 +79,52 @@ private:
 	void update_wave_addr(int inc);
 
 	uint32_t    m_channel;
-	emu_timer * m_zx_timer;
-	uint8_t     m_zx_flag;
-	uint8_t     m_zx_ff;
+	emu_timer * m_zx_timer = nullptr;
+	uint8_t     m_zx_flag = 0;
+	uint8_t     m_zx_ff = 0;
 
-	emu_timer * m_eosi_timer;
+	emu_timer * m_eosi_timer = nullptr;
 
-	emu_timer * m_bcas_timer;
+	emu_timer * m_bcas_timer = nullptr;
 
 	std::unique_ptr<uint8_t[]>    m_wave_ram;
-	uint16_t  m_segment_cnt;
-	uint8_t   m_new_addr;     // Flag
-	uint8_t   m_vol_latch;
-	uint8_t   m_flt_latch;
-	uint8_t   m_rp;
-	uint8_t   m_ws;
-	int       m_dir;
-	int       m_env_dir;
-	uint8_t   m_env;
-	int       m_pia0_cb2_state;
+	uint16_t  m_segment_cnt = 0;
+	uint8_t   m_new_addr = 0;     // Flag
+	uint8_t   m_vol_latch = 0;
+	uint8_t   m_flt_latch = 0;
+	uint8_t   m_rp = 0;
+	uint8_t   m_ws = 0;
+	int       m_dir = 0;
+	int       m_env_dir = 0;
+	uint8_t   m_env = 0;
+	int       m_pia0_cb2_state = 0;
 
-	uint8_t   m_bcas_q1_ticks;
-	uint8_t   m_bcas_q1;
-	uint8_t   m_bcas_q2_ticks;
-	uint8_t   m_bcas_q2;
+	uint8_t   m_bcas_q1_ticks = 0;
+	uint8_t   m_bcas_q1 = 0;
+	uint8_t   m_bcas_q2_ticks = 0;
+	uint8_t   m_bcas_q2 = 0;
 
-	double    m_freq;
+	double    m_freq = 0;
 
-	int       m_ptm_o1;
-	int       m_ptm_o2;
-	int       m_ptm_o3;
+	int       m_ptm_o1 = 0;
+	int       m_ptm_o2 = 0;
+	int       m_ptm_o3 = 0;
 
-	bool      m_load;
-	bool      m_run;
-	bool      m_gzx;
-	bool      m_nwpe;
-	bool      m_tri;
-	bool      m_pia1_ca2;
+	bool      m_load = 0;
+	bool      m_run = 0;
+	bool      m_gzx = 0;
+	bool      m_nwpe = 0;
+	bool      m_tri = 0;
+	bool      m_pia1_ca2 = 0;
 
-	bool      m_eclk;
-	bool      m_env_clk;
-	bool      m_ediv_out;
-	uint8_t   m_ediv_rate;
-	uint8_t   m_ediv_count;
+	bool      m_eclk = false;
+	bool      m_env_clk = false;
+	bool      m_ediv_out = false;
+	uint8_t   m_ediv_rate = 0;
+	uint8_t   m_ediv_count = 0;
 
-	uint16_t  m_pitch;
-	uint8_t   m_octave;
+	uint16_t  m_pitch = 0;
+	uint8_t   m_octave = 0;
 
 	devcb_write_line m_irq_cb;
 

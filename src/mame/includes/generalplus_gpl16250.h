@@ -89,7 +89,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	int m_upperbase;
+	int m_upperbase = 0;
 
 	virtual uint16_t cs0_r(offs_t offset) override;
 
@@ -128,16 +128,16 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	int m_upperbase;
+	int m_upperbase = 0;
 
 	virtual uint16_t cs0_r(offs_t offset) override;
 
 	void beijuehh_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void beijuehh_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	uint16_t m_portb_data;
-	uint16_t m_portd_data;
-	uint8_t m_bank;
+	uint16_t m_portb_data = 0U;
+	uint16_t m_portd_data = 0U;
+	uint8_t m_bank = 0U;
 };
 
 

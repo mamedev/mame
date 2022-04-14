@@ -38,6 +38,7 @@ public:
 	void dynablsb(machine_config &config);
 	void matchit2(machine_config &config);
 	void quizf1(machine_config &config);
+	void dicegame(machine_config &config);
 
 	void init_bomblord();
 	void init_quizf1();
@@ -56,8 +57,8 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 
-	tilemap_t *m_pf_layer[2][2];
-	uint8_t m_last_pf[2];
+	tilemap_t *m_pf_layer[2][2]{};
+	uint8_t m_last_pf[2]{};
 	void coincounter_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void quizf1_bankswitch_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void m90_video_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

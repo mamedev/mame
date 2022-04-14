@@ -463,7 +463,7 @@ void midway_ssio_device::device_reset()
 //  device_timer - timer callbacks
 //-------------------------------------------------
 
-void midway_ssio_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void midway_ssio_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_data[param >> 8] = param & 0xff;
 }
@@ -653,7 +653,7 @@ void midway_sounds_good_device::device_reset()
 //  device_timer - timer callbacks
 //-------------------------------------------------
 
-void midway_sounds_good_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void midway_sounds_good_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_pia->portb_w((param >> 1) & 0x0f);
 	m_pia->ca1_w(~param & 0x01);
@@ -820,7 +820,7 @@ void midway_turbo_cheap_squeak_device::device_reset()
 //  device_timer - timer callbacks
 //-------------------------------------------------
 
-void midway_turbo_cheap_squeak_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void midway_turbo_cheap_squeak_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_pia->portb_w((param >> 1) & 0x0f);
 	m_pia->ca1_w(~param & 0x01);

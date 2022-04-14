@@ -115,7 +115,7 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
 
 	required_device<palette_device> m_palette;
@@ -137,7 +137,7 @@ private:
 	uint16_t translate_mm5740_b(uint16_t b);
 };
 
-void h19_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void h19_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

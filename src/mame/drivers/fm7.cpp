@@ -55,7 +55,7 @@
 #include "formats/fm7_cas.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

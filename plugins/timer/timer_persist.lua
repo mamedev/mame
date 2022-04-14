@@ -101,7 +101,7 @@ local function check_schema(db)
 						if vals[i] == 'driver' then
 							driver_indexed = true
 						elseif vals[i] == 'softlist' then
-							softlist_indexed = true 
+							softlist_indexed = true
 						elseif vals[i] == 'software' then
 							software_indexed = true
 						end

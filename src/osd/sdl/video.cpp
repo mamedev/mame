@@ -191,12 +191,10 @@ void sdl_osd_interface::extract_video_config()
 	stemp = options().video();
 	if (strcmp(stemp, "auto") == 0)
 	{
-#if (defined SDLMAME_WIN32)
-		stemp = "opengl";
-#elif (defined SDLMAME_MACOSX)
-		stemp = "bgfx";
-#else
+#if (defined SDLMAME_EMSCRIPTEN)
 		stemp = "soft";
+#else
+		stemp = "bgfx";
 #endif
 	}
 	if (strcmp(stemp, SDLOPTVAL_SOFT) == 0)

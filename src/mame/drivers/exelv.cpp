@@ -66,7 +66,7 @@ TODO:
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #define VERBOSE 0
@@ -109,16 +109,16 @@ private:
 	DECLARE_MACHINE_START(exeltel);
 
 	/* tms7020 i/o ports */
-	uint8_t   m_tms7020_portb;
+	uint8_t   m_tms7020_portb = 0;
 
 	/* tms7041 i/o ports */
-	uint8_t   m_tms7041_portb;
-	uint8_t   m_tms7041_portc;
-	uint8_t   m_tms7041_portd;
+	uint8_t   m_tms7041_portb = 0;
+	uint8_t   m_tms7041_portc = 0;
+	uint8_t   m_tms7041_portd = 0;
 
 	/* mailbox data */
-	uint8_t   m_wx318;    /* data of 74ls374 labeled wx318 */
-	uint8_t   m_wx319;    /* data of 74sl374 labeled wx319 */
+	uint8_t   m_wx318 = 0;    /* data of 74ls374 labeled wx318 */
+	uint8_t   m_wx319 = 0;    /* data of 74sl374 labeled wx319 */
 
 	TIMER_DEVICE_CALLBACK_MEMBER(exelv_hblank_interrupt);
 

@@ -6,6 +6,7 @@
 #pragma once
 
 #include "machine/74259.h"
+#include "machine/gaelcrpt.h"
 #include "video/gaelco_wrally_sprites.h"
 #include "emupal.h"
 #include "tilemap.h"
@@ -21,6 +22,7 @@ public:
 		m_palette(*this, "palette"),
 		m_sprites(*this, "sprites"),
 		m_okibank(*this, "okibank"),
+		m_vramcrypt(*this, "vramcrypt"),
 		m_videoram(*this, "videoram"),
 		m_vregs(*this, "vregs"),
 		m_spriteram(*this, "spriteram"),
@@ -66,6 +68,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<gaelco_wrally_sprites_device> m_sprites;
 	required_memory_bank m_okibank;
+	required_device<gaelco_vram_encryption_device> m_vramcrypt;
 
 	required_shared_ptr<uint16_t> m_videoram;
 	required_shared_ptr<uint16_t> m_vregs;
@@ -74,8 +77,8 @@ private:
 
 	required_ioport_array<2> m_analog;
 
-	tilemap_t *m_tilemap[2];
-	uint8_t m_analog_ports[2];
+	tilemap_t *m_tilemap[2]{};
+	uint8_t m_analog_ports[2]{};
 };
 
 #endif // MAME_INCLUDES_WRALLY_H

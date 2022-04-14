@@ -184,8 +184,7 @@ int konamigx_state::K055555GX_decode_vmixcolor(int layer, int *color) // (see p.
 	return(emx);
 }
 
-#ifdef UNUSED_FUNCTION
-int K055555GX_decode_osmixcolor(int layer, int *color) // (see p.63, p.49-50 and p.27 3.3)
+int konamigx_state::K055555GX_decode_osmixcolor(int layer, int *color) // (see p.63, p.49-50 and p.27 3.3)
 {
 	int scb, shift, pal, osmx, oson, pl45, emx;
 
@@ -222,7 +221,6 @@ int K055555GX_decode_osmixcolor(int layer, int *color) // (see p.63, p.49-50 and
 
 	return(emx);
 }
-#endif
 
 void konamigx_state::wipezbuf(int noshadow)
 {
@@ -1584,7 +1582,6 @@ static inline void set_color_555(palette_device &palette, pen_t color, int rshif
 	palette.set_pen_color(color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
 }
 
-#ifdef UNUSED_FUNCTION
 // main monitor for type 3
 void konamigx_state::konamigx_555_palette_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
@@ -1609,7 +1606,6 @@ void konamigx_state::konamigx_555_palette2_w(offs_t offset, uint32_t data, uint3
 	set_color_555(*m_palette, offset*2, 0, 5, 10,coldat >> 16);
 	set_color_555(*m_palette, offset*2+1, 0, 5, 10,coldat & 0xffff);
 }
-#endif
 
 void konamigx_state::konamigx_tilebank_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {

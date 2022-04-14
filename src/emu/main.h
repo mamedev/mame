@@ -71,7 +71,7 @@ protected:
 	// construction/destruction
 	machine_manager(emu_options& options, osd_interface& osd);
 public:
-	virtual ~machine_manager() { }
+	virtual ~machine_manager();
 
 	osd_interface &osd() const { return m_osd; }
 	emu_options &options() const { return m_options; }
@@ -88,7 +88,7 @@ public:
 
 	virtual void update_machine() { }
 
-	http_manager *http() { return m_http.get(); }
+	http_manager *http();
 	void start_http_server();
 
 protected:

@@ -14,6 +14,7 @@
 #include "texturemanager.h"
 #include "texture.h"
 #include "bgfxutil.h"
+#include "fileio.h"
 #include "rendutil.h"
 #include "modules/render/copyutil.h"
 
@@ -67,7 +68,7 @@ bgfx_texture* texture_manager::create_png_texture(std::string path, std::string 
 
 	if (bitmap.width() == 0 || bitmap.height() == 0)
 	{
-		printf("Unable to load PNG '%s' from path '%s'\n", file_name.c_str(), path.c_str());
+		osd_printf_error("Unable to load PNG '%s' from path '%s'\n", file_name.c_str(), path.c_str());
 		return nullptr;
 	}
 
@@ -80,7 +81,7 @@ bgfx_texture* texture_manager::create_png_texture(std::string path, std::string 
 	auto* base = reinterpret_cast<uint32_t *>(bitmap.raw_pixptr(0));
 	for (int y = 0; y < height; y++)
 	{
-		copy_util::copyline_argb32(data32 + y * width, base + y * rowpixels, width, nullptr);
+		copy_util::copyline_argb32_to_bgra(data32 + y * width, base + y * rowpixels, width, nullptr);
 	}
 
 	if (screen >= 0)

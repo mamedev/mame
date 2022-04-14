@@ -371,8 +371,8 @@ license:CC0
 
 <!-- buttons -->
 
-	<element name="brown"><rect><color red="0.58" green="0.37" blue="0.18" /></rect></element>
-	<element name="bmask"><rect><color red="0.91" green="0.89" blue="0.89" /></rect></element>
+	<element name="brown"><rect><color red="0.53" green="0.33" blue="0.16" /></rect></element>
+	<element name="bmask"><rect><color red="0.38" green="0.56" blue="0.73" /></rect></element>
 
 	<element name="but_rb" defstate="0">
 		<rect state="0"><color red="0.13" green="0.1" blue="0.1" /></rect>
@@ -464,8 +464,8 @@ license:CC0
 			<element ref="text_p~i~"><bounds x="~x~" y="6" width="3.9" height="3.9" /></element>
 		</repeat>
 
-		<element ref="brown" blend="add"><bounds x="0" y="-1.2" width="88" height="18.5" /></element>
 		<element ref="bmask" blend="multiply"><bounds x="0" y="-1.2" width="88" height="18.5" /></element>
+		<element ref="brown" blend="add"><bounds x="0" y="-1.2" width="88" height="18.5" /></element>
 
 		<element ref="switch" inputtag="IN.0" inputmask="0x0c" inputraw="yes"><bounds x="22.5" y="2.3" width="3.5" height="11.4" /></element>
 		<element ref="switch" inputtag="IN.1" inputmask="0x03" inputraw="yes"><bounds x="30.5" y="2.3" width="3.5" height="11.4" /></element>

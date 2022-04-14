@@ -66,7 +66,7 @@ uint8_t btoads_state::nvram_r(offs_t offset)
  *
  *************************************/
 
-void btoads_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void btoads_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

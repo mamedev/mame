@@ -2,14 +2,17 @@
 // copyright-holders:Carl
 
 #include "emu.h"
+#include "machine/at.h"
+
 #include "bus/isa/isa_cards.h"
 #include "cpu/i86/i286.h"
 #include "machine/8042kbdc.h"
-#include "machine/at.h"
 #include "machine/ds6417.h"
 #include "sound/dac.h"
 #include "sound/ymopl.h"
 #include "video/pc_vga.h"
+
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -24,22 +27,22 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void dack16_w(int line, uint16_t data) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 private:
 	required_device<dac_16bit_r2r_device> m_rdac;
 	required_device<dac_16bit_r2r_device> m_ldac;
-	uint16_t m_count;
-	uint16_t m_curcount;
-	uint16_t m_sample[2];
-	uint8_t m_index[2]; // unknown indexed registers, volume?
-	uint8_t m_data[2][16];
-	uint8_t m_mode;
-	uint8_t m_ctrl;
-	unsigned int m_sample_byte;
-	unsigned int m_samples;
-	emu_timer *m_pcm;
+	uint16_t m_count = 0U;
+	uint16_t m_curcount = 0U;
+	uint16_t m_sample[2]{};
+	uint8_t m_index[2]{}; // unknown indexed registers, volume?
+	uint8_t m_data[2][16]{};
+	uint8_t m_mode = 0U;
+	uint8_t m_ctrl = 0U;
+	unsigned int m_sample_byte = 0U;
+	unsigned int m_samples = 0U;
+	emu_timer *m_pcm = nullptr;
 };
 
 DEFINE_DEVICE_TYPE(VIS_AUDIO, vis_audio_device, "vis_pcm", "vis_pcm")
@@ -80,7 +83,7 @@ void vis_audio_device::dack16_w(int line, uint16_t data)
 		m_isa->drq7_w(CLEAR_LINE);
 }
 
-void vis_audio_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void vis_audio_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if(((m_samples < 2) && (m_mode & 8)) || !m_samples)
 		return;
@@ -242,15 +245,16 @@ protected:
 	virtual void recompute_params() override;
 private:
 	void vga_vh_yuv8(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void vga_vh_yuv422(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	rgb_t yuv_to_rgb(int y, int u, int v) const;
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
-	int m_extcnt;
-	uint8_t m_extreg;
-	uint8_t m_interlace;
-	uint16_t m_wina, m_winb;
-	uint8_t m_shift256, m_dw, m_8bit_640;
-	uint8_t m_crtc_regs[0x32];
+	int m_extcnt = 0;
+	uint8_t m_extreg = 0U;
+	uint8_t m_interlace = 0U;
+	uint16_t m_wina = 0U, m_winb = 0U;
+	uint8_t m_shift256 = 0U, m_dw = 0U, m_8bit_640 = 0U;
+	uint8_t m_crtc_regs[0x32]{};
 };
 
 DEFINE_DEVICE_TYPE(VIS_VGA, vis_vga_device, "vis_vga", "vis_vga")
@@ -260,6 +264,7 @@ vis_vga_device::vis_vga_device(const machine_config &mconfig, const char *tag, d
 	device_isa16_card_interface(mconfig, *this)
 {
 	set_screen(*this, "screen");
+	set_vram_size(0x100000);
 }
 
 void vis_vga_device::device_add_mconfig(machine_config &config)
@@ -378,6 +383,54 @@ void vis_vga_device::vga_vh_yuv8(bitmap_rgb32 &bitmap, const rectangle &cliprect
 	}
 }
 
+void vis_vga_device::vga_vh_yuv422(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	const uint32_t IV = 0xff000000;
+	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
+	int curr_addr = 0;
+
+	for (int addr = vga.crtc.start_addr, line=0; line<(vga.crtc.vert_disp_end+1); line+=height, addr+=offset(), curr_addr+=offset())
+	{
+		for(int yi = 0;yi < height; yi++)
+		{
+			uint8_t ua = 0, va = 0;
+			if((line + yi) < (vga.crtc.line_compare & 0x3ff))
+				curr_addr = addr;
+			if((line + yi) == (vga.crtc.line_compare & 0x3ff))
+				curr_addr = 0;
+			for (int pos=curr_addr, col=0, column=0; column<(vga.crtc.horz_disp_end+1); column++, col+=8,  pos+=8)
+			{
+				if(pos + 0x08 > 0x80000)
+					return;
+				for(int xi=0;xi<8;xi+=4)
+				{
+					if(!screen().visible_area().contains(col+xi, line + yi))
+						continue;
+					uint8_t y0 = vga.memory[pos + xi + 0], ub = vga.memory[pos + xi + 1];
+					uint8_t y1 = vga.memory[pos + xi + 2], vb = vga.memory[pos + xi + 3];
+					uint16_t u, v;
+					if(col)
+					{
+						u = (ua + ub) >> 1;
+						v = (va + vb) >> 1;
+					}
+					else
+					{
+						u = ub;
+						v = vb;
+					}
+					ua = ub; va = vb;
+					// this reads one byte per clock so it'll be one pixel for every 2 clocks
+					bitmap.pix(line + yi, col + xi + 0) = IV | (uint32_t)yuv_to_rgb(y0, u, v);
+					bitmap.pix(line + yi, col + xi + 1) = IV | (uint32_t)yuv_to_rgb(y0, u, v);
+					bitmap.pix(line + yi, col + xi + 2) = IV | (uint32_t)yuv_to_rgb(y1, ub, vb);
+					bitmap.pix(line + yi, col + xi + 3) = IV | (uint32_t)yuv_to_rgb(y1, ub, vb);
+				}
+			}
+		}
+	}
+}
+
 void vis_vga_device::device_start()
 {
 	set_isa_device();
@@ -421,7 +474,7 @@ uint32_t vis_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 			popmessage("Border encoded 8-bit mode");
 			break;
 		case 0xc3:
-			popmessage("YUV 422 mode");
+			vga_vh_yuv422(bitmap, cliprect);
 			break;
 		case 0xc4:
 			vga_vh_yuv8(bitmap, cliprect);
@@ -741,18 +794,21 @@ private:
 	uint8_t m_unk1[4];
 	uint8_t m_cardreg, m_cardval, m_cardcnt;
 	uint16_t m_padctl, m_padstat;
+	bool m_padsel;
 };
 
 void vis_state::machine_reset()
 {
 	m_sysctl = 0;
 	m_padctl = 0;
+	m_padsel = false;
 }
 
 INPUT_CHANGED_MEMBER(vis_state::update)
 {
 	m_pic1->ir3_w(ASSERT_LINE);
 	m_padstat = 0x80;
+	m_padsel = false;
 }
 
 //chipset registers?
@@ -835,12 +891,17 @@ uint16_t vis_state::pad_r(offs_t offset)
 	switch(offset)
 	{
 		case 0:
-			ret = m_pad->read();
-			if(m_padctl != 0x18)
-				ret |= 0x400;
+			if(!m_padsel)
+			{
+				ret = m_pad->read();
+				m_padstat = 0;
+				m_padsel = true;
+			}
 			else
-				m_padctl = 0;
-			m_padstat = 0;
+			{
+				ret = 0x400; // this is probably for the second controller
+				m_padsel = false;
+			}
 			m_pic1->ir3_w(CLEAR_LINE);
 			break;
 		case 1:
@@ -935,18 +996,12 @@ static INPUT_PORTS_START(vis)
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("1") PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("A") PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("2") PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("4") PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("B") PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("3") PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
 INPUT_PORTS_END
 
 void vis_state::vis(machine_config &config)
@@ -972,6 +1027,8 @@ void vis_state::vis(machine_config &config)
 	ISA16_SLOT(config, "mcd",      0, "mb:isabus", pc_isa16_cards, "mcd",      true);
 	ISA16_SLOT(config, "visaudio", 0, "mb:isabus", vis_cards,      "visaudio", true);
 	ISA16_SLOT(config, "visvga",   0, "mb:isabus", vis_cards,      "visvga",   true);
+
+	SOFTWARE_LIST(config, "cd_list").set_original("vis");
 
 	DS6417(config, m_card, 0);
 }

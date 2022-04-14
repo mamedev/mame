@@ -73,7 +73,7 @@ void chessmachine_device::device_start()
 //  external handlers
 //-------------------------------------------------
 
-void chessmachine_device::sync0_callback(void *ptr, s32 param)
+void chessmachine_device::sync0_callback(s32 param)
 {
 	m_latch[0] = (m_latch[0] & 0x80) | param;
 }
@@ -83,7 +83,7 @@ void chessmachine_device::data0_w(int state)
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(chessmachine_device::sync0_callback), this), state ? 1 : 0);
 }
 
-void chessmachine_device::sync1_callback(void *ptr, s32 param)
+void chessmachine_device::sync1_callback(s32 param)
 {
 	m_latch[0] = (m_latch[0] & 1) | param;
 

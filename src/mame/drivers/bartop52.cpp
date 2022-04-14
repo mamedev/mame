@@ -4,7 +4,7 @@
     Atari Bartop 5200 prototype system
 
     Driver by Mariusz Wojcieszek
-    Based on Atari 400/800 MESS Driver by Juergen Buchmueller
+    Based on Atari 400/800 MAME Driver by Juergen Buchmueller
 
     Hardware was based on Atari 5200 game console with additional coin and timer hardware.
     System was intented to run in barrooms and taverns. Software was based on Atari 5200

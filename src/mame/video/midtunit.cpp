@@ -18,6 +18,7 @@
 #include "debugger.h"
 
 #include "emuopts.h" // Used by PNG logging
+#include "fileio.h" // Used by PNG logging
 #include "png.h" // Used by PNG logging
 
 #include <rapidjson/prettywriter.h> // Used by JSON logging
@@ -616,7 +617,7 @@ DEFINE_TEMPLATED_DMA_DRAW_GROUP(false, false);
  *
  *************************************/
 
-void midtunit_video_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void midtunit_video_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

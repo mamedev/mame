@@ -233,7 +233,7 @@ void laserbat_state::csound2_w(uint8_t data)
     circuitry.  Unfortunately we lack a schematic, so all knowledge of
     this board is based on tracing the sound program, examining PCB
     photos and cross-referencing with the schematic for the 1B11142
-    schematic.
+    board.
 
     The 6821 PIA is mapped at addresses $005C..$005F.  The known PIA
     signal assignments are as follows:

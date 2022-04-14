@@ -49,9 +49,9 @@ void ie15_keyboard_device::key_make(uint8_t row, uint8_t column)
 		row += 8;
 
 	if (column < 16)
-		key_code = m_rom [(row << 4) + column];
+		key_code = m_rom[(row << 4) + column];
 	else
-		key_code = m_rom [(row << 4) + (column - 16) * 2 + 256];
+		key_code = m_rom[(row << 4) + (column - 16) * 2 + 256];
 
 	if (ctrl)
 		key_code &= 0x1f;
@@ -76,7 +76,7 @@ ROM_END
 
 const tiny_rom_entry *ie15_keyboard_device::device_rom_region() const
 {
-	return ROM_NAME( ie15_keyboard );
+	return ROM_NAME(ie15_keyboard);
 }
 
 
@@ -85,7 +85,7 @@ void ie15_keyboard_device::device_start()
 	m_keyboard_cb.resolve_safe();
 	m_sdv_cb.resolve_safe();
 
-	m_rom = (uint8_t*)memregion("ie15kbd")->base();
+	m_rom = (uint8_t *)memregion("ie15kbd")->base();
 }
 
 void ie15_keyboard_device::device_reset()

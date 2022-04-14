@@ -75,8 +75,8 @@ private:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 
-	u8 m_cass_data[4];
-	bool m_cassold, m_cassinbit, m_cassoutbit;
+	u8 m_cass_data[4]{};
+	bool m_cassold = 0, m_cassinbit = 0, m_cassoutbit = 0;
 
 	void mem_map(address_map &map);
 	void machine_start() override;

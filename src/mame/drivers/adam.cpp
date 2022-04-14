@@ -302,7 +302,7 @@ Mark Gordon
 #include "emu.h"
 #include "includes/adam.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

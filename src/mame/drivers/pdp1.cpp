@@ -61,6 +61,7 @@ To load and play a game:
 #include "cpu/pdp1/pdp1.h"
 #include "video/crt.h"
 #include "screen.h"
+#include "softlist_dev.h"
 
 
 /*
@@ -610,8 +611,7 @@ void pdp1_state::machine_start()
 DEFINE_DEVICE_TYPE(PDP1_READTAPE, pdp1_readtape_image_device, "pdp1_readtape_image", "PDP-1 Tape Reader")
 
 pdp1_readtape_image_device::pdp1_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PDP1_READTAPE, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	: paper_tape_reader_device(mconfig, PDP1_READTAPE, tag, owner, clock)
 	, m_maincpu(*this, "^maincpu")
 	, m_st_ptr(*this)
 	, m_timer(nullptr)
@@ -634,8 +634,7 @@ void pdp1_readtape_image_device::device_start()
 DEFINE_DEVICE_TYPE(PDP1_PUNCHTAPE, pdp1_punchtape_image_device, "pdp1_punchtape_image_device", "PDP-1 Tape Puncher")
 
 pdp1_punchtape_image_device::pdp1_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PDP1_PUNCHTAPE, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	: paper_tape_punch_device(mconfig, PDP1_PUNCHTAPE, tag, owner, clock)
 	, m_maincpu(*this, "^maincpu")
 	, m_st_ptp(*this)
 	, m_timer(nullptr)
@@ -1302,7 +1301,10 @@ void pdp1_cylinder_image_device::set_il(int il)
 	m_il_timer->adjust(il_phase, 0, PARALLEL_DRUM_ROTATION_TIME);
 }
 
-#ifdef UNUSED_FUNCTION
+TIMER_CALLBACK_MEMBER(pdp1_cylinder_image_device::rotation_timer_callback)
+{
+}
+
 TIMER_CALLBACK_MEMBER(pdp1_cylinder_image_device::il_timer_callback)
 {
 	if (m_dba)
@@ -1312,15 +1314,14 @@ TIMER_CALLBACK_MEMBER(pdp1_cylinder_image_device::il_timer_callback)
 	}
 }
 
-void pdp1_cylinder_image_device::parallel_drum_init(pdp1_state *state)
+void pdp1_cylinder_image_device::parallel_drum_init()
 {
-	m_rotation_timer = machine().scheduler().timer_alloc();
+	m_rotation_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pdp1_cylinder_image_device::rotation_timer_callback), this));
 	m_rotation_timer->adjust(PARALLEL_DRUM_ROTATION_TIME, 0, PARALLEL_DRUM_ROTATION_TIME);
 
-	m_il_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pdp1_cylinder_image_device::il_timer_callback),this));
+	m_il_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pdp1_cylinder_image_device::il_timer_callback), this));
 	set_il(0);
 }
-#endif
 
 /*
     Open a file for drum

@@ -233,7 +233,7 @@ static const z80_daisy_config daisy_chain[] =
 
 TIMER_CALLBACK_MEMBER(cedar_magnet_sound_device::reset_assert_callback)
 {
-	cedar_magnet_board_interface::reset_assert_callback(ptr,param);
+	cedar_magnet_board_interface::reset_assert_callback(param);
 	// reset lines go to the ctc as well?
 	m_ctc[0]->reset();
 	m_ctc[1]->reset();

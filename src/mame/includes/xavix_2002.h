@@ -33,9 +33,9 @@ public:
 	void xavix2002_superpctv(machine_config &config);
 
 private:
-	uint8_t read_extended_io0() { return 0x00; };
-	uint8_t read_extended_io1() { return 0x00; };
-	uint8_t read_extended_io2() { return 0x00; };
+	uint8_t read_extended_io0() { return 0x00; }
+	uint8_t read_extended_io1() { return 0x00; }
+	uint8_t read_extended_io2() { return 0x00; }
 	//void write_extended_io0(uint8_t data);
 	//void write_extended_io1(uint8_t data);
 	//void write_extended_io2(uint8_t data);

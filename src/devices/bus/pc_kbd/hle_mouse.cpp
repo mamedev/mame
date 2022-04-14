@@ -155,7 +155,7 @@ void hle_ps2_mouse_device::resume()
 	}
 }
 
-void hle_ps2_mouse_device::serial(void *ptr, s32 param)
+void hle_ps2_mouse_device::serial(s32 param)
 {
 	// host may inhibit device communication by holding the clock low for 100µs
 	if (!clock_signal() && clock_held(100))
@@ -474,7 +474,7 @@ void hle_ps2_mouse_device::command(u8 const command)
 	}
 }
 
-void hle_ps2_mouse_device::sample(void *ptr, s32 param)
+void hle_ps2_mouse_device::sample(s32 param)
 {
 	// read mouse state
 	s16 const x = m_port_x_axis->read();

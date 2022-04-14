@@ -12,6 +12,7 @@
 #include "screen.h"
 
 #include "emuopts.h"
+#include "fileio.h"
 #include "render.h"
 #include "rendutil.h"
 
@@ -554,7 +555,7 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 	, m_curtexture(0)
 	, m_changed(true)
 	, m_last_partial_scan(0)
-	, m_partial_scan_hpos(-1)
+	, m_partial_scan_hpos(0)
 	, m_color(rgb_t(0xff, 0xff, 0xff, 0xff))
 	, m_brightness(0xff)
 	, m_frame_period(DEFAULT_FRAME_PERIOD.as_attoseconds())
@@ -683,9 +684,9 @@ void screen_device::device_validity_check(validity_checker &valid) const
 			osd_printf_error("Non-raster display cannot have a variable width\n");
 	}
 
-	// check for zero frame rate
-	if (m_refresh == 0)
-		osd_printf_error("Invalid (zero) refresh rate\n");
+	// check for invalid frame rate
+	if (m_refresh == 0 || m_refresh > ATTOSECONDS_PER_SECOND)
+		osd_printf_error("Invalid (under 1Hz) refresh rate\n");
 
 	texture_format texformat = !m_screen_update_ind16.isnull() ? TEXFORMAT_PALETTE16 : TEXFORMAT_RGB32;
 	if (m_palette.finder_tag() != finder_base::DUMMY_TAG)
@@ -934,7 +935,7 @@ void screen_device::device_post_load()
 //  fires
 //-------------------------------------------------
 
-void screen_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void screen_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -1108,7 +1109,7 @@ void screen_device::realloc_screen_bitmaps()
 	s32 effwidth = std::max(per_scanline ? m_max_width : m_width, m_visarea.right() + 1);
 	s32 effheight = std::max(m_height, m_visarea.bottom() + 1);
 
-	// reize all registered screen bitmaps
+	// resize all registered screen bitmaps
 	for (auto &item : m_auto_bitmap_list)
 		item->m_bitmap.resize(effwidth, effheight);
 
@@ -1244,7 +1245,7 @@ bool screen_device::update_partial(int scanline)
 
 	// remember where we left off
 	m_last_partial_scan = scanline + 1;
-	m_partial_scan_hpos = -1;
+	m_partial_scan_hpos = 0;
 	return true;
 }
 
@@ -1298,10 +1299,10 @@ void screen_device::update_now()
 	if (current_vpos > m_last_partial_scan)
 	{
 		// if the line before us was incomplete, we must do it in two pieces
-		if (m_partial_scan_hpos >= 0)
+		if (m_partial_scan_hpos > 0)
 		{
 			// now finish the previous partial scanline
-			clip.set((std::max)(clip.left(), m_partial_scan_hpos + 1),
+			clip.set((std::max)(clip.left(), m_partial_scan_hpos),
 					 clip.right(),
 					 (std::max)(clip.top(), m_last_partial_scan),
 					 (std::min)(clip.bottom(), m_last_partial_scan));
@@ -1340,7 +1341,7 @@ void screen_device::update_now()
 				m_changed |= ~flags & UPDATE_HAS_NOT_CHANGED;
 			}
 
-			m_partial_scan_hpos = -1;
+			m_partial_scan_hpos = 0;
 			m_last_partial_scan++;
 		}
 		if (current_vpos > m_last_partial_scan)
@@ -1350,47 +1351,50 @@ void screen_device::update_now()
 	}
 
 	// now draw this partial scanline
-	clip = m_visarea;
-
-	clip.set((std::max)(clip.left(), m_partial_scan_hpos + 1),
-			 (std::min)(clip.right(), current_hpos),
-			 (std::max)(clip.top(), current_vpos),
-			 (std::min)(clip.bottom(), current_vpos));
-
-	// and if there's something to draw, do it
-	if (!clip.empty())
+	if (current_hpos > 0)
 	{
-		g_profiler.start(PROFILER_VIDEO);
+		clip = m_visarea;
 
-		LOG_PARTIAL_UPDATES(("doing scanline partial draw: Y %d X %d-%d\n", clip.bottom(), clip.left(), clip.right()));
+		clip.set((std::max)(clip.left(), m_partial_scan_hpos),
+				(std::min)(clip.right(), current_hpos - 1),
+				(std::max)(clip.top(), current_vpos),
+				(std::min)(clip.bottom(), current_vpos));
 
-		u32 flags = 0;
-		screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
-		if (m_video_attributes & VIDEO_VARIABLE_WIDTH)
+		// and if there's something to draw, do it
+		if (!clip.empty())
 		{
-			pre_update_scanline(current_vpos);
-			switch (curbitmap.format())
-			{
-				default:
-				case BITMAP_FORMAT_IND16:   flags = m_screen_update_ind16(*this, *(bitmap_ind16 *)m_scan_bitmaps[m_curbitmap][current_vpos], clip);   break;
-				case BITMAP_FORMAT_RGB32:   flags = m_screen_update_rgb32(*this, *(bitmap_rgb32 *)m_scan_bitmaps[m_curbitmap][current_vpos], clip);   break;
-			}
-		}
-		else
-		{
-			switch (curbitmap.format())
-			{
-				default:
-				case BITMAP_FORMAT_IND16:   flags = m_screen_update_ind16(*this, curbitmap.as_ind16(), clip);   break;
-				case BITMAP_FORMAT_RGB32:   flags = m_screen_update_rgb32(*this, curbitmap.as_rgb32(), clip);   break;
-			}
-		}
+			g_profiler.start(PROFILER_VIDEO);
 
-		m_partial_updates_this_frame++;
-		g_profiler.stop();
+			LOG_PARTIAL_UPDATES(("doing scanline partial draw: Y %d X %d-%d\n", clip.bottom(), clip.left(), clip.right()));
 
-		// if we modified the bitmap, we have to commit
-		m_changed |= ~flags & UPDATE_HAS_NOT_CHANGED;
+			u32 flags = 0;
+			screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
+			if (m_video_attributes & VIDEO_VARIABLE_WIDTH)
+			{
+				pre_update_scanline(current_vpos);
+				switch (curbitmap.format())
+				{
+					default:
+					case BITMAP_FORMAT_IND16:   flags = m_screen_update_ind16(*this, *(bitmap_ind16 *)m_scan_bitmaps[m_curbitmap][current_vpos], clip);   break;
+					case BITMAP_FORMAT_RGB32:   flags = m_screen_update_rgb32(*this, *(bitmap_rgb32 *)m_scan_bitmaps[m_curbitmap][current_vpos], clip);   break;
+				}
+			}
+			else
+			{
+				switch (curbitmap.format())
+				{
+					default:
+					case BITMAP_FORMAT_IND16:   flags = m_screen_update_ind16(*this, curbitmap.as_ind16(), clip);   break;
+					case BITMAP_FORMAT_RGB32:   flags = m_screen_update_rgb32(*this, curbitmap.as_rgb32(), clip);   break;
+				}
+			}
+
+			m_partial_updates_this_frame++;
+			g_profiler.stop();
+
+			// if we modified the bitmap, we have to commit
+			m_changed |= ~flags & UPDATE_HAS_NOT_CHANGED;
+		}
 	}
 
 	// remember where we left off
@@ -1407,7 +1411,7 @@ void screen_device::update_now()
 void screen_device::reset_partial_updates()
 {
 	m_last_partial_scan = 0;
-	m_partial_scan_hpos = -1;
+	m_partial_scan_hpos = 0;
 	m_partial_updates_this_frame = 0;
 	m_scanline0_timer->adjust(time_until_pos(0));
 }
@@ -1870,7 +1874,7 @@ void screen_device::finalize_burnin()
 			m_visarea.top() * m_burnin.height() / m_height,
 			m_visarea.bottom() * m_burnin.height() / m_height);
 
-	// wrap a bitmap around the memregion we care about
+	// wrap a bitmap around the subregion we care about
 	bitmap_argb32 finalmap(scaledvis.width(), scaledvis.height());
 	int srcwidth = m_burnin.width();
 	int srcheight = m_burnin.height();

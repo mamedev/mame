@@ -63,6 +63,7 @@
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "machine/z80sio.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #define I80186_TAG      "ic1"

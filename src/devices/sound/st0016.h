@@ -35,12 +35,14 @@ protected:
 private:
 	struct voice_t
 	{
+		voice_t(memory_access<21, 0, 0, ENDIANNESS_LITTLE>::cache &host) : m_host(host) { }
+
 		bool update();
 
 		u8 reg_r(offs_t offset);
 		void reg_w(offs_t offset, u8 data, int voice);
 
-		memory_access<21, 0, 0, ENDIANNESS_LITTLE>::cache m_host; // host device
+		memory_access<21, 0, 0, ENDIANNESS_LITTLE>::cache &m_host; // host device
 		u8 m_regs[0x20] = {0};   // 32 registers per voices
 		u32 m_start     = 0;     // Start position
 		u32 m_end       = 0;     // End position

@@ -33,7 +33,7 @@ Game Status:
 #include "includes/gamecom.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "gamecom.lh"

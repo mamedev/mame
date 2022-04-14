@@ -68,9 +68,9 @@ private:
 
 	required_memory_bank m_okibank;
 
-	emu_timer       *m_gun_irq_timer[2];
+	emu_timer       *m_gun_irq_timer[2]{};
 
-	tilemap_t *m_pant[2];
+	tilemap_t *m_pant[2]{};
 };
 
 #endif // MAME_INCLUDES_TARGETH_H

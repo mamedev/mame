@@ -1073,8 +1073,8 @@ private:
 nforcepc_state::nforcepc_state(const machine_config &mconfig, device_type type, const char *tag) :
 	driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	isalpc(*this, ":pci:01.0"),
-	m_as99127f(*this, ":pci:01.1:12d")
+	isalpc(*this, "pci:01.0"),
+	m_as99127f(*this, "pci:01.1:12d")
 {
 }
 
@@ -1162,65 +1162,65 @@ void nforcepc_state::nforcepc(machine_config &config)
 	maincpu.set_irq_acknowledge_callback(FUNC(nforcepc_state::irq_callback));
 	//maincpu.smiact().set("pci:01.0", FUNC(???_host_device::smi_act_w));
 
-	PCI_ROOT(config, ":pci", 0);
-	CRUSH11(config, ":pci:00.0", 0, "maincpu", "bios"); // 10de:01a4 NVIDIA Corporation nForce CPU bridge
-	CRUSH11_MEMORY(config, ":pci:00.1", 0, 0x10430c11, 2); // 10de:01ac NVIDIA Corporation nForce 220/420 Memory Controller
+	PCI_ROOT(config, "pci", 0);
+	CRUSH11(config, "pci:00.0", 0, "maincpu", "bios"); // 10de:01a4 NVIDIA Corporation nForce CPU bridge
+	CRUSH11_MEMORY(config, "pci:00.1", 0, 0x10430c11, 2); // 10de:01ac NVIDIA Corporation nForce 220/420 Memory Controller
 	// 10de:01ad NVIDIA Corporation nForce 220/420 Memory Controller
 	// 10de:01ab NVIDIA Corporation nForce 420 Memory Controller (DDR)
-	mcpx_isalpc_device &isa(MCPX_ISALPC(config, ":pci:01.0", 0, 0x10430c11)); // 10de:01b2 NVIDIA Corporation nForce ISA Bridge (LPC bus)
+	mcpx_isalpc_device &isa(MCPX_ISALPC(config, "pci:01.0", 0, 0x10430c11)); // 10de:01b2 NVIDIA Corporation nForce ISA Bridge (LPC bus)
 	isa.smi().set_inputline(":maincpu", INPUT_LINE_SMI);
 	isa.boot_state_hook().set(FUNC(nforcepc_state::boot_state_award_w));
 	isa.interrupt_output().set(FUNC(nforcepc_state::maincpu_interrupt));
-	it8703f_device &ite(IT8703F(config, ":pci:01.0:0", 0));
-	ite.pin_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
-	ite.pin_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
+	it8703f_device &ite(IT8703F(config, "pci:01.0:0", 0));
+	ite.pin_reset().set_inputline("maincpu", INPUT_LINE_RESET);
+	ite.pin_gatea20().set_inputline("maincpu", INPUT_LINE_A20);
 	ite.txd1().set("serport0", FUNC(rs232_port_device::write_txd));
 	ite.ndtr1().set("serport0", FUNC(rs232_port_device::write_dtr));
 	ite.nrts1().set("serport0", FUNC(rs232_port_device::write_rts));
 	ite.txd2().set("serport1", FUNC(rs232_port_device::write_txd));
 	ite.ndtr2().set("serport1", FUNC(rs232_port_device::write_dtr));
 	ite.nrts2().set("serport1", FUNC(rs232_port_device::write_rts));
-	MCPX_SMBUS(config, ":pci:01.1", 0, 0x10430c11); // 10de:01b4 NVIDIA Corporation nForce PCI System Management (SMBus)
-	SMBUS_ROM(config, ":pci:01.1:050", 0, test_spd_data, sizeof(test_spd_data)); // these 3 are on smbus number 0
-	SMBUS_LOGGER(config, ":pci:01.1:051", 0);
-	SMBUS_LOGGER(config, ":pci:01.1:052", 0);
-	SMBUS_LOGGER(config, ":pci:01.1:108", 0); // these 4 are on smbus number 1
-	AS99127F(config, ":pci:01.1:12d", 0);
-	AS99127F_SENSOR2(config, ":pci:01.1:148", 0);
-	AS99127F_SENSOR3(config, ":pci:01.1:149", 0);
-	mcpx_ohci_device &ohci(MCPX_OHCI(config, ":pci:02.0", 0, 0x10430c11)); // 10de:01c2 NVIDIA Corporation nForce USB Controller
-	ohci.interrupt_handler().set(":pci:01.0", FUNC(mcpx_isalpc_device::irq1));
-	MCPX_OHCI(config, ":pci:03.0", 0, 0x10430c11); // 10de:01c2 NVIDIA Corporation nForce USB Controller
-	MCPX_ETH(config, ":pci:04.0", 0); // 10de:01c3 NVIDIA Corporation nForce Ethernet Controller
-	MCPX_APU(config, ":pci:05.0", 0, 0x10430c11, m_maincpu); // 10de:01b0 NVIDIA Corporation nForce Audio Processing Unit
-	MCPX_AC97_AUDIO(config, ":pci:06.0", 0, 0x10438384); // 10de:01b1 NVIDIA Corporation nForce AC'97 Audio Controller
-	PCI_BRIDGE(config, ":pci:08.0", 0, 0x10de01b8, 0xc2); // 10de:01b8 NVIDIA Corporation nForce PCI-to-PCI bridge
+	MCPX_SMBUS(config, "pci:01.1", 0, 0x10430c11); // 10de:01b4 NVIDIA Corporation nForce PCI System Management (SMBus)
+	SMBUS_ROM(config, "pci:01.1:050", 0, test_spd_data, sizeof(test_spd_data)); // these 3 are on smbus number 0
+	SMBUS_LOGGER(config, "pci:01.1:051", 0);
+	SMBUS_LOGGER(config, "pci:01.1:052", 0);
+	SMBUS_LOGGER(config, "pci:01.1:108", 0); // these 4 are on smbus number 1
+	AS99127F(config, "pci:01.1:12d", 0);
+	AS99127F_SENSOR2(config, "pci:01.1:148", 0);
+	AS99127F_SENSOR3(config, "pci:01.1:149", 0);
+	mcpx_ohci_device &ohci(MCPX_OHCI(config, "pci:02.0", 0, 0x10430c11)); // 10de:01c2 NVIDIA Corporation nForce USB Controller
+	ohci.interrupt_handler().set("pci:01.0", FUNC(mcpx_isalpc_device::irq1));
+	MCPX_OHCI(config, "pci:03.0", 0, 0x10430c11); // 10de:01c2 NVIDIA Corporation nForce USB Controller
+	MCPX_ETH(config, "pci:04.0", 0); // 10de:01c3 NVIDIA Corporation nForce Ethernet Controller
+	MCPX_APU(config, "pci:05.0", 0, 0x10430c11, m_maincpu); // 10de:01b0 NVIDIA Corporation nForce Audio Processing Unit
+	MCPX_AC97_AUDIO(config, "pci:06.0", 0, 0x10438384); // 10de:01b1 NVIDIA Corporation nForce AC'97 Audio Controller
+	PCI_BRIDGE(config, "pci:08.0", 0, 0x10de01b8, 0xc2); // 10de:01b8 NVIDIA Corporation nForce PCI-to-PCI bridge
 	// 10ec:8139 Realtek Semiconductor Co., Ltd. RTL-8139/8139C/8139C+ (behind bridge)
-	mcpx_ide_device &ide(MCPX_IDE(config, ":pci:09.0", 0, 0x10430c11)); // 10de:01bc NVIDIA Corporation nForce IDE
-	ide.pri_interrupt_handler().set(":pci:01.0", FUNC(mcpx_isalpc_device::irq14));
-	ide.sec_interrupt_handler().set(":pci:01.0", FUNC(mcpx_isalpc_device::irq15));
+	mcpx_ide_device &ide(MCPX_IDE(config, "pci:09.0", 0, 0x10430c11)); // 10de:01bc NVIDIA Corporation nForce IDE
+	ide.pri_interrupt_handler().set("pci:01.0", FUNC(mcpx_isalpc_device::irq14));
+	ide.sec_interrupt_handler().set("pci:01.0", FUNC(mcpx_isalpc_device::irq15));
 	ide.subdevice<ide_controller_32_device>("ide1")->options(ata_devices, "hdd", nullptr, true);
 	ide.subdevice<ide_controller_32_device>("ide2")->options(ata_devices, "cdrom", nullptr, true);
-	NV2A_AGP(config, ":pci:1e.0", 0, 0x10de01b7, 0xb2); // 10de:01b7 NVIDIA Corporation nForce AGP to PCI Bridge
-	VIRGEDX_PCI(config, ":pci:0a.0", 0);
+	NV2A_AGP(config, "pci:1e.0", 0, 0x10de01b7, 0xb2); // 10de:01b7 NVIDIA Corporation nForce AGP to PCI Bridge
+	VIRGEDX_PCI(config, "pci:0a.0", 0);
 	SST_49LF020(config, "bios", 0);
 
-	FLOPPY_CONNECTOR(config, ":pci:01.0:0:fdc:0", pc_hd_floppies, "35hd", floppy_formats);
-	FLOPPY_CONNECTOR(config, ":pci:01.0:0:fdc:1", pc_hd_floppies, "35hd", floppy_formats);
+	FLOPPY_CONNECTOR(config, "pci:01.0:0:fdc:0", pc_hd_floppies, "35hd", floppy_formats);
+	FLOPPY_CONNECTOR(config, "pci:01.0:0:fdc:1", pc_hd_floppies, "35hd", floppy_formats);
 
 	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, nullptr));
-	serport0.rxd_handler().set(":pci:01.0:0", FUNC(it8703f_device::rxd1_w));
-	serport0.dcd_handler().set(":pci:01.0:0", FUNC(it8703f_device::ndcd1_w));
-	serport0.dsr_handler().set(":pci:01.0:0", FUNC(it8703f_device::ndsr1_w));
-	serport0.ri_handler().set(":pci:01.0:0", FUNC(it8703f_device::nri1_w));
-	serport0.cts_handler().set(":pci:01.0:0", FUNC(it8703f_device::ncts1_w));
+	serport0.rxd_handler().set("pci:01.0:0", FUNC(it8703f_device::rxd1_w));
+	serport0.dcd_handler().set("pci:01.0:0", FUNC(it8703f_device::ndcd1_w));
+	serport0.dsr_handler().set("pci:01.0:0", FUNC(it8703f_device::ndsr1_w));
+	serport0.ri_handler().set("pci:01.0:0", FUNC(it8703f_device::nri1_w));
+	serport0.cts_handler().set("pci:01.0:0", FUNC(it8703f_device::ncts1_w));
 
 	rs232_port_device& serport1(RS232_PORT(config, "serport1", isa_com, nullptr));
-	serport1.rxd_handler().set(":pci:01.0:0", FUNC(it8703f_device::rxd2_w));
-	serport1.dcd_handler().set(":pci:01.0:0", FUNC(it8703f_device::ndcd2_w));
-	serport1.dsr_handler().set(":pci:01.0:0", FUNC(it8703f_device::ndsr2_w));
-	serport1.ri_handler().set(":pci:01.0:0", FUNC(it8703f_device::nri2_w));
-	serport1.cts_handler().set(":pci:01.0:0", FUNC(it8703f_device::ncts2_w));
+	serport1.rxd_handler().set("pci:01.0:0", FUNC(it8703f_device::rxd2_w));
+	serport1.dcd_handler().set("pci:01.0:0", FUNC(it8703f_device::ndcd2_w));
+	serport1.dsr_handler().set("pci:01.0:0", FUNC(it8703f_device::ndsr2_w));
+	serport1.ri_handler().set("pci:01.0:0", FUNC(it8703f_device::nri2_w));
+	serport1.cts_handler().set("pci:01.0:0", FUNC(it8703f_device::ncts2_w));
 }
 
 ROM_START(nforcepc)

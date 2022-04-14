@@ -1,9 +1,7 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 ##
 ## license:BSD-3-Clause
 ## copyright-holders:Aaron Giles, Andrew Gardner
-
-from __future__ import with_statement
 
 import io
 import re
@@ -28,7 +26,7 @@ def parse_args():
             format = 'plist'
         elif flags and (sys.argv[i] == '-b'):
             i += 1
-            if (i >= len(sys.argv)):
+            if i >= len(sys.argv):
                 usage()
             else:
                 target = sys.argv[i]

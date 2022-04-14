@@ -98,6 +98,13 @@
 #include "machine/6522via.h"
 #include "machine/z80scc.h"
 
+#include "screen.h"
+
+#define LOG_GENERAL (1U << 0)
+#define LOG_VIDEO   (1U << 1)
+
+//#define VERBOSE (LOG_COMMAND)
+#include "logmacro.h"
 
 namespace {
 
@@ -114,6 +121,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_scc(*this, "scc")
 		, m_via(*this, "via")
+		, m_screen(*this, "screen")
+		, m_vram_offset(0)
 		, m_dsw1(*this, "DSW1")
 		, m_dram_ptr(*this, "dram")
 		, m_sram_ptr(*this, "sram")
@@ -127,16 +136,23 @@ public:
 		, m_print_result(0)
 		, m_sbsy(0)
 		, m_cbsy(0)
+		, m_vsync(0)
+		, m_fifo_count(0)
+		, m_pb6_tick_count(0)
 	{ }
 
 	void lwriter(machine_config &config);
 	void lwriter2nt(machine_config &config);
 
 protected:
-	virtual void machine_start () override;
-	virtual void machine_reset () override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
+	// A guess based on not very much
+	static constexpr unsigned FB_HEIGHT = 3434;
+	static constexpr unsigned FB_WIDTH = 2520;
+
 	uint16_t bankedarea_r(offs_t offset);
 	void bankedarea_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t eeprom_r(offs_t offset);
@@ -155,12 +171,18 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(via_cb1_w);
 	DECLARE_WRITE_LINE_MEMBER(via_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(via_int_w);
+	emu_timer *m_pb6_timer;
+	TIMER_CALLBACK_MEMBER(pb6_tick);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	//DECLARE_WRITE_LINE_MEMBER(scc_int);
 	void maincpu_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<scc8530_device> m_scc;
 	required_device<via6522_device> m_via;
+	optional_device<screen_device> m_screen;
+	std::unique_ptr<u8[]> m_vram;
+	size_t m_vram_offset;
 	required_ioport m_dsw1;
 
 	required_shared_ptr<uint16_t> m_dram_ptr;
@@ -174,6 +196,11 @@ private:
 	int m_print_result;
 	bool m_sbsy;
 	bool m_cbsy;
+	bool m_vsync;;
+	int m_fifo_count;
+	int m_pb6_tick_count;
+	int m_vbl_count;
+	int m_reset_count;
 };
 
 /*
@@ -277,11 +304,18 @@ static INPUT_PORTS_START( lwriter )
 	PORT_DIPSETTING(  0x60, "AppleTalk")
 INPUT_PORTS_END
 
+// 300 dots/inch: 1,863,813 Hz (from the CX manual) / (8 bits per byte) / (48 bytes written per interrupt / 24 ticks per interrupt) = ~116488.3
+#define PB6_CLK 116488
+
 /* Start it up */
 void lwriter_state::machine_start()
 {
-	// do stuff here later on like setting up printer mechanisms HLE timers etc
+	m_vram = make_unique_clear<uint8_t []>(FB_WIDTH * FB_HEIGHT / 8);
 
+	// do stuff here later on like setting up printer mechanisms HLE timers etc
+	m_pb6_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lwriter_state::pb6_tick), this));
+
+	m_pb6_timer->adjust(attotime::from_hz(PB6_CLK));
 	// Initialize ca1 to 1 so that we don't miss the first interrupt/transition to 0
 	m_via->write_ca1(1);
 }
@@ -358,20 +392,51 @@ void lwriter_state::eeprom_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 	logerror("eeprom_w! %x %x %x\n", offset, data, mem_mask);
 }
 
+TIMER_CALLBACK_MEMBER(lwriter_state::pb6_tick)
+{
+	m_pb6_tick_count += 1;
+	m_via->write_pb6(0);
+	m_via->write_pb6(1);
+	m_pb6_timer->adjust(attotime::from_hz(PB6_CLK));
+}
+
 /* 4 diagnostic LEDs, plus 4 i/o lines for the printer */
+/* 0 - print cbsy
+ * 1 - print prnt
+ * 2 - print vsync
+ * 3 - print cprdy
+ * 4 - led 1
+ * 5 - led 2
+ * 6 - led 3
+ * 7 - led 4
+ */
 void lwriter_state::led_out_w(uint8_t data)
 {
 	//popmessage("LED status: %02X\n", data&0xFF);
 	logerror("LED status: %02X\n", data&0xFF);
 	m_cbsy = data & 1;
+	if (!m_vsync && (data & 4)) { // vsync
+		LOGMASKED(LOG_VIDEO, "vsync\n");
+		m_vbl_count = 0;
+	}
+	m_vsync = (data & 4);
 	popmessage("LED status: %x %x %x %x %x %x %x %x\n", data&0x80, data&0x40, data&0x20, data&0x10, data&0x8, data&0x4, data&0x2, data&0x1);
 }
 
 /* FIFO to printer, 64 bytes long */
 void lwriter_state::fifo_out_w(uint8_t data)
 {
-	/** TODO: actually emulate this */
-	logerror("FIFO written with: %02X\n", data&0xFF);
+	m_fifo_count += 8;
+	if (m_vbl_count >= FB_HEIGHT) {
+		m_vbl_count = 0;
+	}
+
+	m_vram[m_vbl_count * FB_WIDTH/8 + m_vram_offset] = data;
+	m_vram_offset++;
+	if (m_vram_offset > (FB_WIDTH*FB_HEIGHT/8)) {
+		LOGMASKED(LOG_VIDEO, "vram reset\n");
+		m_vram_offset = 0;
+	}
 }
 /* via port a bits */
 /* 0 - ?
@@ -416,10 +481,10 @@ WRITE_LINE_MEMBER(lwriter_state::via_ca2_w)
  * 1 - print rdy
  * 2 - print pprdy
  * 3 - overlay
- * 4 -
- * 5 -
- * 6 - timer 2 clk
- * 7 - print related timing thing
+ * 4 - scc w/req
+ * 5 - resetfifo
+ * 6 - timer 2 clk (mroclk)
+ * 7 - vbl
  */
 uint8_t lwriter_state::via_pb_r()
 {
@@ -436,6 +501,16 @@ uint8_t lwriter_state::via_pb_lw2nt_r()
 
 void lwriter_state::via_pb_w(uint8_t data)
 {
+	if ((data & 0x20) && ((m_via_pb & 0x20) == 0)) {
+		m_reset_count++;
+		LOGMASKED(LOG_VIDEO, "reset fifo %d pb6 %d\n", m_fifo_count, m_pb6_tick_count);
+	}
+	if ((data & 0x80) && ((m_via_pb & 0x80) == 0)) {
+		m_vbl_count++;
+		LOGMASKED(LOG_VIDEO, "vbl fifo:%d vbl:%d vram_off: %ld\n", m_fifo_count, m_vbl_count, m_vram_offset);
+		m_vram_offset = 0;
+	}
+
 	logerror(" VIA: Port B written with data of 0x%02x!\n", data);
 	/* Like early Mac models which had VIA A4 control overlaying, the
 	 * LaserWriter II NT overlay is controlled by VIA B3 */
@@ -471,7 +546,6 @@ WRITE_LINE_MEMBER(lwriter_state::scc_int)
 
 #define CPU_CLK (22.321_MHz_XTAL / 2) // Based on pictures form here: http://picclick.co.uk/Apple-Postscript-LaserWriter-IINT-Printer-640-4105-M6009-Mainboard-282160713108.html#&gid=1&pid=7
 #define RXC_CLK ((CPU_CLK.value() - (87 * 16 * 70)) / 3) // Tuned to get 9600 baud according to manual, needs rework based on real hardware
-
 /* These are from LBP-CX Series Video Interface Manual:
  * http://beefchicken.com/retro/laserwriter/LBP-CX%20Series%20Video%20Interface%20Service%20Manual.pdf
  */
@@ -548,6 +622,27 @@ void lwriter_state::write_dtr(int state)
 	}
 }
 
+uint32_t lwriter_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	auto const f = [] (auto x) { return x ? u32(0) : u32(0xffffffff); };
+	for (int y = 0; y < FB_HEIGHT; y++) {
+		for (int x = 0; x < FB_WIDTH; x += 8) {
+			uint32_t *scanline = &bitmap.pix(y, x);
+			uint8_t const pixels = m_vram[y * FB_WIDTH/8 + x/8];
+			*scanline++ = f(BIT(pixels, 7));
+			*scanline++ = f(BIT(pixels, 6));
+			*scanline++ = f(BIT(pixels, 5));
+			*scanline++ = f(BIT(pixels, 4));
+			*scanline++ = f(BIT(pixels, 3));
+			*scanline++ = f(BIT(pixels, 2));
+			*scanline++ = f(BIT(pixels, 1));
+			*scanline++ = f(BIT(pixels, 0));
+		}
+	}
+
+	return 0;
+}
+
 void lwriter_state::lwriter2nt(machine_config &config)
 {
 	lwriter(config);
@@ -559,6 +654,12 @@ void lwriter_state::lwriter(machine_config &config)
 {
 	M68000(config, m_maincpu, CPU_CLK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lwriter_state::maincpu_map);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_refresh_hz(30);
+	m_screen->set_size(FB_WIDTH, FB_HEIGHT);
+	m_screen->set_visarea_full();
+	m_screen->set_screen_update(FUNC(lwriter_state::screen_update));
 
 	SCC8530N(config, m_scc, CPU_CLK);
 	m_scc->configure_channels(RXC_CLK, 0, RXC_CLK, 0);
@@ -627,38 +728,72 @@ void lwriter_state::lwriter(machine_config &config)
 */
 
 
+#define ROM_LOAD16_BYTE_BIOS(bios,name,offset,length,hash)     ROMX_LOAD(name, offset, length, hash, ROM_SKIP(1) | ROM_BIOS(bios))
+
 ROM_START(lwriter)
 	ROM_REGION16_BE( 0x200000, "rom", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE("342-0568a.rom", 0x000001, 0x10000, CRC (83341c75) SHA1 (d7c65d09abaaf862fef00ac4df7a094ddedd24c5)) // Label: "342-0568-A // (C) '87 ADOBE SYS // (C) 81 LINOTYPE // POSTSCRIPT"
-	ROM_LOAD16_BYTE("342-0569a.rom", 0x000000, 0x10000, CRC (47d33a6b) SHA1 (0e79fa9204f9be6539abcdb619a17a4ced912b13)) // Label: "342-0569-A // (C) '87 ADOBE SYS // (C) 81 LINOTYPE // POSTSCRIPT"
-	ROM_LOAD16_BYTE("342-0570a.rom", 0x020001, 0x10000, CRC (38753dd2) SHA1 (931eb3386fe0fff1de1311b2bc1cee8ee02ed599)) // Label: "342-0570-A // (C) '87 ADOBE SYS // (C) 81 LINOTYPE // POSTSCRIPT"
-	ROM_LOAD16_BYTE("342-0571a.rom", 0x020000, 0x10000, CRC (08888acd) SHA1 (f771306d8f876e6e4ed14f3c6e5b71dff75cf49e)) // Label: "342-0571-A // (C) '87 ADOBE SYS // (C) 81 LINOTYPE // POSTSCRIPT"
-	ROM_LOAD16_BYTE("342-0572a.rom", 0x040001, 0x10000, CRC (0a64af91) SHA1 (22cd61ed7c2f64bfd4ddbd7b5cde64311a3db5e6)) // Label: "342-0572-A // (C) '87 ADOBE SYS // (C) 81 LINOTYPE // POSTSCRIPT"
-	ROM_LOAD16_BYTE("342-0573a.rom", 0x040000, 0x10000, CRC (f8e529fe) SHA1 (8a4511a4c12eb24c731e1de747886aacfa2057d5)) // Label: "342-0573-A // (C) '87 ADOBE SYS // (C) 81 LINOTYPE // POSTSCRIPT"
-	ROM_LOAD16_BYTE("342-0574a.rom", 0x060001, 0x10000, CRC (bb694699) SHA1 (2e208b30e8d05725f7e8b469974b6357008fbb1d)) // Label: "342-0574-A // (C) '87 ADOBE SYS // (C) 81 LINOTYPE // POSTSCRIPT"
-	ROM_LOAD16_BYTE("342-0575a.rom", 0x060000, 0x10000, CRC (c21c1d22) SHA1 (9fc6cd059380c11588c182fb8ec6422e5db472e1)) // Label: "342-0575-A // (C) '87 ADOBE SYS // (C) 81 LINOTYPE // POSTSCRIPT"
+
+	ROM_SYSTEM_BIOS(0, "rev47", "PostScript Version 47.0")
+	ROM_LOAD16_BYTE_BIOS(0, "342-0568a.rom", 0x000001, 0x10000, CRC (83341c75) SHA1 (d7c65d09abaaf862fef00ac4df7a094ddedd24c5)) // Label: "342-0568-A // (C) '87 ADOBE SYS // (C) 81 LINOTYPE // POSTSCRIPT"
+	ROM_LOAD16_BYTE_BIOS(0, "342-0569a.rom", 0x000000, 0x10000, CRC (47d33a6b) SHA1 (0e79fa9204f9be6539abcdb619a17a4ced912b13)) // Label: "342-0569-A // (C) '87 ADOBE SYS // (C) 81 LINOTYPE // POSTSCRIPT"
+	ROM_LOAD16_BYTE_BIOS(0, "342-0570a.rom", 0x020001, 0x10000, CRC (38753dd2) SHA1 (931eb3386fe0fff1de1311b2bc1cee8ee02ed599)) // Label: "342-0570-A // (C) '87 ADOBE SYS // (C) 81 LINOTYPE // POSTSCRIPT"
+	ROM_LOAD16_BYTE_BIOS(0, "342-0571a.rom", 0x020000, 0x10000, CRC (08888acd) SHA1 (f771306d8f876e6e4ed14f3c6e5b71dff75cf49e)) // Label: "342-0571-A // (C) '87 ADOBE SYS // (C) 81 LINOTYPE // POSTSCRIPT"
+	ROM_LOAD16_BYTE_BIOS(0, "342-0572a.rom", 0x040001, 0x10000, CRC (0a64af91) SHA1 (22cd61ed7c2f64bfd4ddbd7b5cde64311a3db5e6)) // Label: "342-0572-A // (C) '87 ADOBE SYS // (C) 81 LINOTYPE // POSTSCRIPT"
+	ROM_LOAD16_BYTE_BIOS(0, "342-0573a.rom", 0x040000, 0x10000, CRC (f8e529fe) SHA1 (8a4511a4c12eb24c731e1de747886aacfa2057d5)) // Label: "342-0573-A // (C) '87 ADOBE SYS // (C) 81 LINOTYPE // POSTSCRIPT"
+	ROM_LOAD16_BYTE_BIOS(0, "342-0574a.rom", 0x060001, 0x10000, CRC (bb694699) SHA1 (2e208b30e8d05725f7e8b469974b6357008fbb1d)) // Label: "342-0574-A // (C) '87 ADOBE SYS // (C) 81 LINOTYPE // POSTSCRIPT"
+	ROM_LOAD16_BYTE_BIOS(0, "342-0575a.rom", 0x060000, 0x10000, CRC (c21c1d22) SHA1 (9fc6cd059380c11588c182fb8ec6422e5db472e1)) // Label: "342-0575-A // (C) '87 ADOBE SYS // (C) 81 LINOTYPE // POSTSCRIPT"
+
+	ROM_SYSTEM_BIOS(1, "rev2", "PostScript Version 38.0")
+	ROM_LOAD16_BYTE_BIOS(1, "342-0081a_l0.bin", 0x000001, 0x10000, CRC (a76c91df) SHA1 (c62ef2ede8ce7ba92ec75b3fcb3ddbb288fe235b)) // Label: "342-0081A-L0 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE_BIOS(1, "342-0082a_h0.bin", 0x000000, 0x10000, CRC (3342d008) SHA1 (bc01749bd9a9bc129a4100ee64e09a428b0619c1)) // Label: "342-0082A-H0 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE_BIOS(1, "342-0083a_l1.bin", 0x020001, 0x10000, CRC (8569fb1e) SHA1 (0e004f649078949d5c70d6b92774e4696f3f3cd4)) // Label: "342-0083A-L1 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE_BIOS(1, "342-0084a_h1.bin", 0x020000, 0x10000, CRC (a4d939bf) SHA1 (1585d5e651349f2857d8934cfda85fc4012c2c91)) // Label: "342-0084A-H1 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE_BIOS(1, "342-0085a_l2.bin", 0x040001, 0x10000, CRC (a77e5efc) SHA1 (73b60da77d433d97ecbe9e28558836da8c1cc259)) // Label: "342-0085A-L2 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE_BIOS(1, "342-0086a_h2.bin", 0x040000, 0x10000, CRC (5cf037a1) SHA1 (1ea7177fa11ecdd02b794144c182de0836eb4110)) // Label: "342-0086A-H3 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE_BIOS(1, "342-0087a_l3.bin", 0x060001, 0x10000, CRC (8186bd91) SHA1 (4e3623efc4926be8d6182b702642bf634ae23f82)) // Label: "342-0087A-L4 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE_BIOS(1, "342-0088a_h3.bin", 0x060000, 0x10000, CRC (ecf425ec) SHA1 (353c957a16edf8d3a685c1c8bfe896e26d4a15ed)) // Label: "342-0088A-H4 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
 
 	ROM_REGION16_BE( 0x1000, "sram", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START(lwriterplus)
 	ROM_REGION16_BE( 0x200000, "rom", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE("342-0089a.l0", 0x000001, 0x10000, CRC (d5dc7d6e) SHA1 (b9a1f807facf6a6de92fae5887044df961d73ab1)) // Label: "342-0089-A+L0 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
-	ROM_LOAD16_BYTE("342-0090a.h0", 0x000000, 0x10000, CRC (32dc1f96) SHA1 (f3647b11c712979f6c5658a15a3e8647bd4d1a1d)) // Label: "342-0090-A+H0 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
-	ROM_LOAD16_BYTE("342-0091a.l1", 0x020001, 0x10000, CRC (a24dcb05) SHA1 (9edfb94a1e6723a7580caed629418ee1d2472a84)) // Label: "342-0091-A+L1 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
-	ROM_LOAD16_BYTE("342-0092a.h1", 0x020000, 0x10000, CRC (8600e85d) SHA1 (332308825f78a768e30eaa36f10f0ac1c5eacc19)) // Label: "342-0092-A+H1 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
-	ROM_LOAD16_BYTE("342-0093a.l2", 0x040001, 0x10000, CRC (3c8fd0f7) SHA1 (36315be1ed691b24c49471eab0cd93a4242d6e10)) // Label: "342-0093-A+L2 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
-	ROM_LOAD16_BYTE("342-0094a.h2", 0x040000, 0x10000, CRC (e1a9d862) SHA1 (ffdd96eb70f54c6bb10dfc94f49ce2d916a74ab6)) // Label: "342-0094-A+H2 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
-	ROM_LOAD16_BYTE("342-0095a.l3", 0x060001, 0x10000, CRC (47f637f3) SHA1 (d04548144f906a8d89b826692812acdcbfbed144)) // Label: "342-0095-A+L3 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
-	ROM_LOAD16_BYTE("342-0096a.h3", 0x060000, 0x10000, CRC (3213e057) SHA1 (94d2ac1849b48628004877521c882e0f828f97b3)) // Label: "342-0096-A+H3 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
-	ROM_LOAD16_BYTE("342-0097a.l4", 0x080001, 0x10000, CRC (9ecdc5fc) SHA1 (336ecaaf29c5396c30a11aaa86533f0598cb50b3)) // Label: "342-0097-A+L4 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
-	ROM_LOAD16_BYTE("342-0098a.h4", 0x080000, 0x10000, CRC (867657e3) SHA1 (0c9c29bac49fdfcd26f22a751be71508add0a25a)) // Label: "342-0098-A+H4 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
-	ROM_LOAD16_BYTE("342-0099a.l5", 0x0a0001, 0x10000, CRC (820c0f63) SHA1 (0f8d45fc886f996fbcb4103961810b673e9ab7e4)) // Label: "342-0099-A+L5 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
-	ROM_LOAD16_BYTE("342-0100a.h5", 0x0a0000, 0x10000, CRC (40aeb030) SHA1 (2a34280a6b2ab54d1c82145ec1a8aaac1f57ae15)) // Label: "342-0100-A+H5 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
-	ROM_LOAD16_BYTE("342-0101a.l6", 0x0c0001, 0x10000, CRC (aed532c4) SHA1 (39d7d3ae1d35d8b4ec33fd8c88a569c607628e2a)) // Label: "342-0101-A+L6 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
-	ROM_LOAD16_BYTE("342-0102a.h6", 0x0c0000, 0x10000, CRC (653979d1) SHA1 (bf56df6a7eaee2bc8edfbc45f78d1abb19e6807a)) // Label: "342-0102-A+H6 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
-	ROM_LOAD16_BYTE("342-0103b.l7", 0x0e0001, 0x10000, CRC (dbafb1ed) SHA1 (b9f5b65b04f8f804c473b62c292dc83d14b2ab33)) // Label: "342-0103-B+L7 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
-	ROM_LOAD16_BYTE("342-0104b.h7", 0x0e0000, 0x10000, CRC (50c72f89) SHA1 (bdbc0e282121f7dc4d701aa12f94296e436b504b)) // Label: "342-0104-B+H7 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+
+	ROM_SYSTEM_BIOS(0, "rev47", "PostScript Version 47.0")
+	ROM_LOAD16_BYTE_BIOS(0, "342-0089a.l0", 0x000001, 0x10000, CRC (d5dc7d6e) SHA1 (b9a1f807facf6a6de92fae5887044df961d73ab1)) // Label: "342-0089-A+L0 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE_BIOS(0, "342-0090a.h0", 0x000000, 0x10000, CRC (32dc1f96) SHA1 (f3647b11c712979f6c5658a15a3e8647bd4d1a1d)) // Label: "342-0090-A+H0 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE_BIOS(0, "342-0091a.l1", 0x020001, 0x10000, CRC (a24dcb05) SHA1 (9edfb94a1e6723a7580caed629418ee1d2472a84)) // Label: "342-0091-A+L1 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE_BIOS(0, "342-0092a.h1", 0x020000, 0x10000, CRC (8600e85d) SHA1 (332308825f78a768e30eaa36f10f0ac1c5eacc19)) // Label: "342-0092-A+H1 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE_BIOS(0, "342-0093a.l2", 0x040001, 0x10000, CRC (3c8fd0f7) SHA1 (36315be1ed691b24c49471eab0cd93a4242d6e10)) // Label: "342-0093-A+L2 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE_BIOS(0, "342-0094a.h2", 0x040000, 0x10000, CRC (e1a9d862) SHA1 (ffdd96eb70f54c6bb10dfc94f49ce2d916a74ab6)) // Label: "342-0094-A+H2 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE_BIOS(0, "342-0095a.l3", 0x060001, 0x10000, CRC (47f637f3) SHA1 (d04548144f906a8d89b826692812acdcbfbed144)) // Label: "342-0095-A+L3 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE_BIOS(0, "342-0096a.h3", 0x060000, 0x10000, CRC (3213e057) SHA1 (94d2ac1849b48628004877521c882e0f828f97b3)) // Label: "342-0096-A+H3 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE_BIOS(0, "342-0097a.l4", 0x080001, 0x10000, CRC (9ecdc5fc) SHA1 (336ecaaf29c5396c30a11aaa86533f0598cb50b3)) // Label: "342-0097-A+L4 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE_BIOS(0, "342-0098a.h4", 0x080000, 0x10000, CRC (867657e3) SHA1 (0c9c29bac49fdfcd26f22a751be71508add0a25a)) // Label: "342-0098-A+H4 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE_BIOS(0, "342-0099a.l5", 0x0a0001, 0x10000, CRC (820c0f63) SHA1 (0f8d45fc886f996fbcb4103961810b673e9ab7e4)) // Label: "342-0099-A+L5 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE_BIOS(0, "342-0100a.h5", 0x0a0000, 0x10000, CRC (40aeb030) SHA1 (2a34280a6b2ab54d1c82145ec1a8aaac1f57ae15)) // Label: "342-0100-A+H5 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE_BIOS(0, "342-0101a.l6", 0x0c0001, 0x10000, CRC (aed532c4) SHA1 (39d7d3ae1d35d8b4ec33fd8c88a569c607628e2a)) // Label: "342-0101-A+L6 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE_BIOS(0, "342-0102a.h6", 0x0c0000, 0x10000, CRC (653979d1) SHA1 (bf56df6a7eaee2bc8edfbc45f78d1abb19e6807a)) // Label: "342-0102-A+H6 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE_BIOS(0, "342-0103b.l7", 0x0e0001, 0x10000, CRC (dbafb1ed) SHA1 (b9f5b65b04f8f804c473b62c292dc83d14b2ab33)) // Label: "342-0103-B+L7 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+	ROM_LOAD16_BYTE_BIOS(0, "342-0104b.h7", 0x0e0000, 0x10000, CRC (50c72f89) SHA1 (bdbc0e282121f7dc4d701aa12f94296e436b504b)) // Label: "342-0104-B+H7 // (C) '85 ADOBE SYS // POSTSCRIPT TM"
+
+	ROM_SYSTEM_BIOS(1, "rev42", "PostScript Version 42.2")
+	ROM_LOAD16_BYTE_BIOS(1, "f0.bin", 0x000001, 0x10000, CRC (d971aeef) SHA1 (5d9a4cebdeab7bc87f6f1f821a95bfb5ad2ea252))
+	ROM_LOAD16_BYTE_BIOS(1, "e0.bin", 0x000000, 0x10000, CRC (9df59887) SHA1 (ffb720cd1067cbbc3b2404bb9e77cc1ce768064a))
+	ROM_LOAD16_BYTE_BIOS(1, "f1.bin", 0x020001, 0x10000, CRC (5216141e) SHA1 (6c53955cdc121ee5bee042a0582e31872c8707a9))
+	ROM_LOAD16_BYTE_BIOS(1, "e1.bin", 0x020000, 0x10000, CRC (660a977b) SHA1 (c1257d87ddee6485dbf49b0c8da11b38947a0932))
+	ROM_LOAD16_BYTE_BIOS(1, "f2.bin", 0x040001, 0x10000, CRC (8947a995) SHA1 (d7f4e2c1ce4f66cb55dd09c6fb876ac765ffca28))
+	ROM_LOAD16_BYTE_BIOS(1, "e2.bin", 0x040000, 0x10000, CRC (3ae6e11b) SHA1 (a95e29abd808041bc00851a2dde1bb0951eb787d))
+	ROM_LOAD16_BYTE_BIOS(1, "f3.bin", 0x060001, 0x10000, CRC (ca23252f) SHA1 (85714dd8716a1971c31a0609b8726a23f9d15cfc))
+	ROM_LOAD16_BYTE_BIOS(1, "e3.bin", 0x060000, 0x10000, CRC (ae91d2a2) SHA1 (84b449d984ab539aef13ece4a0093fff041bd5e3))
+	ROM_LOAD16_BYTE_BIOS(1, "f4.bin", 0x080001, 0x10000, CRC (5ad31e1b) SHA1 (90310fa158986ae88adec6de1d2a72a2ff161699))
+	ROM_LOAD16_BYTE_BIOS(1, "e4.bin", 0x080000, 0x10000, CRC (987d6796) SHA1 (29a916eb76c953ec0b11b68b4b38dedb305d0c54))
+	ROM_LOAD16_BYTE_BIOS(1, "f5.bin", 0x0a0001, 0x10000, CRC (c687c0ab) SHA1 (22e757fa46860b9ee4e97883b884084beb0f9f78))
+	ROM_LOAD16_BYTE_BIOS(1, "e5.bin", 0x0a0000, 0x10000, CRC (b4ce7883) SHA1 (ef93d2ab821fe30ab78d749584656772fd95c42d))
+	ROM_LOAD16_BYTE_BIOS(1, "f6.bin", 0x0c0001, 0x10000, CRC (3f60a380) SHA1 (d18cd39bb253054807c92f9fbbd756b460b7be5b))
+	ROM_LOAD16_BYTE_BIOS(1, "e6.bin", 0x0c0000, 0x10000, CRC (0b2e9058) SHA1 (3ac9e02e70ef9bf1c732efe5912eac0a2fb58a35))
+	ROM_LOAD16_BYTE_BIOS(1, "f7.bin", 0x0e0001, 0x10000, CRC (82478865) SHA1 (e6d56e04a586a646ef44bc15460572e8f7a4b602))
+	ROM_LOAD16_BYTE_BIOS(1, "e7.bin", 0x0e0000, 0x10000, CRC (07a5548e) SHA1 (23b90b5e2dbaf5fa6a78929033e40c8ded919bad))
 
 	ROM_REGION16_BE( 0x1000, "sram", ROMREGION_ERASEFF )
 ROM_END

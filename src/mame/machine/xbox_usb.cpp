@@ -220,7 +220,7 @@ void ohci_usb_controller::write(offs_t offset, uint32_t data)
 	ohcist.hc_regs[offset] = data;
 }
 
-void ohci_usb_controller::timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ohci_usb_controller::timer(emu_timer &timer, device_timer_id id, int param)
 {
 	uint32_t hcca;
 	uint32_t plh;

@@ -124,7 +124,7 @@ void dmac_0266_device::control_w(u32 data)
 		soft_reset();
 }
 
-void dmac_0266_device::dma_check(void *ptr, s32 param)
+void dmac_0266_device::dma_check(s32 param)
 {
 	// check req active
 	if (!m_req_state)

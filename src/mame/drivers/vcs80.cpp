@@ -57,7 +57,6 @@ public:
 		, m_bdmem(*this, "bdmem")
 		, m_display(*this, "display")
 		, m_io_keyboard(*this, "Y%u", 0U)
-		, m_keyclk(0)
 	{ }
 
 	void vcs80(machine_config &config);
@@ -102,9 +101,9 @@ private:
 	}
 
 	/* keyboard state */
-	bool m_keyclk;
-	u8 m_digit;
-	u8 m_seg;
+	bool m_keyclk = false;
+	u8 m_digit = 0U;
+	u8 m_seg = 0U;
 	void init_vcs80();
 	TIMER_DEVICE_CALLBACK_MEMBER(vcs80_keyboard_tick);
 

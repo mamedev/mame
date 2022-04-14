@@ -113,15 +113,15 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<tms9927_device> m_tms;
 	required_shared_ptr<uint8_t> m_videoram;
-	tilemap_t *m_tilemap;
+	tilemap_t *m_tilemap = nullptr;
 	optional_shared_ptr<uint8_t> m_question_offset;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	uint8_t m_question_offset_low;
-	uint8_t m_question_offset_mid;
-	uint8_t m_question_offset_high;
-	uint8_t m_latched_coin;
-	uint8_t m_last_coin;
+	uint8_t m_question_offset_low = 0;
+	uint8_t m_question_offset_mid = 0;
+	uint8_t m_question_offset_high = 0;
+	uint8_t m_latched_coin = 0;
+	uint8_t m_last_coin = 0;
 
 	void statriv2_videoram_w(offs_t offset, uint8_t data);
 	uint8_t question_data_r();
@@ -499,14 +499,16 @@ static INPUT_PORTS_START( hangman )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE_NO_TOGGLE( 0x10, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Service_Mode ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Keep High Scores" )
+	PORT_DIPNAME( 0x80, 0x00, "Retain Backup Memory" )
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 
@@ -667,19 +669,8 @@ static GFXDECODE_START( gfx_horizontal )
 GFXDECODE_END
 
 
-static const gfx_layout vertical_tiles_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	8*8
-};
-
 static GFXDECODE_START( gfx_vertical )
-	GFXDECODE_ENTRY( "tiles", 0, vertical_tiles_layout, 0, 64 )
+	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x1, 0, 64 )
 GFXDECODE_END
 
 

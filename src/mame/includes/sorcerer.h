@@ -10,22 +10,23 @@
 
 #pragma once
 
+#include "bus/centronics/ctronics.h"
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
+#include "imagedev/snapquik.h"
 #include "machine/ay31015.h"
 #include "machine/clock.h"
-#include "bus/centronics/ctronics.h"
-#include "bus/rs232/rs232.h"
-#include "machine/ram.h"
-#include "imagedev/cassette.h"
-#include "imagedev/snapquik.h"
-#include "imagedev/floppy.h"
-#include "formats/sorc_dsk.h"
-#include "formats/sorc_cas.h"
 #include "machine/micropolis.h"
+#include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80dma.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
+
+#include "formats/sorc_cas.h"
+#include "formats/sorc_dsk.h"
 
 
 class sorcerer_state : public driver_device
@@ -36,14 +37,14 @@ class sorcerer_state : public driver_device
 
 	struct cass_data_t {
 		struct {
-			int length;     // time cassette level is at input.level
-			int level;      // cassette level
-			int bit;        // bit being read
+			int length = 0;     // time cassette level is at input.level
+			int level = 0;      // cassette level
+			int bit = 0;        // bit being read
 		} input;
 		struct {
-			int length;     // time cassette level is at output.level
-			int level;      // cassette level
-			int bit;        // bit to output
+			int length = 0;     // time cassette level is at output.level
+			int level = 0;      // cassette level
+			int bit = 0;        // bit to output
 		} output;
 	};
 
@@ -76,7 +77,7 @@ public:
 		, m_floppy43(*this, "fdc4:3")
 		, m_iop_config(*this, "CONFIG")
 		, m_iop_vs(*this, "VS")
-		, m_iop_x(*this, "X.%u", 0)
+		, m_iop_x(*this, "X.%u", 0U)
 	{ }
 
 	void sorcerer(machine_config &config);
@@ -108,12 +109,12 @@ protected:
 	void sorcerera_io(address_map &map);
 	void sorcererb_io(address_map &map);
 
-	u8 m_portfe;
-	u8 m_keyboard_line;
-	emu_timer *m_serial_timer;
-	emu_timer *m_cassette_timer;
+	u8 m_portfe = 0U;
+	u8 m_keyboard_line = 0U;
+	emu_timer *m_serial_timer = nullptr;
+	emu_timer *m_cassette_timer = nullptr;
 	cass_data_t m_cass_data;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_pcg;
@@ -141,17 +142,17 @@ protected:
 	required_ioport m_iop_config;
 	required_ioport m_iop_vs;
 	required_ioport_array<16> m_iop_x;
-	memory_passthrough_handler *m_rom_shadow_tap;
+	memory_passthrough_handler m_rom_shadow_tap;
 
 private:
-	u8 m_port48;
-	u8 m_port34;
+	u8 m_port48 = 0;
+	u8 m_port34 = 0;
 	u8 port34_r();
 	u8 port48_r();
 	void port34_w(u8 data);
 	void port48_w(u8 data);
 	void intrq4_w(bool state);
-	bool m_halt;
+	bool m_halt = 0;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void busreq_w(bool state);
@@ -178,10 +179,10 @@ private:
 	void port2c_w(u8 data);
 	void intrq2_w(bool state);
 	void drq2_w(bool state);
-	u8 m_port2c;
-	bool m_wait;
-	bool m_drq_off;
-	bool m_intrq_off;
+	u8 m_port2c = 0U;
+	bool m_wait = false;
+	bool m_drq_off = false;
+	bool m_intrq_off = false;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	optional_device<micropolis_device> m_fdc;

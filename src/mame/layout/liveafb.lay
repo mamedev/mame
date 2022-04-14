@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="black"><rect><color red="0" green="0" blue="0" /></rect></element>
+	<element name="white"><rect><color red="0.8" green="0.8" blue="0.8" /></rect></element>
+	<element name="red"><rect><color red="1.0" green="0.1" blue="0.15" /></rect></element>
+
+	<element name="text_l1"><text string="POSITION"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l2"><text string="DOWN"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l3"><text string="TO GO"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l4"><text string="HOME"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l5"><text string="QTR.TIME"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l6"><text string="VISITOR"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
+	</element>
+
+
+<!-- 7seg display -->
+
+	<group name="display2">
+		<bounds x="7.8" y="8.4" width="20.2" height="5.8" />
+
+		<element ref="white"><bounds x="7.8" y="8.4" width="20.2" height="5.8" /></element>
+		<element ref="black"><bounds x="8" y="8.6" width="19.8" height="5.4" /></element>
+
+		<element ref="text_l1"><bounds x="9" y="8.8" width="5.8" height="1" /></element>
+		<element ref="text_l2"><bounds x="15" y="8.8" width="5.8" height="1" /></element>
+		<element ref="text_l3"><bounds x="21" y="8.8" width="5.8" height="1" /></element>
+
+		<element ref="text_l4"><bounds x="9" y="12.8" width="5.8" height="1" /></element>
+		<element ref="text_l5"><bounds x="15" y="12.8" width="5.8" height="1" /></element>
+		<element ref="text_l6"><bounds x="21" y="12.8" width="5.8" height="1" /></element>
+
+		<element name="digit1" ref="digit"><bounds x="10" y="10" width="1.8" height="2.6" /></element>
+		<element name="digit0" ref="digit"><bounds x="12" y="10" width="1.8" height="2.6" /></element>
+		<element name="digit5" ref="digit"><bounds x="16" y="10" width="1.8" height="2.6" /></element>
+		<element name="digit4" ref="digit"><bounds x="18" y="10" width="1.8" height="2.6" /></element>
+		<element name="digit3" ref="digit"><bounds x="22" y="10" width="1.8" height="2.6" /></element>
+		<element name="digit2" ref="digit"><bounds x="24" y="10" width="1.8" height="2.6" /></element>
+	</group>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="-0.5" right="45" top="0" bottom="22.2" />
+
+		<group ref="display2"><bounds x="0" y="1" width="5.8" height="20.2" /><orientation rotate="270" /></group>
+
+		<!-- led outputs are done in the svg -->
+		<screen index="0"><bounds x="7" y="0.1" width="37.359259" height="22" /></screen>
+		<element ref="red" blend="multiply"><bounds x="7" y="0.1" width="37.359259" height="22" /></element>
+
+	</view>
+</mamelayout>

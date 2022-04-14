@@ -169,6 +169,7 @@ Hayaoshi Quiz Grand Champion Taikai (hayaosi2)
 Not Dumped:
 
 Super Strong Warriors
+Shutokou Red Zone / Super Circuit Red Zone
 
 NOTE: Several games use the ROM cart board number for the EPROM numbers.  Though several
       use MB93166 for the MB-94166 cart

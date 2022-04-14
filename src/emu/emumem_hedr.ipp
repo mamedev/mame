@@ -132,6 +132,11 @@ template<int HighBits, int Width, int AddrShift> typename emu::detail::handler_e
 	return dispatch_read<Level, Width, AddrShift>(HIGHMASK, offset, mem_mask, m_a_dispatch);
 }
 
+template<int HighBits, int Width, int AddrShift> std::pair<typename emu::detail::handler_entry_size<Width>::uX, u16> handler_entry_read_dispatch<HighBits, Width, AddrShift>::read_flags(offs_t offset, uX mem_mask) const
+{
+	return dispatch_read_flags<Level, Width, AddrShift>(HIGHMASK, offset, mem_mask, m_a_dispatch);
+}
+
 template<int HighBits, int Width, int AddrShift> void *handler_entry_read_dispatch<HighBits, Width, AddrShift>::get_ptr(offs_t offset) const
 {
 	return m_a_dispatch[(offset & HIGHMASK) >> LowBits]->get_ptr(offset);

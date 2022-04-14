@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+
+General purpose Amiga demos collection
+
+The idea here is to collect Public Domain demos that can be run without any user intervention and
+be run with in a side-by-side fashion.
+
+TODO:
+- Add filter by unsupported chipset;
+- Add estimate wall-clock times in seconds, by platform;
+-->
+<softwarelist name="amiga_demos" description="Commodore Amiga demos">
+
+	<software name="drgnmega" supported="no">
+		<description>Dragons Megademo I (Demo)</description>
+		<year>1990</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Dragons"/>
+		<!-- OCS/ECS -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="901120">
+				<rom name="dragons megademo (19xx)(dragons).adf" size="901120" crc="f15010ec" sha1="07c47185534f127bf21a9fe013d71a2250c7a037"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="miseryd2" supported="no">
+		<description>Misery Dentro 2 (Demo)</description>
+		<year>1993</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Masque of TRSI, Tristar and Red Sector Inc."/>
+		<info name="release" value="19930328"/>
+		<!-- 2nd place in CeBIT 1993 Amiga Demo Competition in Germany -->
+		<!-- OCS/ECS -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="901120">
+				<rom name="misery dentro 2 (1992)(trsi).adf" size="901120" crc="c61f8f60" sha1="25a16e354931f2050dffb5b945a9210b59e9be08"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elysium" supported="no">
+		<description>Sanity Elysium (Demo)</description>
+		<year>1991</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Sanity"/>
+		<info name="release" value="19910428"/>
+		<!-- 3rd place in Amiga Summit Convention 1991 in Denmark -->
+		<!-- OCS/ECS -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="901120">
+				<rom name="elysium (1991)(sanity).adf" size="901120" crc="5311a737" sha1="dba662f8f21d37916d978fe370e24b5c567d7846"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -64,7 +64,7 @@ protected:
 	midtunit_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	static const device_timer_id TIMER_DMA = 0;
 
@@ -79,7 +79,7 @@ protected:
 	static constexpr uint32_t YPOSMASK = 0x1ff;
 
 	template <int BitsPerPixel, bool XFlip, bool Skip, bool Scale, op_type_t Zero, op_type_t NonZero> void dma_draw();
-	void dma_draw_none() {};
+	void dma_draw_none() {}
 
 	typedef void (midtunit_video_device::*draw_func)();
 	draw_func m_dma_draw_skip_scale[8*32];

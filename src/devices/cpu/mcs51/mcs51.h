@@ -168,6 +168,7 @@ protected:
 		uint8_t   mcon;                   /* bootstrap loader MCON register */
 		uint8_t   rpctl;                  /* bootstrap loader RPCTL register */
 		uint8_t   crc;                    /* bootstrap loader CRC register */
+		int32_t   rnr_delay;              /* delay before new random number available */
 	} m_ds5002fp;
 
 	// for the debugger
@@ -594,8 +595,8 @@ public:
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
-	virtual void nvram_read( emu_file &file ) override;
-	virtual void nvram_write( emu_file &file ) override;
+	virtual bool nvram_read( util::read_stream &file ) override;
+	virtual bool nvram_write( util::write_stream &file ) override;
 
 protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
@@ -603,6 +604,9 @@ protected:
 	/* SFR Callbacks */
 	virtual void sfr_write(size_t offset, uint8_t data) override;
 	virtual uint8_t sfr_read(size_t offset) override;
+
+	uint8_t handle_rnr();
+	bool is_rnr_ready();
 
 private:
 	optional_memory_region m_region;

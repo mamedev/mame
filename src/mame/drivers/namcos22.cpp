@@ -46,7 +46,7 @@ TODO:
 - ss22 poly translucency is probably more limited than currently emulated, not supporting stacked layers
 - there's a sprite limit per scanline, eg. timecris submarine explosion smoke partially erases sprites on real hardware
 - cybrcycc speed dial needle polygon is missing
-- global offset is wrong in non-super22 servicemode video test, and above that, it flickers in acedrvrw, victlapw
+- global offset is wrong in non-super22 servicemode video test, and above that, it flickers in acedrive, victlap
 - ridgerac fogging isn't applied to the upper/side part of the sky (best seen when driving down a hill), it's fine in ridgera2,
   czram contents is rather odd here and partly cleared (probably the cause?):
   + $0000-$0d7f - gradual increase from $00-$7c
@@ -397,9 +397,12 @@ Notes:
                           Armadillo Racing 'AM1 Ver.A'
                           Armadillo Racing 'AM2 Ver.A'
                           Cyber Cycles     'CB2 Ver.C'
+                          Cyber Cycles     'CB1 Ver.C'
+                          Dirt Dash        'DT2 Ver.B'
                           Prop Cycle       'PR2 Ver.A'
                           Time Crisis      'TS2 Ver.B'
                           Tokyo Wars       'TW2 Ver.A'
+                          Tokyo Wars       'TW1 Ver.A'
 
 Type 2
 SYSTEM SUPER22 MPM(F16) PCB 8646962500 (8646972500)
@@ -3638,13 +3641,7 @@ void namcos22_state::machine_start()
 	m_cpuled_out.resolve();
 	m_portbits[0] = 0xffff;
 	m_portbits[1] = 0xffff;
-
-	m_cpuled_data = 0;
-	m_keycus_rng = 0;
-	m_su_82 = 0;
-	m_irq_state = 0;
-	m_old_coin_state = 0;
-	m_credits1 = m_credits2 = 0;
+	m_dsp_upload_state = NAMCOS22_DSP_UPLOAD_READY;
 
 	// register for savestates, stuff that isn't done in video_start()
 	// note: namcos22_renderer class doesn't need saving, it is refreshed every frame
@@ -3922,10 +3919,56 @@ void namcos22s_state::adillor(machine_config &config)
 
 ROM_START( ridgerac )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* main program */
-	ROM_LOAD32_BYTE( "rr3prgll.4d", 0x00003, 0x80000, CRC(856fe5ec) SHA1(72d95b8bd5da551c3d358b8ab266373a89f8aa6a) )
-	ROM_LOAD32_BYTE( "rr3prglm.2d", 0x00002, 0x80000, CRC(1e9ef0a9) SHA1(a4577bcdf13673568793d8a324945fca30b10f43) )
-	ROM_LOAD32_BYTE( "rr3prgum.8d", 0x00001, 0x80000, CRC(e160f63f) SHA1(9b4b7a13eb4bc19fcb53daedb87e4945c20a1b8e) )
-	ROM_LOAD32_BYTE( "rr3prguu.6d", 0x00000, 0x80000, CRC(f07c78c0) SHA1(dbed76d868b761711faf5b6e11f2c9affb91db5d) )
+	ROM_LOAD32_BYTE( "rr2_prgllb.4d", 0x00003, 0x80000, CRC(d50d4fa0) SHA1(0fcd55e653d4f596b38b4e7b876ccd1f2a3836df) ) // Ridge Racer Standard  Date 1994-01-17
+	ROM_LOAD32_BYTE( "rr2_prglmb.2d", 0x00002, 0x80000, CRC(6a266f42) SHA1(470613dbddd6b3050f666de9a2b222a4b7e1e809) )
+	ROM_LOAD32_BYTE( "rr2_prgumb.8d", 0x00001, 0x80000, CRC(64c3aff1) SHA1(46b30ee0601a0a7887d29bc94d595f50a5a812d6) )
+	ROM_LOAD32_BYTE( "rr2_prguub.6d", 0x00000, 0x80000, CRC(e6ff0b8d) SHA1(a02ffd2d3dc0a2c4a5665303c8021fd99a50eb8e) )
+
+	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
+	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
+
+	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
+	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
+
+	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
+	ROM_LOAD( "rr1data.6r", 0, 0x080000, CRC(18f5f748) SHA1(e0d149a66de36156edd9b55f604c9a9801aaefa8) )
+
+	ROM_REGION( 0x200000*8, "textile", 0) /* 16x16x8bpp texture tiles */
+	ROM_LOAD( "rr1cg0.bin", 0x200000*0x4, 0x200000, CRC(b557a795) SHA1(f345486ffbe797246ad80a55d3c4a332ed6e2888) )
+	ROM_LOAD( "rr1cg1.bin", 0x200000*0x5, 0x200000, CRC(0fa212d9) SHA1(a1311de0a504e2d399044fa8ac32ec6c56ec965f) )
+	ROM_LOAD( "rr1cg2.bin", 0x200000*0x6, 0x200000, CRC(18e2d2bd) SHA1(69c2ea62eeb255f27d3c69373f6716b0a34683cc) )
+	ROM_LOAD( "rr1cg3.bin", 0x200000*0x7, 0x200000, CRC(9564488b) SHA1(6b27d1aea75d6be747c62e165cfa49ecc5d9e767) )
+
+	ROM_REGION16_LE( 0x280000, "textilemap", 0 ) /* texture tilemap */
+	ROM_LOAD( "rr1ccrl.bin",0x000000, 0x200000, CRC(6092d181) SHA1(52c0e3ac20aa23059a87d1a985d24ae641577310) )
+	ROM_LOAD( "rr1ccrh.bin",0x200000, 0x080000, CRC(dd332fd5) SHA1(a7d9c1d6b5a8e3a937b525c1363880e404dcd147) )
+
+	ROM_REGION( 0x80000*6, "pointrom", 0 ) /* 3d model data */
+	ROM_LOAD( "rr1potl0.5b", 0x80000*0, 0x80000,CRC(3ac193e3) SHA1(ff213766f15e34dc1b25187b57d94e17930090a3) )
+	ROM_LOAD( "rr1potl1.4b", 0x80000*1, 0x80000,CRC(ac3ffba5) SHA1(4eb4dda5faeff237e0d35725b56d309948fba900) )
+	ROM_LOAD( "rr1potm0.5c", 0x80000*2, 0x80000,CRC(42a3fa08) SHA1(15db0ae7ccf7f5a77b9dd9a9d82a488b67f8aaff) )
+	ROM_LOAD( "rr1potm1.4c", 0x80000*3, 0x80000,CRC(1bc1ea7b) SHA1(52c21eef4989c45acc5fa4deda2d0b63214731c8) )
+	ROM_LOAD( "rr1potu0.5d", 0x80000*4, 0x80000,CRC(5e367f72) SHA1(5887f011379dce865fef238b402678a3d2033de9) )
+	ROM_LOAD( "rr1potu1.4d", 0x80000*5, 0x80000,CRC(31d92475) SHA1(51d3c0baa223e1bc16ea2950f2e085597528f870) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
+	ROM_LOAD( "rr1wav0.10r", 0x100000*0, 0x100000,CRC(a8e85bde) SHA1(b56677e9f6c98f7b600043f5dcfef3a482ca7455) )
+	ROM_LOAD( "rr1wav1.10p", 0x100000*2, 0x100000,CRC(35f47c8e) SHA1(7c3f9e942f532af8008fbead2a96fee6084bcde6) )
+	ROM_LOAD( "rr1wav2.10n", 0x100000*1, 0x100000,CRC(3244cb59) SHA1(b3283b30cfafbfdcbc6d482ecc4ed6a47a527ca4) )
+	ROM_LOAD( "rr1wav3.10l", 0x100000*3, 0x100000,CRC(c4cda1a7) SHA1(60bc96880ec79efdff3cc70c09e848692a40bea4) )
+
+	ROM_REGION( 0x300, "gamma_proms", 0 )
+	ROM_LOAD( "rr1gam.2d",   0x0000, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
+	ROM_LOAD( "rr1gam.3d",   0x0100, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
+	ROM_LOAD( "rr1gam.4d",   0x0200, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
+ROM_END
+
+ROM_START( ridgeraca )
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* main program */
+	ROM_LOAD32_BYTE( "rr2_prgll.4d", 0x00003, 0x80000, CRC(4bb7fc86) SHA1(8291375b8ec4d37e0d9e3bf38da2d5907b0f31bd) ) // Ridge Racer Standard  Date 1993-10-07
+	ROM_LOAD32_BYTE( "rr2_prglm.2d", 0x00002, 0x80000, CRC(68e13830) SHA1(ddc447c7afbb5c4238969d7e78bfe9cf8fac6061) )
+	ROM_LOAD32_BYTE( "rr2_prgum.8d", 0x00001, 0x80000, CRC(705ef78a) SHA1(881903413e66d6fd83d46eb18c4e1230531832ae) )
+	ROM_LOAD32_BYTE( "rr2_prguu.6d", 0x00000, 0x80000, CRC(a79e456f) SHA1(049c596e01e53e3a401c5c4260517f170688d387) )
 
 	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
@@ -3968,10 +4011,63 @@ ROM_END
 
 ROM_START( ridgeracb )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* main program */
-	ROM_LOAD32_BYTE( "rr1prll.4d", 0x00003, 0x80000, CRC(4bb7fc86) SHA1(8291375b8ec4d37e0d9e3bf38da2d5907b0f31bd) )
-	ROM_LOAD32_BYTE( "rr1prlm.2d", 0x00002, 0x80000, CRC(68e13830) SHA1(ddc447c7afbb5c4238969d7e78bfe9cf8fac6061) )
-	ROM_LOAD32_BYTE( "rr1prum.8d", 0x00001, 0x80000, CRC(705ef78a) SHA1(881903413e66d6fd83d46eb18c4e1230531832ae) )
-	ROM_LOAD32_BYTE( "rr2pruu.6d", 0x00000, 0x80000, CRC(a79e456f) SHA1(049c596e01e53e3a401c5c4260517f170688d387) )
+	ROM_LOAD32_BYTE( "rr3_prgllb.4d", 0x00003, 0x80000, CRC(856fe5ec) SHA1(72d95b8bd5da551c3d358b8ab266373a89f8aa6a) ) // Ridge Racer Standard  -Foreign B-  Date 1994-01-17
+	ROM_LOAD32_BYTE( "rr3_prglmb.2d", 0x00002, 0x80000, CRC(1e9ef0a9) SHA1(a4577bcdf13673568793d8a324945fca30b10f43) )
+	ROM_LOAD32_BYTE( "rr3_prgumb.8d", 0x00001, 0x80000, CRC(e160f63f) SHA1(9b4b7a13eb4bc19fcb53daedb87e4945c20a1b8e) )
+	ROM_LOAD32_BYTE( "rr3_prguub.6d", 0x00000, 0x80000, CRC(f07c78c0) SHA1(dbed76d868b761711faf5b6e11f2c9affb91db5d) )
+
+	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
+	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
+
+	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
+	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
+
+	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
+	ROM_LOAD( "rr1data.6r", 0, 0x080000, CRC(18f5f748) SHA1(e0d149a66de36156edd9b55f604c9a9801aaefa8) )
+
+	ROM_REGION( 0x200000*8, "textile", 0) /* 16x16x8bpp texture tiles */
+	ROM_LOAD( "rr1cg0.bin", 0x200000*0x4, 0x200000, CRC(b557a795) SHA1(f345486ffbe797246ad80a55d3c4a332ed6e2888) )
+	ROM_LOAD( "rr1cg1.bin", 0x200000*0x5, 0x200000, CRC(0fa212d9) SHA1(a1311de0a504e2d399044fa8ac32ec6c56ec965f) )
+	ROM_LOAD( "rr1cg2.bin", 0x200000*0x6, 0x200000, CRC(18e2d2bd) SHA1(69c2ea62eeb255f27d3c69373f6716b0a34683cc) )
+	ROM_LOAD( "rr1cg3.bin", 0x200000*0x7, 0x200000, CRC(9564488b) SHA1(6b27d1aea75d6be747c62e165cfa49ecc5d9e767) )
+
+	ROM_REGION16_LE( 0x280000, "textilemap", 0 ) /* texture tilemap */
+	ROM_LOAD( "rr1ccrl.bin",0x000000, 0x200000, CRC(6092d181) SHA1(52c0e3ac20aa23059a87d1a985d24ae641577310) )
+	ROM_LOAD( "rr1ccrh.bin",0x200000, 0x080000, CRC(dd332fd5) SHA1(a7d9c1d6b5a8e3a937b525c1363880e404dcd147) )
+
+	ROM_REGION( 0x80000*6, "pointrom", 0 ) /* 3d model data */
+	ROM_LOAD( "rr1potl0.5b", 0x80000*0, 0x80000,CRC(3ac193e3) SHA1(ff213766f15e34dc1b25187b57d94e17930090a3) )
+	ROM_LOAD( "rr1potl1.4b", 0x80000*1, 0x80000,CRC(ac3ffba5) SHA1(4eb4dda5faeff237e0d35725b56d309948fba900) )
+	ROM_LOAD( "rr1potm0.5c", 0x80000*2, 0x80000,CRC(42a3fa08) SHA1(15db0ae7ccf7f5a77b9dd9a9d82a488b67f8aaff) )
+	ROM_LOAD( "rr1potm1.4c", 0x80000*3, 0x80000,CRC(1bc1ea7b) SHA1(52c21eef4989c45acc5fa4deda2d0b63214731c8) )
+	ROM_LOAD( "rr1potu0.5d", 0x80000*4, 0x80000,CRC(5e367f72) SHA1(5887f011379dce865fef238b402678a3d2033de9) )
+	ROM_LOAD( "rr1potu1.4d", 0x80000*5, 0x80000,CRC(31d92475) SHA1(51d3c0baa223e1bc16ea2950f2e085597528f870) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
+	ROM_LOAD( "rr1wav0.10r", 0x100000*0, 0x100000,CRC(a8e85bde) SHA1(b56677e9f6c98f7b600043f5dcfef3a482ca7455) )
+	ROM_LOAD( "rr1wav1.10p", 0x100000*2, 0x100000,CRC(35f47c8e) SHA1(7c3f9e942f532af8008fbead2a96fee6084bcde6) )
+	ROM_LOAD( "rr1wav2.10n", 0x100000*1, 0x100000,CRC(3244cb59) SHA1(b3283b30cfafbfdcbc6d482ecc4ed6a47a527ca4) )
+	ROM_LOAD( "rr1wav3.10l", 0x100000*3, 0x100000,CRC(c4cda1a7) SHA1(60bc96880ec79efdff3cc70c09e848692a40bea4) )
+
+	ROM_REGION( 0x300, "gamma_proms", 0 )
+	ROM_LOAD( "rr1gam.2d",   0x0000, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
+	ROM_LOAD( "rr1gam.3d",   0x0100, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
+	ROM_LOAD( "rr1gam.4d",   0x0200, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
+ROM_END
+
+/*
+ridgeracc is purportedly the Ridge Racer 3 Screen version
+
+There doesn't seem to be anything specific about this set to indicate it supports 3 screens
+  The 3 screen machine has 3 identical PCB sets running with communication between them.
+   Until it's verified one way or the other leave as labeled
+*/
+ROM_START( ridgeracc )
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* main program */
+	ROM_LOAD32_BYTE( "rr3_prgll-3s.4d", 0x000003, 0x080000, CRC(2c3d8cb7) SHA1(46a7b62938fe3edde5c52ce3fdfe447000cd6af0) ) // Ridge Racer Standard  -Foreign B-  Date 1993-10-28
+	ROM_LOAD32_BYTE( "rr3_prglm-3s.2d", 0x000002, 0x080000, CRC(b15343f2) SHA1(3056eb5a3036a74b2ac641a4c3221986c0be1e27) )
+	ROM_LOAD32_BYTE( "rr3_prgum-3s.8d", 0x000001, 0x080000, CRC(8fda06ac) SHA1(7e9adba198eb0941100cda64ecedac504f6ac696) )
+	ROM_LOAD32_BYTE( "rr3_prguu-3s.6d", 0x000000, 0x080000, CRC(868398df) SHA1(422e0f9884904b0df93fcacd1468b8da0458eb8e) )
 
 	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
@@ -4014,56 +4110,10 @@ ROM_END
 
 ROM_START( ridgeracj )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* main program */
-	ROM_LOAD32_BYTE( "rr1prll.4d", 0x00003, 0x80000, CRC(4bb7fc86) SHA1(8291375b8ec4d37e0d9e3bf38da2d5907b0f31bd) )
-	ROM_LOAD32_BYTE( "rr1prlm.2d", 0x00002, 0x80000, CRC(68e13830) SHA1(ddc447c7afbb5c4238969d7e78bfe9cf8fac6061) )
-	ROM_LOAD32_BYTE( "rr1prum.8d", 0x00001, 0x80000, CRC(705ef78a) SHA1(881903413e66d6fd83d46eb18c4e1230531832ae) )
-	ROM_LOAD32_BYTE( "rr1pruu.6d", 0x00000, 0x80000, CRC(c1371f96) SHA1(a78e0bf6c147c034487a85efa0a8470f4e8f4bf0) )
-
-	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
-	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
-
-	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
-	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
-
-	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
-	ROM_LOAD( "rr1data.6r", 0, 0x080000, CRC(18f5f748) SHA1(e0d149a66de36156edd9b55f604c9a9801aaefa8) )
-
-	ROM_REGION( 0x200000*8, "textile", 0) /* 16x16x8bpp texture tiles */
-	ROM_LOAD( "rr1cg0.bin", 0x200000*0x4, 0x200000, CRC(b557a795) SHA1(f345486ffbe797246ad80a55d3c4a332ed6e2888) )
-	ROM_LOAD( "rr1cg1.bin", 0x200000*0x5, 0x200000, CRC(0fa212d9) SHA1(a1311de0a504e2d399044fa8ac32ec6c56ec965f) )
-	ROM_LOAD( "rr1cg2.bin", 0x200000*0x6, 0x200000, CRC(18e2d2bd) SHA1(69c2ea62eeb255f27d3c69373f6716b0a34683cc) )
-	ROM_LOAD( "rr1cg3.bin", 0x200000*0x7, 0x200000, CRC(9564488b) SHA1(6b27d1aea75d6be747c62e165cfa49ecc5d9e767) )
-
-	ROM_REGION16_LE( 0x280000, "textilemap", 0 ) /* texture tilemap */
-	ROM_LOAD( "rr1ccrl.bin",0x000000, 0x200000, CRC(6092d181) SHA1(52c0e3ac20aa23059a87d1a985d24ae641577310) )
-	ROM_LOAD( "rr1ccrh.bin",0x200000, 0x080000, CRC(dd332fd5) SHA1(a7d9c1d6b5a8e3a937b525c1363880e404dcd147) )
-
-	ROM_REGION( 0x80000*6, "pointrom", 0 ) /* 3d model data */
-	ROM_LOAD( "rr1potl0.5b", 0x80000*0, 0x80000,CRC(3ac193e3) SHA1(ff213766f15e34dc1b25187b57d94e17930090a3) )
-	ROM_LOAD( "rr1potl1.4b", 0x80000*1, 0x80000,CRC(ac3ffba5) SHA1(4eb4dda5faeff237e0d35725b56d309948fba900) )
-	ROM_LOAD( "rr1potm0.5c", 0x80000*2, 0x80000,CRC(42a3fa08) SHA1(15db0ae7ccf7f5a77b9dd9a9d82a488b67f8aaff) )
-	ROM_LOAD( "rr1potm1.4c", 0x80000*3, 0x80000,CRC(1bc1ea7b) SHA1(52c21eef4989c45acc5fa4deda2d0b63214731c8) )
-	ROM_LOAD( "rr1potu0.5d", 0x80000*4, 0x80000,CRC(5e367f72) SHA1(5887f011379dce865fef238b402678a3d2033de9) )
-	ROM_LOAD( "rr1potu1.4d", 0x80000*5, 0x80000,CRC(31d92475) SHA1(51d3c0baa223e1bc16ea2950f2e085597528f870) )
-
-	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
-	ROM_LOAD( "rr1wav0.10r", 0x100000*0, 0x100000,CRC(a8e85bde) SHA1(b56677e9f6c98f7b600043f5dcfef3a482ca7455) )
-	ROM_LOAD( "rr1wav1.10p", 0x100000*2, 0x100000,CRC(35f47c8e) SHA1(7c3f9e942f532af8008fbead2a96fee6084bcde6) )
-	ROM_LOAD( "rr1wav2.10n", 0x100000*1, 0x100000,CRC(3244cb59) SHA1(b3283b30cfafbfdcbc6d482ecc4ed6a47a527ca4) )
-	ROM_LOAD( "rr1wav3.10l", 0x100000*3, 0x100000,CRC(c4cda1a7) SHA1(60bc96880ec79efdff3cc70c09e848692a40bea4) )
-
-	ROM_REGION( 0x300, "gamma_proms", 0 )
-	ROM_LOAD( "rr1gam.2d",   0x0000, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
-	ROM_LOAD( "rr1gam.3d",   0x0100, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
-	ROM_LOAD( "rr1gam.4d",   0x0200, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
-ROM_END
-
-ROM_START( ridgerac3 )
-	ROM_REGION( 0x200000, "maincpu", 0 ) /* main program */
-	ROM_LOAD32_BYTE( "rr3prgll-3s.4d", 0x000003, 0x080000, CRC(2c3d8cb7) SHA1(46a7b62938fe3edde5c52ce3fdfe447000cd6af0) )
-	ROM_LOAD32_BYTE( "rr3prglm-3s.2d", 0x000002, 0x080000, CRC(b15343f2) SHA1(3056eb5a3036a74b2ac641a4c3221986c0be1e27) )
-	ROM_LOAD32_BYTE( "rr3prgum-3s.8d", 0x000001, 0x080000, CRC(8fda06ac) SHA1(7e9adba198eb0941100cda64ecedac504f6ac696) )
-	ROM_LOAD32_BYTE( "rr3prguu-3s.6d", 0x000000, 0x080000, CRC(868398df) SHA1(422e0f9884904b0df93fcacd1468b8da0458eb8e) )
+	ROM_LOAD32_BYTE( "rr1_prgll.4d", 0x00003, 0x80000, CRC(4bb7fc86) SHA1(8291375b8ec4d37e0d9e3bf38da2d5907b0f31bd) ) // Ridge Racer Standard  Date 1993-10-07
+	ROM_LOAD32_BYTE( "rr1_prglm.2d", 0x00002, 0x80000, CRC(68e13830) SHA1(ddc447c7afbb5c4238969d7e78bfe9cf8fac6061) )
+	ROM_LOAD32_BYTE( "rr1_prgum.8d", 0x00001, 0x80000, CRC(705ef78a) SHA1(881903413e66d6fd83d46eb18c4e1230531832ae) )
+	ROM_LOAD32_BYTE( "rr1_prguu.6d", 0x00000, 0x80000, CRC(c1371f96) SHA1(a78e0bf6c147c034487a85efa0a8470f4e8f4bf0) )
 
 	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
@@ -4106,10 +4156,10 @@ ROM_END
 
 ROM_START( ridgeracf )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* main program */
-	ROM_LOAD32_BYTE( "rrf2prgll.4d", 0x00003, 0x80000, CRC(23c6144d) SHA1(99f70e2c60fba7551cafdce12b07da1f8ab8aad6) )
-	ROM_LOAD32_BYTE( "rrf2prglm.2d", 0x00002, 0x80000, CRC(1ad638a1) SHA1(505a7f4ba60bbc4e735865fbc5d664311b6045d9) )
-	ROM_LOAD32_BYTE( "rrf2prgum.8d", 0x00001, 0x80000, CRC(d7e0aa16) SHA1(cab4578cdd3af84b865114be4105cfdc2e7abf36) )
-	ROM_LOAD32_BYTE( "rrf2prguu.6d", 0x00000, 0x80000, CRC(12c808bb) SHA1(64e84686d4ceb8145b9a59b75d0dced830884c9d) )
+	ROM_LOAD32_BYTE( "rrf2_prgll.4d", 0x00003, 0x80000, CRC(23c6144d) SHA1(99f70e2c60fba7551cafdce12b07da1f8ab8aad6) ) // Ridge Racer Full Scale  -Foreign-  Date 1993-12-13
+	ROM_LOAD32_BYTE( "rrf2_prglm.2d", 0x00002, 0x80000, CRC(1ad638a1) SHA1(505a7f4ba60bbc4e735865fbc5d664311b6045d9) )
+	ROM_LOAD32_BYTE( "rrf2_prgum.8d", 0x00001, 0x80000, CRC(d7e0aa16) SHA1(cab4578cdd3af84b865114be4105cfdc2e7abf36) )
+	ROM_LOAD32_BYTE( "rrf2_prguu.6d", 0x00000, 0x80000, CRC(12c808bb) SHA1(64e84686d4ceb8145b9a59b75d0dced830884c9d) )
 
 	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
@@ -4154,10 +4204,10 @@ ROM_END
 
 ROM_START( ridgera2 )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* main program */
-	ROM_LOAD32_BYTE( "rrs2prll.4d",  0x00003, 0x80000, CRC(88199c0f) SHA1(5cf5bb714c3d209943a8d815eaea60afd34641ff) )
-	ROM_LOAD32_BYTE( "rrs1prlmb.2d", 0x00002, 0x80000, CRC(8e86f199) SHA1(7bd9ec9147ef0380864508f66203ef2c6ad1f7f6) )
-	ROM_LOAD32_BYTE( "rrs1prumb.8d", 0x00001, 0x80000, CRC(78c360b6) SHA1(8ee502291359cbc8aef39145c8fe7538311cc58f) )
-	ROM_LOAD32_BYTE( "rrs1pruub.6d", 0x00000, 0x80000, CRC(60d6d4a4) SHA1(759762a9b7d7aee7ee1b44b1721e5356898aa7ea) )
+	ROM_LOAD32_BYTE( "rrs2_prgll.4d", 0x00003, 0x80000, CRC(88199c0f) SHA1(5cf5bb714c3d209943a8d815eaea60afd34641ff) ) // Ridge Racer 2 Standard  Date 1994-06-21  -Foreign-
+	ROM_LOAD32_BYTE( "rrs2_prglm.2d", 0x00002, 0x80000, CRC(8e86f199) SHA1(7bd9ec9147ef0380864508f66203ef2c6ad1f7f6) ) // One byte different compared to the Rev.B Japanese set below
+	ROM_LOAD32_BYTE( "rrs2_prgum.8d", 0x00001, 0x80000, CRC(78c360b6) SHA1(8ee502291359cbc8aef39145c8fe7538311cc58f) ) // The "World" set's ROMs are NOT marked as Rev.B even though
+	ROM_LOAD32_BYTE( "rrs2_prguu.6d", 0x00000, 0x80000, CRC(60d6d4a4) SHA1(759762a9b7d7aee7ee1b44b1721e5356898aa7ea) ) // they are clearly based off of the Japanese Rev.B ROM set.
 
 	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
@@ -4200,10 +4250,10 @@ ROM_END
 
 ROM_START( ridgera2j )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* main program */
-	ROM_LOAD32_BYTE( "rrs1prllb.4d", 0x00003, 0x80000, CRC(22f069e5) SHA1(fcaec3aa83853c39d713ed01c511060663027ccd) )
-	ROM_LOAD32_BYTE( "rrs1prlmb.2d", 0x00002, 0x80000, CRC(8e86f199) SHA1(7bd9ec9147ef0380864508f66203ef2c6ad1f7f6) )
-	ROM_LOAD32_BYTE( "rrs1prumb.8d", 0x00001, 0x80000, CRC(78c360b6) SHA1(8ee502291359cbc8aef39145c8fe7538311cc58f) )
-	ROM_LOAD32_BYTE( "rrs1pruub.6d", 0x00000, 0x80000, CRC(60d6d4a4) SHA1(759762a9b7d7aee7ee1b44b1721e5356898aa7ea) )
+	ROM_LOAD32_BYTE( "rrs1_prgllb.4d", 0x00003, 0x80000, CRC(22f069e5) SHA1(fcaec3aa83853c39d713ed01c511060663027ccd) ) // Ridge Racer 2 Standard  Date 1994-06-21
+	ROM_LOAD32_BYTE( "rrs1_prglmb.2d", 0x00002, 0x80000, CRC(8e86f199) SHA1(7bd9ec9147ef0380864508f66203ef2c6ad1f7f6) )
+	ROM_LOAD32_BYTE( "rrs1_prgumb.8d", 0x00001, 0x80000, CRC(78c360b6) SHA1(8ee502291359cbc8aef39145c8fe7538311cc58f) )
+	ROM_LOAD32_BYTE( "rrs1_prguub.6d", 0x00000, 0x80000, CRC(60d6d4a4) SHA1(759762a9b7d7aee7ee1b44b1721e5356898aa7ea) )
 
 	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
@@ -4246,10 +4296,10 @@ ROM_END
 
 ROM_START( ridgera2ja )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* main program */
-	ROM_LOAD32_BYTE( "rrs1prll.4d", 0x00003, 0x80000, CRC(fbf785a2) SHA1(b9333c7623f68f48aa6ae50913a22a527a19576a) )
-	ROM_LOAD32_BYTE( "rrs1prlm.2d", 0x00002, 0x80000, CRC(562f747a) SHA1(79d818b87c9a992fc9706fb39e6d560c2b0aa392) )
-	ROM_LOAD32_BYTE( "rrs1prum.8d", 0x00001, 0x80000, CRC(93259fb0) SHA1(c29787e873797a003db27adbd20d7b852e26d8c6) )
-	ROM_LOAD32_BYTE( "rrs1pruu.6d", 0x00000, 0x80000, CRC(31cdefe8) SHA1(ae836d389bed43dd156eb4cf3e97b6f1ad68181e) )
+	ROM_LOAD32_BYTE( "rrs1_prgll.4d", 0x00003, 0x80000, CRC(fbf785a2) SHA1(b9333c7623f68f48aa6ae50913a22a527a19576a) ) // Ridge Racer 2 Standard  Date 1994-06-13
+	ROM_LOAD32_BYTE( "rrs1_prglm.2d", 0x00002, 0x80000, CRC(562f747a) SHA1(79d818b87c9a992fc9706fb39e6d560c2b0aa392) )
+	ROM_LOAD32_BYTE( "rrs1_prgum.8d", 0x00001, 0x80000, CRC(93259fb0) SHA1(c29787e873797a003db27adbd20d7b852e26d8c6) )
+	ROM_LOAD32_BYTE( "rrs1_prguu.6d", 0x00000, 0x80000, CRC(31cdefe8) SHA1(ae836d389bed43dd156eb4cf3e97b6f1ad68181e) )
 
 	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
@@ -4290,13 +4340,59 @@ ROM_START( ridgera2ja )
 	ROM_LOAD( "rr1gam.4d",   0x0200, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 ROM_END
 
-
-ROM_START( raveracw )
+ROM_START( ridgera28 )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* main program */
-	ROM_LOAD32_BYTE( "rv2prllb.4d", 0x00003, 0x80000, CRC(3017cd1e) SHA1(ccd648b4a5dfc74fd141815af2969f423311042f) )
-	ROM_LOAD32_BYTE( "rv2prlmb.2d", 0x00002, 0x80000, CRC(894be0c3) SHA1(4dba93dc3ca1cf502c5f54018b64ad79bb2a632b) )
-	ROM_LOAD32_BYTE( "rv2prumb.8d", 0x00001, 0x80000, CRC(6414a800) SHA1(c278ff644909d12a43ba6fc2bf8d2092e469c3e6) )
-	ROM_LOAD32_BYTE( "rv2pruub.6d", 0x00000, 0x80000, CRC(a9f18714) SHA1(8e7b17749d151f92020f68d1ac06003cf1f5c573) )
+	ROM_LOAD32_BYTE( "rrs_8_prgll.4d", 0x00003, 0x80000, CRC(c8d2bc61) SHA1(9db734fc45f47e6742ef2a8ba2558efb881df94a) ) // Ridge Racer 2 Standard  Date 1994-XX-XX
+	ROM_LOAD32_BYTE( "rrs_8_prglm.2d", 0x00002, 0x80000, CRC(bb1d23c7) SHA1(feaa1387b7003794c192edef4478636d8b125fef) ) // Early dev or test set? Only uses half of music tracks
+	ROM_LOAD32_BYTE( "rrs_8_prgum.8d", 0x00001, 0x80000, CRC(720c854d) SHA1(9c8e2868dd7ef425fdc6f701968b9713bb12b56c) ) // Has extra PCG TEST in service menu
+	ROM_LOAD32_BYTE( "rrs_8_prguu.6d", 0x00000, 0x80000, CRC(fb4b7e8f) SHA1(1919803dbe35a88bbb6b608d0c3ab8daea31f580) )
+
+	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
+	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
+
+	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
+	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
+
+	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
+	ROM_LOAD( "rrs_8_data.6r", 0, 0x080000, CRC(8bf75a96) SHA1(987d24f2195eb5a84c10c68584404556ef1dfe88) ) // this DATA rom unique to this set
+
+	ROM_REGION( 0x200000*8, "textile", 0) /* 16x16x8bpp texture tiles */
+	ROM_LOAD( "rrs1cg0.1a", 0x200000*0x4, 0x200000,CRC(714c0091) SHA1(df29512bd6e64827660c40304051366d2c4d7977) )
+	ROM_LOAD( "rrs1cg1.2a", 0x200000*0x5, 0x200000,CRC(836545c1) SHA1(05e3346463d8d42b5d33216207e855033a65510d) )
+	ROM_LOAD( "rrs1cg2.3a", 0x200000*0x6, 0x200000,CRC(00e9799d) SHA1(280184451138420f64080efe13e5e2795f7b61d4) )
+	ROM_LOAD( "rrs1cg3.5a", 0x200000*0x7, 0x200000,CRC(3858983f) SHA1(feda270b71f1310ecf4c17823bc8827ca2951b40) )
+
+	ROM_REGION16_LE( 0x280000, "textilemap", 0 ) /* texture tilemap */
+	ROM_LOAD( "rrs1ccrl.5a", 0x000000, 0x200000,CRC(304a8b57) SHA1(f4f3e7c194697d754375f36a0e41d0941fa5d225) )
+	ROM_LOAD( "rrs1ccrh.5c", 0x200000, 0x080000,CRC(bd3c86ab) SHA1(cd3a8774843c5864e651fa8989c80e2d975a13e8) )
+
+	ROM_REGION( 0x80000*6, "pointrom", 0 ) /* 3d model data */
+	ROM_LOAD( "rrs1pol0.5b", 0x80000*0, 0x80000,CRC(9376c384) SHA1(cde0e36db1beab1523607098a760d81fac2ea90e) )
+	ROM_LOAD( "rrs1pol1.4b", 0x80000*1, 0x80000,CRC(094fa832) SHA1(cc59442540b1cdef068c4408b6e048c11042beb8) )
+	ROM_LOAD( "rrs1pom0.5c", 0x80000*2, 0x80000,CRC(b47a7f8b) SHA1(0fa0456ad8b4864a7071b5b5ba1a78877c1ac0f0) )
+	ROM_LOAD( "rrs1pom1.4c", 0x80000*3, 0x80000,CRC(27260361) SHA1(8775cc779eb8b6a0d79fa84d606c970ec2d6ea8d) )
+	ROM_LOAD( "rrs1pou0.5d", 0x80000*4, 0x80000,CRC(74d6ec84) SHA1(63f5beee51443c98100330ec04291f71e10716c4) )
+	ROM_LOAD( "rrs1pou1.4d", 0x80000*5, 0x80000,CRC(f527caaa) SHA1(f92bdd15323239d593ddac92a11d23a27e6635ed) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
+	ROM_LOAD( "rrs1wav0.10r", 0x100000*0, 0x100000,CRC(99d11a2d) SHA1(1f3db98a99be0f07c03b0a7817561459a58f310e) )
+	ROM_LOAD( "rrs1wav1.10p", 0x100000*2, 0x100000,CRC(ad28444a) SHA1(c31bbf3cae5015e5494fe4988b9b01d822224c69) )
+	ROM_LOAD( "rrs1wav2.10n", 0x100000*1, 0x100000,CRC(6f0d4619) SHA1(cd3d57f2ea21497f388ffa29ec7d2665647a01c0) )
+	ROM_LOAD( "rrs1wav3.10l", 0x100000*3, 0x100000,CRC(106e761f) SHA1(97f47b857bdcbc79b0aface53dd385e67fcc9108) )
+
+	ROM_REGION( 0x300, "gamma_proms", 0 )
+	ROM_LOAD( "rr1gam.2d",   0x0000, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
+	ROM_LOAD( "rr1gam.3d",   0x0100, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
+	ROM_LOAD( "rr1gam.4d",   0x0200, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
+ROM_END
+
+
+ROM_START( raverace )
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* main program */
+	ROM_LOAD32_BYTE( "rv2_prgllb.4d", 0x00003, 0x80000, CRC(3017cd1e) SHA1(ccd648b4a5dfc74fd141815af2969f423311042f) ) // Raveracer Standard  -Foreign-  Date: 07/16/95
+	ROM_LOAD32_BYTE( "rv2_prglmb.2d", 0x00002, 0x80000, CRC(894be0c3) SHA1(4dba93dc3ca1cf502c5f54018b64ad79bb2a632b) )
+	ROM_LOAD32_BYTE( "rv2_prgumb.8d", 0x00001, 0x80000, CRC(6414a800) SHA1(c278ff644909d12a43ba6fc2bf8d2092e469c3e6) )
+	ROM_LOAD32_BYTE( "rv2_prguub.6d", 0x00000, 0x80000, CRC(a9f18714) SHA1(8e7b17749d151f92020f68d1ac06003cf1f5c573) )
 
 	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
@@ -4350,12 +4446,12 @@ ROM_START( raveracw )
 	ROM_LOAD( "rv1eeprm.9e", 0x0000, 0x2000, CRC(e00dd412) SHA1(f594b31ace5e5e980e904faa8b83a450cc95db17) )
 ROM_END
 
-ROM_START( raveracj )
+ROM_START( raveracej )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* main program */
-	ROM_LOAD32_BYTE( "rv1prllb.4d", 0x00003, 0x80000, CRC(71da3eea) SHA1(8a641bb23e0ad89cae5ee1570f8a3627b2434d20) )
-	ROM_LOAD32_BYTE( "rv1prlmb.2d", 0x00002, 0x80000, CRC(6ab7e9ce) SHA1(0c6376ca5a63409aeea344bbc201af6c47afe9ab) )
-	ROM_LOAD32_BYTE( "rv1prumb.8d", 0x00001, 0x80000, CRC(375fabcf) SHA1(448e3db3e3fab8c7c27e214ab5a5fa84e5f84366) )
-	ROM_LOAD32_BYTE( "rv1pruub.6d", 0x00000, 0x80000, CRC(92f834d6) SHA1(028368790f0293fcfea5c7b12f7f315e27a62f77) )
+	ROM_LOAD32_BYTE( "rv1_prgllb.4d", 0x00003, 0x80000, CRC(71da3eea) SHA1(8a641bb23e0ad89cae5ee1570f8a3627b2434d20) ) // Raveracer Standard  Date: 07/16/95
+	ROM_LOAD32_BYTE( "rv1_prglmb.2d", 0x00002, 0x80000, CRC(6ab7e9ce) SHA1(0c6376ca5a63409aeea344bbc201af6c47afe9ab) )
+	ROM_LOAD32_BYTE( "rv1_prgumb.8d", 0x00001, 0x80000, CRC(375fabcf) SHA1(448e3db3e3fab8c7c27e214ab5a5fa84e5f84366) )
+	ROM_LOAD32_BYTE( "rv1_prguub.6d", 0x00000, 0x80000, CRC(92f834d6) SHA1(028368790f0293fcfea5c7b12f7f315e27a62f77) )
 
 	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
@@ -4409,12 +4505,12 @@ ROM_START( raveracj )
 	ROM_LOAD( "rv1eeprm.9e", 0x0000, 0x2000, CRC(e00dd412) SHA1(f594b31ace5e5e980e904faa8b83a450cc95db17) )
 ROM_END
 
-ROM_START( raveracja )
+ROM_START( raveraceja )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* main program */
-	ROM_LOAD32_BYTE( "rv1prll.4d", 0x00003, 0x80000, CRC(5dfce6cd) SHA1(1aeeca1e507ae4cbe3d39ca5efd1cc4fe1ab03a8) )
-	ROM_LOAD32_BYTE( "rv1prlm.2d", 0x00002, 0x80000, CRC(0d4d9f74) SHA1(f886b0629cbf5a369af1f44e53c6fd3f51b3fbc9) )
-	ROM_LOAD32_BYTE( "rv1prum.8d", 0x00001, 0x80000, CRC(28e503e3) SHA1(a3071461f840f28c65c660de215c73f812f356b3) )
-	ROM_LOAD32_BYTE( "rv1pruu.6d", 0x00000, 0x80000, CRC(c47d9ff4) SHA1(4d7c4ac4151a3b306e7277937add8eee26e561a6) )
+	ROM_LOAD32_BYTE( "rv1_prgll.4d", 0x00003, 0x80000, CRC(5dfce6cd) SHA1(1aeeca1e507ae4cbe3d39ca5efd1cc4fe1ab03a8) ) // Raveracer Standard  Date: 06/29/95
+	ROM_LOAD32_BYTE( "rv1_prglm.2d", 0x00002, 0x80000, CRC(0d4d9f74) SHA1(f886b0629cbf5a369af1f44e53c6fd3f51b3fbc9) )
+	ROM_LOAD32_BYTE( "rv1_prgum.8d", 0x00001, 0x80000, CRC(28e503e3) SHA1(a3071461f840f28c65c660de215c73f812f356b3) )
+	ROM_LOAD32_BYTE( "rv1_prguu.6d", 0x00000, 0x80000, CRC(c47d9ff4) SHA1(4d7c4ac4151a3b306e7277937add8eee26e561a6) )
 
 	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
@@ -4529,12 +4625,12 @@ ROM_START( cybrcomm )
 ROM_END
 
 
-ROM_START( acedrvrw )
+ROM_START( acedrive )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* main program */
-	ROM_LOAD32_BYTE( "ad2prgll.4d", 0x00003, 0x80000, CRC(808c5ff8) SHA1(119c90ecb5aa099a0e5d1d7944c004beacead367) )
-	ROM_LOAD32_BYTE( "ad2prglm.2d", 0x00002, 0x80000, CRC(5f726a10) SHA1(d077312c6a387fbdf906d278c73c6a3730687f32) )
-	ROM_LOAD32_BYTE( "ad2prgum.8d", 0x00001, 0x80000, CRC(d5042d6e) SHA1(9ae93e7ea7126302831a879ba0aadcb6e5b842f5) )
-	ROM_LOAD32_BYTE( "ad2prguu.6d", 0x00000, 0x80000, CRC(86d4661d) SHA1(2a1529a51ca5466994a2d0d84c7aab13cef95a11) )
+	ROM_LOAD32_BYTE( "ad2_prgll.4d", 0x00003, 0x80000, CRC(808c5ff8) SHA1(119c90ecb5aa099a0e5d1d7944c004beacead367) ) // Version 94/10/20 16:22:25
+	ROM_LOAD32_BYTE( "ad2_prglm.2d", 0x00002, 0x80000, CRC(5f726a10) SHA1(d077312c6a387fbdf906d278c73c6a3730687f32) )
+	ROM_LOAD32_BYTE( "ad2_prgum.8d", 0x00001, 0x80000, CRC(d5042d6e) SHA1(9ae93e7ea7126302831a879ba0aadcb6e5b842f5) )
+	ROM_LOAD32_BYTE( "ad2_prguu.6d", 0x00000, 0x80000, CRC(86d4661d) SHA1(2a1529a51ca5466994a2d0d84c7aab13cef95a11) )
 
 	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
@@ -4576,12 +4672,65 @@ ROM_START( acedrvrw )
 ROM_END
 
 
-ROM_START( victlapw )
+ROM_START( victlap )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* main program */
-	ROM_LOAD32_BYTE( "advprgll.4d", 0x00003, 0x80000, CRC(4dc1b0ab) SHA1(b5913388d16f824af6dbb01b5b0350d510667a87) )
-	ROM_LOAD32_BYTE( "advprglm.2d", 0x00002, 0x80000, CRC(7b658bef) SHA1(cf982b49fde0c1897c4c16e77f9eb2a145d8cd42) )
-	ROM_LOAD32_BYTE( "advprgum.8d", 0x00001, 0x80000, CRC(af67f2fb) SHA1(f391843ee0d053e33660c60e3718871142d932f2) )
-	ROM_LOAD32_BYTE( "advprguu.6d", 0x00000, 0x80000, CRC(b60e5d2b) SHA1(f5740615c2864c5c6433275cf4388bda5122b7a7) )
+	ROM_LOAD32_BYTE( "adv2_prgllb.4d", 0x00003, 0x80000, CRC(03ba6e42) SHA1(0e8138214463a6db59a6f7cbea3f0b6ed1b82465) ) // Version 96/05/21 19:39:59
+	ROM_LOAD32_BYTE( "adv2_prglmb.2d", 0x00002, 0x80000, CRC(9f4b49c0) SHA1(e8d5fc070f3855f11ef12b41bfd889f06acccd3d) )
+	ROM_LOAD32_BYTE( "adv2_prgumb.8d", 0x00001, 0x80000, CRC(ccad3e90) SHA1(16ccddf5114f1847808b0c5655aadd8ac040ff4e) )
+	ROM_LOAD32_BYTE( "adv2_prguub.6d", 0x00000, 0x80000, CRC(f3fffc41) SHA1(277cc5b24a094e4adff41d6d35ffc111bc8fef27) )
+
+	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
+	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
+
+	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
+	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
+
+	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
+	ROM_LOAD( "adv1data.6r", 0, 0x080000, CRC(10eecdb4) SHA1(aaedeed166614e6670e765e0d7e4e9eb5f38ad10) )
+
+	ROM_REGION( 0x200000*8, "textile", 0) /* 16x16x8bpp texture tiles */
+	ROM_LOAD( "adv1cg0.2a",  0x200000*0x0, 0x200000,CRC(13353848) SHA1(c6c7693e3cb086919daf9fcaf6bf602142213073) )
+	ROM_LOAD( "adv1cg1.1c",  0x200000*0x1, 0x200000,CRC(1542066c) SHA1(20a053e919b7a81da2a17d31dc7482832a4d4ffe) )
+	ROM_LOAD( "adv1cg2.2d",  0x200000*0x2, 0x200000,CRC(111f371c) SHA1(29d8062daae51b3c1712bd30baa9813a2b5b374d) )
+	ROM_LOAD( "adv1cg3.1e",  0x200000*0x3, 0x200000,CRC(a077831f) SHA1(71bb95199b368e48bc474123ca84d19213f73137) )
+	ROM_LOAD( "adv1cg4.2f",  0x200000*0x4, 0x200000,CRC(71abdacf) SHA1(64409e6aa40dd9e5a6dd1dc306860fbbf6ee7c3e) )
+	ROM_LOAD( "adv1cg5.1j",  0x200000*0x5, 0x200000,CRC(cd6cd798) SHA1(51070997a457c0ace078174569cd548ac2226b2d) )
+	ROM_LOAD( "adv1cg6.2k",  0x200000*0x6, 0x200000,CRC(94bdafba) SHA1(41e64fa99b342edd8b0ed95ae9869c23e03399e6) )
+	ROM_LOAD( "adv1cg7.1n",  0x200000*0x7, 0x200000,CRC(18823475) SHA1(a3244d665b59c352593de21f5cb8d55ddf8cee5c) )
+
+	ROM_REGION16_LE( 0x280000, "textilemap", 0 ) /* texture tilemap */
+	ROM_LOAD( "adv1ccrl.5a",     0x000000, 0x200000,CRC(dd2b96ae) SHA1(6337ce17e617234c27ebad578ba82451649aad9c) ) /* ident to adv1ccrl.5l */
+	ROM_LOAD( "adv1ccrh.5c",     0x200000, 0x080000,CRC(5719844a) SHA1(a17d7bc239235e9f566931ba4fee1d6ad7964d83) ) /* ident to adv1ccrh.5j */
+
+	ROM_REGION( 0x80000*9, "pointrom", 0 ) /* 3d model data */
+	ROM_LOAD( "adv1pot.l0", 0x80000*0, 0x80000,CRC(3b85b2a4) SHA1(84c92ed0105618d4aa5508af344b4b6cfa772567) )
+	ROM_LOAD( "adv1pot.l1", 0x80000*1, 0x80000,CRC(601d6488) SHA1(c7932103ba6070e17deb3cc06060eed7789f938e) )
+	ROM_LOAD( "adv1pot.l2", 0x80000*2, 0x80000,CRC(a0323a84) SHA1(deadf9a47461df7b137759d6886e676137b39fd2) )
+	ROM_LOAD( "adv1pot.m0", 0x80000*3, 0x80000,CRC(20951aa2) SHA1(3de55bded443a5b78699cec4845470b53b22301a) )
+	ROM_LOAD( "adv1pot.m1", 0x80000*4, 0x80000,CRC(5aed6fbf) SHA1(8cee781d8a12e00635b9a1e5cc8d82e64b17e8f1) )
+	ROM_LOAD( "adv1pot.m2", 0x80000*5, 0x80000,CRC(00cbff92) SHA1(09a11ba064aafc921a7ca0add5898d91b773f10a) )
+	ROM_LOAD( "adv1pot.u0", 0x80000*6, 0x80000,CRC(6b73dd2a) SHA1(e3654ab2b62e4f3314558209e37c5636f871a6c7) )
+	ROM_LOAD( "adv1pot.u1", 0x80000*7, 0x80000,CRC(c8788f74) SHA1(606e10b05146e3db824aa608745de80584420d12) )
+	ROM_LOAD( "adv1pot.u2", 0x80000*8, 0x80000,CRC(e67f29c5) SHA1(16222afb4f1f494711dd00ebb347c824db333bae) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
+	ROM_LOAD( "adv1wav0.10r", 0x000000, 0x100000, CRC(f07b2d9d) SHA1(fd46c23b336d5e9a748f7f8d825c19737125d2fb) )
+	ROM_LOAD( "adv1wav1.10p", 0x200000, 0x100000, CRC(737f3c7a) SHA1(4737994f146c0076e7270785f41f3a85c53c7c5f) )
+	ROM_LOAD( "adv1wav2.10n", 0x100000, 0x100000, CRC(c1a5ca5e) SHA1(27e6f9256d5fe5966e91d6be1e6e80900a764af1) )
+	ROM_LOAD( "adv1wav3.10l", 0x300000, 0x100000, CRC(fc6b8004) SHA1(5c9e0805895931ec2b6a43376059bdbf5777222f) )
+
+	ROM_REGION( 0x300, "gamma_proms", 0 )
+	ROM_LOAD( "rr1gam.2d",   0x0000, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
+	ROM_LOAD( "rr1gam.3d",   0x0100, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
+	ROM_LOAD( "rr1gam.4d",   0x0200, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
+ROM_END
+
+ROM_START( victlapa )
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* main program */
+	ROM_LOAD32_BYTE( "adv2_prgll.4d", 0x00003, 0x80000, CRC(4dc1b0ab) SHA1(b5913388d16f824af6dbb01b5b0350d510667a87) ) // Version 96/02/13 17:50:06
+	ROM_LOAD32_BYTE( "adv2_prglm.2d", 0x00002, 0x80000, CRC(7b658bef) SHA1(cf982b49fde0c1897c4c16e77f9eb2a145d8cd42) )
+	ROM_LOAD32_BYTE( "adv2_prgum.8d", 0x00001, 0x80000, CRC(af67f2fb) SHA1(f391843ee0d053e33660c60e3718871142d932f2) )
+	ROM_LOAD32_BYTE( "adv2_prguu.6d", 0x00000, 0x80000, CRC(b60e5d2b) SHA1(f5740615c2864c5c6433275cf4388bda5122b7a7) )
 
 	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
@@ -4631,8 +4780,8 @@ ROM_END
 
 ROM_START( victlapj )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* main program */
-	ROM_LOAD32_BYTE( "adv1_prgllc.4d", 0x00003, 0x80000, CRC(1c630018) SHA1(c4cddeb18c6b81c768e25489f1d5af0e9c0bbfa5) )
-	ROM_LOAD32_BYTE( "adv1_prglmc.2d", 0x00002, 0x80000, CRC(78413604) SHA1(08245cc1f8d97a166b6c0022fc03c423d92a3653) )
+	ROM_LOAD32_BYTE( "adv1_prgllc.4d", 0x00003, 0x80000, CRC(1c630018) SHA1(c4cddeb18c6b81c768e25489f1d5af0e9c0bbfa5) ) // Version 96/02/13 17:29:10
+	ROM_LOAD32_BYTE( "adv1_prglmc.2d", 0x00002, 0x80000, CRC(78413604) SHA1(08245cc1f8d97a166b6c0022fc03c423d92a3653) ) // Are these really Rev C??
 	ROM_LOAD32_BYTE( "adv1_prgumc.8d", 0x00001, 0x80000, CRC(464388d9) SHA1(afad780532aff175b0a547392e80c9f01efbf9d9) )
 	ROM_LOAD32_BYTE( "adv1_prguuc.6d", 0x00000, 0x80000, CRC(ad3cb5f9) SHA1(9a62043f60de4d4c82c5bec169ec975add271367) )
 
@@ -4866,6 +5015,60 @@ ROM_START( cybrcycc )
 	ROM_LOAD32_BYTE( "cb2ver-c.2", 0x00002, 0x100000, CRC(054c504f) SHA1(9bde803ff09be0402f9b0388e55407362a2508e3) )
 	ROM_LOAD32_BYTE( "cb2ver-c.3", 0x00001, 0x100000, CRC(47e6306c) SHA1(39d6fc2c3cb9b4c9d3569cedb79b916a90537115) )
 	ROM_LOAD32_BYTE( "cb2ver-c.4", 0x00000, 0x100000, CRC(398426e4) SHA1(f20cd4892420e7b978baa51c9129b362422a3895) )
+
+	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
+	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
+
+	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
+	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
+
+	ROM_REGION16_LE( 0x080000, "mcu", 0 ) /* S22-BIOS ver1.30 */
+	ROM_LOAD( "cb1datab.8k", 0, 0x080000, CRC(e2404221) SHA1(b88810dd45aee8a5475c30806cdfded25fa14e0e) )
+
+	ROM_REGION( 0x200000*8, "sprite", ROMREGION_ERASEFF ) /* 32x32x8bpp sprite tiles */
+	ROM_LOAD( "cb1scg0.12f", 0x200000*0, 0x200000,CRC(7aaca90d) SHA1(9808819db5d86d555a03bb20a2fbedf060d04f0e) ) /* identical to "cb1scg0.12l" */
+
+	ROM_REGION( 0x200000*7, "textile", 0) /* 16x16x8bpp texture tiles */
+	ROM_LOAD( "cb1cg0.12b",  0x200000*0x0, 0x200000,CRC(762a47a0) SHA1(8a49c700dca7afec5d8d6a38fedcd3ad4b0e6713) ) /* identical to "cb1cg0.8d" */
+	ROM_LOAD( "cb1cg1.10d",  0x200000*0x1, 0x200000,CRC(df92c3e6) SHA1(302d7ee7e073a45e7baa948543bd30251f903a6d) ) /* identical to "cb1cg1.13b" */
+	ROM_LOAD( "cb1cg2.12d",  0x200000*0x2, 0x200000,CRC(07bc508e) SHA1(7675694d10b50e57bb10b350559bd321df75d1ea) ) /* identical to "cb1cg2.14b" */
+	ROM_LOAD( "cb1cg3.13d",  0x200000*0x3, 0x200000,CRC(50c86dea) SHA1(7837a1d2bd3ade470f7fbc732513dd598badd219) ) /* identical to "cb1cg3.16b" */
+	ROM_LOAD( "cb1cg4.14d",  0x200000*0x4, 0x200000,CRC(e93b8894) SHA1(4d28b557b7ed2667e6af9f970f3e99cda785b940) ) /* identical to "cb1cg4.18b" */
+	ROM_LOAD( "cb1cg5.16d",  0x200000*0x5, 0x200000,CRC(9ee610a1) SHA1(ebc7892b6a66461ca6b6b912a264da1594340b2d) ) /* identical to "cb1cg5.19b" */
+	ROM_LOAD( "cb1cg6.18a",  0x200000*0x6, 0x200000,CRC(ddc3b5cc) SHA1(34edffee9eb6fbf4a00fce0da34d9354b1a1155f) ) /* identical to "cb1cg6.18d" */
+
+	ROM_REGION16_LE( 0x280000, "textilemap", 0 ) /* texture tilemap */
+	ROM_LOAD( "cb1ccrl.3d",  0x000000, 0x200000,CRC(2f171c48) SHA1(52b76213e37379b4a5cea7de40cf5396dc2998d8) ) /* identical to "cb1ccrl.7b" */
+	ROM_LOAD( "cb1ccrh.1d",  0x200000, 0x080000,CRC(86124b93) SHA1(f2cfd726313cbeff162d402a15de2360377630e7) ) /* identical to "cb1ccrh.5b" */
+
+	ROM_REGION( 0x80000*12, "pointrom", 0 ) /* 3d model data */
+	ROM_LOAD( "cb1ptrl0.18k", 0x80000*0x0, 0x80000,CRC(f1393a03) SHA1(c9e808601eef5839e6bff630e5f83380e073c5c0) )
+	ROM_LOAD( "cb1ptrl1.16k", 0x80000*0x1, 0x80000,CRC(2ad51de7) SHA1(efd102b960ca10cda70da84661acf61e4bbb9f00) )
+	ROM_LOAD( "cb1ptrl2.15k", 0x80000*0x2, 0x80000,CRC(78f77c0d) SHA1(5183a8909c2ac0a3d80e707393bcbb4441d79a3c) )
+	ROM_LOAD( "cb1ptrl3.14k", 0x80000*0x3, 0x80000,CRC(804bfb4a) SHA1(74b3fc3931265398e23605d3da7ca84a002da632) )
+	ROM_LOAD( "cb1ptrm0.18j", 0x80000*0x4, 0x80000,CRC(f4eece49) SHA1(3f34d1ae5986f0d340563ab0fb637bfdacb8712c) )
+	ROM_LOAD( "cb1ptrm1.16j", 0x80000*0x5, 0x80000,CRC(5f3cbd7d) SHA1(d00d0a96b71d6a3b98907c4ba7c702e549dd0adb) )
+	ROM_LOAD( "cb1ptrm2.15j", 0x80000*0x6, 0x80000,CRC(02c7e4af) SHA1(6a541a28163b1026a824f6f8aed05d0eb0c8ae93) )
+	ROM_LOAD( "cb1ptrm3.14j", 0x80000*0x7, 0x80000,CRC(ace3123b) SHA1(2b590ed967572d77b3cc6b37e341a5bdc55c762f) )
+	ROM_LOAD( "cb1ptru0.18f", 0x80000*0x8, 0x80000,CRC(58d35341) SHA1(a5fe00bdcf39521f0465743664ff0dd78be5d6e8) )
+	ROM_LOAD( "cb1ptru1.16f", 0x80000*0x9, 0x80000,CRC(f4d005b0) SHA1(0862ed1dd0818bfb765d97f1f9d996c321b0ec83) )
+	ROM_LOAD( "cb1ptru2.15f", 0x80000*0xa, 0x80000,CRC(68ffcd50) SHA1(5ca5f71b6b079fde14d76c869d211a815bffae68) )
+	ROM_LOAD( "cb1ptru3.14f", 0x80000*0xb, 0x80000,CRC(d89c1c2b) SHA1(9c25df696b2d120ce33d7774381460297740007a) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
+	ROM_LOAD( "cb1wavea.2l", 0x000000, 0x400000, CRC(b79a624d) SHA1(c0ee358a183ba6d0835731dbdd191b64718fde6e) )
+	ROM_LOAD( "cb1waveb.1l", 0x800000, 0x200000, CRC(33bf08f6) SHA1(bf9d68b26a8158ea1abfe8428b7454cac25242c5) )
+
+	ROM_REGION( 0x2000, "eeprom", 0 ) // default eeprom
+	ROM_LOAD( "cybrcycc_defaults.nv", 0x0000, 0x2000, CRC(57fbd7d3) SHA1(c93e0d7875f5e66a661aed757fb4a314fe2025c2) )
+ROM_END
+
+ROM_START( cybrcyccj )
+	ROM_REGION( 0x400000, "maincpu", 0 ) /* main program */
+	ROM_LOAD32_BYTE( "cb1ver-c.1", 0x00003, 0x100000, CRC(91166c69) SHA1(08e4d0d8226234b01b7d4fbc8ba2ade1ae409fe4) )
+	ROM_LOAD32_BYTE( "cb1ver-c.2", 0x00002, 0x100000, CRC(b2e25e15) SHA1(095df28601dbc98b8974cd99b9329312980eacaf) )
+	ROM_LOAD32_BYTE( "cb1ver-c.3", 0x00001, 0x100000, CRC(97fa2f39) SHA1(865e016553f733430aac70809b21a3b2914bb638) )
+	ROM_LOAD32_BYTE( "cb1ver-c.4", 0x00000, 0x100000, CRC(529bd227) SHA1(6d7979643d015ae388a4a93b9dccc7f43f93baff) )
 
 	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
@@ -5394,8 +5597,115 @@ ROM_START( tokyowar )
 	ROM_LOAD( "tokyowar_defaults.nv", 0x0000, 0x2000, CRC(e8bd7d09) SHA1(7e59017b9d5eb78984b4f177b50a4727ad72a623) )
 ROM_END
 
+ROM_START( tokyowarj )
+	ROM_REGION( 0x400000, "maincpu", 0 ) /* main program */
+	ROM_LOAD32_BYTE( "tw1ver-a.1",   0x000003, 0x100000, CRC(29b38f05) SHA1(d55a34dce5f61d72e3edc331d3a346397069a5fc) )
+	ROM_LOAD32_BYTE( "tw1ver-a.2",   0x000002, 0x100000, CRC(5f8e2e9e) SHA1(14513480fed483e5381ac5bf4467a1c17b0d9e75) )
+	ROM_LOAD32_BYTE( "tw1ver-a.3",   0x000001, 0x100000, CRC(17146e7f) SHA1(0fd270152eef1966e0960531554cbe115668205f) )
+	ROM_LOAD32_BYTE( "tw1ver-a.4",   0x000000, 0x100000, CRC(12698e2a) SHA1(51761ea96cb458f56d832cd233afbc374ded7f20) )
+
+	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
+	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
+
+	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
+	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
+
+	ROM_REGION16_LE( 0x080000, "mcu", 0 ) /* S22-BIOS ver1.41 */
+	ROM_LOAD( "tw1data.8k",   0x000000, 0x080000, CRC(bd046e4b) SHA1(162bc4ab69959ccab49fd69de291d34d472fb1c8) )
+
+	ROM_REGION( 0x200000*8, "sprite", ROMREGION_ERASEFF ) /* 32x32x8bpp sprite tiles */
+	ROM_LOAD( "tw1scg0.12f",  0x000000, 0x200000, CRC(e3ec4daa) SHA1(f3a71ae9820d62075b814ffa2fecf3343ae09ffe) )
+	ROM_LOAD( "tw1scg1.10f",  0x200000, 0x200000, CRC(b18a06e9) SHA1(ecf6a1e11603b8ea5119a036a57595dea021d778) )
+	ROM_LOAD( "tw1scg2.8f",   0x400000, 0x200000, CRC(36f8c3d8) SHA1(d5c965d5cdd258c77b9db3137ce33404a5a3641c) )
+	ROM_LOAD( "tw1scg3.7f",   0x600000, 0x200000, CRC(8e14d013) SHA1(ca63105a5c07bb9653499eef7a757db52612b59b) )
+
+	ROM_REGION( 0x200000*8, "textile", 0) /* 16x16x8bpp texture tiles */
+	ROM_LOAD( "tw1cg0.8d",    0x000000, 0x200000, CRC(98b9b070) SHA1(cb920a34700dab330c967cc634717134c04b7e1d) )
+	ROM_LOAD( "tw1cg1.10d",   0x200000, 0x200000, CRC(f96a723a) SHA1(5ba14963a4c51c875ac8d3b42049bc334de90038) )
+	ROM_LOAD( "tw1cg2.12d",   0x400000, 0x200000, CRC(573e9ded) SHA1(815bda1ac000532c915c2d65ffdb04fee6fa8201) )
+	ROM_LOAD( "tw1cg3.13d",   0x600000, 0x200000, CRC(302d5c74) SHA1(5a823f6842cf0f79eb93da47d5bf8c5f51e420db) )
+	ROM_LOAD( "tw1cg4.14d",   0x800000, 0x200000, CRC(ab8aa1df) SHA1(355192d999f493e0761fbc822fa9b30c33d8e1c4) )
+	ROM_LOAD( "tw1cg5.16d",   0xa00000, 0x200000, CRC(5063f3d0) SHA1(ad8dd2f4184373a3a3ca748b411a5eec1835dc97) )
+	ROM_LOAD( "tw1cg6.18d",   0xc00000, 0x200000, CRC(d764027c) SHA1(5cbf93392683885c220628936ba50c09cb40fcfb) )
+	ROM_LOAD( "tw1cg7.19d",   0xe00000, 0x200000, CRC(12da0a43) SHA1(99287348a5219146bcd3e61fde3f2bc26b0c5a25) )
+
+	ROM_REGION16_LE( 0x280000, "textilemap", 0 ) /* texture tilemap */
+	ROM_LOAD( "tw1ccrl.3d",   0x000000, 0x200000, CRC(d08f5794) SHA1(336a97a2b060505e259e3bcedb9eb8aa4ea8815e) )
+	ROM_LOAD( "tw1ccrh.1d",   0x200000, 0x080000, CRC(ad17e693) SHA1(4f06dc82c03159894fb8e10383862920f94563b1) )
+
+	ROM_REGION( 0x600000, "pointrom", 0 ) /* 3d model data */
+	ROM_LOAD( "tw1ptrl0.18k", 0x000000, 0x080000, CRC(44ac5e86) SHA1(5e42db58f2e352c0fe5e49588a9283817dd15ab1) )
+	ROM_LOAD( "tw1ptrl1.16k", 0x080000, 0x080000, CRC(3c769860) SHA1(19b32c3d262f2a9d07354fbd6ac6be97b05f176e) )
+	ROM_LOAD( "tw1ptrl2.15k", 0x100000, 0x080000, CRC(6e94103c) SHA1(ee90b77939a9f5780ce271882133cdf977eb643e) )
+	ROM_LOAD( "tw1ptrl3.14k", 0x180000, 0x080000, CRC(e3ce5eb2) SHA1(4e15a6f630be15eb017cd51c5e7901db3138a061) )
+	ROM_LOAD( "tw1ptrm0.18j", 0x200000, 0x080000, CRC(e170cea2) SHA1(ca259508d76fdab97a9d0502f871f0e560e6c308) )
+	ROM_LOAD( "tw1ptrm1.16j", 0x280000, 0x080000, CRC(36a32237) SHA1(f46851dc5c094810ddc42d56310a9f85908bf715) )
+	ROM_LOAD( "tw1ptrm2.15j", 0x300000, 0x080000, CRC(c426c278) SHA1(64232ac3c1649e0d0adb4b03e58b8b5ea4013f83) )
+	ROM_LOAD( "tw1ptrm3.14j", 0x380000, 0x080000, CRC(d9b9a651) SHA1(0c49a051526081149d894d629f19cb0f2b66a698) )
+	ROM_LOAD( "tw1ptru0.18f", 0x400000, 0x080000, CRC(62a9e9fb) SHA1(24739adba029b0acf2d7078962c9d01098a29a6c) )
+	ROM_LOAD( "tw1ptru1.16f", 0x480000, 0x080000, CRC(2fd36177) SHA1(368b915261d914be01ae9daeb52571bead52d14d) )
+	ROM_LOAD( "tw1ptru2.15f", 0x500000, 0x080000, CRC(ceacb1c9) SHA1(b86cf576e16bbe26ad0d6d6df8bf28d0071c25e2) )
+	ROM_LOAD( "tw1ptru3.14f", 0x580000, 0x080000, CRC(939044c2) SHA1(f4c1c0a1c2f07ca7f784d59ef4162a2a6a8bbc43) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
+	ROM_LOAD( "tw1wavea.2l",  0x000000, 0x400000, CRC(ebce6366) SHA1(44ebe90ff3c7af5bebbf1baba3b7a2b1863daebb) )
+
+	ROM_REGION( 0x2000, "eeprom", 0 ) // default eeprom
+	ROM_LOAD( "tokyowar_defaults.nv", 0x0000, 0x2000, CRC(e8bd7d09) SHA1(7e59017b9d5eb78984b4f177b50a4727ad72a623) )
+ROM_END
+
 
 ROM_START( dirtdash )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 ) /* main program */
+	ROM_LOAD32_BYTE( "dt2verb.rom1",    0x000003, 0x100000, CRC(d133c6d7) SHA1(6fbdb823771826ba8c62d8d85223eeda38c081e7) )
+	ROM_LOAD32_BYTE( "dt2verb.rom2",    0x000002, 0x100000, CRC(ba4d7626) SHA1(c48b724a454b97c47122548c77793599e9d8f92c) )
+	ROM_LOAD32_BYTE( "dt2verb.rom3",    0x000001, 0x100000, NO_DUMP ) // has failed internally, reads always 0x00 filled
+	ROM_LOAD32_BYTE( "dt2verb.rom4",    0x000000, 0x100000, CRC(9a80fc82) SHA1(81a14749a39d213db58527f7a98d48dbfca1c153) )
+
+	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
+	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
+
+	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
+	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
+
+	ROM_REGION16_LE( 0x080000, "mcu", 0 ) /* S22-BIOS ver1.41 */
+	ROM_LOAD( "dt1dataa.8k",  0x000000, 0x080000, CRC(9bcdea21) SHA1(26ae025cf746d3a703a82495eb2bb515b828a650) )
+
+	ROM_REGION( 0x200000*8, "sprite", ROMREGION_ERASEFF ) /* 32x32x8bpp sprite tiles */
+	ROM_LOAD( "dt1scg0.12f",  0x000000, 0x200000, CRC(a09b5760) SHA1(3dd54ebebf9da1de76874a1adf491ed15849e1b1) )
+	ROM_LOAD( "dt1scg1.10f",  0x200000, 0x200000, CRC(f9ac8111) SHA1(814074ae8cc81c6c1201d764a84dd95fe914f19c) )
+
+	ROM_REGION( 0x200000*8, "textile", 0) /* 16x16x8bpp texture tiles */
+	ROM_LOAD( "dt1cg0.8d",    0x000000, 0x200000, CRC(10ab95e0) SHA1(ffde1f00ac3e82a36fbcfa060c6b97c92dfcfc8b) )
+	ROM_LOAD( "dt1cg1.10d",   0x200000, 0x200000, CRC(d9f1ba53) SHA1(5a1095b726c55001cc1d4c695adc38097e6a0201) )
+	ROM_LOAD( "dt1cg2.12d",   0x400000, 0x200000, CRC(bd8b1e0b) SHA1(fcd94e33a0cbd17c9308cb8952e3c618ab56f9fc) )
+	ROM_LOAD( "dt1cg3.13d",   0x600000, 0x200000, CRC(ba960663) SHA1(e98149bc4652ea7933ac47d760a6f7e6489f15e2) )
+	ROM_LOAD( "dt1cg4.14d",   0x800000, 0x200000, CRC(424b9652) SHA1(fa8865110db03559740c4e633e123d1a009782c4) )
+	ROM_LOAD( "dt1cg5.16d",   0xa00000, 0x200000, CRC(29516626) SHA1(1f12c5dc3975b88dc60d87d0409bf311837e9fa4) )
+	ROM_LOAD( "dt1cg6.18d",   0xc00000, 0x200000, CRC(e6fa7180) SHA1(85316cde282cff1f913cf9f155cfa36adcc1108e) )
+	ROM_LOAD( "dt1cg7.19d",   0xe00000, 0x200000, CRC(2ca19153) SHA1(c82403c8b40bf85daedf610b1bc7bfea9dfc6206) )
+
+	ROM_REGION16_LE( 0x280000, "textilemap", 0 ) /* texture tilemap */
+	ROM_LOAD( "dt1ccrl.3d",   0x000000, 0x200000, CRC(e536b313) SHA1(7357da993d2bb3fcc8c1c2feb53689ad368cd80a) )
+	ROM_LOAD( "dt1ccrh.1d",   0x200000, 0x080000, CRC(af257064) SHA1(0da561d9f8824618c00209ccef6146e9f3ad72bb) )
+
+	ROM_REGION( 0x480000, "pointrom", 0 ) /* 3d model data */
+	ROM_LOAD( "dt1ptrl0.18k", 0x000000, 0x080000, CRC(4e0cac3a) SHA1(c2778e9e93be2de729c6f118caf62ac9f48efbb0) )
+	ROM_LOAD( "dt1ptrl1.16k", 0x080000, 0x080000, CRC(59ba9dba) SHA1(a2e9488cf0ff255284c06a1ef653ae86c0d98adc) )
+	ROM_LOAD( "dt1ptrl2.15k", 0x100000, 0x080000, CRC(cfe80c67) SHA1(ba3bc48aa39712e63c915070a76974fbd560dee6) )
+	ROM_LOAD( "dt1ptrm0.18j", 0x180000, 0x080000, CRC(41f34337) SHA1(7e624e7b6fdefe156168b1c9cc5e919db3b2fbaa) )
+	ROM_LOAD( "dt1ptrm1.16j", 0x200000, 0x080000, CRC(f620fd41) SHA1(18cf6e11eb68da1b7f7fcc32562dc952c247de65) )
+	ROM_LOAD( "dt1ptrm2.15j", 0x280000, 0x080000, CRC(71e6714d) SHA1(6aad6db3be5020213d7add61c7d927ae9c4fea4e) )
+	ROM_LOAD( "dt1ptru0.18f", 0x300000, 0x080000, CRC(4909bd7d) SHA1(0e4ef3987c43ef0438331b82b50dcc97363a45d0) )
+	ROM_LOAD( "dt1ptru1.16f", 0x380000, 0x080000, CRC(4a5097df) SHA1(a9c814b0ed4bd92accd0e57be8e3d887114b06a5) )
+	ROM_LOAD( "dt1ptru2.15f", 0x400000, 0x080000, CRC(1171eaf5) SHA1(168365ea619386f218585c49025cdd7fd1224082) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* sound samples */
+	ROM_LOAD( "dt1wavea.2l",  0x000000, 0x400000, CRC(cbd52e40) SHA1(dc995dd919548c96a90efb0375e5b5f1055e05cb) )
+	ROM_LOAD( "dt1waveb.1l",  0x800000, 0x400000, CRC(6b736f94) SHA1(ac3715480aa9a9c2dec099607f89859bb3b73a6a) )
+ROM_END
+
+ROM_START( dirtdasha )
 	ROM_REGION( 0x400000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD_SWAP( "dt2vera.1",    0x000002, 0x200000, CRC(402a3d73) SHA1(009b57ed0ea228ccedb139d945b9eaf2a36e2502) )
 	ROM_LOAD32_WORD_SWAP( "dt2vera.2",    0x000000, 0x200000, CRC(66ed140d) SHA1(a472fdc7b6aaeb4b3643ecdafd32fa665e7c7aa2) )
@@ -5901,40 +6211,46 @@ void namcos22s_state::init_dirtdash()
 
 /*********************************************************************************************/
 
-/*     YEAR, NAME,     PARENT,   MACHINE,   INPUT,     CLASS,           INIT,           MNTR, COMPANY, FULLNAME, FLAGS */
+/*     YEAR, NAME,      PARENT,   MACHINE,   INPUT,     CLASS,           INIT,           MNTR, COMPANY, FULLNAME, FLAGS */
 // System22 games
-GAME( 1993, ridgerac,  0,        namcos22,  ridgera,   namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer (Rev. RR3, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1994-01-17, RR3 means USA?
-GAME( 1993, ridgerac3, ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer (Rev. RR2 Ver.B, World, 3-screen?)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-28, no indication that this really is a 3-screen version.
-GAME( 1993, ridgeracb, ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer (Rev. RR2, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-07
-GAME( 1993, ridgeracj, ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer (Rev. RR1, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-07
-GAME( 1993, ridgeracf, ridgerac, namcos22,  ridgeracf, namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer Full Scale (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 1993-12-13, very different version, incomplete dump.
-GAME( 1994, ridgera2,  0,        namcos22,  ridgera2,  namcos22_state,  init_ridger2j,  ROT0, "Namco", "Ridge Racer 2 (Rev. RRS2, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-21
-GAME( 1994, ridgera2j, ridgera2, namcos22,  ridgera2,  namcos22_state,  init_ridger2j,  ROT0, "Namco", "Ridge Racer 2 (Rev. RRS1 Ver.B, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-21
-GAME( 1994, ridgera2ja,ridgera2, namcos22,  ridgera2,  namcos22_state,  init_ridger2j,  ROT0, "Namco", "Ridge Racer 2 (Rev. RRS1, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-13
-GAME( 1994, cybrcomm,  0,        cybrcomm,  cybrcomm,  namcos22_state,  init_cybrcomm,  ROT0, "Namco", "Cyber Commando (Rev. CY1, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 10/14/94
-GAME( 1995, raveracw,  0,        namcos22,  raveracw,  namcos22_state,  init_raveracw,  ROT0, "Namco", "Rave Racer (Rev. RV2, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 07/16/95
-GAME( 1995, raveracj,  raveracw, namcos22,  raveracw,  namcos22_state,  init_raveracw,  ROT0, "Namco", "Rave Racer (Rev. RV1 Ver.B, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 07/16/95
-GAME( 1995, raveracja, raveracw, namcos22,  raveracw,  namcos22_state,  init_raveracw,  ROT0, "Namco", "Rave Racer (Rev. RV1, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 06/29/95
-GAME( 1994, acedrvrw,  0,        namcos22,  acedrvr,   namcos22_state,  init_acedrvr,   ROT0, "Namco", "Ace Driver: Racing Evolution (Rev. AD2, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 94/10/20 16:22:25
-GAME( 1996, victlapw,  0,        namcos22,  victlap,   namcos22_state,  init_victlap,   ROT0, "Namco", "Ace Driver: Victory Lap (Rev. ADV2, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/02/13 17:50:06
-GAME( 1996, victlapj,  victlapw, namcos22,  victlap,   namcos22_state,  init_victlap,   ROT0, "Namco", "Ace Driver: Victory Lap (Rev. ADV1, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/02/13 17:29:10
+GAME( 1993, ridgerac,   0,        namcos22,  ridgera,   namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer (Rev. RR2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1994-01-17
+GAME( 1993, ridgeraca,  ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer (Rev. RR2, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-28
+GAME( 1993, ridgeracb,  ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer (Rev. RR3 Ver.B, US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1994-01-17, reports as "-Foreign B-" RR3 means USA?
+GAME( 1993, ridgeracc,  ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer (Rev. RR3, US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-28, purportedly 3 Screen version, reports as "-Foreign B-"
+GAME( 1993, ridgeracj,  ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer (Rev. RR1, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-07
+GAME( 1993, ridgeracf,  ridgerac, namcos22,  ridgeracf, namcos22_state,  init_ridgeraj,  ROT0, "Namco", "Ridge Racer Full Scale (Rev. RRF2, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 1993-12-13, very different version, incomplete dump.
+GAME( 1994, ridgera2,   0,        namcos22,  ridgera2,  namcos22_state,  init_ridger2j,  ROT0, "Namco", "Ridge Racer 2 (Rev. RRS2, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-21 - NOT labeled "B" but based off Japan Rev.B
+GAME( 1994, ridgera2j,  ridgera2, namcos22,  ridgera2,  namcos22_state,  init_ridger2j,  ROT0, "Namco", "Ridge Racer 2 (Rev. RRS1 Ver.B, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-21
+GAME( 1994, ridgera2ja, ridgera2, namcos22,  ridgera2,  namcos22_state,  init_ridger2j,  ROT0, "Namco", "Ridge Racer 2 (Rev. RRS1, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-13
+GAME( 1994, ridgera28,  ridgera2, namcos22,  ridgera2,  namcos22_state,  init_ridger2j,  ROT0, "Namco", "Ridge Racer 2 (Rev. RRS8, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-XX-XX - Test Location / proto??
+GAME( 1994, cybrcomm,   0,        cybrcomm,  cybrcomm,  namcos22_state,  init_cybrcomm,  ROT0, "Namco", "Cyber Commando (Rev. CY1, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 10/14/94
+GAME( 1995, raverace,   0,        namcos22,  raveracw,  namcos22_state,  init_raveracw,  ROT0, "Namco", "Rave Racer (Rev. RV2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 07/16/95
+GAME( 1995, raveracej,  raverace, namcos22,  raveracw,  namcos22_state,  init_raveracw,  ROT0, "Namco", "Rave Racer (Rev. RV1 Ver.B, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 07/16/95
+GAME( 1995, raveraceja, raverace, namcos22,  raveracw,  namcos22_state,  init_raveracw,  ROT0, "Namco", "Rave Racer (Rev. RV1, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 06/29/95
+GAME( 1994, acedrive,   0,        namcos22,  acedrvr,   namcos22_state,  init_acedrvr,   ROT0, "Namco", "Ace Driver: Racing Evolution (Rev. AD2, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 94/10/20 16:22:25
+GAME( 1996, victlap,    0,        namcos22,  victlap,   namcos22_state,  init_victlap,   ROT0, "Namco", "Ace Driver: Victory Lap (Rev. ADV2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/05/21 19:39:59
+GAME( 1996, victlapa,   victlap,  namcos22,  victlap,   namcos22_state,  init_victlap,   ROT0, "Namco", "Ace Driver: Victory Lap (Rev. ADV2, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/02/13 17:29:10
+GAME( 1996, victlapj,   victlap,  namcos22,  victlap,   namcos22_state,  init_victlap,   ROT0, "Namco", "Ace Driver: Victory Lap (Rev. ADV1 Ver.C, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/02/13 17:29:10
 
 // System Super22 games
-GAME( 1994, alpinerd,  0,        alpine,    alpiner,   namcos22s_state, init_alpiner,   ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.D, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, alpinerc,  alpinerd, alpine,    alpiner,   namcos22s_state, init_alpiner,   ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.C, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, alpinerjc, alpinerd, alpine,    alpiner,   namcos22s_state, init_alpiner,   ROT0, "Namco", "Alpine Racer (Rev. AR1 Ver.C, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, airco22b,  0,        airco22b,  airco22,   namcos22s_state, init_airco22,   ROT0, "Namco", "Air Combat 22 (Rev. ACS1 Ver.B, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, cybrcycc,  0,        cybrcycc,  cybrcycc,  namcos22s_state, init_cybrcyc,   ROT0, "Namco", "Cyber Cycles (Rev. CB2 Ver.C, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 95/04/04
-GAME( 1995, dirtdash,  0,        dirtdash,  dirtdash,  namcos22s_state, init_dirtdash,  ROT0, "Namco", "Dirt Dash (Rev. DT2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 95/12/20 20:01:56
-GAME( 1995, dirtdashj, dirtdash, dirtdash,  dirtdash,  namcos22s_state, init_dirtdash,  ROT0, "Namco", "Dirt Dash (Rev. DT1 Ver.A, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 95/12/20 20:06:45
-GAME( 1995, timecris,  0,        timecris,  timecris,  namcos22s_state, init_timecris,  ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/04/02 18:48:00
-GAME( 1995, timecrisa, timecris, timecris,  timecris,  namcos22s_state, init_timecris,  ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/01/08 18:56:09
-GAME( 1996, propcycl,  0,        propcycl,  propcycl,  namcos22s_state, init_propcycl,  ROT0, "Namco", "Prop Cycle (Rev. PR2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/06/18 21:22:13
-GAME( 1996, propcyclj, propcycl, propcycl,  propcycl,  namcos22s_state, init_propcyclj, ROT0, "Namco", "Prop Cycle (Rev. PR1 Ver.A, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/06/18 21:06:03
-GAME( 1996, alpinesa,  0,        alpinesa,  alpiner,   namcos22s_state, init_alpinesa,  ROT0, "Namco", "Alpine Surfer (Rev. AF2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 96/07/01 15:19:23. major problems, protection?
-GAME( 1996, tokyowar,  0,        tokyowar,  tokyowar,  namcos22s_state, init_tokyowar,  ROT0, "Namco", "Tokyo Wars (Rev. TW2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/09/03 14:08:47
-GAME( 1996, aquajet,   0,        cybrcycc,  aquajet,   namcos22s_state, init_aquajet,   ROT0, "Namco", "Aqua Jet (Rev. AJ2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/09/20 14:28:30
-GAME( 1996, alpinr2b,  0,        alpine,    alpiner,   namcos22s_state, init_alpiner2,  ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 97/01/10 17:10:59
-GAME( 1996, alpinr2a,  alpinr2b, alpine,    alpiner,   namcos22s_state, init_alpiner2,  ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/12/06 13:45:05
-GAME( 1997, adillor,   0,        adillor,   adillor,   namcos22s_state, init_adillor,   ROT0, "Namco", "Armadillo Racing (Rev. AM2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 97/04/07 19:43:29
-GAME( 1997, adillorj,  adillor,  adillor,   adillor,   namcos22s_state, init_adillor,   ROT0, "Namco", "Armadillo Racing (Rev. AM1 Ver.A, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 97/04/07 19:19:41
+GAME( 1994, alpinerd,   0,        alpine,    alpiner,   namcos22s_state, init_alpiner,   ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.D, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, alpinerc,   alpinerd, alpine,    alpiner,   namcos22s_state, init_alpiner,   ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.C, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, alpinerjc,  alpinerd, alpine,    alpiner,   namcos22s_state, init_alpiner,   ROT0, "Namco", "Alpine Racer (Rev. AR1 Ver.C, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, airco22b,   0,        airco22b,  airco22,   namcos22s_state, init_airco22,   ROT0, "Namco", "Air Combat 22 (Rev. ACS1 Ver.B, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, cybrcycc,   0,        cybrcycc,  cybrcycc,  namcos22s_state, init_cybrcyc,   ROT0, "Namco", "Cyber Cycles (Rev. CB2 Ver.C, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 95/04/04
+GAME( 1995, cybrcyccj,  cybrcycc, cybrcycc,  cybrcycc,  namcos22s_state, init_cybrcyc,   ROT0, "Namco", "Cyber Cycles (Rev. CB1 Ver.C, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 95/04/04
+GAME( 1995, dirtdash,   0,        dirtdash,  dirtdash,  namcos22s_state, init_dirtdash,  ROT0, "Namco", "Dirt Dash (Rev. DT2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 96/?1/0? 21:03:?6, one ROM is bad
+GAME( 1995, dirtdasha,  dirtdash, dirtdash,  dirtdash,  namcos22s_state, init_dirtdash,  ROT0, "Namco", "Dirt Dash (Rev. DT2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 95/12/20 20:01:56
+GAME( 1995, dirtdashj,  dirtdash, dirtdash,  dirtdash,  namcos22s_state, init_dirtdash,  ROT0, "Namco", "Dirt Dash (Rev. DT1 Ver.A, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 95/12/20 20:06:45
+GAME( 1995, timecris,   0,        timecris,  timecris,  namcos22s_state, init_timecris,  ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/04/02 18:48:00
+GAME( 1995, timecrisa,  timecris, timecris,  timecris,  namcos22s_state, init_timecris,  ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/01/08 18:56:09
+GAME( 1996, propcycl,   0,        propcycl,  propcycl,  namcos22s_state, init_propcycl,  ROT0, "Namco", "Prop Cycle (Rev. PR2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/06/18 21:22:13
+GAME( 1996, propcyclj,  propcycl, propcycl,  propcycl,  namcos22s_state, init_propcyclj, ROT0, "Namco", "Prop Cycle (Rev. PR1 Ver.A, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/06/18 21:06:03
+GAME( 1996, alpinesa,   0,        alpinesa,  alpiner,   namcos22s_state, init_alpinesa,  ROT0, "Namco", "Alpine Surfer (Rev. AF2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 96/07/01 15:19:23. major problems, protection?
+GAME( 1996, tokyowar,   0,        tokyowar,  tokyowar,  namcos22s_state, init_tokyowar,  ROT0, "Namco", "Tokyo Wars (Rev. TW2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/09/03 14:08:47
+GAME( 1996, tokyowarj,  tokyowar, tokyowar,  tokyowar,  namcos22s_state, init_tokyowar,  ROT0, "Namco", "Tokyo Wars (Rev. TW1 Ver.A, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/09/03 14:16:29
+GAME( 1996, aquajet,    0,        cybrcycc,  aquajet,   namcos22s_state, init_aquajet,   ROT0, "Namco", "Aqua Jet (Rev. AJ2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/09/20 14:28:30
+GAME( 1996, alpinr2b,   0,        alpine,    alpiner,   namcos22s_state, init_alpiner2,  ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 97/01/10 17:10:59
+GAME( 1996, alpinr2a,   alpinr2b, alpine,    alpiner,   namcos22s_state, init_alpiner2,  ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/12/06 13:45:05
+GAME( 1997, adillor,    0,        adillor,   adillor,   namcos22s_state, init_adillor,   ROT0, "Namco", "Armadillo Racing (Rev. AM2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 97/04/07 19:43:29
+GAME( 1997, adillorj,   adillor,  adillor,   adillor,   namcos22s_state, init_adillor,   ROT0, "Namco", "Armadillo Racing (Rev. AM1 Ver.A, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 97/04/07 19:19:41

@@ -175,7 +175,7 @@ std::string video992_device::tts(attotime t)
 }
 
 
-void video992_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void video992_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	int raw_vpos = screen().vpos();
 

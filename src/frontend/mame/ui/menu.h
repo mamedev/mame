@@ -54,7 +54,7 @@ public:
 	void item_append(const std::string &text, const std::string &subtext, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN) { item_append(std::string(text), std::string(subtext), flags, ref, type); }
 	void item_append(std::string &&text, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN) { item_append(text, std::string(), flags, ref, type); }
 	void item_append(std::string &&text, std::string &&subtext, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN);
-	void item_append(menu_item item) { item_append(item.text, item.subtext, item.flags, item.ref, item.type); }
+	void item_append(menu_item item) { item_append(item.text(), item.subtext(), item.flags(), item.ref(), item.type()); }
 	void item_append(menu_item_type type, uint32_t flags = 0);
 	void item_append_on_off(const std::string &text, bool state, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN);
 
@@ -117,8 +117,8 @@ protected:
 	// menu-related events
 	struct event
 	{
-		void                *itemref;   // reference for the selected item
-		menu_item_type      type;       // item type (eventually will go away when itemref is proper ui_menu_item class rather than void*)
+		void                *itemref;   // reference for the selected item or nullptr
+		menu_item           *item;      // selected item or nullptr
 		int                 iptkey;     // one of the IPT_* values from inptport.h
 		char32_t            unichar;    // unicode character if iptkey == IPT_SPECIAL
 		render_bounds       mouse;      // mouse position if iptkey == IPT_CUSTOM
@@ -150,7 +150,7 @@ protected:
 	int item_count() const { return m_items.size(); }
 
 	// retrieves the ref of the currently selected menu item or nullptr
-	void *get_selection_ref() const { return selection_valid() ? m_items[m_selected].ref : nullptr; }
+	void *get_selection_ref() const { return selection_valid() ? m_items[m_selected].ref() : nullptr; }
 
 	menu_item &selected_item() { return m_items[m_selected]; }
 	menu_item const &selected_item() const { return m_items[m_selected]; }
@@ -279,7 +279,7 @@ protected:
 
 	static bool is_selectable(menu_item const &item)
 	{
-		return (!(item.flags & menu::FLAG_DISABLE) && (item.type != menu_item_type::SEPARATOR));
+		return (!(item.flags() & menu::FLAG_DISABLE) && (item.type() != menu_item_type::SEPARATOR));
 	}
 
 	// get arrows status

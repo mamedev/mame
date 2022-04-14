@@ -399,7 +399,7 @@ void egret_device::device_start()
 	}
 #endif
 
-	m_timer = timer_alloc(0, nullptr);
+	m_timer = timer_alloc(0);
 	save_item(NAME(ddrs[0]));
 	save_item(NAME(ddrs[1]));
 	save_item(NAME(ddrs[2]));
@@ -468,7 +468,7 @@ void egret_device::device_reset()
 	last_adb = 0;
 }
 
-void egret_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void egret_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	onesec |= 0x40;
 
@@ -520,13 +520,19 @@ void egret_device::nvram_default()
 	pram_loaded = false;
 }
 
-void egret_device::nvram_read(emu_file &file)
+bool egret_device::nvram_read(util::read_stream &file)
 {
-	file.read(disk_pram, 0x100);
-	pram_loaded = false;
+	size_t actual;
+	if (!file.read(disk_pram, 0x100, actual) && actual == 0x100)
+	{
+		pram_loaded = false;
+		return true;
+	}
+	return false;
 }
 
-void egret_device::nvram_write(emu_file &file)
+bool egret_device::nvram_write(util::write_stream &file)
 {
-	file.write(pram, 0x100);
+	size_t actual;
+	return !file.write(pram, 0x100, actual) && actual == 0x100;
 }

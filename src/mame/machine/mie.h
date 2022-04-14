@@ -83,7 +83,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -107,16 +107,16 @@ private:
 
 	// internal state
 	required_device<cpu_device> cpu;
-	emu_timer *timer;
+	emu_timer *timer = nullptr;
 	required_device<mie_jvs_device> jvs;
 	optional_ioport_array<8> gpio_port;
 
-	uint32_t tbuf[TBUF_SIZE];
-	uint32_t control, lreg, jvs_rpos;
-	uint8_t gpiodir, gpio_val[8];
-	uint8_t irq_enable, irq_pending, maple_irqlevel;
-	uint8_t jvs_control, jvs_dest;
-	uint8_t jvs_lcr;
+	uint32_t tbuf[TBUF_SIZE]{};
+	uint32_t control = 0, lreg = 0, jvs_rpos = 0;
+	uint8_t gpiodir = 0, gpio_val[8]{};
+	uint8_t irq_enable = 0, irq_pending = 0, maple_irqlevel = 0;
+	uint8_t jvs_control = 0, jvs_dest = 0;
+	uint8_t jvs_lcr = 0;
 
 	void raise_irq(int level);
 	void recalc_irq();

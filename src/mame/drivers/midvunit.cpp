@@ -7,10 +7,10 @@
     driver by Aaron Giles
 
     Games supported:
-        * Cruis'n USA (1994)        [5 sets]
+        * Cruis'n USA (1994)        [7 sets]
         * Cruis'n World (1996)      [7 sets]
         * War Gods (1996)           [3 sets]
-        * Off Road Challenge (1997) [5 sets]
+        * Off Road Challenge (1997) [6 sets]
 
     Known bugs:
         * textures for automatic/manual selection get overwritten in Cruis'n World
@@ -19,9 +19,6 @@
         * Off Road Challenge has polygon sorting issues, among other problems
         * Issues for the Wargods sets:
            All sets report as Game Type: 452 (12/11/1995) [which is wrong for newer sets]
-
-Known to exist but not dumped:
-    Off Road Challenge v1.00 (Mon 07-28-97)
 
 **************************************************************************/
 
@@ -1463,6 +1460,92 @@ ROM_START( crusnusa21 ) /* Version 2.1, Wed Nov 09 1994 - 16:28:10 */
 ROM_END
 
 
+ROM_START( crusnusa20 ) /* Version 2.0, Tue Oct 25 1994 - 11:49:09 */
+	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
+	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u2.u2", 0x000000, 0x80000, CRC(b9338332) SHA1(e5c420e63c4eba0010a68c7e0a57ef210e2c83d2) ) /* also known to be labeled as P2, the P1 revision hasn't been dumped or confirmed to be different */
+	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u3.u3", 0x200000, 0x80000, CRC(cd8325d6) SHA1(d65d7263e056ca1d637adb44cafef523e0831a34) )
+	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u4.u4", 0x400000, 0x80000, CRC(fab457f3) SHA1(2b4b647838b7a8100afc25ca1ffdc74ed67ae00a) )
+	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u5.u5", 0x600000, 0x80000, CRC(becc92f4) SHA1(6dffa73ff5270155c44f295e443d5e77c03c0338) )
+	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u6.u6", 0x800000, 0x80000, CRC(a9f915d3) SHA1(6a16a2d7a807a775673e7121b54f37c583581203) )
+	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u7.u7", 0xa00000, 0x80000, CRC(424f0bbc) SHA1(f38a431fc0fb7102c51f2d5b6f716dd4669a9822) )
+	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u8.u8", 0xc00000, 0x80000, CRC(03c28199) SHA1(393b009acd3eceb346b8fff45ae2bdf4f53d041f) )
+	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u9.u9", 0xe00000, 0x80000, CRC(24ba6371) SHA1(f60a9ff73b3645e2c8bad67e2f6debc61b5e0653) )
+
+	ROM_REGION32_LE( 0x1000000, "user1", 0 )
+	ROM_LOAD32_BYTE( "l2.0_cruisin_u.s.a._game_rom_u10.u10", 0x000000, 0x80000, CRC(5cdeaee9) SHA1(af8efa5969bad1975de67c82b2eec48e27eb9798) )
+	ROM_LOAD32_BYTE( "l2.0_cruisin_u.s.a._game_rom_u11.u11", 0x000001, 0x80000, CRC(87aaaeef) SHA1(79e5a35b7eaa086c693347e266276e2c31647fec) )
+	ROM_LOAD32_BYTE( "l2.0_cruisin_u.s.a._game_rom_u12.u12", 0x000002, 0x80000, CRC(587b01ad) SHA1(776ffff9764356d513ef25377c1805041869a02a) )
+	ROM_LOAD32_BYTE( "l2.0_cruisin_u.s.a._game_rom_u13.u13", 0x000003, 0x80000, CRC(23f1a96c) SHA1(d7ab96f3cbd42e0caa6b67c6de23c44f8c340621) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u14.u14", 0x200000, 0x80000, CRC(6a4ae622) SHA1(f488e7616371125d5aef2047b8e0fc954ca4b9b4) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u15.u15", 0x200001, 0x80000, CRC(1a0ad3b7) SHA1(a5300f3c789a4d9d257fda3a280e882f17f4a99f) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u16.u16", 0x200002, 0x80000, CRC(799d4dd6) SHA1(f1208967544477005924f2a553037e0ffbc668ab) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u17.u17", 0x200003, 0x80000, CRC(3d68b660) SHA1(3f14e32c205a504ef39abf1e390bd8031d9d7b5b) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u18.u18", 0x400000, 0x80000, CRC(9e8193fb) SHA1(ec88c2b51bb607d3181e467f8b255c13efebc73c) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u19.u19", 0x400001, 0x80000, CRC(0bf60cde) SHA1(6c63b3eacaefeb405c8fdf641437786262bcb10d) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u20.u20", 0x400002, 0x80000, CRC(c07f68f0) SHA1(444ccf8e49fd9c0f707ab32347984ca5628207f9) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u21.u21", 0x400003, 0x80000, CRC(b0264aed) SHA1(d6a6eca4e4ecedfbc5590dbd06870761155ae8c5) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u22.u22", 0x600000, 0x80000, CRC(ad137193) SHA1(642a7c37940cb3b2b190661da7b1d4848c7c513d) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u23.u23", 0x600001, 0x80000, CRC(842449b0) SHA1(b23ebe28ff3c6a268ff9ae1242a4392d2305396b) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u24.u24", 0x600002, 0x80000, CRC(0b2275be) SHA1(3dc79095064cc158d37218c9a038b5b7a777fc66) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u25.u25", 0x600003, 0x80000, CRC(2b9fe68f) SHA1(2750613e61c1eaac629ef5b9e89fd88e99a262cc) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u26.u26", 0x800000, 0x80000, CRC(ae56b871) SHA1(1e218426084123c6c2389d96ce92691010012aa4) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u27.u27", 0x800001, 0x80000, CRC(2d977a8e) SHA1(8f4d511bfd6c3bee18daa7253be1a27d079aec8f) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u28.u28", 0x800002, 0x80000, CRC(cffa5fb1) SHA1(fb73bc8f65b604c374f88d0ecf06c50ef52f0547) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u29.u29", 0x800003, 0x80000, CRC(cbe52c60) SHA1(3f309ce8ef1784c830f4160cfe76dc3a0b438cac) )
+
+	ROM_REGION( 0x0b33, "pals", 0 ) // all protected
+	ROM_LOAD("a-19669.u38",  0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT  NOTE: Head to Head games use a different U38 PAL */
+	ROM_LOAD("a-19670.u43",  0x0000, 0x0144, BAD_DUMP CRC(acafcc97) SHA1(b6f916838d08590a536fe925ec62d66e6ea3dcbc) ) /* TIBPAL20L8-10CNT */
+	ROM_LOAD("a-19668.u52",  0x0000, 0x0157, BAD_DUMP CRC(7915134e) SHA1(aeb22e46abdc14a9e9b34cfe3b77da3e29b789fe) ) /* GAL20V8B */
+	ROM_LOAD("a-19671.u54",  0x0000, 0x02dd, BAD_DUMP CRC(b9cce038) SHA1(8d1df026bdac66ea5493e9e51c23f8eb182b024e) ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19673.u111", 0x0000, 0x02dd, BAD_DUMP CRC(8552977d) SHA1(a1a53d797697682b3f18893a90b6bef39ebb069e) ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19672.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+ROM_END
+
+
+ROM_START( crusnusa11 ) /* Version 1.1, Wed Aug 31 1994 - 18:44:40 */
+	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
+	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u2.u2", 0x000000, 0x80000, CRC(b9338332) SHA1(e5c420e63c4eba0010a68c7e0a57ef210e2c83d2) )
+	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u3.u3", 0x200000, 0x80000, CRC(cd8325d6) SHA1(d65d7263e056ca1d637adb44cafef523e0831a34) )
+	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u4.u4", 0x400000, 0x80000, CRC(fab457f3) SHA1(2b4b647838b7a8100afc25ca1ffdc74ed67ae00a) )
+	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u5.u5", 0x600000, 0x80000, CRC(becc92f4) SHA1(6dffa73ff5270155c44f295e443d5e77c03c0338) )
+	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u6.u6", 0x800000, 0x80000, CRC(a9f915d3) SHA1(6a16a2d7a807a775673e7121b54f37c583581203) )
+	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u7.u7", 0xa00000, 0x80000, CRC(424f0bbc) SHA1(f38a431fc0fb7102c51f2d5b6f716dd4669a9822) )
+	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u8.u8", 0xc00000, 0x80000, CRC(03c28199) SHA1(393b009acd3eceb346b8fff45ae2bdf4f53d041f) )
+	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u9.u9", 0xe00000, 0x80000, CRC(24ba6371) SHA1(f60a9ff73b3645e2c8bad67e2f6debc61b5e0653) )
+
+	ROM_REGION32_LE( 0x1000000, "user1", 0 )
+	ROM_LOAD32_BYTE( "l1.1_cruisin_u.s.a._game_rom_u10.u10", 0x000000, 0x80000, CRC(44f36b34) SHA1(6180579631319b3748539c79a016e12e5543185a) )
+	ROM_LOAD32_BYTE( "l1.1_cruisin_u.s.a._game_rom_u11.u11", 0x000001, 0x80000, CRC(f0328c25) SHA1(b129f3fb4eb95c5e27119ceced1484077b2fb1f9) )
+	ROM_LOAD32_BYTE( "l1.1_cruisin_u.s.a._game_rom_u12.u12", 0x000002, 0x80000, CRC(0e529551) SHA1(30bc072cd175a6ce85f7688f7bb42bcb2ab1d672) )
+	ROM_LOAD32_BYTE( "l1.1_cruisin_u.s.a._game_rom_u13.u13", 0x000003, 0x80000, CRC(bd5fa269) SHA1(46b1f7012020e5a960cb743c92cf251de18ff94a) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u14.u14", 0x200000, 0x80000, CRC(6a4ae622) SHA1(f488e7616371125d5aef2047b8e0fc954ca4b9b4) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u15.u15", 0x200001, 0x80000, CRC(1a0ad3b7) SHA1(a5300f3c789a4d9d257fda3a280e882f17f4a99f) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u16.u16", 0x200002, 0x80000, CRC(799d4dd6) SHA1(f1208967544477005924f2a553037e0ffbc668ab) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u17.u17", 0x200003, 0x80000, CRC(3d68b660) SHA1(3f14e32c205a504ef39abf1e390bd8031d9d7b5b) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u18.u18", 0x400000, 0x80000, CRC(9e8193fb) SHA1(ec88c2b51bb607d3181e467f8b255c13efebc73c) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u19.u19", 0x400001, 0x80000, CRC(0bf60cde) SHA1(6c63b3eacaefeb405c8fdf641437786262bcb10d) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u20.u20", 0x400002, 0x80000, CRC(c07f68f0) SHA1(444ccf8e49fd9c0f707ab32347984ca5628207f9) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u21.u21", 0x400003, 0x80000, CRC(b0264aed) SHA1(d6a6eca4e4ecedfbc5590dbd06870761155ae8c5) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u22.u22", 0x600000, 0x80000, CRC(ad137193) SHA1(642a7c37940cb3b2b190661da7b1d4848c7c513d) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u23.u23", 0x600001, 0x80000, CRC(842449b0) SHA1(b23ebe28ff3c6a268ff9ae1242a4392d2305396b) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u24.u24", 0x600002, 0x80000, CRC(0b2275be) SHA1(3dc79095064cc158d37218c9a038b5b7a777fc66) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u25.u25", 0x600003, 0x80000, CRC(2b9fe68f) SHA1(2750613e61c1eaac629ef5b9e89fd88e99a262cc) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u26.u26", 0x800000, 0x80000, CRC(ae56b871) SHA1(1e218426084123c6c2389d96ce92691010012aa4) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u27.u27", 0x800001, 0x80000, CRC(2d977a8e) SHA1(8f4d511bfd6c3bee18daa7253be1a27d079aec8f) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u28.u28", 0x800002, 0x80000, CRC(cffa5fb1) SHA1(fb73bc8f65b604c374f88d0ecf06c50ef52f0547) )
+	ROM_LOAD32_BYTE( "l1_cruisin_u.s.a._game_rom_u29.u29", 0x800003, 0x80000, CRC(cbe52c60) SHA1(3f309ce8ef1784c830f4160cfe76dc3a0b438cac) )
+
+	ROM_REGION( 0x0b33, "pals", 0 ) // all protected
+	ROM_LOAD("a-19669.u38",  0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT  NOTE: Head to Head games use a different U38 PAL */
+	ROM_LOAD("a-19670.u43",  0x0000, 0x0144, BAD_DUMP CRC(acafcc97) SHA1(b6f916838d08590a536fe925ec62d66e6ea3dcbc) ) /* TIBPAL20L8-10CNT */
+	ROM_LOAD("a-19668.u52",  0x0000, 0x0157, BAD_DUMP CRC(7915134e) SHA1(aeb22e46abdc14a9e9b34cfe3b77da3e29b789fe) ) /* GAL20V8B */
+	ROM_LOAD("a-19671.u54",  0x0000, 0x02dd, BAD_DUMP CRC(b9cce038) SHA1(8d1df026bdac66ea5493e9e51c23f8eb182b024e) ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19673.u111", 0x0000, 0x02dd, BAD_DUMP CRC(8552977d) SHA1(a1a53d797697682b3f18893a90b6bef39ebb069e) ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19672.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+ROM_END
+
+
 /*
 Some Cruis'n World PCBs have mask ROMs for the data ROMs
 
@@ -1726,7 +1809,7 @@ ROM_START( offroadc ) /* Version 1.63, Tue 03-03-98 */
 	ROM_LOAD16_BYTE( "offroad_challenge_5341-15511-07_u9_sound.u9", 0xe00000, 0x80000, CRC(7ad27f69) SHA1(b33665d0593a95b58d529720aae49e90449bf714) )
 
 	ROM_REGION32_LE( 0x1000000, "user1", 0 )
-	ROM_LOAD32_BYTE( "1.63_off_road_u10_game.u10", 0x0000000, 0x100000, CRC(faaf81b8) SHA1(d0bd40b2cf5d07db9f668826cc7f0ed84c4e84bf) ) /* Version 1.63 program roms */
+	ROM_LOAD32_BYTE( "1.63_off_road_u10_game.u10", 0x0000000, 0x100000, CRC(faaf81b8) SHA1(d0bd40b2cf5d07db9f668826cc7f0ed84c4e84bf) ) /* Version 1.63 program ROMs */
 	ROM_LOAD32_BYTE( "1.63_off_road_u11_game.u11", 0x0000001, 0x100000, CRC(f68e9655) SHA1(e29926ea24cfbd228a2136d04a63a92eba0098d7) )
 	ROM_LOAD32_BYTE( "1.63_off_road_u12_game.u12", 0x0000002, 0x100000, CRC(6a5295b3) SHA1(ac72fe205ffb306598400e8b1d9c98ae67b0bab9) )
 	ROM_LOAD32_BYTE( "1.63_off_road_u13_game.u13", 0x0000003, 0x100000, CRC(cb9233b5) SHA1(2d23b6a2312a75dbaa44de3224512c844aaac7b5) )
@@ -1757,7 +1840,7 @@ ROM_START( offroadc5 ) /* Version 1.50, Tue 10-21-97 */
 	ROM_LOAD16_BYTE( "offroad_challenge_5341-15511-07_u9_sound.u9", 0xe00000, 0x80000, CRC(7ad27f69) SHA1(b33665d0593a95b58d529720aae49e90449bf714) )
 
 	ROM_REGION32_LE( 0x1000000, "user1", 0 )
-	ROM_LOAD32_BYTE( "1.5_off_road_u10_game.u10",  0x0000000, 0x100000, CRC(f464be4f) SHA1(da6c04ae49d033f92cdd62f997841365c4a08616) ) /* Version 1.50 program roms */
+	ROM_LOAD32_BYTE( "1.5_off_road_u10_game.u10",  0x0000000, 0x100000, CRC(f464be4f) SHA1(da6c04ae49d033f92cdd62f997841365c4a08616) ) /* Version 1.50 program ROMs */
 	ROM_LOAD32_BYTE( "1.5_off_road_u11_game.u11",  0x0000001, 0x100000, CRC(eaddc9ac) SHA1(a6b810bf7460e3257bf6acdc3b79c532fb71ad68) )
 	ROM_LOAD32_BYTE( "1.5_off_road_u12_game.u12",  0x0000002, 0x100000, CRC(a2da68da) SHA1(b8dcc042b9926055bff9020599c1c218f08b1727) )
 	ROM_LOAD32_BYTE( "1.5_off_road_u13_game.u13",  0x0000003, 0x100000, CRC(b4755ee2) SHA1(1c4cde7ca60a6e8bff12aed348e7148e20a8caba) )
@@ -1788,7 +1871,7 @@ ROM_START( offroadc4 ) /* Version 1.40, Mon 10-06-97 */
 	ROM_LOAD16_BYTE( "offroad_challenge_5341-15511-07_u9_sound.u9", 0xe00000, 0x80000, CRC(7ad27f69) SHA1(b33665d0593a95b58d529720aae49e90449bf714) )
 
 	ROM_REGION32_LE( 0x1000000, "user1", 0 )
-	ROM_LOAD32_BYTE( "1.4_off_road_u10_game.u10",  0x0000000, 0x100000, CRC(d263b078) SHA1(d376e120e05cf8526b002300db345fd0b9775702) ) /* Version 1.40 program roms */
+	ROM_LOAD32_BYTE( "1.4_off_road_u10_game.u10",  0x0000000, 0x100000, CRC(d263b078) SHA1(d376e120e05cf8526b002300db345fd0b9775702) ) /* Version 1.40 program ROMs */
 	ROM_LOAD32_BYTE( "1.4_off_road_u11_game.u11",  0x0000001, 0x100000, CRC(1b443a72) SHA1(0e16d923f0e97f21e92c8d5b431fcaa0815b2c87) )
 	ROM_LOAD32_BYTE( "1.4_off_road_u12_game.u12",  0x0000002, 0x100000, CRC(4e82a34b) SHA1(c22a3f638b7e226add511147982339b1f59821e9) )
 	ROM_LOAD32_BYTE( "1.4_off_road_u13_game.u13",  0x0000003, 0x100000, CRC(558b859c) SHA1(b7946a4b44976b08a691622000e1457021267d1a) )
@@ -1819,7 +1902,7 @@ ROM_START( offroadc3 ) /* Version 1.30, Mon 09-15-97 */
 	ROM_LOAD16_BYTE( "offroad_challenge_5341-15511-07_u9_sound.u9", 0xe00000, 0x80000, CRC(7ad27f69) SHA1(b33665d0593a95b58d529720aae49e90449bf714) )
 
 	ROM_REGION32_LE( 0x1000000, "user1", 0 )
-	ROM_LOAD32_BYTE( "1.3_off_road_u10.u10",  0x0000000, 0x100000, CRC(71c62ce2) SHA1(e6bdbf3df4795f4cf29a08641cc59d90aed73b57) ) /* Version 1.30 program roms */
+	ROM_LOAD32_BYTE( "1.3_off_road_u10.u10",  0x0000000, 0x100000, CRC(71c62ce2) SHA1(e6bdbf3df4795f4cf29a08641cc59d90aed73b57) ) /* Version 1.30 program ROMs */
 	ROM_LOAD32_BYTE( "1.3_off_road_u11.u11",  0x0000001, 0x100000, CRC(9e362dbb) SHA1(2480710f1081679ff87239a8e28a9a3f235bd3dc) )
 	ROM_LOAD32_BYTE( "1.3_off_road_u12.u12",  0x0000002, 0x100000, CRC(9e0a5b06) SHA1(63bbe427713fc966c65dab575dd42cdce6b00874) )
 	ROM_LOAD32_BYTE( "1.3_off_road_u13.u13",  0x0000003, 0x100000, CRC(d602db7e) SHA1(48bc762a83baeb382476619f54631ccbe12d1b2c) )
@@ -1850,10 +1933,41 @@ ROM_START( offroadc1 ) /* Version 1.10, Mon 08-18-97 */
 	ROM_LOAD16_BYTE( "offroad_challenge_5341-15511-07_u9_sound.u9", 0xe00000, 0x80000, CRC(7ad27f69) SHA1(b33665d0593a95b58d529720aae49e90449bf714) )
 
 	ROM_REGION32_LE( 0x1000000, "user1", 0 )
-	ROM_LOAD32_BYTE( "1.1_off_road_u10.u10",  0x0000000, 0x100000, CRC(4729660c) SHA1(0baff6a27015f4eb3fe0a981ecbac33d140e872a) ) /* Version 1.10 program roms */
+	ROM_LOAD32_BYTE( "1.1_off_road_u10.u10",  0x0000000, 0x100000, CRC(4729660c) SHA1(0baff6a27015f4eb3fe0a981ecbac33d140e872a) ) /* Version 1.10 program ROMs */
 	ROM_LOAD32_BYTE( "1.1_off_road_u11.u11",  0x0000001, 0x100000, CRC(6272d013) SHA1(860121184282627ed692e56a0dafee8b64562811) )
 	ROM_LOAD32_BYTE( "1.1_off_road_u12.u12",  0x0000002, 0x100000, CRC(9c8326be) SHA1(55f16d14379f57d08ed84d82f9db1a582bc223a1) )
 	ROM_LOAD32_BYTE( "1.1_off_road_u13.u13",  0x0000003, 0x100000, CRC(53bbc181) SHA1(1ab29a27a216eb09d69a9f3d681865de1a904717) )
+	ROM_LOAD32_BYTE( "offroad_challenge_5341-15510-01_u14_video_image.u14", 0x0400000, 0x100000, CRC(1e41d14b) SHA1(3f7c5fae1f8b82ddd811720837fa298785a8dd27) ) /* mask ROMs */
+	ROM_LOAD32_BYTE( "offroad_challenge_5341-15510-02_u15_video_image.u15", 0x0400001, 0x100000, CRC(654d623d) SHA1(a944b8f8d71b099d7b5bbd7df6effb90afc3aec8) )
+	ROM_LOAD32_BYTE( "offroad_challenge_5341-15510-03_u16_video_image.u16", 0x0400002, 0x100000, CRC(259774d8) SHA1(90cdf659324b84b3c2c59497cc5611e8f12629a6) )
+	ROM_LOAD32_BYTE( "offroad_challenge_5341-15510-04_u17_video_image.u17", 0x0400003, 0x100000, CRC(50c61434) SHA1(52bc603101b4f88b7d892af683b7c8358cabbf4a) )
+	ROM_LOAD32_BYTE( "offroad_challenge_5341-15510-05_u18_video_image.u18", 0x0800000, 0x100000, CRC(015be91c) SHA1(1624537068c6bc5fa6235bf0b0343347c337e8d8) )
+	ROM_LOAD32_BYTE( "offroad_challenge_5341-15510-06_u19_video_image.u19", 0x0800001, 0x100000, CRC(cfc6b70e) SHA1(8c5ad84c50ca142726db0595153cf04caaabec9c) )
+	ROM_LOAD32_BYTE( "offroad_challenge_5341-15510-07_u20_video_image.u20", 0x0800002, 0x100000, CRC(f48d6e33) SHA1(8b9c205e24f217ac110cdd82388c056ebbbb09b0) )
+	ROM_LOAD32_BYTE( "offroad_challenge_5341-15510-08_u21_video_image.u21", 0x0800003, 0x100000, CRC(17794b56) SHA1(8bfd8f5b43056bfe7f62524bb8c3a8564a3a9413) )
+	ROM_LOAD32_BYTE( "offroad_challenge_5341-15510-09_u22_video_image.u22", 0x0c00000, 0x100000, CRC(f2a6e622) SHA1(a7d7004e95b058124cc02e8073dab8fbed8813c5) )
+	ROM_LOAD32_BYTE( "offroad_challenge_5341-15510-10_u23_video_image.u23", 0x0c00001, 0x100000, CRC(1cba6e20) SHA1(a7c9c58bfc4d26decb08979d83cccedb27528eb6) )
+	ROM_LOAD32_BYTE( "offroad_challenge_5341-15510-11_u24_video_image.u24", 0x0c00002, 0x100000, CRC(fd3ce11f) SHA1(78c65267712488784bc6dc14eef98a90494a9553) )
+	ROM_LOAD32_BYTE( "offroad_challenge_5341-15510-12_u25_video_image.u25", 0x0c00003, 0x100000, CRC(78f8e5db) SHA1(7ec2a5add27d66c43ba5cb7182554321007f5798) )
+ROM_END
+
+
+ROM_START( offroadc0 ) /* Version 1.00, Mon 07-28-97 */
+	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
+	ROM_LOAD16_BYTE( "1.0_off_road_u2_sound.u2", 0x000000, 0x80000, CRC(69976e9d) SHA1(63c886ac2563c43a10840f49f929f8613cd94de2) ) /* generally a M27C4001 EPROM with label */
+	ROM_LOAD16_BYTE( "offroad_challenge_5341-15511-01_u3_sound.u3", 0x200000, 0x80000, CRC(2db9b548) SHA1(4f454a3e6a8851b0ef5d325dd28102d57ea11a11) ) /* these are mask ROMs */
+	ROM_LOAD16_BYTE( "offroad_challenge_5341-15511-02_u4_sound.u4", 0x400000, 0x80000, CRC(42bdf9d0) SHA1(04add0f0ee7fa61de1913cc0b988345d3d430cde) )
+	ROM_LOAD16_BYTE( "offroad_challenge_5341-15511-03_u5_sound.u5", 0x600000, 0x80000, CRC(569cc84b) SHA1(08b917cc41fae6b6a3e9d9461a783d3d2865e72a) )
+	ROM_LOAD16_BYTE( "offroad_challenge_5341-15511-04_u6_sound.u6", 0x800000, 0x80000, CRC(0896f679) SHA1(dde39ef17834256909ef2c9fcd5b5fb9939d5178) )
+	ROM_LOAD16_BYTE( "offroad_challenge_5341-15511-05_u7_sound.u7", 0xa00000, 0x80000, CRC(fe242d6a) SHA1(8fbac22ed23044841f309ce58c5b1affcdd5d114) )
+	ROM_LOAD16_BYTE( "offroad_challenge_5341-15511-06_u8_sound.u8", 0xc00000, 0x80000, CRC(5da13f12) SHA1(2bb5e929e8bc6c70cb4475024a6b0bb07ac25244) )
+	ROM_LOAD16_BYTE( "offroad_challenge_5341-15511-07_u9_sound.u9", 0xe00000, 0x80000, CRC(7ad27f69) SHA1(b33665d0593a95b58d529720aae49e90449bf714) )
+
+	ROM_REGION32_LE( 0x1000000, "user1", 0 )
+	ROM_LOAD32_BYTE( "off_road_u10_game.u10",  0x0000000, 0x100000, CRC(f3535a2c) SHA1(b9578ac9bf3092d983608bc26535127108565062) ) /* Version 1.00 program ROMs  - mask ROMS simply labeled:  OFF ROAD   U1x GAME   1997 Midway */
+	ROM_LOAD32_BYTE( "off_road_u11_game.u11",  0x0000001, 0x100000, CRC(16c904ee) SHA1(ad0a7d9db239cfeb43aba6c4a0a830ba010f397f) )
+	ROM_LOAD32_BYTE( "off_road_u12_game.u12",  0x0000002, 0x100000, CRC(d267d7bf) SHA1(eaafba935392444871c17a06e7f513545846aac5) )
+	ROM_LOAD32_BYTE( "off_road_u13_game.u13",  0x0000003, 0x100000, CRC(e6274bb3) SHA1(3203d0bf6ce01efd8e28114b95ddf31e70df5e6e) )
 	ROM_LOAD32_BYTE( "offroad_challenge_5341-15510-01_u14_video_image.u14", 0x0400000, 0x100000, CRC(1e41d14b) SHA1(3f7c5fae1f8b82ddd811720837fa298785a8dd27) ) /* mask ROMs */
 	ROM_LOAD32_BYTE( "offroad_challenge_5341-15510-02_u15_video_image.u15", 0x0400001, 0x100000, CRC(654d623d) SHA1(a944b8f8d71b099d7b5bbd7df6effb90afc3aec8) )
 	ROM_LOAD32_BYTE( "offroad_challenge_5341-15510-03_u16_video_image.u16", 0x0400002, 0x100000, CRC(259774d8) SHA1(90cdf659324b84b3c2c59497cc5611e8f12629a6) )
@@ -2061,6 +2175,8 @@ GAMEL( 1994, crusnusa44, crusnusa, midvunit, crusnusa, midvunit_state, init_crus
 GAMEL( 1994, crusnusa41, crusnusa, midvunit, crusnusa, midvunit_state, init_crusnu40, ROT0, "Midway", "Cruis'n USA (v4.1)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 GAMEL( 1994, crusnusa40, crusnusa, midvunit, crusnusa, midvunit_state, init_crusnu40, ROT0, "Midway", "Cruis'n USA (v4.0)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 GAMEL( 1994, crusnusa21, crusnusa, midvunit, crusnusa, midvunit_state, init_crusnu21, ROT0, "Midway", "Cruis'n USA (v2.1)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1994, crusnusa20, crusnusa, midvunit, crusnusa, midvunit_state, init_crusnu21, ROT0, "Midway", "Cruis'n USA (v2.0)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1994, crusnusa11, crusnusa, midvunit, crusnusa, midvunit_state, init_crusnu21, ROT0, "Midway", "Cruis'n USA (v1.1)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 
 GAMEL( 1996, crusnwld,   0,        crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (v2.5)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 GAMEL( 1996, crusnwld24, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (v2.4)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
@@ -2075,6 +2191,7 @@ GAMEL( 1997, offroadc5, offroadc, offroadc, offroadc, midvunit_state, init_offro
 GAMEL( 1997, offroadc4, offroadc, offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.40)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 GAMEL( 1997, offroadc3, offroadc, offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.30)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 GAMEL( 1997, offroadc1, offroadc, offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.10)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1997, offroadc0, offroadc, offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.00)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 
 GAME( 1995, wargods,   0,        midvplus, wargods, midvunit_state,  init_wargods,  ROT0, "Midway", "War Gods (HD 10/09/1996 - Dual Resolution)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, wargodsa,  wargods,  midvplus, wargodsa, midvunit_state, init_wargods,  ROT0, "Midway", "War Gods (HD 08/15/1996)", MACHINE_SUPPORTS_SAVE )

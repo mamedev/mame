@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "intf2.h"
+#include "softlist_dev.h"
 
 
 //**************************************************************************
@@ -127,7 +128,7 @@ uint8_t spectrum_intf2_device::mreq_r(offs_t offset)
 
 uint8_t spectrum_intf2_device::iorq_r(offs_t offset)
 {
-	uint8_t data = 0xff;
+	uint8_t data = offset & 1 ? m_slot->fb_r() : 0xff;
 
 	switch (offset & 0xff)
 	{

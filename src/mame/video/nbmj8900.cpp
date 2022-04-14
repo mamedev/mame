@@ -37,7 +37,6 @@ void nbmj8900_state::palette_type1_w(offs_t offset, uint8_t data)
 	}
 }
 
-#ifdef UNUSED_FUNCTION
 uint8_t nbmj8900_state::palette_type2_r(offs_t offset)
 {
 	return m_palette_ptr[offset];
@@ -81,7 +80,6 @@ void nbmj8900_state::palette_type3_w(offs_t offset, uint8_t data)
 
 	m_palette->set_pen_color((offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 }
-#endif
 
 void nbmj8900_state::clutsel_w(uint8_t data)
 {
@@ -196,7 +194,7 @@ void nbmj8900_state::update_pixel1(int x, int y)
 	m_tmpbitmap1.pix(y, x) = m_palette->pen(color);
 }
 
-void nbmj8900_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nbmj8900_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

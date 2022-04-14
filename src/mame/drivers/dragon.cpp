@@ -23,6 +23,7 @@
 #include "imagedev/floppy.h"
 #include "bus/coco/cococart.h"
 #include "bus/rs232/rs232.h"
+#include "softlist_dev.h"
 
 
 

@@ -284,7 +284,7 @@ void dp83932c_device::reg_w(offs_t offset, u16 data)
 	}
 }
 
-void dp83932c_device::command(void *ptr, s32 param)
+void dp83932c_device::command(s32 param)
 {
 	if (param & CR_HTX)
 	{

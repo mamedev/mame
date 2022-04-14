@@ -7289,17 +7289,17 @@ GAME( 2003, ep_icebgh,  ep_icebg,   maygayep,  maygayep, maygayep_state, init_ma
 GAME( 2003, ep_icebgi,  ep_icebg,   maygayep,  maygayep, maygayep_state, init_maygayep, ROT0, "Maygay",        "Ice Burger (Maygay) (EPOCH) (1.4, set 10)",MACHINE_IS_SKELETON_MECHANICAL )
 
 // CA000719 ITALIAN JOB
-GAME( 2002, ep_itjb2,   0,          maygayep,  maygayep, maygayep_state, init_maygayep, ROT0, "Maygay",        "Italian Job 2 (Maygay) (EPOCH) (1.5, set 1)",MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 2002, ep_itjb2a,  ep_itjb2,   maygayep,  maygayep, maygayep_state, init_maygayep, ROT0, "Maygay",        "Italian Job 2 (Maygay) (EPOCH) (1.5, set 2)",MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 2002, ep_itjb2b,  ep_itjb2,   maygayep,  maygayep, maygayep_state, init_maygayep, ROT0, "Maygay",        "Italian Job 2 (Maygay) (EPOCH) (2.3, set 3)",MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 2002, ep_itjb2c,  ep_itjb2,   maygayep,  maygayep, maygayep_state, init_maygayep, ROT0, "Maygay",        "Italian Job 2 (Maygay) (EPOCH) (2.3, set 4)",MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 2002, ep_itjb2,   0,          maygayep,  maygayep, maygayep_state, init_maygayep, ROT0, "Maygay",        "The Italian Job 2 (Maygay) (EPOCH) (1.5, set 1)",MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 2002, ep_itjb2a,  ep_itjb2,   maygayep,  maygayep, maygayep_state, init_maygayep, ROT0, "Maygay",        "The Italian Job 2 (Maygay) (EPOCH) (1.5, set 2)",MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 2002, ep_itjb2b,  ep_itjb2,   maygayep,  maygayep, maygayep_state, init_maygayep, ROT0, "Maygay",        "The Italian Job 2 (Maygay) (EPOCH) (2.3, set 3)",MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 2002, ep_itjb2c,  ep_itjb2,   maygayep,  maygayep, maygayep_state, init_maygayep, ROT0, "Maygay",        "The Italian Job 2 (Maygay) (EPOCH) (2.3, set 4)",MACHINE_IS_SKELETON_MECHANICAL )
 // same game code, but 2.1 is (c)2001 wheras 1.5 above is 2002...
-GAME( 2001, ep_ijob,    0,          maygayep,  maygayep, maygayep_state, init_maygayep, ROT0, "Maygay",        "Italian Job (Maygay) (EPOCH, v2.1)",MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 2001, ep_ijoba,   ep_ijob,    maygayep,  maygayep, maygayep_state, init_maygayep, ROT0, "Maygay",        "Italian Job (Maygay) (EPOCH, v1.1)",MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 2001, ep_ijob,    0,          maygayep,  maygayep, maygayep_state, init_maygayep, ROT0, "Maygay",        "The Italian Job (Maygay) (EPOCH, v2.1)",MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 2001, ep_ijoba,   ep_ijob,    maygayep,  maygayep, maygayep_state, init_maygayep, ROT0, "Maygay",        "The Italian Job (Maygay) (EPOCH, v1.1)",MACHINE_IS_SKELETON_MECHANICAL )
 
 // CC000059 CLUBITALIAN
-GAME( 2002, ep_ijcl,    0,          maygayep,  maygayep, maygayep_state, init_maygayep, ROT0, "Maygay",        "Italian Job Club (Maygay) (EPOCH) (2.6, set 1)",MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 2002, ep_ijcla,   ep_ijcl,    maygayep,  maygayep, maygayep_state, init_maygayep, ROT0, "Maygay",        "Italian Job Club (Maygay) (EPOCH) (2.5, set 2)",MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 2002, ep_ijcl,    0,          maygayep,  maygayep, maygayep_state, init_maygayep, ROT0, "Maygay",        "The Italian Job Club (Maygay) (EPOCH) (2.6, set 1)",MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 2002, ep_ijcla,   ep_ijcl,    maygayep,  maygayep, maygayep_state, init_maygayep, ROT0, "Maygay",        "The Italian Job Club (Maygay) (EPOCH) (2.5, set 2)",MACHINE_IS_SKELETON_MECHANICAL )
 
 // again build date vs build number doesn't make sense
 GAME( 2002, ep_jsttt,   0,          maygayep,  maygayep, maygayep_state, init_maygayep, ROT0, "Maygay",        "Just The Ticket (Maygay) (EPOCH) (4.2, set 1)",MACHINE_IS_SKELETON_MECHANICAL )

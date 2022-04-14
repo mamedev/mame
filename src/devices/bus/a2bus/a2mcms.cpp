@@ -207,8 +207,8 @@ void mcms_device::device_start()
 {
 	m_write_irq.resolve();
 	m_stream = stream_alloc(0, 2, 31250);
-	m_timer = timer_alloc(0, nullptr);
-	m_clrtimer = timer_alloc(1, nullptr);
+	m_timer = timer_alloc(0);
+	m_clrtimer = timer_alloc(1);
 	m_enabled = false;
 	memset(m_vols, 0, sizeof(m_vols));
 	memset(m_table, 0, sizeof(m_table));
@@ -238,7 +238,7 @@ void mcms_device::device_reset()
 	m_enabled = false;
 }
 
-void mcms_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void mcms_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
 {
 	if (tid == 0)
 	{

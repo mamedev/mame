@@ -864,7 +864,7 @@ void natural_keyboard::internal_post(char32_t ch)
 //  when posting a string of characters
 //-------------------------------------------------
 
-void natural_keyboard::timer(void *ptr, int param)
+void natural_keyboard::timer(s32 param)
 {
 	if (!m_queue_chars.isnull())
 	{

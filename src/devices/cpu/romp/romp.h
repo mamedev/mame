@@ -174,10 +174,24 @@ private:
 			break;
 
 		case 15:
-			if (m_iou->load(address, data, mode))
-				f(data);
-			else
+			switch (address >> 24)
+			{
+			case 0xf0:
+			case 0xf4:
+				if (m_iou->load(address, data, mode))
+					f(data);
+				else
+					program_check(PCS_PCK | PCS_DAE);
+				break;
+
+			case 0xfc: // mc68881 assist mode
+			case 0xfd: // mc68881 non-assist mode
+			case 0xfe: // afpa dma
+			case 0xff: // fpa
+			default: // reserved
 				program_check(PCS_PCK | PCS_DAE);
+				break;
+			}
 			break;
 		}
 	}
@@ -194,8 +208,22 @@ private:
 			break;
 
 		case 15:
-			if (!m_iou->store(address, data, mode))
+			switch (address >> 24)
+			{
+			case 0xf0:
+			case 0xf4:
+				if (!m_iou->store(address, data, mode))
+					program_check(PCS_PCK | PCS_DAE);
+				break;
+
+			case 0xfc: // mc68881 assist mode
+			case 0xfd: // mc68881 non-assist mode
+			case 0xfe: // afpa dma
+			case 0xff: // fpa
+			default: // reserved
 				program_check(PCS_PCK | PCS_DAE);
+				break;
+			}
 			break;
 		}
 	}
@@ -212,8 +240,22 @@ private:
 			break;
 
 		case 15:
-			if (!m_iou->modify(address, f, mode))
+			switch (address >> 24)
+			{
+			case 0xf0:
+			case 0xf4:
+				if (!m_iou->modify(address, f, mode))
+					program_check(PCS_PCK | PCS_DAE);
+				break;
+
+			case 0xfc: // mc68881 assist mode
+			case 0xfd: // mc68881 non-assist mode
+			case 0xfe: // afpa dma
+			case 0xff: // fpa
+			default: // reserved
 				program_check(PCS_PCK | PCS_DAE);
+				break;
+			}
 			break;
 		}
 	}

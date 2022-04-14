@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Mariusz Wojcieszek, Angelo Salese
+// copyright-holders:Mariusz Wojcieszek, Angelo Salese, Brian Johnson
 /***************************************************************************
 
     QX-10
@@ -35,6 +35,7 @@
 #include "emu.h"
 
 #include "bus/centronics/ctronics.h"
+#include "bus/epson_qx/option.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
@@ -54,7 +55,7 @@
 #include "emupal.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "imagedev/snapquik.h"
 
 
@@ -85,13 +86,15 @@ public:
 		m_rtc(*this, "rtc"),
 		m_kbd(*this, "kbd"),
 		m_centronics(*this, "centronics"),
+		m_bus(*this, "bus"),
 		m_speaker(*this, "speaker"),
 		m_vram_bank(0),
 		m_char_rom(*this, "chargen"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_ram(*this, RAM_TAG),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_ram_view(*this, "ramview")
 	{
 	}
 
@@ -113,10 +116,12 @@ private:
 	void prom_sel_w(uint8_t data);
 	void cmos_sel_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( qx10_upd765_interrupt );
+	void update_fdd_motor(uint8_t state);
 	void fdd_motor_w(uint8_t data);
 	uint8_t qx10_30_r();
 	void zoom_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( tc_w );
+	void sqw_out(uint8_t state);
 	uint8_t mc146818_r(offs_t offset);
 	void mc146818_w(offs_t offset, uint8_t data);
 	IRQ_CALLBACK_MEMBER( inta_call );
@@ -168,6 +173,7 @@ private:
 	required_device<mc146818_device> m_rtc;
 	required_device<rs232_port_device> m_kbd;
 	required_device<centronics_device> m_centronics;
+	required_device<bus::epson_qx::option_bus_device> m_bus;
 	required_device<speaker_sound_device>   m_speaker;
 	uint8_t m_vram_bank;
 	//required_shared_ptr<uint8_t> m_video_ram;
@@ -180,30 +186,33 @@ private:
 	required_device<palette_device> m_palette;
 
 	/* FDD */
-	int     m_fdcint;
-	int     m_fdcmotor;
-	//int     m_fdcready;
+	int     m_fdcint = 0;
+	uint8_t  m_motor_clk = 0;
+	uint16_t m_counter = 0;
+	//int     m_fdcready = 0;
 
-	int m_spkr_enable;
-	int m_spkr_freq;
-	int m_pit1_out0;
+	int m_spkr_enable = 0;
+	int m_spkr_freq = 0;
+	int m_pit1_out0 = 0;
 
 	/* centronics */
-	int m_centronics_error;
-	int m_centronics_busy;
-	int m_centronics_paper;
-	int m_centronics_select;
-	int m_centronics_sense;
+	int m_centronics_error = 0;
+	int m_centronics_busy = 0;
+	int m_centronics_paper = 0;
+	int m_centronics_select = 0;
+	int m_centronics_sense = 0;
 
 
 	/* memory */
-	int     m_membank;
-	int     m_memprom;
-	int     m_memcmos;
-	uint8_t   m_cmosram[0x800];
+	memory_view m_ram_view;
+	int     m_external_bank = 0;
+	int     m_membank = 0;
+	int     m_memprom = 0;
+	int     m_memcmos = 0;
+	uint8_t   m_cmosram[0x800]{};
 
-	uint8_t m_color_mode;
-	uint8_t m_zoom;
+	uint8_t m_color_mode = 0;
+	uint8_t m_zoom = 0;
 };
 
 UPD7220_DISPLAY_PIXELS_MEMBER( qx10_state::hgdc_display_pixels )
@@ -323,7 +332,7 @@ void qx10_state::update_speaker()
 */
 void qx10_state::update_memory_mapping()
 {
-	int drambank = 0;
+	int drambank = -1;
 
 	if (m_membank & 1)
 	{
@@ -342,28 +351,46 @@ void qx10_state::update_memory_mapping()
 		drambank = 3;
 	}
 
-	if (!m_memprom)
+	if (drambank >= 0 || !m_memprom || m_memcmos)
 	{
-		membank("bank1")->set_base(memregion("maincpu")->base());
+		m_ram_view.select(0);
+		if (!m_memprom)
+		{
+			membank("bank1")->set_base(memregion("maincpu")->base());
+		}
+		else
+		{
+			membank("bank1")->set_base(m_ram->pointer() + drambank*64*1024);
+		}
+		if (m_memcmos)
+		{
+			membank("bank2")->set_base(m_cmosram);
+		}
+		else
+		{
+			membank("bank2")->set_base(m_ram->pointer() + drambank*64*1024 + 32*1024);
+		}
 	}
 	else
 	{
-		membank("bank1")->set_base(m_ram->pointer() + drambank*64*1024);
+		if (m_external_bank)
+		{
+			m_ram_view.select(1);;
+		}
+		else
+		{
+			m_ram_view.disable();
+		}
 	}
-	if (m_memcmos)
-	{
-		membank("bank2")->set_base(m_cmosram);
-	}
-	else
-	{
-		membank("bank2")->set_base(m_ram->pointer() + drambank*64*1024 + 32*1024);
-	}
+
 }
 
 void qx10_state::qx10_18_w(uint8_t data)
 {
 	m_membank = (data >> 4) & 0x0f;
 	m_spkr_enable = (data >> 2) & 0x01;
+	m_external_bank = (data >> 3) & 0x01;
+	m_pit_1->write_gate2(BIT(data, 1));
 	m_pit_1->write_gate0(data & 1);
 	update_speaker();
 	update_memory_mapping();
@@ -453,12 +480,22 @@ WRITE_LINE_MEMBER( qx10_state::qx10_upd765_interrupt )
 	m_pic_m->ir6_w(state);
 }
 
+void qx10_state::update_fdd_motor(uint8_t state)
+{
+	for (auto& fdd : m_floppy)
+	{
+		floppy_image_device *floppy = fdd->get_device();
+		if (floppy)
+		{
+			floppy->mon_w(state);
+		}
+	}
+}
+
 void qx10_state::fdd_motor_w(uint8_t data)
 {
-	m_fdcmotor = 1;
-
-	m_floppy[0]->get_device()->mon_w(false);
-	m_floppy[1]->get_device()->mon_w(false);
+	m_counter = 0;
+	update_fdd_motor(0);
 	// motor off controlled by clock
 }
 
@@ -470,7 +507,7 @@ uint8_t qx10_state::qx10_30_r()
 	floppy2 = m_floppy[1]->get_device();
 
 	return m_fdcint |
-			/*m_fdcmotor*/ 0 << 1 |
+			BIT(m_counter, 11) << 1 |
 			((floppy1 != nullptr) || (floppy2 != nullptr) ? 1 : 0) << 3 |
 			m_membank << 4;
 }
@@ -534,6 +571,7 @@ WRITE_LINE_MEMBER( qx10_state::tc_w )
 {
 	/* floppy terminal count */
 	m_fdc->tc_w(!state);
+	m_bus->slots_w<&bus::epson_qx::option_slot_device::eopf>(state);
 }
 
 /*
@@ -565,6 +603,23 @@ void qx10_state::memory_write_byte(offs_t offset, uint8_t data)
 /*
     MC146818
 */
+void qx10_state::sqw_out(uint8_t state)
+{
+	uint8_t clk = !(state || BIT(m_counter, 11));
+	uint16_t cnt = m_counter;
+
+	if (!clk && m_motor_clk)
+	{
+		cnt = (cnt + 1) & 0xfff;
+	}
+	if (BIT(cnt, 11) && !BIT(m_counter, 11))
+	{
+		update_fdd_motor(1);
+	}
+
+	m_motor_clk = clk;
+	m_counter = cnt;
+}
 
 void qx10_state::mc146818_w(offs_t offset, uint8_t data)
 {
@@ -661,8 +716,10 @@ void qx10_state::vram_bank_w(uint8_t data)
 void qx10_state::qx10_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x7fff).bankrw("bank1");
-	map(0x8000, 0xdfff).bankrw("bank2");
+	map(0x0000, 0xdfff).view(m_ram_view);
+	m_ram_view[0](0x0000, 0x7fff).bankrw("bank1");
+	m_ram_view[0](0x8000, 0xdfff).bankrw("bank2");
+	m_ram_view[1](0x0000, 0xdfff).unmaprw();
 	map(0xe000, 0xffff).ram();
 }
 
@@ -688,7 +745,6 @@ void qx10_state::qx10_io(address_map &map)
 	map(0x3c, 0x3d).rw(FUNC(qx10_state::mc146818_r), FUNC(qx10_state::mc146818_w));
 	map(0x40, 0x4f).rw(m_dma_1, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x50, 0x5f).rw(m_dma_2, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
-//  map(0xfc, 0xfd) Multi-Font comms
 }
 
 /* Input ports */
@@ -743,6 +799,7 @@ INPUT_PORTS_END
 
 void qx10_state::machine_start()
 {
+	m_bus->set_memview(m_ram_view[1]);
 }
 
 void qx10_state::machine_reset()
@@ -755,6 +812,7 @@ void qx10_state::machine_reset()
 
 	m_zoom = 0;
 
+	m_external_bank = 0;
 	m_memprom = 0;
 	m_memcmos = 0;
 	m_membank = 0;
@@ -872,7 +930,9 @@ void qx10_state::qx10(machine_config &config)
 	m_pit_1->set_clk<0>(1200);
 	m_pit_1->out_handler<0>().set(FUNC(qx10_state::speaker_duration));
 	m_pit_1->set_clk<1>(1200);
+	m_pit_1->out_handler<1>().set(m_pic_s, FUNC(pic8259_device::ir5_w));
 	m_pit_1->set_clk<2>(MAIN_CLK / 8);
+	m_pit_1->out_handler<2>().set(m_pic_m, FUNC(pic8259_device::ir1_w));
 
 /*
     Timer 1
@@ -935,6 +995,7 @@ void qx10_state::qx10(machine_config &config)
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->irq().set(m_pic_s, FUNC(pic8259_device::ir2_w));
+	m_rtc->sqw().set(FUNC(qx10_state::sqw_out));
 
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set(FUNC(qx10_state::qx10_upd765_interrupt));
@@ -965,6 +1026,39 @@ void qx10_state::qx10(machine_config &config)
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("256K");
 
+	EPSON_QX_OPTION_BUS(config, m_bus, MAIN_CLK / 4);
+	m_dma_1->out_iow_callback<2>().set(m_bus, FUNC(bus::epson_qx::option_bus_device::dackf_w));
+	m_dma_1->in_ior_callback<2>().set(m_bus, FUNC(bus::epson_qx::option_bus_device::dackf_r));
+	m_dma_2->out_iow_callback<0>().set(m_bus, FUNC(bus::epson_qx::option_bus_device::dacks_w<0>));
+	m_dma_2->in_ior_callback<0>().set(m_bus, FUNC(bus::epson_qx::option_bus_device::dacks_r<0>));
+	m_dma_2->out_iow_callback<1>().set(m_bus, FUNC(bus::epson_qx::option_bus_device::dacks_w<1>));
+	m_dma_2->in_ior_callback<1>().set(m_bus, FUNC(bus::epson_qx::option_bus_device::dacks_r<1>));
+	m_dma_2->out_iow_callback<2>().set(m_bus, FUNC(bus::epson_qx::option_bus_device::dacks_w<2>));
+	m_dma_2->in_ior_callback<2>().set(m_bus, FUNC(bus::epson_qx::option_bus_device::dacks_r<2>));
+	m_dma_2->out_iow_callback<3>().set(m_bus, FUNC(bus::epson_qx::option_bus_device::dacks_w<3>));
+	m_dma_2->in_ior_callback<3>().set(m_bus, FUNC(bus::epson_qx::option_bus_device::dacks_r<3>));
+	m_dma_2->out_eop_callback().set(m_bus, FUNC(bus::epson_qx::option_bus_device::slots_w<&bus::epson_qx::option_slot_device::eops>));
+	m_bus->out_drqf_callback().set(m_dma_1, FUNC(am9517a_device::dreq2_w));
+	m_bus->out_rdyf_callback().set(m_dma_1, FUNC(am9517a_device::ready_w));
+	m_bus->out_drqs_callback<0>().set(m_dma_2, FUNC(am9517a_device::dreq0_w));
+	m_bus->out_drqs_callback<1>().set(m_dma_2, FUNC(am9517a_device::dreq1_w));
+	m_bus->out_drqs_callback<2>().set(m_dma_2, FUNC(am9517a_device::dreq2_w));
+	m_bus->out_drqs_callback<3>().set(m_dma_2, FUNC(am9517a_device::dreq3_w));
+	m_bus->out_rdys_callback().set(m_dma_2, FUNC(am9517a_device::ready_w));
+	m_bus->out_inth1_callback().set(m_pic_m, FUNC(pic8259_device::ir2_w));
+	m_bus->out_inth2_callback().set(m_pic_m, FUNC(pic8259_device::ir3_w));
+	m_bus->out_intl_callback<0>().set(m_pic_s, FUNC(pic8259_device::ir1_w));
+	m_bus->out_intl_callback<1>().set(m_pic_s, FUNC(pic8259_device::ir3_w));
+	m_bus->out_intl_callback<2>().set(m_pic_s, FUNC(pic8259_device::ir4_w));
+	m_bus->out_intl_callback<3>().set(m_pic_s, FUNC(pic8259_device::ir6_w));
+	m_bus->out_intl_callback<4>().set(m_pic_s, FUNC(pic8259_device::ir7_w));
+	m_bus->set_iospace(m_maincpu, AS_IO);
+	EPSON_QX_OPTION_BUS_SLOT(config, "option1", m_bus, 0, bus::epson_qx::option_bus_devices, nullptr);
+	EPSON_QX_OPTION_BUS_SLOT(config, "option2", m_bus, 1, bus::epson_qx::option_bus_devices, nullptr);
+	EPSON_QX_OPTION_BUS_SLOT(config, "option3", m_bus, 2, bus::epson_qx::option_bus_devices, nullptr);
+	EPSON_QX_OPTION_BUS_SLOT(config, "option4", m_bus, 3, bus::epson_qx::option_bus_devices, nullptr);
+	EPSON_QX_OPTION_BUS_SLOT(config, "option5", m_bus, 4, bus::epson_qx::option_bus_devices, nullptr);
+
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("qx10_flop");
 
@@ -978,12 +1072,6 @@ ROM_START( qx10 )
 	ROMX_LOAD( "ipl006.bin", 0x0000, 0x0800, CRC(3155056a) SHA1(67cc0ae5055d472aa42eb40cddff6da69ffc6553), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v003", "v0.03")
 	ROMX_LOAD( "ipl003.bin", 0x0000, 0x0800, CRC(3cbc4008) SHA1(cc8c7d1aa0cca8f9753d40698b2dc6802fd5f890), ROM_BIOS(1))
-
-	/* This is probably the i8039 program ROM for the Q10MF Multifont card, and the actual font ROMs are missing (6 * HM43128) */
-	/* The first part of this rom looks like code for an embedded controller?
-	    From 0300 on, is a keyboard lookup table */
-	ROM_REGION( 0x0800, "i8039", 0 )
-	ROM_LOAD( "m12020a.3e", 0x0000, 0x0800, CRC(fa27f333) SHA1(73d27084ca7b002d5f370220d8da6623a6e82132))
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 //  ROM_LOAD( "qge.2e",   0x0000, 0x0800, BAD_DUMP CRC(ed93cb81) SHA1(579e68bde3f4184ded7d89b72c6936824f48d10b))  //this one contains special characters only

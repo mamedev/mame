@@ -480,7 +480,7 @@ void via6522_device::shift_in()
 	m_shift_counter = (m_shift_counter - 1) & 0x0f; // Count all edges
 }
 
-void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

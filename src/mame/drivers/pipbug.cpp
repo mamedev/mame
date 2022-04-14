@@ -76,8 +76,8 @@ private:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	void data_map(address_map &map);
 	void mem_map(address_map &map);
-	u8 m_cass_data[4];
-	bool m_cassold, m_cassinbit;
+	u8 m_cass_data[4]{};
+	bool m_cassold = false, m_cassinbit = false;
 };
 
 void pipbug_state::pipbug_ctrl_w(u8 data)

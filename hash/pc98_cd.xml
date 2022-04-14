@@ -430,6 +430,8 @@ license:CC0
 		<description>Windows 98 Second Edition</description>
 		<year>1999</year>
 		<publisher>Microsoft</publisher>
+		<info name="alt_title" value="マイクロソフト ウィンドウズ 98 オペレイティング システム SECOND EDITION" />
+		<info name="serial" value="X04-67430"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="microsoft windows 98se" sha1="eb0bdd209334b3709fa31043f390838351127bc0" />
@@ -1101,8 +1103,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Requires disk 2 of the floppy version (included in the box) as copy protection, but fails the check -->
-	<software name="brandnew" supported="no">
+	<!-- Requires disk 2 of the floppy version (included in the box) as copy protection -->
+	<software name="brandnew">
 		<!--
 		Origin: redump.org
 		<rom name="Brandish (Japan) (Renewal) (Track 01).bin" size="11936400" crc="07953f04" sha1="e3aba6d10495617412095fb47ae40c59c63b2237"/>
@@ -1128,7 +1130,7 @@ license:CC0
 		<info name="release" value="19950310" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="3594434">
-				<rom name="brandish_renewal_disk2.mfm" size="3594434" crc="ff09f243" sha1="9c8e3c99ac406b2501aa83867fa9e78424efb408" offset="0" />
+				<rom name="brandish_renewal_disk2.mfm" size="3594434" crc="411f9f13" sha1="97054b414c002e0b6884746015026e1acb03ddaf" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="cdrom">
@@ -4734,7 +4736,7 @@ license:CC0
 		<info name="serial" value="DWDC4023"/>
 		<info name="alt_title" value="サイキック・ディテクティヴ・シリーズ　Vol.4　オルゴール" />
 		<info name="release" value="199412xx" />
-		<part name="cdrom" interface="fmt_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="psychic detective series vol. 4 - orgel (japan) (remake)" sha1="60b1d1a9085734c7d86d9d88c1590610b179567c" />
 			</diskarea>

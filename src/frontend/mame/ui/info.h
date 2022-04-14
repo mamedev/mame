@@ -15,6 +15,9 @@
 
 #include "ui/textbox.h"
 
+#include <string>
+
+
 namespace ui {
 
 class machine_static_info

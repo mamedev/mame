@@ -131,10 +131,10 @@ protected:
 	void port04_w(u8 data);
 	void port34_w(u8 data);
 
-	bool m_ss;
-	bool m_dden;
-	bool m_dsize;
-	u8 m_ds;
+	bool m_ss = 0;
+	bool m_dden = 0;
+	bool m_dsize = 0;
+	u8 m_ds = 0U;
 	floppy_image_device *m_floppy;
 
 	required_device<z80_device> m_maincpu;
@@ -161,7 +161,7 @@ private:
 	void ccs2810_io(address_map &map);
 	void ccs2810_mem(address_map &map);
 
-	u8 m_power_on_status;
+	u8 m_power_on_status = 0U;
 };
 
 class ccs300_state : public ccs_state
@@ -271,7 +271,7 @@ void ccs300_state::ccs300_io(address_map &map)
 	map(0x34, 0x34).rw(FUNC(ccs300_state::port34_r), FUNC(ccs300_state::port34_w));
 	map(0x40, 0x40).w(FUNC(ccs300_state::port40_w));
 	map(0xf0, 0xf0).rw("dma", FUNC(z80dma_device::read), FUNC(z80dma_device::write));
-	map(0xf2, 0xf2); // dip or jumper? only used by CCS-400
+	map(0xf2, 0xf2).portr("MODEL"); // dip or jumper? only used by CCS-400
 }
 
 
@@ -847,6 +847,16 @@ static INPUT_PORTS_START( ccs2810 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ccs300 )
+	// No information available on this system, but it may be assumed that
+	//  the 300 is floppy-only, while the 400 boots off a hard drive.
+	//  Plugging in the HDC cable would ground this pin to inform the bios
+	//  it should be a 400. This "dip" is so you can see (and trace) what
+	//  happens.
+	PORT_START("MODEL")
+	PORT_DIPNAME(0x08, 0x08, "Model")
+	PORT_DIPSETTING(0x00, "CCS-400")
+	PORT_DIPSETTING(0x08, "CCS-300")
+	PORT_BIT(0xf7, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 

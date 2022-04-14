@@ -60,22 +60,23 @@ ksm|DVK KSM,
 #include "machine/ms7004.h"
 #include "machine/pic8259.h"
 #include "machine/timer.h"
+
 #include "emupal.h"
 #include "screen.h"
 
 
-#define SCREEN_PAGE (80*48)
+static constexpr int SCREEN_PAGE = 80 * 48;
 
-#define KSM_TOTAL_HORZ 1000
-#define KSM_DISP_HORZ  800
-#define KSM_HORZ_START 200
+static constexpr int KSM_TOTAL_HORZ = 1000;
+static constexpr int KSM_DISP_HORZ = 800;
+static constexpr int KSM_HORZ_START = 200;
 
-#define KSM_TOTAL_VERT (28 * 11)
-#define KSM_DISP_VERT  (25 * 11)
-#define KSM_VERT_START (2 * 11)
+static constexpr int KSM_TOTAL_VERT = (28 * 11);
+static constexpr int KSM_DISP_VERT = (25 * 11);
+static constexpr int KSM_VERT_START = (2 * 11);
 
-#define KSM_STATUSLINE_TOTAL 11
-#define KSM_STATUSLINE_VRAM 0xF8B0
+static constexpr int KSM_STATUSLINE_TOTAL = 11;
+static constexpr int KSM_STATUSLINE_VRAM = 0xF8B0;
 
 
 //#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
@@ -83,7 +84,7 @@ ksm|DVK KSM,
 #define LOG_DEBUG     (1U <<  2)
 
 //#define VERBOSE (LOG_DEBUG)
-//#define LOG_OUTPUT_FUNC printf
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGKBD(...) LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
@@ -109,13 +110,13 @@ public:
 	void ksm(machine_config &config);
 
 private:
-	TIMER_DEVICE_CALLBACK_MEMBER( scanline_callback );
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
 
 	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
 
@@ -135,8 +136,8 @@ private:
 
 	struct
 	{
-		uint8_t line;
-		uint16_t ptr;
+		uint8_t line = 0;
+		uint16_t ptr = 0;
 	} m_video;
 
 	enum
@@ -144,8 +145,8 @@ private:
 		TIMER_ID_BRG = 0
 	};
 
-	bool brg_state;
-	int brga, brgb, brgc;
+	bool brg_state = false;
+	int brga = 0, brgb = 0, brgc = 0;
 	emu_timer *m_brg = nullptr;
 
 	void update_brg(bool a, bool b, int c);
@@ -220,7 +221,7 @@ static INPUT_PORTS_START( ksm )
 	PORT_DIPSETTING(0x0E, "75")
 INPUT_PORTS_END
 
-void ksm_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ksm_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_ID_BRG)
 	{
@@ -239,7 +240,7 @@ void ksm_state::machine_reset()
 	brg_state = 0;
 }
 
-void ksm_state::video_start()
+void ksm_state::machine_start()
 {
 	m_tmpclip = rectangle(0, KSM_DISP_HORZ - 1, 0, KSM_DISP_VERT - 1);
 	m_tmpbmp.allocate(KSM_DISP_HORZ, KSM_DISP_VERT);
@@ -413,7 +414,7 @@ GFXDECODE_END
 
 void ksm_state::ksm(machine_config &config)
 {
-	I8080(config, m_maincpu, XTAL(15'400'000)/10);
+	I8080(config, m_maincpu, XTAL(15'400'000) / 10);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ksm_state::ksm_mem);
 	m_maincpu->set_addrmap(AS_IO, &ksm_state::ksm_io);
 	m_maincpu->in_inta_func().set("pic8259", FUNC(pic8259_device::acknowledge));
@@ -460,7 +461,7 @@ void ksm_state::ksm(machine_config &config)
 	m_ms7004->tx_handler().set(m_i8251kbd, FUNC(i8251_device::write_rxd));
 
 	// baud rate is supposed to be 4800 but keyboard is slightly faster
-	clock_device &keyboard_clock(CLOCK(config, "keyboard_clock", 4960*16));
+	clock_device &keyboard_clock(CLOCK(config, "keyboard_clock", 4960 * 16));
 	keyboard_clock.signal_handler().set(FUNC(ksm_state::write_keyboard_clock));
 }
 

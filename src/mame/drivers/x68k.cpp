@@ -147,24 +147,24 @@
 static constexpr uint32_t adpcm_clock[2] = { 8000000, 4000000 };
 static constexpr uint32_t adpcm_div[4] = { 1024, 768, 512, /* Reserved */512 };
 
-void x68k_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void x68k_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_X68K_LED:
-		led_callback(ptr, param);
+		led_callback(param);
 		break;
 	case TIMER_X68K_SCC_ACK:
-		scc_ack(ptr, param);
+		scc_ack(param);
 		break;
 	case TIMER_MD_6BUTTON_PORT1_TIMEOUT:
-		md_6button_port1_timeout(ptr, param);
+		md_6button_port1_timeout(param);
 		break;
 	case TIMER_MD_6BUTTON_PORT2_TIMEOUT:
-		md_6button_port2_timeout(ptr, param);
+		md_6button_port2_timeout(param);
 		break;
 	case TIMER_X68K_BUS_ERROR:
-		bus_error(ptr, param);
+		bus_error(param);
 		break;
 	case TIMER_X68K_FDC_TC:
 		m_upd72065->tc_w(ASSERT_LINE);

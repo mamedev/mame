@@ -42,7 +42,7 @@ public:
 		, m_pio3(*this, "pio3")
 		, m_ctc(*this, "ctc")
 		, m_sio(*this, "sio")
-		, m_io_keyboard(*this, "KEY.%u", 0)
+		, m_io_keyboard(*this, "KEY.%u", 0U)
 		, m_beep(*this, "beeper")
 	{ }
 
@@ -55,8 +55,8 @@ private:
 	u8 port08_r();
 	void port08_w(u8 data);
 	void port09_w(u8 data);
-	u8 m_port08;
-	u8 m_port09;
+	u8 m_port08 = 0U;
+	u8 m_port09 = 0U;
 	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio1;
 	required_device<z80pio_device> m_pio2;

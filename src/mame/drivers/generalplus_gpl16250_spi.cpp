@@ -14,6 +14,7 @@
 
 #include "emu.h"
 #include "includes/generalplus_gpl16250.h"
+#include "softlist_dev.h"
 
 
 class generalplus_gpspispi_game_state : public gcm394_game_state

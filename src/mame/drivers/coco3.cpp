@@ -17,7 +17,7 @@
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6809/hd6309.h"
 #include "formats/coco_cas.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 
 
@@ -156,13 +156,13 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( coco3_joystick )
 	PORT_START(JOYSTICK_RX_TAG)
-	PORT_BIT( 0x3ff, 0x140,  IPT_AD_STICK_X) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0x00,0x280) PORT_CODE_DEC(KEYCODE_4_PAD) PORT_CODE_INC(KEYCODE_6_PAD) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH) PORT_PLAYER(1) PORT_CONDITION(CTRL_SEL_TAG, 0x0f, EQUALS, 0x01)
+	PORT_BIT( 0x3ff, 0x200,  IPT_AD_STICK_X) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0, 1023) PORT_CODE_DEC(KEYCODE_4_PAD) PORT_CODE_INC(KEYCODE_6_PAD) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH) PORT_PLAYER(1) PORT_CONDITION(CTRL_SEL_TAG, 0x0f, EQUALS, 0x01)
 	PORT_START(JOYSTICK_RY_TAG)
-	PORT_BIT( 0x3ff, 0x140,  IPT_AD_STICK_Y) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0x00,0x280) PORT_CODE_DEC(KEYCODE_8_PAD) PORT_CODE_INC(KEYCODE_2_PAD) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH)   PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH)  PORT_PLAYER(1) PORT_CONDITION(CTRL_SEL_TAG, 0x0f, EQUALS, 0x01)
+	PORT_BIT( 0x3ff, 0x200,  IPT_AD_STICK_Y) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0, 1023) PORT_CODE_DEC(KEYCODE_8_PAD) PORT_CODE_INC(KEYCODE_2_PAD) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH)   PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH)  PORT_PLAYER(1) PORT_CONDITION(CTRL_SEL_TAG, 0x0f, EQUALS, 0x01)
 	PORT_START(JOYSTICK_LX_TAG)
-	PORT_BIT( 0x3ff, 0x140,  IPT_AD_STICK_X) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0x00,0x280) PORT_CODE_DEC(KEYCODE_4_PAD) PORT_CODE_INC(KEYCODE_6_PAD) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH) PORT_PLAYER(2) PORT_CONDITION(CTRL_SEL_TAG, 0xf0, EQUALS, 0x10)
+	PORT_BIT( 0x3ff, 0x200,  IPT_AD_STICK_X) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0, 1023) PORT_CODE_DEC(KEYCODE_4_PAD) PORT_CODE_INC(KEYCODE_6_PAD) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH) PORT_PLAYER(2) PORT_CONDITION(CTRL_SEL_TAG, 0xf0, EQUALS, 0x10)
 	PORT_START(JOYSTICK_LY_TAG)
-	PORT_BIT( 0x3ff, 0x140,  IPT_AD_STICK_Y) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0x00,0x280) PORT_CODE_DEC(KEYCODE_8_PAD) PORT_CODE_INC(KEYCODE_2_PAD) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH)   PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH)  PORT_PLAYER(2) PORT_CONDITION(CTRL_SEL_TAG, 0xf0, EQUALS, 0x10)
+	PORT_BIT( 0x3ff, 0x200,  IPT_AD_STICK_Y) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0, 1023) PORT_CODE_DEC(KEYCODE_8_PAD) PORT_CODE_INC(KEYCODE_2_PAD) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH)   PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH)  PORT_PLAYER(2) PORT_CONDITION(CTRL_SEL_TAG, 0xf0, EQUALS, 0x10)
 	PORT_START(JOYSTICK_BUTTONS_TAG)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Right Button 1") PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(JOYCODE_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_PLAYER(1) PORT_CONDITION(CTRL_SEL_TAG, 0x0f, EQUALS, 0x01)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Right Button 2") PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_DEL_PAD) PORT_CODE(JOYCODE_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_PLAYER(1) PORT_CONDITION(CTRL_SEL_TAG, 0x0f, EQUALS, 0x01)
@@ -305,11 +305,6 @@ void coco3_state::coco3(machine_config &config)
 	rs232.dcd_handler().set(PIA1_TAG, FUNC(pia6821_device::ca1_w));
 	rs232.set_option_device_input_defaults("rs_printer", DEVICE_INPUT_DEFAULTS_NAME(rs_printer));
 
-	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), coco_cart, "fdcv11"));
-	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
-	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
-
 	COCO_VHD(config, m_vhd_0, 0, m_maincpu);
 	COCO_VHD(config, m_vhd_1, 0, m_maincpu);
 
@@ -332,6 +327,12 @@ void coco3_state::coco3(machine_config &config)
 
 	// floating space
 	coco_floating(config);
+
+	// cartridge
+	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), coco_cart, "fdcv11"));
+	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
+	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
 	// software lists
 	SOFTWARE_LIST(config, "cart_list").set_original("coco_cart").set_filter("COCO3");
@@ -384,6 +385,11 @@ ROM_START(coco3p)
 	ROM_LOAD("coco3p.rom",  0x0000, 0x8000, CRC(ff050d80) SHA1(631e383068b1f52a8f419f4114b69501b21cf379))
 ROM_END
 
+ROM_START(msm3)
+	ROM_REGION(0x8000,MAINCPU_TAG,0)
+	ROM_LOAD("msm3.rom", 0x0000, 0x8000, CRC(26d67890) SHA1(271fd39b3eb3f521aa5484ae7ce3956ab9ef782c))
+ROM_END
+
 #define rom_coco3h  rom_coco3
 #define rom_coco3dw1 rom_coco3
 
@@ -391,7 +397,9 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-COMP( 1986, coco3,    coco, 0, coco3,    coco3, coco3_state, empty_init, "Tandy Radio Shack", "Color Computer 3 (NTSC)",          0 )
-COMP( 1986, coco3p,   coco, 0, coco3p,   coco3, coco3_state, empty_init, "Tandy Radio Shack", "Color Computer 3 (PAL)",           0 )
-COMP( 19??, coco3h,   coco, 0, coco3h,   coco3, coco3_state, empty_init, "Tandy Radio Shack", "Color Computer 3 (NTSC; HD6309)",  MACHINE_UNOFFICIAL )
-COMP( 19??, coco3dw1, coco, 0, coco3dw1, coco3dw, coco3_state, empty_init, "Tandy Radio Shack", "Color Computer 3 (NTSC; HDB-DOS)", MACHINE_UNOFFICIAL )
+//    YEAR  NAME      PARENT COMPAT MACHINE   INPUT    CLASS        INIT        COMPANY              FULLNAME                            FLAGS
+COMP( 1986, coco3,    coco,  0,     coco3,    coco3,   coco3_state, empty_init, "Tandy Radio Shack", "Color Computer 3 (NTSC)",          0 )
+COMP( 1986, coco3p,   coco,  0,     coco3p,   coco3,   coco3_state, empty_init, "Tandy Radio Shack", "Color Computer 3 (PAL)",           0 )
+COMP( 19??, coco3h,   coco,  0,     coco3h,   coco3,   coco3_state, empty_init, "Tandy Radio Shack", "Color Computer 3 (NTSC; HD6309)",  MACHINE_UNOFFICIAL )
+COMP( 19??, coco3dw1, coco,  0,     coco3dw1, coco3dw, coco3_state, empty_init, "Tandy Radio Shack", "Color Computer 3 (NTSC; HDB-DOS)", MACHINE_UNOFFICIAL )
+COMP( 1987, msm3,     coco,  0,     coco3,    coco3,   coco3_state, empty_init, "ILCE / SEP",        "Micro-Sep Model 3",                0 )

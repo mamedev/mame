@@ -152,7 +152,7 @@ void c2040_fdc_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void c2040_fdc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void c2040_fdc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	live_sync();
 	live_run();

@@ -178,7 +178,7 @@ void nbmj9195_state::update_pixel(int vram, int x, int y)
 	m_tmpbitmap[vram].pix(y, x) = color;
 }
 
-void nbmj9195_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nbmj9195_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

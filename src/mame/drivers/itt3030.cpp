@@ -202,6 +202,7 @@ Beeper Circuit, all ICs shown:
 #include "video/tms9927.h"          //Display hardware
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 #include "formats/itt3030_dsk.h"
 #include "debugger.h"
@@ -281,11 +282,11 @@ private:
 	// shared pointers
 	required_shared_ptr<uint8_t> m_vram;
 
-	uint8_t m_kbdclk, m_kbdread, m_kbdport2;
+	uint8_t m_kbdclk = 0, m_kbdread = 0, m_kbdport2 = 0;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	floppy_image_device *m_curfloppy;
-	bool m_fdc_irq, m_fdc_drq, m_fdc_hld;
+	floppy_image_device *m_curfloppy = nullptr;
+	bool m_fdc_irq = false, m_fdc_drq = false, m_fdc_hld = false;
 };
 
 //**************************************************************************

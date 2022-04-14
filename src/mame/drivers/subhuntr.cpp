@@ -60,7 +60,7 @@ public:
 protected:
 	enum { TIMER_VIDEO };
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -107,12 +107,12 @@ private:
 
 ***************************************************************************/
 
-void subhuntr_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void subhuntr_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_VIDEO:
-		video_callback(ptr, param);
+		video_callback(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in subhuntr_state::device_timer");

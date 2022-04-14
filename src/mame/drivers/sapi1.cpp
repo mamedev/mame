@@ -62,7 +62,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_p_videoram(*this, "videoram")
 		, m_bank1(*this, "bank1")
-		, m_io_keyboard(*this, "LINE%u", 0)
+		, m_io_keyboard(*this, "LINE%u", 0U)
 		, m_maincpu(*this, "maincpu")
 		, m_cass(*this, "cassette")
 		, m_uart(*this, "uart")
@@ -122,15 +122,15 @@ private:
 	void sapi3b_io(address_map &map);
 	void sapi3b_mem(address_map &map);
 
-	uint8_t m_term_data;
-	uint8_t m_keyboard_mask;
-	uint8_t m_refresh_counter;
-	uint8_t m_zps3_25;
+	uint8_t m_term_data = 0U;
+	uint8_t m_keyboard_mask = 0U;
+	uint8_t m_refresh_counter = 0U;
+	uint8_t m_zps3_25 = 0U;
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	DECLARE_WRITE_LINE_MEMBER(kansas_w);
-	u8 m_cass_data[4];
-	bool m_cassinbit, m_cassoutbit, m_cassold;
-	bool m_ier, m_iet;
+	u8 m_cass_data[4]{};
+	bool m_cassinbit = 0, m_cassoutbit = 0, m_cassold = 0;
+	bool m_ier = 0, m_iet = 0;
 	optional_memory_bank m_bank1;   // Only for sapi3
 	required_ioport_array<5> m_io_keyboard;
 	required_device<cpu_device> m_maincpu;

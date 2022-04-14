@@ -77,7 +77,7 @@ void alesis_dm3ag_device::device_reset()
 //-------------------------------------------------
 //  device_timer - handler timer events
 //-------------------------------------------------
-void alesis_dm3ag_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void alesis_dm3ag_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (m_output_active)
 	{

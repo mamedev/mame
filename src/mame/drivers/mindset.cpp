@@ -12,6 +12,7 @@
 #include "bus/rs232/rs232.h"
 
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "mindset.lh"
@@ -169,7 +170,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	u8 m_p1, m_p2;
+	u8 m_p1 = 0, m_p2 = 0;
 
 	required_device<i8042_device> m_soundcpu;
 	required_device<dac_byte_interface> m_dac;

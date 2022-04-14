@@ -39,7 +39,7 @@ TODO:
 #include "video/pwm.h"
 
 #include "emupal.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "screen.h"
 #include "speaker.h"
 

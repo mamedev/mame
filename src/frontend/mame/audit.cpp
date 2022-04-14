@@ -15,10 +15,12 @@
 
 #include "emuopts.h"
 #include "drivenum.h"
+#include "fileio.h"
 #include "romload.h"
 #include "softlist_dev.h"
 
 #include "chd.h"
+#include "path.h"
 
 #include <algorithm>
 
@@ -422,8 +424,10 @@ media_auditor::summary media_auditor::audit_samples()
 			emu_file file(m_enumerator.options().sample_path(), OPEN_FLAG_READ | OPEN_FLAG_NO_PRELOAD);
 			path_iterator path(searchpath);
 			std::string curpath;
-			while (path.next(curpath, samplename))
+			while (path.next(curpath))
 			{
+				util::path_append(curpath, samplename);
+
 				// attempt to access the file (.flac) or (.wav)
 				std::error_condition filerr = file.open(curpath + ".flac");
 				if (filerr)

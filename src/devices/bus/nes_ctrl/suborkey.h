@@ -27,15 +27,14 @@ public:
 	// construction/destruction
 	nes_suborkey_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual uint8_t read_exp(offs_t offset) override;
+	virtual void write(uint8_t data) override;
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
-	virtual uint8_t read_exp(offs_t offset) override;
-	virtual void write(uint8_t data) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	required_ioport_array<13> m_kbd;

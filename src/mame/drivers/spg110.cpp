@@ -29,7 +29,7 @@
 #include "cpu/unsp/unsp.h"
 #include "machine/spg110.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 class spg110_game_state : public driver_device

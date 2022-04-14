@@ -10,8 +10,10 @@
 #include "video/bufsprite.h"
 #include "video/vsystem_spr.h"
 #include "video/k053936.h"
+
 #include "emupal.h"
 #include "tilemap.h"
+
 
 class crshrace_state : public driver_device
 {
@@ -57,10 +59,10 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	// video-related
-	tilemap_t *m_tilemap[2];
-	uint8_t m_roz_bank;
-	uint8_t m_gfxctrl;
-	uint8_t m_flipscreen;
+	tilemap_t *m_tilemap[2]{};
+	uint8_t m_roz_bank = 0U;
+	uint8_t m_gfxctrl = 0U;
+	uint8_t m_flipscreen = 0U;
 
 	uint32_t tile_callback(uint32_t code);
 	void sh_bankswitch_w(uint8_t data);
@@ -76,6 +78,8 @@ private:
 	void main_map(address_map &map);
 	void sound_io_map(address_map &map);
 	void sound_map(address_map &map);
+
+	[[maybe_unused]] void patch_code(uint16_t offset);
 };
 
 #endif // MAME_INCLUDES_CRSHRACE_H

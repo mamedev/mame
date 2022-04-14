@@ -17,7 +17,6 @@ To Do:
  - Coin optics
  - Correct sound banking
  - Proper protection emulation in tm4k and later games
- - Find cause and fix hang in Solitaire Erotic (all Touchmaster version hang in this game)
 
 To be dumped and added:
 
@@ -154,9 +153,9 @@ private:
 	required_device<microtouch_device> m_microtouch;
 	required_device<mc68681_device> m_duart;
 
-	int m_okibank;
+	int m_okibank = 0;
 
-	uint8_t m_rtc_ram[8];
+	uint8_t m_rtc_ram[8]{};
 };
 
 WRITE_LINE_MEMBER(tmaster_state::blitter_irq_callback)
@@ -270,7 +269,7 @@ READ_LINE_MEMBER(tmaster_state::read_rand)
 void tmaster_state::tmaster_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
-	map(0x200000, 0x27ffff).ram();
+	map(0x200000, 0x20ffff).mirror(0x70000).ram();
 	map(0x280000, 0x28ffef).ram().share("nvram");
 	map(0x28fff0, 0x28ffff).rw(FUNC(tmaster_state::rtc_r), FUNC(tmaster_state::rtc_w));
 

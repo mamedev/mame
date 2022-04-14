@@ -270,7 +270,7 @@ void sega_scu_device::device_reset_after_children()
 }
 
 
-void sega_scu_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void sega_scu_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 
 	switch(id)

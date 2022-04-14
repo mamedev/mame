@@ -260,7 +260,7 @@ WRITE_LINE_MEMBER( myarc_fdc_device::fdc_mon_w )
 	// Do not start the motors when no drive is selected. However, motors
 	// can always be stopped.
 	if (m_selected_drive != 0 || state==1)
-		for (int i=0; i < 3; i++)
+		for (int i = 0; i < 4; i++)
 			if (m_floppy[i] != nullptr) m_floppy[i]->mon_w(state);
 }
 

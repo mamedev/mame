@@ -25,7 +25,6 @@
 #include "cycles.h"
 #include "i386ops.h"
 
-#include "debugger.h"
 #include "debug/debugcpu.h"
 #include "debug/express.h"
 
@@ -56,7 +55,6 @@ i386_device::i386_device(const machine_config &mconfig, device_type type, const 
 	, device_vtlb_interface(mconfig, *this, AS_PROGRAM)
 	, m_program_config("program", ENDIANNESS_LITTLE, program_data_width, program_addr_width, 0, 32, 12)
 	, m_io_config("io", ENDIANNESS_LITTLE, io_data_width, 16, 0)
-	, m_dr_breakpoints{nullptr, nullptr, nullptr, nullptr}
 	, m_smiact(*this)
 	, m_ferr_handler(*this)
 {
@@ -2026,10 +2024,7 @@ void i386_device::i386_common_init()
 	m_ferr_handler(0);
 
 	set_icountptr(m_cycles);
-	m_notifier = m_program->add_change_notifier([this](read_or_write mode)
-	{
-		dri_changed();
-	});
+	m_notifier = m_program->add_change_notifier([this] (read_or_write mode) { dri_changed(); });
 }
 
 void i386_device::device_start()
@@ -2449,6 +2444,7 @@ void i386_device::zero_state()
 	m_opcode_bytes_length = 0;
 	memset(m_opcode_addrs, 0, sizeof(m_opcode_addrs));
 	m_opcode_addrs_index = 0;
+	m_dri_changed_active = false;
 }
 
 void i386_device::device_reset()

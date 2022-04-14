@@ -100,17 +100,17 @@ public:
 
 private:
 	/* controls related */
-	int m_power;
-	int m_max_power;
-	int m_input_power;
-	int m_previous_power;
-	int m_cnt;
+	int m_power = 0;
+	int m_max_power = 0;
+	int m_input_power = 0;
+	int m_previous_power = 0;
+	int m_cnt = 0;
 
 #if USE_MSM
-	uint32_t m_adpcm_pos;
-	uint8_t m_adpcm_idle;
-	uint8_t m_trigger;
-	uint8_t m_adpcm_data;
+	uint32_t m_adpcm_pos = 0;
+	uint8_t m_adpcm_idle = 0;
+	uint8_t m_trigger = 0;
+	uint8_t m_adpcm_data = 0;
 #endif
 	void controls_w(uint8_t data);
 	uint8_t controls_r();

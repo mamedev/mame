@@ -9,7 +9,6 @@
 
 #include "emu.h"
 #include "i186.h"
-#include "debugger.h"
 #include "i86inline.h"
 
 #define LOG_PORTS           0
@@ -1199,7 +1198,7 @@ void i80186_cpu_device::external_int(uint16_t intno, int state)
  *
  *************************************/
 
-void i80186_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void i80186_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{
@@ -1303,10 +1302,10 @@ void i80186_cpu_device::inc_timer(int which)
 	if (t->control & 2)
 	{
 		if (t->count == ((t->control & 0x1000) ? t->maxB : t->maxA))
-			device_timer(*t->int_timer, which, which, nullptr);
+			device_timer(*t->int_timer, which, which);
 	}
 	else if (t->count == t->maxA)
-		device_timer(*t->int_timer, which, which, nullptr);
+		device_timer(*t->int_timer, which, which);
 }
 
 void i80186_cpu_device::internal_timer_update(int which, int new_count, int new_maxA, int new_maxB, int new_control)

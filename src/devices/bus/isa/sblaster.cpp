@@ -1341,7 +1341,7 @@ void isa16_sblaster16_device::device_start()
 
 void sb_device::device_start()
 {
-	m_timer = timer_alloc(0, nullptr);
+	m_timer = timer_alloc(0);
 
 	save_item(NAME(m_dack_out));
 	save_item(NAME(m_onebyte_midi));
@@ -1559,7 +1559,7 @@ void sb_device::dack_w(int line, uint8_t data)
 	}
 }
 
-void sb_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void sb_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
 {
 	if (tid)
 		return;

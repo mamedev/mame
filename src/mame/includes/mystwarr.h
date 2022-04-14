@@ -19,38 +19,41 @@ public:
 		konamigx_state(mconfig, type, tag),
 		m_k054321(*this, "k054321"),
 		m_gx_workram(*this, "gx_workram"),
-		m_spriteram(*this, "spriteram")
+		m_spriteram(*this, "spriteram"),
+		m_okibank(*this, "okibank")
 	{ }
 
 	void martchmp(machine_config &config);
 	void mystwarr(machine_config &config);
 	void dadandrn(machine_config &config);
 	void viostorm(machine_config &config);
+	void viostormbl(machine_config &config);
 	void gaiapols(machine_config &config);
 	void metamrph(machine_config &config);
 
 private:
-	required_device<k054321_device> m_k054321;
+	optional_device<k054321_device> m_k054321;
 	required_shared_ptr<uint16_t> m_gx_workram;
 	optional_shared_ptr<uint16_t> m_spriteram;
+	optional_memory_bank m_okibank; // for viostormabbl
 	std::unique_ptr<uint8_t[]> m_decoded;
 
-	uint8_t m_mw_irq_control;
-	int m_cur_sound_region;
-	int m_layer_colorbase[6];
-	int m_oinprion;
-	int m_cbparam;
-	int m_sprite_colorbase;
-	int m_sub1_colorbase;
-	int m_last_psac_colorbase;
-	int m_gametype;
-	int m_roz_enable;
-	int m_roz_rombank;
-	tilemap_t *m_ult_936_tilemap;
-	uint16_t m_clip;
+	uint8_t m_mw_irq_control = 0;
+	int m_cur_sound_region = 0;
+	int m_layer_colorbase[6]{};
+	int m_oinprion = 0;
+	int m_cbparam = 0;
+	int m_sprite_colorbase = 0;
+	int m_sub1_colorbase = 0;
+	int m_last_psac_colorbase = 0;
+	int m_gametype = 0;
+	int m_roz_enable = 0;
+	int m_roz_rombank = 0;
+	tilemap_t *m_ult_936_tilemap = nullptr;
+	uint16_t m_clip = 0;
 
-	uint8_t m_sound_ctrl;
-	uint8_t m_sound_nmi_clk;
+	uint8_t m_sound_ctrl = 0;
+	uint8_t m_sound_nmi_clk = 0;
 
 	uint16_t eeprom_r(offs_t offset, uint16_t mem_mask = ~0);
 	void mweeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -81,6 +84,7 @@ private:
 	DECLARE_VIDEO_START(mystwarr);
 	DECLARE_MACHINE_RESET(viostorm);
 	DECLARE_VIDEO_START(viostorm);
+	DECLARE_MACHINE_START(viostormbl);
 	DECLARE_MACHINE_RESET(metamrph);
 	DECLARE_VIDEO_START(metamrph);
 	DECLARE_MACHINE_RESET(dadandrn);
@@ -113,5 +117,7 @@ private:
 	void metamrph_map(address_map &map);
 	void mystwarr_map(address_map &map);
 	void mystwarr_sound_map(address_map &map);
+	void oki_map(address_map &map); // for viostormabbl
 	void viostorm_map(address_map &map);
+	void viostormbl_map(address_map &map);
 };

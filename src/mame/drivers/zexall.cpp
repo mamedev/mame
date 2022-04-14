@@ -53,10 +53,10 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	required_shared_ptr<uint8_t> m_main_ram;
-	uint8_t m_out_data; // byte written to 0xFFFF
-	uint8_t m_out_req; // byte written to 0xFFFE
-	uint8_t m_out_req_last; // old value at 0xFFFE before the most recent write
-	uint8_t m_out_ack; // byte written to 0xFFFC
+	uint8_t m_out_data = 0U; // byte written to 0xFFFF
+	uint8_t m_out_req = 0U; // byte written to 0xFFFE
+	uint8_t m_out_req_last = 0U; // old value at 0xFFFE before the most recent write
+	uint8_t m_out_ack = 0U; // byte written to 0xFFFC
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

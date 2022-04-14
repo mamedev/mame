@@ -17,15 +17,18 @@
 
 #include "emu.h"
 #include "machine/genpc.h"
-#include "cpu/i86/i86.h"
-#include "cpu/nec/nec.h"
+
 #include "bus/isa/xsu_cards.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
+#include "cpu/i86/i86.h"
 #include "machine/pc_lpt.h"
 #include "machine/ram.h"
+
 #include "softlist.h"
 
+
+namespace {
 
 class iskr103x_state : public driver_device
 {
@@ -67,7 +70,7 @@ static DEVICE_INPUT_DEFAULTS_START(iskr1031)
 	DEVICE_INPUT_DEFAULTS("DSW0", 0x30, 0x20)
 DEVICE_INPUT_DEFAULTS_END
 
-// XXX
+
 void iskr103x_state::iskr1030m(machine_config &config)
 {
 	/* basic machine hardware */
@@ -121,6 +124,9 @@ ROM_START( iskr1031 )
 	ROMX_LOAD( "150-06.bin", 0xc000, 0x2000, CRC(1adbf969) SHA1(08c0a0fc50a75e6207b1987bae389cca60893eac), ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD( "150-07.bin", 0xc001, 0x2000, CRC(0dc4b65a) SHA1(c96f066251a7343eac8113ea9dcb2cb12d0334d5), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
+
+} // anonymous namespace
+
 
 /***************************************************************************
 
