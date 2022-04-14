@@ -118,8 +118,6 @@ K Kick & Kick                                   2001       GNA36 EA          (no
 P Konami 80's Arcade Gallery                    1998.11    GC826 JA          826 JA A01
 P Konami 80's AC Special                        1998       GC826 UA          826 UA A01
 D Mambo a GoGo                                  2001.06
-D *Mambo Heaven                                 2001
-D *Mambo King                                   2001
 D Punchmania Hokuto no Ken                      2000.03                      918 JA B02
 D Punchmania Hokuto no Ken 2                    2000.12                      A09 JA A02
 P Salary Man Champ
