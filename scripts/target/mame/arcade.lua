@@ -2466,8 +2466,6 @@ files {
 	MAME_DIR .. "src/mame/video/gyruss.cpp",
 	MAME_DIR .. "src/mame/drivers/hcastle.cpp",
 	MAME_DIR .. "src/mame/drivers/hexion.cpp",
-	MAME_DIR .. "src/mame/includes/hexion.h",
-	MAME_DIR .. "src/mame/video/hexion.cpp",
 	MAME_DIR .. "src/mame/drivers/hornet.cpp",
 	MAME_DIR .. "src/mame/machine/konppc.cpp",
 	MAME_DIR .. "src/mame/machine/konppc.h",
