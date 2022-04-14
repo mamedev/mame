@@ -47,6 +47,7 @@ enum class meta_type {
 
 class meta_value {
 public:
+	meta_type type() const;
 	std::string to_string() const;
 	static meta_value from_string(meta_type type, std::string value);
 
