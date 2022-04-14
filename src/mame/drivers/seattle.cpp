@@ -444,6 +444,8 @@ private:
 	void widget_cs3_map(address_map &map);
 	void carnevil_cs3_map(address_map &map);
 	void flagstaff_cs3_map(address_map &map);
+
+	static void hdd_config(device_t* device);
 };
 
 /*************************************
@@ -520,10 +522,6 @@ void seattle_state::machine_reset()
 
 	if (m_board_config == SEATTLE_WIDGET_CONFIG)
 		widget_reset();
-
-	// Set the disk dma transfer speed
-	auto* hdd = subdevice<ide_hdd_device>(PCI_ID_IDE":ide:0:hdd");
-	hdd->set_dma_transfer_time(attotime::from_usec(15));
 }
 
 /*************************************
@@ -2029,6 +2027,7 @@ void seattle_state::seattle_common(machine_config &config)
 	ide_pci_device &ide(IDE_PCI(config, PCI_ID_IDE, 0, 0x100b0002, 0x01, 0x0));
 	ide.irq_handler().set_inputline(m_maincpu, IDE_IRQ_NUM);
 	ide.set_legacy_top(0x0a0);
+	ide.subdevice<bus_master_ide_controller_device>("ide")->slot(0).set_option_machine_config("hdd", hdd_config);
 
 	// video hardware
 	VOODOO_1_PCI(config, m_voodoo, 0, m_maincpu, m_screen);
@@ -2050,6 +2049,11 @@ void seattle_state::seattle_common(machine_config &config)
 	m_screen->set_screen_update(PCI_ID_VIDEO, FUNC(voodoo_1_pci_device::screen_update));
 }
 
+void seattle_state::hdd_config(device_t* device)
+{
+	// Set the disk dma transfer speed
+	static_cast<ide_hdd_device*>(device)->set_dma_transfer_time(attotime::from_usec(15));
+}
 
 void seattle_state::phoenix(machine_config &config)
 {
