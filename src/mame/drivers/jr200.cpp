@@ -2,18 +2,19 @@
 // copyright-holders:Angelo Salese, Roberto Zandona'
 /***************************************************************************
 
-    JR-200 (c) 1982 National / Panasonic
+JR-200 (c) 1982 National / Panasonic
 
-    driver by Roberto Zandona' and Angelo Salese
+driver by Roberto Zandona' and Angelo Salese
 
-    http://www.armchairarcade.com/neo/node/1598
+http://www.armchairarcade.com/neo/node/1598
 
-    TODO:
-    - Timings are basically screwed, it takes too much to load the POST but
-      then the cursor blink is too fast
-    - keyboard MCU irq and data polling simulation should be inside a timer
-      callback
-    - MN1544 4-bit CPU core and ROM dump
+TODO:
+- Timings are basically screwed, it takes too much to load the POST but
+  then the cursor blink is too fast
+- keyboard MCU irq and data polling simulation should be inside a timer
+  callback
+- MN1544 4-bit CPU core and ROM dump
+- ROM regions "gfx_ram" and "pcg" are being written to - to be refactored.
 
 ****************************************************************************/
 
@@ -58,10 +59,10 @@ private:
 	required_shared_ptr<uint8_t> m_vram;
 	required_shared_ptr<uint8_t> m_cram;
 	required_shared_ptr<uint8_t> m_mn1271_ram;
-	uint8_t m_border_col;
-	uint8_t m_old_keydata;
-	uint8_t m_freq_reg[2];
-	emu_timer *m_timer_d;
+	uint8_t m_border_col = 0;
+	uint8_t m_old_keydata = 0;
+	uint8_t m_freq_reg[2]{};
+	emu_timer *m_timer_d = nullptr;
 	uint8_t jr200_pcg_1_r(offs_t offset);
 	uint8_t jr200_pcg_2_r(offs_t offset);
 	void jr200_pcg_1_w(offs_t offset, uint8_t data);
@@ -179,9 +180,7 @@ uint32_t jr200_state::screen_update_jr200(screen_device &screen, bitmap_ind16 &b
 			{
 				for(int xi=0;xi<8;xi++)
 				{
-					const uint8_t *gfx_data;
-					int pen;
-
+					int pen = 0;
 					if(attr & 0x80) //bitmap mode
 					{
 						/*
@@ -194,16 +193,14 @@ uint32_t jr200_state::screen_update_jr200(screen_device &screen, bitmap_ind16 &b
 						    10xx x--- down-right
 						    10-- -xxx down-left
 						*/
-						int step;
-
-						step = ((xi & 4) ? 3 : 0);
+						int step = ((xi & 4) ? 3 : 0);
 						step+= ((yi & 4) ? 6 : 0);
 
 						pen = ((((attr & 0x3f) << 6) | (tile & 0x3f)) >> (step)) & 0x07;
 					}
 					else // tile mode
 					{
-						gfx_data = (attr & 0x40) ? m_pcg->base() : m_gfx_ram->base();
+						const uint8_t *gfx_data = (attr & 0x40) ? m_pcg->base() : m_gfx_ram->base();
 
 						pen = (gfx_data[(tile*8)+yi]>>(7-xi) & 1) ? (attr & 0x7) : ((attr & 0x38) >> 3);
 					}
@@ -260,7 +257,7 @@ I/O Device
 
 uint8_t jr200_state::mcu_keyb_r()
 {
-	int row, col, table = 0;
+	int table = 0;
 	uint8_t keydata = 0;
 
 	if (m_row9->read() & 0x07)
@@ -270,7 +267,7 @@ uint8_t jr200_state::mcu_keyb_r()
 	}
 
 	/* scan keyboard */
-	for (row = 0; row < 9; row++)
+	for (int row = 0; row < 9; row++)
 	{
 		uint8_t data = 0xff;
 
@@ -287,7 +284,7 @@ uint8_t jr200_state::mcu_keyb_r()
 			case 8: data = m_row8->read(); break;
 		}
 
-		for (col = 0; col < 8; col++)
+		for (int col = 0; col < 8; col++)
 		{
 			if (!BIT(data, col))
 			{
@@ -313,13 +310,14 @@ void jr200_state::jr200_beep_w(uint8_t data)
 
 void jr200_state::jr200_beep_freq_w(offs_t offset, uint8_t data)
 {
-	uint32_t beep_freq;
-
 	m_freq_reg[offset] = data;
 
-	beep_freq = ((m_freq_reg[0]<<8) | (m_freq_reg[1] & 0xff)) + 1;
+	u32 beep_freq = ((m_freq_reg[0]<<8) | (m_freq_reg[1] & 0xff)) + 1;
 
-	m_beeper->set_clock(84000 / beep_freq);
+	if (beep_freq)
+		m_beeper->set_clock(84000 / beep_freq);
+	else
+		m_beeper->set_clock(0);
 }
 
 void jr200_state::jr200_border_col_w(uint8_t data)

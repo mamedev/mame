@@ -466,9 +466,9 @@ private:
 	uint16_t sysflash_r(offs_t offset);
 	void sysflash_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 private:
-	uint16_t * m_sysflash;
-	uint32_t m_sf_mode;
-	uint32_t m_sf_state;
+	uint16_t * m_sysflash = nullptr;
+	uint32_t m_sf_mode = 0;
+	uint32_t m_sf_state = 0;
 #endif
 };
 
