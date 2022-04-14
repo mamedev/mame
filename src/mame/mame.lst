@@ -14259,7 +14259,6 @@ nmsengen                        // (c) 1991 Video System (Japan)
 
 @source:fruitpc.cpp
 fruitpc                         // ???
-gogostrk                        //
 
 @source:fs3216.cpp
 fs3216                          //
@@ -34106,6 +34105,9 @@ pangofun                        // (c) 1995 InfoCube
 @source:panicr.cpp
 panicr                          // Seibu / Taito
 panicrg                         // Seibu / TV-Tuning (Germany)
+
+@source:paokaipc.cpp
+gogostrk                        //
 
 @source:paradise.cpp
 madball                         // (c) 1998 Yun Sung

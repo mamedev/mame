@@ -2107,13 +2107,14 @@ createMAMEProjects(_target, _subtarget, "ibmpc")
 files {
 	MAME_DIR .. "src/mame/drivers/calchase.cpp",
 	MAME_DIR .. "src/mame/drivers/fruitpc.cpp",
+	MAME_DIR .. "src/mame/drivers/igspc.cpp",
 	MAME_DIR .. "src/mame/drivers/pangofun.cpp",
+	MAME_DIR .. "src/mame/drivers/paokaipc.cpp",
 	MAME_DIR .. "src/mame/drivers/pcat_dyn.cpp",
 	MAME_DIR .. "src/mame/drivers/pcat_nit.cpp",
 	MAME_DIR .. "src/mame/drivers/pcxt.cpp",
 	MAME_DIR .. "src/mame/drivers/quakeat.cpp",
 	MAME_DIR .. "src/mame/drivers/queen.cpp",
-	MAME_DIR .. "src/mame/drivers/igspc.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "igs")
