@@ -39,6 +39,8 @@ DEFINE_DEVICE_TYPE(NES_WAIXING_D,     nes_waixing_d_device,     "nes_waixing_d",
 DEFINE_DEVICE_TYPE(NES_WAIXING_E,     nes_waixing_e_device,     "nes_waixing_e",     "NES Cart Waixing Type E PCB")
 DEFINE_DEVICE_TYPE(NES_WAIXING_F,     nes_waixing_f_device,     "nes_waixing_f",     "NES Cart Waixing Type F PCB")
 DEFINE_DEVICE_TYPE(NES_WAIXING_G,     nes_waixing_g_device,     "nes_waixing_g",     "NES Cart Waixing Type G PCB")
+DEFINE_DEVICE_TYPE(NES_WAIXING_G1,    nes_waixing_g1_device,    "nes_waixing_g1",    "NES Cart Waixing Type G1 PCB")
+DEFINE_DEVICE_TYPE(NES_WAIXING_G2,    nes_waixing_g2_device,    "nes_waixing_g2",    "NES Cart Waixing Type G2 PCB")
 DEFINE_DEVICE_TYPE(NES_WAIXING_H,     nes_waixing_h_device,     "nes_waixing_h",     "NES Cart Waixing Type H PCB")
 DEFINE_DEVICE_TYPE(NES_WAIXING_H1,    nes_waixing_h1_device,    "nes_waixing_h1",    "NES Cart Waixing Type H (Alt) PCB")
 DEFINE_DEVICE_TYPE(NES_WAIXING_I,     nes_waixing_i_device,     "nes_waixing_i",     "NES Cart Waixing Type I PCB")
@@ -95,6 +97,21 @@ nes_waixing_f_device::nes_waixing_f_device(const machine_config &mconfig, const 
 
 nes_waixing_g_device::nes_waixing_g_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_waixing_a_device(mconfig, NES_WAIXING_G, tag, owner, clock)
+{
+}
+
+nes_waixing_g1_device::nes_waixing_g1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, type, tag, owner, clock)
+{
+}
+
+nes_waixing_g1_device::nes_waixing_g1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_waixing_g1_device(mconfig, NES_WAIXING_G1, tag, owner, clock)
+{
+}
+
+nes_waixing_g2_device::nes_waixing_g2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_waixing_g1_device(mconfig, NES_WAIXING_G2, tag, owner, clock)
 {
 }
 
@@ -642,6 +659,49 @@ void nes_waixing_g_device::write_h(offs_t offset, uint8_t data)
 			waixing_write(offset, data);
 			break;
 	}
+}
+
+/*-------------------------------------------------
+
+ Waixing Board Type G1, G2
+
+ Games: Chengjisihan, Tangmu Lixian Ji, Fengse Huanxiang,
+        Tunshi Tiandi III, Datang Fengyun VI Dai
+
+ MMC3 clone with an extra 4K WRAM at 0x5000-0x5fff.
+
+ iNES: mapper 199
+
+ In MAME: Supported.
+
+ TODO: Sort out G, G1, G2 and determine which G games,
+ if any, are really mapper 199.
+
+ -------------------------------------------------*/
+
+u8 nes_waixing_g1_device::read_l(offs_t offset)
+{
+// LOG_MMC(("waixing_g1 read_l, offset: %04x\n", offset));
+
+	offset += 0x100;
+	if (!m_prgram.empty() && offset >= 0x1000)
+		return m_prgram[offset & 0x0fff & (m_prgram.size() - 1)];
+
+	return get_open_bus();
+}
+
+void nes_waixing_g1_device::write_l(offs_t offset, u8 data)
+{
+// LOG_MMC(("waixing_g1 write_l, offset: %04x, data: %02x\n", offset, data));
+
+	offset += 0x100;
+	if (!m_prgram.empty() && offset >= 0x1000)
+		m_prgram[offset & 0x0fff & (m_prgram.size() - 1)] = data;
+}
+
+void nes_waixing_g2_device::set_chr(u8 chr, int chr_base, int chr_mask)
+{
+// ignore CHR banking as all G2 games use 8K unbanked CHR RAM
 }
 
 /*-------------------------------------------------

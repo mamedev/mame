@@ -139,6 +139,36 @@ protected:
 };
 
 
+// ======================> nes_waixing_g1_device
+
+class nes_waixing_g1_device : public nes_txrom_device
+{
+public:
+	// construction/destruction
+	nes_waixing_g1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual u8 read_l(offs_t offset) override;
+	virtual void write_l(offs_t offset, u8 data) override;
+
+protected:
+	// construction/destruction
+	nes_waixing_g1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+};
+
+
+// ======================> nes_waixing_g2_device
+
+class nes_waixing_g2_device : public nes_waixing_g1_device
+{
+public:
+	// construction/destruction
+	nes_waixing_g2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual void set_chr(uint8_t chr, int chr_base, int chr_mask) override;
+};
+
+
 // ======================> nes_waixing_h_device
 
 class nes_waixing_h_device : public nes_txrom_device
@@ -356,6 +386,8 @@ DECLARE_DEVICE_TYPE(NES_WAIXING_D,     nes_waixing_d_device)
 DECLARE_DEVICE_TYPE(NES_WAIXING_E,     nes_waixing_e_device)
 DECLARE_DEVICE_TYPE(NES_WAIXING_F,     nes_waixing_f_device)
 DECLARE_DEVICE_TYPE(NES_WAIXING_G,     nes_waixing_g_device)
+DECLARE_DEVICE_TYPE(NES_WAIXING_G1,    nes_waixing_g1_device)
+DECLARE_DEVICE_TYPE(NES_WAIXING_G2,    nes_waixing_g2_device)
 DECLARE_DEVICE_TYPE(NES_WAIXING_H,     nes_waixing_h_device)
 DECLARE_DEVICE_TYPE(NES_WAIXING_H1,    nes_waixing_h1_device)
 DECLARE_DEVICE_TYPE(NES_WAIXING_I,     nes_waixing_i_device)
