@@ -237,6 +237,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("waixing_d",        NES_WAIXING_D);
 	device.option_add_internal("waixing_e",        NES_WAIXING_E);
 	device.option_add_internal("waixing_f",        NES_WAIXING_F);
+	device.option_add_internal("waixing_f1",       NES_WAIXING_F1);
 	device.option_add_internal("waixing_g",        NES_WAIXING_G);
 	device.option_add_internal("waixing_h",        NES_WAIXING_H);
 	device.option_add_internal("waixing_h1",       NES_WAIXING_H1);   // FIXME: Made up boards the different WRAM protect banks (see Shen Mi Jin San Jiao)

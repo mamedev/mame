@@ -232,7 +232,7 @@ static const nes_mmc mmc_list[] =
 	{ 196, BTL_SBROS11 },
 	{ 197, UNL_SF3 },
 	{ 198, WAIXING_TYPE_F },
-	{ 199, WAIXING_TYPE_G },
+	{ 199, WAIXING_TYPE_F1 },
 	{ 200, BMC_36IN1 },
 	{ 201, BMC_21IN1 },
 	{ 202, BMC_150IN1 },
