@@ -345,7 +345,7 @@ void nes_txrom_device::write_m(offs_t offset, uint8_t data)
 	{
 		if (!m_battery.empty())
 			m_battery[offset & (m_battery.size() - 1)] = data;
-		if (!m_prgram.empty())
+		else if (!m_prgram.empty())
 			m_prgram[offset & (m_prgram.size() - 1)] = data;
 	}
 }

@@ -145,6 +145,7 @@ static const nes_pcb pcb_list[] =
 	{ "waixing_d",        WAIXING_TYPE_D },
 	{ "waixing_e",        WAIXING_TYPE_E },
 	{ "waixing_f",        WAIXING_TYPE_F },
+	{ "waixing_f1",       WAIXING_TYPE_F1 },
 	{ "waixing_g",        WAIXING_TYPE_G },
 	{ "waixing_h",        WAIXING_TYPE_H },
 	{ "waixing_h1",       WAIXING_TYPE_H1 },

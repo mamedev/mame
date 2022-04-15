@@ -57904,20 +57904,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="chengji" supported="no">
-		<description>Cheng Ji Si Han (Chi)</description>
-		<year>19??</year>
+	<software name="chengji" cloneof="genghis">
+		<description>Chéngjísīhán (China)</description>
+		<year>2005</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1110"/>
 		<info name="alt_title" value="成吉思汗"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="waixing_a" />
-			<feature name="pcb" value="WAIXING-A" /> <!-- Wrong pcb, but header says mapper 198 which is wrong too -->
+			<feature name="slot" value="waixing_f1" />
+			<feature name="pcb" value="WAIXING-F1" />
 			<dataarea name="prg" size="524288">
 				<rom name="[es-1110] cheng ji si han (c).prg" size="524288" crc="935f2119" sha1="ca7fe978a1926827c6d3eb670d8e1ff9903614b7" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 4k WRAM on cartridge -->
+			<dataarea name="wram" size="4096">
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
@@ -57926,20 +57929,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="tmlxj" cloneof="sqtomsaw" supported="no">
-		<description>Tang Mu Li Xian Ji (Chi)</description>
-		<year>19??</year>
+	<software name="tmlxj" cloneof="sqtomsaw">
+		<description>Tāngmǔ Lìxiǎn Jì (China)</description>
+		<year>2005</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1111"/>
-		<info name="alt_title" value="汤姆历险记"/>
+		<info name="alt_title" value="湯姆歷險記"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="waixing_i" />
-			<feature name="pcb" value="WAIXING-I" />
+			<feature name="slot" value="waixing_f1" />
+			<feature name="pcb" value="WAIXING-F1" />
 			<dataarea name="prg" size="524288">
 				<rom name="tang mu li xian ji (ch).prg" size="524288" crc="2ca9bf7f" sha1="b9f444ff60f60c177eeec8671bec3731b0f6fe49" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 4k WRAM on cartridge -->
+			<dataarea name="wram" size="4096">
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
@@ -58102,20 +58108,27 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="fengshx" supported="no">
-		<description>Feng Se Huan Xiang (Chi)</description>
-		<year>19??</year>
+	<software name="fengshx" cloneof="sqtomsaw">
+		<description>Fēngsè Huànxiǎng (China)</description>
+		<year>2005</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1138"/>
 		<info name="alt_title" value="风色幻想"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" /> <!-- Header says mapper 4 but there are tons of unmapped accesses -->
+			<feature name="slot" value="waixing_f1" />
+			<feature name="pcb" value="WAIXING-F1" />
 			<dataarea name="prg" size="524288">
 				<rom name="[es-1138] feng se huan xiang (c).prg" size="524288" crc="2389335f" sha1="8148813ca6225c01088bbc9a4af2031176632b4d" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 4k WRAM on cartridge -->
+			<dataarea name="wram" size="4096">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -62301,9 +62314,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="tenchik2c" cloneof="tenchik2" supported="no">
-		<description>Tenchi wo Kurau II - Shokatsu Koumei Den (Chi, Simplified)</description>
-		<year>19??</year>
+	<software name="tenchik2c" cloneof="tenchik2">
+		<description>Tenchi wo Kurau II - Shokatsu Koumei Den (China)</description>
+		<year>1994</year>
 		<publisher>Waixing?</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="waixing_f" />
@@ -62314,6 +62327,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
+			<!-- 4k WRAM on cartridge -->
+			<dataarea name="wram" size="4096">
+			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
 				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
@@ -62321,9 +62337,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="tenchik2c1" cloneof="tenchik2" supported="no">
-		<description>Tenchi wo Kurau II - Shokatsu Koumei Den (Chi, Traditional)</description>
-		<year>19??</year>
+	<software name="tenchik2c1" cloneof="tenchik2">
+		<description>Tenchi wo Kurau II - Shokatsu Koumei Den (China, alt)</description>
+		<year>1994</year>
 		<publisher>Waixing?</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="waixing_f" />
@@ -62334,6 +62350,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
+			<!-- 4k WRAM on cartridge -->
+			<dataarea name="wram" size="4096">
+			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
 				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
@@ -62341,9 +62360,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="tstd2b" cloneof="tenchik2" supported="no">
-		<description>Tun Shi Tian Di II (Chi, Alt 2)</description>
-		<year>19??</year>
+	<software name="tstd2b" cloneof="tenchik2">
+		<description>Tūnshí Tiāndì II (China, alt 2)</description>
+		<year>1994</year>
 		<publisher>XianFeng Katong</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="waixing_f" />
@@ -62354,6 +62373,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
+			<!-- 4k WRAM on cartridge -->
+			<dataarea name="wram" size="4096">
+			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
 				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
@@ -62361,9 +62383,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="tstd2" cloneof="tenchik2" supported="no">
-		<description>Tun Shi Tian Di II (Chi)</description>
-		<year>19??</year>
+	<software name="tstd2" cloneof="tenchik2">
+		<description>Tūnshí Tiāndì II (China)</description>
+		<year>1994</year>
 		<publisher>XianFeng Katong</publisher>
 		<info name="alt_title" value="吞食天地II-诸葛孔明传"/>
 		<part name="cart" interface="nes_cart">
@@ -62375,6 +62397,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
+			<!-- 4k WRAM on cartridge -->
+			<dataarea name="wram" size="4096">
+			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
 				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
@@ -62382,9 +62407,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="tstd2a" cloneof="tenchik2" supported="no">
-		<description>Tun Shi Tian Di II (Chi, Alt)</description>
-		<year>19??</year>
+	<software name="tstd2a" cloneof="tenchik2">
+		<description>Tūnshí Tiāndì II (China, alt)</description>
+		<year>1994</year>
 		<publisher>XianFeng Katong</publisher>
 		<info name="alt_title" value="吞食天地II-诸葛孔明传"/>
 		<part name="cart" interface="nes_cart">
@@ -62396,6 +62421,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
+			<!-- 4k WRAM on cartridge -->
+			<dataarea name="wram" size="4096">
+			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
 				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
@@ -62403,11 +62431,11 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="tstd3" cloneof="tenchik2" supported="no">
-		<description>Tun Shi Tian Di III (Chi)</description>
-		<year>19??</year>
+	<software name="tstd3" cloneof="tenchik2">
+		<description>Tūnshí Tiāndì III (China)</description>
+		<year>1994</year>
 		<publisher>Waixing?</publisher>
-		<info name="alt_title" value="吞Ⅲ"/>
+		<info name="alt_title" value="吞食天地Ⅲ"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="waixing_f" />
 			<feature name="pcb" value="WAIXING-F" />
@@ -62416,6 +62444,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 4k WRAM on cartridge -->
+			<dataarea name="wram" size="4096">
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
@@ -64214,19 +64245,22 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="datangf6" supported="no">
-		<description>Da Tang Feng Yun VI Dai (Chi)</description>
+	<software name="datangf6" cloneof="genghis">
+		<description>Dàtáng Fēngyún VI Dài (China)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi</publisher>
-		<info name="alt_title" value="大唐风云VI代"/>
+		<info name="alt_title" value="大唐风云VI代"/> <!-- Is 代 really in the title? -->
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="waixing_a" />
-			<feature name="pcb" value="WAIXING-A" />
+			<feature name="slot" value="waixing_f1" />
+			<feature name="pcb" value="WAIXING-F1" />
 			<dataarea name="prg" size="524288">
 				<rom name="[hengge] da tang feng yun vi dai (c).prg" size="524288" crc="92a14846" sha1="3660539682971d5727140d3cd298c3fdd979208a" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 4k WRAM on cartridge -->
+			<dataarea name="wram" size="4096">
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
