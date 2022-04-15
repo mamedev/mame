@@ -133,8 +133,8 @@
         P16 is a 6 pin marked "Aux in"
         P3 is a 6 pin marked "Bill in"
         P8 is a 14 pin marked "Aux Latched Outputs"
-        P22 is a 9 pin marked "serial port" used for bill acceptors (leads
-		    to the IOASIC's serial port)
+        P22 is a 9 pin marked "serial port" used for bill acceptors and Blitz
+            '99's memory card reader (leads to the IOASIC's serial port).
 ***************************************************************************
 
     NFL Blitz '99 has an addon card reader board for saving custom stats and
