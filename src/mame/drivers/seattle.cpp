@@ -2632,9 +2632,6 @@ ROM_START( blitz99 )
 
 	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
 	ROM_LOAD( "481_blitz-99.u96", 0x0000, 0x2000, CRC(f58df548) SHA1(5bda123035f49f06b4721ab4a1577a115470aa02) )
-	
-	ROM_REGION( 0x1000, "cardcpu", 0 )   // Card reader AT90S4414 MCU code
-	ROM_LOAD( "a-22799-1.u2", 0x0000, 0x1000, NO_DUMP ) // 4KB internal flash rom :(
 ROM_END
 
 
@@ -2655,9 +2652,6 @@ ROM_START( blitz99a )
 
 	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
 	ROM_LOAD( "481_blitz-99.u96", 0x0000, 0x2000, CRC(f58df548) SHA1(5bda123035f49f06b4721ab4a1577a115470aa02) )
-
-	ROM_REGION( 0x1000, "cardcpu", 0 )   // Card reader AT90S4414 MCU code
-	ROM_LOAD( "a-22799-1.u2", 0x0000, 0x1000, NO_DUMP ) // 4KB internal flash rom :(
 ROM_END
 
 
