@@ -8,13 +8,37 @@ driver by Roberto Zandona' and Angelo Salese
 
 http://www.armchairarcade.com/neo/node/1598
 
+BIOS will jump to D800 if it contains 7E. If not, it will jump to A000
+ if it contains CE. Otherwise, the Monitor is entered. From the monitor,
+ GA000 for cold start Basic, or GE79D for warm start Basic.
+
+To get to the monitor from Basic type MON. Commands must be in UPPERcase.
+Dnnnn : Display block of hex (D for next block)
+Gnnnn : Go to address
+Mnnnn : Modify memory at address
+
+Cassette (if it worked):
+- POKE 43,0 for 2400 baud, or POKE 43,1 for 600 baud (affects SAVE only);
+- SAVE "x" (1-16 chars) to save. LOAD to load (it autodetects the speed).
+
 TODO:
 - Timings are basically screwed, it takes too much to load the POST but
   then the cursor blink is too fast
 - keyboard MCU irq and data polling simulation should be inside a timer
   callback
 - MN1544 4-bit CPU core and ROM dump
-- ROM regions "gfx_ram" and "pcg" are being written to - to be refactored.
+- MN1271 device to be emulated (4x 8-bit ports, 3-bit port, timers, etc)
+- JR200 keyboard includes Kana characters, Kana On, Kana off, GRAPH
+- JR200U keyboard omits Kana, but has GRAPH ON and GRAPH OFF instead.
+- Keyboard matrix and decoding incomplete.
+- The BREAK key on the unit is actually a soft reset.
+- The Chargen interfaces to the MN1271, so that the text character
+  definitions can be copied to D000-D7FF ram (via 0150-016F). The user can
+  modify these characters with pokes. Since we have no information, some
+  guesswork has been used to feed in the required info.
+- Sound command never ends. (SOUND 1000,50 should output 1000 Hz for 1 sec)
+- Keyclick not working (POKE 0,64 should activate it)
+- Cassette not implemented (needs MN1271 to work)
 
 ****************************************************************************/
 
@@ -29,28 +53,20 @@ TODO:
 class jr200_state : public driver_device
 {
 public:
-	jr200_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_vram(*this, "vram"),
-		m_cram(*this, "cram"),
-		m_mn1271_ram(*this, "mn1271_ram"),
-		m_maincpu(*this, "maincpu"),
-		m_beeper(*this, "beeper"),
-		m_pcg(*this, "pcg"),
-		m_gfx_rom(*this, "gfx_rom"),
-		m_gfx_ram(*this, "gfx_ram"),
-		m_row0(*this, "ROW0"),
-		m_row1(*this, "ROW1"),
-		m_row2(*this, "ROW2"),
-		m_row3(*this, "ROW3"),
-		m_row4(*this, "ROW4"),
-		m_row5(*this, "ROW5"),
-		m_row6(*this, "ROW6"),
-		m_row7(*this, "ROW7"),
-		m_row8(*this, "ROW8"),
-		m_row9(*this, "ROW9"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+	jr200_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_vram(*this, "vram")
+		, m_cram(*this, "cram")
+		, m_mn1271_ram(*this, "mn1271_ram")
+		, m_maincpu(*this, "maincpu")
+		, m_beeper(*this, "beeper")
+		, m_pcg1(*this, "pcg1")
+		, m_pcg2(*this, "pcg2")
+		, m_gfx_rom(*this, "gfx_rom")
+		, m_gfx_ram(*this, "gfx_ram")
+		, m_io_keyboard(*this, "X%d", 0U)
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
 	{ }
 
 	void jr200(machine_config &config);
@@ -62,14 +78,12 @@ private:
 	uint8_t m_border_col = 0;
 	uint8_t m_old_keydata = 0;
 	uint8_t m_freq_reg[2]{};
+	u16 m_autorepeat = 0;
+	u8 m_port_ctr = 0;
+	int m_port_cnt = 0;
 	emu_timer *m_timer_d = nullptr;
-	uint8_t jr200_pcg_1_r(offs_t offset);
-	uint8_t jr200_pcg_2_r(offs_t offset);
-	void jr200_pcg_1_w(offs_t offset, uint8_t data);
-	void jr200_pcg_2_w(offs_t offset, uint8_t data);
-	uint8_t jr200_bios_char_r(offs_t offset);
-	void jr200_bios_char_w(offs_t offset, uint8_t data);
 	uint8_t mcu_keyb_r();
+	void unknown_port_w(u8);
 	void jr200_beep_w(uint8_t data);
 	void jr200_beep_freq_w(offs_t offset, uint8_t data);
 	void jr200_border_col_w(uint8_t data);
@@ -77,27 +91,18 @@ private:
 	void mn1271_io_w(offs_t offset, uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 	uint32_t screen_update_jr200(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(timer_d_callback);
 
-	void jr200_mem(address_map &map);
+	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beeper;
-	required_memory_region m_pcg;
-	required_memory_region m_gfx_rom;
-	required_memory_region m_gfx_ram;
-	required_ioport m_row0;
-	required_ioport m_row1;
-	required_ioport m_row2;
-	required_ioport m_row3;
-	required_ioport m_row4;
-	required_ioport m_row5;
-	required_ioport m_row6;
-	required_ioport m_row7;
-	required_ioport m_row8;
-	required_ioport m_row9;
+	required_shared_ptr<uint8_t> m_pcg1;
+	required_shared_ptr<uint8_t> m_pcg2;
+	required_region_ptr<u8> m_gfx_rom;
+	required_shared_ptr<uint8_t> m_gfx_ram;
+	required_ioport_array<10> m_io_keyboard;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 };
@@ -161,10 +166,6 @@ static const uint8_t jr200_keycodes[4][9][8] =
 };
 
 
-void jr200_state::video_start()
-{
-}
-
 uint32_t jr200_state::screen_update_jr200(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_border_col, cliprect);
@@ -193,16 +194,19 @@ uint32_t jr200_state::screen_update_jr200(screen_device &screen, bitmap_ind16 &b
 						    10xx x--- down-right
 						    10-- -xxx down-left
 						*/
-						int step = ((xi & 4) ? 3 : 0);
-						step+= ((yi & 4) ? 6 : 0);
+						u8 step = ((xi & 4) ? 3 : 0) + ((yi & 4) ? 6 : 0);
 
 						pen = ((((attr & 0x3f) << 6) | (tile & 0x3f)) >> (step)) & 0x07;
 					}
 					else // tile mode
 					{
-						const uint8_t *gfx_data = (attr & 0x40) ? m_pcg->base() : m_gfx_ram->base();
-
-						pen = (gfx_data[(tile*8)+yi]>>(7-xi) & 1) ? (attr & 0x7) : ((attr & 0x38) >> 3);
+						if (!BIT(attr, 6))
+							pen = BIT(m_gfx_ram[(tile*8)+yi], 7-xi) ? (attr & 0x7) : BIT(attr, 3, 3);
+						else
+						if (BIT(tile, 7))
+							pen = BIT(m_pcg2[(tile*8)+yi], 7-xi) ? (attr & 0x7) : BIT(attr, 3, 3);
+						else
+							pen = BIT(m_pcg1[(tile*8)+yi], 7-xi) ? (attr & 0x7) : BIT(attr, 3, 3);
 					}
 
 					bitmap.pix(y*8+yi+16, x*8+xi+16) = m_palette->pen(pen);
@@ -214,40 +218,6 @@ uint32_t jr200_state::screen_update_jr200(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-uint8_t jr200_state::jr200_pcg_1_r(offs_t offset)
-{
-	return m_pcg->base()[offset+0x000];
-}
-
-uint8_t jr200_state::jr200_pcg_2_r(offs_t offset)
-{
-	return m_pcg->base()[offset+0x400];
-}
-
-void jr200_state::jr200_pcg_1_w(offs_t offset, uint8_t data)
-{
-	m_pcg->base()[offset+0x000] = data;
-	m_gfxdecode->gfx(1)->mark_dirty((offset+0x000) >> 3);
-}
-
-void jr200_state::jr200_pcg_2_w(offs_t offset, uint8_t data)
-{
-	m_pcg->base()[offset+0x400] = data;
-	m_gfxdecode->gfx(1)->mark_dirty((offset+0x400) >> 3);
-}
-
-uint8_t jr200_state::jr200_bios_char_r(offs_t offset)
-{
-	return m_gfx_ram->base()[offset];
-}
-
-
-void jr200_state::jr200_bios_char_w(offs_t offset, uint8_t data)
-{
-	/* TODO: writing is presumably controlled by an I/O bit */
-//  m_gfx_ram->base()[offset] = data;
-//  m_gfxdecode->gfx(0)->mark_dirty(offset >> 3);
-}
 
 /*
 
@@ -257,49 +227,63 @@ I/O Device
 
 uint8_t jr200_state::mcu_keyb_r()
 {
-	int table = 0;
-	uint8_t keydata = 0;
+	if (m_port_ctr == 1)
+		return m_gfx_rom[m_port_cnt];
 
-	if (m_row9->read() & 0x07)
-	{
-		/* shift, upper case */
-		table = 1;
-	}
+	u8 modifiers = m_io_keyboard[9]->read();
+	u8 table = 0, keydata = 0;
+	u8 ret = 0;
+	// GRAPH
+	if (modifiers & 0x10)
+		table = 2;
+	// SHIFT
+	if (modifiers & 0x06)
+		table ++;
 
 	/* scan keyboard */
-	for (int row = 0; row < 9; row++)
+	for (u8 row = 0; row < 9; row++)
 	{
-		uint8_t data = 0xff;
+		uint8_t data = m_io_keyboard[row]->read();
 
-		switch ( row )
-		{
-			case 0: data = m_row0->read(); break;
-			case 1: data = m_row1->read(); break;
-			case 2: data = m_row2->read(); break;
-			case 3: data = m_row3->read(); break;
-			case 4: data = m_row4->read(); break;
-			case 5: data = m_row5->read(); break;
-			case 6: data = m_row6->read(); break;
-			case 7: data = m_row7->read(); break;
-			case 8: data = m_row8->read(); break;
-		}
-
-		for (int col = 0; col < 8; col++)
+		for (u8 col = 0; col < 8; col++)
 		{
 			if (!BIT(data, col))
 			{
 				/* latch key data */
 				keydata = jr200_keycodes[table][row][col];
+				// LOCK
+				if ((modifiers & 0x01) && (keydata > 0x40) && (keydata < 0x80))
+					keydata ^= 0x20;
+				// CTRL
+				if ((modifiers & 0x08) && (keydata > 0x40) && (keydata < 0x80))
+					keydata &= 0x1f;
 			}
 		}
 	}
 
-	if(m_old_keydata == keydata)
-		return 0x00;
+	// Autorepeat handler
+	// This might need to be done away with if games don't like it (should any be found)
+	if (keydata && (m_old_keydata == keydata))
+	{
+		m_autorepeat++;
+		if (m_autorepeat == 2) // initial keypress
+			ret = keydata;
+		else
+		if (m_autorepeat == 0x330) // pause
+		{
+			ret = keydata;
+			m_autorepeat = 0x2e0; // repeat speed (pause - this)
+		}
+	}
+	else
+	if (m_old_keydata != keydata)
+	{
+		// new key or none
+		m_old_keydata = keydata;
+		m_autorepeat = 0;
+	}
 
-	m_old_keydata = keydata;
-
-	return keydata;
+	return ret;
 }
 
 void jr200_state::jr200_beep_w(uint8_t data)
@@ -331,6 +315,23 @@ TIMER_CALLBACK_MEMBER(jr200_state::timer_d_callback)
 	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
+// get data from chargen for bios to copy to D000-D7FF
+void jr200_state::unknown_port_w(u8 data)
+{
+	if ((m_port_ctr == 0) && (data == 0x31))
+	{
+		m_port_ctr++;
+		m_port_cnt = -1;
+	}
+	else
+	if ((m_port_ctr == 1) && (data == 0x73))
+	{
+		m_port_cnt++;
+		if (m_port_cnt > 0x7ff)
+			m_port_ctr++;
+	}
+}
+
 uint8_t jr200_state::mn1271_io_r(offs_t offset)
 {
 	uint8_t retVal = m_mn1271_ram[offset];
@@ -348,7 +349,7 @@ uint8_t jr200_state::mn1271_io_r(offs_t offset)
 		case 0xc810: retVal= 0; break;
 		case 0xc816: retVal= 0x4e; break;
 		case 0xc81c: retVal= (m_mn1271_ram[0x1c] & 0xfe) | 1;  break;//bit 0 needs to be high otherwise system refuses to boot
-		case 0xc81d: retVal= (m_mn1271_ram[0x1d] & 0xed); break;
+		case 0xc81d: retVal= (m_port_ctr == 2) ? (m_mn1271_ram[0x1d] & 0xed) : 1; break;
 	}
 	//logerror("mn1271_io_r [%04x] = %02x\n",offset+0xc800,retVal);
 	return retVal;
@@ -356,9 +357,10 @@ uint8_t jr200_state::mn1271_io_r(offs_t offset)
 
 void jr200_state::mn1271_io_w(offs_t offset, uint8_t data)
 {
-	m_mn1271_ram[offset] = data;
+	m_mn1271_ram[offset] = data;//printf("%X=%X ",offset,data);
 	switch(offset+0xc800)
 	{
+		case 0xc803: unknown_port_w(data); break;
 		case 0xc805: break; //LPT printer port W
 		case 0xc816: if (data!=0) {
 					m_timer_d->adjust(attotime::zero, 0, attotime::from_hz(XTAL(14'318'181)) * (m_mn1271_ram[0x17]*0x100 + m_mn1271_ram[0x18]));
@@ -373,7 +375,7 @@ void jr200_state::mn1271_io_w(offs_t offset, uint8_t data)
 	}
 }
 
-void jr200_state::jr200_mem(address_map &map)
+void jr200_state::mem_map(address_map &map)
 {
 /*
     0000-3fff RAM
@@ -385,15 +387,15 @@ void jr200_state::jr200_mem(address_map &map)
 
 	map(0xa000, 0xbfff).rom();
 
-	map(0xc000, 0xc0ff).rw(FUNC(jr200_state::jr200_pcg_1_r), FUNC(jr200_state::jr200_pcg_1_w)); //PCG area (1)
+	map(0xc000, 0xc0ff).ram().share("pcg1"); //PCG area (1)
 	map(0xc100, 0xc3ff).ram().share("vram");
-	map(0xc400, 0xc4ff).rw(FUNC(jr200_state::jr200_pcg_2_r), FUNC(jr200_state::jr200_pcg_2_w)); //PCG area (2)
+	map(0xc400, 0xc4ff).ram().share("pcg2"); //PCG area (2)
 	map(0xc500, 0xc7ff).ram().share("cram");
 
 //  0xc800 - 0xcfff I / O area
 	map(0xc800, 0xcfff).rw(FUNC(jr200_state::mn1271_io_r), FUNC(jr200_state::mn1271_io_w)).share("mn1271_ram");
 
-	map(0xd000, 0xd7ff).rw(FUNC(jr200_state::jr200_bios_char_r), FUNC(jr200_state::jr200_bios_char_w)); //BIOS PCG RAM area
+	map(0xd000, 0xd7ff).ram().share("gfx_ram"); //BIOS PCG RAM area
 	map(0xd800, 0xdfff).rom(); // cart space (header 0x7e)
 	map(0xe000, 0xffff).rom();
 }
@@ -402,7 +404,7 @@ void jr200_state::jr200_mem(address_map &map)
 static INPUT_PORTS_START( jr200 )
 //  PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
-	PORT_START("ROW0")
+	PORT_START("X0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("HELP") PORT_CODE(KEYCODE_TILDE)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('@')
@@ -412,7 +414,7 @@ static INPUT_PORTS_START( jr200 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('^')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')
 
-	PORT_START("ROW1")
+	PORT_START("X1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('*')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR('(')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(')')
@@ -422,7 +424,7 @@ static INPUT_PORTS_START( jr200 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("DEL") PORT_CODE(KEYCODE_DEL)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad -") PORT_CODE(KEYCODE_MINUS_PAD)
 
-	PORT_START("ROW2")
+	PORT_START("X2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 7") PORT_CODE(KEYCODE_7_PAD)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 8") PORT_CODE(KEYCODE_8_PAD)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 9") PORT_CODE(KEYCODE_9_PAD)
@@ -432,7 +434,7 @@ static INPUT_PORTS_START( jr200 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
 
-	PORT_START("ROW3")
+	PORT_START("X3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
@@ -442,7 +444,7 @@ static INPUT_PORTS_START( jr200 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
 
-	PORT_START("ROW4")
+	PORT_START("X4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad +") PORT_CODE(KEYCODE_PLUS_PAD)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 4") PORT_CODE(KEYCODE_4_PAD)
@@ -452,7 +454,7 @@ static INPUT_PORTS_START( jr200 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
 
-	PORT_START("ROW5")
+	PORT_START("X5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
@@ -462,7 +464,7 @@ static INPUT_PORTS_START( jr200 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'') PORT_CHAR('"')
 
-	PORT_START("ROW6")
+	PORT_START("X6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\r')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LINE FEED") PORT_CODE(KEYCODE_ENTER_PAD)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
@@ -472,7 +474,7 @@ static INPUT_PORTS_START( jr200 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
 
-	PORT_START("ROW7")
+	PORT_START("X7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
@@ -482,22 +484,23 @@ static INPUT_PORTS_START( jr200 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
 
-	PORT_START("ROW8")
+	PORT_START("X8")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 0") PORT_CODE(KEYCODE_0_PAD)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad .") PORT_CODE(KEYCODE_ASTERISK)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RALT) PORT_NAME("BREAK") PORT_CHAR(3)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ROW9")
+	PORT_START("X9")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("LEFT SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RIGHT SHIFT") PORT_CODE(KEYCODE_RSHIFT)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("LEFT CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RIGHT CTRL") PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("GRAPH") PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
+	// ToDo: add Kana on/off keys, JR200 only
 INPUT_PORTS_END
 
 static const gfx_layout tiles8x8_layout =
@@ -512,27 +515,29 @@ static const gfx_layout tiles8x8_layout =
 };
 
 static GFXDECODE_START( gfx_jr200 )
-	GFXDECODE_ENTRY( "gfx_ram", 0, tiles8x8_layout, 0, 1 )
-	GFXDECODE_ENTRY( "pcg", 0, tiles8x8_layout, 0, 1 )
+	GFXDECODE_RAM( "gfx_ram", 0, tiles8x8_layout, 0, 1 )
+	GFXDECODE_RAM( "pcg1", 0, tiles8x8_layout, 0, 1 )
+	GFXDECODE_RAM( "pcg2", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
 void jr200_state::machine_start()
 {
 	m_timer_d = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jr200_state::timer_d_callback),this));
+	save_item(NAME(m_border_col));
+	save_item(NAME(m_old_keydata));
+	save_item(NAME(m_freq_reg));
+	save_item(NAME(m_autorepeat));
+	save_item(NAME(m_port_ctr));
+	save_item(NAME(m_port_cnt));
 }
 
 void jr200_state::machine_reset()
 {
-	uint8_t *gfx_rom = m_gfx_rom->base();
-	uint8_t *gfx_ram = m_gfx_ram->base();
-	int i;
+	m_autorepeat = 0;
+	m_old_keydata = 0;
+	m_port_ctr = 0;
+	m_port_cnt = 0;
 	memset(m_mn1271_ram,0,0x800);
-
-	for(i=0;i<0x800;i++)
-		gfx_ram[i] = gfx_rom[i];
-
-	for(i=0;i<0x800;i+=8)
-		m_gfxdecode->gfx(0)->mark_dirty(i >> 3);
 }
 
 
@@ -540,7 +545,7 @@ void jr200_state::jr200(machine_config &config)
 {
 	/* basic machine hardware */
 	M6808(config, m_maincpu, XTAL(14'318'181) / 4); /* MN1800A, ? MHz assumption that it is same as JR-100*/
-	m_maincpu->set_addrmap(AS_PROGRAM, &jr200_state::jr200_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jr200_state::mem_map);
 
 //  MN1544(config, "mn1544", ?);
 
@@ -576,10 +581,6 @@ ROM_START( jr200 )
 
 	ROM_REGION( 0x0800, "gfx_rom", ROMREGION_ERASEFF )
 	ROM_LOAD( "char.rom", 0x0000, 0x0800, CRC(cb641624) SHA1(6fe890757ebc65bbde67227f9c7c490d8edd84f2) )
-
-	ROM_REGION( 0x0800, "gfx_ram", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x0800, "pcg", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( jr200u )
@@ -592,10 +593,6 @@ ROM_START( jr200u )
 
 	ROM_REGION( 0x0800, "gfx_rom", ROMREGION_ERASEFF )
 	ROM_LOAD( "char.rom", 0x0000, 0x0800, CRC(cb641624) SHA1(6fe890757ebc65bbde67227f9c7c490d8edd84f2) )
-
-	ROM_REGION( 0x0800, "gfx_ram", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x0800, "pcg", ROMREGION_ERASEFF )
 ROM_END
 
 /* Driver */
