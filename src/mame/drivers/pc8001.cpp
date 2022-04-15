@@ -61,26 +61,31 @@ UPD3301_FETCH_ATTRIBUTE( pc8001_base_state::attr_fetch )
 	// further extend the attributes if we are in color mode
 	if (is_color_mode)
 	{
-		// TODO: defaults
 		// flgworld (pc8001) gameplay sets up:
 		// - 0x00 0x00 0x02 0x88 on playfield
 		// \- (wanting the default from the first defined color)
 		// - 0x00 0x00 0x00 0x48 0x12 0x88 for first row
-		// \- (Expecting "FLAG WORLD" wording to be red while the "P"s in green wtf)
+		// \- (Expecting "FLAG WORLD" wording to be red while the "P"s in green)
 		// undermon (pc8001) instruction screen sets up:
 		// - 0x00 0x00 0x06 0xb8
 		// \- (expecting blue fill up to 0x06)
-		u8 attr_color = 0xe8;
-		u8 attr_decoration = 0x00;
+		// xak2 & cancanb (pc8801) really expects that the color / decoration is implictly
+		// latched from previous line (uses semigfx black tiles for masking)
+		if (y == 0)
+		{
+			// TODO: default values for line 0
+			m_attr_color = 0xe8;
+			m_attr_decoration = 0x00;
+		}
 
 		for (int ex = 0; ex < row_size; ex++)
 		{
 			u16 cur_attr = attr_extend_info[ex];
 			if (BIT(cur_attr, 3))
-				attr_color = cur_attr;
+				m_attr_color = cur_attr;
 			else
-				attr_decoration = cur_attr;
-			attr_extend_info[ex] = (attr_color << 8) | attr_decoration;
+				m_attr_decoration = cur_attr;
+			attr_extend_info[ex] = (m_attr_color << 8) | m_attr_decoration;
 		}
 	}
 
@@ -155,7 +160,7 @@ UPD3301_DRAW_CHARACTER_MEMBER( pc8001_base_state::draw_text )
 
 //  if (m_width80)
 	{
-		u8 pen;
+		u8 pen_dot;
 
 		for (int xi = 0; xi < tile_width; xi += dot_width)
 		{
@@ -164,16 +169,19 @@ UPD3301_DRAW_CHARACTER_MEMBER( pc8001_base_state::draw_text )
 			{
 				u8 mask = (xi & (4 << (dot_width - 1))) ? 0x10 : 0x01;
 				mask <<= (lc & (0x3 << y_double)) >> y_double;
-				pen = tile & mask;
+				pen_dot = tile & mask;
 			}
 			else
 			{
-				pen = tile;
-				pen = (pen >> (7 - (xi >> (dot_width - 1)))) & 1;
+				pen_dot = tile;
+				pen_dot = (pen_dot >> (7 - (xi >> (dot_width - 1)))) & 1;
 			}
 
+			if (!pen_dot)
+				continue;
+
 			for (int di = 0; di < dot_width; di++)
-				bitmap.pix(y, res_x + di) = m_crtc_palette->pen(pen ? color : 0);
+				bitmap.pix(y, res_x + di) = m_crtc_palette->pen(color);
 		}
 	}
 }
@@ -216,27 +224,26 @@ void pc8001_state::port10_w(uint8_t data)
 	m_cent_data_out->write(data);
 }
 
+/*
+ * I/O Port $30 (w/o) "System Control Port (1)"
+ * N88-BASIC buffer port $e6c0
+ *
+ * Virtually same between PC-8001 and PC-8801
+ *
+ * --xx ---- BS2, BS1: USART channel control
+ * --00 ----           CMT 600 bps
+ * --01 ----           CMT 1200 bps
+ * --10 ----           RS-232C async mode
+ * --11 ----           RS-232C sync mode
+ * ---- x--- MTON: CMT motor control (active high)
+ * ---- -x-- CDS: CMT carrier control (1) mark (0) space
+ * ---- --x- /COLOR: CRT display mode control (0) color mode (1) monochrome
+ * ---- ---x /40: CRT display format control (1) 80 chars per line (0) 40 chars
+ *
+ */
 void pc8001_base_state::port30_w(uint8_t data)
 {
-	/*
-
-	    bit     description
-
-	    0       characters per line (0=40, 1=80)
-	    1       color mode (0=color, 1=B&W)
-	    2       CMT CHIN
-	    3       CMT MOTOR (1=on)
-	    4       CMT BS1
-	    5       CMT BS2
-	    6       unused
-	    7       unused
-
-	*/
-
-	/* characters per line */
 	m_width80 = BIT(data, 0);
-
-	/* color mode */
 	m_color = BIT(data, 1);
 
 	m_cassette->change_state(BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);

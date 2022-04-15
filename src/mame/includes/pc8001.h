@@ -54,12 +54,13 @@ protected:
 	void port30_w(u8 data);
 	virtual void machine_start() override;
 	void set_screen_frequency(bool is_24KHz) { m_screen_is_24KHz = is_24KHz; }
+	bool get_screen_frequency() { return m_screen_is_24KHz; }
 
 	DECLARE_WRITE_LINE_MEMBER( crtc_reverse_w );
 	UPD3301_DRAW_CHARACTER_MEMBER( draw_text );
-	UPD3301_FETCH_ATTRIBUTE( attr_fetch );
+	virtual UPD3301_FETCH_ATTRIBUTE( attr_fetch );
 	DECLARE_WRITE_LINE_MEMBER( hrq_w );
-	uint8_t dma_mem_r(offs_t offset);
+	virtual uint8_t dma_mem_r(offs_t offset);
 
 private:
 	bool m_screen_reverse = false;
@@ -68,6 +69,7 @@ private:
 	/* video state */
 	int m_width80 = 0;
 	int m_color = 0;
+	u8 m_attr_color = 0xe8, m_attr_decoration = 0;
 };
 
 class pc8001_state : public pc8001_base_state
