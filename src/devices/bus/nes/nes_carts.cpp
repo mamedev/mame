@@ -505,7 +505,6 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("onebus",           NES_NROM);    // UNSUPPORTED
 	device.option_add_internal("pec586",           NES_NROM);    // UNSUPPORTED
 // are there dumps of games with these boards?
-	device.option_add_internal("bmc_hik_kof",      NES_NROM); // mapper 251 - UNSUPPORTED
 	device.option_add_internal("bmc_13in1jy110",   NES_NROM); //  [mentioned in FCEUMM source - we need more info] - UNSUPPORTED
 	device.option_add_internal("bmc_gk_192",       NES_NROM); //  [mentioned in FCEUMM source - we need more info] - UNSUPPORTED
 	device.option_add_internal("konami_qtai",      NES_NROM); //  [mentioned in FCEUMM source - we need more info] - UNSUPPORTED

@@ -85711,23 +85711,6 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-<!-- shall we safely remove this? what about mapper 251? is it redundant? -->
-	<software name="mc_s8kfa" cloneof="mc_s8kf" supported="no">
-		<description>Super 8 in 1 99 King Fighter (Bad CHR?)</description>
-		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_hik_kof" />
-			<feature name="pcb" value="BMC-SUPERHIK-KOF" />
-			<dataarea name="chr" size="2097152">
-				<rom name="super 8-in-1 99 king fighter (unl).chr" size="2097152" crc="9ed79320" sha1="8d995754eab023cd55083e86b147f8d0a882ccc2" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="1048576">
-				<rom name="super 8-in-1 99 king fighter (unl).prg" size="1048576" crc="a5d2bc9f" sha1="c5e6860712d478cefc5f762bcb2f5ea20744aa41" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mc_s8">
 		<description>Super 8 in 1</description>
 		<year>19??</year>
