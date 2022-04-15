@@ -725,7 +725,7 @@ void seattle_state::analog_port_w(uint32_t data)
 	// Declare calibration finished as soon as a SYSTEM button is hit
 	if (!m_wheel_calibrated && ((~m_io_system->read()) & 0xffff)) {
 		m_wheel_calibrated = true;
-		//osd_printf_info("wheel calibration complete wheel: %02x\n", currValue);
+		//osd_printf_info("wheel calibration complete system: %04x wheel: %02x\n", m_io_system->read(), currValue);
 	}
 }
 
@@ -1403,7 +1403,7 @@ static INPUT_PORTS_START( seattle_analog )
 
 	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start Button")
-	PORT_BIT( 0x0620, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0620, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1491,8 +1491,7 @@ static INPUT_PORTS_START( sfrush )
 	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Abort")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Reverse")
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x1e00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("View 1")
