@@ -49,7 +49,7 @@ Additional CD-ROM games: "99 Bottles of Beer"
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "bus/lpci/pci.h"
+#include "machine/pci.h"
 #include "machine/pcshare.h"
 #include "machine/pckeybrd.h"
 #include "video/pc_vga.h"
@@ -58,11 +58,15 @@ class gammagic_state : public pcat_base_state
 {
 public:
 	gammagic_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pcat_base_state(mconfig, type, tag) { }
+		: pcat_base_state(mconfig, type, tag)
+        , m_pciroot(*this, "pci")
+	{ }
 
 	void gammagic(machine_config &config);
 
 private:
+	required_device<pci_root_device> m_pciroot;
+
 	virtual void machine_start() override;
 	void gammagic_io(address_map &map);
 	void gammagic_map(address_map &map);
@@ -89,7 +93,7 @@ void gammagic_state::gammagic_io(address_map &map)
 	map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
 	map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
 //  map(0x03e0, 0x03ef).noprw();
-	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_device::read), FUNC(pci_bus_device::write));
+//	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_device::read), FUNC(pci_bus_device::write));
 //  map(0x0400, 0xffff).noprw();
 }
 
@@ -110,7 +114,8 @@ void gammagic_state::gammagic(machine_config &config)
 
 	pcat_common(config);
 
-	PCI_BUS(config, "pcibus", 0).set_busnum(0);
+	PCI_ROOT(config, "pci", 0);
+	// ...
 
 	/* video hardware */
 	pcvideo_vga(config);

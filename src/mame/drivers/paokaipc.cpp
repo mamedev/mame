@@ -24,7 +24,7 @@
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "bus/lpci/pci.h"
+#include "machine/pci.h"
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
 #include "video/pc_vga.h"
@@ -37,14 +37,14 @@ class paokaipc_state : public pcat_base_state
 public:
 	paokaipc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag)
-		, m_pcibus(*this, "pcibus")
+		, m_pciroot(*this, "pci")
 		, m_isabus(*this, "isa")
 	{ }
 
 	void paokaipc(machine_config &config);
 
 private:
-	required_device<pci_bus_device> m_pcibus;
+	required_device<pci_root_device> m_pciroot;
 	required_device<isa8_device> m_isabus;
 
 	void main_io(address_map &map);
@@ -70,7 +70,7 @@ void paokaipc_state::main_io(address_map &map)
 	map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
 	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_device::cs1_r), FUNC(ide_controller_device::cs1_w));
 //	map(0x0880, 0x0880) extensively accessed at POST, hangs if returns wrong values
-	map(0x0cf8, 0x0cff).rw(m_pcibus, FUNC(pci_bus_device::read), FUNC(pci_bus_device::write));
+//	map(0x0cf8, 0x0cff).rw(m_pcibus, FUNC(pci_bus_device::read), FUNC(pci_bus_device::write));
 }
 
 static INPUT_PORTS_START( gogostrk )
@@ -91,7 +91,8 @@ void paokaipc_state::paokaipc(machine_config &config)
 
 	pcvideo_vga(config);
 
-	PCI_BUS(config, m_pcibus, 0).set_busnum(0);
+	PCI_ROOT(config, m_pciroot, 0);
+	// ...
 
 	ISA8(config, m_isabus, 0);
 	m_isabus->set_memspace("maincpu", AS_PROGRAM);
