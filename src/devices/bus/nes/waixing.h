@@ -215,10 +215,9 @@ class nes_waixing_sh2_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_waixing_sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_waixing_sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual uint8_t chr_r(offs_t offset) override;
-	virtual void chr_cb(int start, int bank, int source) override;
+	virtual u8 chr_r(offs_t offset) override;
 
 	virtual void pcb_reset() override;
 
@@ -226,7 +225,10 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
-	uint8_t m_reg[2];
+	virtual void set_chr(u8 chr, int chr_base, int chr_mask) override;
+
+private:
+	u8 m_reg[2];
 };
 
 
