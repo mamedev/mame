@@ -413,7 +413,6 @@ static const nes_pcb pcb_list[] =
 	{ "ffe4",             FFE4_BOARD },
 	{ "ffe8",             FFE8_BOARD },
 	{ "unl_dance",        UNSUPPORTED_BOARD },
-	{ "bmc_hik_kof",      UNSUPPORTED_BOARD },
 	{ "onebus",           UNSUPPORTED_BOARD },
 	{ "pec586",           UNSUPPORTED_BOARD },
 	{ "test",             TEST_BOARD },
