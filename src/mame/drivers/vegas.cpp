@@ -274,6 +274,7 @@
 #include "emu.h"
 
 #include "audio/dcs.h"
+#include "machine/midwayic.h"
 
 #include "bus/ata/idehd.h"
 #include "bus/rs232/rs232.h"
@@ -282,7 +283,6 @@
 #include "machine/idectrl.h"
 #include "machine/input_merger.h"
 #include "machine/ins8250.h"
-#include "machine/midwayic.h"
 #include "machine/pci-ide.h"
 #include "machine/pci.h"
 #include "machine/smc91c9x.h"
@@ -473,7 +473,7 @@ private:
 	void vegas_cs7_map(address_map &map);
 	void vegas_cs8_map(address_map &map);
 
-	static void hdd_config(device_t* device);
+	static void hdd_config(device_t *device);
 };
 
 /*************************************
@@ -1950,12 +1950,12 @@ void vegas_state::vegascore(machine_config &config)
 	screen.set_screen_update(PCI_ID_VIDEO, FUNC(voodoo_pci_device::screen_update));
 }
 
-void vegas_state::hdd_config(device_t* device)
+void vegas_state::hdd_config(device_t *device)
 {
 	// Set the disk dma transfer speed
-	static_cast<ide_hdd_device*>(device)->set_dma_transfer_time(attotime::from_usec(15));
+	dynamic_cast<ide_hdd_device *>(device)->set_dma_transfer_time(attotime::from_usec(15));
 	// Allow ultra dma
-	//uint16_t *identify_device = static_cast<ide_hdd_device*>(device)->identify_device_buffer();
+	//uint16_t *identify_device = dynamic_cast<ide_hdd_device *>(device)->identify_device_buffer();
 	//identify_device[88] = 0x7f;
 
 }

@@ -185,20 +185,21 @@
 **************************************************************************/
 
 #include "emu.h"
+
 #include "audio/cage.h"
 #include "audio/dcs.h"
+#include "machine/midwayic.h"
 
+#include "bus/ata/idehd.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/mips/mips3.h"
-#include "machine/midwayic.h"
-#include "machine/nvram.h"
-#include "machine/smc91c9x.h"
-
-#include "machine/pci.h"
 #include "machine/gt64xxx.h"
+#include "machine/nvram.h"
 #include "machine/pci-ide.h"
-#include "bus/ata/idehd.h"
+#include "machine/pci.h"
+#include "machine/smc91c9x.h"
 #include "video/voodoo_pci.h"
+
 #include "screen.h"
 
 #include "calspeed.lh"
@@ -445,7 +446,7 @@ private:
 	void carnevil_cs3_map(address_map &map);
 	void flagstaff_cs3_map(address_map &map);
 
-	static void hdd_config(device_t* device);
+	static void hdd_config(device_t *device);
 };
 
 /*************************************
@@ -2048,10 +2049,10 @@ void seattle_state::seattle_common(machine_config &config)
 	m_screen->set_screen_update(PCI_ID_VIDEO, FUNC(voodoo_1_pci_device::screen_update));
 }
 
-void seattle_state::hdd_config(device_t* device)
+void seattle_state::hdd_config(device_t *device)
 {
 	// Set the disk dma transfer speed
-	static_cast<ide_hdd_device*>(device)->set_dma_transfer_time(attotime::from_usec(15));
+	dynamic_cast<ide_hdd_device *>(device)->set_dma_transfer_time(attotime::from_usec(15));
 }
 
 void seattle_state::phoenix(machine_config &config)

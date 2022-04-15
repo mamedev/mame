@@ -33,6 +33,11 @@
 #include "cpu/drcumlsh.h"
 
 
+/* Use with STRICT_VERIFY to print debug info to console for extra validation checks */
+/* Set to 1 to activate and use MIPS3DRC_STRICT_VERIFY in the drc options */
+#define DEBUG_STRICT_VERIFY	0
+
+
 /***************************************************************************
     MACROS
 ***************************************************************************/
@@ -291,7 +296,7 @@ void mips3_device::code_compile_block(uint8_t mode, offs_t pc)
 {
 	compiler_state compiler = { 0 };
 	const opcode_desc *seqhead, *seqlast;
-	const opcode_desc* codelast;
+	const opcode_desc *codelast;
 	const opcode_desc *desclist;
 	bool override = false;
 
@@ -1109,7 +1114,7 @@ void mips3_device::generate_update_cycles(drcuml_block &block, compiler_state &c
     validate a sequence of opcodes
 -------------------------------------------------*/
 
-void mips3_device::generate_checksum_block(drcuml_block &block, compiler_state &compiler, const opcode_desc *seqhead, const opcode_desc *seqlast, const opcode_desc* codelast)
+void mips3_device::generate_checksum_block(drcuml_block &block, compiler_state &compiler, const opcode_desc *seqhead, const opcode_desc *seqlast, const opcode_desc *codelast)
 {
 	const opcode_desc *curdesc;
 	if (m_drcuml->logging())
@@ -1203,10 +1208,9 @@ void mips3_device::generate_checksum_block(drcuml_block &block, compiler_state &
 		if (DEBUG_STRICT_VERIFY)
 		{
 			// This code will do additional checks on the last instruction and last delay slot and indicate if the check failed
-			uml::code_label check_passed, check_failed, check_second;
-			check_second = compiler.labelnum++;
-			check_failed = compiler.labelnum++;
-			check_passed = compiler.labelnum++;
+			uml::code_label check_second = compiler.labelnum++;
+			uml::code_label check_failed = compiler.labelnum++;
+			uml::code_label check_passed = compiler.labelnum++;
 			// Check the last instruction
 			if (!(codelast->flags & OPFLAG_VIRTUAL_NOOP) && codelast->physpc != seqhead->physpc)
 			{
@@ -1263,21 +1267,19 @@ void mips3_device::generate_checksum_block(drcuml_block &block, compiler_state &
 
 void mips3_device::generate_sequence_instruction(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
-	offs_t expc;
-	int hotnum;
 	/* add an entry for the log */
 	if (m_drcuml->logging() && !(desc->flags & OPFLAG_VIRTUAL_NOOP))
 		log_add_disasm_comment(block, desc->pc, desc->opptr.l[0]);
 
 	/* set the PC map variable */
-	expc = (desc->flags & OPFLAG_IN_DELAY_SLOT) ? desc->pc - 3 : desc->pc;
+	offs_t expc = (desc->flags & OPFLAG_IN_DELAY_SLOT) ? desc->pc - 3 : desc->pc;
 	UML_MAPVAR(block, MAPVAR_PC, expc);                                             // mapvar  PC,expc
 
 	/* accumulate total cycles */
 	compiler.cycles += desc->cycles;
 
 	/* is this a hotspot? */
-	for (hotnum = 0; hotnum < MIPS3_MAX_HOTSPOTS; hotnum++)
+	for (int hotnum = 0; hotnum < MIPS3_MAX_HOTSPOTS; hotnum++)
 		if (m_hotspot[hotnum].pc != 0 && desc->pc == m_hotspot[hotnum].pc && desc->opptr.l[0] == m_hotspot[hotnum].opcode)
 		{
 			compiler.cycles += m_hotspot[hotnum].cycles;

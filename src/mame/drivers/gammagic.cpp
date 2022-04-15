@@ -59,7 +59,7 @@ class gammagic_state : public pcat_base_state
 public:
 	gammagic_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag)
-        , m_pciroot(*this, "pci")
+		, m_pciroot(*this, "pci")
 	{ }
 
 	void gammagic(machine_config &config);
