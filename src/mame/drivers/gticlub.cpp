@@ -43,7 +43,7 @@ Known games on this hardware include....
 
 Game                        (C)      Year
 -----------------------------------------
-GTI Club                    Konami   1996
+GTI Club: Rally Cote D'Azur Konami   1996
 Jet Wave / Wave Shark       Konami   1996 (video board only)
 Operation Thunder Hurricane Konami   1997
 Solar Assault               Konami   1997
@@ -112,7 +112,7 @@ ROM Usage
                             |--------------------------------------- ROM Locations --------------------------------------|
 Game                        13K     2S      5S      7S      9S      12U     14U     19R       19U       21R       21U
 --------------------------------------------------------------------------------------------------------------------------
-GTI Club                    688A07  688A12  688A11  688A10  688A09  688A06  688A05  688AAA04  688AAA02  688AAA03  688AAA01
+GTI Club: Rally Cote D'Azur 688A07  688A12  688A11  688A10  688A09  688A06  688A05  688AAA04  688AAA02  688AAA03  688AAA01
 Jet Wave                    - see note -
 Hang Pilot                  685A07  -       -       685A10  685A09  685A06  685A05  685JAB04  685JAB02  685JAB03  685JAB01
 Operation Thunder Hurricane 680A07  680A12  680A11  680A10  680A09  680A06  680A05  680UAA04  680UAA02  680UAA03  680UAA01
@@ -213,7 +213,7 @@ ROM Usage
                             |---------------------- ROM Locations -----------------------|
 Game                        2D      4D      6D      9D      11D     13D     16D     18D
 ------------------------------------------------------------------------------------------
-GTI Club                    -       688A16  -       688A15  -       688A14  -       688A13
+GTI Club: Rally Cote D'Azur -       688A16  -       688A15  -       688A14  -       688A13
 Jet Wave                    -       678A16  -       678A15  -       678A14  -       678A13
 Operation Thunder Hurricane -       680A16  -       680A15  -       680A14  -       680A13
 Solar Assault               -       792A16  -       792A15  -       792A14  -       792A13
@@ -1372,10 +1372,10 @@ void gticlub_state::init_hangpltu()
 
 /*************************************************************************/
 
-GAME( 1996, gticlub,    0,        gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club (ver EAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
-GAME( 1996, gticlubu,   gticlub,  gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
-GAME( 1996, gticluba,   gticlub,  gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club (ver AAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
-GAME( 1996, gticlubj,   gticlub,  gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1996, gticlub,    0,        gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club: Rally Cote D'Azur (ver EAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1996, gticlubu,   gticlub,  gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club: Rally Cote D'Azur (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1996, gticluba,   gticlub,  gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club: Rally Cote D'Azur (ver AAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1996, gticlubj,   gticlub,  gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club: Rally Cote D'Azur (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
 GAME( 1997, thunderh,   0,        thunderh, thunderh, gticlub_state, init_gticlub,  ROT0, "Konami", "Operation Thunder Hurricane (ver EAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
 GAME( 1997, thunderhu,  thunderh, thunderh, thunderh, gticlub_state, init_gticlub,  ROT0, "Konami", "Operation Thunder Hurricane (ver UAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
 GAME( 1997, slrasslt,   0,        slrasslt, slrasslt, gticlub_state, init_gticlub,  ROT0, "Konami", "Solar Assault (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Based on Revised code
