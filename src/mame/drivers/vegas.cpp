@@ -2057,7 +2057,9 @@ void vegas_state::denver(machine_config &config)
 
 void vegas_state::gauntleg(machine_config &config)
 {
-	vegas(config);
+	// Needs 250MHz MIPS or screen tearing occurs (See MT8064)
+	// Firmware frequency detection seems to have a bug, console reports 220MHz for a 200MHz cpu and 260MHz for a 250MHz cpu
+	vegas250(config);
 	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0b5d);
@@ -2072,7 +2074,8 @@ void vegas_state::gauntleg(machine_config &config)
 
 void vegas_state::gauntdl(machine_config &config)
 {
-	vegas(config);
+	// Needs 250MHz MIPS or screen tearing occurs (See MT8064)
+	vegas250(config);
 	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0b5d);
