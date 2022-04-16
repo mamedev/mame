@@ -291,7 +291,7 @@ uint8_t jr200_state::mcu_keyb_r()
 				/* latch key data */
 				keydata = jr200_keycodes[table][row][col];
 				// LOCK
-				if ((modifiers & 0x01) && (keydata > 0x40) && (keydata < 0x80))
+				if ((modifiers & 0x01) && ((keydata & 0xdf) > 0x40) && ((keydata & 0xdf) < 0x5b))
 					keydata ^= 0x20;
 				// CTRL
 				if ((modifiers & 0x08) && (keydata > 0x40) && (keydata < 0x80))
