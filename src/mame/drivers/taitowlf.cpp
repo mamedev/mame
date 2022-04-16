@@ -6,6 +6,21 @@ Driver by Ville Linde
 
 Three board system consisting of a P5TX-LA PC motherboard, a Taito main board and a rom board.
 
+TODO:
+- program ROM is read via parallel port (for offset write, encrypted) and game port.
+  It's the first thing that the BIOS does at boot (cfr. accesses at $20x), 
+  if these ports are fed with proper values then it sets up PnP then tries a DMA ch. 3 transfer,
+  otherwise it just boots the normal P5TX-LA bootstrap sequence.
+  cfr. PC=e850b, PC=e4fc8, PC=fd84a (reading I/O $0006).
+- Above needs to be converted to a proper EISA device, program ROM board is connected on MB thru the only
+  available slot option;
+- Convert North/South bridge to newest PCI model;
+- Hookup Voodoo to PCI root;
+- Convert P5TX-LA to a proper stand-alone driver;
+- According to manual hold A+B+service button for 10 seconds for entering test mode during initial bootup
+  sequence. Board and input test menu doesn't seem to have a dedicated test mode switch. This statement needs
+  verification once we get there;
+
 Hardware configuration:
 
 P5TX-LA Motherboard:
@@ -40,11 +55,6 @@ Taito W Main Board:
 Taito W Rom Board:
 -AMD M4-128N/64 CPLD stamped 'E58-05'
 -Program, Sound roms
-
-TODO:
-- program ROM is read via parallel port (for offset write, encrypted) and game port!?
-- Emulation of the entire Taito Wolf main board which plugs into the PC motherboard's only PCI slot.
-- PCI comms between both boards have yet to be understood.
 
 */
 
@@ -404,11 +414,11 @@ ROM_START(pf2012)
 	ROM_CONTINUE(                                 0x0001, 0x4000 )
 #endif
 
-	ROM_REGION(0x400000, "user3", 0) // Program ROM
+	ROM_REGION(0x400000, "user3", 0) // Program ROM (FAT12)
 	ROM_LOAD("u1.bin", 0x000000, 0x200000, CRC(8f4c09cb) SHA1(0969a92fec819868881683c580f9e01cbedf4ad2))
 	ROM_LOAD("u2.bin", 0x200000, 0x200000, CRC(59881781) SHA1(85ff074ab2a922eac37cf96f0bf153a2dac55aa4))
 
-	ROM_REGION(0x4000000, "user4", 0) // Data ROM
+	ROM_REGION(0x4000000, "user4", 0) // Data ROM (FAT12)
 	ROM_LOAD("e59-01.u20", 0x0000000, 0x800000, CRC(701d3a9a) SHA1(34c9f34f4da34bb8eed85a4efd1d9eea47a21d77) )
 	ROM_LOAD("e59-02.u23", 0x0800000, 0x800000, CRC(626df682) SHA1(35bb4f91201734ce7ccdc640a75030aaca3d1151) )
 	ROM_LOAD("e59-03.u26", 0x1000000, 0x800000, CRC(74e4efde) SHA1(630235c2e4a11f615b5f3b8c93e1e645da09eefe) )
