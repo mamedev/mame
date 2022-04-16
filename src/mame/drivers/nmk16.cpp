@@ -581,6 +581,15 @@ void nmk16_state::mustangb3_map(address_map &map)
 	map(0x0f0000, 0x0fffff).ram().w(FUNC(nmk16_state::mainram_strange_w)).share("mainram");
 }
 
+void nmk16_state::mustangb3_sound_map(address_map &map)
+{
+	tharrier_sound_map(map);
+
+	// remove some leftover banking calls, not needed since this bootleg uses smaller ROMs
+	map(0xf600, 0xf600).unmapw();
+	map(0xf700, 0xf700).unmapw();
+}
+
 void nmk16_state::twinactn_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
@@ -4349,7 +4358,7 @@ void nmk16_state::mustangb3(machine_config &config)
 	set_hacky_interrupt_timing(config);
 
 	Z80(config, m_audiocpu, 14318180/4);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::tharrier_sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::mustangb3_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &nmk16_state::tharrier_sound_io_map);
 
 	// video hardware
