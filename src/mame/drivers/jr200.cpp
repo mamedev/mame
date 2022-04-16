@@ -4,9 +4,7 @@
 
 JR-200 (c) 1982 National / Panasonic
 
-driver by Roberto Zandona' and Angelo Salese
-
-http://www.armchairarcade.com/neo/node/1598
+Driver by Roberto Zandona' and Angelo Salese
 
 BIOS will jump to D800 if it contains 7E. If not, it will jump to A000
  if it contains CE. Otherwise, the Monitor is entered. From the monitor,
@@ -20,6 +18,11 @@ Mnnnn : Modify memory at address
 Cassette (if it worked):
 - POKE 43,0 for 2400 baud, or POKE 43,1 for 600 baud (affects SAVE only);
 - SAVE "x" (1-16 chars) to save. LOAD to load (it autodetects the speed).
+- 600 baud uses Kansas City format, each byte has a start bit, 8 data bits
+  (LSB first) and 3 stop bits. 1 = 2 cycles @1200Hz; 0 = 4 cycles @2400Hz
+- 2400 baud has the same byte format, but each bit is represented in this
+  way: 1 = half cycle @1200Hz; 0 = 1 cycle @2400Hz.
+- Since it is not working, programs can be entered via the Paste facility.
 
 TODO:
 - Timings are basically screwed, it takes too much to load the POST but
@@ -27,7 +30,18 @@ TODO:
 - keyboard MCU irq and data polling simulation should be inside a timer
   callback
 - MN1544 4-bit CPU core and ROM dump
-- MN1271 device to be emulated (4x 8-bit ports, 3-bit port, timers, etc)
+--- Character Generator ROM
+--- Keyboard
+--- Joysticks
+--- Cassette baud switch
+--- 128 bytes of RAM
+- MN1271 device to be emulated
+--- 4x 8-bit I/O ports
+--- 3-bit port
+--- timers
+--- sound
+--- cassette
+--- interface between the 2 CPUs
 - JR200 keyboard includes Kana characters, Kana On, Kana off, GRAPH
 - JR200U keyboard omits Kana, but has GRAPH ON and GRAPH OFF instead.
 - Keyboard matrix and decoding incomplete.
@@ -36,9 +50,10 @@ TODO:
   definitions can be copied to D000-D7FF ram (via 0150-016F). The user can
   modify these characters with pokes. Since we have no information, some
   guesswork has been used to feed in the required info.
-- Sound command never ends. (SOUND 1000,50 should output 1000 Hz for 1 sec)
+- Sound command never ends (SOUND 1000,50 should output 1000 Hz for 1 sec)
 - Keyclick not working (POKE 0,64 should activate it)
 - Cassette not implemented (needs MN1271 to work)
+- Kana character 0xAC ('`) displays wrongly; chargen and manual conflict.
 
 ****************************************************************************/
 
@@ -102,7 +117,7 @@ private:
 	required_shared_ptr<uint8_t> m_pcg2;
 	required_region_ptr<u8> m_gfx_rom;
 	required_shared_ptr<uint8_t> m_gfx_ram;
-	required_ioport_array<10> m_io_keyboard;
+	required_ioport_array<8> m_io_keyboard;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 };
@@ -110,58 +125,71 @@ private:
 
 
 /* TODO: double check this */
-static const uint8_t jr200_keycodes[4][9][8] =
+static const uint8_t jr200_keycodes[6][7][8] =
 {
 	/* unshifted */
 	{
-	{ 0x00, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37 },
-	{ 0x38, 0x39, 0x30, 0x2d, 0x5e, 0x08, 0x7f, 0x2d },
-	{ 0x37, 0x38, 0x39, 0x09, 0x71, 0x77, 0x65, 0x72 },
-	{ 0x74, 0x79, 0x75, 0x69, 0x6f, 0x70, 0x40, 0x5b },
-	{ 0x1b, 0x2b, 0x34, 0x35, 0x36, 0x61, 0x73, 0x64 },
-	{ 0x66, 0x67, 0x68, 0x6a, 0x6b, 0x6c, 0x3b, 0x27 },
-	{ 0x0d, 0x0a, 0x1e, 0x31, 0x32, 0x33, 0x7a, 0x78 },
-	{ 0x63, 0x76, 0x62, 0x6e, 0x6d, 0x2c, 0x2e, 0x2f },
-	{ 0x1d, 0x1f, 0x1c, 0x30, 0x2e, 0x20, 0x03, 0x00 }
+	{ 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38 },
+	{ 0x39, 0x30, 0x2d, 0x5e, 0x08, 0x7f, 0x13, 0x5c },
+	{ 0x71, 0x77, 0x65, 0x72, 0x74, 0x79, 0x75, 0x69 },
+	{ 0x6f, 0x70, 0x40, 0x5b, 0x0d, 0x61, 0x73, 0x64 },
+	{ 0x66, 0x67, 0x68, 0x6a, 0x6b, 0x6c, 0x3b, 0x3a },
+	{ 0x5d, 0x7a, 0x78, 0x63, 0x76, 0x62, 0x6e, 0x6d },
+	{ 0x2c, 0x2e, 0x2f, 0x20, 0x1e, 0x1d, 0x1f, 0x1c },
 	},
 
 	/* shifted */
 	{
-	{ 0x00, 0x21, 0x40, 0x23, 0x24, 0x25, 0x5e, 0x26 },
-	{ 0x2a, 0x28, 0x29, 0x3d, 0x10, 0x08, 0x7f, 0x2d },
-	{ 0x37, 0x38, 0x39, 0x09, 0x51, 0x57, 0x45, 0x52 },
-	{ 0x54, 0x59, 0x55, 0x49, 0x4f, 0x50, 0x40, 0x7b },
-	{ 0x1b, 0x2b, 0x34, 0x35, 0x36, 0x41, 0x53, 0x44 },
-	{ 0x46, 0x47, 0x48, 0x4a, 0x4b, 0x4c, 0x3a, 0x22 },
-	{ 0x0d, 0x0a, 0x1e, 0x31, 0x32, 0x33, 0x5a, 0x58 },
-	{ 0x43, 0x56, 0x42, 0x4e, 0x4d, 0x3c, 0x3e, 0x3f },
-	{ 0x1d, 0x1f, 0x1c, 0x30, 0x2e, 0x20, 0x00, 0x00 }
+	{ 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28 },
+	{ 0x29, 0x20, 0x3d, 0x5f, 0x08, 0x7f, 0x13, 0x7c },
+	{ 0x51, 0x57, 0x45, 0x52, 0x54, 0x59, 0x55, 0x49 },
+	{ 0x4f, 0x50, 0x60, 0x7b, 0x0d, 0x41, 0x53, 0x44 },
+	{ 0x46, 0x47, 0x48, 0x4a, 0x4b, 0x4c, 0x2b, 0x2a },
+	{ 0x7d, 0x5a, 0x58, 0x43, 0x56, 0x42, 0x4e, 0x4d },
+	{ 0x3c, 0x3e, 0x3f, 0x20, 0x1e, 0x1d, 0x1f, 0x1c },
 	},
 
 	/* graph on */
 	{
-	{ 0x00, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97 },
-	{ 0x98, 0x99, 0x90, 0x1f, 0x9a, 0x88, 0xff, 0xad },
-	{ 0xb7, 0xb8, 0xb9, 0x89, 0x11, 0x17, 0x05, 0x12 },
-	{ 0x14, 0x19, 0x15, 0x09, 0x0f, 0x10, 0x1b, 0x1d },
-	{ 0x9b, 0xab, 0xb4, 0xb5, 0xb6, 0x01, 0x13, 0x04 },
-	{ 0x06, 0x07, 0x08, 0x0a, 0x0b, 0x0c, 0x7e, 0x60 },
-	{ 0x8d, 0x8a, 0x81, 0xb1, 0xb2, 0xb3, 0x1a, 0x18 },
-	{ 0x03, 0x16, 0x02, 0x0e, 0x0d, 0x1c, 0x7c, 0x5c },
-	{ 0x84, 0x82, 0x83, 0xb0, 0xae, 0x00, 0x00, 0x00 }
+	{ 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88 },
+	{ 0x89, 0x30, 0xed, 0x8c, 0x08, 0x7f, 0x13, 0x8e },
+	{ 0x98, 0x9b, 0x99, 0xec, 0xeb, 0x9a, 0xe9, 0x90 },
+	{ 0x8d, 0xe0, 0xea, 0x5b, 0x0d, 0x91, 0x92, 0x93 },
+	{ 0x94, 0x95, 0x96, 0x97, 0xef, 0xf0, 0x3b, 0x3a },
+	{ 0x5d, 0xfa, 0xf8, 0xe3, 0xf6, 0xe2, 0xee, 0x8a },
+	{ 0x2c, 0x2e, 0x2f, 0x20, 0x1e, 0x1d, 0x1f, 0x1c },
 	},
 
 	/* graph on shifted*/
 	{
-	{ 0x9e, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97 },
-	{ 0x98, 0x99, 0x90, 0x1f, 0x9a, 0x88, 0xff, 0xad },
-	{ 0xb7, 0xb8, 0xb9, 0x89, 0x11, 0x17, 0x05, 0x12 },
-	{ 0x14, 0x19, 0x15, 0x09, 0x0f, 0x10, 0x1b, 0x1d },
-	{ 0x9b, 0xab, 0xb4, 0xb5, 0xb6, 0x01, 0x13, 0x04 },
-	{ 0x06, 0x07, 0x08, 0x0a, 0x0b, 0x0c, 0x7e, 0x60 },
-	{ 0x8d, 0x8a, 0x81, 0xb1, 0xb2, 0xb3, 0x1a, 0x18 },
-	{ 0x03, 0x16, 0x02, 0x0e, 0x0d, 0x1c, 0x7c, 0x5c },
-	{ 0x84, 0x82, 0x83, 0xb0, 0xae, 0x00, 0x00, 0x00 }
+	{ 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88 },
+	{ 0x89, 0x30, 0xed, 0x8c, 0x08, 0x7f, 0x13, 0x8e },
+	{ 0x9e, 0xff, 0x9f, 0x9c, 0x8f, 0x9a, 0xe9, 0xfe },
+	{ 0x9d, 0xfc, 0xea, 0x5b, 0x0d, 0xf1, 0xf7, 0xe5 },
+	{ 0xf2, 0xf4, 0xf9, 0xf5, 0xfb, 0xfd, 0x3b, 0x3a },
+	{ 0x5d, 0xe1, 0xf3, 0xe4, 0xe6, 0xe7, 0xe8, 0x8b },
+	{ 0x2c, 0x2e, 0x2f, 0x20, 0x1e, 0x1d, 0x1f, 0x1c },
+	},
+	/* kana on */
+	{
+	{ 0xc7, 0xcc, 0xb1, 0xb3, 0xaa, 0xab, 0xac, 0xad },
+	{ 0xae, 0xdc, 0xce, 0xcd, 0x08, 0x7f, 0x13, 0xb0 },
+	{ 0xc0, 0xc3, 0xb2, 0xbd, 0xb6, 0xdd, 0xc5, 0xc6 },
+	{ 0xd7, 0xbe, 0xde, 0xdf, 0x0d, 0xc1, 0xc4, 0xbc },
+	{ 0xca, 0xb7, 0xb8, 0xcf, 0xc9, 0xd8, 0xda, 0xb9 },
+	{ 0xd1, 0xaf, 0xbb, 0xbf, 0xcb, 0xba, 0xd0, 0xd3 },
+	{ 0xc8, 0xd9, 0xd2, 0x20, 0x1e, 0x1d, 0x1f, 0x1c },
+	},
+
+	/* kana on shifted*/
+	{
+	{ 0xc7, 0xcc, 0xb1, 0xb3, 0xaa, 0xab, 0xac, 0xad },
+	{ 0xae, 0xa6, 0xce, 0xcd, 0x08, 0x7f, 0x13, 0xb0 },
+	{ 0xc0, 0xc3, 0xb2, 0xbd, 0xb6, 0xdd, 0xc5, 0xc6 },
+	{ 0xd7, 0xbe, 0xde, 0xa2, 0x0d, 0xc1, 0xc4, 0xbc },
+	{ 0xca, 0xb7, 0xb8, 0xcf, 0xc9, 0xd8, 0xda, 0xb9 },
+	{ 0xa3, 0xaf, 0xbb, 0xbf, 0xcb, 0xba, 0xd0, 0xd3 },
+	{ 0xa4, 0xa1, 0xa5, 0x20, 0x1e, 0x1d, 0x1f, 0x1c },
 	}
 };
 
@@ -200,13 +228,21 @@ uint32_t jr200_state::screen_update_jr200(screen_device &screen, bitmap_ind16 &b
 					}
 					else // tile mode
 					{
-						if (!BIT(attr, 6))
-							pen = BIT(m_gfx_ram[(tile*8)+yi], 7-xi) ? (attr & 0x7) : BIT(attr, 3, 3);
-						else
-						if (BIT(tile, 7))
-							pen = BIT(m_pcg2[(tile*8)+yi], 7-xi) ? (attr & 0x7) : BIT(attr, 3, 3);
-						else
-							pen = BIT(m_pcg1[(tile*8)+yi], 7-xi) ? (attr & 0x7) : BIT(attr, 3, 3);
+						pen = BIT(m_gfx_ram[(tile*8)+yi], 7-xi) ? (attr & 0x7) : BIT(attr, 3, 3);
+						if (BIT(attr, 6))
+						{
+							if ((tile >= 0x20) && (tile < 0x40))
+							{
+								tile &= 0x1f;
+								pen = BIT(m_pcg1[(tile*8)+yi], 7-xi) ? (attr & 0x7) : BIT(attr, 3, 3);
+							}
+							else
+							if ((tile >= 0x40) && (tile < 0x60))
+							{
+								tile &= 0x1f;
+								pen = BIT(m_pcg2[(tile*8)+yi], 7-xi) ? (attr & 0x7) : BIT(attr, 3, 3);
+							}
+						}
 					}
 
 					bitmap.pix(y*8+yi+16, x*8+xi+16) = m_palette->pen(pen);
@@ -230,9 +266,12 @@ uint8_t jr200_state::mcu_keyb_r()
 	if (m_port_ctr == 1)
 		return m_gfx_rom[m_port_cnt];
 
-	u8 modifiers = m_io_keyboard[9]->read();
+	u8 modifiers = m_io_keyboard[7]->read();
 	u8 table = 0, keydata = 0;
 	u8 ret = 0;
+	// KANA
+	if (modifiers & 0x40)
+		table = 4;
 	// GRAPH
 	if (modifiers & 0x10)
 		table = 2;
@@ -241,7 +280,7 @@ uint8_t jr200_state::mcu_keyb_r()
 		table ++;
 
 	/* scan keyboard */
-	for (u8 row = 0; row < 9; row++)
+	for (u8 row = 0; row < 7; row++)
 	{
 		uint8_t data = m_io_keyboard[row]->read();
 
@@ -335,8 +374,6 @@ void jr200_state::unknown_port_w(u8 data)
 uint8_t jr200_state::mn1271_io_r(offs_t offset)
 {
 	uint8_t retVal = m_mn1271_ram[offset];
-	if((offset+0xc800) > 0xca00)
-		retVal= 0xff;
 
 	switch(offset+0xc800)
 	{
@@ -371,7 +408,6 @@ void jr200_state::mn1271_io_w(offs_t offset, uint8_t data)
 		case 0xc819: jr200_beep_w(data); break;
 		case 0xc81a:
 		case 0xc81b: jr200_beep_freq_w(offset-0x1a,data); break;
-		case 0xca00: jr200_border_col_w(data); break;
 	}
 }
 
@@ -383,20 +419,29 @@ void jr200_state::mem_map(address_map &map)
     4000-7fff RAM (16k expansion)
     4000-bfff RAM (32k expansion)
 */
+	// 32K RAM
 	map(0x0000, 0x7fff).ram();
-
+	// BASIC ROM
 	map(0xa000, 0xbfff).rom();
-
-	map(0xc000, 0xc0ff).ram().share("pcg1"); //PCG area (1)
+	// PCG 1
+	map(0xc000, 0xc0ff).ram().share("pcg1");
+	// Videoram
 	map(0xc100, 0xc3ff).ram().share("vram");
-	map(0xc400, 0xc4ff).ram().share("pcg2"); //PCG area (2)
+	// PCG 2
+	map(0xc400, 0xc4ff).ram().share("pcg2");
+	// Attribute RAM
 	map(0xc500, 0xc7ff).ram().share("cram");
-
-//  0xc800 - 0xcfff I / O area
-	map(0xc800, 0xcfff).rw(FUNC(jr200_state::mn1271_io_r), FUNC(jr200_state::mn1271_io_w)).share("mn1271_ram");
-
-	map(0xd000, 0xd7ff).ram().share("gfx_ram"); //BIOS PCG RAM area
-	map(0xd800, 0xdfff).rom(); // cart space (header 0x7e)
+	// MN1271 PIA/timer
+	map(0xc800, 0xc81f).mirror(0x01e0).rw(FUNC(jr200_state::mn1271_io_r), FUNC(jr200_state::mn1271_io_w)).share("mn1271_ram");
+	// YLHSD61K201F (or HD61K201F) CRTC
+	map(0xca00, 0xcbff).w(FUNC(jr200_state::jr200_border_col_w));
+	// External I/O area
+	map(0xcc00, 0xcfff);
+	// RAM-based normal characters
+	map(0xd000, 0xd7ff).ram().share("gfx_ram");
+	// System extension (presumably via the External Bus Connector - there's no "cart" slot)
+	map(0xd800, 0xdfff).rom();
+	// BIOS
 	map(0xe000, 0xffff).rom();
 }
 
@@ -405,102 +450,88 @@ static INPUT_PORTS_START( jr200 )
 //  PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("X0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("HELP") PORT_CODE(KEYCODE_TILDE)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('@')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('^')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR(0x27)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
 
 	PORT_START("X1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('*')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR('(')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(')')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('+')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("BACKSPACE") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("DEL") PORT_CODE(KEYCODE_DEL)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad -") PORT_CODE(KEYCODE_MINUS_PAD)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('=')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('^') PORT_CHAR('_')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RUBOUT") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("DEL") PORT_CODE(KEYCODE_DEL)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("INS") PORT_CODE(KEYCODE_INSERT)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("YEN") PORT_CODE(KEYCODE_HOME) PORT_CHAR(0x5c) PORT_CHAR(0x7c)
 
 	PORT_START("X2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 7") PORT_CODE(KEYCODE_7_PAD)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 8") PORT_CODE(KEYCODE_8_PAD)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 9") PORT_CODE(KEYCODE_9_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("TAB") PORT_CODE(KEYCODE_TAB) PORT_CHAR('\t')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')
 
 	PORT_START("X3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
-
-	PORT_START("X4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC))
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad +") PORT_CODE(KEYCODE_PLUS_PAD)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 4") PORT_CODE(KEYCODE_4_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 5") PORT_CODE(KEYCODE_5_PAD)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 6") PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('@') PORT_CHAR(0x60)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('[') PORT_CHAR('{')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
 
-	PORT_START("X5")
+	PORT_START("X4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'') PORT_CHAR('"')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('+')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(':') PORT_CHAR('*')
+
+	PORT_START("X5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(']') PORT_CHAR('}')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
 
 	PORT_START("X6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\r')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LINE FEED") PORT_CODE(KEYCODE_ENTER_PAD)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 1") PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 2") PORT_CODE(KEYCODE_2_PAD)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 3") PORT_CODE(KEYCODE_3_PAD)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 
 	PORT_START("X7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
-
-	PORT_START("X8")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 0") PORT_CODE(KEYCODE_0_PAD)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad .") PORT_CODE(KEYCODE_ASTERISK)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RALT) PORT_NAME("BREAK") PORT_CHAR(3)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("X9")
+	// This key does not exist, it's for our convenience only
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("LEFT SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RIGHT SHIFT") PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
+	// on JR200U there's GRAPH ON and GRAPH OFF keys
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("GRAPH") PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
-	// ToDo: add Kana on/off keys, JR200 only
+	// Kana is on JR200 only
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("KANA OFF") PORT_CODE(KEYCODE_LALT)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("KANA ON") PORT_CODE(KEYCODE_RALT)
+	// This key does a soft reset, so needs a proper NMI handler
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("BREAK")
 INPUT_PORTS_END
 
 static const gfx_layout tiles8x8_layout =
@@ -537,7 +568,7 @@ void jr200_state::machine_reset()
 	m_old_keydata = 0;
 	m_port_ctr = 0;
 	m_port_cnt = 0;
-	memset(m_mn1271_ram,0,0x800);
+	memset(m_mn1271_ram,0,0x20);
 }
 
 
@@ -563,7 +594,7 @@ void jr200_state::jr200(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	// AY-8910 ?
+	// All sounds are produced by the MN1271
 
 	BEEP(config, m_beeper, 0).add_route(ALL_OUTPUTS,"mono",0.50);
 }
