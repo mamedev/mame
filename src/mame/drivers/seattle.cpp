@@ -24,8 +24,8 @@
         * San Francisco Rush: The Rock [Flagstaff, Atari, 192MHz, 8MB RAM, 2xTMU]
 
     Known bugs:
-        * Carnevil: lets you set the flash brightness; need to emulate that
-
+        * carnevil: lets you set the flash brightness; need to emulate that
+        * blitz99: unemulated N64 controller pak option;
 ***************************************************************************
 
     Phoenix hardware main board:
@@ -109,7 +109,7 @@
         14.31818MHz crystal near 3dfx DAC
         16MHz crystal attached to ADSP
         16.6667MHz crystal near Midway IO chip
-        33.3333MHz crystal near IDE chip and Galileo(PCI bus I assume)
+        33.3333MHz crystal near IDE chip and Galileo (PCI bus I assume)
         50MHz crystal near CPU
 
     Boot ROM-1.3
@@ -118,8 +118,8 @@
     Connectors:
         P2 and P6 look like PCI slots, but with no connectors soldered in, near
             3dfx/Galileo/IDE section.
-        P19 is for the Daisy Dukes widget board(used by Cal Speed), and maybe
-            the Carnevil gun board.
+        P19 is for the Daisy Dukes widget board (used by Cal Speed), and the
+            Carnevil gun board.
         P28 is a large 120 pin connector that is not populated, right next to
             the CPU.
         P20 is a 10 pin connector labeled "factory test".
@@ -148,8 +148,6 @@
         U5: UCN5804LB
         U6: MM74HC574WM
         Y1: 4.000 XTAL
-
-    TODO: Not supported
 
 ***************************************************************************
 
