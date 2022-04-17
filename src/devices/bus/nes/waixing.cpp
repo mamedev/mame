@@ -134,7 +134,7 @@ nes_waixing_j_device::nes_waixing_j_device(const machine_config &mconfig, const 
 {
 }
 
-nes_waixing_sh2_device::nes_waixing_sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_waixing_sh2_device::nes_waixing_sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_txrom_device(mconfig, NES_WAIXING_SH2, tag, owner, clock)
 {
 }
@@ -237,10 +237,9 @@ void nes_waixing_sh2_device::device_start()
 
 void nes_waixing_sh2_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-
 	m_reg[0] = m_reg[1] = 0;
 	mmc3_common_initialize(0xff, 0xff, 0);
+	set_nt_mirroring(PPU_MIRROR_VERT); // first Fire Emblem doesn't properly set mirroring like the other games do
 }
 
 void nes_waixing_sec_device::device_start()
@@ -783,40 +782,38 @@ void nes_waixing_j_device::write_h(offs_t offset, uint8_t data)
 
  Waixing SH2 Board
 
- Games: Fire Emblem (C) and Fire Emblem Gaiden (C)
+ Games: Fire Emblem (C), Fire Emblem Gaiden (C),
+ Zhentian Shi Yongshi
 
- MMC3 clone with different access to CHR
+ MMC3 clone with MMC2-like CHR banking.
 
  iNES: mapper 165
 
- In MESS: Partially Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_waixing_sh2_device::chr_cb(int start, int bank, int source)
+void nes_waixing_sh2_device::set_chr(u8 chr, int chr_base, int chr_mask)
 {
-	chr4_0(m_reg[0], m_reg[0] ? CHRRAM : CHRROM);
-	chr4_4(m_reg[1], m_reg[1] ? CHRRAM : CHRROM);
+	int bank1 = m_mmc_vrom_bank[m_reg[0] ? 1 : 0] >> 2;
+	int bank2 = m_mmc_vrom_bank[m_reg[1] ? 4 : 2] >> 2;
+
+	chr4_0(bank1, bank1 ? CHRROM : CHRRAM);
+	chr4_4(bank2, bank2 ? CHRROM : CHRRAM);
 }
 
-uint8_t nes_waixing_sh2_device::chr_r(offs_t offset)
+u8 nes_waixing_sh2_device::chr_r(offs_t offset)
 {
-	int bank = offset >> 10;
-	uint8_t val = m_chr_access[bank][offset & 0x3ff]; // this would be usual return value
-	int chr_helper;
+	int val = device_nes_cart_interface::chr_r(offset);
 
 	switch (offset & 0xff8)
 	{
-		case 0xfd0: chr_helper = (bank & 0x4) | 0x0; break;
-		case 0xfe8: chr_helper = (bank & 0x4) | 0x2; break;
-		default: return val;
+		case 0xfd0:
+		case 0xfe8:
+			m_reg[BIT(offset, 12)] = BIT(offset, 3);
+			set_chr(m_chr_source, m_chr_base, m_chr_mask);
+			break;
 	}
-
-	m_reg[offset >> 12] = chr_helper;
-	if (offset & 0x1000)
-		chr4_4(m_reg[1], m_reg[1] ? CHRRAM : CHRROM);
-	else
-		chr4_0(m_reg[0], m_reg[0] ? CHRRAM : CHRROM);
 
 	return val;
 }
