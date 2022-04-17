@@ -929,8 +929,6 @@ void nes_bmc_f600_device::device_start()
 
 void nes_bmc_f600_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-
 	m_reg = 0;
 	mmc3_common_initialize(0x1f, 0x7f, 0);
 }
@@ -1041,8 +1039,6 @@ void nes_bmc_810305c_device::device_start()
 
 void nes_bmc_810305c_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-
 	m_outer = 0;
 	mmc3_common_initialize(0x1f, 0x7f, 0);
 }
@@ -3085,12 +3081,12 @@ void nes_bmc_f600_device::write_h(offs_t offset, u8 data)
 		nes_txrom_device::write_h(offset, data);
 }
 
-void nes_bmc_f600_device::chr_cb(int start, int bank, int source)
+void nes_bmc_f600_device::set_chr(u8 chr, int chr_base, int chr_mask)
 {
 	if ((m_reg & 0x07) == 1)
-		nes_txsrom_device::chr_cb(start, bank, source);
+		nes_txsrom_device::set_chr(chr, chr_base, chr_mask);
 	else
-		nes_txrom_device::chr_cb(start, bank, source);
+		nes_txrom_device::set_chr(chr, chr_base, chr_mask);
 }
 
 /*-------------------------------------------------
@@ -3452,16 +3448,10 @@ void nes_bmc_810305c_device::set_chr(u8 chr, int chr_base, int chr_mask)
 {
 	if (m_outer == 2 && BIT(m_mmc_vrom_bank[0], 7))
 		chr8(0, CHRRAM);
-	else
+	else if (m_outer)
 		nes_txrom_device::set_chr(chr, chr_base, chr_mask);
-}
-
-void nes_bmc_810305c_device::chr_cb(int start, int bank, int source)
-{
-	if (m_outer)
-		nes_txrom_device::chr_cb(start, bank, source);
 	else
-		nes_txsrom_device::chr_cb(start, bank, source);
+		nes_txsrom_device::set_chr(chr, chr_base, chr_mask);
 }
 
 void nes_bmc_810305c_device::write_h(offs_t offset, u8 data)
