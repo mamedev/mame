@@ -34,6 +34,16 @@ const char *meta_data::entry_name(meta_name name)
 	return "";
 }
 
+std::optional<meta_name> meta_data::from_entry_name(const char *name)
+{
+	for (int i = 0; i <= (int)meta_name::max; i++)
+	{
+		if (!strcmp(name, entry_name((meta_name)i)))
+			return (meta_name)i;
+	}
+	return {};
+}
+
 template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
 template<class... Ts> overloaded(Ts...)->overloaded<Ts...>;
 
@@ -50,33 +60,71 @@ meta_type meta_value::type() const
 	return *result;
 }
 
-std::string meta_value::to_string() const
+std::string meta_value::as_string() const
 {
 	std::string result;
 
-	switch (type())
+	std::visit(overloaded
 	{
-	case meta_type::string:
-		result = as_string();
-		break;
-	case meta_type::number:
-		result = util::string_format("0x%x", as_number());
-		break;
-	case meta_type::flag:
-		result = as_flag() ? "t" : "f";
-		break;
-	case meta_type::date:
+		[&result](const std::string &s)				{ result = s; },
+		[&result](std::uint64_t i)					{ result = util::string_format("0x%x", i); },
+		[&result](bool b)							{ result = b ? "t" : "f"; },
+		[&result](const util::arbitrary_datetime &dt)
 		{
-			auto dt = as_date();
 			result = util::string_format("%04d-%02d-%02d %02d:%02d:%02d",
 				dt.year, dt.month, dt.day_of_month,
 				dt.hour, dt.minute, dt.second);
 		}
-		break;
-	default:
-		throw false;
-	}
+	}, value);
 	return result;
 }
+
+util::arbitrary_datetime meta_value::as_date() const
+{
+	util::arbitrary_datetime result = { 0, };
+
+	std::visit(overloaded
+	{
+		[&result](const std::string &s)
+		{
+			sscanf(s.c_str(), "%d-%d-%d %d:%d:%d", &result.year, &result.month, &result.day_of_month, &result.hour, &result.minute, &result.second);
+		},
+		[&result](const util::arbitrary_datetime &dt)	{ result = dt; },
+		[](std::uint64_t)							{ /* nonsensical */ },
+		[](bool)									{ /* nonsensical */ }
+	}, value);
+
+	return result;
+
+}
+
+bool meta_value::as_flag() const
+{
+	bool result = false;
+
+	std::visit(overloaded
+	{
+		[&result](const std::string &s)				{ result = !s.empty() && s != "f"; },
+		[&result](bool b)							{ result = b; },
+		[](std::uint64_t)							{ /* nonsensical */ },
+		[](const util::arbitrary_datetime &)		{ /* nonsensical */ }
+	}, value);
+	return result;
+}
+
+uint64_t meta_value::as_number() const
+{
+	uint64_t result = 0;
+
+	std::visit(overloaded
+	{
+		[&result](const std::string &s)				{ result = std::stoull(s); },
+		[&result](uint64_t i)						{ result = i; },
+		[](const util::arbitrary_datetime &)		{ /* nonsensical */ },
+		[](bool)									{ /* nonsensical */ }
+	}, value);
+	return result;
+}
+
 
 } // namespace fs
