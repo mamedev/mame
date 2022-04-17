@@ -17135,6 +17135,39 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="pyrotech">
+		<description>Pyrotechnica</description>
+		<year>1995</year>
+		<publisher>Psygnosis</publisher>
+		<info name="developer" value="Psygnosis" />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Pyrotechnica [Psygnosis] [1995] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="1f7a62ae" sha1="38b68a84028ad975da06455803eed73039869f4b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Pyrotechnica [Psygnosis] [1995] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="52c47638" sha1="3ced7f33dca81a9e8542c1080f79103b98a1cde2" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Pyrotechnica [Psygnosis] [1995] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="ae8f40ac" sha1="8a90d602563e7e7e71e13980282a55f1ca57fe8e" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Pyrotechnica [Psygnosis] [1995] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="f8dc8055" sha1="a9232582b834de74cf301fa9017f10c7634fba2a" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Pyrotechnica [Psygnosis] [1995] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="3282c4c5" sha1="f7c080dd6949d5cc6c2fa124b13ca5991e0b0086" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="quarantin">
 		<description>Quarantine</description>
 		<year>1994</year>
@@ -17417,6 +17450,93 @@ license:CC0
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Realms of Chaos (USA) (v1.0) (Disk 3).img" size="1474560" crc="4611a516" sha1="157f4bb42c1293feb5bac9d7452619711bb4c1dd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="redbaron">
+		<description>Red Baron (VGA 256 colors version)</description>
+		<year>1991</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Dynamix" />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Red Baron (VGA) [Sierra] [1991] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="a7b7e3b7" sha1="5718ebe5e5344c4ae3c8eacceb1ea1cb14a18ec8"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Red Baron (VGA) [Sierra] [1991] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="c21f2a67" sha1="035119b1eefd1248f34ee78aed7588ac12560855"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="redbarona" cloneof="redbaron">
+		<description>Red Baron (EGA 16 colors version)</description>
+		<year>1991</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Dynamix" />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Red Baron (EGA) [Sierra] [1991] [3.5HD] [Disk 1 of 3].img" size="737280" crc="40812b87" sha1="0d0188217599c212752371dcb48c87fdbde691e3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Red Baron (EGA) [Sierra] [1991] [3.5HD] [Disk 2 of 3].img" size="737280" crc="59f01f8b" sha1="26cc05041c2fc1d71a456b0bb495b5f8dd45dd5d"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Red Baron (EGA) [Sierra] [1991] [3.5HD] [Disk 3 of 3].img" size="737280" crc="cefe45a4" sha1="4149b7af1e6b20256053e40b5345ef4de78c3379"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="redbarmb">
+		<description>Red Baron: Mission Builder</description>
+		<year>1991</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Dynamix" />
+		<info name="usage" value="Add-on for Red Baron (VGA 256 colors version). Requires Red Baron (VGA 256 colors version) previously installed"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Red Baron - Mission Builder [Sierra] [1992] [3.5DD] [Disk 1 of 1].img" size="737280" crc="181231a8" sha1="72174691212deb37688ac853c51a52f1144c899e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rphantom">
+		<description>Return of the Phantom</description>
+		<year>1993</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="MPS Labs" />
+		<info name="version" value="version 2.00 3-Jun-93" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Return of the Phantom [MicroProse] [1993] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="78978b7a" sha1="485b689688cbeecadee7c786e7fa51f119ec1d23"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Return of the Phantom [MicroProse] [1993] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="ca8d1c5f" sha1="4eec88f64e60d99582a5b88c1007ae599a658bb0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Return of the Phantom [MicroProse] [1993] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="e2005d42" sha1="8a44f8f978fc0a2987de493d69eebefa7962f8f2"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Return of the Phantom [MicroProse] [1993] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="5d909461" sha1="486731f47716d49ce3557eb02eca83d9e2d686f8"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Return of the Phantom [MicroProse] [1993] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="957ef117" sha1="8134fc34910f30f34c4d4d0d8d0f8dcda420f5d3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18117,6 +18237,35 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="simcityw">
+		<description>SimCity Classic (Windows 3.x release) (3.5")</description>
+		<year>1993</year>
+		<publisher>Maxis</publisher>
+		<info name="version" value="1.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="SimCity Classic (Windows 3.x release) [Maxis] [1993] [3.5DD] [Disk 1 of 2] [Install Disk].img" size="737280" crc="a2a24523" sha1="15970109725d27fce3609f83c367b07b9979df1a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="SimCity Classic (Windows 3.x release) [Maxis] [1993] [3.5DD] [Disk 2 of 2] [Data Disk].img" size="737280" crc="7a72e17d" sha1="e7ba99908cd0cf491f9b3103b80ba29942729328"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simcityw525" cloneof="simcityw">
+		<description>SimCity Classic (Windows 3.x release) (5.25")</description>
+		<year>1993</year>
+		<publisher>Maxis</publisher>
+		<info name="version" value="1.1" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="SimCity Classic (Windows 3.x release) [Maxis] [1993] [5.25HD] [Disk 1 of 1].img" size="1228800" crc="5a87c7a4" sha1="6d668984561cbec5e2556925910c6275680f438d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="simcit2k">
 		<description>SimCity 2000 (Ver 1.00)</description>
 		<year>1994</year>
@@ -18266,12 +18415,34 @@ license:CC0
 		<info name="developer" value="Maxis" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="simlife.img" size="737280" crc="59898bed" sha1="346ae9fb47fe2a0324e2df8f1f77c09dd5c3d8ec"/>
+				<rom name="SimLife [Maxis] [1992] [3.5DD] [Disk 1 of 2].img" size="737280" crc="e1be65f7" sha1="23a7a17d6a6745ed860e1b266cb7d3b6f05fdeed"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="simlifed2.img" size="737280" crc="6e704c65" sha1="fc2e641147584f3a5675083edbd0cee355db3ba6"/>
+				<rom name="SimLife [Maxis] [1992] [3.5DD] [Disk 2 of 2].img" size="737280" crc="757c0e9d" sha1="e4a971834cc92e767fde324b2529e82229e58f0f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simlifew">
+		<description>SimLife (Windows 3.x release)</description>
+		<year>1993</year>
+		<publisher>Maxis</publisher>
+		<info name="developer" value="Maxis" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="SimLife (Windows 3.x release) [Maxis] [1993] [3.5DD] [Disk 1 of 3].img" size="737280" crc="40136c47" sha1="4a80d0ec9c6cc7360bfeb23323b0a520b79a35b4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="SimLife (Windows 3.x release) [Maxis] [1993] [3.5DD] [Disk 2 of 3].img" size="737280" crc="bafc7365" sha1="b2c88c8a1010897d469b9dbbb85053e25ea93626"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="SimLife (Windows 3.x release) [Maxis] [1993] [3.5DD] [Disk 3 of 3].img" size="737280" crc="31cfd3d2" sha1="50314726fdc3f94fb86ab35d6887ae663503be87"/>
 			</dataarea>
 		</part>
 	</software>
