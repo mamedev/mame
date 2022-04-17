@@ -62,6 +62,7 @@ private:
 	virtual void video_start() override;
 	DECLARE_MACHINE_START(bestbest);
 	DECLARE_MACHINE_START(bssoccer);
+	DECLARE_MACHINE_START(sunaq);
 	DECLARE_MACHINE_START(uballoon);
 	DECLARE_MACHINE_RESET(uballoon);
 
