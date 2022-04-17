@@ -4,8 +4,6 @@
 
 JR-200 (c) 1982 National / Panasonic
 
-Driver by Roberto Zandona' and Angelo Salese
-
 BIOS will jump to D800 if it contains 7E. If not, it will jump to A000
  if it contains CE. Otherwise, the Monitor is entered. From the monitor,
  GA000 for cold start Basic, or GE79D for warm start Basic.
@@ -41,6 +39,7 @@ TODO:
 --- timers
 --- sound
 --- cassette
+--- serial / RS-232
 --- interface between the 2 CPUs
 - JR200 keyboard includes Kana characters, Kana On, Kana off, GRAPH
 - JR200U keyboard omits Kana, but has GRAPH ON and GRAPH OFF instead.
@@ -85,6 +84,7 @@ public:
 	{ }
 
 	void jr200(machine_config &config);
+	DECLARE_INPUT_CHANGED_MEMBER(nmi_button);
 
 private:
 	required_shared_ptr<uint8_t> m_vram;
@@ -117,7 +117,7 @@ private:
 	required_shared_ptr<uint8_t> m_pcg2;
 	required_region_ptr<u8> m_gfx_rom;
 	required_shared_ptr<uint8_t> m_gfx_ram;
-	required_ioport_array<8> m_io_keyboard;
+	required_ioport_array<11> m_io_keyboard;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 };
@@ -265,6 +265,8 @@ uint8_t jr200_state::mcu_keyb_r()
 {
 	if (m_port_ctr == 1)
 		return m_gfx_rom[m_port_cnt];
+	if (m_port_ctr == 2)
+		return m_io_keyboard[10]->read();
 
 	u8 modifiers = m_io_keyboard[7]->read();
 	u8 table = 0, keydata = 0;
@@ -354,7 +356,8 @@ TIMER_CALLBACK_MEMBER(jr200_state::timer_d_callback)
 	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-// get data from chargen for bios to copy to D000-D7FF
+// get data from chargen for bios to copy to D000-D7FF.
+// After that, one more copy for the cassette dipswitch
 void jr200_state::unknown_port_w(u8 data)
 {
 	if ((m_port_ctr == 0) && (data == 0x31))
@@ -366,9 +369,12 @@ void jr200_state::unknown_port_w(u8 data)
 	if ((m_port_ctr == 1) && (data == 0x73))
 	{
 		m_port_cnt++;
-		if (m_port_cnt > 0x7ff)
+		if (m_port_cnt == 0x800)
 			m_port_ctr++;
 	}
+	else
+	if ((m_port_ctr == 2) && (data == 0x73))
+		m_port_ctr++;
 }
 
 uint8_t jr200_state::mn1271_io_r(offs_t offset)
@@ -386,7 +392,7 @@ uint8_t jr200_state::mn1271_io_r(offs_t offset)
 		case 0xc810: retVal= 0; break;
 		case 0xc816: retVal= 0x4e; break;
 		case 0xc81c: retVal= (m_mn1271_ram[0x1c] & 0xfe) | 1;  break;//bit 0 needs to be high otherwise system refuses to boot
-		case 0xc81d: retVal= (m_port_ctr == 2) ? (m_mn1271_ram[0x1d] & 0xed) : 1; break;
+		case 0xc81d: retVal= (m_port_ctr == 3) ? (m_mn1271_ram[0x1d] & 0xed) : 1; break;
 	}
 	//logerror("mn1271_io_r [%04x] = %02x\n",offset+0xc800,retVal);
 	return retVal;
@@ -531,8 +537,24 @@ static INPUT_PORTS_START( jr200 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("KANA OFF") PORT_CODE(KEYCODE_LALT)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("KANA ON") PORT_CODE(KEYCODE_RALT)
 	// This key does a soft reset, so needs a proper NMI handler
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("BREAK")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("BREAK") PORT_CODE(KEYCODE_PGDN) PORT_CHANGED_MEMBER(DEVICE_SELF, jr200_state, nmi_button, 0)
+
+	PORT_START("X8")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED ) // reserved for Joystick 1
+
+	PORT_START("X9")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED ) // reserved for Joystick 2
+
+	PORT_START("X10")
+	PORT_DIPNAME( 0x01, 0x00, "Cassette Baud")  // mounted on the underside of the unit
+	PORT_DIPSETTING(    0x00, "2400")
+	PORT_DIPSETTING(    0x01, "600")
 INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(jr200_state::nmi_button)
+{
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+}
 
 static const gfx_layout tiles8x8_layout =
 {
