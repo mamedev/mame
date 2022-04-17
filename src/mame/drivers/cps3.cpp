@@ -89,8 +89,8 @@ Street Fighter III 2nd Impact: Giant Attack          1997  3GA97a00F  CP300000G 
 Street Fighter III 2nd Impact: Giant Attack                3GA97a00F  CP300000G  JAPAN   X          CAP-3GA000  ?           ?            971016*
 Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000C0G  ASIA        X                                           970930
 Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000C0G  ASIA        X                                           971016*
-Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000H0G  USA     X          CAP-3GA0A0  CAP-3GA000  CAP-3GA-1    970930
-Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000H0G  USA     X          CAP-3GA0A0  ?           ?            971016*
+Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000H0G  MEXICO  X          CAP-3GA0A0  CAP-3GA000  CAP-3GA-1    970930
+Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000H0G  MEXICO  X          CAP-3GA0A0  ?           ?            971016*
 Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000U0G  USA     X          CAP-3GA0A0  CAP-3GA000  CAP-3GA-1    970930
 Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000U0G  USA     X          CAP-3GA0A0  ?           ?            971016*
 
