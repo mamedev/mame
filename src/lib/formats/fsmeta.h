@@ -54,6 +54,7 @@ public:
 	meta_value() { value = false; }
 	meta_value(std::string &&str) { value = std::move(str); }
 	meta_value(std::string_view str) { value = std::string(str); }
+	meta_value(const char *str) { value = std::string(str); }
 	meta_value(bool b) { value = b; }
 	meta_value(int32_t num) { value = uint64_t(num); }
 	meta_value(uint32_t num) { value = uint64_t(num); }
