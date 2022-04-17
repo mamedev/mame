@@ -38,7 +38,7 @@ enum class meta_name {
 	owner_id,
 	attributes,
 
-	total = attributes + 1
+	max = attributes
 };
 
 enum class meta_type {

@@ -36,7 +36,7 @@ const char *meta_data::entry_name(meta_name name)
 
 std::optional<meta_name> meta_data::from_entry_name(const char *name)
 {
-	for (int i = 0; i < (int)meta_name::total; i++)
+	for (int i = 0; i <= (int)meta_name::max; i++)
 	{
 		if (!strcmp(name, entry_name((meta_name)i)))
 			return (meta_name)i;
