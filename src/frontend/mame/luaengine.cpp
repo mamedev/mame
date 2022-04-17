@@ -1631,6 +1631,12 @@ void lua_engine::initialize()
 	 * emu.fs_meta_data()
 	 */
 	auto fs_meta_data_type = emu.new_usertype<fs::meta_data>("fs_meta_data", sol::call_constructor, sol::constructors<sol::types<>>());
+	fs_meta_data_type["set"] = [](fs::meta_data &meta, const char *name, const char *value)
+	{
+		std::optional<fs::meta_name> mname = fs::meta_data::from_entry_name(name);
+		if (mname)
+			meta.set(*mname, value);
+	};
 
 	auto fs_meta_description_type = sol().registry().new_usertype<fs::meta_description>("fs_meta_description", sol::no_constructor);
 	fs_meta_description_type["name"] = sol::property([](fs::meta_description const &desc)
@@ -1650,7 +1656,7 @@ void lua_engine::initialize()
 		});
 	fs_meta_description_type["default"] = sol::property([](fs::meta_description const &desc)
 		{
-			return desc.m_default.to_string();
+			return desc.m_default.as_string();
 		});
 	fs_meta_description_type["ro"] = sol::property([](fs::meta_description const &desc)
 		{
