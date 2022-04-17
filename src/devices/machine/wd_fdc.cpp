@@ -98,6 +98,8 @@ static const char *const states[] =
 	"SPINUP_DONE",
 	"SETTLE_WAIT",
 	"SETTLE_DONE",
+	"WRITE_PROTECT_WAIT",
+	"WRITE_PROTECT_DONE",
 	"DATA_LOAD_WAIT",
 	"DATA_LOAD_WAIT_DONE",
 	"SEEK_MOVE",
@@ -851,13 +853,23 @@ void wd_fdc_device_base::write_track_continue()
 			LOGSTATE("SETTLE_DONE\n");
 			if (floppy && floppy->wpt_r()) {
 				LOGSTATE("WRITE_PROT\n");
-				status |= S_WP;
-				command_end();
+				sub_state = WRITE_PROTECT_WAIT;
+				delay_cycles(t_gen, 30000);
 				return;
 			}
 			set_drq();
 			sub_state = DATA_LOAD_WAIT;
 			delay_cycles(t_gen, 192);
+			return;
+
+		case WRITE_PROTECT_WAIT:
+			LOGSTATE("WRITE_PROTECT_WAIT\n");
+			return;
+
+		case WRITE_PROTECT_DONE:
+			LOGSTATE("WRITE_PROTECT_DONE\n");
+			status |= S_WP;
+			command_end();
 			return;
 
 		case DATA_LOAD_WAIT:
@@ -963,13 +975,23 @@ void wd_fdc_device_base::write_sector_continue()
 			LOGSTATE("SETTLE_DONE\n");
 			if (floppy && floppy->wpt_r()) {
 				LOGSTATE("WRITE_PROT\n");
-				status |= S_WP;
-				command_end();
+				sub_state = WRITE_PROTECT_WAIT;
+				delay_cycles(t_gen, 30000);
 				return;
 			}
 			sub_state = SCAN_ID;
 			counter = 0;
 			live_start(SEARCH_ADDRESS_MARK_HEADER);
+			return;
+
+		case WRITE_PROTECT_WAIT:
+			LOGSTATE("WRITE_PROTECT_WAIT\n");
+			return;
+
+		case WRITE_PROTECT_DONE:
+			LOGSTATE("WRITE_PROTECT_DONE\n");
+			status |= S_WP;
+			command_end();
 			return;
 
 		case SCAN_ID:
@@ -1119,6 +1141,10 @@ void wd_fdc_device_base::do_generic()
 
 	case SETTLE_WAIT:
 		sub_state = SETTLE_DONE;
+		break;
+
+	case WRITE_PROTECT_WAIT:
+		sub_state = WRITE_PROTECT_DONE;
 		break;
 
 	case SEEK_WAIT_STEP_TIME:
@@ -1498,6 +1524,8 @@ void wd_fdc_device_base::index_callback(floppy_image_device *floppy, int state)
 	case SPINUP_DONE:
 	case SETTLE_WAIT:
 	case SETTLE_DONE:
+	case WRITE_PROTECT_WAIT:
+	case WRITE_PROTECT_DONE:
 	case DATA_LOAD_WAIT:
 	case DATA_LOAD_WAIT_DONE:
 	case SEEK_MOVE:
