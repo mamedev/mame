@@ -357,8 +357,8 @@ nes_bmc_22games_device::nes_bmc_22games_device(const machine_config &mconfig, co
 {
 }
 
-nes_bmc_64y2k_device::nes_bmc_64y2k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_BMC_64Y2K, tag, owner, clock)
+nes_bmc_64y2k_device::nes_bmc_64y2k_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_64Y2K, tag, owner, clock), m_reg_mask(0)
 {
 }
 
@@ -986,14 +986,11 @@ void nes_bmc_64y2k_device::device_start()
 
 void nes_bmc_64y2k_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	chr8(0, m_chr_source);
-
+	m_reg_mask = m_chr_source == CHRROM ? 0x03 : 0x01;
 	m_reg[0] = 0x80;
 	m_reg[1] = 0x43;
 	m_reg[2] = m_reg[3] = 0;
-	set_prg();
-	set_nt_mirroring(PPU_MIRROR_VERT);
+	update_banks();
 }
 
 void nes_bmc_420y2k_device::device_start()
@@ -2652,54 +2649,45 @@ void nes_bmc_22games_device::write_h(offs_t offset, u8 data)
 
  Games: 64-in-1 Y2K
 
- In MESS: Supported
+ NES 2.0: mapper 314
+
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_bmc_64y2k_device::set_prg()
+void nes_bmc_64y2k_device::update_banks()
 {
-	uint8_t helper1 = m_reg[1] & 0x1f;
-	uint8_t helper2 = (helper1 << 1) | BIT(m_reg[1], 6);
-
-	if (m_reg[0] & 0x80)
-	{
-		if (m_reg[1] & 0x80)
-			prg32(helper1);
-		else
-		{
-			prg16_89ab(helper2);
-			prg16_cdef(helper2);
-		}
-	}
+	if (BIT(m_reg[0] & m_reg[1], 7))
+		prg32(m_reg[1]);
 	else
-		prg16_cdef(helper2);
-}
-
-void nes_bmc_64y2k_device::write_l(offs_t offset, uint8_t data)
-{
-	LOG_MMC(("bmc64y2k write_l, offset: %04x, data: %02x\n", offset, data));
-	offset += 0x100;
-
-	switch (offset)
 	{
-		case 0x1000:
-		case 0x1001:
-		case 0x1002:
-		case 0x1003:
-			m_reg[offset & 0x03] = data;
-			set_prg();
-			chr8(BIT(m_reg[0], 1, 2) | (m_reg[2] << 2), CHRROM);
-			break;
+		u8 bank = m_reg[1] << 1 | BIT(m_reg[1], 6);
+		prg16_89ab(bank);
+		prg16_cdef(bank | (BIT(m_reg[0], 7) ? 0 : 7));
 	}
-	if (offset == 0x1000)   /* write to reg[0] also sets mirroring */
-		set_nt_mirroring(BIT(data, 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+
+	chr8(BIT(m_reg[0], 1, 2) | (m_reg[2] << 2), m_chr_source);
+	set_nt_mirroring(BIT(m_reg[0], 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
-void nes_bmc_64y2k_device::write_h(offs_t offset, uint8_t data)
+void nes_bmc_64y2k_device::write_l(offs_t offset, u8 data)
 {
-	LOG_MMC(("bmc64y2k write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG_MMC(("bmc_64y2k write_l, offset: %04x, data: %02x\n", offset, data));
 
-	m_reg[3] = data;    // reg[3] is currently unused?!?
+	offset += 0x100;
+	if (offset >= 0x1000)
+	{
+		m_reg[offset & m_reg_mask] = data;
+		update_banks();
+	}
+}
+
+void nes_bmc_64y2k_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_64y2k write_h, offset: %04x, data: %02x\n", offset, data));
+
+	if (!BIT(m_reg[0], 7))
+		prg16_89ab(((m_reg[1] << 1) & ~0x07) | (data & 0x07));
 }
 
 /*-------------------------------------------------
