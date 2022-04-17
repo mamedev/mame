@@ -147,7 +147,6 @@ private:
 	dir_t           m_root;
 
 	directory *open_directory(u32 lsn);
-	void drop_root_ref();
 	std::vector<u8> read_file_data(const file_header &header) const;
 };
 
@@ -549,16 +548,6 @@ filesystem_t::dir_t impl::root()
 	if (!m_root)
 		m_root = open_directory(m_volume_header.root_dir_lsn());
 	return m_root.strong();
-}
-
-
-//-------------------------------------------------
-//  impl::drop_root_ref
-//-------------------------------------------------
-
-void impl::drop_root_ref()
-{
-	m_root = nullptr;
 }
 
 
