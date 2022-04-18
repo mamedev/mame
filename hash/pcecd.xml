@@ -183,7 +183,7 @@ license:CC0
 	</software>
 
 	<software name="angels2">
-		<description>Angels II - Holy Night [Prototype][Backup] (SCD)(Jpn)</description>
+		<description>Angels II - Holy Night [prototype][backup] (SCD)(Jpn)</description>
 		<year>19??</year>
 		<publisher>NEC</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
@@ -3240,7 +3240,7 @@ license:CC0
 	</software>
 
 	<software name="silkylipo" cloneof="silkylip">
-		<description>Mahou no Shoujo Silky Lip [Ver 3.1 Prototype][Backup] (SCD)(Jpn)</description>
+		<description>Mahou no Shoujo Silky Lip [ver 3.1 prototype][backup] (SCD)(Jpn)</description>
 		<year>19??</year>
 		<publisher>Nihon Telenet</publisher>
 		<info name="alt_title" value="魔法の少女シルキーリップ"/>
@@ -3254,7 +3254,7 @@ license:CC0
 	</software>
 
 	<software name="silkylip">
-		<description>Mahou no Shoujo Silky Lip [Ver 5.0 Prototype][Backup][alt] (SCD)(Jpn)</description>
+		<description>Mahou no Shoujo Silky Lip [ver 5.0 prototype][backup][alt] (SCD)(Jpn)</description>
 		<year>19??</year>
 		<publisher>Nihon Telenet</publisher>
 		<info name="alt_title" value="魔法の少女シルキーリップ"/>
@@ -4914,7 +4914,7 @@ license:CC0
 	</software>
 
 	<software name="seiyamonp" cloneof="seiyamon">
-		<description>Seiya Monogatari - Anearth Fantasy Stories [Debug Version Prototype] (SCD)(Jpn)</description>
+		<description>Seiya Monogatari - Anearth Fantasy Stories [debug version prototype] (SCD)(Jpn)</description>
 		<year>19??</year>
 		<publisher>NEC</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
@@ -5415,7 +5415,7 @@ license:CC0
 	</software>
 
 	<software name="spcfzone">
-		<description>Space Fantasy Zone [Prototype][Backup] (CD, SCD)(Jpn)</description>
+		<description>Space Fantasy Zone [prototype][backup] (CD, SCD)(Jpn)</description>
 		<year>1991?</year>
 		<publisher>NEC Avenue</publisher>
 		<info name="serial" value="NAPR-1023?"/>
@@ -7190,7 +7190,7 @@ license:CC0
 	</software>
 
 	<software name="fssoldr">
-		<description>Fantasy Star Soldier [Prototype] (SCD)(USA)</description>
+		<description>Fantasy Star Soldier [prototype] (SCD)(USA)</description>
 		<year>199?</year>
 		<publisher>Inter State</publisher>
 		<info name="serial" value="N/A"/>
