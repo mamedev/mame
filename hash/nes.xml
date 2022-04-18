@@ -75785,17 +75785,17 @@ Other
 	</software>
 
 	<software name="tysonpoh" cloneof="tysonpo" supported="partial">
-		<description>Mike Tyson's Punch-Out!! (Pirate)</description>
+		<description>Mike Tyson's Punch-Out!! (pirate)</description>
 		<year>19??</year>
 		<publisher>J. Y. Company</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="jyc_c" />
 			<feature name="pcb" value="JYCOMPANY-C" />
 			<dataarea name="chr" size="131072">
-				<rom name="mike tyson's punch-out (unl).chr" size="131072" crc="72570294" sha1="7913948da9c87e307e356c40a397f8a559bce2df" offset="00000" status="baddump" />
+				<rom name="mike tyson's punch-out (unl).chr" size="131072" crc="26c667fc" sha1="8d8442fc94952991d506224567d750070e3990ce" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="mike tyson's punch-out (unl).prg" size="131072" crc="841c8f6e" sha1="4d23c49b1a0ebced13371597c4a5d25820728dc3" offset="00000" status="baddump" />
+				<rom name="mike tyson's punch-out (unl).prg" size="131072" crc="841c8f6e" sha1="4d23c49b1a0ebced13371597c4a5d25820728dc3" />
 			</dataarea>
 		</part>
 	</software>
@@ -86266,10 +86266,28 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
+<!-- This dump was made in a hex editor from the hacked clone. It matches the known MD5 hash of the unreleased dump. -->
 	<software name="tysonipp">
+		<description>Mike Tyson's Intergalactic Power Punch (USA, prototype)</description>
+		<year>1991</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="prg" size="131072">
+				<rom name="mike tyson's intergalactic power punch (june 1991 ces prototype).prg" size="131072" crc="fe9239d6" sha1="88cf22111bedd0583d8e49f70730d802e7851e5b" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="mike tyson's intergalactic power punch (june 1991 ces prototype).chr" size="262144" crc="65f969e2" sha1="fe84a134e37790571542325665806b8064de6de6" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Should this be removed? Or is this the version that RetroZone released? -->
+	<software name="tysonippa" cloneof="tysonipp">
 		<!-- There is also an hacked dump (headerless checksum fc6cc3b5) where the hacked copyright has been removed -->
-		<description>Mike Tyson's Intergalactic Power Punch (USA, Prototype, Hacked)</description>
-		<year>1992</year>
+		<description>Mike Tyson's Intergalactic Power Punch (USA, prototype, hacked)</description>
+		<year>2009?</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
