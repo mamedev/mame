@@ -2278,6 +2278,7 @@ void apple2e_state::c000_w(offs_t offset, u8 data)
 
 		case 0x0c:  // 80COLOFF
 			m_video->m_80col = false;
+			m_video->m_dhires = false;
 			break;
 
 		case 0x0d:  // 80COLON
@@ -2586,6 +2587,7 @@ void apple2e_state::c000_iic_w(offs_t offset, u8 data)
 
 		case 0x0c:  // 80COLOFF
 			m_video->m_80col = false;
+			m_video->m_dhires = false;
 			break;
 
 		case 0x0d:  // 80COLON
