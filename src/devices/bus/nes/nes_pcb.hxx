@@ -129,7 +129,6 @@ static const nes_pcb pcb_list[] =
 	{ "tcu01",            SACHEN_TCU01 },
 	{ "tcu02",            SACHEN_TCU02 },
 	{ "sa9602b",          SACHEN_SA9602B },
-	{ "tengen_800008",    TENGEN_800008 },  /* FIXME: Is this the same as mapper 3? */
 	{ "tengen_800032",    TENGEN_800032 },
 	{ "tengen_800037",    TENGEN_800037 },
 	{ "txc_22110",        TXC_22110 },
