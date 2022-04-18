@@ -84139,6 +84139,21 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_76y2k">
+		<description>76 in 1 Y2K</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_64y2k" />
+			<dataarea name="prg" size="2097152">
+				<rom name="y2k 76-in-1.prg" size="2097152" crc="736dd9e1" sha1="d666c646342fd5c72630d989d3f633c53143ef33" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_77">
 		<description>77 in 1 (NT141)</description>
 		<year>19??</year>
@@ -85878,6 +85893,21 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="524288">
 				<rom name="1997 super hik 4-in-1 (jy-052) [p1].prg" size="524288" crc="a8b1f53c" sha1="dedfd6341b04f14de03d79cbc50a762d020ce437" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_sh42">
+		<description>Super HiK 42 in 1 (K-42001)</description>
+		<year>1998</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_64y2k" />
+			<dataarea name="prg" size="1048576">
+				<rom name="super hik 42-in-1 (k-42001).prg" size="1048576" crc="ad97266b" sha1="a10bd03f1e125fa1d39b1c9db2b49b783de3dd45" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
