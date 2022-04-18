@@ -64,7 +64,6 @@ public:
 	// construction/destruction
 	nes_ffe8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
 	virtual void write_l(offs_t offset, uint8_t data) override;
 	virtual void write_h(offs_t offset, uint8_t data) override {}
 
