@@ -1316,92 +1316,142 @@ std::vector<bool> floppy_image_format_t::generate_bitstream_from_track(int track
 		return trackbuf;
 	}
 
-	// Start at the write splice
-	uint32_t splice = image->get_write_splice_position(track, head, subtrack);
-	int cur_pos = splice;
-	int cur_entry = 0;
-	while(cur_entry < int(tbuf.size())-1 && (tbuf[cur_entry+1] & floppy_image::TIME_MASK) < cur_pos)
-		cur_entry++;
+	class pll {
+	private:
+		const std::vector<uint32_t> &tbuf;
+		int cur_pos;
+		int cur_entry;
+		int period;
+		int period_adjust_base;
+		int min_period;
+		int max_period;
+		int phase_adjust;
+		int freq_hist;
+		bool next_is_first;
 
-	int period = cell_size;
-	int period_adjust_base = period * 0.05;
+	public:
+		pll(const std::vector<uint32_t> &_tbuf, int cell_size) : tbuf(_tbuf) {
+			period = cell_size;
+			period_adjust_base = period * 0.05;
 
-	int min_period = int(cell_size*0.75);
-	int max_period = int(cell_size*1.25);
-	int phase_adjust = 0;
-	int freq_hist = 0;
+			min_period = int(cell_size*0.75);
+			max_period = int(cell_size*1.25);
+			phase_adjust = 0;
+			freq_hist = 0;
 
-	uint32_t scanned = 0;
-	while(scanned < 200000000) {
-		// Note that only MG_F edges are taken into account, the rest is ignored.
-		// The lack of MG_F has been tested for previously.
-		while((tbuf[cur_entry] & floppy_image::MG_MASK) != floppy_image::MG_F) {
-			cur_entry ++;
-			if(cur_entry == tbuf.size())
-				cur_entry = 0;
+			// Try to go back 16 flux changes from the end of the track, or at most at the start
+			int flux_to_step = 16;
+			cur_entry = tbuf.size()-1;
+			while(cur_entry > 0 && flux_to_step) {
+				if((tbuf[cur_entry] & floppy_image::MG_MASK) == floppy_image::MG_F)
+					flux_to_step --;
+				cur_entry--;
+			}
+
+			// Go back by half-a-period
+			cur_pos = (tbuf[cur_entry] & floppy_image::TIME_MASK) - period/2;
+
+			// Adjust the entry accordingly
+			while(cur_entry > 0 && (cur_pos > (tbuf[cur_entry] & floppy_image::TIME_MASK)))
+				cur_entry --;
+
+			// Now go to the next flux change from there (the no-MG_F case has been handled earlier)
+			while((tbuf[cur_entry] & floppy_image::MG_MASK) != floppy_image::MG_F)
+				cur_entry ++;
+
+			next_is_first = false;
 		}
 
-		int edge = tbuf[cur_entry] & floppy_image::TIME_MASK;
-		if(edge < cur_pos)
-			edge += 200000000;
-		int next = cur_pos + period + phase_adjust;
-		scanned += period + phase_adjust;
+		std::pair<bool, bool> get() {
+			bool bit, first;
+			int edge = tbuf[cur_entry] & floppy_image::TIME_MASK;
+			if(edge < cur_pos)
+				edge += 200000000;
+			int next = cur_pos + period + phase_adjust;
 
-		if(edge >= next) {
-			// No transition in the window means 0 and pll in free run mode
-			trackbuf.push_back(false);
-			phase_adjust = 0;
+			if(edge >= next) {
+				// No transition in the window means 0 and pll in free run mode
+				bit = false;
+				phase_adjust = 0;
 
-		} else {
-			// Transition in the window means 1, and the pll is adjusted
-			trackbuf.push_back(true);
+			} else {
+				// Transition in the window means 1, and the pll is adjusted
+				bit = true;
 
-			int delta = edge - (next - period/2);
+				int delta = edge - (next - period/2);
 
-			phase_adjust = 0.65*delta;
+				phase_adjust = 0.65*delta;
 
-			if(delta < 0) {
-				if(freq_hist < 0)
-					freq_hist--;
-				else
-					freq_hist = -1;
-			} else if(delta > 0) {
-				if(freq_hist > 0)
-					freq_hist++;
-				else
-					freq_hist = 1;
-			} else
-				freq_hist = 0;
+				if(delta < 0) {
+					if(freq_hist < 0)
+						freq_hist--;
+					else
+						freq_hist = -1;
+				} else if(delta > 0) {
+					if(freq_hist > 0)
+						freq_hist++;
+					else
+						freq_hist = 1;
+				} else
+					freq_hist = 0;
 
-			if(freq_hist) {
-				int afh = freq_hist < 0 ? -freq_hist : freq_hist;
-				if(afh > 1) {
-					int aper = period_adjust_base*delta/period;
-					if(!aper)
-						aper = freq_hist < 0 ? -1 : 1;
-					period += aper;
+				if(freq_hist) {
+					int afh = freq_hist < 0 ? -freq_hist : freq_hist;
+					if(afh > 1) {
+						int aper = period_adjust_base*delta/period;
+						if(!aper)
+							aper = freq_hist < 0 ? -1 : 1;
+						period += aper;
 
-					if(period < min_period)
-						period = min_period;
-					else if(period > max_period)
-						period = max_period;
+						if(period < min_period)
+							period = min_period;
+						else if(period > max_period)
+							period = max_period;
+					}
 				}
 			}
-		}
 
-		cur_pos = next;
-		if(cur_pos >= 200000000) {
-			cur_pos -= 200000000;
-			cur_entry = 0;
-		}
-		while(cur_entry < int(tbuf.size())-1 && (tbuf[cur_entry] & floppy_image::TIME_MASK) < cur_pos)
-			cur_entry++;
+			first = next_is_first;
+			next_is_first = false;
 
-		// Wrap around
-		if(cur_entry == int(tbuf.size())-1 &&
-		   (tbuf[cur_entry] & floppy_image::TIME_MASK) < cur_pos)
-			cur_entry = 0;
+			cur_pos = next;
+			if(cur_pos >= 200000000) {
+				cur_pos -= 200000000;
+				cur_entry = 0;
+
+				if(cur_pos >= period/2)
+					first = true;
+				else
+					next_is_first = true;
+			}
+			while(cur_entry < int(tbuf.size())-1 && (tbuf[cur_entry] & floppy_image::TIME_MASK) < cur_pos)
+				cur_entry++;
+
+			// Wrap around
+			if(cur_entry == int(tbuf.size())-1 &&
+			   (tbuf[cur_entry] & floppy_image::TIME_MASK) < cur_pos)
+				cur_entry = 0;
+
+			return std::make_pair(bit, first);
+		}
+	};
+
+	pll cpll(tbuf, cell_size);
+
+	for(;;) {
+		auto r = cpll.get();
+		if(r.second) {
+			trackbuf.push_back(r.first);
+			break;
+		}
 	}
+	for(;;) {
+		auto r = cpll.get();
+		if(r.second)
+			break;
+		trackbuf.push_back(r.first);
+	}
+
 	return trackbuf;
 }
 
