@@ -97,42 +97,42 @@ protected:
 	optional_ioport m_p1;
 	optional_ioport m_p2;
 
-	rectangle m_visarea;
+	rectangle m_visarea{};
 
-	uint8_t m_grom_bank;
-	uint8_t m_blitter_int;
-	uint8_t m_tms34061_int;
-	uint8_t m_periodic_int;
-	uint8_t m_pia_porta_data;
-	uint8_t m_pia_portb_data;
-	uint8_t m_z80_ctrl;
-	uint8_t m_z80_port_val;
-	uint8_t m_z80_clear_to_send;
-	uint16_t m_sensor0;
-	uint16_t m_sensor1;
-	uint16_t m_sensor2;
-	uint16_t m_sensor3;
-	uint8_t m_curvx;
-	uint8_t m_curvy;
-	uint8_t m_curx;
-	int8_t m_xbuffer[YBUFFER_COUNT];
-	int8_t m_ybuffer[YBUFFER_COUNT];
-	int m_ybuffer_next;
-	int m_curxpos;
-	int m_last_ytotal;
-	uint8_t m_crosshair_vis;
-	uint8_t m_blitter_data[16];
-	uint8_t m_blit_in_progress;
-	uint8_t m_page_select;
-	offs_t m_fetch_offset;
-	uint8_t m_fetch_rle_count;
-	uint8_t m_fetch_rle_value;
-	uint8_t m_fetch_rle_literal;
-	emu_timer *m_irq_off_timer;
-	emu_timer *m_behind_beam_update_timer;
-	emu_timer *m_blitter_done_timer;
-	emu_timer *m_delayed_z80_control_timer;
-	int m_bankxor;
+	uint8_t m_grom_bank = 0;
+	uint8_t m_blitter_int = 0;
+	uint8_t m_tms34061_int = 0;
+	uint8_t m_periodic_int = 0;
+	uint8_t m_pia_porta_data = 0;
+	uint8_t m_pia_portb_data = 0;
+	uint8_t m_z80_ctrl = 0;
+	uint8_t m_z80_port_val = 0;
+	uint8_t m_z80_clear_to_send = 0;
+	uint16_t m_sensor0 = 0;
+	uint16_t m_sensor1 = 0;
+	uint16_t m_sensor2 = 0;
+	uint16_t m_sensor3 = 0;
+	uint8_t m_curvx = 0;
+	uint8_t m_curvy = 0;
+	uint8_t m_curx = 0;
+	int8_t m_xbuffer[YBUFFER_COUNT]{};
+	int8_t m_ybuffer[YBUFFER_COUNT]{};
+	int m_ybuffer_next = 0;
+	int m_curxpos = 0;
+	int m_last_ytotal = 0;
+	uint8_t m_crosshair_vis = 0;
+	uint8_t m_blitter_data[16]{};
+	uint8_t m_blit_in_progress = 0;
+	uint8_t m_page_select = 0;
+	offs_t m_fetch_offset = 0;
+	uint8_t m_fetch_rle_count = 0;
+	uint8_t m_fetch_rle_value = 0;
+	uint8_t m_fetch_rle_literal = 0;
+	emu_timer *m_irq_off_timer = nullptr;
+	emu_timer *m_behind_beam_update_timer = nullptr;
+	emu_timer *m_blitter_done_timer = nullptr;
+	emu_timer *m_delayed_z80_control_timer = nullptr;
+	int m_bankxor = 0;
 
 	// common
 	DECLARE_WRITE_LINE_MEMBER(generate_tms34061_interrupt);
@@ -256,7 +256,7 @@ protected:
 
 	void palette_update();
 
-	emu_timer *m_palette_timer;
+	emu_timer *m_palette_timer = nullptr;
 	uint8_t m_palcontrol = 0U;
 	uint8_t m_xscroll = 0U;
 	rgb_t m_palette[2][16]{};

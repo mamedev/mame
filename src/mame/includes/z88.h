@@ -105,13 +105,13 @@ private:
 
 	struct
 	{
-		uint8_t slot;
-		uint8_t page;
+		uint8_t slot = 0;
+		uint8_t page = 0;
 	} m_bank[4];
 
-	int         m_bank_type[4];
-	uint8_t *   m_bios;
-	uint8_t *   m_ram_base;
+	int         m_bank_type[4] = {};
+	uint8_t *   m_bios = 0;
+	uint8_t *   m_ram_base = 0;
 };
 
 #endif // MAME_INCLUDES_Z88_H

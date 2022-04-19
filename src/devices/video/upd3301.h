@@ -81,6 +81,8 @@ public:
 	void lpen_w(int state);
 	int hrtc_r();
 	int vrtc_r();
+	int lines_per_char() { return m_r; }
+	bool get_display_status();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

@@ -55,9 +55,9 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram2;
 	required_shared_ptr<uint8_t> m_colorram;
 
-	uint8_t m_portb;
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_irq_mask;
+	uint8_t m_portb = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_irq_mask = 0;
 
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);

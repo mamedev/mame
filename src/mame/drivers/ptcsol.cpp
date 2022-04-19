@@ -172,14 +172,14 @@ private:
 	struct cass_data_t
 	{
 		struct {
-			int length;     /* time cassette level is at input.level */
-			int level;      /* cassette level */
-			int bit;        /* bit being read */
+			int length = 0;     /* time cassette level is at input.level */
+			int level = 0;      /* cassette level */
+			int bit = 0;        /* bit being read */
 		} input;
 		struct {
-			int length;     /* time cassette level is at output.level */
-			int level;      /* cassette level */
-			int bit;        /* bit to output */
+			int length = 0;     /* time cassette level is at output.level */
+			int level = 0;      /* cassette level */
+			int bit = 0;        /* bit to output */
 		} output;
 	};
 
@@ -206,7 +206,7 @@ private:
 	u8 m_sol20_fe = 0U;
 	u8 m_framecnt = 0U;
 	cass_data_t m_cass_data;
-	emu_timer *m_cassette_timer;
+	emu_timer *m_cassette_timer = nullptr;
 	cassette_image_device *cassette_device_image();
 	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<i8080a_cpu_device> m_maincpu;

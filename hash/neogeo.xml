@@ -5502,7 +5502,7 @@ license:CC0
 
 	<software name="moshougi">
 		<description>Shougi no Tatsujin - Master of Shougi</description>
-		<year>1990</year>
+		<year>1995</year>
 		<publisher>ADK / SNK</publisher>
 		<info name="serial" value="NGM-203 / ADM-010 (MVS), NGH-203 / ADH-010 (AES)"/>
 		<info name="release" value="19950928 (MVS), 19951013 (AES)"/>
@@ -7670,7 +7670,7 @@ license:CC0
 
 	<software name="flipshot">
 		<description>Battle Flip Shot</description>
-		<year>1999</year>
+		<year>1998</year>
 		<publisher>Visco</publisher>
 		<info name="serial" value="NGM-2470"/>
 		<info name="release" value="19981208"/>
@@ -9184,7 +9184,7 @@ license:CC0
 		<description>Matrimelee / Shin Gouketsuji Ichizoku Toukon (NGM-2660 ~ NGH-2660)</description>
 		<year>2003</year>
 		<publisher>Noise Factory / Atlus</publisher>
-		<info name="serial" value="NGM-2660 (MVS), NGM-2660 (AES)"/>
+		<info name="serial" value="NGM-2660 (MVS), NGH-2660 (AES)"/>
 		<info name="release" value="20030320 (MVS), 20030529 (AES)"/>
 		<info name="alt_title" value="新・豪血寺一族 闘婚"/>
 		<sharedfeat name="release" value="MVS,AES" />

@@ -50,16 +50,16 @@ private:
 	required_ioport m_io_fake;
 
 	/* video-related */
-	u8          m_fg_scrollx;
-	u8          m_fg_scrolly;
-	u8          m_fg_select;
-	u8          m_text_scrolly;
-	u8          m_text_mode;
-	u8          m_bg_select;
-	u8          m_bg_priority;
-	u8          m_bg_mask;
-	u8          m_fg_mask;
-	u8          m_flipscreen;
+	u8          m_fg_scrollx = 0;
+	u8          m_fg_scrolly = 0;
+	u8          m_fg_select = 0;
+	u8          m_text_scrolly = 0;
+	u8          m_text_mode = 0;
+	u8          m_bg_select = 0;
+	u8          m_bg_priority = 0;
+	u8          m_bg_mask = 0;
+	u8          m_fg_mask = 0;
+	u8          m_flipscreen = 0;
 	void bg_read_bank_w(u8 data);
 	void fg_scrollx_w(u8 data);
 	void fg_scrolly_w(u8 data);

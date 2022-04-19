@@ -70,10 +70,10 @@ protected:
 		TIMER_SCANLINE_INTERRUPT
 	};
 
-	emu_timer *m_tape_timer;
-	int m_map4[256];
-	int m_map16[256];
-	emu_timer *m_scanline_timer;
+	emu_timer *m_tape_timer = nullptr;
+	int m_map4[256]{};
+	int m_map16[256]{};
+	emu_timer *m_scanline_timer = nullptr;
 	uint8_t electron64_fetch_r(offs_t offset);
 	uint8_t electron_mem_r(offs_t offset);
 	void electron_mem_w(offs_t offset, uint8_t data);
@@ -127,33 +127,33 @@ protected:
 	/* ULA context */
 	struct ULA
 	{
-		uint8_t interrupt_status;
-		uint8_t interrupt_control;
-		uint8_t rompage;
-		uint16_t screen_start;
-		uint16_t screen_base;
-		uint16_t screen_size;
-		uint16_t screen_addr;
-		int screen_dispend;
-		int current_pal[16];
-		int communication_mode;
-		int screen_mode;
-		int cassette_motor_mode;
-		int capslock_mode;
+		uint8_t interrupt_status = 0;
+		uint8_t interrupt_control = 0;
+		uint8_t rompage = 0;
+		uint16_t screen_start = 0;
+		uint16_t screen_base = 0;
+		uint16_t screen_size = 0;
+		uint16_t screen_addr = 0;
+		int screen_dispend = 0;
+		int current_pal[16]{};
+		int communication_mode = 0;
+		int screen_mode = 0;
+		int cassette_motor_mode = 0;
+		int capslock_mode = 0;
 		/* tape reading related */
-		uint32_t tape_value;
-		int tape_steps;
-		int bit_count;
-		int high_tone_set;
-		int start_bit;
-		int stop_bit;
-		int tape_running;
-		uint8_t tape_byte;
+		uint32_t tape_value = 0;
+		int tape_steps = 0;
+		int bit_count = 0;
+		int high_tone_set = 0;
+		int start_bit = 0;
+		int stop_bit = 0;
+		int tape_running = 0;
+		uint8_t tape_byte = 0;
 	};
 
 	ULA m_ula;
-	bool m_mrb_mapped;
-	bool m_vdu_drivers;
+	bool m_mrb_mapped = false;
+	bool m_vdu_drivers = false;
 };
 
 
@@ -186,7 +186,7 @@ private:
 	required_device_array<generic_slot_device, 2> m_romi;
 	required_ioport m_rompages;
 
-	uint8_t m_sp64_bank;
+	uint8_t m_sp64_bank = 0;
 	std::unique_ptr<uint8_t[]> m_sp64_ram;
 
 	image_init_result load_rom(device_image_interface &image, generic_slot_device *slot);

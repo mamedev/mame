@@ -50,9 +50,9 @@ private:
 	required_memory_bank m_audiobank;
 
 	/* video-related */
-	tilemap_t  *m_txt_tilemap;
-	tilemap_t  *m_mid_tilemap;
-	tilemap_t  *m_bak_tilemap;
+	tilemap_t  *m_txt_tilemap = nullptr;
+	tilemap_t  *m_mid_tilemap = nullptr;
+	tilemap_t  *m_bak_tilemap = nullptr;
 	std::unique_ptr<u8[]> m_decoded_gfx[2];
 
 	/* devices */

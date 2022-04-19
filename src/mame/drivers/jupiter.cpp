@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol, Robbbert
+// copyright-holders:Wilbert Pol
 /**************************************************************************
 
 Wave Mate Jupiter

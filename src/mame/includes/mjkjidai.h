@@ -48,12 +48,12 @@ private:
 
 	required_ioport_array<12> m_row;
 
-	int m_adpcm_pos;
-	int m_adpcm_end;
-	int m_keyb;
-	bool m_nmi_enable;
-	bool m_display_enable;
-	tilemap_t *m_bg_tilemap;
+	int m_adpcm_pos = 0;
+	int m_adpcm_end = 0;
+	int m_keyb = 0;
+	bool m_nmi_enable = false;
+	bool m_display_enable = false;
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	void keyboard_select_lo_w(uint8_t data);
 	void keyboard_select_hi_w(uint8_t data);

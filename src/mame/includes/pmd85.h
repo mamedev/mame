@@ -27,6 +27,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_rom(*this, "maincpu")
 		, m_ram(*this, RAM_TAG)
+		, m_user1(*this, "user1")
 		, m_cassette(*this, "cassette")
 		, m_speaker(*this, "speaker")
 		, m_pit(*this, "pit")
@@ -66,16 +67,16 @@ private:
 		TIMER_CASSETTE
 	};
 
-	bool m_txd, m_rts;
-	uint8_t m_rom_module_present;
-	uint8_t m_ppi_port_outputs[4][3];
-	uint8_t m_startup_mem_map;
-	uint8_t m_pmd853_memory_mapping;
-	bool m_previous_level;
-	bool m_clk_level;
-	bool m_clk_level_tape;
-	uint8_t m_model;
-	emu_timer * m_cassette_timer;
+	bool m_txd = false, m_rts = false;
+	uint8_t m_rom_module_present = 0;
+	uint8_t m_ppi_port_outputs[4][3]{};
+	uint8_t m_startup_mem_map = 0;
+	uint8_t m_pmd853_memory_mapping = 0;
+	bool m_previous_level = false;
+	bool m_clk_level = false;
+	bool m_clk_level_tape = false;
+	uint8_t m_model = 0;
+	emu_timer * m_cassette_timer = nullptr;
 	void (pmd85_state::*update_memory)();
 	uint8_t io_r(offs_t offset);
 	void io_w(offs_t offset, uint8_t data);
@@ -136,6 +137,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_device<ram_device> m_ram;
+	optional_memory_region m_user1;
 	required_device<cassette_image_device> m_cassette;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<pit8253_device> m_pit;

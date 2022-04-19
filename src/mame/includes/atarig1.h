@@ -58,17 +58,17 @@ private:
 	optional_device<adc0808_device> m_adc;
 	optional_ioport m_in1;
 
-	bool            m_is_pitfight;
+	bool            m_is_pitfight = false;
 
 	required_shared_ptr<uint16_t> m_mo_command;
 
-	bool            m_bslapstic_primed;
+	bool            m_bslapstic_primed = false;
 
-	uint8_t           m_pfscroll_xoffset;
-	uint16_t          m_current_control;
-	uint8_t           m_playfield_tile_bank;
-	uint16_t          m_playfield_xscroll;
-	uint16_t          m_playfield_yscroll;
+	uint8_t           m_pfscroll_xoffset = 0;
+	uint16_t          m_current_control = 0;
+	uint8_t           m_playfield_tile_bank = 0;
+	uint16_t          m_playfield_xscroll = 0;
+	uint16_t          m_playfield_yscroll = 0;
 
 	void video_int_ack_w(uint16_t data = 0);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);

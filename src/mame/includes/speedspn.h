@@ -44,9 +44,9 @@ private:
 	required_memory_bank m_okibank;
 	required_shared_ptr<uint8_t> m_attram;
 
-	tilemap_t *m_tilemap;
-	bool m_display_disable;
-	uint32_t m_bank_vidram;
+	tilemap_t *m_tilemap = nullptr;
+	bool m_display_disable = false;
+	uint32_t m_bank_vidram = 0;
 	std::vector<uint8_t> m_vidram;
 	uint8_t irq_ack_r();
 	void rombank_w(uint8_t data);

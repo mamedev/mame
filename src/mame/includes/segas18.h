@@ -176,14 +176,14 @@ private:
 	write16sm_delegate  m_custom_io_w;
 
 	// internal state
-	int                 m_grayscale_enable;
-	int                 m_vdp_enable;
-	uint8_t               m_vdp_mixing;
+	int                 m_grayscale_enable = 0;
+	int                 m_vdp_enable = 0;
+	uint8_t               m_vdp_mixing = 0;
 	bitmap_ind16        m_temp_bitmap;
 
 	// game-specific state
-	uint8_t               m_lghost_value;
-	uint8_t               m_lghost_select;
+	uint8_t               m_lghost_value = 0;
+	uint8_t               m_lghost_select = 0;
 };
 
 #endif // MAME_INCLUDES_SEGAS18_H

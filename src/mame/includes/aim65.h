@@ -88,7 +88,7 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z13_load) { return load_cart(image, m_z13, "z13"); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z14_load) { return load_cart(image, m_z14, "z14"); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z15_load) { return load_cart(image, m_z15, "z15"); }
-	emu_timer *m_print_timer = 0;
+	emu_timer *m_print_timer = nullptr;
 	TIMER_CALLBACK_MEMBER(printer_timer);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -99,13 +99,13 @@ private:
 	optional_device<palette_device> m_palette;
 	uint8_t m_riot_port_a = 0U;
 	uint8_t m_pb_save = 0U;
-	bool m_kb_en = 0;
-	bool m_ca2 = 0;
-	bool m_cb2 = 0;
+	bool m_kb_en = false;
+	bool m_ca2 = false;
+	bool m_cb2 = false;
 	u8 m_printer_x =0U;
 	u8 m_printer_y = 0U;
 	u8 m_printer_flag = 0U;
-	bool m_printer_level = 0;
+	bool m_printer_level = false;
 	std::unique_ptr<uint16_t[]> m_printerRAM {};
 
 	required_device<cpu_device> m_maincpu;

@@ -221,36 +221,36 @@ private:
 	};
 
 
-	uint32_t m_overlay;
+	uint32_t m_overlay = 0;
 
-	uint32_t m_via2_vbl;
-	uint32_t m_se30_vbl_enable;
-	uint8_t m_nubus_irq_state;
+	uint32_t m_via2_vbl = 0;
+	uint32_t m_se30_vbl_enable = 0;
+	uint8_t m_nubus_irq_state = 0;
 
-	emu_timer *m_overlay_timeout;
+	emu_timer *m_overlay_timeout = nullptr;
 	TIMER_CALLBACK_MEMBER(overlay_timeout_func);
 	uint32_t rom_switch_r(offs_t offset);
 
-	bool m_main_buffer;
-	int m_adb_irq_pending;
-	int m_screen_buffer;
+	bool m_main_buffer = false;
+	int m_adb_irq_pending = 0;
+	int m_screen_buffer = 0;
 	int irq_count, ca1_data, ca2_data;
 
 	// 60.15 Hz timer for RBV/V8/Sonora/Eagle/VASP/etc.
-	emu_timer *m_6015_timer;
+	emu_timer *m_6015_timer = nullptr;
 
 	// ADB refresh timer, independent of anything else going on
-	emu_timer *m_adbupdate_timer;
+	emu_timer *m_adbupdate_timer = nullptr;
 
 	WRITE_LINE_MEMBER(adb_irq_w) { m_adb_irq_pending = state; }
 
 	// RBV and friends (V8, etc)
-	uint8_t m_rbv_regs[256], m_rbv_ier, m_rbv_ifr, m_rbv_type, m_rbv_montype, m_rbv_vbltime;
-	uint32_t m_rbv_colors[3], m_rbv_count, m_rbv_clutoffs, m_rbv_immed10wr;
-	uint32_t m_rbv_palette[256];
-	uint8_t m_sonora_vctl[8];
-	emu_timer *m_vbl_timer, *m_cursor_timer;
-	uint16_t m_cursor_line;
+	uint8_t m_rbv_regs[256]{}, m_rbv_ier = 0, m_rbv_ifr = 0, m_rbv_type = 0, m_rbv_montype = 0, m_rbv_vbltime = 0;
+	uint32_t m_rbv_colors[3]{}, m_rbv_count = 0, m_rbv_clutoffs = 0, m_rbv_immed10wr = 0;
+	uint32_t m_rbv_palette[256]{};
+	uint8_t m_sonora_vctl[8]{};
+	emu_timer *m_vbl_timer = nullptr, *m_cursor_timer = nullptr;
+	uint16_t m_cursor_line = 0;
 
 	// this is shared among all video setups with vram
 	optional_shared_ptr<uint32_t> m_vram;
@@ -258,7 +258,7 @@ private:
 	optional_shared_ptr<uint64_t> m_vram64;
 
 	// interrupts
-	int m_scc_interrupt, m_via_interrupt, m_via2_interrupt, m_scsi_interrupt, m_last_taken_interrupt;
+	int m_scc_interrupt = false, m_via_interrupt = false, m_via2_interrupt = false, m_scsi_interrupt = false, m_last_taken_interrupt = false;
 
 	// defined in machine/mac.c
 	void v8_resize();
@@ -334,20 +334,20 @@ private:
 	void macse30_map(address_map &map);
 	void pwrmac_map(address_map &map);
 
-	uint8_t m_oss_regs[0x400];
+	uint8_t m_oss_regs[0x400]{};
 
-	int m_via2_ca1_hack;
+	int m_via2_ca1_hack = 0;
 	optional_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 
-	uint32_t m_rom_size;
-	uint32_t *m_rom_ptr;
+	uint32_t m_rom_size = 0;
+	uint32_t *m_rom_ptr = nullptr;
 
-	emu_timer *m_scanline_timer;
+	emu_timer *m_scanline_timer = nullptr;
 
-	floppy_image_device *m_cur_floppy;
+	floppy_image_device *m_cur_floppy = nullptr;
 
-	uint8_t m_pm_req, m_pm_state, m_pm_dptr, m_pm_cmd;
+	uint8_t m_pm_req = 0, m_pm_state = 0, m_pm_dptr = 0, m_pm_cmd = 0;
 
 	void phases_w(uint8_t phases);
 	void sel35_w(int sel35);

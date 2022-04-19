@@ -110,21 +110,21 @@ private:
 	required_ioport m_fake;
 
 	/* machine state */
-	int    m_vert_pos;
-	int    m_horiz_pos;
-	bool   m_motor_on;
+	int    m_vert_pos = 0;
+	int    m_horiz_pos = 0;
+	bool   m_motor_on = false;
 
 	/* video state */
-	uint8_t  m_y_scroll_d;
-	uint8_t  m_y_scroll_e;
-	uint8_t  m_y_scroll_f;
-	uint8_t  m_frame_count;
-	uint8_t  m_shot_standby;
-	uint8_t  m_shot_arrive;
-	uint16_t m_beam_state;
-	uint16_t m_old_beam_state;
-	uint16_t m_beam_states_per_frame;
-	uint8_t  m_palette_bank;
+	uint8_t  m_y_scroll_d = 0;
+	uint8_t  m_y_scroll_e = 0;
+	uint8_t  m_y_scroll_f = 0;
+	uint8_t  m_frame_count = 0;
+	uint8_t  m_shot_standby = 0;
+	uint8_t  m_shot_arrive = 0;
+	uint16_t m_beam_state = 0;
+	uint16_t m_old_beam_state = 0;
+	uint16_t m_beam_states_per_frame = 0;
+	uint8_t  m_palette_bank = 0;
 };
 
 #endif // MAME_INCLUDES_STACTICS_H

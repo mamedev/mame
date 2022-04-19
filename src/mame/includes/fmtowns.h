@@ -38,54 +38,54 @@
 
 struct towns_cdrom_controller
 {
-	uint8_t command;
-	uint8_t status;
-	uint8_t cmd_status[4];
-	uint8_t cmd_status_ptr;
-	uint8_t extra_status;
-	uint8_t parameter[8];
-	uint8_t mpu_irq_enable;
-	uint8_t dma_irq_enable;
-	uint8_t buffer[2048];
-	int32_t buffer_ptr;
-	uint32_t lba_current;
-	uint32_t lba_last;
-	uint32_t cdda_current;
-	uint32_t cdda_length;
-	bool software_tx;
-	emu_timer* read_timer;
+	uint8_t command = 0;
+	uint8_t status = 0;
+	uint8_t cmd_status[4]{};
+	uint8_t cmd_status_ptr = 0;
+	uint8_t extra_status = 0;
+	uint8_t parameter[8]{};
+	uint8_t mpu_irq_enable = 0;
+	uint8_t dma_irq_enable = 0;
+	uint8_t buffer[2048]{};
+	int32_t buffer_ptr = 0;
+	uint32_t lba_current = 0;
+	uint32_t lba_last = 0;
+	uint32_t cdda_current = 0;
+	uint32_t cdda_length = 0;
+	bool software_tx = false;
+	emu_timer* read_timer = nullptr;
 };
 
 struct towns_video_controller
 {
-	uint8_t towns_vram_wplane;
-	uint8_t towns_vram_rplane;
-	uint8_t towns_vram_page_sel;
-	uint8_t towns_palette_select;
-	uint8_t towns_palette_r[256];
-	uint8_t towns_palette_g[256];
-	uint8_t towns_palette_b[256];
-	uint8_t towns_degipal[8];
-	uint8_t towns_dpmd_flag;
-	uint8_t towns_crtc_mix;
-	uint8_t towns_crtc_sel;  // selected CRTC register
-	uint16_t towns_crtc_reg[32];
-	uint8_t towns_video_sel;  // selected video register
-	uint8_t towns_video_reg[2];
-	uint8_t towns_sprite_sel;  // selected sprite register
-	uint8_t towns_sprite_reg[8];
-	uint8_t towns_sprite_flag;  // sprite drawing flag
-	uint8_t towns_sprite_page;  // VRAM page (not layer) sprites are drawn to
-	uint8_t towns_tvram_enable;
-	uint16_t towns_kanji_offset;
-	uint8_t towns_kanji_code_h;
-	uint8_t towns_kanji_code_l;
+	uint8_t towns_vram_wplane = 0;
+	uint8_t towns_vram_rplane = 0;
+	uint8_t towns_vram_page_sel = 0;
+	uint8_t towns_palette_select = 0;
+	uint8_t towns_palette_r[256]{};
+	uint8_t towns_palette_g[256]{};
+	uint8_t towns_palette_b[256]{};
+	uint8_t towns_degipal[8]{};
+	uint8_t towns_dpmd_flag = 0;
+	uint8_t towns_crtc_mix = 0;
+	uint8_t towns_crtc_sel = 0;  // selected CRTC register
+	uint16_t towns_crtc_reg[32]{};
+	uint8_t towns_video_sel = 0;  // selected video register
+	uint8_t towns_video_reg[2]{};
+	uint8_t towns_sprite_sel = 0;  // selected sprite register
+	uint8_t towns_sprite_reg[8]{};
+	uint8_t towns_sprite_flag = 0;  // sprite drawing flag
+	uint8_t towns_sprite_page = 0;  // VRAM page (not layer) sprites are drawn to
+	uint8_t towns_tvram_enable = 0;
+	uint16_t towns_kanji_offset = 0;
+	uint8_t towns_kanji_code_h = 0;
+	uint8_t towns_kanji_code_l = 0;
 	rectangle towns_crtc_layerscr[2];  // each layer has independent sizes
-	uint8_t towns_display_plane;
-	uint8_t towns_display_page_sel;
-	uint8_t towns_vblank_flag;
-	uint8_t towns_layer_ctrl;
-	emu_timer* sprite_timer;
+	uint8_t towns_display_plane = 0;
+	uint8_t towns_display_page_sel = 0;
+	uint8_t towns_vblank_flag = 0;
+	uint8_t towns_layer_ctrl = 0;
+	emu_timer* sprite_timer = nullptr;
 };
 
 class towns_state : public driver_device
@@ -199,59 +199,59 @@ private:
 	required_memory_bank m_bank_f8000_r;
 	required_memory_bank m_bank_f8000_w;
 
-	uint16_t m_ftimer;
-	uint16_t m_freerun_timer;
-	emu_timer* m_towns_freerun_counter;
-	uint16_t m_intervaltimer2_period;
-	uint8_t m_intervaltimer2_irqmask;
-	uint8_t m_intervaltimer2_timeout_flag;
-	uint8_t m_intervaltimer2_timeout_flag2;
-	emu_timer* m_towns_intervaltimer2;
-	uint8_t m_nmi_mask;
-	uint8_t m_compat_mode;
-	uint8_t m_towns_system_port;
-	uint32_t m_towns_ankcg_enable;
-	uint32_t m_towns_mainmem_enable;
-	uint32_t m_towns_ram_enable;
+	uint16_t m_ftimer = 0;
+	uint16_t m_freerun_timer = 0;
+	emu_timer* m_towns_freerun_counter = nullptr;
+	uint16_t m_intervaltimer2_period = 0;
+	uint8_t m_intervaltimer2_irqmask = 0;
+	uint8_t m_intervaltimer2_timeout_flag = 0;
+	uint8_t m_intervaltimer2_timeout_flag2 = 0;
+	emu_timer* m_towns_intervaltimer2 = nullptr;
+	uint8_t m_nmi_mask = 0;
+	uint8_t m_compat_mode = 0;
+	uint8_t m_towns_system_port = 0;
+	uint32_t m_towns_ankcg_enable = 0;
+	uint32_t m_towns_mainmem_enable = 0;
+	uint32_t m_towns_ram_enable = 0;
 	std::unique_ptr<uint32_t[]> m_towns_vram;
 	std::unique_ptr<uint8_t[]> m_towns_gfxvram;
 	std::unique_ptr<uint8_t[]> m_towns_txtvram;
-	int m_towns_selected_drive;
-	uint8_t m_towns_fdc_irq6mask;
+	int m_towns_selected_drive = 0;
+	uint8_t m_towns_fdc_irq6mask = 0;
 	std::unique_ptr<uint8_t[]> m_towns_serial_rom;
-	int m_towns_srom_position;
-	uint8_t m_towns_srom_clk;
-	uint8_t m_towns_srom_reset;
-	uint8_t m_towns_rtc_select;
-	uint8_t m_towns_rtc_data;
-	uint8_t m_towns_timer_mask;
-	uint8_t m_towns_kb_status;
-	uint8_t m_towns_kb_irq1_enable;
-	uint8_t m_towns_kb_output;  // key output
-	uint8_t m_towns_kb_extend;  // extended key output
-	emu_timer* m_towns_kb_timer;
-	emu_timer* m_towns_mouse_timer;
-	uint8_t m_towns_fm_irq_flag;
-	uint8_t m_towns_pcm_irq_flag;
-	uint8_t m_towns_pcm_channel_flag;
-	uint8_t m_towns_pcm_channel_mask;
-	uint8_t m_towns_pad_mask;
-	uint8_t m_towns_mouse_output;
-	uint8_t m_towns_mouse_x;
-	uint8_t m_towns_mouse_y;
-	uint8_t m_towns_volume[4];  // volume ports
-	uint8_t m_towns_volume_select;
-	uint8_t m_towns_scsi_control;
-	uint8_t m_towns_scsi_status;
-	uint8_t m_towns_spkrdata;
-	uint8_t m_pit_out0;
-	uint8_t m_pit_out1;
-	uint8_t m_pit_out2;
-	uint8_t m_timer0;
-	uint8_t m_timer1;
+	int m_towns_srom_position = 0;
+	uint8_t m_towns_srom_clk = 0;
+	uint8_t m_towns_srom_reset = 0;
+	uint8_t m_towns_rtc_select = 0;
+	uint8_t m_towns_rtc_data = 0;
+	uint8_t m_towns_timer_mask = 0;
+	uint8_t m_towns_kb_status = 0;
+	uint8_t m_towns_kb_irq1_enable = 0;
+	uint8_t m_towns_kb_output = 0;  // key output
+	uint8_t m_towns_kb_extend = 0;  // extended key output
+	emu_timer* m_towns_kb_timer = nullptr;
+	emu_timer* m_towns_mouse_timer = nullptr;
+	uint8_t m_towns_fm_irq_flag = 0;
+	uint8_t m_towns_pcm_irq_flag = 0;
+	uint8_t m_towns_pcm_channel_flag = 0;
+	uint8_t m_towns_pcm_channel_mask = 0;
+	uint8_t m_towns_pad_mask = 0;
+	uint8_t m_towns_mouse_output = 0;
+	uint8_t m_towns_mouse_x = 0;
+	uint8_t m_towns_mouse_y = 0;
+	uint8_t m_towns_volume[4]{};  // volume ports
+	uint8_t m_towns_volume_select = 0;
+	uint8_t m_towns_scsi_control = 0;
+	uint8_t m_towns_scsi_status = 0;
+	uint8_t m_towns_spkrdata = 0;
+	uint8_t m_pit_out0 = 0;
+	uint8_t m_pit_out1 = 0;
+	uint8_t m_pit_out2 = 0;
+	uint8_t m_timer0 = 0;
+	uint8_t m_timer1 = 0;
 
-	uint8_t m_serial_irq_source;
-	uint8_t m_serial_irq_enable;  // RS232 interrupt control
+	uint8_t m_serial_irq_source = 0;
+	uint8_t m_serial_irq_enable = 0;  // RS232 interrupt control
 
 	enum
 	{
@@ -265,16 +265,16 @@ private:
 		TXRDY_IRQ_ENABLE  = 0x01
 	};
 
-	emu_timer* m_towns_wait_timer;
-	emu_timer* m_towns_status_timer;
-	emu_timer* m_towns_cdda_timer;
+	emu_timer* m_towns_wait_timer = nullptr;
+	emu_timer* m_towns_status_timer = nullptr;
+	emu_timer* m_towns_cdda_timer = nullptr;
 	struct towns_cdrom_controller m_towns_cd;
 	struct towns_video_controller m_video;
 
-	uint32_t m_kb_prev[4];
-	uint8_t m_prev_pad_mask;
-	uint8_t m_prev_x;
-	uint8_t m_prev_y;
+	uint32_t m_kb_prev[4]{};
+	uint8_t m_prev_pad_mask = 0;
+	uint8_t m_prev_x = 0;
+	uint8_t m_prev_y = 0;
 
 	optional_shared_ptr<uint32_t> m_nvram;
 	optional_shared_ptr<uint16_t> m_nvram16;
@@ -407,10 +407,10 @@ private:
 	void towns_cd_status_ready();
 	void towns_delay_cdda(cdrom_image_device* dev);
 
-	u8 m_rtc_d;
-	bool m_rtc_busy;
-	u8 m_vram_mask[4];
-	u8 m_vram_mask_addr;
+	u8 m_rtc_d = 0;
+	bool m_rtc_busy = false;
+	u8 m_vram_mask[4]{};
+	u8 m_vram_mask_addr = 0;
 
 	TIMER_CALLBACK_MEMBER(towns_cdrom_read_byte);
 	TIMER_CALLBACK_MEMBER(towns_vblank_end);

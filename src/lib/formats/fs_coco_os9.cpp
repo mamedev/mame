@@ -117,8 +117,8 @@ char coco_os9_image::directory_separator() const
 std::vector<meta_description> coco_os9_image::volume_meta_description() const
 {
 	std::vector<meta_description> results;
-	results.emplace_back(meta_description(meta_name::name, meta_type::string, "UNTITLED", false, [](const meta_value &m) { return m.as_string().size() <= 32; }, "Volume name, up to 32 characters"));
-	results.emplace_back(meta_description(meta_name::creation_date, meta_type::date, util::arbitrary_datetime::now(), false, nullptr, "Creation time"));
+	results.emplace_back(meta_description(meta_name::name, "UNTITLED", false, [](const meta_value &m) { return m.as_string().size() <= 32; }, "Volume name, up to 32 characters"));
+	results.emplace_back(meta_description(meta_name::creation_date, util::arbitrary_datetime::now(), false, nullptr, "Creation time"));
 	return results;
 }
 
@@ -150,11 +150,11 @@ std::vector<meta_description> coco_os9_image::directory_meta_description() const
 std::vector<meta_description> coco_os9_image::entity_meta_description() const
 {
 	std::vector<meta_description> results;
-	results.emplace_back(meta_description(meta_name::name, meta_type::string, "", false, [](const meta_value &m) { return validate_filename(m.as_string()); }, "File name"));
-	results.emplace_back(meta_description(meta_name::creation_date, meta_type::date, util::arbitrary_datetime::now(), false, nullptr, "Creation time"));
-	results.emplace_back(meta_description(meta_name::owner_id, meta_type::number, 0, true, nullptr, "Owner ID"));
-	results.emplace_back(meta_description(meta_name::attributes, meta_type::string, 0, true, nullptr, "File attributes"));
-	results.emplace_back(meta_description(meta_name::length, meta_type::number, 0, true, nullptr, "Size of the file in bytes"));
+	results.emplace_back(meta_description(meta_name::name, "", false, [](const meta_value &m) { return validate_filename(m.as_string()); }, "File name"));
+	results.emplace_back(meta_description(meta_name::creation_date, util::arbitrary_datetime::now(), false, nullptr, "Creation time"));
+	results.emplace_back(meta_description(meta_name::owner_id, 0, true, nullptr, "Owner ID"));
+	results.emplace_back(meta_description(meta_name::attributes, "", true, nullptr, "File attributes"));
+	results.emplace_back(meta_description(meta_name::length, 0, true, nullptr, "Size of the file in bytes"));
 	return results;
 }
 

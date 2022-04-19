@@ -98,9 +98,9 @@ protected:
 	optional_memory_bank m_bank1;
 	required_device<palette_device> m_palette;
 
-	memory_region *m_cart_rom;
-	uint8_t m_timer_irq_vector;
-	uint16_t m_timer_hz_div;
+	memory_region *m_cart_rom = nullptr;
+	uint8_t m_timer_irq_vector = 0;
+	uint16_t m_timer_hz_div = 0;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -131,26 +131,26 @@ protected:
 	void draw_border(bitmap_ind16 &bitmap,const rectangle &cliprect,int attr,int has_mc6847);
 	void pc6001_screen_draw(bitmap_ind16 &bitmap,const rectangle &cliprect, int has_mc6847);
 
-	emu_timer *m_timer_irq_timer;
-	uint8_t *m_video_base;
+	emu_timer *m_timer_irq_timer = nullptr;
+	uint8_t *m_video_base = nullptr;
 	std::unique_ptr<uint8_t[]> m_video_ram;
-	uint8_t m_cas_switch;
-	uint8_t m_sys_latch;
-	uint32_t m_cas_offset;
-	uint32_t m_cas_maxsize;
-	uint8_t m_bank_opt;
-	bool m_timer_enable;
-	bool m_timer_irq_mask;
-	uint8_t m_port_c_8255;
-	uint8_t m_cur_keycode;
+	uint8_t m_cas_switch = 0;
+	uint8_t m_sys_latch = 0;
+	uint32_t m_cas_offset = 0;
+	uint32_t m_cas_maxsize = 0;
+	uint8_t m_bank_opt = 0;
+	bool m_timer_enable = false;
+	bool m_timer_irq_mask = false;
+	uint8_t m_port_c_8255 = 0;
+	uint8_t m_cur_keycode = 0;
 
 private:
-	uint32_t m_old_key1;
-	uint32_t m_old_key2;
-	uint32_t m_old_key3;
+	uint32_t m_old_key1 = 0;
+	uint32_t m_old_key2 = 0;
+	uint32_t m_old_key3 = 0;
 	u8 m_old_key_fn;
 
-	emu_timer *m_sub_trig_timer;
+	emu_timer *m_sub_trig_timer = nullptr;
 
 // IRQ model
 protected:
@@ -177,8 +177,8 @@ protected:
 	virtual u8 get_timer_base_divider();
 
 private:
-	u8 m_irq_pending;
-	u8 m_sub_vector;
+	u8 m_irq_pending = 0;
+	u8 m_sub_vector = 0;
 };
 
 
@@ -228,8 +228,8 @@ protected:
 	void pc6001mk2_map(address_map &map);
 	void pc6001mk2_io(address_map &map);
 
-	uint8_t m_bgcol_bank;
-	uint8_t m_gfx_bank_on;
+	uint8_t m_bgcol_bank = 0;
+	uint8_t m_gfx_bank_on = 0;
 	optional_memory_bank m_bank2;
 	optional_memory_bank m_bank3;
 	optional_memory_bank m_bank4;
@@ -245,14 +245,14 @@ protected:
 	virtual u8 vrtc_ack() override;
 
 private:
-	uint8_t m_bank_r0;
-	uint8_t m_bank_r1;
-	uint8_t m_bank_w;
-	uint8_t m_ex_vram_bank;
-	uint8_t m_exgfx_text_mode;
-	uint32_t m_cgrom_bank_addr;
-	uint8_t m_exgfx_bitmap_mode;
-	uint8_t m_exgfx_2bpp_mode;
+	uint8_t m_bank_r0 = 0;
+	uint8_t m_bank_r1 = 0;
+	uint8_t m_bank_w = 0;
+	uint8_t m_ex_vram_bank = 0;
+	uint8_t m_exgfx_text_mode = 0;
+	uint32_t m_cgrom_bank_addr = 0;
+	uint8_t m_exgfx_bitmap_mode = 0;
+	uint8_t m_exgfx_2bpp_mode = 0;
 
 	void vram_bank_change(uint8_t vram_bank);
 };

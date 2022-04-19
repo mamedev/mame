@@ -7,6 +7,7 @@
 
 #include "sound/mas3507d.h"
 #include "machine/ds2401.h"
+#include "machine/timer.h"
 
 DECLARE_DEVICE_TYPE(KONAMI_573_DIGITAL_FPGA, k573fpga_device)
 
@@ -18,32 +19,33 @@ public:
 	template <typename... T> void add_route(T &&... args) { subdevice<mas3507d_device>("mpeg")->add_route(std::forward<T>(args)...); }
 	template <typename T> void set_ram(T &&tag) { ram.set_tag(std::forward<T>(tag)); }
 
-	void set_ddrsbm_fpga(bool flag) { use_ddrsbm_fpga = flag; }
+	void set_ddrsbm_fpga(bool flag) { is_ddrsbm_fpga = flag; }
 
-	uint16_t get_decrypted();
+	DECLARE_WRITE_LINE_MEMBER(mpeg_frame_sync);
+	DECLARE_WRITE_LINE_MEMBER(mas3507d_demand);
 
-	void set_crypto_key1(uint16_t v) { crypto_key1 = v; }
-	void set_crypto_key2(uint16_t v) { crypto_key2 = v; }
-	void set_crypto_key3(uint8_t v) { crypto_key3 = v; }
+	void set_crypto_key1(uint16_t v);
+	void set_crypto_key2(uint16_t v);
+	void set_crypto_key3(uint8_t v);
 
 	uint32_t get_mp3_start_addr() { return mp3_start_addr; }
-	void set_mp3_start_addr(uint32_t v) { mp3_start_addr = v; }
+	void set_mp3_start_addr(uint32_t v);
 
 	uint32_t get_mp3_end_addr() { return mp3_end_addr; }
-	void set_mp3_end_addr(uint32_t v) { mp3_end_addr = v; }
+	void set_mp3_end_addr(uint32_t v);
 
 	uint16_t mas_i2c_r();
 	void mas_i2c_w(uint16_t data);
 
 	uint16_t get_fpga_ctrl();
-	void set_mpeg_ctrl(uint16_t data);
+	void set_fpga_ctrl(uint16_t data);
 
 	uint16_t get_mpeg_ctrl();
 
 	uint32_t get_counter();
 	uint32_t get_counter_diff();
+	uint16_t get_mp3_frame_count();
 
-	void status_update();
 	void reset_counter();
 
 protected:
@@ -52,33 +54,58 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
+	TIMER_CALLBACK_MEMBER(update_stream);
+	void update_counter();
+	void update_mp3_decode_state();
+
 	uint16_t decrypt_default(uint16_t data);
 	uint16_t decrypt_ddrsbm(uint16_t data);
 
-	bool is_mp3_playing();
-	bool is_streaming();
+	emu_timer* m_stream_timer;
 
 	enum {
-		PLAYBACK_STATE_UNKNOWN = 0x8000,
-		PLAYBACK_STATE_ERROR = 0xa000, // Error?
-		PLAYBACK_STATE_IDLE = 0xb000, // Not playing
-		PLAYBACK_STATE_BUFFER_FULL = 0xc000, // Playing, demand pin = 0?
-		PLAYBACK_STATE_DEMAND_BUFFER = 0xd000 // Playing, demand pin = 1?
+		PLAYBACK_STATE_DEMAND = 12,
+		PLAYBACK_STATE_IDLE = 13,
+		PLAYBACK_STATE_PLAYING = 14,
+		PLAYBACK_STATE_ENABLED = 15,
+	};
+
+	enum {
+		// Allows MP3 data to be decrypted?
+		// If this is 0 then data won't be sent to the MAS3507D even if FPGA_STREAMING_ENABLE is 1.
+		FPGA_MP3_ENABLE = 13,
+
+		// Allows data to be streamed to MAS3507D.
+		// This needs to be set before the register at 0x1f6400ae will return the streaming status.
+		FPGA_STREAMING_ENABLE = 14,
+
+		// Allows frame counter to be incremented based on the MPEG frame sync pin from the MAS3507D.
+		// Setting this to 0 resets the frame counter register.
+		FPGA_FRAME_COUNTER_ENABLE = 15,
 	};
 
 	required_shared_ptr<uint16_t> ram;
 	required_device<mas3507d_device> mas3507d;
 
-	uint16_t crypto_key1 = 0, crypto_key2 = 0;
-	uint8_t crypto_key3 = 0;
+	bool is_ddrsbm_fpga;
 
-	uint32_t mp3_start_addr = 0, mp3_cur_addr = 0, mp3_end_addr = 0;
-	bool use_ddrsbm_fpga = false;
+	uint16_t mpeg_status, fpga_status;
 
-	bool is_stream_active = false, is_timer_active = false;
-	uint32_t counter_previous = 0, counter_offset = 0;
-	int32_t counter_current = 0;
-	uint32_t last_playback_status = 0;
+	uint16_t crypto_key1, crypto_key2;
+	uint8_t crypto_key3;
+	uint16_t crypto_key1_start, crypto_key2_start;
+	uint8_t crypto_key3_start;
+
+	uint32_t mp3_start_addr, mp3_end_addr;
+	uint32_t mp3_cur_start_addr, mp3_cur_end_addr, mp3_cur_addr;
+	uint16_t mp3_data;
+	int mp3_remaining_bytes;
+
+	bool is_mpeg_frame_synced;
+	uint32_t mp3_frame_counter;
+
+	attotime counter_current, counter_base;
+	double counter_value;
 };
 
 #endif // MAME_MACHINE_K573FPGA_H

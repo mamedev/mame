@@ -37,12 +37,12 @@ protected:
 private:
 	struct schs_tempsprite
 	{
-		u8 gfx;
-		u32 code,color;
-		bool flipx,flipy;
-		int x,y;
-		int zoomx,zoomy;
-		u32 primask;
+		u8 gfx = 0;
+		u32 code = 0, color = 0;
+		bool flipx = 0, flipy = 0;
+		int x = 0, y = 0;
+		int zoomx = 0, zoomy = 0;
+		u32 primask = 0;
 	};
 
 	required_shared_ptr<u32> m_ram;

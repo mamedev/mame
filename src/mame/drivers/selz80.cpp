@@ -2,10 +2,10 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-        SEL Z80 Trainer (LEHRSYSTEME)
+SEL Z80 Trainer (LEHRSYSTEME)
 
-        31/08/2010 Skeleton driver.
-        23/06/2011 Working [Robbbert]
+2010-08-31 Skeleton driver.
+2011-06-23 Working [Robbbert]
 
 No diagram has been found. The following is guesswork.
 

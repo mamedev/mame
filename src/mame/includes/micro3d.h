@@ -85,7 +85,7 @@ private:
 
 	struct micro3d_vtx
 	{
-		int32_t x, y, z;
+		int32_t x = 0, y = 0, z = 0;
 
 		constexpr int64_t dot_product(micro3d_vtx const &that) const;
 	};
@@ -108,49 +108,49 @@ private:
 	optional_ioport m_joystick_y;
 
 	required_shared_ptr<uint16_t> m_shared_ram;
-	uint8_t               m_m68681_tx0;
+	uint8_t               m_m68681_tx0 = 0;
 
 	/* Sound */
-	uint8_t               m_sound_port_latch[4];
+	uint8_t               m_sound_port_latch[4]{};
 
 	/* Hardware version-check latch for BOTSS 1.1a */
-	uint8_t               m_botss_latch;
+	uint8_t               m_botss_latch = 0;
 
 	/* MAC */
 	required_shared_ptr<uint32_t> m_mac_sram;
-	uint32_t              m_sram_r_addr;
-	uint32_t              m_sram_w_addr;
-	uint32_t              m_vtx_addr;
-	uint32_t              m_mrab11;
-	uint32_t              m_mac_stat;
-	uint32_t              m_mac_inst;
+	uint32_t              m_sram_r_addr = 0;
+	uint32_t              m_sram_w_addr = 0;
+	uint32_t              m_vtx_addr = 0;
+	uint32_t              m_mrab11 = 0;
+	uint32_t              m_mac_stat = 0;
+	uint32_t              m_mac_inst = 0;
 
 	/* 2D video */
 	required_shared_ptr<uint16_t> m_sprite_vram;
-	uint16_t              m_creg;
-	uint16_t              m_xfer3dk;
+	uint16_t              m_creg = 0;
+	uint16_t              m_xfer3dk = 0;
 
 	/* 3D pipeline */
-	uint32_t              m_pipe_data;
-	uint32_t              m_pipeline_state;
-	int32_t               m_vtx_fifo[512];
-	uint32_t              m_fifo_idx;
-	uint32_t              m_draw_cmd;
-	int                 m_draw_state;
-	int32_t               m_x_min;
-	int32_t               m_x_max;
-	int32_t               m_y_min;
-	int32_t               m_y_max;
-	int32_t               m_z_min;
-	int32_t               m_z_max;
-	int32_t               m_x_mid;
-	int32_t               m_y_mid;
-	int                 m_dpram_bank;
-	uint32_t              m_draw_dpram[1024];
+	uint32_t              m_pipe_data = 0;
+	uint32_t              m_pipeline_state = 0;
+	int32_t               m_vtx_fifo[512]{};
+	uint32_t              m_fifo_idx = 0;
+	uint32_t              m_draw_cmd = 0;
+	int                 m_draw_state = 0;
+	int32_t               m_x_min = 0;
+	int32_t               m_x_max = 0;
+	int32_t               m_y_min = 0;
+	int32_t               m_y_max = 0;
+	int32_t               m_z_min = 0;
+	int32_t               m_z_max = 0;
+	int32_t               m_x_mid = 0;
+	int32_t               m_y_mid = 0;
+	int                 m_dpram_bank = 0;
+	uint32_t              m_draw_dpram[1024]{};
 	std::unique_ptr<uint16_t[]>              m_frame_buffers[2];
 	std::unique_ptr<uint16_t[]>              m_tmp_buffer;
-	int                 m_drawing_buffer;
-	int                 m_display_buffer;
+	int                 m_drawing_buffer = 0;
+	int                 m_display_buffer = 0;
 
 	void vgb_uart_w(offs_t offset, uint8_t data);
 	uint8_t vgb_uart_r(offs_t offset);

@@ -174,14 +174,11 @@ static const uint8_t apple1_keymap[] =
 // header is "LOAD:abcdDATA:" where abcd is the starting address
 SNAPSHOT_LOAD_MEMBER(apple1_state::snapshot_cb)
 {
-	uint64_t snapsize;
-	uint8_t *data;
-	uint16_t start, end;
 	static const char hd1[6] = "LOAD:";
 	static const char hd2[6] = "DATA:";
 
 	// get the snapshot's size
-	snapsize = image.length();
+	uint64_t snapsize = image.length();
 
 	if (snapsize < 12)
 	{
@@ -195,21 +192,21 @@ SNAPSHOT_LOAD_MEMBER(apple1_state::snapshot_cb)
 		return image_init_result::FAIL;
 	}
 
-	data = (uint8_t *)image.ptr();
-	if (!data)
+	auto data = std::make_unique<uint8_t []>(snapsize);
+	if (image.fread(data.get(), snapsize) != snapsize)
 	{
 		logerror("Internal error loading snapshot\n");
 		return image_init_result::FAIL;
 	}
 
-	if ((memcmp(hd1, data, 5)) || (memcmp(hd2, &data[7], 5)))
+	if ((memcmp(hd1, &data[0], 5)) || (memcmp(hd2, &data[7], 5)))
 	{
 		logerror("Snapshot is invalid\n");
 		return image_init_result::FAIL;
 	}
 
-	start = (data[5]<<8) | data[6];
-	end = (snapsize - 12) + start;
+	uint16_t start = (data[5]<<8) | data[6];
+	uint16_t end = (snapsize - 12) + start;
 
 	// check if this fits in RAM; load below 0xe000 must fit in RAMSIZE,
 	// load at 0xe000 must fit in 4K

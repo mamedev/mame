@@ -83,24 +83,24 @@ private:
 	void init_nbajam_common(int te_protection);
 
 	/* CMOS-related variables */
-	uint8_t    m_cmos_write_enable;
+	uint8_t    m_cmos_write_enable = 0;
 
 	/* sound-related variables */
-	uint8_t    m_chip_type;
-	uint8_t    m_fake_sound_state;
+	uint8_t    m_chip_type = 0;
+	uint8_t    m_fake_sound_state = 0;
 
 	/* protection */
-	uint8_t    m_mk_prot_index;
-	uint16_t   m_mk2_prot_data;
+	uint8_t    m_mk_prot_index = 0;
+	uint16_t   m_mk2_prot_data = 0;
 	std::unique_ptr<uint8_t[]> m_hidden_ram;
 
-	const uint32_t *m_nbajam_prot_table;
-	uint16_t   m_nbajam_prot_queue[5];
-	uint8_t    m_nbajam_prot_index;
+	const uint32_t *m_nbajam_prot_table = nullptr;
+	uint16_t   m_nbajam_prot_queue[5] = {};
+	uint8_t    m_nbajam_prot_index = 0;
 
-	const uint8_t *m_jdredd_prot_table;
-	uint8_t    m_jdredd_prot_index;
-	uint8_t    m_jdredd_prot_max;
+	const uint8_t *m_jdredd_prot_table = nullptr;
+	uint8_t    m_jdredd_prot_index = 0;
+	uint8_t    m_jdredd_prot_max = 0;
 
 	void main_map(address_map &map);
 };

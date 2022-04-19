@@ -46,6 +46,11 @@ n8x300_cpu_device::n8x300_cpu_device(const machine_config &mconfig, device_type 
 	, m_program_config("program", ENDIANNESS_BIG, 16, 13, -1)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 9, 0)
 	, m_sc_callback(*this)
+	, m_wc_callback(*this)
+	, m_lb_callback(*this)
+	, m_rb_callback(*this)
+	, m_mclk_callback(*this)
+	, m_iv_callback(*this)
 {
 }
 
@@ -67,15 +72,49 @@ device_memory_interface::space_config_vector n8x300_cpu_device::memory_space_con
 	};
 }
 
-void n8x300_cpu_device::xmit_lb(uint8_t dst, uint8_t mask)
+void n8x300_cpu_device::xmit_lb(uint8_t dst, uint8_t mask, bool with_sc, bool with_wc)
 {
 	m_IV_latch = (m_IV_latch & ~mask) | (dst & mask);
+
+	if(with_sc)
+	{
+		m_sc_callback(1);
+		m_wc_callback(0);
+		m_lb_callback(1);
+		m_iv_callback(m_IVL);
+	}
+
+	if(with_wc)
+	{
+		m_sc_callback(0);
+		m_wc_callback(1);
+		m_lb_callback(1);
+		m_iv_callback(m_IV_latch);
+	}
+
 	WRITEPORT(m_IVL, m_IV_latch);
 }
 
-void n8x300_cpu_device::xmit_rb(uint8_t dst, uint8_t mask)
+void n8x300_cpu_device::xmit_rb(uint8_t dst, uint8_t mask, bool with_sc, bool with_wc)
 {
 	m_IV_latch = (m_IV_latch & ~mask) | (dst & mask);
+
+	if(with_sc)
+	{
+		m_sc_callback(1);
+		m_wc_callback(0);
+		m_rb_callback(1);
+		m_iv_callback(m_IVL);
+	}
+
+	if(with_wc)
+	{
+		m_sc_callback(0);
+		m_wc_callback(1);
+		m_rb_callback(1);
+		m_iv_callback(m_IV_latch);
+	}
+
 	WRITEPORT(m_IVR + 0x100, m_IV_latch);
 }
 
@@ -90,11 +129,11 @@ void n8x300_cpu_device::set_reg(uint8_t reg, uint8_t val, bool xmit)
 	case 0x04: m_R4 = val; break;
 	case 0x05: m_R5 = val; break;
 	case 0x06: m_R6 = val; break;
-	case 0x07: m_IVL = val; m_sc_callback(0, val); break;
+	case 0x07: m_IVL = val; xmit_lb(val, 0xFF, true, false); break;
 //  OVF is read-only
 	case 0x09: m_R11 = val; break;
-	case 0x0f: m_IVR = val; m_sc_callback(1, val); break;
-	default: logerror("8X300: Invalid register %02x written to.\n",reg); break;
+	case 0x0f: m_IVR = val; xmit_rb(val, 0xFF, true, false); break;
+	default: logerror("8X300: Tried to write to invalid register %02x.\n",reg); break;
 	}
 }
 
@@ -102,8 +141,8 @@ void n8x305_cpu_device::set_reg(uint8_t reg, uint8_t val, bool xmit)
 {
 	switch (reg)
 	{
-	case 0x0a: if (xmit) xmit_lb(val, 0xff); else m_R12 = val; break;
-	case 0x0b: if (xmit) xmit_rb(val, 0xff); else m_R13 = val; break;
+	case 0x0a: if (xmit) xmit_lb(val, 0xff, true, true); else m_R12 = val; break;
+	case 0x0b: if (xmit) xmit_rb(val, 0xff, true, true); else m_R13 = val; break;
 	case 0x0c: m_R14 = val; break;
 	case 0x0d: m_R15 = val; break;
 	case 0x0e: m_R16 = val; break;
@@ -148,6 +187,11 @@ uint8_t n8x305_cpu_device::get_reg(uint8_t reg)
 void n8x300_cpu_device::device_resolve_objects()
 {
 	m_sc_callback.resolve_safe();
+	m_wc_callback.resolve_safe();
+	m_lb_callback.resolve_safe();
+	m_rb_callback.resolve_safe();	
+	m_mclk_callback.resolve_safe();
+	m_iv_callback.resolve_safe();
 }
 
 void n8x300_cpu_device::device_start()
@@ -270,6 +314,10 @@ void n8x300_cpu_device::device_reset()
 	m_AR = 0;
 	m_genPC = 0;
 	m_increment_pc = true;
+
+	m_lb_callback(0);
+	m_rb_callback(0);
+	m_mclk_callback(0);
 }
 
 void n8x300_cpu_device::execute_run()
@@ -281,11 +329,20 @@ void n8x300_cpu_device::execute_run()
 		uint8_t dst;
 		uint8_t rotlen;  // rotate amount or I/O field length
 		uint8_t mask;
+		bool with_sc;
+		bool with_wc;
 
 		/* fetch the opcode */
 		m_genPC = m_AR;
 		debugger_instruction_hook(m_genPC);
 		opcode = FETCHOP(m_genPC);
+
+		/* reset I/O lines for this instruction */
+		m_lb_callback(0);
+		m_rb_callback(0);
+		m_sc_callback(0);
+		m_wc_callback(0);
+		m_mclk_callback(0);
 
 		if (m_increment_pc)
 		{
@@ -321,9 +378,9 @@ void n8x300_cpu_device::execute_run()
 					src = (get_reg(SRC)) << (7-DST_LSB);
 					mask <<= (7-DST_LSB);
 					if(DST_IS_RIGHT_BANK)
-						xmit_rb(src, mask);
+						xmit_rb(src, mask, false, true);
 					else
-						xmit_lb(src, mask);
+						xmit_lb(src, mask, false, true);
 				}
 				else if(!(is_src_reg(opcode)) && is_dst_reg(opcode))
 				{  // MOVE IV,reg
@@ -342,9 +399,9 @@ void n8x300_cpu_device::execute_run()
 					dst <<= (7-DST_LSB);
 					mask <<= (7-DST_LSB);
 					if(DST_IS_RIGHT_BANK)  // untouched source IV bits are preserved and sent to destination IV
-						xmit_rb(dst, mask);
+						xmit_rb(dst, mask, false, true);
 					else
-						xmit_lb(dst, mask);
+						xmit_lb(dst, mask, false, true);
 				}
 			}
 			break;
@@ -372,9 +429,9 @@ void n8x300_cpu_device::execute_run()
 					mask <<= DST_LSB;
 					SET_OVF;
 					if(DST_IS_RIGHT_BANK)
-						xmit_rb(dst, mask);
+						xmit_rb(dst, mask, false, true);
 					else
-						xmit_lb(dst, mask);
+						xmit_lb(dst, mask, false, true);
 				}
 				else if(!(is_src_reg(opcode)) && is_dst_reg(opcode))
 				{  // ADD IV,reg
@@ -395,9 +452,9 @@ void n8x300_cpu_device::execute_run()
 					dst = (result << (7-DST_LSB)) & 0xff;
 					mask <<= (7-DST_LSB);
 					if(DST_IS_RIGHT_BANK)  // unused destination IV data is not preserved, is merged with input IV data
-						xmit_rb(dst, mask);
+						xmit_rb(dst, mask, false, true);
 					else
-						xmit_lb(dst, mask);
+						xmit_lb(dst, mask, false, true);
 				}
 			}
 			break;
@@ -423,9 +480,9 @@ void n8x300_cpu_device::execute_run()
 					dst <<= (7-DST_LSB);
 					mask <<= (7-DST_LSB);
 					if(DST_IS_RIGHT_BANK)
-						xmit_rb(dst, mask);
+						xmit_rb(dst, mask, false, true);
 					else
-						xmit_lb(dst, mask);
+						xmit_lb(dst, mask, false, true);
 				}
 				else if(!(is_src_reg(opcode)) && is_dst_reg(opcode))
 				{  // AND IV,reg
@@ -444,9 +501,9 @@ void n8x300_cpu_device::execute_run()
 					dst <<= (7-DST_LSB);
 					mask <<= (7-DST_LSB);
 					if(DST_IS_RIGHT_BANK)
-						xmit_rb(dst, mask);
+						xmit_rb(dst, mask, false, true);
 					else
-						xmit_lb(dst, mask);
+						xmit_lb(dst, mask, false, true);
 				}
 			}
 			break;
@@ -471,9 +528,9 @@ void n8x300_cpu_device::execute_run()
 					dst <<= (7-DST_LSB);
 					mask <<= (7-DST_LSB);
 					if(DST_IS_RIGHT_BANK)
-						xmit_rb(dst, mask);
+						xmit_rb(dst, mask, false, true);
 					else
-						xmit_lb(dst, mask);
+						xmit_lb(dst, mask, false, true);
 				}
 				else if(!(is_src_reg(opcode)) && is_dst_reg(opcode))
 				{  // XOR IV,reg
@@ -492,9 +549,9 @@ void n8x300_cpu_device::execute_run()
 					dst <<= (7-DST_LSB);
 					mask <<= (7-DST_LSB);
 					if(DST_IS_RIGHT_BANK)
-						xmit_rb(dst, mask);
+						xmit_rb(dst, mask, false, true);
 					else
-						xmit_lb(dst, mask);
+						xmit_lb(dst, mask, false, true);
 				}
 			}
 			break;
@@ -552,16 +609,36 @@ void n8x300_cpu_device::execute_run()
 				dst = IMM5;
 				mask <<= (7-SRC_LSB);
 				dst <<= (7-SRC_LSB);
-				if(SRC_IS_RIGHT_BANK)
-					xmit_rb(dst, mask);
+
+				if(opcode & 0xA00 || opcode & 0xB00)
+				{
+					// Imm -> IV Data
+					with_sc = false;
+					with_wc = true;
+				}
 				else
-					xmit_lb(dst, mask);
+				{
+					// Imm -> IV Address
+					with_sc = false;
+					with_wc = true;
+				}
+
+				if(SRC_IS_RIGHT_BANK)
+				{
+					xmit_rb(dst, mask, with_sc, with_wc);
+				}
+				else
+				{
+					xmit_lb(dst, mask, with_sc, with_wc);
+				}
+					
 			}
 			break;
 		case 0x07:  // JMP
 			SET_PC(ADDR);
 			break;
 		}
+		m_mclk_callback(1);
 		CYCLES(1);  // all instructions take 1 cycle (250ns)
 	} while (m_icount > 0);
 }

@@ -54,11 +54,11 @@ private:
 	void mem_map(address_map &map);
 
 	std::unique_ptr<uint8_t[]> m_charram;           /* character generator ROM */
-	bool m_reset;                /* CPU mode */
-	bool m_dma;              /* memory refresh DMA */
+	bool m_reset = false;                /* CPU mode */
+	bool m_dma = false;              /* memory refresh DMA */
 
 	/* timers */
-	emu_timer *m_reset_timer;   /* power on reset timer */
+	emu_timer *m_reset_timer = nullptr;   /* power on reset timer */
 
 	required_device<cosmac_device> m_maincpu;
 	required_device<cdp1869_device> m_cdp1869;

@@ -126,16 +126,16 @@ private:
 	void batmanfr_sound_comms_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	optional_device<acclaim_rax_device> m_rax;
 
-	uint8_t     m_port_sel,m_mux_data;
-	uint8_t     m_system_output;
-	uint8_t     m_ioga_mode;
-	uint8_t     m_ioga_portg;
-	uint16_t    m_ioga_count[4];
-	uint16_t    m_serial_tx;
+	uint8_t     m_port_sel,m_mux_data = 0;
+	uint8_t     m_system_output = 0;
+	uint8_t     m_ioga_mode = 0;
+	uint8_t     m_ioga_portg = 0;
+	uint16_t    m_ioga_count[4]{};
+	uint16_t    m_serial_tx = 0;
 
 	// protection specific variables and functions
-	uint32_t m_abus_protenable;
-	uint32_t m_abus_protkey;
+	uint32_t m_abus_protenable = 0;
+	uint32_t m_abus_protkey = 0;
 
 	uint32_t decathlt_prot_r(offs_t offset, uint32_t mem_mask = ~0);
 	void sega5838_map(address_map &map);
@@ -144,7 +144,7 @@ private:
 	int m_protbankval; // debug helper only, doesn't need saving
 	void decathlt_prot_srcaddr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	uint32_t m_a_bus[4];
+	uint32_t m_a_bus[4]{};
 
 	uint32_t common_prot_r(offs_t offset);
 	void common_prot_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -169,7 +169,7 @@ private:
 	void pdr1_output_w(uint8_t data);
 	void pdr2_output_w(uint8_t data);
 	void stv_select_game(int gameno);
-	uint8_t     m_prev_gamebank_select;
+	uint8_t     m_prev_gamebank_select = 0;
 
 	void sound_mem(address_map &map);
 	void scsp_mem(address_map &map);

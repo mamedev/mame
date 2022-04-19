@@ -44,7 +44,7 @@ protected:
 
 	required_device<upd765a_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
-	u8 m_irq_vector;
+	u8 m_irq_vector = 0;
 
 private:
 	required_device<z80_device> m_fdc_cpu;
@@ -61,7 +61,7 @@ private:
 	u8 terminal_count_r(address_space &space);
 	void motor_control_w(u8 data);
 
-	emu_timer *m_tc_zero_timer;
+	emu_timer *m_tc_zero_timer = nullptr;
 
 	IRQ_CALLBACK_MEMBER(irq_cb);
 };

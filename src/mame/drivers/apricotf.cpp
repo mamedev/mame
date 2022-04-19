@@ -7,11 +7,6 @@
     preliminary driver by Angelo Salese
 
 
-11/09/2011 - modernised. The portable doesn't seem to have
-             scroll registers, and it sets the palette to black.
-             I've added a temporary video output so that you can get
-             an idea of what the screen should look like. [Robbbert]
-
 ****************************************************************************/
 
 /*
@@ -84,8 +79,8 @@ public:
 		, m_centronics(*this, CENTRONICS_TAG)
 		, m_cent_data_out(*this, "cent_data_out")
 		, m_irqs(*this, "irqs")
-		, m_p_scrollram(*this, "p_scrollram")
-		, m_p_paletteram(*this, "p_paletteram")
+		, m_p_scrollram(*this, "scrollram")
+		, m_p_paletteram(*this, "paletteram")
 		, m_palette(*this, "palette")
 	{ }
 
@@ -272,9 +267,9 @@ void f1_state::act_f1_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000, 0x01dff).ram();
-	map(0x01e00, 0x01fff).ram().share("p_scrollram");
+	map(0x01e00, 0x01fff).ram().share("scrollram");
 	map(0x02000, 0x3ffff).ram();
-	map(0xe0000, 0xe001f).rw(FUNC(f1_state::palette_r), FUNC(f1_state::palette_w)).share("p_paletteram");
+	map(0xe0000, 0xe001f).rw(FUNC(f1_state::palette_r), FUNC(f1_state::palette_w)).share("paletteram");
 	map(0xf8000, 0xfffff).rom().region(I8086_TAG, 0);
 }
 

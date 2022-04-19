@@ -53,9 +53,9 @@ private:
 	required_ioport m_dsw1;
 
 	// video state
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
-	emu_timer *m_interrupt_timer;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	emu_timer *m_interrupt_timer = nullptr;
 	required_shared_ptr<uint8_t> m_bg_videoram;
 	required_shared_ptr<uint8_t> m_fg_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
