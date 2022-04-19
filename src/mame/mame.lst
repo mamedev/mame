@@ -16492,6 +16492,7 @@ bbtime                          // Bandai
 bdoramon                        // Bandai
 bfriskyt                        // Bandai
 bmboxing                        // Bambino
+bombman                         // Tomy
 bpengo                          // Bandai
 bultrman                        // Bandai
 bzaxxon                         // Bandai
@@ -16507,18 +16508,24 @@ epacman2r                       // Entex
 estargte                        // Entex
 eturtles                        // Entex
 gckong                          // Gakken
+gdefender                       // Gakken
 gdigdug                         // Gakken
+ggdman                          // Bandai
 ghalien                         // Gakken
 gscobra                         // Gakken
 kingman                         // Tomy
+ktparman                        // Bandai
 machiman                        // Bandai
 msthawk                         // Mattel
 mwcbaseb                        // Mattel
 packmon                         // Bandai
 pairmtch                        // Bandai
 pbqbert                         // Parker Brothers
+puckimon                        // Romtec
+tkjmaru                         // Bandai
 tmtron                          // Tomy
 vinvader                        // VTech
+wantgman                        // Actronics / Hanzawa
 zackman                         // Bandai
 
 @source:hh_melps4.cpp
