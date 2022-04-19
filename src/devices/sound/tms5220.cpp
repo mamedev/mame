@@ -1564,9 +1564,11 @@ void tms5220_device::set_interrupt_state(int state)
 
 	LOGMASKED(LOG_PIN_READS, "irq pin set to state %d\n", state);
 
-	if (!m_irq_handler.isnull() && state != m_irq_pin)
+	if (state != m_irq_pin)
+	{
+		m_irq_pin = state;
 		m_irq_handler(!state);
-	m_irq_pin = state;
+	}
 }
 
 /**********************************************************************************************
@@ -1640,7 +1642,7 @@ void tms5220_device::device_start()
 	}
 
 	/* resolve callbacks */
-	m_irq_handler.resolve();
+	m_irq_handler.resolve_safe();
 	m_readyq_handler.resolve();
 	m_m0_cb.resolve();
 	m_m1_cb.resolve();
