@@ -41,7 +41,7 @@ private:
 	required_memory_bank m_soundbank;
 
 	/* video-related */
-	int m_palette_bank[2];
+	int m_palette_bank[2] = {};
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

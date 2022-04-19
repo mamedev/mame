@@ -91,22 +91,12 @@ nes_sunsoft_5_device::nes_sunsoft_5_device(const machine_config &mconfig, const 
 }
 
 
-void nes_sunsoft_1_device::device_start()
-{
-	common_start();
-}
-
 void nes_sunsoft_1_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
-}
-
-void nes_sunsoft_2_device::device_start()
-{
-	common_start();
 }
 
 void nes_sunsoft_2_device::pcb_reset()
@@ -426,7 +416,7 @@ uint8_t nes_sunsoft_4_device::read_m(offs_t offset)
 	if (!m_prgram.empty() && m_wram_enable)
 		return m_prgram[offset & (m_prgram.size() - 1)];
 
-	return get_open_bus();   // open bus
+	return get_open_bus();
 }
 
 /*-------------------------------------------------
@@ -542,7 +532,7 @@ uint8_t nes_sunsoft_fme7_device::read_m(offs_t offset)
 			return m_prgram[((bank * 0x2000) + offset) & (m_prgram.size() - 1)];
 	}
 
-	return get_open_bus();   // open bus
+	return get_open_bus();
 }
 
 

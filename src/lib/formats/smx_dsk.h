@@ -27,6 +27,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_SMX_FORMAT;
+extern const smx_format FLOPPY_SMX_FORMAT;
 
 #endif // MAME_FORMATS_SMX_DSK_H

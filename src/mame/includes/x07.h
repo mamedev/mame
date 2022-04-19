@@ -223,7 +223,7 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( card_load );
 
 	/* general */
-	uint8_t m_sleep;
+	uint8_t m_sleep = 0;
 	uint8_t m_warm_start;
 	uint8_t m_t6834_ram[0x800];
 	uint8_t m_regs_r[8];
@@ -233,16 +233,16 @@ private:
 	struct fifo_buffer
 	{
 		uint8_t data[0x100];
-		uint8_t read;
-		uint8_t write;
+		uint8_t read = 0;
+		uint8_t write = 0;
 	};
 	fifo_buffer m_in;
 	fifo_buffer m_out;
 
-	uint8_t m_udk_on;
-	uint8_t m_draw_udk;
-	uint8_t m_sp_on;
-	uint8_t m_font_code;
+	uint8_t m_udk_on = 0;
+	uint8_t m_draw_udk = 0;
+	uint8_t m_sp_on = 0;
+	uint8_t m_font_code = 0;
 	emu_timer *m_rsta_clear = nullptr;
 	emu_timer *m_rstb_clear = nullptr;
 	emu_timer *m_beep_stop = nullptr;

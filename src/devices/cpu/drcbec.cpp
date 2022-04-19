@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
+#include "debug/debugcpu.h"
 #include "drcbec.h"
 
 #include <cmath>

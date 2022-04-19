@@ -3641,13 +3641,7 @@ void namcos22_state::machine_start()
 	m_cpuled_out.resolve();
 	m_portbits[0] = 0xffff;
 	m_portbits[1] = 0xffff;
-
-	m_cpuled_data = 0;
-	m_keycus_rng = 0;
-	m_su_82 = 0;
-	m_irq_state = 0;
-	m_old_coin_state = 0;
-	m_credits1 = m_credits2 = 0;
+	m_dsp_upload_state = NAMCOS22_DSP_UPLOAD_READY;
 
 	// register for savestates, stuff that isn't done in video_start()
 	// note: namcos22_renderer class doesn't need saving, it is refreshed every frame

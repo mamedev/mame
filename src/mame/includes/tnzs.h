@@ -58,7 +58,7 @@ protected:
 	optional_memory_bank m_subbank; /* FIXME: optional because of reuse from cchance.cpp */
 
 	/* misc / mcu */
-	int      m_bank2;
+	int      m_bank2 = 0;
 };
 
 class tnzs_mcu_state : public tnzs_base_state
@@ -96,8 +96,8 @@ protected:
 	required_ioport m_in1;
 	required_ioport m_in2;
 
-	int      m_input_select;
-	bool     m_lockout_level;
+	int      m_input_select = 0;
+	bool     m_lockout_level = false;
 };
 
 class tnzs_state : public tnzs_mcu_state
@@ -155,16 +155,16 @@ private:
 
 	void mcu_reset();
 
-	int      m_mcu_initializing;
-	int      m_mcu_coinage_init;
-	int      m_mcu_command;
-	int      m_mcu_readcredits;
-	int      m_mcu_reportcoin;
-	int      m_insertcoin;
-	uint8_t    m_mcu_coinage[4];
-	uint8_t    m_mcu_coins_a;
-	uint8_t    m_mcu_coins_b;
-	uint8_t    m_mcu_credits;
+	int      m_mcu_initializing = 0;
+	int      m_mcu_coinage_init = 0;
+	int      m_mcu_command = 0;
+	int      m_mcu_readcredits = 0;
+	int      m_mcu_reportcoin = 0;
+	int      m_insertcoin = 0;
+	uint8_t    m_mcu_coinage[4]{};
+	uint8_t    m_mcu_coins_a = 0;
+	uint8_t    m_mcu_coins_b = 0;
+	uint8_t    m_mcu_credits = 0;
 
 	void mcu_handle_coins(int coin);
 };
@@ -209,9 +209,9 @@ private:
 
 	/* sound-related */
 	std::unique_ptr<int16_t[]>    m_sampledata[MAX_SAMPLES];
-	int      m_samplesize[MAX_SAMPLES];
+	int      m_samplesize[MAX_SAMPLES]{};
 
-	int      m_csport_sel;
+	int      m_csport_sel = 0;
 };
 
 class jpopnics_state : public tnzs_base_state

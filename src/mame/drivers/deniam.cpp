@@ -200,21 +200,9 @@ INPUT_PORTS_END
 
 
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
-
 static GFXDECODE_START( gfx_deniam )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 128 )    /* colors 0-1023 */
-												/* sprites use colors 1024-2047 */
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar, 0, 128 )    /* colors 0-1023 */
+														/* sprites use colors 1024-2047 */
 GFXDECODE_END
 
 

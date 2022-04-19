@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:rfka01, Robbbert
+// copyright-holders:rfka01
 /***************************************************************************
 
 Mikrocomputer fuer Ausbildung

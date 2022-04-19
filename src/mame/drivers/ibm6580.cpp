@@ -871,17 +871,11 @@ uint32_t ibm6580_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 						ca |= (ra > 2) ? ra - 3 : 0;
 #endif
 
-					// underline
-					if (attr & 0x08 && ra == 13)
-						gfx = 0xff;
-					else
-						gfx = m_p_chargen[ca | ra];
+					gfx = m_p_chargen[ca | ra];
 
-					// cursor
-					if (attr & 0x04 && ra == 14)
+					// underline, cursor
+					if (((attr & 0x08) && (ra == 13)) || ((attr & 0x04) && (ra == 14)))
 						gfx = 0xff;
-					else
-						gfx = m_p_chargen[ca | ra];
 
 					// reverse video
 					if (attr & 0x10)

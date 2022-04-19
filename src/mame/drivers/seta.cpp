@@ -4309,6 +4309,20 @@ static INPUT_PORTS_START( daiohp )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+/***************************************************************************
+                       Daioh (prototype, earlier)
+***************************************************************************/
+
+static INPUT_PORTS_START( daiohp2 )
+	PORT_INCLUDE(daiohp)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0xc000, 0xc000, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(      0x8000, "300k and every 800k" )
+	PORT_DIPSETTING(      0xc000, "500k and every 1000k" )
+	PORT_DIPSETTING(      0x4000, "800k and 2000k only" )
+	PORT_DIPSETTING(      0x0000, "1000k Only" )
+INPUT_PORTS_END
 
 /***************************************************************************
                                 Dragon Unit
@@ -10931,7 +10945,7 @@ ROM_START( daiohp2 ) /* Found on the same P0-072-2 PCB as the previous Daioh pro
 	ROM_REGION( 0x200000, "gfx3", 0 )   /* Layer 2 */
 	ROM_LOAD16_BYTE( "bg2_0.u164", 0x000001, 0x080000, CRC(7e46a10e) SHA1(a8576f7a140b065b88a0dab648f7b31c75fec006) )
 	ROM_LOAD16_BYTE( "bg2_1.u166", 0x000000, 0x080000, CRC(9274123b) SHA1(b58e107a5bd222e454fd435d515e57cab52e6593) )
-	ROM_LOAD16_BYTE( "bg2_2.u165", 0x100001, 0x080000, CRC(3119189b) SHA1(3a45ec8db30659d7fd47090cb137df05bbdc1c86) )
+	ROM_LOAD16_BYTE( "bg2_2.u165", 0x100001, 0x080000, CRC(dc8ecfb7) SHA1(a202ff32c74601d5cd0aebdf84a481d36f540403) )
 	ROM_LOAD16_BYTE( "bg2_3.u167", 0x100000, 0x080000, CRC(533ba782) SHA1(b5f62323be95b2def8d1383b400b4ef0d3b3d6cd) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
@@ -12462,7 +12476,7 @@ GAME( 1993, atehate,   0,        atehate,   atehate,   seta_state,     empty_ini
 GAME( 1993, daioh,     0,        daioh,     daioh,     seta_state,     empty_init,     ROT270, "Athena",                    "Daioh", 0 )
 GAME( 1993, daioha,    daioh,    daioh,     daioh,     seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (earlier)", 0 )
 GAME( 1993, daiohp,    daioh,    daiohp,    daiohp,    seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (prototype)", 0 )
-GAME( 1993, daiohp2,   daioh,    daiohp,    daiohp,    seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (prototype, earlier)", 0 )
+GAME( 1993, daiohp2,   daioh,    daiohp,    daiohp2,   seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (prototype, earlier)", 0 )
 GAME( 1993, daiohc,    daioh,    wrofaero,  daioh,     seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (93111A PCB conversion)", 0 )
 
 GAME( 1993, jjsquawk,  0,        jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "Athena / Able",             "J. J. Squawkers", MACHINE_IMPERFECT_SOUND )

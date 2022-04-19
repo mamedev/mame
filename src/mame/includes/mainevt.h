@@ -66,8 +66,8 @@ private:
 	virtual void machine_reset() override;
 
 	/* misc */
-	int        m_nmi_enable;
-	uint8_t      m_sound_irq_mask;
+	int        m_nmi_enable = 0;
+	uint8_t      m_sound_irq_mask = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

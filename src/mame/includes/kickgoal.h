@@ -78,28 +78,28 @@ private:
 	void oki_map(address_map &map);
 
 	/* video-related */
-	tilemap_t     *m_fgtm;
-	tilemap_t     *m_bgtm;
-	tilemap_t     *m_bg2tm;
+	tilemap_t     *m_fgtm = nullptr;
+	tilemap_t     *m_bgtm = nullptr;
+	tilemap_t     *m_bg2tm = nullptr;
 
 	/* misc */
-	int         m_snd_new;
-	int         m_snd_sam[4];
+	int         m_snd_new = 0;
+	int         m_snd_sam[4]{};
 
-	u8 m_pic_portc;
-	u8 m_pic_portb;
-	int m_sound_command_sent;
+	u8 m_pic_portc = 0;
+	u8 m_pic_portb = 0;
+	int m_sound_command_sent = 0;
 
-	int m_fg_base;
+	int m_fg_base = 0;
 
-	int m_bg_base;
-	int m_bg_mask;
+	int m_bg_base = 0;
+	int m_bg_mask = 0;
 
-	int m_bg2_base;
-	int m_bg2_mask;
-	int m_bg2_region;
+	int m_bg2_base = 0;
+	int m_bg2_mask = 0;
+	int m_bg2_region = 0;
 
-	int m_sprbase;
+	int m_sprbase = 0;
 
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 

@@ -1797,6 +1797,7 @@ void lua_engine::initialize()
 	ui_type["single_step"] = sol::property(&mame_ui_manager::single_step, &mame_ui_manager::set_single_step);
 	ui_type["show_fps"] = sol::property(&mame_ui_manager::show_fps, &mame_ui_manager::set_show_fps);
 	ui_type["show_profiler"] = sol::property(&mame_ui_manager::show_profiler, &mame_ui_manager::set_show_profiler);
+	ui_type["image_display_enabled"] = sol::property(&mame_ui_manager::image_display_enabled, &mame_ui_manager::set_image_display_enabled);
 
 
 /*  device_state_entry library

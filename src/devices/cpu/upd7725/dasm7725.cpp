@@ -21,6 +21,7 @@ offs_t necdsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 {
 	uint32_t opcode = opcodes.r32(pc) >> 8;
 	uint32_t type = (opcode >> 22);
+	offs_t flags = 0;
 
 //  printf("dasm: PC %x opcode %08x\n", pc, opcode);
 
@@ -145,6 +146,7 @@ offs_t necdsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 
 	if(type == 1) {
 		stream << " | ret";
+		flags = STEP_OUT;
 	}
 	}
 
@@ -154,44 +156,44 @@ offs_t necdsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 
 	switch(brch) {
 		case 0x000: stream << "jmpso "; break;
-		case 0x080: stream << "jnca "; break;
-		case 0x082: stream << "jca "; break;
-		case 0x084: stream << "jncb "; break;
-		case 0x086: stream << "jcb "; break;
-		case 0x088: stream << "jnza "; break;
-		case 0x08a: stream << "jza "; break;
-		case 0x08c: stream << "jnzb "; break;
-		case 0x08e: stream << "jzb "; break;
-		case 0x090: stream << "jnova0 "; break;
-		case 0x092: stream << "jova0 "; break;
-		case 0x094: stream << "jnovb0 "; break;
-		case 0x096: stream << "jovb0 "; break;
-		case 0x098: stream << "jnova1 "; break;
-		case 0x09a: stream << "jova1 "; break;
-		case 0x09c: stream << "jnovb1 "; break;
-		case 0x09e: stream << "jovb1 "; break;
-		case 0x0a0: stream << "jnsa0 "; break;
-		case 0x0a2: stream << "jsa0 "; break;
-		case 0x0a4: stream << "jnsb0 "; break;
-		case 0x0a6: stream << "jsb0 "; break;
-		case 0x0a8: stream << "jnsa1 "; break;
-		case 0x0aa: stream << "jsa1 "; break;
-		case 0x0ac: stream << "jnsb1 "; break;
-		case 0x0ae: stream << "jsb1 "; break;
-		case 0x0b0: stream << "jdpl0 "; break;
-		case 0x0b1: stream << "jdpln0 "; break;
-		case 0x0b2: stream << "jdplf "; break;
-		case 0x0b3: stream << "jdplnf "; break;
-		case 0x0b4: stream << "jnsiak "; break;
-		case 0x0b6: stream << "jsiak "; break;
-		case 0x0b8: stream << "jnsoak "; break;
-		case 0x0ba: stream << "jsoak "; break;
-		case 0x0bc: stream << "jnrqm "; break;
-		case 0x0be: stream << "jrqm "; break;
+		case 0x080: stream << "jnca "; flags = STEP_COND; break;
+		case 0x082: stream << "jca "; flags = STEP_COND; break;
+		case 0x084: stream << "jncb "; flags = STEP_COND; break;
+		case 0x086: stream << "jcb "; flags = STEP_COND; break;
+		case 0x088: stream << "jnza "; flags = STEP_COND; break;
+		case 0x08a: stream << "jza "; flags = STEP_COND; break;
+		case 0x08c: stream << "jnzb "; flags = STEP_COND; break;
+		case 0x08e: stream << "jzb "; flags = STEP_COND; break;
+		case 0x090: stream << "jnova0 "; flags = STEP_COND; break;
+		case 0x092: stream << "jova0 "; flags = STEP_COND; break;
+		case 0x094: stream << "jnovb0 "; flags = STEP_COND; break;
+		case 0x096: stream << "jovb0 "; flags = STEP_COND; break;
+		case 0x098: stream << "jnova1 "; flags = STEP_COND; break;
+		case 0x09a: stream << "jova1 "; flags = STEP_COND; break;
+		case 0x09c: stream << "jnovb1 "; flags = STEP_COND; break;
+		case 0x09e: stream << "jovb1 "; flags = STEP_COND; break;
+		case 0x0a0: stream << "jnsa0 "; flags = STEP_COND; break;
+		case 0x0a2: stream << "jsa0 "; flags = STEP_COND; break;
+		case 0x0a4: stream << "jnsb0 "; flags = STEP_COND; break;
+		case 0x0a6: stream << "jsb0 "; flags = STEP_COND; break;
+		case 0x0a8: stream << "jnsa1 "; flags = STEP_COND; break;
+		case 0x0aa: stream << "jsa1 "; flags = STEP_COND; break;
+		case 0x0ac: stream << "jnsb1 "; flags = STEP_COND; break;
+		case 0x0ae: stream << "jsb1 "; flags = STEP_COND; break;
+		case 0x0b0: stream << "jdpl0 "; flags = STEP_COND; break;
+		case 0x0b1: stream << "jdpln0 "; flags = STEP_COND; break;
+		case 0x0b2: stream << "jdplf "; flags = STEP_COND; break;
+		case 0x0b3: stream << "jdplnf "; flags = STEP_COND; break;
+		case 0x0b4: stream << "jnsiak "; flags = STEP_COND; break;
+		case 0x0b6: stream << "jsiak "; flags = STEP_COND; break;
+		case 0x0b8: stream << "jnsoak "; flags = STEP_COND; break;
+		case 0x0ba: stream << "jsoak "; flags = STEP_COND; break;
+		case 0x0bc: stream << "jnrqm "; flags = STEP_COND; break;
+		case 0x0be: stream << "jrqm "; flags = STEP_COND; break;
 		case 0x100: stream << "ljmp "; break;
 		case 0x101: stream << "hjmp "; break;
-		case 0x140: stream << "lcall "; break;
-		case 0x141: stream << "hcall "; break;
+		case 0x140: stream << "lcall "; flags = STEP_OVER; break;
+		case 0x141: stream << "hcall "; flags = STEP_OVER; break;
 		default:    stream << "??????  "; break;
 	}
 
@@ -225,5 +227,5 @@ offs_t necdsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	}
 	}
 
-	return 1 | SUPPORTED;
+	return 1 | flags | SUPPORTED;
 }

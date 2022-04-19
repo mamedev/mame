@@ -185,12 +185,10 @@ void nes_subor2_device::ppu_latch(offs_t offset)
 
 uint8_t nes_subor2_device::nt_r(offs_t offset)
 {
-	int page = ((offset & 0xc00) >> 10);
+	// Nametable reads report the current page; this seems to work without issues
+	m_page = BIT(offset, 10, 2);
 
-	/* Nametable reads report the current page; this seems to work without issues */
-	m_page = page;
-
-	return m_nt_access[page][offset & 0x3ff];
+	return device_nes_cart_interface::nt_r(offset);
 }
 
 /*-------------------------------------------------
@@ -254,7 +252,7 @@ void nes_subor0_device::write_h(offs_t offset, uint8_t data)
 	uint8_t subor_helper1, subor_helper2;
 	LOG_MMC("subor0 write_h, offset: %04x, data: %02x\n", offset, data);
 
-	m_reg[(offset >> 13) & 0x03] = data;
+	m_reg[BIT(offset, 13, 2)] = data;
 	subor_helper1 = ((m_reg[0] ^ m_reg[1]) << 1) & 0x20;
 	subor_helper2 = ((m_reg[2] ^ m_reg[3]) << 0) & 0x1f;
 
@@ -284,7 +282,7 @@ void nes_subor1_device::write_h(offs_t offset, uint8_t data)
 	uint8_t subor_helper1, subor_helper2;
 	LOG_MMC("subor1 write_h, offset: %04x, data: %02x\n", offset, data);
 
-	m_reg[(offset >> 13) & 0x03] = data;
+	m_reg[BIT(offset, 13, 2)] = data;
 	subor_helper1 = ((m_reg[0] ^ m_reg[1]) << 1) & 0x20;
 	subor_helper2 = ((m_reg[2] ^ m_reg[3]) << 0) & 0x1f;
 

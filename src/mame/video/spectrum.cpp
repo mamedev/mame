@@ -41,7 +41,7 @@ void spectrum_128_state::video_start()
 
   The screen consists of 312 scanlines as follows:
   64  border lines (the last 48 are actual border lines; the others may be
-					border lines or vertical retrace)
+                    border lines or vertical retrace)
   192 screen lines
   56  border lines
 

@@ -25,8 +25,6 @@
 #include "mb86235fe.h"
 #include "mb86235d.h"
 
-#include "debugger.h"
-
 
 #define ENABLE_DRC      0
 

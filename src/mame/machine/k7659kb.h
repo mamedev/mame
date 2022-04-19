@@ -46,13 +46,13 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	emu_timer *m_timer;
+	emu_timer *m_timer = nullptr;
 
 private:
 	uint8_t key_pos(uint8_t val);
-	uint8_t m_lookup;
-	uint8_t m_key;
-	const uint8_t *m_p_rom;
+	uint8_t m_lookup = 0;
+	uint8_t m_key = 0;
+	const uint8_t *m_p_rom = nullptr;
 };
 
 

@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="pc8801_cdrom" description="NEC PC-8801 CD-ROMs">
+
+<!-- 
+PC-8801-31 SW list
+
+TODO:
+- Add Mirrors dump (ones floating around are in .ccd/.sub/.img format);
+- Add DIOS CD-ROM Ban dump (undumped?)
+- Reportedly later Koei and Falcom releases can optionally load the correlated audio CD soundtracks.
+  Pinpoint how exactly they detect the presence of a valid CD-ROM, add candidates here.
+
+-->
+
+	<software name="takabako" supported="no">
+		<description>CD Takarabako</description>
+		<year>1989</year>
+		<publisher>NEC</publisher>
+		<info name="alt_title" value="ＣＤたから箱"/>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cd takarabako (japan)" sha1="fa04ebd2556c6508a2401e9a261b8bce843164c0"/>
+			</diskarea>
+		</part>
+	</software>
+</softwarelist>

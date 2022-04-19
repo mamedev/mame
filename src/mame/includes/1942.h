@@ -72,8 +72,8 @@ protected:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* video-related */
-	tilemap_t *m_fg_tilemap = 0;
-	tilemap_t *m_bg_tilemap = 0;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
 	int m_palette_bank = 0;
 	uint8_t m_scroll[2]{};
 	void create_palette(palette_device &palette) const;

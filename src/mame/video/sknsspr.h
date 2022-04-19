@@ -23,7 +23,7 @@ protected:
 	virtual void rom_bank_updated() override;
 private:
 	static constexpr unsigned SUPRNOVA_DECODE_BUFFER_SIZE = 0x2000;
-	int m_sprite_kludge_x, m_sprite_kludge_y;
+	int m_sprite_kludge_x = 0, m_sprite_kludge_y = 0;
 	std::unique_ptr<u8[]> m_decodebuffer;
 	int skns_rle_decode ( int romoffset, int size );
 };

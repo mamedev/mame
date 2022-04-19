@@ -106,7 +106,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "adsp2100.h"
 #include "2100dasm.h"
 

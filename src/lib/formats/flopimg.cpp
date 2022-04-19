@@ -91,9 +91,10 @@ bool floppy_image::track_is_formatted(int track, int head, int subtrack)
 	const auto &data = track_array[idx][head].cell_data;
 	if(data.empty())
 		return false;
-	if(data.size() == 1 && (data[0] & MG_MASK) == MG_N)
-		return false;
-	return true;
+	for(uint32_t mg : data)
+		if((mg & floppy_image::MG_MASK) == floppy_image::MG_F)
+			return true;
+	return false;
 }
 
 const char *floppy_image::get_variant_name(uint32_t form_factor, uint32_t variant)
@@ -118,7 +119,7 @@ bool floppy_image_format_t::has_variant(const std::vector<uint32_t> &variants, u
 	return false;
 }
 
-bool floppy_image_format_t::save(util::random_read_write &io, const std::vector<uint32_t> &, floppy_image *)
+bool floppy_image_format_t::save(util::random_read_write &io, const std::vector<uint32_t> &, floppy_image *) const
 {
 	return false;
 }
@@ -840,17 +841,11 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 	generate_track_from_levels(track, head, buffer, 0, image);
 }
 
-void floppy_image_format_t::normalize_times(std::vector<uint32_t> &buffer)
+void floppy_image_format_t::normalize_times(std::vector<uint32_t> &buffer, uint32_t last_position)
 {
-	unsigned int total_sum = 0;
-	for(unsigned int i=0; i != buffer.size(); i++)
-		total_sum += buffer[i] & floppy_image::TIME_MASK;
-
-	unsigned int current_sum = 0;
 	for(unsigned int i=0; i != buffer.size(); i++) {
 		uint32_t time = buffer[i] & floppy_image::TIME_MASK;
-		buffer[i] = (buffer[i] & floppy_image::MG_MASK) | (200000000ULL * current_sum / total_sum);
-		current_sum += time;
+		buffer[i] = (buffer[i] & floppy_image::MG_MASK) | (200000000ULL * time / last_position);
 	}
 }
 
@@ -859,36 +854,11 @@ void floppy_image_format_t::generate_track_from_bitstream(int track, int head, c
 	std::vector<uint32_t> &dest = image->get_buffer(track, head, subtrack);
 	dest.clear();
 
-	// If the bitstream has an odd number of inversions, one needs to be added.
-	// Put in in the middle of the half window after the center inversion, where
-	// any fdc ignores it.
-
-	int inversions = 0;
 	for(int i=0; i != track_size; i++)
 		if(trackbuf[i >> 3] & (0x80 >> (i & 7)))
-			inversions++;
-	bool need_flux = inversions & 1;
+			dest.push_back(floppy_image::MG_F | (i*2+1));
 
-	uint32_t cbit = floppy_image::MG_A;
-	uint32_t count = 0;
-	for(int i=0; i != track_size; i++)
-		if(trackbuf[i >> 3] & (0x80 >> (i & 7))) {
-			dest.push_back(cbit | (count+2));
-			cbit = cbit == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
-			if(need_flux) {
-				need_flux = false;
-				dest.push_back(cbit | 1);
-				cbit = cbit == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
-				count = 1;
-			} else
-				count = 2;
-		} else
-			count += 4;
-
-	if(count)
-		dest.push_back(cbit | count);
-
-	normalize_times(dest);
+	normalize_times(dest, track_size*2);
 
 	if(splice >= 0 || splice < track_size) {
 		int splpos = uint64_t(200000000) * splice / track_size;
@@ -902,81 +872,23 @@ void floppy_image_format_t::generate_track_from_levels(int track, int head, std:
 	splice_pos = splice_pos % trackbuf.size();
 	uint32_t splice_angular_pos = trackbuf[splice_pos] & floppy_image::TIME_MASK;
 
-	// Check if we need to invert a cell to get an even number of
-	// transitions on the whole track
-	//
-	// Also check if all MG values are valid
-
-	int transition_count = 0;
-	for(auto & elem : trackbuf) {
-		switch(elem & floppy_image::MG_MASK) {
-		case MG_1:
-			transition_count++;
-			break;
-
-		case MG_W:
-			throw std::runtime_error(util::string_format("Weak bits not yet handled, track %d head %d", track, head));
-
-		case MG_0:
-		case floppy_image::MG_N:
-		case floppy_image::MG_D:
-			break;
-
-		case floppy_image::MG_A:
-		case floppy_image::MG_B:
-		default:
-			throw std::invalid_argument(util::string_format("Incorrect MG information in generate_track_from_levels, track %d head %d", track, head));
-		}
-	}
-
-	if(transition_count & 1) {
-		int pos = splice_pos;
-		while((trackbuf[pos] & floppy_image::MG_MASK) != MG_0 && (trackbuf[pos] & floppy_image::MG_MASK) != MG_1) {
-			pos++;
-			if(pos == int(trackbuf.size()))
-				pos = 0;
-			if(pos == splice_pos)
-				goto meh;
-		}
-		if((trackbuf[pos] & floppy_image::MG_MASK) == MG_0)
-			trackbuf[pos] = (trackbuf[pos] & floppy_image::TIME_MASK) | MG_1;
-		else
-			trackbuf[pos] = (trackbuf[pos] & floppy_image::TIME_MASK) | MG_0;
-
-	meh:
-		;
-
-	}
-
-	// Maximal number of cells which happens when the buffer is all MG_1/MG_N alternated, which would be 3/2
 	std::vector<uint32_t> &dest = image->get_buffer(track, head);
 	dest.clear();
 
-	uint32_t cbit = floppy_image::MG_A;
-	uint32_t count = 0;
+	uint32_t total_time = 0;
 	for(auto & elem : trackbuf) {
 		uint32_t bit = elem & floppy_image::MG_MASK;
 		uint32_t time = elem & floppy_image::TIME_MASK;
-		if(bit == MG_0) {
-			count += time;
-			continue;
-		}
-		if(bit == MG_1) {
-			count += time >> 1;
-			dest.push_back(cbit | count);
-			cbit = cbit == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
-			count = time - (time >> 1);
-			continue;
-		}
-		dest.push_back(cbit | count);
-		dest.push_back(elem);
-		count = 0;
+		if(bit == MG_1)
+			dest.push_back(floppy_image::MG_F | (total_time + (time >> 1)));
+
+		else if(bit != MG_0)
+			dest.push_back(bit | total_time);
+
+		total_time += time;
 	}
 
-	if(count)
-		dest.push_back(cbit | count);
-
-	normalize_times(dest);
+	normalize_times(dest, total_time);
 	image->set_write_splice_position(track, head, splice_angular_pos);
 }
 
@@ -1390,7 +1302,14 @@ std::vector<bool> floppy_image_format_t::generate_bitstream_from_track(int track
 {
 	std::vector<bool> trackbuf;
 	std::vector<uint32_t> &tbuf = image->get_buffer(track, head, subtrack);
-	if(tbuf.size() <= 1) {
+	bool track_has_info = false;
+	for(uint32_t mg : tbuf)
+		if((mg & floppy_image::MG_MASK) == floppy_image::MG_F) {
+			track_has_info = true;
+			break;
+		}
+
+	if(!track_has_info) {
 		// Unformatted track
 		int track_size = 200000000/cell_size;
 		trackbuf.resize(track_size, false);
@@ -1414,8 +1333,14 @@ std::vector<bool> floppy_image_format_t::generate_bitstream_from_track(int track
 
 	uint32_t scanned = 0;
 	while(scanned < 200000000) {
-		// Note that all magnetic cell type changes are considered
-		// edges.  No randomness added for neutral/damaged cells
+		// Note that only MG_F edges are taken into account, the rest is ignored.
+		// The lack of MG_F has been tested for previously.
+		while((tbuf[cur_entry] & floppy_image::MG_MASK) != floppy_image::MG_F) {
+			cur_entry ++;
+			if(cur_entry == tbuf.size())
+				cur_entry = 0;
+		}
+
 		int edge = tbuf[cur_entry] & floppy_image::TIME_MASK;
 		if(edge < cur_pos)
 			edge += 200000000;
@@ -1474,11 +1399,8 @@ std::vector<bool> floppy_image_format_t::generate_bitstream_from_track(int track
 
 		// Wrap around
 		if(cur_entry == int(tbuf.size())-1 &&
-			(tbuf[cur_entry] & floppy_image::TIME_MASK) < cur_pos) {
-			// Wrap to index 0 or 1 depending on whether there is a transition exactly at the index hole
-			cur_entry = (tbuf[int(tbuf.size())-1] & floppy_image::MG_MASK) != (tbuf[0] & floppy_image::MG_MASK) ?
-				0 : 1;
-		}
+		   (tbuf[cur_entry] & floppy_image::TIME_MASK) < cur_pos)
+			cur_entry = 0;
 	}
 	return trackbuf;
 }

@@ -252,8 +252,8 @@ public:
 	template<int cpunum> uint8_t perr_r(offs_t offset);
 	template<int cpunum> void perr_w(offs_t offset, uint8_t data);
 
-	uint16_t m_aic_ad565_in[16];
-	uint8_t m_aic_mux_latch;
+	uint16_t m_aic_ad565_in[16]{};
+	uint8_t m_aic_mux_latch = 0;
 
 	uint8_t aic_ad574_r();
 	template<int Dac> void aic_dac_w(uint8_t data);
@@ -403,15 +403,15 @@ protected:
 	required_device<address_map_bank_device> m_cpu1_periphs;
 	required_device<address_map_bank_device> m_cpu2_periphs;
 
-	address_space *m_cpu1space;
-	address_space *m_cpu2space;
+	address_space *m_cpu1space = nullptr;
+	address_space *m_cpu2space = nullptr;
 
 private:
-	emu_timer *m_map_switch_timer;
-	emu_timer *m_hblank_timer;
-	emu_timer *m_jam_timeout_timer;
+	emu_timer *m_map_switch_timer = nullptr;
+	emu_timer *m_hblank_timer = nullptr;
+	emu_timer *m_jam_timeout_timer = nullptr;
 
-	uint8_t m_video_data;
+	uint8_t m_video_data = 0;
 
 	// Memory
 	bool map_is_active(int cpunum, int map, uint8_t *map_info);
@@ -427,52 +427,52 @@ private:
 	void fdc_dma_transfer();
 
 	// Q133 CPU Card
-	uint8_t *m_q133_rom;
+	uint8_t *m_q133_rom = nullptr;
 
-	uint16_t  m_int_state[2];
-	uint8_t   m_lp_int;
-	uint8_t   m_hp_int;
+	uint16_t  m_int_state[2]{};
+	uint8_t   m_lp_int = 0;
+	uint8_t   m_hp_int = 0;
 	std::unique_ptr<uint8_t[]>    m_shared_ram;
 	std::unique_ptr<uint8_t[]>    m_scratch_ram[2];
 
 	/* Memory management */
-	uint8_t   m_map_sel[16];
+	uint8_t   m_map_sel[16]{};
 	std::unique_ptr<uint8_t[]>    m_map_ram[2];
 	std::unique_ptr<uint8_t[]>    m_q256_ram[2];
-	uint8_t   m_map_ram_latch;
-	int     m_cpu_active_space[2];
-	int     m_cpu_map_switch[2];
-	uint8_t m_curr_mapinfo[2];
-	uint8_t m_irq_address[2][2];
-	int     m_m6809_bs_hack_cnt[2];
+	uint8_t   m_map_ram_latch = 0;
+	int     m_cpu_active_space[2]{};
+	int     m_cpu_map_switch[2]{};
+	uint8_t m_curr_mapinfo[2]{};
+	uint8_t m_irq_address[2][2]{};
+	int     m_m6809_bs_hack_cnt[2]{};
 
 	/* Q219 lightpen/graphics card */
 	std::unique_ptr<uint8_t[]>    m_video_ram;
-	uint16_t  m_x_pos;
-	uint8_t   m_y_pos;
-	uint16_t  m_lp_x;
-	uint8_t   m_lp_y;
-	uint8_t   m_q219_b_touch;
+	uint16_t  m_x_pos = 0;
+	uint8_t   m_y_pos = 0;
+	uint16_t  m_lp_x = 0;
+	uint8_t   m_lp_y = 0;
+	uint8_t   m_q219_b_touch = 0;
 
 	/* QFC9 floppy disk controller card */
-	uint8_t * m_qfc9_region_ptr;
-	int       m_fdc_drq;
-	uint8_t   m_fdc_addr;
-	uint8_t   m_fdc_ctrl;
-	uint8_t   m_fdc_status;
-	PAIR      m_fdc_dma_addr;
-	PAIR      m_fdc_dma_cnt;
+	uint8_t * m_qfc9_region_ptr = 0;
+	int       m_fdc_drq = 0;
+	uint8_t   m_fdc_addr = 0;
+	uint8_t   m_fdc_ctrl = 0;
+	uint8_t   m_fdc_status = 0;
+	PAIR      m_fdc_dma_addr{};
+	PAIR      m_fdc_dma_cnt{};
 
 	/* CMI-07 */
-	uint8_t   m_cmi07_ctrl;
-	bool      m_cmi07_base_enable[2];
-	uint16_t  m_cmi07_base_addr;
+	uint8_t   m_cmi07_ctrl = 0;
+	bool      m_cmi07_base_enable[2]{};
+	uint16_t  m_cmi07_base_addr = 0;
 
-	uint8_t   m_msm5832_addr;
+	uint8_t   m_msm5832_addr = 0;
 
 	// Master card (CMI-02)
-	int       m_cmi02_ptm_irq;
-	uint8_t   m_cmi02_pia_chsel;
+	int       m_cmi02_ptm_irq = 0;
+	uint8_t   m_cmi02_pia_chsel = 0;
 };
 
 /**************************************
@@ -1356,7 +1356,7 @@ void cmi_state::dma_fdc_rom()
 	/* Active low */
 	m_fdc_status &= ~FDC_STATUS_DRIVER_LOAD;
 
-	int i;
+	int i = 0;
 	for (i = 0; i < NUM_Q256_CARDS; ++i)
 	{
 		p_info = m_map_ram[i][(map << PAGE_SHIFT) | page];
@@ -1452,7 +1452,7 @@ void cmi_state::fdc_dma_transfer()
 	int cpu_page = (m_fdc_dma_addr.w.l & ~PAGE_MASK) / PAGE_SIZE;
 	int phys_page = 0;
 
-	int i;
+	int i = 0;
 	for (i = 0; i < NUM_Q256_CARDS; ++i)
 	{
 		phys_page = m_map_ram[i][(map << PAGE_SHIFT) | cpu_page];

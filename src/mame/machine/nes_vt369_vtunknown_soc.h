@@ -51,8 +51,8 @@ private:
 	required_device<cpu_device> m_soundcpu;
 	uint8_t m_relative[2];
 	std::vector<u8> m_6000_ram;
-	uint8_t m_bank6000;
-	uint8_t m_bank6000_enable;
+	uint8_t m_bank6000 = 0;
+	uint8_t m_bank6000_enable = 0;
 };
 
 class nes_vtunknown_soc_bt_device : public nes_vt09_soc_device

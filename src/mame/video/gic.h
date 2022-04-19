@@ -85,8 +85,8 @@ protected:
 	bitmap_ind16 m_bitmap;
 	required_region_ptr<uint8_t> m_cgrom;          // internal chargen ROM
 
-	emu_timer    *m_vblank_timer;
-	sound_stream *m_stream;
+	emu_timer    *m_vblank_timer = nullptr;
+	sound_stream *m_stream = nullptr;
 
 	int m_audiocnt;
 	int m_audioval;

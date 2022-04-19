@@ -513,17 +513,6 @@ INPUT_PORTS_END
 
 /* Graphics Layouts */
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ STEP8(0,4) },
-	{ STEP8(0,32) },
-	32*8
-};
-
 static const gfx_layout spritelayout =
 {
 	16,16,
@@ -538,7 +527,7 @@ static const gfx_layout spritelayout =
 /* Graphics Decode Information */
 
 static GFXDECODE_START( gfx_docastle )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,       0, 64 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb, 0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,     0, 32*2 )
 GFXDECODE_END
 
@@ -1033,8 +1022,8 @@ ROM_START( idsoccera )
 	ROM_REGION( 0x8000, "gfx1", 0 )
 	ROM_LOAD( "indoor.e6",          0x0000, 0x4000, CRC(a57c7a11) SHA1(9faebad0050da05101811427f350e163a7811396) )
 
-	// some graphic / sound roms also differ on this set - verify them
-	// the sound rom causes bad sound, but the implementation is hacked anyway so I'm not 100% convinced it's bad yet
+	// some graphic / sound ROMs also differ on this set - verify them
+	// the sound ROM causes bad sound, but the implementation is hacked
 	ROM_REGION( 0x20000, "gfx2", 0 )
 	ROM_LOAD( "indoor.p3",           0x00000, 0x8000, CRC(b42a6f4a) SHA1(ddce4438b3649610bd3703cbd7592aaa9a3eda0e) )
 	ROM_LOAD( "indoor.n3",           0x08000, 0x8000, CRC(fa2b1c77) SHA1(0d8e9db065c76621deb58575f01c6ec5ee6cf6b0) )
@@ -1042,12 +1031,43 @@ ROM_START( idsoccera )
 	ROM_LOAD( "indoor.k3",           0x18000, 0x8000, CRC(a2a69223) SHA1(6bd9b76e0119643450c9f64c80b52e9056da82d6) )
 
 	ROM_REGION( 0x10000, "adpcm", 0 )
-	ROM_LOAD( "indoor.ic1",            0x0000, 0x4000, CRC(3bb65dc7) SHA1(499151903b3da9fa2455b3d2c04863b3e33e853d) ) // different (causes bad sound in attract, but doesn't simply look like a bad dump?)
+	ROM_LOAD( "indoor.ic1",            0x0000, 0x4000, CRC(3bb65dc7) SHA1(499151903b3da9fa2455b3d2c04863b3e33e853d) ) // different (causes bad sound in attract, but isn't a bad dump since it has been confirmed on multiple boards)
 	ROM_LOAD( "indoor.ic3",            0x8000, 0x4000, CRC(27bebba3) SHA1(cf752b22603c1e2a0b33958481c652d6d56ebf68) )
 	ROM_LOAD( "indoor.ic4",            0xc000, 0x4000, CRC(dd5ffaa2) SHA1(4bc4330a54ca93448a8fe05207d3fb1a3a9872e1) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "indoor.d3",   0x0000, 0x0200, CRC(d9b2550c) SHA1(074253b1ede42a743f1a8858756640693126209f) ) // different
+ROM_END
+
+ROM_START( idsoccert ) // UNIVERSAL 8461-A (with TECFRI SA logo) + UNIVERSAL 8461-SUB-1 PCBs. Uses a SY6845BA with a 10MHz XTAL instead.
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.e10", 0x0000, 0x2000, CRC(1fa5ad7d) SHA1(f9d8dd0c8300085e84472014f8573cad637dbea2) )
+	ROM_LOAD( "2.f10", 0x2000, 0x2000, CRC(68b9764b) SHA1(73811d71aef4c43ea99a8a578b38e7836d377536) )
+	ROM_LOAD( "3.h10", 0x6000, 0x2000, CRC(5baabe1f) SHA1(12afaeac45ce03499614708edd171f20f3b4a73d) )
+
+	ROM_REGION( 0x10000, "slave", 0 )
+	ROM_LOAD( "9.e2", 0x0000, 0x4000, CRC(c4bacc14) SHA1(d457a24b084726fe6b2f97a1be44e67c0a61a97b) )
+
+	ROM_REGION( 0x10000, "cpu3", 0 )
+	ROM_LOAD( "82s147.p8", 0x0000, 0x0200, CRC(2747ca77) SHA1(abc0ca05925974c4b852827605ee2f1caefb8524) )
+
+	ROM_REGION( 0x8000, "gfx1", 0 )
+	ROM_LOAD( "4.e6", 0x0000, 0x4000, CRC(a57c7a11) SHA1(9faebad0050da05101811427f350e163a7811396) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "8.p3", 0x00000, 0x8000, CRC(b42a6f4a) SHA1(ddce4438b3649610bd3703cbd7592aaa9a3eda0e) )
+	ROM_LOAD( "7.n3", 0x08000, 0x8000, CRC(fa2b1c77) SHA1(0d8e9db065c76621deb58575f01c6ec5ee6cf6b0) )
+	ROM_LOAD( "6.l3", 0x10000, 0x8000, CRC(2663405c) SHA1(16c054c5c16ace80941523a64654afa3a77d7611) )
+	ROM_LOAD( "5.k3", 0x18000, 0x8000, CRC(a2a69223) SHA1(6bd9b76e0119643450c9f64c80b52e9056da82d6) )
+
+	ROM_REGION( 0x10000, "adpcm", 0 )
+	ROM_LOAD( "10_sub-1.ic1", 0x0000, 0x4000, CRC(3bb65dc7) SHA1(499151903b3da9fa2455b3d2c04863b3e33e853d) )
+	// ic2 empty
+	ROM_LOAD( "11_sub-1.ic3", 0x8000, 0x4000, CRC(27bebba3) SHA1(cf752b22603c1e2a0b33958481c652d6d56ebf68) )
+	ROM_LOAD( "12_sub-1.ic4", 0xc000, 0x4000, CRC(3bb65dc7) SHA1(499151903b3da9fa2455b3d2c04863b3e33e853d) ) // same as ic1, verified. Really strange. Manufacturing error?
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "4_82s147.d3", 0x0000, 0x0200, CRC(d9b2550c) SHA1(074253b1ede42a743f1a8858756640693126209f) )
 ROM_END
 
 /*
@@ -1104,5 +1124,6 @@ GAME( 1984, dowild,     0,        dorunrun, dowild,   docastle_state, empty_init
 GAME( 1984, jjack,      0,        dorunrun, jjack,    docastle_state, empty_init, ROT270, "Universal", "Jumping Jack", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, kickridr,   0,        dorunrun, kickridr, docastle_state, empty_init, ROT0,   "Universal", "Kick Rider", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, idsoccer,   0,        idsoccer, idsoccer, docastle_state, empty_init, ROT0,   "Universal", "Indoor Soccer (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1985, idsoccera,  idsoccer, idsoccer, idsoccer, docastle_state, empty_init, ROT0,   "Universal", "Indoor Soccer (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1987, asoccer,    idsoccer, idsoccer, idsoccer, docastle_state, empty_init, ROT0,   "Universal", "American Soccer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1985, idsoccera,  idsoccer, idsoccer, idsoccer, docastle_state, empty_init, ROT0,   "Universal", "Indoor Soccer (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // see MT05419
+GAME( 1985, idsoccert,  idsoccer, idsoccer, idsoccer, docastle_state, empty_init, ROT0,   "Universal (Tecfri license)", "Indoor Soccer (Tecfri license PCB)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // see MT05419
+GAME( 1987, asoccer,    idsoccer, idsoccer, idsoccer, docastle_state, empty_init, ROT0,   "Universal", "American Soccer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // see MT05419

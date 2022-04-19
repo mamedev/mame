@@ -1433,7 +1433,7 @@ ROM_START( pc_virus )   /* Virus (from location test board) */
 	ROM_RELOAD(         0x18000, 0x08000 )
 
 	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
-	ROM_LOAD( "security.u6", 0x00, 0x10, CRC(5b4f6930) SHA1(bd152d6907fe55f80125b34360fdb44cfc348906) )
+	ROM_LOAD( "security.u6", 0x00, 0x10, CRC(b69309ab) SHA1(a11ae46ed4c6ae5c22bab36593a53535a257fd4f) )
 ROM_END
 
 ROM_START( pc_bload )   /* Bases Loaded (from location test board) */
@@ -1449,7 +1449,7 @@ ROM_START( pc_bload )   /* Bases Loaded (from location test board) */
 	ROM_LOAD( "u1",  0x00000, 0x20000, CRC(02ff6ae9) SHA1(ba15b91f917c9e722d1d8b24b5783bd5eac6a4e7) )
 
 	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
-	ROM_LOAD( "security.u6", 0x00, 0x10, CRC(5b4f6930) SHA1(bd152d6907fe55f80125b34360fdb44cfc348906) )
+	ROM_LOAD( "security.u6", 0x00, 0x10, CRC(b69309ab) SHA1(a11ae46ed4c6ae5c22bab36593a53535a257fd4f) )
 ROM_END
 
 ROM_START( pc_ftqst )   /* Fester's Quest */
@@ -1638,7 +1638,7 @@ ROM_START( pc_ttoon )   /* Tiny Toon Adventures */
 	ROM_LOAD( "tt-chr.u1",    0x00000, 0x20000, CRC(a024ae14) SHA1(2e797a173161a61c14ce299e3c5a31c6029f2b50) )
 
 	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
-	ROM_LOAD( "security.u6", 0x00, 0x10, CRC(5b4f6930) SHA1(bd152d6907fe55f80125b34360fdb44cfc348906) )
+	ROM_LOAD( "security.u6", 0x00, 0x10, CRC(b69309ab) SHA1(a11ae46ed4c6ae5c22bab36593a53535a257fd4f) )
 ROM_END
 
 
@@ -1898,10 +1898,10 @@ GAME( 1989, pc_tmnt,  playch10, playch10_f, playch10, playch10_state, init_pcfbo
 GAME( 1989, pc_ftqst, playch10, playch10_f, playch10, playch10_state, init_pcfboard, ROT0, "Sunsoft (Nintendo of America license)",    "Uncle Fester's Quest: The Addams Family (PlayChoice-10)", 0 )
 GAME( 1989, pc_bstar, playch10, playch10_f2,playch10, playch10_state, init_pcfboard, ROT0, "SNK (Nintendo of America license)",        "Baseball Stars: Be a Champ! (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1989, pc_tbowl, playch10, playch10_f, playch10, playch10_state, init_pcfboard, ROT0, "Tecmo (Nintendo of America license)",      "Tecmo Bowl (PlayChoice-10)", 0 )
-GAME( 1990, pc_virus, pc_drmro, playch10_f, playch10, playch10_state, init_virus,    ROT0, "Nintendo",                                 "Virus (Dr. Mario prototype, PlayChoice-10)", 0 )
+GAME( 1990, pc_virus, pc_drmro, playch10_f, playch10, playch10_state, init_pcfboard, ROT0, "Nintendo",                                 "Virus (Dr. Mario prototype, PlayChoice-10)", 0 )
 GAME( 1990, pc_rrngr, playch10, playch10_f, playch10, playch10_state, init_pcfboard, ROT0, "Capcom USA (Nintendo of America license)", "Chip'n Dale: Rescue Rangers (PlayChoice-10)", 0 )
 GAME( 1990, pc_drmro, playch10, playch10_f, playch10, playch10_state, init_pcfboard, ROT0, "Nintendo",                                 "Dr. Mario (PlayChoice-10)", 0 )
-GAME( 1990, pc_bload, playch10, playch10_f, playch10, playch10_state, init_virus,    ROT0, "Jaleco (Nintendo of America license)",     "Bases Loaded (Prototype, PlayChoice-10)", 0 )
+GAME( 1990, pc_bload, playch10, playch10_f, playch10, playch10_state, init_pcfboard, ROT0, "Jaleco (Nintendo of America license)",     "Bases Loaded (Prototype, PlayChoice-10)", 0 )
 GAME( 1990, pc_ynoid, playch10, playch10_f, playch10, playch10_state, init_pcfboard, ROT0, "Capcom USA (Nintendo of America license)", "Yo! Noid (PlayChoice-10)", 0 )
 
 // G-Board Games
@@ -1915,7 +1915,7 @@ GAME( 1990, pc_ngai2, playch10, playch10_g, playch10, playch10_state, init_pcgbo
 GAME( 1991, pc_ngai3, playch10, playch10_g, playch10, playch10_state, init_pcgboard, ROT0, "Tecmo (Nintendo of America license)",      "Ninja Gaiden Episode III: The Ancient Ship of Doom (PlayChoice-10)", 0 )
 GAME( 1991, pc_pwbld, playch10, playch10_g, playch10, playch10_state, init_pcgboard, ROT0, "Taito (Nintendo of America license)",      "Power Blade (PlayChoice-10)", 0 )
 GAME( 1991, pc_rkats, playch10, playch10_g, playch10, playch10_state, init_pcgboard, ROT0, "Atlus (Nintendo of America license)",      "Rockin' Kats (PlayChoice-10)", 0 )
-GAME( 1991, pc_ttoon, playch10, playch10_g, playch10, playch10_state, init_ttoon,    ROT0, "Konami (Nintendo of America license)",     "Tiny Toon Adventures (prototype) (PlayChoice-10)", 0 ) // Code is final USA NES version of the game, (which is MMC3C according to nes.xml, but this cart has MMC3B)
+GAME( 1991, pc_ttoon, playch10, playch10_g, playch10, playch10_state, init_pcgboard, ROT0, "Konami (Nintendo of America license)",     "Tiny Toon Adventures (prototype) (PlayChoice-10)", 0 ) // Code is final USA NES version of the game, (which is MMC3C according to nes.xml, but this cart has MMC3B)
 
 // variant with 4 screen mirror
 GAME( 1990, pc_radr2, playch10, playch10_g, playch10, playch10_state, init_pcgboard_type2, ROT0, "Square (Nintendo of America license)", "Rad Racer II (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )

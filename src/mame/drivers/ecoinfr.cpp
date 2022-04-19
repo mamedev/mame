@@ -116,8 +116,8 @@ private:
 	virtual void machine_start() override { m_digits.resolve(); }
 	TIMER_DEVICE_CALLBACK_MEMBER(ecoinfr_irq_timer);
 
-	uint8_t m_banksel;
-	uint8_t m_credsel;
+	uint8_t m_banksel = 0;
+	uint8_t m_credsel = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device_array<stepper_device, 4> m_reel;

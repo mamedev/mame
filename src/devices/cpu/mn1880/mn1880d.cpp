@@ -252,6 +252,7 @@ void mn1880_disassembler::dasm_operands(std::ostream &stream, u8 opcode, offs_t 
 			stream << ", ";
 			format_rel(stream, pc + 1, opcodes.r8(pc));
 			++pc;
+			flags |= STEP_COND;
 		}
 	}
 	else if (opcode < 0x34)
@@ -416,6 +417,8 @@ void mn1880_disassembler::dasm_operands(std::ostream &stream, u8 opcode, offs_t 
 				util::stream_format(stream, "%s, ", BIT(opcode, 1) ? "yp" : "xp");
 			format_rel(stream, pc + 1, opcodes.r8(pc));
 			++pc;
+			if ((opcode & 0xf7) != 0x80)
+				flags |= STEP_COND;
 		}
 	}
 	else if (opcode < 0xb0)
@@ -439,6 +442,7 @@ void mn1880_disassembler::dasm_operands(std::ostream &stream, u8 opcode, offs_t 
 				stream << ", ";
 				format_rel(stream, pc + 1, opcodes.r8(pc));
 				++pc;
+				flags |= STEP_COND;
 			}
 		}
 		else
@@ -543,6 +547,7 @@ void mn1880_disassembler::dasm_operands(std::ostream &stream, u8 opcode, offs_t 
 		stream << ", ";
 		format_rel(stream, pc + 1, opcodes.r8(pc));
 		++pc;
+		flags |= STEP_COND;
 	}
 	else if ((opcode & 0xf7) == 0xf2)
 	{

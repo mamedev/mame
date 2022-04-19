@@ -173,8 +173,8 @@ enum
 		NAMCOS2_KYUUKAI_DOUCHUUKI,
 	};
 
-	int m_gametype;
-	bool m_update_to_line_before_posirq;
+	int m_gametype = 0;
+	bool m_update_to_line_before_posirq = false;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_slave;
@@ -234,9 +234,9 @@ enum
 
 	required_shared_ptr<uint8_t> m_dpram; /* 2Kx8 */
 	optional_shared_ptr<uint16_t> m_spriteram;
-	uint16_t m_gfx_ctrl;
-	unsigned m_finallap_prot_count;
-	int m_sendval;
+	uint16_t m_gfx_ctrl = 0;
+	unsigned m_finallap_prot_count = 0;
+	int m_sendval = 0;
 
 	optional_device<namco_c45_road_device> m_c45_road;
 	optional_device<namcos2_sprite_device> m_ns2sprite;

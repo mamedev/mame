@@ -135,7 +135,7 @@ bool jvc_format::parse_header(util::random_read &io, int &header_size, int &trac
 	// The JVC format has a header whose size is the size of the image modulo 256.  Currently, we only
 	// handle up to five header bytes
 	uint64_t size;
-	if (io.length(size))
+	if (io.length(size) || !size)
 		return false;
 	header_size = size % 256;
 	uint8_t header[5];
@@ -175,13 +175,13 @@ bool jvc_format::parse_header(util::random_read &io, int &header_size, int &trac
 	return tracks * heads * sectors * sector_size == (size - header_size);
 }
 
-int jvc_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int jvc_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	int header_size, tracks, heads, sectors, sector_size, sector_base_id;
-	return parse_header(io, header_size, tracks, heads, sectors, sector_size, sector_base_id) ? 50 : 0;
+	return parse_header(io, header_size, tracks, heads, sectors, sector_size, sector_base_id) ? FIFID_STRUCT|FIFID_SIZE : 0;
 }
 
-bool jvc_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool jvc_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	int header_size, track_count, head_count, sector_count, sector_size, sector_base_id;
 	int max_tracks, max_heads;
@@ -246,7 +246,7 @@ bool jvc_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-bool jvc_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool jvc_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	uint64_t file_offset = 0;
 
@@ -295,4 +295,4 @@ bool jvc_format::supports_save() const
 	return true;
 }
 
-const floppy_format_type FLOPPY_JVC_FORMAT = &floppy_image_format_creator<jvc_format>;
+const jvc_format FLOPPY_JVC_FORMAT;

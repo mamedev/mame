@@ -23,7 +23,6 @@
 #include "emu.h"
 #include "ucom4.h"
 #include "ucom4d.h"
-#include "debugger.h"
 
 
 // uCOM-43 products: 2000x8 ROM, 96x4 RAM, supports full instruction set

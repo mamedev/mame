@@ -40,16 +40,16 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
-	tilemap_t    *m_freek_tilemap;
+	tilemap_t    *m_freek_tilemap = nullptr;
 
 	/* misc */
-	int        m_inval;
-	int        m_outval;
-	int        m_cnt;   // used by oigas
-	int        m_romaddr;
-	int        m_spinner;
-	int        m_nmi_en;
-	int        m_ff_data;
+	int        m_inval = 0;
+	int        m_outval = 0;
+	int        m_cnt = 0;   // used by oigas
+	int        m_romaddr = 0;
+	int        m_spinner = 0;
+	int        m_nmi_en = 0;
+	int        m_ff_data = 0;
 	std::unique_ptr<uint8_t[]> m_decrypted_opcodes;
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_x_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_y_w);

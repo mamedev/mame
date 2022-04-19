@@ -43,12 +43,9 @@ void nscsi_harddisk_device::device_reset()
 		scsi_id = -1;
 		bytes_per_sector = 0;
 	} else {
-		const hard_disk_info *hdinfo = hard_disk_get_info(harddisk);
-		bytes_per_sector = hdinfo->sectorbytes;
-
-		chd_file *chd = image->get_chd_file();
-		if(chd != nullptr)
-			chd->read_metadata(HARD_DISK_IDENT_METADATA_TAG, 0, m_inquiry_data);
+		const auto &hdinfo = harddisk->get_info();
+		bytes_per_sector = hdinfo.sectorbytes;
+		harddisk->get_inquiry_data(m_inquiry_data);
 	}
 	cur_lba = -1;
 }
@@ -70,7 +67,7 @@ uint8_t nscsi_harddisk_device::scsi_get_data(int id, int pos)
 		int clba = lba + pos / bytes_per_sector;
 		if(clba != cur_lba) {
 			cur_lba = clba;
-			if(!hard_disk_read(harddisk, cur_lba, block)) {
+			if(!harddisk->read(cur_lba, block)) {
 				LOG("HD READ ERROR !\n");
 				memset(block, 0, sizeof(block));
 			}
@@ -93,7 +90,7 @@ void nscsi_harddisk_device::scsi_put_data(int id, int pos, uint8_t data)
 	block[offset] = data;
 	cur_lba = lba + pos / bytes_per_sector;
 	if(offset == bytes_per_sector-1) {
-		if(!hard_disk_write(harddisk, cur_lba, block))
+		if(!harddisk->write(cur_lba, block))
 			LOG("HD WRITE ERROR !\n");
 	}
 }
@@ -120,7 +117,7 @@ void nscsi_harddisk_device::scsi_command()
 
 		LOG("command READ start=%08x blocks=%04x\n", lba, blocks);
 
-		if(hard_disk_read(harddisk, lba, block)) {
+		if(harddisk->read(lba, block)) {
 			scsi_data_in(2, blocks*bytes_per_sector);
 			scsi_status_complete(SS_GOOD);
 		}
@@ -222,17 +219,17 @@ void nscsi_harddisk_device::scsi_command()
 		scsi_cmdbuf[pos++] = 0x00; // medium type
 		scsi_cmdbuf[pos++] = 0x00; // WP, cache
 
-		hard_disk_info *info = hard_disk_get_info(harddisk);
-		uint32_t dsize = info->cylinders * info->heads * info->sectors - 1;
+		const auto &info = harddisk->get_info();
+		uint32_t dsize = info.cylinders * info.heads * info.sectors - 1;
 		scsi_cmdbuf[pos++] = 0x08; // Block descriptor length
 		scsi_cmdbuf[pos++] = 0x00;
 		scsi_cmdbuf[pos++] = (dsize>>16) & 0xff;
 		scsi_cmdbuf[pos++] = (dsize>>8) & 0xff;
 		scsi_cmdbuf[pos++] = (dsize & 0xff);
 		scsi_cmdbuf[pos++] = 0x00;
-		scsi_cmdbuf[pos++] = (info->sectorbytes>>16)&0xff;
-		scsi_cmdbuf[pos++] = (info->sectorbytes>>8)&0xff;
-		scsi_cmdbuf[pos++] = (info->sectorbytes & 0xff);
+		scsi_cmdbuf[pos++] = (info.sectorbytes>>16)&0xff;
+		scsi_cmdbuf[pos++] = (info.sectorbytes>>8)&0xff;
+		scsi_cmdbuf[pos++] = (info.sectorbytes & 0xff);
 
 		int pmax = page == 0x3f ? 0x3e : page;
 		int pmin = page == 0x3f ? 0x00 : page;
@@ -284,18 +281,18 @@ void nscsi_harddisk_device::scsi_command()
 			case 0x03:  { // Format parameters page
 				scsi_cmdbuf[pos++] = 0x83; // PS, page id
 				scsi_cmdbuf[pos++] = 0x16; // Page length
-				scsi_cmdbuf[pos++] = (info->cylinders * info->heads) >> 8; // Track/zone
-				scsi_cmdbuf[pos++] = info->cylinders * info->heads;        // Track/zone
+				scsi_cmdbuf[pos++] = (info.cylinders * info.heads) >> 8; // Track/zone
+				scsi_cmdbuf[pos++] = info.cylinders * info.heads;        // Track/zone
 				scsi_cmdbuf[pos++] = 0x00; // Alt sect/zone
 				scsi_cmdbuf[pos++] = 0x00; // Alt sect/zone
 				scsi_cmdbuf[pos++] = 0x00; // Alt track/zone
 				scsi_cmdbuf[pos++] = 0x00; // Alt track/zone
 				scsi_cmdbuf[pos++] = 0x00; // Alt track/volume
 				scsi_cmdbuf[pos++] = 0x00; // Alt track/volume
-				scsi_cmdbuf[pos++] = info->sectors >> 8; // Sectors/track
-				scsi_cmdbuf[pos++] = info->sectors;      // Sectors/track
-				scsi_cmdbuf[pos++] = info->sectorbytes >> 8; // Bytes/sector
-				scsi_cmdbuf[pos++] = info->sectorbytes;      // Bytes/sector
+				scsi_cmdbuf[pos++] = info.sectors >> 8; // Sectors/track
+				scsi_cmdbuf[pos++] = info.sectors;      // Sectors/track
+				scsi_cmdbuf[pos++] = info.sectorbytes >> 8; // Bytes/sector
+				scsi_cmdbuf[pos++] = info.sectorbytes;      // Bytes/sector
 				scsi_cmdbuf[pos++] = 0x00; // Interleave
 				scsi_cmdbuf[pos++] = 0x00; // Interleave
 				scsi_cmdbuf[pos++] = 0x00; // Track skew
@@ -312,10 +309,10 @@ void nscsi_harddisk_device::scsi_command()
 			case 0x04: { // Rigid drive geometry page
 				scsi_cmdbuf[pos++] = 0x84; // PS, page id
 				scsi_cmdbuf[pos++] = 0x16; // Page length
-				scsi_cmdbuf[pos++] = info->cylinders >> 16; // Cylinders
-				scsi_cmdbuf[pos++] = info->cylinders >> 8;  // Cylinders
-				scsi_cmdbuf[pos++] = info->cylinders;       // Cylinders
-				scsi_cmdbuf[pos++] = info->heads;           // Heads
+				scsi_cmdbuf[pos++] = info.cylinders >> 16; // Cylinders
+				scsi_cmdbuf[pos++] = info.cylinders >> 8;  // Cylinders
+				scsi_cmdbuf[pos++] = info.cylinders;       // Cylinders
+				scsi_cmdbuf[pos++] = info.heads;           // Heads
 				scsi_cmdbuf[pos++] = 0x00;                  // Starting cylinder - write precomp
 				scsi_cmdbuf[pos++] = 0x00;                  // Starting cylinder - write precomp
 				scsi_cmdbuf[pos++] = 0x00;                  // Starting cylinder - write precomp
@@ -453,17 +450,17 @@ void nscsi_harddisk_device::scsi_command()
 	case SC_READ_CAPACITY: {
 		LOG("command READ CAPACITY\n");
 
-		hard_disk_info *info = hard_disk_get_info(harddisk);
-		uint32_t size = info->cylinders * info->heads * info->sectors - 1;
+		const auto &info = harddisk->get_info();
+		uint32_t size = info.cylinders * info.heads * info.sectors - 1;
 
 		scsi_cmdbuf[0] = (size>>24) & 0xff;
 		scsi_cmdbuf[1] = (size>>16) & 0xff;
 		scsi_cmdbuf[2] = (size>>8) & 0xff;
 		scsi_cmdbuf[3] = (size & 0xff);
-		scsi_cmdbuf[4] = (info->sectorbytes>>24)&0xff;
-		scsi_cmdbuf[5] = (info->sectorbytes>>16)&0xff;
-		scsi_cmdbuf[6] = (info->sectorbytes>>8)&0xff;
-		scsi_cmdbuf[7] = (info->sectorbytes & 0xff);
+		scsi_cmdbuf[4] = (info.sectorbytes>>24)&0xff;
+		scsi_cmdbuf[5] = (info.sectorbytes>>16)&0xff;
+		scsi_cmdbuf[6] = (info.sectorbytes>>8)&0xff;
+		scsi_cmdbuf[7] = (info.sectorbytes & 0xff);
 
 		scsi_data_in(0, 8);
 		scsi_status_complete(SS_GOOD);
@@ -476,7 +473,7 @@ void nscsi_harddisk_device::scsi_command()
 
 		LOG("command READ EXTENDED start=%08x blocks=%04x\n",lba, blocks);
 
-		if(hard_disk_read(harddisk, lba, block)) {
+		if(harddisk->read(lba, block)) {
 			scsi_data_in(2, blocks*bytes_per_sector);
 			scsi_status_complete(SS_GOOD);
 		}
@@ -505,12 +502,12 @@ void nscsi_harddisk_device::scsi_command()
 				(scsi_cmdbuf[1] & 0x10) ? " FMTDATA" : "",
 				(scsi_cmdbuf[1] & 0x08) ? " CMPLIST" : "");
 		{
-			hard_disk_info *info = hard_disk_get_info(harddisk);
-			auto block = std::make_unique<uint8_t[]>(info->sectorbytes);
-			for(int cyl = 0; cyl < info->cylinders; cyl++) {
-				for(int head = 0; head < info->heads; head++) {
-					for(int sector = 0; sector < info->sectors; sector++) {
-						hard_disk_write(harddisk, cyl * head * sector, block.get());
+			const auto &info = harddisk->get_info();
+			auto block = std::make_unique<uint8_t[]>(info.sectorbytes);
+			for(int cyl = 0; cyl < info.cylinders; cyl++) {
+				for(int head = 0; head < info.heads; head++) {
+					for(int sector = 0; sector < info.sectors; sector++) {
+						harddisk->write(cyl * head * sector, block.get());
 					}
 				}
 			}

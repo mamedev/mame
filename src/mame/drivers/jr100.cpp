@@ -93,8 +93,8 @@ protected:
 
 private:
 	uint8_t m_keyboard_line = 0U;
-	bool m_use_pcg = 0;
-	bool m_pb7 = 0;
+	bool m_use_pcg = false;
+	bool m_pb7 = false;
 	uint32_t screen_update_jr100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(sound_tick);
 	uint8_t pb_r();
@@ -117,7 +117,7 @@ private:
 	required_ioport_array<9> m_io_keyboard;
 	required_device<m6800_cpu_device> m_maincpu;
 
-	emu_timer *m_sound_timer;
+	emu_timer *m_sound_timer = nullptr;
 };
 
 

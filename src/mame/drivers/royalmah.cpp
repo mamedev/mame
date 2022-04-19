@@ -1403,8 +1403,8 @@ uint8_t royalmah_state::mjvegasa_rom_io_r(offs_t offset)
 
 	return m_rtc->read(offset & 0xf);
 
-	logerror("mjvegasa_rom_io_r: %04X: unmapped IO read at %04X\n", m_maincpu->pc(), offset);
-	return 0xff;
+	//logerror("mjvegasa_rom_io_r: %04X: unmapped IO read at %04X\n", m_maincpu->pc(), offset);
+	//return 0xff;
 }
 
 void royalmah_state::mjvegasa_rom_io_w(offs_t offset, uint8_t data)

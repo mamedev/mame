@@ -63,16 +63,16 @@ private:
 	required_ioport_array<2> m_port_dsw;
 
 	/* video-related */
-	tilemap_t   *m_background;
-	uint8_t       m_videoreg;
-	uint8_t       m_scrollx;
-	uint8_t       m_scrolly;
+	tilemap_t   *m_background = nullptr;
+	uint8_t       m_videoreg = 0;
+	uint8_t       m_scrollx = 0;
+	uint8_t       m_scrolly = 0;
 
 	/* Kaneko BEAST state */
-	uint8_t       m_beast_p0;
-	uint8_t       m_beast_p1;
-	uint8_t       m_beast_p2;
-	uint8_t       m_beast_p3;
+	uint8_t       m_beast_p0 = 0;
+	uint8_t       m_beast_p1 = 0;
+	uint8_t       m_beast_p2 = 0;
+	uint8_t       m_beast_p3 = 0;
 
 	/* devices */
 	required_device<cpu_device> m_mastercpu;

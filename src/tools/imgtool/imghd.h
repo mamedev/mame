@@ -45,6 +45,6 @@ imgtoolerr_t imghd_read(struct mess_hard_disk_file *disk, uint32_t lbasector, vo
 imgtoolerr_t imghd_write(struct mess_hard_disk_file *disk, uint32_t lbasector, const void *buffer);
 
 /* gets the header from a hard disk */
-const hard_disk_info *imghd_get_header(struct mess_hard_disk_file *disk);
+const hard_disk_file::info &imghd_get_header(struct mess_hard_disk_file *disk);
 
 #endif /* IMGHD_H */

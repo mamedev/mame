@@ -174,17 +174,6 @@ void hh_sm510_state::machine_start()
 	m_display_decay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hh_sm510_state::display_decay_tick),this));
 	m_display_decay_timer->adjust(attotime::from_hz(1024), 0, attotime::from_hz(1024));
 
-	// zerofill
-	m_inp_mux = 0;
-	m_speaker_data = 0;
-	m_s = 0;
-	m_r = 0;
-	m_display_x_len = 0;
-	m_display_y_len = 0;
-	m_display_z_len = 0;
-	memset(m_display_state, 0, sizeof(m_display_state));
-	memset(m_display_decay, 0, sizeof(m_display_decay));
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_inp_lines));
@@ -5326,7 +5315,7 @@ ROM_END
 /***************************************************************************
 
   Nelsonic Game Watches on SM530*, wristwatch with an LCD game on it.
-  *: Older games are on different a MCU, several seen with OKI MSM5055.
+  *: Older games are on a different MCU, several seen with OKI MSM5055.
   Newer ones: to be investigated, maybe SM5x.
 
   Hardware notes:
@@ -9518,8 +9507,8 @@ static INPUT_PORTS_START( trshutvoy )
 	PORT_START("IN.3") // S4
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("+")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("-")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_CHANGED_CB(input_changed) PORT_NAME(UTF8_MULTIPLY)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"×")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"÷")
 
 	PORT_START("IN.4") // S5
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_CHANGED_CB(input_changed) PORT_NAME("ALM")
@@ -9849,8 +9838,8 @@ static INPUT_PORTS_START( nummunch )
 	PORT_START("IN.3") // S4
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_CHANGED_CB(input_changed) PORT_NAME("Choose +")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_CHANGED_CB(input_changed) PORT_NAME("Choose -")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_CHANGED_CB(input_changed) PORT_NAME("Choose " UTF8_MULTIPLY)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_CHANGED_CB(input_changed) PORT_NAME("Choose " UTF8_DIVIDE)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"Choose ×")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"Choose ÷")
 
 	PORT_START("IN.4") // S5
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("1")
@@ -9873,8 +9862,8 @@ static INPUT_PORTS_START( nummunch )
 	PORT_START("IN.7") // S8
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("+")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("-")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_CHANGED_CB(input_changed) PORT_NAME(UTF8_MULTIPLY)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"×")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"÷")
 
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_CB(acl_button)

@@ -268,7 +268,7 @@ private:
 						m_name,
 						[this] (offs_t offset, T &data, T mem_mask)
 						{
-							auto result = invoke(m_callback, offset, data, mem_mask).template get<sol::optional<T> >();
+							auto result = invoke(m_callback, offset, data, mem_mask).template get<std::optional<T> >();
 							if (result)
 								data = *result;
 						},
@@ -281,7 +281,7 @@ private:
 						m_name,
 						[this] (offs_t offset, T &data, T mem_mask)
 						{
-							auto result = invoke(m_callback, offset, data, mem_mask).template get<sol::optional<T> >();
+							auto result = invoke(m_callback, offset, data, mem_mask).template get<std::optional<T> >();
 							if (result)
 								data = *result;
 						},

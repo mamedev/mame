@@ -134,8 +134,8 @@ private:
 
 	const u16 *m_pf1_rowscroll_ptr, *m_pf2_rowscroll_ptr;
 
-	tilemap_t *m_pf1_tilemap_16x16, *m_pf2_tilemap_16x16;
-	tilemap_t *m_pf1_tilemap_8x8, *m_pf2_tilemap_8x8;
+	tilemap_t *m_pf1_tilemap_16x16 = nullptr, *m_pf2_tilemap_16x16 = nullptr;
+	tilemap_t *m_pf1_tilemap_8x8 = nullptr, *m_pf2_tilemap_8x8 = nullptr;
 
 	deco16_tile_cb_delegate m_tile_cb;
 

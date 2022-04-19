@@ -87,7 +87,7 @@ public:
 
 	void render_videobuffer_to_screenbuffer_helper(int scanline);
 	void render_videobuffer_to_screenbuffer(int x, uint32_t priority, uint32_t &lineptr);
-	int sh2_master_pwmint_enable, sh2_slave_pwmint_enable;
+	int sh2_master_pwmint_enable = 0, sh2_slave_pwmint_enable = 0;
 
 	void check_framebuffer_swap(bool enabled);
 	void check_irqs();
@@ -123,80 +123,80 @@ protected:
 	required_device<timer_device> m_scan_timer;
 	memory_bank_creator m_rombank;
 
-	int m_32x_hcount_compare_val;
-	int m_32x_vblank_flag;
-	int m_sh2_are_running;
-	int m_32x_240mode;
-	uint16_t m_32x_a1518a_reg;
+	int m_32x_hcount_compare_val = 0;
+	int m_32x_vblank_flag = 0;
+	int m_sh2_are_running = 0;
+	int m_32x_240mode = 0;
+	uint16_t m_32x_a1518a_reg = 0;
 
-	sound_stream *m_stream;
+	sound_stream *m_stream = nullptr;
 	TIMER_CALLBACK_MEMBER(handle_pwm_callback);
 	void calculate_pwm_timer();
-	uint16_t m_pwm_ctrl, m_pwm_cycle, m_pwm_tm_reg;
+	uint16_t m_pwm_ctrl = 0, m_pwm_cycle = 0, m_pwm_tm_reg = 0;
 	static constexpr int PWM_FIFO_SIZE = 3;
-	uint16_t m_cur_lch[PWM_FIFO_SIZE],m_cur_rch[PWM_FIFO_SIZE];
-	uint16_t m_pwm_cycle_reg; //used for latching
-	uint8_t m_pwm_timer_tick;
-	uint8_t m_lch_size, m_rch_size;
-	uint16_t m_lch_fifo_state, m_rch_fifo_state;
+	uint16_t m_cur_lch[PWM_FIFO_SIZE]{},m_cur_rch[PWM_FIFO_SIZE]{};
+	uint16_t m_pwm_cycle_reg = 0; //used for latching
+	uint8_t m_pwm_timer_tick = 0;
+	uint8_t m_lch_size = 0, m_rch_size = 0;
+	uint16_t m_lch_fifo_state = 0, m_rch_fifo_state = 0;
 
 	void lch_pop();
 	void rch_pop();
 
 	uint16_t get_hposition(void);
 
-	emu_timer *m_32x_pwm_timer;
+	emu_timer *m_32x_pwm_timer = nullptr;
 
 private:
 
-	int m_32x_displaymode;
-	int m_32x_videopriority;
-	uint32_t m_32x_linerender[320+258]; // tmp buffer (bigger than it needs to be to simplify RLE decode)
+	int m_32x_displaymode = 0;
+	int m_32x_videopriority = 0;
+	uint32_t m_32x_linerender[320+258]{}; // tmp buffer (bigger than it needs to be to simplify RLE decode)
 
-	int m_32x_adapter_enabled;
-	int m_32x_access_auth;
-	int m_32x_screenshift;
+	int m_32x_adapter_enabled = 0;
+	int m_32x_access_auth = 0;
+	int m_32x_screenshift = 0;
 
-	uint16_t m_32x_68k_a15104_reg;
-	int m_sh2_master_vint_enable, m_sh2_slave_vint_enable;
-	int m_sh2_master_hint_enable, m_sh2_slave_hint_enable;
-	int m_sh2_master_cmdint_enable, m_sh2_slave_cmdint_enable;
-	int m_sh2_hint_in_vbl;
-	int m_sh2_master_vint_pending;
-	int m_sh2_slave_vint_pending;
-	int m_32x_fb_swap;
-	int m_32x_hcount_reg;
+	uint16_t m_32x_68k_a15104_reg = 0;
+	int m_sh2_master_vint_enable = 0, m_sh2_slave_vint_enable = 0;
+	int m_sh2_master_hint_enable = 0, m_sh2_slave_hint_enable = 0;
+	int m_sh2_master_cmdint_enable = 0, m_sh2_slave_cmdint_enable = 0;
+	int m_sh2_hint_in_vbl = 0;
+	int m_sh2_master_vint_pending = 0;
+	int m_sh2_slave_vint_pending = 0;
+	int m_32x_fb_swap = 0;
+	int m_32x_hcount_reg = 0;
 
-	uint16_t m_32x_autofill_length;
-	uint16_t m_32x_autofill_address;
-	uint16_t m_32x_autofill_data;
-	uint16_t m_a15106_reg;
-	uint16_t m_dreq_src_addr[2],m_dreq_dst_addr[2],m_dreq_size;
-	uint8_t m_sega_tv;
-	uint16_t m_hint_vector[2];
-	uint16_t m_a15100_reg;
-	int m_32x_68k_a15102_reg;
+	uint16_t m_32x_autofill_length = 0;
+	uint16_t m_32x_autofill_address = 0;
+	uint16_t m_32x_autofill_data = 0;
+	uint16_t m_a15106_reg = 0;
+	uint16_t m_dreq_src_addr[2]{}, m_dreq_dst_addr[2]{}, m_dreq_size = 0;
+	uint8_t m_sega_tv = 0;
+	uint16_t m_hint_vector[2]{};
+	uint16_t m_a15100_reg = 0;
+	int m_32x_68k_a15102_reg = 0;
 
-	int m_32x_pal;
-	int m_framerate;
-	int m_base_total_scanlines;
-	int m_total_scanlines;
+	int m_32x_pal = 0;
+	int m_framerate = 0;
+	int m_base_total_scanlines = 0;
+	int m_total_scanlines = 0;
 
-	uint16_t m_commsram[8];
+	uint16_t m_commsram[8]{};
 
 	std::unique_ptr<uint16_t[]> m_32x_dram0;
 	std::unique_ptr<uint16_t[]> m_32x_dram1;
-	uint16_t *m_32x_display_dram, *m_32x_access_dram;
+	uint16_t *m_32x_display_dram = nullptr, *m_32x_access_dram = nullptr;
 	std::unique_ptr<uint16_t[]> m_32x_palette;
 
-	uint16_t m_fifo_block_a[4];
-	uint16_t m_fifo_block_b[4];
-	uint16_t* m_current_fifo_block;
-	uint16_t* m_current_fifo_readblock;
-	int m_current_fifo_write_pos;
-	int m_current_fifo_read_pos;
-	int m_fifo_block_a_full;
-	int m_fifo_block_b_full;
+	uint16_t m_fifo_block_a[4]{};
+	uint16_t m_fifo_block_b[4]{};
+	uint16_t* m_current_fifo_block = nullptr;
+	uint16_t* m_current_fifo_readblock = nullptr;
+	int m_current_fifo_write_pos = 0;
+	int m_current_fifo_read_pos = 0;
+	int m_fifo_block_a_full = 0;
+	int m_fifo_block_b_full = 0;
 };
 
 

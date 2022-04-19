@@ -27,6 +27,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_A5105_FORMAT;
+extern const a5105_format FLOPPY_A5105_FORMAT;
 
 #endif // MAME_FORMATS_A5105_DSK_H

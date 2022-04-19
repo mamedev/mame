@@ -119,8 +119,8 @@ private:
 	output_finder<2> m_blueled;
 	output_finder<2> m_greenled;
 
-	bool m_ctrl_rts[2];
-	bool m_ctrl_select[2];
+	bool m_ctrl_rts[2]{};
+	bool m_ctrl_select[2]{};
 };
 
 class vsmilem_state : public vsmile_state
@@ -176,7 +176,7 @@ private:
 
 	required_ioport m_io_logo;
 
-	uint16_t m_mode;
+	uint16_t m_mode = 0;
 };
 
 #endif // MAME_INCLUDES_VSMILE_H

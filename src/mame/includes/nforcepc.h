@@ -52,7 +52,7 @@ protected:
 private:
 	required_device<device_memory_interface> cpu;
 	required_device<intelfsh8_device> biosrom;
-	uint32_t ram_size;
+	uint32_t ram_size = 0;
 
 	virtual uint8_t header_type_r() override;
 	uint8_t unknown_r();
@@ -83,9 +83,9 @@ protected:
 
 private:
 	int ddr_ram_size = 0;
-	std::vector<uint32_t> ram;
-	crush11_host_device *host;
-	address_space *ram_space;
+	std::vector<uint32_t> ram{};
+	crush11_host_device *host = nullptr;
+	address_space *ram_space = nullptr;
 };
 
 DECLARE_DEVICE_TYPE(CRUSH11_MEMORY, crush11_memory_device)
@@ -274,11 +274,11 @@ private:
 		ACPI,           // ACPI
 		Gpio567 = 12    // GPIO set 5, 6 and 7
 	};
-	int config_key_step;
-	int config_index;
-	int logical_device;
-	uint8_t global_configuration_registers[0x30];
-	uint8_t configuration_registers[13][0x100];
+	int config_key_step = 0;
+	int config_index = 0;
+	int logical_device = 0;
+	uint8_t global_configuration_registers[0x30]{};
+	uint8_t configuration_registers[13][0x100]{};
 	devcb_write_line pin_reset_callback;
 	devcb_write_line pin_gatea20_callback;
 	devcb_write_line m_txd1_callback;
@@ -292,14 +292,14 @@ private:
 	required_device<ns16450_device> pc_serial1_comdev;
 	required_device<ns16450_device> pc_serial2_comdev;
 	required_device<kbdc8042_device> m_kbdc;
-	bool enabled_logical[13];
-	bool enabled_game_port;
-	bool enabled_midi_port;
+	bool enabled_logical[13]{};
+	bool enabled_game_port = false;
+	bool enabled_midi_port = false;
 
-	lpcbus_host_interface *lpchost;
-	int lpcindex;
-	address_space *memspace;
-	address_space *iospace;
+	lpcbus_host_interface *lpchost = nullptr;
+	int lpcindex = 0;
+	address_space *memspace = nullptr;
+	address_space *iospace = nullptr;
 
 	void internal_memory_map(address_map &map);
 	void internal_io_map(address_map &map);

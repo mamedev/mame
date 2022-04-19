@@ -809,31 +809,31 @@ ROM_END
 } // Anonymous namespace
 
 // system 3, 2-player, with beep sounds, playable
-GAME(1981, arizona,  0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "Arizona",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, atla_ltd, 0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "Atlantis (LTD)",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, discodan, 0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "Disco Dancing",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, hustlerp, 0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "Hustler",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, marqueen, 0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "Martian Queen",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, kkongltd, 0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "King Kong",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(198?, vikngkng, 0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "Viking King",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, arizona,  0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "Arizona",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, atla_ltd, 0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "Atlantis (LTD)",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, discodan, 0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "Disco Dancing",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, hustlerp, 0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "Hustler",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, marqueen, 0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "Martian Queen",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, kkongltd, 0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "King Kong",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(198?, vikngkng, 0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "Viking King",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
 // system 3, 2-player, unknown sound system, playable
-GAME(1981, force,    0,        ltd3, ltd3, ltd3_state, init_1,   ROT0, "LTD", "Force",                             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, bhol_ltd, 0,        ltd3, ltd3, ltd3_state, init_2,   ROT0, "LTD", "Black Hole (LTD)",                  MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, spcpoker, 0,        ltd3, ltd3, ltd3_state, init_2,   ROT0, "LTD", "Space Poker",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, force,    0,        ltd3, ltd3, ltd3_state, init_1,   ROT0, "LTD", "Force",                             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, bhol_ltd, 0,        ltd3, ltd3, ltd3_state, init_2,   ROT0, "LTD", "Black Hole (LTD)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, spcpoker, 0,        ltd3, ltd3, ltd3_state, init_2,   ROT0, "LTD", "Space Poker",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
 // system 3, 3-player, ay sounds, unplayable
-GAME(1981, cowboy,   0,        ltd3, ltd3, ltd3_state, init_3,   ROT0, "LTD", "Cowboy Eight Ball (set 1)",         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, cowboya,  cowboy,   ltd3, ltd3, ltd3_state, init_3,   ROT0, "LTD", "Cowboy Eight Ball (set 2)",         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, zephy,    0,        ltd3, ltd3, ltd3_state, init_3,   ROT0, "LTD", "Zephy (set 1)",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, zephya,   zephy,    ltd3, ltd3, ltd3_state, init_3,   ROT0, "LTD", "Zephy (set 2)",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, cowboy,   0,        ltd3, ltd3, ltd3_state, init_3,   ROT0, "LTD", "Cowboy Eight Ball (set 1)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, cowboya,  cowboy,   ltd3, ltd3, ltd3_state, init_3,   ROT0, "LTD", "Cowboy Eight Ball (set 2)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, zephy,    0,        ltd3, ltd3, ltd3_state, init_3,   ROT0, "LTD", "Zephy (set 1)",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, zephya,   zephy,    ltd3, ltd3, ltd3_state, init_3,   ROT0, "LTD", "Zephy (set 2)",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
 // system 4, mostly 4-player, ay sounds, unplayable
-GAME(1982, cowboy2,  0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Cowboy Eight Ball 2",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, hhotel,   0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Haunted Hotel",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, pecmen,   0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Mr. & Mrs. Pec-Men",                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, alcapone, 0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Al Capone",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1982, columbia, 0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Columbia",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, tmacltd4, 0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Time Machine (LTD, 4 players)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, tmacltd2, tmacltd4, ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Time Machine (LTD, 2 players)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1982, tricksht, 0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Trick Shooter",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1982, cowboy2,  0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Cowboy Eight Ball 2",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, hhotel,   0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Haunted Hotel",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, pecmen,   0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Mr. & Mrs. Pec-Men",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, alcapone, 0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Al Capone",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1982, columbia, 0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Columbia",                          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, tmacltd4, 0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Time Machine (LTD, 4 players)",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, tmacltd2, tmacltd4, ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Time Machine (LTD, 2 players)",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1982, tricksht, 0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Trick Shooter",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

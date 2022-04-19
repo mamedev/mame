@@ -34,7 +34,7 @@
 
     TODO:
 
-	- z80dma.cpp register read must return byte UP counter value (0x200 at end of block, not 0 as it does now)
+    - z80dma.cpp register read must return byte UP counter value (0x200 at end of block, not 0 as it does now)
     - short/long reset (RSTBUT)
     - CIO
         - optimize timers!
@@ -424,7 +424,7 @@ void abc1600_state::spec_contr_reg_w(uint8_t data)
 		break;
 
 	case 4: // PARTST
-		m_partst = state;
+		m_mac->partst_w(state);
 		break;
 
 	case 5: // _DMADIS
@@ -815,7 +815,6 @@ void abc1600_state::machine_start()
 	save_item(NAME(m_dmadis));
 	save_item(NAME(m_sysscc));
 	save_item(NAME(m_sysfs));
-	save_item(NAME(m_partst));
 	save_item(NAME(m_cs7));
 	save_item(NAME(m_bus0));
 	save_item(NAME(m_csb));

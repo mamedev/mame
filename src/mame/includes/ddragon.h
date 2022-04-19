@@ -72,20 +72,20 @@ protected:
 	optional_memory_bank m_mainbank;
 
 	/* video-related */
-	tilemap_t      *m_fg_tilemap;
-	tilemap_t      *m_bg_tilemap;
-	uint8_t        m_technos_video_hw;
-	uint8_t        m_scrollx_hi;
-	uint8_t        m_scrolly_hi;
+	tilemap_t      *m_fg_tilemap = nullptr;
+	tilemap_t      *m_bg_tilemap = nullptr;
+	uint8_t        m_technos_video_hw = 0;
+	uint8_t        m_scrollx_hi = 0;
+	uint8_t        m_scrolly_hi = 0;
 
 	/* misc */
-	uint8_t        m_ddragon_sub_port;
-	uint8_t        m_sprite_irq;
-	uint8_t        m_adpcm_sound_irq;
-	uint32_t       m_adpcm_pos[2];
-	uint32_t       m_adpcm_end[2];
-	bool           m_adpcm_idle[2];
-	int            m_adpcm_data[2];
+	uint8_t        m_ddragon_sub_port = 0;
+	uint8_t        m_sprite_irq = 0;
+	uint8_t        m_adpcm_sound_irq = 0;
+	uint32_t       m_adpcm_pos[2]{};
+	uint32_t       m_adpcm_end[2]{};
+	bool           m_adpcm_idle[2]{};
+	int            m_adpcm_data[2]{};
 
 	void ddragon_bgvideoram_w(offs_t offset, uint8_t data);
 	void ddragon_fgvideoram_w(offs_t offset, uint8_t data);
@@ -180,7 +180,7 @@ private:
 	required_device<address_map_bank_device> m_darktowr_bank;
 	required_shared_ptr<uint8_t> m_rambase;
 
-	uint8_t m_mcu_port_a_out;
+	uint8_t m_mcu_port_a_out = 0;
 };
 
 

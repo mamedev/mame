@@ -20,6 +20,11 @@ Status:
 - Skeletons
 
 TODO:
+- Inputs
+- Outputs
+- Save states
+- Sound
+- Mechanical sounds
 - Almost everything
 - Value of crystal on audio cpu
 - Outputs (solenoids, lamps)

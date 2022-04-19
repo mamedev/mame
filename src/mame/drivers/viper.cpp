@@ -2541,9 +2541,7 @@ INTERRUPT_GEN_MEMBER(viper_state::viper_vblank)
 
 WRITE_LINE_MEMBER(viper_state::voodoo_vblank)
 {
-	// FIXME: The driver seems to hang using the voodoo vblank signal
-	// Seems to only work if using negative vsync
-	if (!state)
+	if (state)
 	  mpc8240_interrupt(MPC8240_IRQ0);
 	//mpc8240_interrupt(MPC8240_IRQ3);
 }

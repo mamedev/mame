@@ -76,6 +76,7 @@ private:
 		const char *name() const;
 		bool is_call() const;
 		bool is_return() const;
+		bool is_cond() const;
 	};
 
 	static const char *const s_opnames[];

@@ -120,28 +120,28 @@ protected:
 	required_shared_ptr<uint16_t> m_subram0;
 
 	// configuration
-	bool            m_adc_reverse[8];
-	uint8_t           m_road_priority;
+	bool            m_adc_reverse[8]{};
+	uint8_t           m_road_priority = 0;
 
 	// internal state
-	emu_timer *     m_scanline_timer;
-	uint8_t           m_timer_irq_state;
-	uint8_t           m_vblank_irq_state;
-	uint8_t           m_pc_0;
+	emu_timer *     m_scanline_timer = nullptr;
+	uint8_t           m_timer_irq_state = 0;
+	uint8_t           m_vblank_irq_state = 0;
+	uint8_t           m_pc_0 = 0;
 
 	// game-specific state
-	uint16_t *        m_loffire_sync;
-	uint8_t           m_lastsurv_mux;
+	uint16_t *        m_loffire_sync = 0;
+	uint8_t           m_lastsurv_mux = 0;
 
 	// memory pointers
 	required_shared_ptr<uint16_t> m_paletteram;
-	bool            m_gprider_hack;
+	bool            m_gprider_hack = false;
 
 	void palette_init();
-	uint32_t      m_palette_entries;          // number of palette entries
-	uint8_t       m_palette_normal[32];       // RGB translations for normal pixels
-	uint8_t       m_palette_shadow[32];       // RGB translations for shadowed pixels
-	uint8_t       m_palette_hilight[32];      // RGB translations for hilighted pixels
+	uint32_t      m_palette_entries = 0;          // number of palette entries
+	uint8_t       m_palette_normal[32]{};       // RGB translations for normal pixels
+	uint8_t       m_palette_shadow[32]{};       // RGB translations for shadowed pixels
+	uint8_t       m_palette_hilight[32]{};      // RGB translations for hilighted pixels
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_ioport m_io0_porta;
@@ -244,7 +244,7 @@ private:
 	required_device<mb8421_device> m_commram;
 	required_device<i8251_device> m_usart;
 
-	uint8_t m_commram_bank;
+	uint8_t m_commram_bank = 0;
 };
 
 #endif // MAME_INCLUDES_SEGAXBD_H

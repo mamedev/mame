@@ -141,12 +141,12 @@ private:
 	required_shared_ptr<uint16_t> m_workram;
 
 	// configuration
-	bool                    m_sharrier_video;
+	bool                    m_sharrier_video = false;
 
 	// internal state
-	uint8_t                   m_adc_select;
+	uint8_t                   m_adc_select = 0;
 	optional_ioport_array<4> m_adc_ports;
-	bool                    m_shadow;
+	bool                    m_shadow = false;
 	optional_shared_ptr<uint16_t> m_decrypted_opcodes;
 	output_finder<2> m_lamps;
 };

@@ -19,11 +19,11 @@ class exidy_sound_device : public device_t,
 	/* 6840 variables */
 	struct sh6840_timer_channel
 	{
-		uint8_t   cr;
-		uint8_t   state;
-		uint8_t   leftovers;
-		uint16_t  timer;
-		uint32_t  clocks;
+		uint8_t   cr = 0;
+		uint8_t   state = 0;
+		uint8_t   leftovers = 0;
+		uint16_t  timer = 0;
+		uint32_t  clocks = 0;
 		union
 		{
 #ifdef LSB_FIRST
@@ -90,11 +90,11 @@ class exidy_sh8253_sound_device : public exidy_sound_device
 {
 	struct sh8253_timer_channel
 	{
-		uint8_t   clstate;
-		uint8_t   enable;
-		uint16_t  count;
-		uint32_t  step;
-		uint32_t  fraction;
+		uint8_t   clstate = 0;
+		uint8_t   enable = 0;
+		uint16_t  count = 0;
+		uint32_t  step = 0;
+		uint32_t  fraction = 0;
 	};
 
 protected:
@@ -224,8 +224,8 @@ private:
 
 	TIMER_CALLBACK_MEMBER( delayed_command_w );
 
-	int m_pia_ca1;
-	int m_pia_cb1;
+	int m_pia_ca1 = 0;
+	int m_pia_cb1 = 0;
 };
 
 DECLARE_DEVICE_TYPE(EXIDY_VICTORY, victory_sound_device)

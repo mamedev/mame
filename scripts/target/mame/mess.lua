@@ -123,7 +123,7 @@ CPUS["UNSP"] = true
 CPUS["HCD62121"] = true
 CPUS["PPS4"] = true
 CPUS["PPS41"] = true
-CPUS["B5000"] = true
+CPUS["RW5000"] = true
 CPUS["UPD7725"] = true
 CPUS["HD61700"] = true
 CPUS["LC8670"] = true
@@ -961,6 +961,7 @@ BUSES["PSX_PARALLEL"] = true
 BUSES["QBUS"] = true
 BUSES["QL"] = true
 BUSES["RS232"] = true
+BUSES["PC8801"] = true
 BUSES["RTPC_KBD"] = true
 BUSES["S100"] = true
 BUSES["SAITEK_OSA"] = true
@@ -2252,7 +2253,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/ac1.cpp",
 	MAME_DIR .. "src/mame/drivers/bcs3.cpp",
 	MAME_DIR .. "src/mame/drivers/c80.cpp",
-	MAME_DIR .. "src/mame/includes/c80.h",
 	MAME_DIR .. "src/mame/drivers/huebler.cpp",
 	MAME_DIR .. "src/mame/includes/huebler.h",
 	MAME_DIR .. "src/mame/drivers/jtc.cpp",
@@ -2410,9 +2410,6 @@ files {
 createMESSProjects(_target, _subtarget, "entex")
 files {
 	MAME_DIR .. "src/mame/drivers/advision.cpp",
-	MAME_DIR .. "src/mame/includes/advision.h",
-	MAME_DIR .. "src/mame/machine/advision.cpp",
-	MAME_DIR .. "src/mame/video/advision.cpp",
 	MAME_DIR .. "src/mame/drivers/sag.cpp",
 }
 
@@ -2771,6 +2768,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/ipc.cpp",
 	MAME_DIR .. "src/mame/drivers/ipds.cpp",
 	MAME_DIR .. "src/mame/drivers/isbc.cpp",
+	MAME_DIR .. "src/mame/drivers/isbc660.cpp",
 	MAME_DIR .. "src/mame/drivers/isbc8010.cpp",
 	MAME_DIR .. "src/mame/drivers/isbc8030.cpp",
 	MAME_DIR .. "src/mame/machine/imm6_76.cpp",
@@ -3554,6 +3552,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/roland_sc55.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_sc88.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_tb303.cpp",
+	MAME_DIR .. "src/mame/drivers/roland_tnsc1.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_tr505.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_tr606.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_tr707.cpp",
@@ -3589,8 +3588,8 @@ files {
 	MAME_DIR .. "src/mame/includes/aim65.h",
 	MAME_DIR .. "src/mame/machine/aim65.cpp",
 	MAME_DIR .. "src/mame/drivers/aim65_40.cpp",
-	MAME_DIR .. "src/mame/drivers/hh_b5000.cpp",
 	MAME_DIR .. "src/mame/drivers/hh_pps41.cpp",
+	MAME_DIR .. "src/mame/drivers/hh_rw5000.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "rtpc")
@@ -4711,6 +4710,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mstation.cpp",
 	MAME_DIR .. "src/mame/drivers/mt735.cpp",
 	MAME_DIR .. "src/mame/drivers/mtd1256.cpp",
+	MAME_DIR .. "src/mame/drivers/mw4pole.cpp",
 	MAME_DIR .. "src/mame/drivers/mx2178.cpp",
 	MAME_DIR .. "src/mame/drivers/mycom.cpp",
 	MAME_DIR .. "src/mame/drivers/myvision.cpp",

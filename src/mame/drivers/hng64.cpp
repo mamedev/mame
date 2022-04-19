@@ -32,7 +32,7 @@ Notes:
   * Xrally and Roads Edge have a symbols table at respectively 0xb2f30 and 0xe10c0
 
 ToDo:
-  * Sprite garbage in Beast Busters 2nd Nightmare, another irq issue?
+  * Sprite garbage in Beast Busters: Second Nightmare, another irq issue?
   * Samurai Shodown 64 2 puts "Press 1p & 2p button" msg in gameplay, known to be a MCU simulation issue, i/o port 4 doesn't
     seem to be just an input port but controls program flow too.
   * Work out the purpose of the interrupts and how many are needed.
@@ -74,11 +74,11 @@ This is a 3D system comprising....
 
 There are only 7 games on this system. In some cases the game name changes depending on the BIOS region.
 The games in order of release are....
-001 Roads Edge / Round Trip
+001 Roads Edge / Round Trip RV
 002 Samurai Shodown 64 / Samurai Spirits 64
 003 Xtreme Rally / Off Beat Racer!
-004 Beast Busters 2nd Nightmare
-005 Samurai Shodown: Warrior's Rage / Samurai Spirits 2: Asura Zanmaden
+004 Beast Busters: Second Nightmare
+005 Samurai Shodown 64: Warriors Rage / Samurai Spirits 2: Asura Zanmaden
 006 Fatal Fury: Wild Ambition / Garou Densetsu: Wild Ambition
 007 Buriki One: World Grapple Tournament '99 in Tokyo
 
@@ -257,7 +257,7 @@ A special I/O board is required to boot the system which plugs into two custom c
 There are 3 types:
 LVS-IOJ runs the driving games and the Samurai Showdown games.
 LVS-JAM runs all of the fighting games.
-LVS-IGX runs the gun game (Beast Busters 2nd Nightmare).
+LVS-IGX runs the gun game (Beast Busters: Second Nightmare).
 Note using an incompatible game and I/O board combination will result in an error at bootup 'MACHINE CODE ERROR'
 For the driving games the network is also checked.
 As a work-around, to satisfy the network check on driving games simply join CON8 pins 1, 3, 5, 6, 7 & 8 then the
@@ -348,7 +348,7 @@ Notes:
 
 The second I/O board 'LVS-IGX' dated 10-11-1997 does not have a JAMMA edge connector. It has the same 6-pin JST VH power connector on the
 bottom of the board. There are several JST XA connectors for hooking up the controls. There is no audio power AMP or volume pot on the
-board. This board only runs the gun game 'Beast Busters 2nd Nightmare'.
+board. This board only runs the gun game 'Beast Busters: Second Nightmare'.
 
 LVS-IGX SNK 1997.11.10
 |---------------------------------------------|
@@ -493,16 +493,16 @@ The actual carts are only about 1/4 to 1/3rd populated.
 Some of the IC locations between DG1 and DG2 are different also. See the source code below
 for the exact number of ROMs used per game and ROM placements.
 
-Games that use the LVS-DG1 cart: Road's Edge / Round Trip
+Games that use the LVS-DG1 cart: Road's Edge / Round Trip RV
                                  Xtreme Rally / Off Beat Racer!
-                                 Beast Busters 2nd Nightmare
+                                 Beast Busters: Second Nightmare
                                  Samurai Shodown 64 / Samurai Spirits 64
 
-Games that use the LVS-DG2 cart: Fatal Fury: Wild Ambition
-                                 Buriki One
-                                 Samurai Shodown: Warrior's Rage / Samurai Spirits 2: Asura Zanmaden
+Games that use the LVS-DG2 cart: Fatal Fury: Wild Ambition / Garou Densetsu: Wild Ambition
+                                 Buriki One: World Grapple Tournament '99 in Tokyo
+                                 Samurai Shodown 64: Warriors Rage / Samurai Spirits 2: Asura Zanmaden
 
-There might be a Rev.A program for Buriki One and Round Trip, we have Rev. B dumps.
+There might be a Rev.A program for Buriki One and Round Trip RV, we have Rev. B dumps.
 
 pr = program
 sc = scroll characters
@@ -2919,10 +2919,10 @@ ROM_END
 GAME( 1997, hng64,    0,     hng64_default, hng64,    hng64_state, init_hng64,       ROT0, "SNK", "Hyper NeoGeo 64 Bios", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND|MACHINE_IS_BIOS_ROOT )
 
 /* Games */
-GAME( 1997, roadedge, hng64, hng64_drive, hng64_drive,    hng64_state, init_roadedge,    ROT0, "SNK", "Roads Edge / Round Trip (rev.B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 001 */
+GAME( 1997, roadedge, hng64, hng64_drive, hng64_drive,    hng64_state, init_roadedge,    ROT0, "SNK", "Roads Edge / Round Trip RV (rev.B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 001 */
 GAME( 1998, sams64,   hng64, hng64_fight, hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK", "Samurai Shodown 64 / Samurai Spirits 64", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND ) /* 002 */
 GAME( 1998, xrally,   hng64, hng64_drive, hng64_drive,    hng64_state, init_hng64_drive, ROT0, "SNK", "Xtreme Rally / Off Beat Racer!", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 003 */
-GAME( 1998, bbust2,   hng64, hng64_shoot, hng64_shoot,    hng64_state, init_hng64_shoot, ROT0, "SNK", "Beast Busters 2nd Nightmare", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 004 */
-GAME( 1998, sams64_2, hng64, hng64_fight, hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK", "Samurai Shodown: Warrior's Rage / Samurai Spirits 2: Asura Zanmaden", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND ) /* 005 */
-GAME( 1998, fatfurwa, hng64, hng64_fight, hng64_fight,    hng64_state, init_hng64_fght,  ROT0, "SNK", "Fatal Fury: Wild Ambition (rev.A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 006 */
-GAME( 1999, buriki,   hng64, hng64_fight, hng64_fight,    hng64_state, init_hng64_fght,  ROT0, "SNK", "Buriki One (rev.B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 007 */
+GAME( 1998, bbust2,   hng64, hng64_shoot, hng64_shoot,    hng64_state, init_hng64_shoot, ROT0, "SNK", "Beast Busters: Second Nightmare", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 004 */
+GAME( 1998, sams64_2, hng64, hng64_fight, hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK", "Samurai Shodown 64: Warriors Rage / Samurai Spirits 2: Asura Zanmaden", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND ) /* 005 */
+GAME( 1998, fatfurwa, hng64, hng64_fight, hng64_fight,    hng64_state, init_hng64_fght,  ROT0, "SNK", "Fatal Fury: Wild Ambition / Garou Densetsu: Wild Ambition (rev.A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 006 */
+GAME( 1999, buriki,   hng64, hng64_fight, hng64_fight,    hng64_state, init_hng64_fght,  ROT0, "SNK", "Buriki One: World Grapple Tournament '99 in Tokyo (rev.B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 007 */

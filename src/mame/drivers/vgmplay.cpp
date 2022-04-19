@@ -473,7 +473,7 @@ public:
 private:
 	virtual void machine_start() override;
 
-	uint32_t m_held_clock;
+	uint32_t m_held_clock = 0;
 	std::vector<uint8_t> m_file_data;
 	required_device<vgmplay_device> m_vgmplay;
 	required_device<vgmviz_device> m_mixer;

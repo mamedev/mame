@@ -8,7 +8,6 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "dspp.h"
 #include "dsppfe.h"
 #include "cpu/drcfe.h"

@@ -2406,6 +2406,8 @@ if (BUSES["VME"]~=null) then
 		MAME_DIR .. "src/devices/bus/vme/vme_fcscsi.h",
 		MAME_DIR .. "src/devices/bus/vme/vme_hcpu30.cpp",
 		MAME_DIR .. "src/devices/bus/vme/vme_hcpu30.h",
+		MAME_DIR .. "src/devices/bus/vme/vme_smvme2000.cpp",
+		MAME_DIR .. "src/devices/bus/vme/vme_smvme2000.h",
 	}
 end
 
@@ -4667,6 +4669,8 @@ if (BUSES["MULTIBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/multibus/multibus.h",
 		MAME_DIR .. "src/devices/bus/multibus/isbc202.cpp",
 		MAME_DIR .. "src/devices/bus/multibus/isbc202.h",
+		MAME_DIR .. "src/devices/bus/multibus/isbc8024.cpp",
+		MAME_DIR .. "src/devices/bus/multibus/isbc8024.h",
 		MAME_DIR .. "src/devices/bus/multibus/cpuap.cpp",
 		MAME_DIR .. "src/devices/bus/multibus/cpuap.h",
 		MAME_DIR .. "src/devices/bus/multibus/serad.cpp",
@@ -4807,5 +4811,25 @@ if (BUSES["PCE_CTRL"]~=null) then
 		MAME_DIR .. "src/devices/bus/pce_ctrl/joypad6.h",
 		MAME_DIR .. "src/devices/bus/pce_ctrl/multitap.cpp",
 		MAME_DIR .. "src/devices/bus/pce_ctrl/multitap.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/pc8801/pc8801_31.h,BUSES["PC8801"] = true
+---------------------------------------------------
+
+if (BUSES["PC8801"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/pc8801/pc8801_23.cpp",
+		MAME_DIR .. "src/devices/bus/pc8801/pc8801_23.h",
+		MAME_DIR .. "src/devices/bus/pc8801/pc8801_31.cpp",
+		MAME_DIR .. "src/devices/bus/pc8801/pc8801_31.h",
+		MAME_DIR .. "src/devices/bus/pc8801/pc8801_exp.cpp",
+		MAME_DIR .. "src/devices/bus/pc8801/pc8801_exp.h",
+		MAME_DIR .. "src/devices/bus/pc8801/pcg8100.cpp",
+		MAME_DIR .. "src/devices/bus/pc8801/pcg8100.h",
+		MAME_DIR .. "src/devices/bus/pc8801/jmbx1.cpp",
+		MAME_DIR .. "src/devices/bus/pc8801/jmbx1.h",
 	}
 end

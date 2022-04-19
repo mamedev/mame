@@ -183,7 +183,7 @@ private:
 	uint16_t m_page = 0U;
 	std::unique_ptr<uint8_t[]> m_work_ram;
 	attotime m_time;
-	bool m_centronics_busy = 0;
+	bool m_centronics_busy = false;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<z80_device> m_maincpu;

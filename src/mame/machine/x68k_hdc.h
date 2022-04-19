@@ -113,17 +113,17 @@ protected:
 private:
 	TIMER_CALLBACK_MEMBER(req_timer_callback);
 
-	sasi_phase m_phase;
-	u8 m_status_port;  // read at 0xe96003
-	u8 m_status;       // status phase output
-	u8 m_command[10];
-	u8 m_sense[4];
-	u16 m_command_byte_count;
-	u16 m_command_byte_total;
-	u8 m_current_command;
-	u16 m_transfer_byte_count;
-	u16 m_transfer_byte_total;
-	emu_timer *m_req_timer;
+	sasi_phase m_phase{};
+	u8 m_status_port = 0;  // read at 0xe96003
+	u8 m_status = 0;       // status phase output
+	u8 m_command[10]{};
+	u8 m_sense[4]{};
+	u16 m_command_byte_count = 0;
+	u16 m_command_byte_total = 0;
+	u8 m_current_command = 0;
+	u16 m_transfer_byte_count = 0;
+	u16 m_transfer_byte_total = 0;
+	emu_timer *m_req_timer = nullptr;
 };
 
 // device type definition

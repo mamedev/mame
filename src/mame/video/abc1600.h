@@ -110,31 +110,31 @@ private:
 	required_region_ptr<uint8_t> m_shinf_rom;
 	required_region_ptr<uint16_t> m_drmsk_rom;
 
-	int m_endisp;               // enable display
-	int m_clocks_disabled;      // clocks disabled
-	uint16_t m_gmdi;              // video RAM data latch
-	uint16_t m_wrm;               // write mask latch
-	uint8_t m_ms[16];             // mover sequence control
-	uint8_t m_ds[16];             // display sequence control
-	uint8_t m_flag;               // flags
-	uint16_t m_xsize;             // X size
-	uint16_t m_ysize;             // Y size
-	int m_udx;                  // up/down X
-	int m_udy;                  // up/down Y
-	uint16_t m_xfrom;             // X from
-	uint16_t m_xto;               // X to
-	uint16_t m_yto;               // Y to
-	uint16_t m_ty;                // to Y
-	uint32_t m_mfa;               // mover from address
-	uint32_t m_mta;               // mover to address
-	uint8_t m_sh;                 //
-	uint16_t m_mdor;              //
-	int m_hold_1w_cyk;          //
-	int m_wrms0;                //
-	int m_wrms1;                //
-	int m_rmc;                  // row match count
-	int m_cmc;                  // column match count
-	int m_amm;                  // active mover mask
+	int m_endisp = 0;               // enable display
+	int m_clocks_disabled = 0;      // clocks disabled
+	uint16_t m_gmdi = 0;              // video RAM data latch
+	uint16_t m_wrm = 0;               // write mask latch
+	uint8_t m_ms[16]{};             // mover sequence control
+	uint8_t m_ds[16]{};             // display sequence control
+	uint8_t m_flag = 0;               // flags
+	uint16_t m_xsize = 0;             // X size
+	uint16_t m_ysize = 0;             // Y size
+	int m_udx = 0;                  // up/down X
+	int m_udy = 0;                  // up/down Y
+	uint16_t m_xfrom = 0;             // X from
+	uint16_t m_xto = 0;               // X to
+	uint16_t m_yto = 0;               // Y to
+	uint16_t m_ty = 0;                // to Y
+	uint32_t m_mfa = 0;               // mover from address
+	uint32_t m_mta = 0;               // mover to address
+	uint8_t m_sh = 0;                 //
+	uint16_t m_mdor = 0;              //
+	int m_hold_1w_cyk = 0;          //
+	int m_wrms0 = 0;                //
+	int m_wrms1 = 0;                //
+	int m_rmc = 0;                  // row match count
+	int m_cmc = 0;                  // column match count
+	int m_amm = 0;                  // active mover mask
 };
 
 

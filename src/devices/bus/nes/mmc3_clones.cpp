@@ -52,6 +52,7 @@ DEFINE_DEVICE_TYPE(NES_COCOMA,        nes_cocoma_device,        "nes_cocoma",   
 DEFINE_DEVICE_TYPE(NES_GOUDER,        nes_gouder_device,        "nes_gouder",        "NES Cart Gouder PCB")
 DEFINE_DEVICE_TYPE(NES_SA9602B,       nes_sa9602b_device,       "nes_sa9602b",       "NES Cart SA-9602B PCB")
 DEFINE_DEVICE_TYPE(NES_SACHEN_SHERO,  nes_sachen_shero_device,  "nes_shero",         "NES Cart Street Hero PCB")
+DEFINE_DEVICE_TYPE(NES_SACHEN_ZGDH,   nes_sachen_zgdh_device,   "nes_zgdh",          "NES Cart Zhongguo Daheng PCB")
 DEFINE_DEVICE_TYPE(NES_A9746,         nes_a9746_device,         "nes_bmc_a9746",     "NES Cart A-9746 PCB")
 
 DEFINE_DEVICE_TYPE(NES_A88S1,         nes_a88s1_device,         "nes_a88s1",         "NES Cart BMC A88S-1 PCB")
@@ -291,6 +292,11 @@ nes_sachen_shero_device::nes_sachen_shero_device(const machine_config &mconfig, 
 	: nes_txrom_device(mconfig, NES_SACHEN_SHERO, tag, owner, clock)
 	, m_jumper(*this, "JUMPER")
 	, m_reg(0)
+{
+}
+
+nes_sachen_zgdh_device::nes_sachen_zgdh_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_SACHEN_ZGDH, tag, owner, clock), m_reg(0)
 {
 }
 
@@ -689,6 +695,20 @@ void nes_sachen_shero_device::pcb_reset()
 	mmc3_common_initialize(0xff, 0xff, 0);
 }
 
+void nes_sachen_zgdh_device::device_start()
+{
+	mmc3_start();
+	save_item(NAME(m_reg));
+}
+
+void nes_sachen_zgdh_device::pcb_reset()
+{
+	assert(m_vram.size() >= 0x2000);
+
+	m_reg = 0;
+	mmc3_common_initialize(0x1f, 0x7f, 0);
+}
+
 void nes_a9746_device::device_start()
 {
 	mmc3_start();
@@ -909,8 +929,6 @@ void nes_bmc_f600_device::device_start()
 
 void nes_bmc_f600_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-
 	m_reg = 0;
 	mmc3_common_initialize(0x1f, 0x7f, 0);
 }
@@ -1021,8 +1039,6 @@ void nes_bmc_810305c_device::device_start()
 
 void nes_bmc_810305c_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-
 	m_outer = 0;
 	mmc3_common_initialize(0x1f, 0x7f, 0);
 }
@@ -2118,6 +2134,61 @@ u8 nes_sachen_shero_device::read_l(offs_t offset)
 
 /*-------------------------------------------------
 
+ SACHEN-ZGDH
+
+ Sachen board used for Zhongguo Daheng
+
+ NES 2.0: mapper 512
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+u8 nes_sachen_zgdh_device::nt_r(offs_t offset)
+{
+	if (m_reg == 1)
+		return m_vram[0x1000 + (offset & 0x0fff)];
+	else
+		return device_nes_cart_interface::nt_r(offset);
+}
+
+void nes_sachen_zgdh_device::nt_w(offs_t offset, u8 data)
+{
+	if (m_reg == 1)
+		m_vram[0x1000 + (offset & 0x0fff)] = data;
+	else
+		device_nes_cart_interface::nt_w(offset, data);
+}
+
+void nes_sachen_zgdh_device::set_chr(u8 chr, int chr_base, int chr_mask)
+{
+	if (m_reg <= 1)
+	{
+		chr = CHRROM;
+		m_chr_mask = 0x7f;
+	}
+	else
+	{
+		chr = CHRRAM;
+		m_chr_mask = 0x03;
+	}
+	nes_txrom_device::set_chr(chr, chr_base, m_chr_mask);
+}
+
+void nes_sachen_zgdh_device::write_l(offs_t offset, u8 data)
+{
+	LOG_MMC(("zgdh write_l, offset: %04x, data: %02x\n", offset, data));
+
+	offset += 0x100;
+	if ((offset & 0x1100) == 0x0100)
+	{
+		m_reg = data & 0x03;
+		set_chr(m_chr_source, m_chr_base, m_chr_mask);
+	}
+}
+
+/*-------------------------------------------------
+
  UNL-A9746
 
  Games: Toy Story, Super 1997 4 in 1 (NT-8029)
@@ -2253,7 +2324,7 @@ void nes_fk23c_device::chr_cb(int start, int bank, int source)
 void nes_fk23c_device::fk23c_set_prg()
 {
 	if ((m_reg[0] & 0x07) == 4)
-		prg32((m_reg[1] & 0x7f) >> 1);
+		prg32(BIT(m_reg[1], 1, 6));
 	else if ((m_reg[0] & 0x07) == 3)
 	{
 		prg16_89ab(m_reg[1] & 0x7f);
@@ -3010,12 +3081,12 @@ void nes_bmc_f600_device::write_h(offs_t offset, u8 data)
 		nes_txrom_device::write_h(offset, data);
 }
 
-void nes_bmc_f600_device::chr_cb(int start, int bank, int source)
+void nes_bmc_f600_device::set_chr(u8 chr, int chr_base, int chr_mask)
 {
 	if ((m_reg & 0x07) == 1)
-		nes_txsrom_device::chr_cb(start, bank, source);
+		nes_txsrom_device::set_chr(chr, chr_base, chr_mask);
 	else
-		nes_txrom_device::chr_cb(start, bank, source);
+		nes_txrom_device::set_chr(chr, chr_base, chr_mask);
 }
 
 /*-------------------------------------------------
@@ -3328,7 +3399,7 @@ void nes_bmc_411120c_device::write_m(offs_t offset, u8 data)
 	{
 		m_reg = offset;
 		if (BIT(m_reg, 3))
-			prg32((m_reg & 0x07) << 2 | (m_reg & 0x30) >> 4);
+			prg32(bitswap<5>(m_reg, 2, 1, 0, 5, 4));
 		else
 		{
 			m_prg_base = (m_reg & 0x07) << 4;
@@ -3377,16 +3448,10 @@ void nes_bmc_810305c_device::set_chr(u8 chr, int chr_base, int chr_mask)
 {
 	if (m_outer == 2 && BIT(m_mmc_vrom_bank[0], 7))
 		chr8(0, CHRRAM);
-	else
+	else if (m_outer)
 		nes_txrom_device::set_chr(chr, chr_base, chr_mask);
-}
-
-void nes_bmc_810305c_device::chr_cb(int start, int bank, int source)
-{
-	if (m_outer)
-		nes_txrom_device::chr_cb(start, bank, source);
 	else
-		nes_txsrom_device::chr_cb(start, bank, source);
+		nes_txsrom_device::set_chr(chr, chr_base, chr_mask);
 }
 
 void nes_bmc_810305c_device::write_h(offs_t offset, u8 data)

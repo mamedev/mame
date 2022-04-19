@@ -155,21 +155,21 @@ private:
 	optional_ioport_array<2> m_steer;
 	output_finder<4> m_leds;
 
-	uint8_t m_in_service_mode;
-	uint32_t m_dial[2];
-	uint8_t m_steer_dir[2];
-	uint8_t m_steer_flag[2];
-	uint8_t m_gear;
+	uint8_t m_in_service_mode = 0;
+	uint32_t m_dial[2]{};
+	uint8_t m_steer_dir[2]{};
+	uint8_t m_steer_flag[2]{};
+	uint8_t m_gear = 0;
 
-	uint8_t m_flash;
-	uint8_t m_crash[2];
-	uint8_t m_skid[2];
+	uint8_t m_flash = 0;
+	uint8_t m_crash[2]{};
+	uint8_t m_skid[2]{};
 	bitmap_ind16 m_helper1;
 	bitmap_ind16 m_helper2;
-	uint32_t m_color1_mask;
-	uint32_t m_color2_mask;
-	tilemap_t *m_tilemap1;
-	tilemap_t *m_tilemap2;
+	uint32_t m_color1_mask = 0;
+	uint32_t m_color2_mask = 0;
+	tilemap_t *m_tilemap1 = nullptr;
+	tilemap_t *m_tilemap2 = nullptr;
 };
 
 

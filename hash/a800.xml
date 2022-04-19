@@ -4318,6 +4318,30 @@ Compiled by K1W1
 		</part>
 	</software>
 
+	<software name="popeyep" cloneof="popeye">
+		<description>Popeye (prototype, 19830829)</description>
+		<year>1983</year>
+		<publisher>Parker Brothers</publisher>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_16k" />
+			<dataarea name="rom" size="16384">
+				<rom name="popeye (8-29-83).rom" size="16384" crc="34bcdb96" sha1="a2183d6a89d12c7b6b9fbacc4af1fa61370079e6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="popeyep1" cloneof="popeye">
+		<description>Popeye (prototype, WIP8)</description>
+		<year>1983</year>
+		<publisher>Parker Brothers</publisher>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_16k" />
+			<dataarea name="rom" size="16384">
+				<rom name="popeye_wip8.rom" size="16384" crc="da07e268" sha1="7719e2c6102ff8b7ff715a6df6c1e6efe3b0b159"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="porkys">
 		<description>Porky's</description>
 		<year>1983</year>

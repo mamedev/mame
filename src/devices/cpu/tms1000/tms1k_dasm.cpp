@@ -83,7 +83,7 @@ const char *const tms1000_base_disassembler::s_mnemonic[] =
 const u32 tms1000_base_disassembler::s_flags[] =
 {
 	0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, STEP_OVER, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, STEP_COND, STEP_OVER | STEP_COND, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, STEP_OUT, 0, 0, 0, 0,

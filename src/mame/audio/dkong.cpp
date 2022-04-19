@@ -294,11 +294,11 @@ static const discrete_op_amp_filt_info dkong_sallen_key_info =
 #define DKONG_CUSTOM_V          DISCRETE_INPUT(7)
 
 DISCRETE_CLASS_STEP_RESET(dkong_custom_mixer, 1,
-	double m_i_in1[2];
-	double m_r_in[2];
-	double m_r_total[2];
-	double m_exp[2];
-	double m_out_v;
+	double m_i_in1[2]{ 0.0 };
+	double m_r_in[2]{ 0.0 };
+	double m_r_total[2]{ 0.0 };
+	double m_exp[2]{ 0.0 };
+	double m_out_v = 0;
 );
 
 DISCRETE_STEP( dkong_custom_mixer )

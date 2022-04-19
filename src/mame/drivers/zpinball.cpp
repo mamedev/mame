@@ -1,8 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:AJR
 /****************************************************************************
+PINBALL
+Skeleton driver for EFO "Z-Pinball" hardware.
 
-    Skeleton driver for EFO "Z-Pinball" hardware.
+ToDo:
+- Inputs
+- Outputs
+- Screen
+- Sound
+- Mechanical sounds
 
 ****************************************************************************/
 

@@ -85,6 +85,7 @@ void nes_state::nes(machine_config &config)
 	SOFTWARE_LIST(config, "ntb_list").set_original("nes_ntbrom");      // Sunsoft Nantettate! Baseball mini-carts
 	SOFTWARE_LIST(config, "kstudio_list").set_original("nes_kstudio"); // Bandai Karaoke Studio expansion carts
 	SOFTWARE_LIST(config, "datach_list").set_original("nes_datach");   // Bandai Datach Joint ROM System mini-carts
+	SOFTWARE_LIST(config, "famibox_list").set_compatible("famibox");   // FamicomBox/FamicomStation carts
 }
 
 void nes_state::nespal(machine_config &config)

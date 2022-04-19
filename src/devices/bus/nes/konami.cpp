@@ -168,9 +168,6 @@ void nes_konami_vrc4_device::device_start()
 
 void nes_konami_vrc4_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	chr8(0, m_chr_source);
-
 	m_irq_mode = 0;
 	m_irq_prescale = 0;
 	m_irq_enable = 0;
@@ -183,7 +180,10 @@ void nes_konami_vrc4_device::pcb_reset()
 	m_mmc_prg_bank[0] = 0;
 	m_mmc_prg_bank[1] = 0;
 	set_prg();
-	std::fill(std::begin(m_mmc_vrom_bank), std::end(m_mmc_vrom_bank), 0x00);
+
+	for (int i = 0; i < 8; i++)
+		m_mmc_vrom_bank[i] = i;
+	set_chr();
 }
 
 void nes_konami_vrc7_device::pcb_reset()
@@ -454,6 +454,12 @@ void nes_konami_vrc4_device::set_prg(int prg_base, int prg_mask)
 	prg8_x(3, prg_base | prg_mask);
 }
 
+void nes_konami_vrc4_device::set_chr(int chr_base, int chr_mask)
+{
+	for (int i = 0; i < 8; i++)
+		chr1_x(i, chr_base | (m_mmc_vrom_bank[i] & chr_mask), m_chr_source);
+}
+
 u8 nes_konami_vrc4_device::read_m(offs_t offset)
 {
 	LOG_MMC(("VRC-4 read_m, offset: %04x\n", offset));
@@ -504,7 +510,7 @@ void nes_konami_vrc4_device::write_h(offs_t offset, u8 data)
 			int shift = BIT(addr_lines, 0) * 4;
 			int mask = shift ? 0x1f0 : 0x0f;
 			m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & ~mask) | ((data << shift) & mask);
-			chr1_x(bank, m_mmc_vrom_bank[bank], m_chr_source);
+			set_chr();
 			break;
 		}
 		case 0x7000:

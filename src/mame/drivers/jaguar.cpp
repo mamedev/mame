@@ -1242,12 +1242,12 @@ void jaguarcd_state::butch_regs_w(offs_t offset, uint32_t data, uint32_t mem_mas
 						return;
 					}
 
-					msf = cdrom_get_track_start(m_cd_file, 0) + 150;
+					msf = m_cd_file->get_track_start(0) + 150;
 
 					/* first track number */
 					m_butch_cmd_response[0] = 0x2000 | 1;
 					/* last track number */
-					m_butch_cmd_response[1] = 0x2100 | cdrom_get_last_track(m_cd_file);
+					m_butch_cmd_response[1] = 0x2100 | m_cd_file->get_last_track();
 
 					/* start of first track minutes */
 					m_butch_cmd_response[2] = 0x2200 | ((msf / 60) / 60);
@@ -1262,11 +1262,11 @@ void jaguarcd_state::butch_regs_w(offs_t offset, uint32_t data, uint32_t mem_mas
 				case 0x14: // Read Long TOC
 					{
 						uint32_t msf;
-						int ntrks = cdrom_get_last_track(m_cd_file);
+						int ntrks = m_cd_file->get_last_track();
 
 						for(int i=0;i<ntrks;i++)
 						{
-							msf = cdrom_get_track_start(m_cd_file, i) + 150;
+							msf = m_cd_file->get_track_start(i) + 150;
 
 							/* track number */
 							m_butch_cmd_response[i*5+0] = 0x6000 | (i+1);

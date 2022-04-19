@@ -670,7 +670,7 @@ offs_t upd78k4_disassembler::dasm_3c(std::ostream &stream, u8 op, offs_t pc, con
 					util::stream_format(stream, "%-8s", BIT(op2, 4) ? "BT" : "BF");
 				util::stream_format(stream, "[%s].%d", s_rg_names[BIT(op2, 3) ? 3 : 2], op2 & 0x07);
 				format_jdisp8(stream, pc + 3, opcodes.r8(pc + 2));
-				return 3 | SUPPORTED;
+				return 3 | STEP_COND | SUPPORTED;
 			}
 			else
 				return dasm_illegal2(stream, 0x3d, op2);
@@ -783,7 +783,7 @@ offs_t upd78k4_disassembler::dasm_3c(std::ostream &stream, u8 op, offs_t pc, con
 					format_saddr1(stream, opcodes.r8(pc + 3));
 					util::stream_format(stream, ".%d,", op3 & 0x07);
 					format_jdisp8(stream, pc + 5, opcodes.r8(pc + 4));
-					return 5 | SUPPORTED;
+					return 5 | STEP_COND | SUPPORTED;
 				}
 				else
 					return dasm_illegal3(stream, 0x3c, 0x08, op3);

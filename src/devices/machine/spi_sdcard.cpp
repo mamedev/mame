@@ -163,7 +163,7 @@ void spi_sdcard_device::spi_clock_w(int state)
 						}
 
 						LOGMASKED(LOG_GENERAL, "writing LBA %x, data %02x %02x %02x %02x\n", blk, m_data[0], m_data[1], m_data[2], m_data[3]);
-						if (hard_disk_write(m_harddisk, blk, &m_data[0]))
+						if (m_harddisk->write(blk, &m_data[0]))
 						{
 							m_data[0] = DATA_RESPONSE_OK;
 						}
@@ -182,7 +182,7 @@ void spi_sdcard_device::spi_clock_w(int state)
 					if (m_state == SD_STATE_DATA_MULTI && m_out_count == 0)
 					{
 						m_data[0] = 0xfe; // data token
-						hard_disk_read(m_harddisk, m_blknext++, &m_data[1]);
+						m_harddisk->read(m_blknext++, &m_data[1]);
 						util::crc16_t crc16 = util::crc16_creator::simple(
 							&m_data[1], m_blksize);
 						m_data[m_blksize + 1] = (crc16 >> 8) & 0xff;
@@ -292,7 +292,7 @@ void spi_sdcard_device::do_command()
 
 		case 16: // CMD16 - SET_BLOCKLEN
 			m_blksize = (u16(m_cmd[3]) << 8) | u16(m_cmd[4]);
-			if (hard_disk_set_block_size(m_harddisk, m_blksize))
+			if (m_harddisk->set_block_size(m_blksize))
 			{
 				m_data[0] = 0;
 			}
@@ -322,7 +322,7 @@ void spi_sdcard_device::do_command()
 					blk /= m_blksize;
 				}
 				LOGMASKED(LOG_GENERAL, "reading LBA %x\n", blk);
-				hard_disk_read(m_harddisk, blk, &m_data[3]);
+				m_harddisk->read(blk, &m_data[3]);
 				{
 					util::crc16_t crc16 = util::crc16_creator::simple(&m_data[3], m_blksize);
 					m_data[m_blksize + 3] = (crc16 >> 8) & 0xff;

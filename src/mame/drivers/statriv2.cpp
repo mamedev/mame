@@ -669,19 +669,8 @@ static GFXDECODE_START( gfx_horizontal )
 GFXDECODE_END
 
 
-static const gfx_layout vertical_tiles_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	8*8
-};
-
 static GFXDECODE_START( gfx_vertical )
-	GFXDECODE_ENTRY( "tiles", 0, vertical_tiles_layout, 0, 64 )
+	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x1, 0, 64 )
 GFXDECODE_END
 
 

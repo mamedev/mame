@@ -16,7 +16,7 @@
 * * 9005
 *
 * The basis of this driver was influenced by the zexall.c driver by
-* Jonathan Gevaryahu and Robbbert.
+* Jonathan Gevaryahu.
 *
 *
 * Special Thanks to:

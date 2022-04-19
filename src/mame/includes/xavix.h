@@ -51,16 +51,16 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
-	sound_stream *m_stream;
+	sound_stream *m_stream = nullptr;
 
 	struct xavix_voice {
-		bool enabled[2];
-		uint32_t position[2];
-		uint32_t startposition[2];
-		uint8_t bank; // no samples appear to cross a bank boundary, so likely wraps
-		int type;
-		int rate;
-		int vol;
+		bool enabled[2]{};
+		uint32_t position[2]{};
+		uint32_t startposition[2]{};
+		uint8_t bank = 0; // no samples appear to cross a bank boundary, so likely wraps
+		int type = 0;
+		int rate = 0;
+		int vol = 0;
 	};
 
 	devcb_read8 m_readregs_cb;
@@ -134,8 +134,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ioevent_trg04);
 	DECLARE_WRITE_LINE_MEMBER(ioevent_trg08);
 
-	int m_rgnlen;
-	uint8_t* m_rgn;
+	int m_rgnlen = 0;
+	uint8_t* m_rgn = nullptr;
 
 	/* this is just a quick memory system bypass for video reads etc. because going through the
 	   memory system is slow and also pollutes logs significantly with unmapped reads if the games
@@ -200,7 +200,7 @@ protected:
 	optional_device<nvram_device> m_nvram;
 	required_device<screen_device> m_screen;
 	required_device<address_map_bank_device> m_lowbus;
-	address_space* m_cpuspace;
+	address_space* m_cpuspace = nullptr;
 
 private:
 
@@ -283,8 +283,8 @@ private:
 	void ioevent_enable_w(uint8_t data);
 	uint8_t ioevent_irqstate_r();
 	void ioevent_irqack_w(uint8_t data);
-	uint8_t m_ioevent_enable;
-	uint8_t m_ioevent_active;
+	uint8_t m_ioevent_enable = 0;
+	uint8_t m_ioevent_active = 0;
 	void process_ioevent(uint8_t bits);
 
 	void slotreg_7810_w(uint8_t data);
@@ -312,8 +312,8 @@ private:
 	void io0_direction_w(uint8_t data);
 	void io1_direction_w(uint8_t data);
 
-	uint8_t m_io0_data;
-	uint8_t m_io1_data;
+	uint8_t m_io0_data = 0;
+	uint8_t m_io1_data = 0;
 	uint8_t m_io0_direction;
 	uint8_t m_io1_direction;
 
@@ -377,13 +377,13 @@ private:
 	uint8_t sound_irqstatus_r();
 	void sound_irqstatus_w(uint8_t data);
 	void sound_75ff_w(uint8_t data);
-	uint8_t m_sound_irqstatus;
-	uint8_t m_soundreg16_0[2];
-	uint8_t m_soundreg16_1[2];
-	uint8_t m_sound_regbase;
+	uint8_t m_sound_irqstatus = 0;
+	uint8_t m_soundreg16_0[2]{};
+	uint8_t m_soundreg16_1[2]{};
+	uint8_t m_sound_regbase = 0;
 
 	TIMER_CALLBACK_MEMBER(sound_timer_done);
-	emu_timer *m_sound_timer[4];
+	emu_timer *m_sound_timer[4]{};
 
 
 	uint8_t timer_status_r();
@@ -393,10 +393,10 @@ private:
 	uint8_t timer_freq_r();
 	void timer_freq_w(uint8_t data);
 	uint8_t timer_curval_r();
-	uint8_t m_timer_control;
-	uint8_t m_timer_freq;
+	uint8_t m_timer_control = 0;
+	uint8_t m_timer_freq = 0;
 	TIMER_CALLBACK_MEMBER(freq_timer_done);
-	emu_timer *m_freq_timer;
+	emu_timer *m_freq_timer = nullptr;
 
 	void palram_sh_w(offs_t offset, uint8_t data);
 	void palram_l_w(offs_t offset, uint8_t data);
@@ -418,7 +418,7 @@ private:
 
 	uint8_t xavix_memoryemu_txarray_r(offs_t offset);
 	void xavix_memoryemu_txarray_w(offs_t offset, uint8_t data);
-	uint8_t m_txarray[3];
+	uint8_t m_txarray[3]{};
 
 	inline uint8_t txarray_r(uint16_t offset)
 	{
@@ -474,40 +474,40 @@ private:
 	uint8_t anport3_r() { logerror("%s: unhandled anport3_r\n", machine().describe_context()); return 0xff; }
 
 	void update_irqs();
-	uint8_t m_irqsource;
+	uint8_t m_irqsource = 0;
 
-	uint8_t m_vectorenable;
-	uint8_t m_nmi_vector_lo_data;
-	uint8_t m_nmi_vector_hi_data;
-	uint8_t m_irq_vector_lo_data;
-	uint8_t m_irq_vector_hi_data;
+	uint8_t m_vectorenable = 0;
+	uint8_t m_nmi_vector_lo_data = 0;
+	uint8_t m_nmi_vector_hi_data = 0;
+	uint8_t m_irq_vector_lo_data = 0;
+	uint8_t m_irq_vector_hi_data = 0;
 
-	uint8_t m_spritefragment_dmaparam1[2];
-	uint8_t m_spritefragment_dmaparam2[2];
+	uint8_t m_spritefragment_dmaparam1[2]{};
+	uint8_t m_spritefragment_dmaparam2[2]{};
 
-	uint8_t m_tmap1_regs[8];
-	uint8_t m_tmap2_regs[8];
+	uint8_t m_tmap1_regs[8]{};
+	uint8_t m_tmap2_regs[8]{};
 
-	int m_arena_start;
-	int m_arena_end;
-	uint8_t m_arena_control;
+	int m_arena_start = 0;
+	int m_arena_end = 0;
+	uint8_t m_arena_control = 0;
 
-	uint8_t m_6ff0;
-	uint8_t m_video_ctrl;
+	uint8_t m_6ff0 = 0;
+	uint8_t m_video_ctrl = 0;
 
-	uint8_t m_mastervol;
-	uint8_t m_unk_snd75f8;
-	uint8_t m_unk_snd75f9;
-	uint8_t m_unk_snd75ff;
-	uint8_t m_sndtimer[4];
+	uint8_t m_mastervol = 0;
+	uint8_t m_unk_snd75f8 = 0;
+	uint8_t m_unk_snd75f9 = 0;
+	uint8_t m_unk_snd75ff = 0;
+	uint8_t m_sndtimer[4]{};
 
-	uint8_t m_timer_baseval;
+	uint8_t m_timer_baseval = 0;
 
 	int16_t get_vectors(int which, int half);
 
 	// raster IRQ
 	TIMER_CALLBACK_MEMBER(interrupt_gen);
-	emu_timer *m_interrupt_timer;
+	emu_timer *m_interrupt_timer = nullptr;
 	void dispctrl_posirq_x_w(uint8_t data);
 	void dispctrl_posirq_y_w(uint8_t data);
 
@@ -549,12 +549,12 @@ private:
 
 	bitmap_ind16 m_zbuffer;
 
-	uint8_t m_spritereg;
+	uint8_t m_spritereg = 0;
 
 	// variables used by rendering
-	int m_tmp_dataaddress;
-	int m_tmp_databit;
-	uint8_t m_bit;
+	int m_tmp_dataaddress = 0;
+	int m_tmp_databit = 0;
+	uint8_t m_bit = 0;
 
 	void set_data_address(int address, int bit);
 	uint8_t get_next_bit();
@@ -573,13 +573,13 @@ protected:
 	required_device<xavix_math_device> m_math;
 	optional_device<xavix2002_io_device> m_xavix2002io;
 
-	uint8_t m_extbusctrl[3];
+	uint8_t m_extbusctrl[3]{};
 
 	virtual uint8_t extintrf_790x_r(offs_t offset);
 	virtual void extintrf_790x_w(offs_t offset, uint8_t data);
 
 	// additional SuperXaviX / XaviX2002 stuff
-	uint8_t m_sx_extended_extbus[3];
+	uint8_t m_sx_extended_extbus[3]{};
 
 	void extended_extbus_reg0_w(uint8_t data);
 	void extended_extbus_reg1_w(uint8_t data);
@@ -885,7 +885,7 @@ protected:
 		}
 	}
 
-	int m_cartlimit;
+	int m_cartlimit = 0;
 	required_device<ekara_cart_slot_device> m_cartslot;
 };
 

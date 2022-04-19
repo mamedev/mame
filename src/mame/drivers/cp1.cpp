@@ -236,15 +236,26 @@ void cp1_state::machine_reset()
 
 QUICKLOAD_LOAD_MEMBER(cp1_state::quickload_cb)
 {
-	char line[0x10];
-	int addr = 0;
-	while (image.fgets(line, 10) && addr < 0x100)
+	uint8_t byte = 0;
+	unsigned addr = 0;
+
+	char ch = '\0';
+	uint32_t actual = 0;
+	while ((actual = image.fread(&ch, 1)) != 0 && addr < 0x100)
 	{
-		int op = 0, arg = 0;
-		if (sscanf(line, "%d.%d", &op, &arg) == 2)
+		// Format: nn.nnn<CR><LF>
+		if (ch >= '0' && ch <= '9')
+			byte = (byte * 10) + (ch - '0');
+		else if (ch == '.' && (addr & 1) == 0)
 		{
-			m_i8155->memory_w(addr++, op);
-			m_i8155->memory_w(addr++, arg);
+			m_i8155->memory_w(addr++, byte);
+			byte = 0;
+		}
+		else if (ch == '\r' || ch == '\n')
+		{
+			if ((addr & 1) != 0)
+				m_i8155->memory_w(addr++, byte);
+			byte = 0;
 		}
 		else
 		{

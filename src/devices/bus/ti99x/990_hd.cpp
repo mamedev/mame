@@ -175,18 +175,16 @@ DEVICE_IMAGE_LOAD_MEMBER( ti990_hdc_device::load_hd )
 
 	if ( hd_file )
 	{
-		const hard_disk_info *standard_header;
-
 		d->format = format_mame;
 		d->hd_handle = hd_file;
 
 		/* use standard hard disk image header. */
-		standard_header = hard_disk_get_info(d->hd_handle);
+		const auto &standard_header = d->hd_handle->get_info();
 
-		d->cylinders = standard_header->cylinders;
-		d->heads = standard_header->heads;
-		d->sectors_per_track = standard_header->sectors;
-		d->bytes_per_sector = standard_header->sectorbytes;
+		d->cylinders = standard_header.cylinders;
+		d->heads = standard_header.heads;
+		d->sectors_per_track = standard_header.sectors;
+		d->bytes_per_sector = standard_header.sectorbytes;
 	}
 	else
 	{
@@ -365,7 +363,7 @@ int ti990_hdc_device::read_sector(int unit, unsigned int lba, void *buffer, unsi
 	switch (m_d[unit].format)
 	{
 	case format_mame:
-		bytes_read = m_d[unit].bytes_per_sector * hard_disk_read(m_d[unit].hd_handle, lba, buffer);
+		bytes_read = m_d[unit].bytes_per_sector * m_d[unit].hd_handle->read(lba, buffer);
 		if (bytes_read > bytes_to_read)
 			bytes_read = bytes_to_read;
 		break;
@@ -395,7 +393,7 @@ int ti990_hdc_device::write_sector(int unit, unsigned int lba, const void *buffe
 	switch (m_d[unit].format)
 	{
 	case format_mame:
-		bytes_written = m_d[unit].bytes_per_sector * hard_disk_write(m_d[unit].hd_handle, lba, buffer);
+		bytes_written = m_d[unit].bytes_per_sector * m_d[unit].hd_handle->write(lba, buffer);
 		if (bytes_written > bytes_to_write)
 			bytes_written = bytes_to_write;
 		break;

@@ -1,12 +1,19 @@
 // license:BSD-3-Clause
 // copyright-holders:AJR
-// PINBALL
-// Skeleton driver for Joctronic pinballs.
+/***********************************************************************************************************
+PINBALL
+Skeleton driver for Joctronic pinballs.
 
-/*
-  TODO:
-   Confirm "Pin Ball" exact hardware configuration, may be different from "Punky Willy" and "Walkyria".
-*/
+
+TODO:
+- Confirm "Pin Ball" exact hardware configuration, may be different from "Punky Willy" and "Walkyria".
+- Inputs
+- Outputs
+- Screen
+- Sound
+- Mechanical sounds
+
+************************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -86,8 +93,8 @@ private:
 	optional_device<ls157_device> m_adpcm_select;
 	optional_device_array<addressable_latch_device, 6> m_driver_latch;
 	optional_memory_bank m_soundbank;
-	u8 m_soundlatch;
-	bool m_adpcm_toggle;
+	u8 m_soundlatch = 0;
+	bool m_adpcm_toggle = false;
 };
 
 u8 joctronic_state::csin_r(offs_t offset)

@@ -9,7 +9,6 @@
 #include "emu.h"
 #include "tms0980.h"
 #include "tms1k_dasm.h"
-#include "debugger.h"
 
 // TMS0980
 // - 144x4bit RAM array at the bottom-left (128+16, set up as 8x18x4)

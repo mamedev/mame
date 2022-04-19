@@ -24,7 +24,6 @@
 #include "bootleg.h"
 
 #include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE
-#include "screen.h"
 
 
 #ifdef NES_PCB_DEBUG
@@ -659,22 +658,6 @@ void nes_ac08_device::pcb_reset()
 	m_latch = 0xff;
 }
 
-void nes_mmalee_device::device_start()
-{
-	common_start();
-}
-
-void nes_mmalee_device::pcb_reset()
-{
-	chr8(0, CHRROM);
-	prg32(0);
-}
-
-void nes_rt01_device::device_start()
-{
-	common_start();
-}
-
 void nes_rt01_device::pcb_reset()
 {
 	chr2_0(0, CHRROM);
@@ -1019,7 +1002,7 @@ void nes_btl_dn_device::write_h(offs_t offset, uint8_t data)
 		case 0x5002:
 		case 0x6000:
 		case 0x6002:
-			bank = ((offset & 0x7000) - 0x3000) / 0x0800 + ((offset & 0x0002) >> 1);
+			bank = 2 * (BIT(offset, 12, 3) - 3) + BIT(offset, 1);
 			chr1_x(bank, data, CHRROM);
 			break;
 		case 0x7000:

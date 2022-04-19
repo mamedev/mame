@@ -7,6 +7,7 @@
 
 #include "machine/rescap.h"
 
+#include <memory>
 #include <vector>
 
 
@@ -4177,8 +4178,6 @@ class discrete_sound_output_interface;
 
 class discrete_device : public device_t
 {
-	//friend class discrete_base_node;
-
 protected:
 	// construction/destruction
 	discrete_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -4410,7 +4409,7 @@ class discrete_node_factory
 public:
 	static std::unique_ptr<discrete_base_node> create(discrete_device &pdev, const discrete_block &block)
 	{
-		std::unique_ptr<discrete_base_node> r = make_unique_clear<C>();
+		std::unique_ptr<discrete_base_node> r = std::make_unique<C>();
 
 		r->init(&pdev, &block);
 		return r;

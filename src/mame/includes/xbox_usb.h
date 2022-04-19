@@ -11,45 +11,45 @@
 
 
 struct OHCIEndpointDescriptor {
-	int mps; // MaximumPacketSize
-	int f; // Format
-	int k; // sKip
-	int s; // Speed
-	int d; // Direction
-	int en; // EndpointNumber
-	int fa; // FunctionAddress
-	uint32_t tailp; // TDQueueTailPointer
-	uint32_t headp; // TDQueueHeadPointer
-	uint32_t nexted; // NextED
-	int c; // toggleCarry
-	int h; // Halted
-	uint32_t word0;
+	int mps = 0; // MaximumPacketSize
+	int f = 0; // Format
+	int k = 0; // sKip
+	int s = 0; // Speed
+	int d = 0; // Direction
+	int en = 0; // EndpointNumber
+	int fa = 0; // FunctionAddress
+	uint32_t tailp = 0; // TDQueueTailPointer
+	uint32_t headp = 0; // TDQueueHeadPointer
+	uint32_t nexted = 0; // NextED
+	int c = 0; // toggleCarry
+	int h = 0; // Halted
+	uint32_t word0 = 0;
 };
 
 struct OHCITransferDescriptor {
-	int cc; // ConditionCode
-	int ec; // ErrorCount
-	int t; // DataToggle
-	int di; // DelayInterrupt
-	int dp; // Direction/PID
-	int r; // bufferRounding
-	uint32_t cbp; // CurrentBufferPointer
-	uint32_t nexttd; // NextTD
-	uint32_t be; // BufferEnd
-	uint32_t word0;
+	int cc = 0; // ConditionCode
+	int ec = 0; // ErrorCount
+	int t = 0; // DataToggle
+	int di = 0; // DelayInterrupt
+	int dp = 0; // Direction/PID
+	int r = 0; // bufferRounding
+	uint32_t cbp = 0; // CurrentBufferPointer
+	uint32_t nexttd = 0; // NextTD
+	uint32_t be = 0; // BufferEnd
+	uint32_t word0 = 0;
 };
 
 struct OHCIIsochronousTransferDescriptor {
-	int cc; // ConditionCode
-	int fc; // FrameCount
-	int di; // DelayInterrupt
-	int sf; // StartingFrame
-	uint32_t bp0; // BufferPage0
-	uint32_t nexttd; // NextTD
-	uint32_t be; // BufferEnd
-	uint32_t offset[8]; // Offset/PacketStatusWord
-	uint32_t word0;
-	uint32_t word1;
+	int cc = 0; // ConditionCode
+	int fc = 0; // FrameCount
+	int di = 0; // DelayInterrupt
+	int sf = 0; // StartingFrame
+	uint32_t bp0 = 0; // BufferPage0
+	uint32_t nexttd = 0; // NextTD
+	uint32_t be = 0; // BufferEnd
+	uint32_t offset[8]{}; // Offset/PacketStatusWord
+	uint32_t word0 = 0;
+	uint32_t word1 = 0;
 };
 
 enum OHCIRegisters {
@@ -192,60 +192,60 @@ enum OHCICompletionCode {
 };
 
 struct USBSetupPacket {
-	uint8_t bmRequestType;
-	uint8_t bRequest;
-	uint16_t wValue;
-	uint16_t wIndex;
-	uint16_t wLength;
+	uint8_t bmRequestType = 0;
+	uint8_t bRequest = 0;
+	uint16_t wValue = 0;
+	uint16_t wIndex = 0;
+	uint16_t wLength = 0;
 };
 
 struct USBStandardDeviceDescriptor {
-	uint8_t bLength;
-	uint8_t bDescriptorType;
-	uint16_t bcdUSB;
-	uint8_t bDeviceClass;
-	uint8_t bDeviceSubClass;
-	uint8_t bDeviceProtocol;
-	uint8_t bMaxPacketSize0;
-	uint16_t idVendor;
-	uint16_t idProduct;
-	uint16_t bcdDevice;
-	uint8_t iManufacturer;
-	uint8_t iProduct;
-	uint8_t iSerialNumber;
-	uint8_t bNumConfigurations;
+	uint8_t bLength = 0;
+	uint8_t bDescriptorType = 0;
+	uint16_t bcdUSB = 0;
+	uint8_t bDeviceClass = 0;
+	uint8_t bDeviceSubClass = 0;
+	uint8_t bDeviceProtocol = 0;
+	uint8_t bMaxPacketSize0 = 0;
+	uint16_t idVendor = 0;
+	uint16_t idProduct = 0;
+	uint16_t bcdDevice = 0;
+	uint8_t iManufacturer = 0;
+	uint8_t iProduct = 0;
+	uint8_t iSerialNumber = 0;
+	uint8_t bNumConfigurations = 0;
 };
 
 struct USBStandardConfigurationDescriptor {
-	uint8_t bLength;
-	uint8_t bDescriptorType;
-	uint16_t wTotalLength;
-	uint8_t bNumInterfaces;
-	uint8_t bConfigurationValue;
-	uint8_t iConfiguration;
-	uint8_t bmAttributes;
-	uint8_t MaxPower;
+	uint8_t bLength = 0;
+	uint8_t bDescriptorType = 0;
+	uint16_t wTotalLength = 0;
+	uint8_t bNumInterfaces = 0;
+	uint8_t bConfigurationValue = 0;
+	uint8_t iConfiguration = 0;
+	uint8_t bmAttributes = 0;
+	uint8_t MaxPower = 0;
 };
 
 struct USBStandardInterfaceDescriptor {
-	uint8_t bLength;
-	uint8_t bDescriptorType;
-	uint8_t bInterfaceNumber;
-	uint8_t bAlternateSetting;
-	uint8_t bNumEndpoints;
-	uint8_t bInterfaceClass;
-	uint8_t bInterfaceSubClass;
-	uint8_t bInterfaceProtocol;
-	uint8_t iInterface;
+	uint8_t bLength = 0;
+	uint8_t bDescriptorType = 0;
+	uint8_t bInterfaceNumber = 0;
+	uint8_t bAlternateSetting = 0;
+	uint8_t bNumEndpoints = 0;
+	uint8_t bInterfaceClass = 0;
+	uint8_t bInterfaceSubClass = 0;
+	uint8_t bInterfaceProtocol = 0;
+	uint8_t iInterface = 0;
 };
 
 struct USBStandardEndpointDescriptor {
-	uint8_t bLength;
-	uint8_t bDescriptorType;
-	uint8_t bEndpointAddress;
-	uint8_t bmAttributes;
-	uint16_t wMaxPacketSize;
-	uint8_t bInterval;
+	uint8_t bLength = 0;
+	uint8_t bDescriptorType = 0;
+	uint8_t bEndpointAddress = 0;
+	uint8_t bmAttributes = 0;
+	uint16_t wMaxPacketSize = 0;
+	uint8_t bInterval = 0;
 };
 
 enum USBPid {
@@ -315,22 +315,22 @@ enum USBEndpointType
 
 struct usb_device_string
 {
-	uint8_t *position;
-	int size;
+	uint8_t *position = nullptr;
+	int size = 0;
 };
 
 struct usb_device_interfac_alternate
 {
-	uint8_t *position;
-	int size;
+	uint8_t *position = nullptr;
+	int size = 0;
 	USBStandardInterfaceDescriptor interface_descriptor;
 	std::forward_list<USBStandardEndpointDescriptor> endpoint_descriptors;
 };
 
 struct usb_device_interfac
 {
-	uint8_t *position;
-	int size;
+	uint8_t *position = nullptr;
+	int size = 0;
 	std::forward_list<usb_device_interfac_alternate> alternate_settings;
 	int selected_alternate;
 };
@@ -338,8 +338,8 @@ struct usb_device_interfac
 struct usb_device_configuration
 {
 	USBStandardConfigurationDescriptor configuration_descriptor;
-	uint8_t *position;
-	int size;
+	uint8_t *position = nullptr;
+	int size = 0;
 	std::forward_list<usb_device_interfac> interfaces;
 };
 
@@ -376,28 +376,28 @@ private:
 	void usb_ohci_read_isochronous_transfer_descriptor(uint32_t address);
 	void usb_ohci_writeback_isochronous_transfer_descriptor(uint32_t address);
 	std::function<void (int state)> irq_callback;
-	cpu_device *m_maincpu;
+	cpu_device *m_maincpu = nullptr;
 	struct {
-		uint32_t hc_regs[256];
+		uint32_t hc_regs[256]{};
 		struct {
-			device_usb_ohci_function_interface *function;
-			int address;
-			int delay;
+			device_usb_ohci_function_interface *function = nullptr;
+			int address = 0;
+			int delay = 0;
 		} ports[4 + 1];
 		struct
 		{
-			device_usb_ohci_function_interface *function;
-			int port;
+			device_usb_ohci_function_interface *function = nullptr;
+			int port = 0;
 		} address[256];
-		emu_timer *timer;
-		int state;
-		uint32_t framenumber;
-		uint32_t nextinterupted;
-		uint32_t nextbulked;
-		int interruptbulkratio;
-		int writebackdonehadcounter;
-		address_space *space;
-		uint8_t buffer[1024];
+		emu_timer *timer = nullptr;
+		int state = 0;
+		uint32_t framenumber = 0;
+		uint32_t nextinterupted = 0;
+		uint32_t nextbulked = 0;
+		int interruptbulkratio = 0;
+		int writebackdonehadcounter = 0;
+		address_space *space = nullptr;
+		uint8_t buffer[1024]{};
 		OHCIEndpointDescriptor endpoint_descriptor;
 		OHCITransferDescriptor transfer_descriptor;
 		OHCIIsochronousTransferDescriptor isochronous_transfer_descriptor;
@@ -440,30 +440,30 @@ protected:
 	uint8_t *position_device_descriptor(int &size);
 	uint8_t *position_configuration_descriptor(int index, int &size);
 	uint8_t *position_string_descriptor(int index, int &size);
-	ohci_usb_controller *busmanager;
+	ohci_usb_controller *busmanager = nullptr;
 	struct {
-		int type;
-		int controldirection;
-		int controltype;
-		int controlrecipient;
-		int remain;
-		uint8_t *position;
-		uint8_t buffer[128];
+		int type = 0;
+		int controldirection = 0;
+		int controltype = 0;
+		int controlrecipient = 0;
+		int remain = 0;
+		uint8_t *position = nullptr;
+		uint8_t buffer[128]{};
 	} endpoints[256];
-	int state;
-	bool settingaddress;
-	int newaddress;
-	int address;
-	int configurationvalue;
+	int state = 0;
+	bool settingaddress = false;
+	int newaddress = 0;
+	int address = 0;
+	int configurationvalue = 0;
 	std::unique_ptr<uint8_t []> descriptors;
-	int descriptors_pos;
-	bool wantstatuscallback;
+	int descriptors_pos = 0;
+	bool wantstatuscallback = false;
 	USBStandardDeviceDescriptor device_descriptor;
 	std::forward_list<usb_device_configuration> configurations;
 	std::forward_list<usb_device_string> device_strings;
-	usb_device_configuration *latest_configuration;
-	usb_device_interfac_alternate *latest_alternate;
-	usb_device_configuration *selected_configuration;
+	usb_device_configuration *latest_configuration = nullptr;
+	usb_device_interfac_alternate *latest_alternate = nullptr;
+	usb_device_configuration *selected_configuration = nullptr;
 };
 
 /*

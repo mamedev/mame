@@ -53,12 +53,12 @@ private:
 	TILEMAP_MAPPER_MEMBER( mapper );
 
 	static const int ROZ_TILEMAP_COUNT = 2;
-	tilemap_t *m_tilemap[ROZ_TILEMAP_COUNT];
+	tilemap_t *m_tilemap[ROZ_TILEMAP_COUNT]{};
 	uint16_t m_control[0x20/2];
 	std::vector<uint16_t> m_videoram;
 	int m_color_base;
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
-	uint32_t m_ramsize;
+	uint32_t m_ramsize = 0;
 
 	// per-game hacks
 	bool m_is_namcofl;

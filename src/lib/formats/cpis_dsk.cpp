@@ -54,4 +54,4 @@ const cpis_format::format cpis_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_CPIS_FORMAT = &floppy_image_format_creator<cpis_format>;
+const cpis_format FLOPPY_CPIS_FORMAT;

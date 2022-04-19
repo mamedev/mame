@@ -50,4 +50,4 @@ const ql_format::format ql_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_QL_FORMAT = &floppy_image_format_creator<ql_format>;
+const ql_format FLOPPY_QL_FORMAT;

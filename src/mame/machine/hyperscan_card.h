@@ -39,12 +39,12 @@ private:
 	void make_resp(std::vector<uint8_t> const &data, bool add_crc);
 	void check_command();
 
-	int                  m_state;
-	int                  m_bit_pos;
-	uint8_t              m_data;
+	int                  m_state = 0;
+	int                  m_bit_pos = 0;
+	uint8_t              m_data = 0;
 	std::vector<uint8_t> m_cmd_buf;
 	std::vector<uint8_t> m_resp_buf;
-	uint8_t              m_resp_idx;
+	uint8_t              m_resp_idx = 0;
 	attotime             m_last_at;
 	uint8_t              m_memory[120];
 };

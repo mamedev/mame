@@ -92,7 +92,7 @@ protected:
 	struct segacd_t
 	{
 		cdrom_file  *cd;
-		const cdrom_toc   *toc;
+		const cdrom_file::toc   *toc;
 		uint32_t current_frame;
 	};
 

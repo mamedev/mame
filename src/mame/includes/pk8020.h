@@ -83,17 +83,17 @@ private:
 	void pk8020_mem(address_map &map);
 	void devices_map(address_map &map);
 
-	uint8_t m_bank_select;
-	uint8_t m_color;
-	uint8_t m_video_page;
-	uint8_t m_wide;
-	uint8_t m_font;
-	uint8_t m_attr;
-	uint8_t m_text_attr;
-	uint8_t m_takt;
-	uint8_t m_video_page_access;
-	uint8_t m_sound_gate;
-	uint8_t m_sound_level;
+	uint8_t m_bank_select = 0;
+	uint8_t m_color = 0;
+	uint8_t m_video_page = 0;
+	uint8_t m_wide = 0;
+	uint8_t m_font = 0;
+	uint8_t m_attr = 0;
+	uint8_t m_text_attr = 0;
+	uint8_t m_takt = 0;
+	uint8_t m_video_page_access = 0;
+	uint8_t m_sound_gate = 0;
+	uint8_t m_sound_level = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pls100_device> m_decplm;

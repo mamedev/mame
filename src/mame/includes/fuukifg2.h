@@ -63,12 +63,12 @@ private:
 	required_memory_bank m_soundbank;
 
 	/* video-related */
-	tilemap_t     *m_tilemap[3];
+	tilemap_t     *m_tilemap[3]{};
 
 	/* misc */
-	emu_timer   *m_level_1_interrupt_timer;
-	emu_timer   *m_vblank_interrupt_timer;
-	emu_timer   *m_raster_interrupt_timer;
+	emu_timer   *m_level_1_interrupt_timer = nullptr;
+	emu_timer   *m_vblank_interrupt_timer = nullptr;
+	emu_timer   *m_raster_interrupt_timer = nullptr;
 
 	void vregs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void sound_command_w(u8 data);

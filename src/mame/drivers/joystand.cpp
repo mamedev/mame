@@ -523,17 +523,6 @@ static INPUT_PORTS_START( joystand )
 INPUT_PORTS_END
 
 
-static const gfx_layout layout_8x8x4 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0, 1) },
-	{ STEP8(0, 4) },
-	{ STEP8(0, 4*8) },
-	8*8*4
-};
-
 static const gfx_layout layout_16x16x8 =
 {
 	16,16,
@@ -546,13 +535,13 @@ static const gfx_layout layout_16x16x8 =
 };
 
 static GFXDECODE_START( gfx_joystand )
-	GFXDECODE_ENTRY( "tiles",    0, layout_8x8x4,   0, 0x100 )
-	GFXDECODE_ENTRY( "cart.u5",  0, layout_16x16x8, 0,  0x10 )
-	GFXDECODE_ENTRY( "cart.u6",  0, layout_16x16x8, 0,  0x10 )
-	GFXDECODE_ENTRY( "cart.u3",  0, layout_16x16x8, 0,  0x10 )
-	GFXDECODE_ENTRY( "cart.u4",  0, layout_16x16x8, 0,  0x10 )
-	GFXDECODE_ENTRY( "cart.u1",  0, layout_16x16x8, 0,  0x10 )
-	GFXDECODE_ENTRY( "cart.u2",  0, layout_16x16x8, 0,  0x10 )
+	GFXDECODE_ENTRY( "tiles",    0, gfx_8x8x4_packed_msb, 0, 0x100 )
+	GFXDECODE_ENTRY( "cart.u5",  0, layout_16x16x8,       0,  0x10 )
+	GFXDECODE_ENTRY( "cart.u6",  0, layout_16x16x8,       0,  0x10 )
+	GFXDECODE_ENTRY( "cart.u3",  0, layout_16x16x8,       0,  0x10 )
+	GFXDECODE_ENTRY( "cart.u4",  0, layout_16x16x8,       0,  0x10 )
+	GFXDECODE_ENTRY( "cart.u1",  0, layout_16x16x8,       0,  0x10 )
+	GFXDECODE_ENTRY( "cart.u2",  0, layout_16x16x8,       0,  0x10 )
 GFXDECODE_END
 
 

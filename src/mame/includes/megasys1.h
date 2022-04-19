@@ -115,38 +115,38 @@ private:
 	optional_ioport m_io_dsw2;
 
 	// configuration
-	u16 m_ip_select_values[7]; // System B and C
-	int m_hardware_type_z; // System Z
-	int m_layers_order[16];
-	u8 m_ignore_oki_status;
+	u16 m_ip_select_values[7]{}; // System B and C
+	int m_hardware_type_z = 0; // System Z
+	int m_layers_order[16]{};
+	u8 m_ignore_oki_status = 0;
 
 	// all
 	bitmap_ind16 m_sprite_buffer_bitmap;
-	u16 m_screen_flag;
+	u16 m_screen_flag = 0;
 	std::unique_ptr<u16[]> m_buffer_objectram;
 	std::unique_ptr<u16[]> m_buffer2_objectram;
 	std::unique_ptr<u16[]> m_buffer_spriteram16;
 	std::unique_ptr<u16[]> m_buffer2_spriteram16;
 
 	// all but System Z
-	u16 m_active_layers;
-	u16 m_sprite_flag;
+	u16 m_active_layers = 0;
+	u16 m_sprite_flag = 0;
 
 	// System B and C
-	u16 m_ip_latched;
+	u16 m_ip_latched = 0;
 
 	 // System C
-	u16 m_sprite_bank;
+	u16 m_sprite_bank = 0;
 
 	// System A only
-	int m_mcu_hs;
-	u16 m_mcu_hs_ram[0x10];
+	int m_mcu_hs = 0;
+	u16 m_mcu_hs_ram[0x10]{};
 
 	// peekaboo
-	u16 m_protection_val;
+	u16 m_protection_val = 0;
 
 	// soldam
-	u16 *m_spriteram;
+	u16 *m_spriteram = nullptr;
 
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	u16 ip_select_r();

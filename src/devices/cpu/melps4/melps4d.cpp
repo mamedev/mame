@@ -28,7 +28,7 @@ const char *const melps4_disassembler::em_name[] =
 };
 
 // number of bits per opcode parameter
-const uint8_t melps4_disassembler::em_bits[] =
+const u8 melps4_disassembler::em_bits[] =
 {
 	0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -43,18 +43,18 @@ const uint8_t melps4_disassembler::em_bits[] =
 	0, 0, 0, 0, 0
 };
 
-const uint32_t melps4_disassembler::em_flags[] =
+const u32 melps4_disassembler::em_flags[] =
 {
 	0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, STEP_COND, STEP_COND, 0, 0,
+	0, 0, STEP_COND, STEP_COND,
+	0, 0, 0, STEP_COND, STEP_COND, 0, 0, STEP_COND, 0, 0, 0,
+	0, 0, STEP_COND, STEP_COND, STEP_COND,
+	0, 0, 0, 0, 0, 0, STEP_COND, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, STEP_COND, STEP_COND,
 	0, 0, 0, STEP_OVER, STEP_OUT, STEP_OUT, STEP_OUT,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, STEP_COND, 0, 0, 0, 0, 0, 0, 0, 0, STEP_COND, 0, 0,
 	0, 0, 0, 0, 0
 };
 
@@ -62,7 +62,7 @@ const uint32_t melps4_disassembler::em_flags[] =
 
 // M58846 disasm
 
-const uint8_t melps4_disassembler::m58846_opmap[0xc0] =
+const u8 melps4_disassembler::m58846_opmap[0xc0] =
 {
 //  0        1        2        3        4        5        6        7        8        9        A        B        C        D        E        F
 	em_NOP,  em_BA,   em_INY,  em_DEY,  em_DI,   em_EI,   em_RU,   em_SU,   0,       em_TABE, em_AM,   em_OSE,  em_TYA,  0,       0,       em_CMA,  // 0x
@@ -81,10 +81,10 @@ const uint8_t melps4_disassembler::m58846_opmap[0xc0] =
 
 offs_t melps4_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	uint16_t op = opcodes.r16(pc) & 0x1ff;
+	u16 op = opcodes.r16(pc) & 0x1ff;
 
 	// get opcode
-	uint8_t instr;
+	u8 instr;
 	if (op >= 0x180)
 		instr = em_B;
 	else if (op >= 0x100)
@@ -94,28 +94,33 @@ offs_t melps4_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	else
 		instr = m58846_opmap[op];
 
+	u32 flags = em_flags[instr];
 	util::stream_format(stream, "%-6s", em_name[instr]);
 
 	// get immediate param
-	uint8_t bits = em_bits[instr];
+	u8 bits = em_bits[instr];
 
 	// special case for LXY x,y
 	if (instr == em_LXY)
 	{
-		uint8_t x = op >> 4 & 3;
-		uint8_t y = op & 0xf;
+		u8 x = op >> 4 & 3;
+		u8 y = op & 0xf;
 		util::stream_format(stream, "%d,%d", x, y);
 	}
 	else if (bits > 0)
 	{
-		uint8_t param = op & ((1 << bits) - 1);
+		u8 param = op & ((1 << bits) - 1);
+
+		if (instr == em_A && param == 6)
+			flags &= ~STEP_COND;
+
 		if (bits > 4)
 			util::stream_format(stream, "$%02X", param);
 		else
 			util::stream_format(stream, "%d", param);
 	}
 
-	return 1 | em_flags[instr] | SUPPORTED;
+	return 1 | flags | SUPPORTED;
 }
 
 u32 melps4_disassembler::opcode_alignment() const

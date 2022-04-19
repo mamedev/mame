@@ -300,12 +300,12 @@ public:
 	// construction/destruction
 	chd_cd_compressor(chd_file &chd, uint32_t hunkbytes, bool lossy)
 		: chd_compressor(chd, hunkbytes, lossy),
-			m_base_compressor(chd, (hunkbytes / CD_FRAME_SIZE) * CD_MAX_SECTOR_DATA, lossy),
-			m_subcode_compressor(chd, (hunkbytes / CD_FRAME_SIZE) * CD_MAX_SUBCODE_DATA, lossy),
-			m_buffer(hunkbytes + (hunkbytes / CD_FRAME_SIZE) * CD_MAX_SUBCODE_DATA)
+			m_base_compressor(chd, (hunkbytes / cdrom_file::FRAME_SIZE) * cdrom_file::MAX_SECTOR_DATA, lossy),
+			m_subcode_compressor(chd, (hunkbytes / cdrom_file::FRAME_SIZE) * cdrom_file::MAX_SUBCODE_DATA, lossy),
+			m_buffer(hunkbytes + (hunkbytes / cdrom_file::FRAME_SIZE) * cdrom_file::MAX_SUBCODE_DATA)
 	{
 		// make sure the CHD's hunk size is an even multiple of the frame size
-		if (hunkbytes % CD_FRAME_SIZE != 0)
+		if (hunkbytes % cdrom_file::FRAME_SIZE != 0)
 			throw std::error_condition(chd_file::error::CODEC_ERROR);
 	}
 
@@ -313,7 +313,7 @@ public:
 	virtual uint32_t compress(const uint8_t *src, uint32_t srclen, uint8_t *dest) override
 	{
 		// determine header bytes
-		uint32_t frames = srclen / CD_FRAME_SIZE;
+		uint32_t frames = srclen / cdrom_file::FRAME_SIZE;
 		uint32_t complen_bytes = (srclen < 65536) ? 2 : 3;
 		uint32_t ecc_bytes = (frames + 7) / 8;
 		uint32_t header_bytes = ecc_bytes + complen_bytes;
@@ -324,21 +324,21 @@ public:
 		// copy audio data followed by subcode data
 		for (uint32_t framenum = 0; framenum < frames; framenum++)
 		{
-			memcpy(&m_buffer[framenum * CD_MAX_SECTOR_DATA], &src[framenum * CD_FRAME_SIZE], CD_MAX_SECTOR_DATA);
-			memcpy(&m_buffer[frames * CD_MAX_SECTOR_DATA + framenum * CD_MAX_SUBCODE_DATA], &src[framenum * CD_FRAME_SIZE + CD_MAX_SECTOR_DATA], CD_MAX_SUBCODE_DATA);
+			memcpy(&m_buffer[framenum * cdrom_file::MAX_SECTOR_DATA], &src[framenum * cdrom_file::FRAME_SIZE], cdrom_file::MAX_SECTOR_DATA);
+			memcpy(&m_buffer[frames * cdrom_file::MAX_SECTOR_DATA + framenum * cdrom_file::MAX_SUBCODE_DATA], &src[framenum * cdrom_file::FRAME_SIZE + cdrom_file::MAX_SECTOR_DATA], cdrom_file::MAX_SUBCODE_DATA);
 
 			// clear out ECC data if we can
-			uint8_t *sector = &m_buffer[framenum * CD_MAX_SECTOR_DATA];
-			if (memcmp(sector, f_cd_sync_header, sizeof(f_cd_sync_header)) == 0 && ecc_verify(sector))
+			uint8_t *sector = &m_buffer[framenum * cdrom_file::MAX_SECTOR_DATA];
+			if (memcmp(sector, f_cd_sync_header, sizeof(f_cd_sync_header)) == 0 && cdrom_file::ecc_verify(sector))
 			{
 				dest[framenum / 8] |= 1 << (framenum % 8);
 				memset(sector, 0, sizeof(f_cd_sync_header));
-				ecc_clear(sector);
+				cdrom_file::ecc_clear(sector);
 			}
 		}
 
 		// encode the base portion
-		uint32_t complen = m_base_compressor.compress(&m_buffer[0], frames * CD_MAX_SECTOR_DATA, &dest[header_bytes]);
+		uint32_t complen = m_base_compressor.compress(&m_buffer[0], frames * cdrom_file::MAX_SECTOR_DATA, &dest[header_bytes]);
 		if (complen >= srclen)
 			throw std::error_condition(chd_file::error::COMPRESSION_ERROR);
 
@@ -349,7 +349,7 @@ public:
 			dest[ecc_bytes + 2] = complen >> ((complen_bytes - 3) * 8);
 
 		// encode the subcode
-		return header_bytes + complen + m_subcode_compressor.compress(&m_buffer[frames * CD_MAX_SECTOR_DATA], frames * CD_MAX_SUBCODE_DATA, &dest[header_bytes + complen]);
+		return header_bytes + complen + m_subcode_compressor.compress(&m_buffer[frames * cdrom_file::MAX_SECTOR_DATA], frames * cdrom_file::MAX_SUBCODE_DATA, &dest[header_bytes + complen]);
 	}
 
 private:
@@ -369,12 +369,12 @@ public:
 	// construction/destruction
 	chd_cd_decompressor(chd_file &chd, uint32_t hunkbytes, bool lossy)
 		: chd_decompressor(chd, hunkbytes, lossy),
-			m_base_decompressor(chd, (hunkbytes / CD_FRAME_SIZE) * CD_MAX_SECTOR_DATA, lossy),
-			m_subcode_decompressor(chd, (hunkbytes / CD_FRAME_SIZE) * CD_MAX_SUBCODE_DATA, lossy),
+			m_base_decompressor(chd, (hunkbytes / cdrom_file::FRAME_SIZE) * cdrom_file::MAX_SECTOR_DATA, lossy),
+			m_subcode_decompressor(chd, (hunkbytes / cdrom_file::FRAME_SIZE) * cdrom_file::MAX_SUBCODE_DATA, lossy),
 			m_buffer(hunkbytes)
 	{
 		// make sure the CHD's hunk size is an even multiple of the frame size
-		if (hunkbytes % CD_FRAME_SIZE != 0)
+		if (hunkbytes % cdrom_file::FRAME_SIZE != 0)
 			throw std::error_condition(chd_file::error::CODEC_ERROR);
 	}
 
@@ -382,7 +382,7 @@ public:
 	virtual void decompress(const uint8_t *src, uint32_t complen, uint8_t *dest, uint32_t destlen) override
 	{
 		// determine header bytes
-		uint32_t frames = destlen / CD_FRAME_SIZE;
+		uint32_t frames = destlen / cdrom_file::FRAME_SIZE;
 		uint32_t complen_bytes = (destlen < 65536) ? 2 : 3;
 		uint32_t ecc_bytes = (frames + 7) / 8;
 		uint32_t header_bytes = ecc_bytes + complen_bytes;
@@ -393,21 +393,21 @@ public:
 			complen_base = (complen_base << 8) | src[ecc_bytes + 2];
 
 		// reset and decode
-		m_base_decompressor.decompress(&src[header_bytes], complen_base, &m_buffer[0], frames * CD_MAX_SECTOR_DATA);
-		m_subcode_decompressor.decompress(&src[header_bytes + complen_base], complen - complen_base - header_bytes, &m_buffer[frames * CD_MAX_SECTOR_DATA], frames * CD_MAX_SUBCODE_DATA);
+		m_base_decompressor.decompress(&src[header_bytes], complen_base, &m_buffer[0], frames * cdrom_file::MAX_SECTOR_DATA);
+		m_subcode_decompressor.decompress(&src[header_bytes + complen_base], complen - complen_base - header_bytes, &m_buffer[frames * cdrom_file::MAX_SECTOR_DATA], frames * cdrom_file::MAX_SUBCODE_DATA);
 
 		// reassemble the data
 		for (uint32_t framenum = 0; framenum < frames; framenum++)
 		{
-			memcpy(&dest[framenum * CD_FRAME_SIZE], &m_buffer[framenum * CD_MAX_SECTOR_DATA], CD_MAX_SECTOR_DATA);
-			memcpy(&dest[framenum * CD_FRAME_SIZE + CD_MAX_SECTOR_DATA], &m_buffer[frames * CD_MAX_SECTOR_DATA + framenum * CD_MAX_SUBCODE_DATA], CD_MAX_SUBCODE_DATA);
+			memcpy(&dest[framenum * cdrom_file::FRAME_SIZE], &m_buffer[framenum * cdrom_file::MAX_SECTOR_DATA], cdrom_file::MAX_SECTOR_DATA);
+			memcpy(&dest[framenum * cdrom_file::FRAME_SIZE + cdrom_file::MAX_SECTOR_DATA], &m_buffer[frames * cdrom_file::MAX_SECTOR_DATA + framenum * cdrom_file::MAX_SUBCODE_DATA], cdrom_file::MAX_SUBCODE_DATA);
 
 			// reconstitute the ECC data and sync header
-			uint8_t *sector = &dest[framenum * CD_FRAME_SIZE];
+			uint8_t *sector = &dest[framenum * cdrom_file::FRAME_SIZE];
 			if ((src[framenum / 8] & (1 << (framenum % 8))) != 0)
 			{
 				memcpy(sector, f_cd_sync_header, sizeof(f_cd_sync_header));
-				ecc_generate(sector);
+				cdrom_file::ecc_generate(sector);
 			}
 		}
 	}
@@ -1427,7 +1427,7 @@ chd_cd_flac_compressor::chd_cd_flac_compressor(chd_file &chd, uint32_t hunkbytes
 		m_buffer(hunkbytes)
 {
 	// make sure the CHD's hunk size is an even multiple of the frame size
-	if (hunkbytes % CD_FRAME_SIZE != 0)
+	if (hunkbytes % cdrom_file::FRAME_SIZE != 0)
 		throw std::error_condition(chd_file::error::CODEC_ERROR);
 
 	// determine whether we want native or swapped samples
@@ -1438,7 +1438,7 @@ chd_cd_flac_compressor::chd_cd_flac_compressor(chd_file &chd, uint32_t hunkbytes
 	// configure the encoder
 	m_encoder.set_sample_rate(44100);
 	m_encoder.set_num_channels(2);
-	m_encoder.set_block_size(blocksize((hunkbytes / CD_FRAME_SIZE) * CD_MAX_SECTOR_DATA));
+	m_encoder.set_block_size(blocksize((hunkbytes / cdrom_file::FRAME_SIZE) * cdrom_file::MAX_SECTOR_DATA));
 	m_encoder.set_strip_metadata(true);
 
 	// initialize the deflater
@@ -1473,25 +1473,25 @@ chd_cd_flac_compressor::~chd_cd_flac_compressor()
 uint32_t chd_cd_flac_compressor::compress(const uint8_t *src, uint32_t srclen, uint8_t *dest)
 {
 	// copy audio data followed by subcode data
-	uint32_t frames = hunkbytes() / CD_FRAME_SIZE;
+	uint32_t frames = hunkbytes() / cdrom_file::FRAME_SIZE;
 	for (uint32_t framenum = 0; framenum < frames; framenum++)
 	{
-		memcpy(&m_buffer[framenum * CD_MAX_SECTOR_DATA], &src[framenum * CD_FRAME_SIZE], CD_MAX_SECTOR_DATA);
-		memcpy(&m_buffer[frames * CD_MAX_SECTOR_DATA + framenum * CD_MAX_SUBCODE_DATA], &src[framenum * CD_FRAME_SIZE + CD_MAX_SECTOR_DATA], CD_MAX_SUBCODE_DATA);
+		memcpy(&m_buffer[framenum * cdrom_file::MAX_SECTOR_DATA], &src[framenum * cdrom_file::FRAME_SIZE], cdrom_file::MAX_SECTOR_DATA);
+		memcpy(&m_buffer[frames * cdrom_file::MAX_SECTOR_DATA + framenum * cdrom_file::MAX_SUBCODE_DATA], &src[framenum * cdrom_file::FRAME_SIZE + cdrom_file::MAX_SECTOR_DATA], cdrom_file::MAX_SUBCODE_DATA);
 	}
 
 	// reset and encode the audio portion
 	m_encoder.reset(dest, hunkbytes());
 	uint8_t *buffer = &m_buffer[0];
-	if (!m_encoder.encode_interleaved(reinterpret_cast<int16_t *>(buffer), frames * CD_MAX_SECTOR_DATA/4, m_swap_endian))
+	if (!m_encoder.encode_interleaved(reinterpret_cast<int16_t *>(buffer), frames * cdrom_file::MAX_SECTOR_DATA/4, m_swap_endian))
 		throw std::error_condition(chd_file::error::COMPRESSION_ERROR);
 
 	// finish up
 	uint32_t complen = m_encoder.finish();
 
 	// deflate the subcode data
-	m_deflater.next_in = const_cast<Bytef *>(&m_buffer[frames * CD_MAX_SECTOR_DATA]);
-	m_deflater.avail_in = frames * CD_MAX_SUBCODE_DATA;
+	m_deflater.next_in = const_cast<Bytef *>(&m_buffer[frames * cdrom_file::MAX_SECTOR_DATA]);
+	m_deflater.avail_in = frames * cdrom_file::MAX_SUBCODE_DATA;
 	m_deflater.total_in = 0;
 	m_deflater.next_out = &dest[complen];
 	m_deflater.avail_out = hunkbytes() - complen;
@@ -1526,7 +1526,7 @@ uint32_t chd_cd_flac_compressor::blocksize(uint32_t bytes)
 {
 	// for CDs it seems that CD_MAX_SECTOR_DATA is the right target
 	uint32_t blocksize = bytes / 4;
-	while (blocksize > CD_MAX_SECTOR_DATA)
+	while (blocksize > cdrom_file::MAX_SECTOR_DATA)
 		blocksize /= 2;
 	return blocksize;
 }
@@ -1556,7 +1556,7 @@ chd_cd_flac_decompressor::chd_cd_flac_decompressor(chd_file &chd, uint32_t hunkb
 		m_buffer(hunkbytes)
 {
 	// make sure the CHD's hunk size is an even multiple of the frame size
-	if (hunkbytes % CD_FRAME_SIZE != 0)
+	if (hunkbytes % cdrom_file::FRAME_SIZE != 0)
 		throw std::error_condition(chd_file::error::CODEC_ERROR);
 
 	// determine whether we want native or swapped samples
@@ -1609,11 +1609,11 @@ chd_cd_flac_decompressor::~chd_cd_flac_decompressor()
 void chd_cd_flac_decompressor::decompress(const uint8_t *src, uint32_t complen, uint8_t *dest, uint32_t destlen)
 {
 	// reset and decode
-	uint32_t frames = destlen / CD_FRAME_SIZE;
-	if (!m_decoder.reset(44100, 2, chd_cd_flac_compressor::blocksize(frames * CD_MAX_SECTOR_DATA), src, complen))
+	uint32_t frames = destlen / cdrom_file::FRAME_SIZE;
+	if (!m_decoder.reset(44100, 2, chd_cd_flac_compressor::blocksize(frames * cdrom_file::MAX_SECTOR_DATA), src, complen))
 		throw std::error_condition(chd_file::error::DECOMPRESSION_ERROR);
 	uint8_t *buffer = &m_buffer[0];
-	if (!m_decoder.decode_interleaved(reinterpret_cast<int16_t *>(buffer), frames * CD_MAX_SECTOR_DATA/4, m_swap_endian))
+	if (!m_decoder.decode_interleaved(reinterpret_cast<int16_t *>(buffer), frames * cdrom_file::MAX_SECTOR_DATA/4, m_swap_endian))
 		throw std::error_condition(chd_file::error::DECOMPRESSION_ERROR);
 
 	// inflate the subcode data
@@ -1621,8 +1621,8 @@ void chd_cd_flac_decompressor::decompress(const uint8_t *src, uint32_t complen, 
 	m_inflater.next_in = const_cast<Bytef *>(src + offset);
 	m_inflater.avail_in = complen - offset;
 	m_inflater.total_in = 0;
-	m_inflater.next_out = &m_buffer[frames * CD_MAX_SECTOR_DATA];
-	m_inflater.avail_out = frames * CD_MAX_SUBCODE_DATA;
+	m_inflater.next_out = &m_buffer[frames * cdrom_file::MAX_SECTOR_DATA];
+	m_inflater.avail_out = frames * cdrom_file::MAX_SUBCODE_DATA;
 	m_inflater.total_out = 0;
 	int zerr = inflateReset(&m_inflater);
 	if (zerr != Z_OK)
@@ -1632,14 +1632,14 @@ void chd_cd_flac_decompressor::decompress(const uint8_t *src, uint32_t complen, 
 	zerr = inflate(&m_inflater, Z_FINISH);
 	if (zerr != Z_STREAM_END)
 		throw std::error_condition(chd_file::error::DECOMPRESSION_ERROR);
-	if (m_inflater.total_out != frames * CD_MAX_SUBCODE_DATA)
+	if (m_inflater.total_out != frames * cdrom_file::MAX_SUBCODE_DATA)
 		throw std::error_condition(chd_file::error::DECOMPRESSION_ERROR);
 
 	// reassemble the data
 	for (uint32_t framenum = 0; framenum < frames; framenum++)
 	{
-		memcpy(&dest[framenum * CD_FRAME_SIZE], &m_buffer[framenum * CD_MAX_SECTOR_DATA], CD_MAX_SECTOR_DATA);
-		memcpy(&dest[framenum * CD_FRAME_SIZE + CD_MAX_SECTOR_DATA], &m_buffer[frames * CD_MAX_SECTOR_DATA + framenum * CD_MAX_SUBCODE_DATA], CD_MAX_SUBCODE_DATA);
+		memcpy(&dest[framenum * cdrom_file::FRAME_SIZE], &m_buffer[framenum * cdrom_file::MAX_SECTOR_DATA], cdrom_file::MAX_SECTOR_DATA);
+		memcpy(&dest[framenum * cdrom_file::FRAME_SIZE + cdrom_file::MAX_SECTOR_DATA], &m_buffer[frames * cdrom_file::MAX_SECTOR_DATA + framenum * cdrom_file::MAX_SUBCODE_DATA], cdrom_file::MAX_SUBCODE_DATA);
 	}
 }
 

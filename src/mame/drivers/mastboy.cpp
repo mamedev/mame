@@ -768,21 +768,9 @@ static const gfx_layout tiles8x8_layout =
 };
 
 
-static const gfx_layout tiles8x8_layout_2 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0,4,8,12,16,20,24,28 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
-
 static GFXDECODE_START( gfx_mastboy )
-	GFXDECODE_RAM(   "vram", 0, tiles8x8_layout,   0, 16 )
-	GFXDECODE_ENTRY( "vrom", 0, tiles8x8_layout_2, 0, 16 )
+	GFXDECODE_RAM(   "vram", 0, tiles8x8_layout,      0, 16 )
+	GFXDECODE_ENTRY( "vrom", 0, gfx_8x8x4_packed_msb, 0, 16 )
 GFXDECODE_END
 
 /* Machine Functions / Driver */

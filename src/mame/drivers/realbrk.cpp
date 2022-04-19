@@ -713,17 +713,6 @@ static const gfx_layout layout_8x8x4 =
 	8*8*4
 };
 
-static const gfx_layout layout_16x16x4 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{   STEP4(0,1)      },
-	{   1*4,0*4,3*4,2*4,5*4,4*4,7*4,6*4,9*4,8*4,11*4,10*4,13*4,12*4,15*4,14*4 },
-	{   STEP16(0,16*4)  },
-	16*16*4
-};
-
 static const gfx_layout layout_16x16x8 =
 {
 	16,16,
@@ -736,10 +725,10 @@ static const gfx_layout layout_16x16x8 =
 };
 
 static GFXDECODE_START( gfx_realbrk )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8,     0, 0x80     )   // [0] Backgrounds
-	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,       0, 0x800    )   // [1] Text
-	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8,     0, 0x80     )   // [2] Sprites (256 colors)
-	GFXDECODE_ENTRY( "gfx4", 0, layout_16x16x4,     0, 0x800    )   // [3] Sprites (16 colors)
+	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8,         0, 0x80     )   // [0] Backgrounds
+	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,           0, 0x800    )   // [1] Text
+	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8,         0, 0x80     )   // [2] Sprites (256 colors)
+	GFXDECODE_ENTRY( "gfx4", 0, gfx_16x16x4_packed_lsb, 0, 0x800    )   // [3] Sprites (16 colors)
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_dai2kaku )

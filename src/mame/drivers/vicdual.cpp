@@ -2223,7 +2223,7 @@ static INPUT_PORTS_START( alphahob )
 	PORT_DIPNAME( 0x04, 0x00, "Missile Bonus Life" )      PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, "10k" )
 	PORT_DIPSETTING(    0x04, "15k" )
-	
+
 	PORT_MODIFY("IN3")
 	PORT_DIPNAME( 0x04, 0x00, "Missile Final UFO Bonus" ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )

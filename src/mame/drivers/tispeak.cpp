@@ -533,8 +533,6 @@ void tispeak_state::machine_start()
 
 void tispeak_state::init_cartridge()
 {
-	m_overlay = 0;
-
 	if (m_cart != nullptr && m_cart->exists())
 	{
 		std::string region_tag;

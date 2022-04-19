@@ -19,12 +19,6 @@ public:
 	virtual uint8_t read_l(offs_t offset) override { return read_m(offset); }
 	virtual uint8_t read_m(offs_t offset) override;
 	virtual void write_h(offs_t offset, uint8_t data) override;
-
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
 
@@ -77,12 +71,6 @@ class nes_3dblock_device : public nes_nrom_device
 public:
 	// construction/destruction
 	nes_3dblock_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
 

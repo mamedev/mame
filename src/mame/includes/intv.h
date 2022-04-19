@@ -86,12 +86,12 @@ private:
 	void intv_ram16_w(offs_t offset, uint16_t data);
 	uint8_t intvkb_iocart_r(offs_t offset);
 
-	uint8_t m_bus_copy_mode;
-	uint8_t m_backtab_row;
-	uint16_t m_ram16[0x160];
-	int m_sr1_int_pending;
-	uint8_t m_ram8[256];
-	bool m_maincpu_reset;
+	uint8_t m_bus_copy_mode = 0;
+	uint8_t m_backtab_row = 0;
+	uint16_t m_ram16[0x160]{};
+	int m_sr1_int_pending = 0;
+	uint8_t m_ram8[256]{};
+	bool m_maincpu_reset = false;
 
 	// Keyboard Component
 	void intvkbd_dualport16_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -106,15 +106,15 @@ private:
 
 	uint16_t iab_r();
 
-	bool m_printer_not_busy;        // printer state
-	bool m_printer_no_paper;        // printer state
-	bool m_printer_not_busy_enable; // printer interface state
+	bool m_printer_not_busy = false;        // printer state
+	bool m_printer_no_paper = false;        // printer state
+	bool m_printer_not_busy_enable = false; // printer interface state
 
-	int m_intvkbd_text_blanked;
-	int m_intvkbd_keyboard_col;
-	int m_tape_int_pending;
-	int m_tape_interrupts_enabled;
-	int m_tape_motor_mode;
+	int m_intvkbd_text_blanked = 0;
+	int m_intvkbd_keyboard_col = 0;
+	int m_tape_int_pending = 0;
+	int m_tape_interrupts_enabled = 0;
+	int m_tape_motor_mode = 0;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -135,7 +135,7 @@ private:
 	void intvkbd_mem(address_map &map);
 	void intvoice_mem(address_map &map);
 
-	int m_is_keybd;
+	int m_is_keybd = 0;
 
 	optional_device<cpu_device> m_keyboard;
 	optional_device<generic_slot_device> m_iocart1;
