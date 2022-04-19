@@ -67923,25 +67923,9 @@ All musics were removed in this game.
 		</part>
 	</software>
 
+<!-- FIXME: misstank and ddtank below look like underdumped multicarts with Tank 1990, Dr Mario, and Pinball? Also with Numen Wager (Dushen)? -->
 	<software name="misstank" cloneof="batlcity">
-		<description>Missile Tank (Chi)</description>
-		<year>1994</year>
-		<publisher>Y.S</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="cnrom" />
-			<feature name="pcb" value="NES-CNROM" />
-			<feature name="bus_conflict" value="no" />
-			<dataarea name="chr" size="16384">
-				<rom name="missile tank (ch).chr" size="16384" crc="1c370fa6" sha1="2b14e218060bebe5d4eeaf480394104f97ce0ad1" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="32768">
-				<rom name="missile tank (ch).prg" size="32768" crc="c4d3b9dd" sha1="7a4275cffcb2d2b632662e21d9f237efab51e602" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="misstank1" cloneof="batlcity">
-		<description>Missile Tank (Chi, Alt with 6 enemies)</description>
+		<description>Missile Tank (China, alt with 6 enemies)</description>
 		<year>1994</year>
 		<publisher>Y.S</publisher>
 		<part name="cart" interface="nes_cart">
