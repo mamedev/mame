@@ -235,7 +235,7 @@ protected:
 	void take_interrupt();
 	void take_nmi();
 	void nomreq_ir(s8 cycles);
-	void nomreq_addr(u16 addr, s8 cycles);
+	u16 nomreq_addr(u16 addr, s8 cycles);
 
 	// address spaces
 	const address_space_config m_program_config;
