@@ -3,11 +3,12 @@
 
 /*
     Fighting Fantasy (Modular System)
+    Dragon Ninja (Modular System)
 
     As with most of the 'Modular System' setups, the hardware is heavily modified from the original
     and consists of a multi-board stack in a cage, hence different driver.
 
-    For this game the Modular System cage contains 8 main boards and 1 sub board.
+    For Fighting Fantasy the Modular System cage contains 8 main boards and 1 sub board.
 
     MOD-6/1 - TSC68000CP12, 4 ROMs, RAMs, 20 MHz XTAL.
     MOD 21/1(?) - 20 MHz XTAL.
@@ -19,19 +20,33 @@
     MOD 4/3 - Tilemap board, has logic + 4 tilemap ROMs, long thin sub-board (C0469 SOLD) with no chips, just routing along one edge.
 
     PCBs pictures and dip listing are available at: http://www.recreativas.org/modular-system-fighting-fantasy-5694-gaelco-sa
+
+    For Dragon Ninja the Modular System cage contains 7 main boards and 1 sub board.
+
+    MOD-6/1 - MC68000P10, 2 ROMs, RAMs, 20 MHz XTAL.
+    MOD 21/1(?) - 20 MHz XTAL.
+    MOD 1/B 4 - Sound board (Z0840006PSC, 2 x YM2203C). 2 8-dips banks + small sub board with OKI M5205.
+    MOD 51/3 - Sprite board, has logic + 4 ROM, short thin sub-board (C0528) with no chips, just routing along one edge.
+    MOD 4/3 - Tilemap board, has logic + 4 tilemap ROMs, long thin sub-board (C0462) with no chips, just routing along one edge.
+    MOD 4/3 - Tilemap board, has logic + 4 tilemap ROMs, long thin sub-board (C0463) with no chips, just routing along one edge.
+    MOD 4/2 - Tilemap board, has logic + 4 tilemap ROMs, long thin sub-board (C0464) with no chips, just routing along one edge.
 */
 
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 #include "sound/ymopn.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 class ffantasy_ms_state : public driver_device
 {
@@ -60,6 +75,7 @@ private:
 void ffantasy_ms_state::ffantasym_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
+	map(0xff8000, 0xffbfff).ram();
 }
 
 
@@ -74,6 +90,23 @@ uint32_t ffantasy_ms_state::screen_update(screen_device &screen, bitmap_ind16 &b
 }
 
 static INPUT_PORTS_START( ffantasym )
+	PORT_START("DSW")
+	PORT_DIPUNKNOWN_DIPLOC(0x0001, 0x0001, "SW1:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x0002, 0x0002, "SW1:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x0004, 0x0004, "SW1:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x0008, 0x0008, "SW1:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x0010, 0x0010, "SW1:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x0020, 0x0020, "SW1:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x0040, 0x0040, "SW1:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x0080, 0x0080, "SW1:8")
+	PORT_DIPUNKNOWN_DIPLOC(0x0100, 0x0100, "SW2:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x0200, 0x0200, "SW2:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x0400, 0x0400, "SW2:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x0800, 0x0800, "SW2:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x1000, 0x1000, "SW2:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x2000, 0x2000, "SW2:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x4000, 0x4000, "SW2:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x8000, 0x8000, "SW2:8")
 INPUT_PORTS_END
 
 static GFXDECODE_START( gfx_ffantasy_ms )
@@ -150,7 +183,7 @@ ROM_START( ffantasym )
 	ROM_LOAD( "ff_5-1_5fa_523.ic26",  0xe0000, 0x10000, CRC(a541c879) SHA1(53133cb2ad5378f101025fc758d08a54e23f3c87) )
 	ROM_LOAD( "ff_5-1_5fa_524.ic27",  0xf0000, 0x10000, CRC(1e7351c5) SHA1(88d83b45f25fe58726e5158b97395443cf065564) )
 
-	ROM_REGION( 0x0400, "proms", 0 )    /* PROMs (function unknown) */
+	ROM_REGION( 0x0400, "proms", 0 )    // PROMs (function unknown)
 	ROM_LOAD( "ff_1-5_110_82s123.ic20",  0x000, 0x020, CRC(e26e680a) SHA1(9bbe30e98e952a6113c64e1171330153ddf22ce7) )
 	ROM_LOAD( "ff_21-1_201_82s129.ic4",  0x100, 0x100, CRC(2697da58) SHA1(e62516b886ff6e204b718e5f0c6ce2712e4b7fc5) )
 	ROM_LOAD( "ff_21-1_205_82s129.ic12", 0x200, 0x100, CRC(204a7aee) SHA1(322164134aa65c37a9389024f921364a81d13e88) )
@@ -167,4 +200,57 @@ ROM_START( ffantasym )
 	ROM_LOAD( "ff_5-1_5235_gal16v8.ic8",       0x000, 0x117, NO_DUMP )
 ROM_END
 
+ROM_START( drgninjam )
+	ROM_REGION( 0x100000, "maincpu", 0 ) // on MOD 6/1 board, extremely similar to drgninjab in dec0.cpp. TODO: ROM loading may be wrong (check 0x20000 - 0x3ffff being empty in drgninjab)
+	ROM_LOAD16_BYTE( "6-1_cpu_dn_603.ic17",  0x00000, 0x20000, CRC(1c3670df) SHA1(0e287a0b4494e702080e80a911c4762bbc6a5815) )
+	ROM_LOAD16_BYTE( "6-1_cpu_dn_606.ic8",   0x00001, 0x20000, CRC(07669458) SHA1(c5dcf72eba5e345228ee3f9e0228cba526e1156a) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // on MOD 1/2 board
+	ROM_LOAD( "1-4_snd_dn_101.ic12",  0x00000, 0x10000, CRC(0b82c205) SHA1(0be243b19693c54914eccefbf6a8b8b513eec299) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 ) // on one of the MOD 4/3 boards
+	ROM_LOAD( "4-3_dn_401.ic17",  0x0000,  0x4000, CRC(45ab2822) SHA1(0cf0f74ad5325a66f74fc20cabd6a9d3d8c42f2a) )
+	ROM_LOAD( "4-3_dn_402.ic16",  0x4000,  0x4000, CRC(26f0095b) SHA1(9e568a23df2b0ca05d8b87fea445f5f98e55fac5) )
+	ROM_LOAD( "4-3_dn_403.ic15",  0x8000,  0x4000, CRC(c2061c37) SHA1(b06737ecece7da4785c2e98977f6dc35986a445e) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(                            0x4000 )
+	ROM_LOAD( "4-3_dn_404.ic14",  0xc000,  0x4000, CRC(1da44e82) SHA1(ccb9464b711025a5c2c18ecb765f7f0e15f7d4a5) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(                            0x4000 )
+
+	ROM_REGION( 0x80000, "gfx2", 0 ) // on a second MOD 4/3 board
+	ROM_LOAD( "4-3-a_dn_4a01.ic17",  0x00000, 0x8000, CRC(c89982ac) SHA1(7509322bf4dcaceefdbaf6e9f4087a576133fe39) )
+	ROM_LOAD( "4-3-a_dn_4a02.ic16",  0x08000, 0x8000, CRC(144b0359) SHA1(46565c5694f0cfcf06c1ee7c131ab3c88c804d35) )
+	ROM_LOAD( "4-3-a_dn_4a03.ic15",  0x10000, 0x8000, CRC(ae98a684) SHA1(d6fe7237b82125a21b9804500ba2166906475a0e) )
+	ROM_LOAD( "4-3-a_dn_4a04.ic14",  0x18000, 0x8000, CRC(8292c4ad) SHA1(f83acf64b101022927b678749d754374a20f5444) )
+
+	ROM_REGION( 0x80000, "gfx3", 0 ) // on a MOD 4/2 board
+	ROM_LOAD( "4-2-b_dn_4b01.ic17",  0x00000, 0x10000, CRC(65002e5c) SHA1(e1fa0a0395d3fbcf31e15b63b7eaf478063aa971) )
+	ROM_LOAD( "4-2-b_dn_4b02.ic16",  0x10000, 0x10000, CRC(dd6acd2d) SHA1(e2a0ccf49dce421b10ad0ed54d02ba1ca6525404) )
+	ROM_LOAD( "4-2-b_dn_4b03.ic15",  0x20000, 0x10000, CRC(63e337c1) SHA1(ca347d6a46ee643edfdc8614760dc9b0994e1745) )
+	ROM_LOAD( "4-2-b_dn_4b04.ic14",  0x30000, 0x10000, CRC(5cc7ec8c) SHA1(3f17e13af7152c51ce025ca06ece70b4a6f65f94) )
+
+	ROM_REGION( 0x100000, "gfx4", 0 ) // on MOD 51/1 board
+	ROM_LOAD( "51-3_dn_501.ic43",  0x00000, 0x20000, CRC(0fccce1f) SHA1(e2e5625b62ddd73a4363596a4b1b2d72c2fe1c38) )
+	ROM_LOAD( "51-3_dn_502.ic42",  0x20000, 0x20000, CRC(361f4616) SHA1(40279c76d027bcf698b8ff694afc2afb15279381) )
+	ROM_LOAD( "51-3_dn_502.ic42",  0x40000, 0x20000, CRC(b3c97ad1) SHA1(f77426e1ee347b8cae9c5aef1e31058344c019c2) )
+	ROM_LOAD( "51-3_dn_504.ic40",  0x60000, 0x20000, CRC(1445dccb) SHA1(fddbb9d136ea6dbb2704ac93e5536ed0e6bfb19c) )
+
+	ROM_REGION( 0x0400, "proms", 0 )    // PROMs (function unknown)
+	ROM_LOAD( "1-4_snd_110_82s123.ic20",  0x000, 0x020, CRC(e26e680a) SHA1(9bbe30e98e952a6113c64e1171330153ddf22ce7) )
+	ROM_LOAD( "21-1_p0201_tbp24s10n.ic4", 0x100, 0x100, CRC(2697da58) SHA1(e62516b886ff6e204b718e5f0c6ce2712e4b7fc5) )
+	ROM_LOAD( "21-1_p0205_82s129n.ic12",  0x200, 0x100, CRC(204a7aee) SHA1(322164134aa65c37a9389024f921364a81d13e88) )
+	ROM_LOAD( "51-3_502_82s129.ic10",     0x300, 0x100, CRC(15085e44) SHA1(646e7100fcb112594023cf02be036bd3d42cc13c) )
+
+	ROM_REGION( 0xc00, "plds", ROMREGION_ERASEFF )
+	ROM_LOAD( "6-1_cpu_604_gal16v8.ic13", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "6-1_cpu_630_gal16v8.ic7",  0x200, 0x117, NO_DUMP )
+	ROM_LOAD( "4-3_p0403_pal16r8a.ic29",  0x400, 0x104, CRC(506156cc) SHA1(5560671fc2c9872ed28620491af5dc486909fc6e) )
+	ROM_LOAD( "4-3-a_p0403.ic29",         0x600, 0x104, CRC(506156cc) SHA1(5560671fc2c9872ed28620491af5dc486909fc6e) )
+	ROM_LOAD( "4-2-b_403_gal16v8.ic29",   0x800, 0x104, NO_DUMP )
+	ROM_LOAD( "51-3_503_gal16v8.ic46",    0xa00, 0x117, CRC(11470ea1) SHA1(cfcafbcc7e55be717348f895df61e144fdd0cc9b) )
+ROM_END
+
+} // anonymous namespace
+
+
 GAME( 199?, ffantasym,  hippodrm,  ffantasym,  ffantasym,  ffantasy_ms_state, empty_init, ROT0, "bootleg (Gaelco / Ervisa)", "Fighting Fantasy (Modular System)", MACHINE_IS_SKELETON )
+GAME( 199?, drgninjam,  baddudes,  ffantasym,  ffantasym,  ffantasy_ms_state, empty_init, ROT0, "bootleg (Gaelco / Ervisa)", "Dragon Ninja (Modular System)",     MACHINE_IS_SKELETON )
