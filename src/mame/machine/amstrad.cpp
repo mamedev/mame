@@ -3072,8 +3072,7 @@ void amstrad_state::amstrad_common_init()
 		(const uint8_t*)amstrad_cycle_table_ed,
 		(const uint8_t*)amstrad_cycle_table_xy,
 		(const uint8_t*)amstrad_cycle_table_xycb,
-		(const uint8_t*)amstrad_cycle_table_ex,
-		nullptr);
+		(const uint8_t*)amstrad_cycle_table_ex);
 
 	/* Juergen is a cool dude! */
 }

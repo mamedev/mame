@@ -293,12 +293,12 @@ SamRam
 
 uint8_t spectrum_state::pre_opcode_fetch_r(offs_t offset)
 {
+	if (is_contended(offset)) adjust_contended();
 	/* this allows expansion devices to act upon opcode fetches from MEM addresses
 	   for example, interface1 detection fetches requires fetches at 0008 / 0708 to
 	   enable paged ROM and then fetches at 0700 to disable it
 	*/
 	m_exp->pre_opcode_fetch(offset);
-	if (is_contended(offset)) adjust_contended();
 	uint8_t retval = m_specmem->space(AS_PROGRAM).read_byte(offset);
 	m_exp->post_opcode_fetch(offset);
 	return retval;
@@ -306,8 +306,8 @@ uint8_t spectrum_state::pre_opcode_fetch_r(offs_t offset)
 
 uint8_t spectrum_state::spectrum_data_r(offs_t offset)
 {
-	m_exp->pre_data_fetch(offset);
 	if (is_contended(offset)) adjust_contended();
+	m_exp->pre_data_fetch(offset);
 	uint8_t retval = m_specmem->space(AS_PROGRAM).read_byte(offset);
 	m_exp->post_data_fetch(offset);
 	return retval;
@@ -323,18 +323,43 @@ bool spectrum_state::is_contended(offs_t offset) {
 	return offset >= 0x4000 && (offset <= 0x7fff /*128: && offset < 0xc000*/);
 }
 
-void spectrum_state::adjust_contended(attotime shift)
+void spectrum_state::adjust_contended(s8 shift)
 {
-	unsigned int vpos = m_screen->vpos();
+	u64 vpos = m_screen->vpos();
 	if (m_contention_pattern.empty() || vpos < get_screen_area().top() || vpos > get_screen_area().bottom())
 		return;
 
-	attotime contended_pass = shift + m_screen->scan_period() - m_screen->time_until_pos(vpos + 1, get_screen_area().left());
-	attotime contended_left = shift + m_screen->scan_period() - m_screen->time_until_pos(vpos + 1, get_screen_area().right() + 1);
-	if(contended_pass >= attotime::zero && contended_left < attotime::zero) {
-		u64 clocks = m_maincpu->attotime_to_clocks(contended_pass);
-		u8 i = m_contention_pattern[clocks % m_contention_pattern.size()];
-		m_maincpu->eat_cycles(i);
+	u64 now = m_maincpu->total_cycles() - m_irq_start_cycle + shift;
+	u64 cf = vpos * m_screen->width() * m_maincpu->clock() / m_screen->clock() - 1;
+	u64 ct = cf + get_screen_area().width() * m_maincpu->clock() / m_screen->clock();
+
+	if(cf <= now && now < ct)
+	{
+		u64 clocks = now - cf;
+		u8 c = m_contention_pattern[clocks % m_contention_pattern.size()];
+		m_maincpu->adjust_icount(-c);
+	}
+}
+
+void spectrum_state::content_port_late()
+{
+	u64 vpos = m_screen->vpos();
+	if (m_contention_pattern.empty() || vpos < get_screen_area().top() || vpos > get_screen_area().bottom())
+		return;
+
+	u64 now = m_maincpu->total_cycles() - m_irq_start_cycle + 1;
+	u64 cf = vpos * m_screen->width() * m_maincpu->clock() / m_screen->clock() - 1;
+	u64 ct = cf + get_screen_area().width() * m_maincpu->clock() / m_screen->clock();
+	for(auto i = 0x04; i; i >>= 1)
+	{
+		if(cf <= now && now < ct)
+		{
+			u64 clocks = now - cf;
+			u8 c = m_contention_pattern[clocks % m_contention_pattern.size()];
+			m_maincpu->adjust_icount(-c);
+			now += c;
+		}
+		now++;
 	}
 }
 
@@ -363,7 +388,9 @@ uint8_t spectrum_state::spectrum_rom_r(offs_t offset)
 */
 void spectrum_state::spectrum_ula_w(offs_t offset, uint8_t data)
 {
-	adjust_contended(m_maincpu->clocks_to_attotime(1));
+	if (is_contended(offset))
+		adjust_contended();
+	adjust_contended(1);
 
 	unsigned char Changed = m_port_fe_data^data;
 
@@ -391,7 +418,9 @@ void spectrum_state::spectrum_ula_w(offs_t offset, uint8_t data)
 /* DJR: Spectrum+ keys added */
 uint8_t spectrum_state::spectrum_ula_r(offs_t offset)
 {
-	adjust_contended(m_maincpu->clocks_to_attotime(1));
+	if (is_contended(offset))
+		adjust_contended();
+	adjust_contended(1);
 
 	int lines = offset >> 8;
 	int data = 0xff;
@@ -468,7 +497,12 @@ uint8_t spectrum_state::spectrum_ula_r(offs_t offset)
 
 void spectrum_state::spectrum_port_w(offs_t offset, uint8_t data)
 {
-	if (is_contended(offset)) adjust_contended(m_maincpu->clocks_to_attotime(1));
+	if (is_contended(offset))
+	{
+		adjust_contended();
+		content_port_late();
+	}
+
 	// Pass through to expansion device if present
 	if (m_exp->get_card_device())
 		m_exp->iorq_w(offset | 1, data);
@@ -476,11 +510,16 @@ void spectrum_state::spectrum_port_w(offs_t offset, uint8_t data)
 
 uint8_t spectrum_state::spectrum_port_r(offs_t offset)
 {
+	if (is_contended(offset))
+	{
+		adjust_contended();
+		content_port_late();
+	}
+
 	// Pass through to expansion device if present
 	if (m_exp->get_card_device())
 		return m_exp->iorq_r(offset | 1);
 
-	if (is_contended(offset)) adjust_contended(m_maincpu->clocks_to_attotime(1));
 	return floating_bus_r();
 }
 
@@ -772,6 +811,7 @@ void spectrum_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	case TIMER_IRQ_ON:
 		m_maincpu->set_input_line(0, HOLD_LINE);
 		timer_set(m_maincpu->clocks_to_attotime(32), TIMER_IRQ_OFF, 0);
+		m_irq_start_cycle = m_maincpu->total_cycles();
 		break;
 	case TIMER_IRQ_OFF:
 		m_maincpu->set_input_line(0, CLEAR_LINE);
@@ -792,8 +832,7 @@ void spectrum_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 INTERRUPT_GEN_MEMBER(spectrum_state::spec_interrupt)
 {
-	// XXX experimentally adjusted. Must be defined in terms of INT latency of Z80
-	timer_set(m_screen->time_until_pos(0) + m_maincpu->cycles_to_attotime(25), TIMER_IRQ_ON, 0);
+	timer_set(m_screen->time_until_pos(0, get_screen_area().left()), TIMER_IRQ_ON, 0);
 
 	/* Default implementation performs screen updates per scanline. Some other
 	clones e.g. pentagon do updates based on video_ram access, border updates,
@@ -811,6 +850,7 @@ void spectrum_state::spectrum_common(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &spectrum_state::spectrum_data);
 	m_maincpu->set_addrmap(AS_IO, &spectrum_state::spectrum_io);
 	m_maincpu->set_vblank_int("screen", FUNC(spectrum_state::spec_interrupt));
+	m_maincpu->nomreq_cb().set(FUNC(spectrum_state::spectrum_nomreq));
 
 	ADDRESS_MAP_BANK(config, m_specmem).set_map(&spectrum_state::spectrum_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x10000);
 

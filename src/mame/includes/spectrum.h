@@ -129,8 +129,10 @@ protected:
 	uint8_t spectrum_data_r(offs_t offset);
 	void spectrum_data_w(offs_t offset, uint8_t data);
 	virtual bool is_contended(offs_t offset);
-	void adjust_contended(attotime shift = attotime::zero);
+	void adjust_contended(s8 shift = 0);
+	void content_port_late();
 
+	void spectrum_nomreq(offs_t offset, uint8_t data);
 	void spectrum_ula_w(offs_t offset, uint8_t data);
 	uint8_t spectrum_ula_r(offs_t offset);
 	void spectrum_port_w(offs_t offset, uint8_t data);
@@ -183,6 +185,7 @@ protected:
 	optional_ioport m_io_joy1;
 	optional_ioport m_io_joy2;
 
+	u64 m_irq_start_cycle;
 	virtual u8 get_border_color(u16 hpos = ~0, u16 vpos = ~0);
 	// Defines position of main screen excluding border
 	virtual rectangle get_screen_area();

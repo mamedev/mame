@@ -148,7 +148,7 @@ void msx_state::driver_start()
 
 	msx_memory_init();
 
-	m_maincpu->z80_set_cycle_tables(cc_op, cc_cb, cc_ed, cc_xy, nullptr, cc_ex, nullptr);
+	m_maincpu->z80_set_cycle_tables(cc_op, cc_cb, cc_ed, cc_xy, nullptr, cc_ex);
 
 	save_item(NAME(m_psg_b));
 	save_item(NAME(m_mouse));

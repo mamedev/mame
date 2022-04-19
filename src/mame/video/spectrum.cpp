@@ -159,3 +159,8 @@ void spectrum_state::spectrum_update_screen(screen_device &screen_d, bitmap_ind1
 		}
 	}
 }
+
+void spectrum_state::spectrum_nomreq(offs_t offset, uint8_t data)
+{
+	if (is_contended(offset)) adjust_contended();
+}
