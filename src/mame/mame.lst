@@ -38923,6 +38923,9 @@ simpsons2pj                     // GX072 (c) 1991 (Japan)
 simpsons4pa                     // GX072 (c) 1991 (Asia)
 simpsons4pe                     // GX072 (c) 1991 (World)
 
+@source:sis630.cpp
+shutms11						// (c) 2000
+
 @source:sitcom.cpp
 sitcom                          //
 sitcomtmr                       //
