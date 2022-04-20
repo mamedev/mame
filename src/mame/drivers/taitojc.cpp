@@ -1597,6 +1597,53 @@ ROM_END
 
 ROM_START( dendego )
 	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68040 code */
+	ROM_LOAD32_BYTE( "e35-21-1.ic36", 0x000000, 0x80000, CRC(47037231) SHA1(e53b854a3f8cf2eed68500f83f3cdf08942a2578) )
+	ROM_LOAD32_BYTE( "e35-22-1.ic37", 0x000001, 0x80000, CRC(559fdd43) SHA1(5f0b8b7ea092f15e492d1257f28e4137f495e9d2) )
+	ROM_LOAD32_BYTE( "e35-23-1.ic38", 0x000002, 0x80000, CRC(e457f024) SHA1(9e0eb40c877580be5a09fed48bacf60c3b0ed0cd) )
+	ROM_LOAD32_BYTE( "e35-24-1.ic39", 0x000003, 0x80000, CRC(880c3b16) SHA1(d18379702f1efc4d0889f76d2d715ada0ab7695e) )
+
+	ROM_REGION( 0x180000, "taito_en:audiocpu", 0 )       /* 68000 Code */
+	ROM_LOAD16_BYTE( "e35-25.ic30", 0x100001, 0x40000, CRC(8104de13) SHA1(e518fbaf91704cf5cb8ffbb4833e3adba8c18658) )
+	ROM_LOAD16_BYTE( "e35-26.ic31", 0x100000, 0x40000, CRC(61821cc9) SHA1(87cd5bd3bb22c9f4ca4b6d96f75434d48418321b) )
+
+	ROM_REGION( 0x4000, "dsp", ROMREGION_ERASE00 ) /* TMS320C51 internal rom */
+	ROM_LOAD16_WORD( "e07-11.ic29", 0x0000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x010000, "sub", 0 )    /* MC68HC11M0 code */
+	ROM_LOAD( "e17-23.ic65",  0x000000, 0x010000, CRC(80ac1428) SHA1(5a2a1e60a11ecdb8743c20ddacfb61f9fd00f01c) )
+
+	ROM_REGION32_BE( 0x1800000, "maingfx", 0 )
+	ROM_LOAD32_WORD_SWAP( "e35-05.ic9",   0x0800000, 0x200000, CRC(a94486c5) SHA1(c3f869aa0557411f747038a1e0ed6eedcf91fda5) )
+	ROM_LOAD32_WORD_SWAP( "e35-13.ic22",  0x0800002, 0x200000, CRC(2dc9dff1) SHA1(bc7ad64bc359f18a065e36749cc29c75e52202e2) )
+	ROM_LOAD32_WORD_SWAP( "e35-06.ic10",  0x0c00000, 0x200000, CRC(cf328021) SHA1(709ce80f9338637172dbf4e9adcacdb3e5b4ccdb) )
+	ROM_LOAD32_WORD_SWAP( "e35-14.ic23",  0x0c00002, 0x200000, CRC(cab50364) SHA1(e3272f844ecadfd63a1e3c965526a851f8cde94d) )
+	ROM_LOAD32_WORD_SWAP( "e35-07.ic11",  0x1000000, 0x200000, CRC(a88a5a86) SHA1(a4a393fe9df3654e41d32e015ca3977d13206dfe) )
+	ROM_LOAD32_WORD_SWAP( "e35-15.ic24",  0x1000002, 0x200000, CRC(aea86b35) SHA1(092f34f844fc6a779a6f18c03d44a9d39a101373) )
+	ROM_LOAD32_WORD_SWAP( "e35-08.ic12",  0x1400000, 0x200000, CRC(99425ff6) SHA1(3bd6fe7204dece55459392170b42d4c6a9d3ef5b) )
+	ROM_LOAD32_WORD_SWAP( "e35-16.ic25",  0x1400002, 0x200000, CRC(161481b6) SHA1(cc3c2939ac8911c197e9930580d316066f345772) )
+
+	ROM_REGION16_LE( 0x1000000, "dspgfx", 0 )      /* only accessible to the TMS */
+	ROM_LOAD( "e35-01.ic5",   0x0000000, 0x200000, CRC(bd1975cb) SHA1(a08c6f4a84f9d4c2a5aa67cc2045aedd4580b8dc) )
+	ROM_LOAD( "e35-02.ic6",   0x0200000, 0x200000, CRC(e5caa459) SHA1(c38d795b96fff193223cd3df9f51ebdc2971b719) )
+	ROM_LOAD( "e35-03.ic7",   0x0400000, 0x200000, CRC(86ea5bcf) SHA1(1cee7f677b786b2fa9f50e723decd08cd69fbdef) )
+	ROM_LOAD( "e35-04.ic8",   0x0600000, 0x200000, CRC(afc07c36) SHA1(f3f7b04766a9a2c8b298e1692aea24abc7001432) )
+	ROM_LOAD( "e35-09.ic18",  0x0800000, 0x200000, CRC(be18ddf1) SHA1(d4fe26e427244c5b421b6421ff3bf9af303673d5) )
+	ROM_LOAD( "e35-10.ic19",  0x0a00000, 0x200000, CRC(44ea9474) SHA1(161ff94b31c3dc2fa4b1e556ed62624147687443) )
+	ROM_LOAD( "e35-11.ic20",  0x0c00000, 0x200000, CRC(dc8f5e88) SHA1(e311252db8a7232a5325a3eff5c1890d20bd3f8f) )
+	ROM_LOAD( "e35-12.ic21",  0x0e00000, 0x200000, CRC(039b604c) SHA1(7e394e7cddc6bf42f3834d5331203e8496597a90) )
+
+	ROM_REGION( 0x40000, "oki", 0 )     /* train board, OKI6295 sound samples */
+	ROM_LOAD( "e35-28.trn",  0x000000, 0x040000, CRC(d1b571c1) SHA1(cac7d3f0285544fe36b8b744edfbac0190cdecab) )
+
+	ROM_REGION16_BE( 0x1000000, "taito_en:ensoniq", ROMREGION_ERASE00  )
+	ROM_LOAD16_BYTE( "e35-17.ic32",  0x000000, 0x200000, CRC(3bc23aa1) SHA1(621e0f2f5f3dbd7d7ce05c9cd317958c361c1c26) )
+	ROM_LOAD16_BYTE( "e35-18.ic33",  0x400000, 0x200000, CRC(a084d3aa) SHA1(18ea39366006e362e16d6732ce3e79cd3bfa041e) )
+	ROM_LOAD16_BYTE( "e35-19.ic34",  0x800000, 0x200000, CRC(ebe2dcef) SHA1(16ae41e0f3bb242cbc2922f53cacbd99961a3f97) )
+	ROM_LOAD16_BYTE( "e35-20.ic35",  0xc00000, 0x200000, CRC(a1d4b30d) SHA1(e02f613b93d3b3ee1eb23f5b7f62c5448ed3966d) )
+ROM_END
+
+ROM_START( dendegoa )
+	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68040 code */
 	ROM_LOAD32_BYTE( "e35-21.ic36", 0x000000, 0x80000, CRC(bc70ca97) SHA1(724a24da9d6f163c26e7528ee2c15bd06f2c4382) )
 	ROM_LOAD32_BYTE( "e35-22.ic37", 0x000001, 0x80000, CRC(83b17de8) SHA1(538ddc16727e08e9a2a8ff6b4f030dc044993aa0) )
 	ROM_LOAD32_BYTE( "e35-23.ic38", 0x000002, 0x80000, CRC(1da4acd6) SHA1(2ce11c5f37287526bb1d39185f793d79fc73d5b5) )
@@ -2124,7 +2171,8 @@ GAME( 1995, landgearja,landgear, taitojc, landgear, taitojc_state, init_taitojc,
 GAME( 1996, sidebs,    0,        taitojc, sidebs,   taitojc_state, init_taitojc,  ROT0, "Taito", "Side by Side (Ver 2.7 J)",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_NODEVICE_LAN )                       // SIDE BY SIDE           VER 2.7 J   1996/10/11   14:54:10
 GAME( 1996, sidebsja,  sidebs,   taitojc, sidebs,   taitojc_state, init_taitojc,  ROT0, "Taito", "Side by Side (Ver 2.6 J)",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_NODEVICE_LAN )                       // SIDE BY SIDE           VER 2.6 J   1996/ 7/ 1   18:41:51
 GAME( 1996, sidebsjb,  sidebs,   taitojc, sidebs,   taitojc_state, init_taitojc,  ROT0, "Taito", "Side by Side (Ver 2.5 J)",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_NODEVICE_LAN )                       // SIDE BY SIDE           VER 2.5 J   1996/ 6/20   18:13:14
-GAMEL(1996, dendego,   0,        dendego, dendego,  taitojc_state, init_taitojc,  ROT0, "Taito", "Densha de GO! (Ver 2.2 J)",                            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING, layout_dendego )                              // DENSYA DE GO           VER 2.2 J   1997/ 2/ 4   12:00:28
+GAMEL(1996, dendego,   0,        dendego, dendego,  taitojc_state, init_taitojc,  ROT0, "Taito", "Densha de GO! (Ver 2.3 J)",                            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING, layout_dendego )                              // DENSYA DE GO           VER 2.3 J   1997/ 3/10   20:49:44
+GAMEL(1996, dendegoa,  dendego,  dendego, dendego,  taitojc_state, init_taitojc,  ROT0, "Taito", "Densha de GO! (Ver 2.2 J)",                            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING, layout_dendego )                              // DENSYA DE GO           VER 2.2 J   1997/ 2/ 4   12:00:28
 GAMEL(1996, dendegox,  dendego,  dendego, dendego,  taitojc_state, init_taitojc,  ROT0, "Taito", "Densha de GO! EX (Ver 2.4 J)",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING, layout_dendego )                              // DENSYA DE GO           VER 2.4 J   1997/ 4/18   13:38:34
 GAME( 1997, sidebs2,   0,        taitojc, sidebs,   taitojc_state, init_taitojc,  ROT0, "Taito", "Side by Side 2 (Ver 2.6 OK)",                          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_NODEVICE_LAN )                       // SIDE BY SIDE2          VER 2.6 OK  1997/ 6/ 4   17:27:37
 GAME( 1997, sidebs2u,  sidebs2,  taitojc, sidebs,   taitojc_state, init_taitojc,  ROT0, "Taito", "Side by Side 2 (Ver 2.6 A)",                           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_NODEVICE_LAN )                       // SIDE BY SIDE2          VER 2.6 A   1997/ 6/19   09:39:22
