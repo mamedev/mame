@@ -87,6 +87,12 @@ pci_device::pci_device(const machine_config &mconfig, device_type type, const ch
 	}
 }
 
+// main_id << 16 = vendor ID ($00-$01)
+// main_id & 0xffff = device ID ($02-$03)
+// revision = board versioning ($08)
+// pclass = programming interface/sub class code/base class code ($09-$0b)
+// subsystem_id << 16 = sub vendor ID ($2c-$2d)    - NB: not all cards have these
+// subsystem_id & 0xffff = sub device ID ($2e-$2f) /
 void pci_device::set_ids(uint32_t _main_id, uint8_t _revision, uint32_t _pclass, uint32_t _subsystem_id)
 {
 	main_id = _main_id;
