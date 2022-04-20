@@ -746,7 +746,7 @@ inline void z80_device::ld_a_i()
  ***************************************************************/
 inline void z80_device::rst(uint16_t addr)
 {
-	//refresh_ir(1);
+	//nomreq_ir(1);
 	push(m_pc);
 	PCD = addr;
 	WZ = PC;
@@ -989,7 +989,11 @@ inline void z80_device::ex_sp(PAIR &r)
 {
 	PAIR tmp = { { 0, 0, 0, 0 } };
 	rm16(SPD, tmp);
+	nomreq_addr(SPD + 1, 1);
+	m_icount_executing -= 2;
 	wm16back(SPD, r);
+	m_icount_executing += 2;
+	nomreq_addr(SPD, 2);
 	r = tmp;
 	WZ = r.d;
 }
