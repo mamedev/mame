@@ -1255,8 +1255,8 @@ private:
 			{
 				snprintf(tempname, std::size(tempname), "NC%d", index);
 				m_sixaxis_mode
-					? devicelist().create_device<sdl_sixaxis_joystick_device>(machine, tempname, guid_str, *this)
-					: devicelist().create_device<sdl_joystick_device>(machine, tempname, guid_str, *this);
+						? devicelist().create_device<sdl_sixaxis_joystick_device>(machine, tempname, guid_str, *this)
+						: devicelist().create_device<sdl_joystick_device>(machine, tempname, guid_str, *this);
 			}
 
 			return nullptr;
