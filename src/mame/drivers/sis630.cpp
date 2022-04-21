@@ -5,9 +5,10 @@
     SiS 630 chipset based PC
 
     TODO:
-    - EISA check, wants two irqs at PC=e9507 then corrupts the GUI vector 0x40 with a
+    - USB check, wants a irq at PC=e9507 then corrupts the GUI vector 0x40 with a
       0xc001:060e (remove the 1 part to continue).
-      \- Cache? Missing EISA?
+      \- cfr. memory buffer at $9e000, the fact that above debug trick doesn't work with
+         USB controllers defined on PCI bus;
     - PCI banking doesn't work as intended
       \- cfr. GUI expansion ROM, host shadow RAM bit 15, misc
     - Verify that PCI listing honors real HW
@@ -35,6 +36,7 @@
 #include "machine/sis5513_ide.h"
 #include "machine/sis630_host.h"
 #include "machine/sis630_gui.h"
+#include "machine/sis7001_usb.h"
 #include "machine/sis950_lpc.h"
 #include "machine/fdc37c93x.h"
 
@@ -88,8 +90,8 @@ void sis630_state::sis630(machine_config &config)
 
 //  SIS900_LAN(config, "pci:01.1"
 	// USB config: 2 on back, 3 on front
-//  SIS7001_USB(config, "pci:01.2"
-//  SIS7001_USB(config, "pci:01.3"
+	SIS7001_USB(config, "pci:01.2", 0);
+	SIS7001_USB(config, "pci:01.3", 0);
 //  SIS7018_AUDIO_AC97(config, "pci:01.4"
 	// documentation doesn't mention modem part #, derived from Shuttle MS11 MB manual
 //  SIS7013_MODEM_AC97(config, "pci:01.6"

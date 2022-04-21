@@ -280,10 +280,11 @@ void sis630_gui_device::map_extra(uint64_t memory_window_start, uint64_t memory_
 
 	LOGMAP("GUI remapping table (%08x)\n", m_exp_rom_reg);
 
-	{
-		// TODO: expansion ROM doesn't work properly
+	// TODO: expansion ROM doesn't work properly
 
-		const u32 start_offs = 0xd0000; //(m_exp_rom_reg & 1) ? m_exp_rom_reg & ~1 : 0xd0000;
+//	if (m_exp_rom_reg & 1)
+	{
+		const u32 start_offs = 0xd0000; //m_exp_rom_reg & ~1;
 		const u32 end_offs = start_offs + m_biosrom.bytes() - 1;
 
 		LOGMAP("- %08x-%08x\n", start_offs, end_offs);
