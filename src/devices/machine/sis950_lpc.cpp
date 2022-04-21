@@ -35,6 +35,7 @@
 #define LOG_IO     (1U << 1) // log PCI register accesses
 #define LOG_TODO   (1U << 2) // log unimplemented registers
 #define LOG_MAP    (1U << 3) // log full remaps
+#define LOG_LPC    (1U << 4) // log LPC legacy regs
 
 #define VERBOSE (LOG_GENERAL | LOG_IO | LOG_TODO | LOG_MAP)
 //#define LOG_OUTPUT_FUNC osd_printf_warning
@@ -44,6 +45,7 @@
 #define LOGIO(...)     LOGMASKED(LOG_IO,   __VA_ARGS__)
 #define LOGMAP(...)    LOGMASKED(LOG_MAP,  __VA_ARGS__)
 #define LOGTODO(...)   LOGMASKED(LOG_TODO, __VA_ARGS__)
+#define LOGLPC(...)    LOGMASKED(LOG_LPC, __VA_ARGS__)
 
 DEFINE_DEVICE_TYPE(SIS950_LPC, sis950_lpc_device, "sis950_lpc", "SiS 950 LPC Super-South Bridge")
 
@@ -94,6 +96,8 @@ void sis950_lpc_device::device_reset()
 	m_cur_eop = false;
 	m_dma_high_byte = 0;
 	m_init_reg = 0;
+
+	m_lpc_legacy.fast_init = 0;
 	remap_cb();
 }
 
@@ -369,8 +373,9 @@ void sis950_lpc_device::io_map(address_map &map)
 	// map(0x0070, 0x0070) CMOS and NMI Mask
 	map(0x0070, 0x007f).rw(m_rtc, FUNC(ds12885_device::read), FUNC(ds12885_device::write));
 	// map(0x0080, 0x008f) DMA low page registers
-	map(0x0080, 0x009f).rw(FUNC(sis950_lpc_device::at_page8_r), FUNC(sis950_lpc_device::at_page8_w));
+	map(0x0080, 0x008f).rw(FUNC(sis950_lpc_device::at_page8_r), FUNC(sis950_lpc_device::at_page8_w));
 	// map(0x0092, 0x0092) INIT and A20
+	map(0x0092, 0x0092).rw(FUNC(sis950_lpc_device::lpc_fast_init_r), FUNC(sis950_lpc_device::lpc_fast_init_w));
 	// map(0x00a0, 0x00a1) INT2
 	map(0x00a0, 0x00bf).rw(m_pic_slave, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	// map(0x00c0, 0x00df) DMA2
@@ -388,8 +393,10 @@ void sis950_lpc_device::io_map(address_map &map)
 
 	// map(0x002e, 0x002f) Super I/O config
 	// map(0x004e, 0x004f) alt Super I/O config
-	// map(0x0062, 0x0062) ACPI embedded controller
+	// map(0x0062, 0x0062) - ACPI embedded controller
 	// map(0x0066, 0x0066) /
+
+	// map(0x0200, 0x020f) game ports ($201 as shutms11 default)
 
 	// map(0x0220, 0x0227) serial 2
 	// map(0x0228, 0x022f) serial 2
@@ -404,7 +411,10 @@ void sis950_lpc_device::io_map(address_map &map)
 	// map(0x02e8, 0x02ef) serial 3
 	// map(0x02f8, 0x02ff) serial 1
 
-	// map(0x0300, 0x0301).mirror(0x0030) MIDI
+	// map(0x0300, 0x0301) - MIDI ($330 as shutms11 default)
+	// map(0x0310, 0x0311) /
+	// map(0x0320, 0x0321) /
+	// map(0x0330, 0x0331) /
 
 	// map(0x0338, 0x033f) serial 4
 	// map(0x0370, 0x0377) FDC 2
@@ -415,6 +425,11 @@ void sis950_lpc_device::io_map(address_map &map)
 	// map(0x03e8, 0x03ef) serial 4
 	// map(0x03f0, 0x03f7) FDC 1
 	// map(0x03f8, 0x03ff) serial 1
+
+	// map(0x0530, 0x0537) - MSS (TCP Maximum Segment Size?)
+	// map(0x0604, 0x060b) /
+	// map(0x0e80, 0x0e87) /
+	// map(0x0f40, 0x0f47) /
 
 	// map(0x0678, 0x067f) ECP parallel port 1
 	// map(0x0778, 0x0779) ECP parallel port 2 & PnP
@@ -448,6 +463,24 @@ void sis950_lpc_device::map_extra(uint64_t memory_window_start, uint64_t memory_
 		memory_space->install_ram(0xfffc0000, 0xfffdffff, m_region->base());
 	}
 	memory_space->install_ram(0xfffe0000, 0xffffffff, m_region->base() + 0x20000);
+}
+
+u8 sis950_lpc_device::lpc_fast_init_r()
+{
+	LOGLPC("LPC fast init read [$92]\n");
+	return m_lpc_legacy.fast_init;
+}
+
+void sis950_lpc_device::lpc_fast_init_w(offs_t offset, u8 data)
+{
+	LOGLPC("LPC fast init write [$92] %02x\n", data);
+	if (data & 0xfd)
+		LOG("Warning: unemulated LPC fast init type %02x", data);
+
+	// TODO: pinpoint exact disable INIT condition and if that will be reflected on reading reg too
+	m_host_cpu->set_input_line(INPUT_LINE_A20, BIT(data, 1));
+
+	m_lpc_legacy.fast_init = data;
 }
 
 /*

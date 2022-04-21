@@ -98,6 +98,13 @@ private:
 	u8 m_init_reg = 0;
 	u8 m_keybc_reg = 0;
 
+	// LPC vendor specific, verify if it's common for all
+	u8 lpc_fast_init_r();
+	void lpc_fast_init_w(offs_t offset, u8 data);
+	struct {
+		u8 fast_init;
+	} m_lpc_legacy;
+
 	// SB implementation, to be moved out
 	DECLARE_WRITE_LINE_MEMBER(pit_out0);
 	DECLARE_WRITE_LINE_MEMBER(pit_out1);
