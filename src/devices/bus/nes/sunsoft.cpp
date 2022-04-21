@@ -64,12 +64,12 @@ nes_sunsoft_3_device::nes_sunsoft_3_device(const machine_config &mconfig, const 
 {
 }
 
-nes_sunsoft_4_device::nes_sunsoft_4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, type, tag, owner, clock), m_reg(0), m_latch1(0), m_latch2(0), m_wram_enable(0)
+nes_sunsoft_4_device::nes_sunsoft_4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_wram_enable(0)
 {
 }
 
-nes_sunsoft_4_device::nes_sunsoft_4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_sunsoft_4_device::nes_sunsoft_4_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_sunsoft_4_device(mconfig, NES_SUNSOFT_4, tag, owner, clock)
 {
 }
@@ -135,8 +135,6 @@ void nes_sunsoft_3_device::pcb_reset()
 void nes_sunsoft_4_device::device_start()
 {
 	common_start();
-	save_item(NAME(m_latch1));
-	save_item(NAME(m_latch2));
 	save_item(NAME(m_reg));
 	save_item(NAME(m_wram_enable));
 }
@@ -148,9 +146,7 @@ void nes_sunsoft_4_device::pcb_reset()
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
 
-	m_reg = 0;
-	m_latch1 = 0;
-	m_latch2 = 0;
+	m_reg[0] = m_reg[1] = m_reg[2] = 0;
 	m_wram_enable = 0;
 }
 
@@ -314,107 +310,69 @@ void nes_sunsoft_3_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_sunsoft_4_device::sun4_mirror( int mirror, int mirr0, int mirr1 )
+void nes_sunsoft_4_device::sun4_mirror()
 {
-	switch (mirror)
+	static constexpr u8 ciram_lut[4] =
 	{
-		case 0x00:
-			set_nt_mirroring(PPU_MIRROR_VERT);
-			break;
-		case 0x01:
-			set_nt_mirroring(PPU_MIRROR_HORZ);
-			break;
-		case 0x02:
-			set_nt_mirroring(PPU_MIRROR_LOW);
-			break;
-		case 0x03:
-			set_nt_mirroring(PPU_MIRROR_HIGH);
-			break;
-		case 0x10:
-			set_nt_page(0, VROM, mirr0 | 0x80, 0);
-			set_nt_page(1, VROM, mirr1 | 0x80, 0);
-			set_nt_page(2, VROM, mirr0 | 0x80, 0);
-			set_nt_page(3, VROM, mirr1 | 0x80, 0);
-			break;
-		case 0x11:
-			set_nt_page(0, VROM, mirr0 | 0x80, 0);
-			set_nt_page(1, VROM, mirr0 | 0x80, 0);
-			set_nt_page(2, VROM, mirr1 | 0x80, 0);
-			set_nt_page(3, VROM, mirr1 | 0x80, 0);
-			break;
-		case 0x12:
-			set_nt_page(0, VROM, mirr0 | 0x80, 0);
-			set_nt_page(1, VROM, mirr0 | 0x80, 0);
-			set_nt_page(2, VROM, mirr0 | 0x80, 0);
-			set_nt_page(3, VROM, mirr0 | 0x80, 0);
-			break;
-		case 0x13:
-			set_nt_page(0, VROM, mirr1 | 0x80, 0);
-			set_nt_page(1, VROM, mirr1 | 0x80, 0);
-			set_nt_page(2, VROM, mirr1 | 0x80, 0);
-			set_nt_page(3, VROM, mirr1 | 0x80, 0);
-			break;
-	}
+		PPU_MIRROR_VERT, PPU_MIRROR_HORZ, PPU_MIRROR_LOW, PPU_MIRROR_HIGH
+	};
+
+	static constexpr u8 vrom_lut[4][4] =
+	{
+		{ 0, 1, 0, 1 }, // vert
+		{ 0, 0, 1, 1 }, // horz
+		{ 0, 0, 0, 0 }, // low
+		{ 1, 1, 1, 1 }  // high
+	};
+
+	int mirr = m_reg[2] & 0x03;
+
+	if (BIT(m_reg[2], 4))
+		for (int i = 0; i < 4; i++)
+			set_nt_page(i, VROM, m_reg[vrom_lut[mirr][i]], 0);
+	else
+		set_nt_mirroring(ciram_lut[mirr]);
 }
 
-void nes_sunsoft_4_device::sun4_write(offs_t offset, uint8_t data)
+void nes_sunsoft_4_device::sun4_write(offs_t offset, u8 data)
 {
 	LOG_MMC(("Sunsoft 4 write_h, offset %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x7000)
 	{
 		case 0x0000:
-			chr2_0(data, CHRROM);
-			break;
 		case 0x1000:
-			chr2_2(data, CHRROM);
-			break;
 		case 0x2000:
-			chr2_4(data, CHRROM);
-			break;
 		case 0x3000:
-			chr2_6(data, CHRROM);
+			chr2_x((offset >> 11) & 0x06, data, CHRROM);
 			break;
 		case 0x4000:
-			m_latch1 = data & 0x7f;
-			sun4_mirror(m_reg, m_latch1, m_latch2);
-			break;
 		case 0x5000:
-			m_latch2 = data & 0x7f;
-			sun4_mirror(m_reg, m_latch1, m_latch2);
-			break;
 		case 0x6000:
-			m_reg = data & 0x13;
-			sun4_mirror(m_reg, m_latch1, m_latch2);
+			m_reg[(offset >> 12) - 4] = data | 0x80;
+			sun4_mirror();
 			break;
 		case 0x7000:
 			prg16_89ab(data & 0x0f);
 			m_wram_enable = BIT(data, 4);
 			break;
-		default:
-			LOG_MMC(("Sunsoft 4 write_h uncaught write, offset: %04x, data: %02x\n", offset, data));
-			break;
 	}
 }
 
-void nes_sunsoft_4_device::write_m(offs_t offset, uint8_t data)
+void nes_sunsoft_4_device::write_m(offs_t offset, u8 data)
 {
 	LOG_MMC(("Sunsoft 4 write_m, offset: %04x, data: %02x\n", offset, data));
 
-	if (!m_battery.empty() && m_wram_enable)
-		m_battery[offset & (m_battery.size() - 1)] = data;
-	if (!m_prgram.empty() && m_wram_enable)
-		m_prgram[offset & (m_prgram.size() - 1)] = data;
+	if (m_wram_enable)
+		device_nes_cart_interface::write_m(offset, data);
 }
 
-uint8_t nes_sunsoft_4_device::read_m(offs_t offset)
+u8 nes_sunsoft_4_device::read_m(offs_t offset)
 {
 	LOG_MMC(("Sunsoft 4 read_m, offset: %04x\n", offset));
 
-	if (!m_battery.empty() && m_wram_enable)
-		return m_battery[offset & (m_battery.size() - 1)];
-	if (!m_prgram.empty() && m_wram_enable)
-		return m_prgram[offset & (m_prgram.size() - 1)];
+	if (m_wram_enable)
+		return device_nes_cart_interface::read_m(offset);
 
 	return get_open_bus();
 }
