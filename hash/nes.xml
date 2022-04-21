@@ -80114,6 +80114,24 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="ao">
+		<description>AO</description>
+		<year>2016</year>
+		<publisher>Second Dimension</publisher>
+		<info name="alt_title" value="青"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="32768">
+				<rom name="ao.prg" size="16384" crc="9cd99840" sha1="31151f2ee3e6cb40e40b36dc209e01d545d597c9" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="ao.chr" size="8192" crc="ddbe1993" sha1="0e39b401f20c713e3a8633812ce6c0f15506994c" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="assimil">
 		<description>Assimilate</description>
 		<year>2012</year>
@@ -80203,6 +80221,23 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="beatem">
+		<description>Beat'Em &amp; Eat'Em</description>
+		<year>2014</year>
+		<publisher>retroUSB</publisher>
+		<info name="serial" value="RET-BE-GBL"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="beatem.prg" size="32768" crc="c0805227" sha1="d6d6db6b4d35a3f19d816c39ecb15be111307d00" />
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="beatem.chr" size="8192" crc="b6be6e86" sha1="56ae1f4377ff274b26bdb0472e65b94a6fc3b845" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="candesto" supported="partial"> <!-- Restore/Options not yet supported -->
 		<description>Candelabra - Estoscerro</description>
 		<year>2020</year> <!-- cartridge release year -->
@@ -80215,6 +80250,22 @@ be better to redump them properly. -->
 			</dataarea>
 			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dushlan">
+		<description>Dúshlán</description>
+		<year>2016</year>
+		<publisher>Mega Cat Studios</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="32768">
+				<rom name="dushlan.prg" size="32768" crc="071ceb4e" sha1="214a08d06f75c306f3fb96736575211fef46677a" />
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="dushlan.chr" size="8192" crc="10493c00" sha1="76a730a19cba7a85718a33efebe0c227a17f683d" />
 			</dataarea>
 		</part>
 	</software>
@@ -80395,6 +80446,22 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="nesvirus">
+		<description>NES Virus Cleaner</description>
+		<year>2016</year>
+		<publisher>Second Dimension</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="32768">
+				<rom name="nesviruscleaner.prg" size="32768" crc="5f9194b3" sha1="9d222e2af4fda6e3a41ae9659fd6ba4fb89d805e" />
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="nesviruscleaner.chr" size="8192" crc="8437a790" sha1="a5b9a7efdaa46f3c85997b30b6864e5ab57a6eb5" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nomolos">
 		<description>Nomolos - Storming the Catsle</description>
 		<year>2014</year>
@@ -80448,6 +80515,22 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="solaris" supported="partial"> <!-- Save/Reset Data not implemented -->
+		<description>Solaris</description>
+		<year>2016</year>
+		<publisher>retroUSB</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="unrom512" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="524288">
+				<rom name="solaris.prg" size="524288" crc="3d095dc7" sha1="0dbf0b95e97a51940ee60b96141a05a6c6b78f6a" />
+			</dataarea>
+			<!-- 32k VRAM on cartridge? -->
+			<dataarea name="vram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="starvers">
 		<description>Star Versus</description>
 		<year>2015</year>
@@ -80479,6 +80562,23 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="dpcm" size="8388608">
 				<rom name="super russian roulette.dpcm" size="8388608" crc="e880dbe6" sha1="b05f2bd2845c3ec3aa63d7aec855c23058fc8412" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tictacxo">
+		<description>Tic-Tac XO</description>
+		<year>2008</year>
+		<publisher>RetroZone</publisher>
+		<info name="serial" value="SDS-TT-GBL"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="32768">
+				<rom name="tic-tac xo.prg" size="32768" crc="b3d665af" sha1="8ed322a4411c1bcdb9445c4dfc1d70370cbbc475" /> <!-- these are from the .nes file distributed by the author, Sly Dog Studios -->
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="tic-tac xo.chr" size="8192" crc="96e714ea" sha1="b12c986cd7d637627d06ce94161cdf42db714589" />
 			</dataarea>
 		</part>
 	</software>
