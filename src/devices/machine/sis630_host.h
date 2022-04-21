@@ -9,11 +9,11 @@
 #include "pci.h"
 //#include "sis630_gui.h"
 
-class sis630_host_device : public pci_host_device 
+class sis630_host_device : public pci_host_device
 {
 public:
 	sis630_host_device(
-		const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, 
+		const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
 		const char *cpu_tag, int ram_size
 	) : sis630_host_device(mconfig, tag, owner, clock)
 	{
@@ -35,13 +35,13 @@ protected:
 
 	virtual bool map_first() const override { return true; }
 
-//	virtual void reset_all_mappings() override;
+//  virtual void reset_all_mappings() override;
 
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 	virtual void config_map(address_map &map) override;
-	
+
 	void memory_map(address_map &map);
 	void io_map(address_map &map);
 
@@ -50,7 +50,7 @@ private:
 	std::vector<uint32_t> m_ram;
 
 	void map_shadowram(address_space *memory_space, offs_t start_offs, offs_t end_offs, bool read_enable, bool write_enable);
-	
+
 	int m_ram_size = 0;
 	u32 m_gfx_window_base = 0;
 	u8 m_dram_status = 0;
@@ -64,7 +64,7 @@ private:
 
 	u32 gfx_window_base_r(offs_t offset, uint32_t mem_mask = ~0);
 	void gfx_window_base_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	
+
 	u32 shadow_ram_ctrl_r(offs_t offset, uint32_t mem_mask = ~0);
 	void shadow_ram_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
@@ -77,11 +77,18 @@ private:
 	u8 agp_mailbox_r(offs_t offset);
 	void agp_mailbox_w(offs_t offset, u8 data);
 
-	u32 agp_id_r(offs_t offset, uint32_t mem_mask = ~0);
-	u32 agp_status_r(offs_t offset, uint32_t mem_mask = ~0);
-
 	virtual uint8_t capptr_r() override;
-	
+	u32 agp_id_r();
+	u32 agp_status_r();
+	u32 agp_command_r(offs_t offset, uint32_t mem_mask);
+	void agp_command_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+
+	struct {
+		bool sba_enable = false;
+		bool enable = false;
+		u8 data_rate = 0;
+	} m_agp;
+
 	u8 unmap_log_r(offs_t offset);
 	void unmap_log_w(offs_t offset, u8 data);
 };

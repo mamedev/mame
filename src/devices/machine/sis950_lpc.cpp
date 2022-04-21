@@ -376,12 +376,12 @@ void sis950_lpc_device::map_extra(uint64_t memory_window_start, uint64_t memory_
 {
 	io_space->install_device(0, 0x07ff, *this, &sis950_lpc_device::io_map);
 
-	LOGMAP("Remapping table (BIOS: %02x, flash: %02x)\n", m_bios_control, m_flash_control);
+	LOGMAP("LPC Remapping table (BIOS: %02x, flash: %02x)\n", m_bios_control, m_flash_control);
 
 	// ACPI enable
 	if (BIT(m_bios_control, 7))
 	{
-		LOGMAP("- LPC ACPI enable (%02x) %04x-%04x\n", m_bios_control, m_acpi_base, m_acpi_base + 0xff);
+		LOGMAP("- ACPI enable (%02x) %04x-%04x\n", m_bios_control, m_acpi_base, m_acpi_base + 0xff);
 		// shutms11 BIOS POST maps this at $5000
 		m_acpi->map_device(memory_window_start, memory_window_end, 0, memory_space, io_window_start, io_window_end, m_acpi_base, io_space);
 		m_smbus->map_device(memory_window_start, memory_window_end, 0, memory_space, io_window_start, io_window_end, m_acpi_base | 0x80, io_space);

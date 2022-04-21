@@ -3,28 +3,28 @@
 /**************************************************************************************************
 
     SiS 630 chipset based PC
-	
-	TODO:
-	- EISA check, wants two irqs at PC=e9507 then corrupts the GUI vector 0x40 with a 
-	  0xc001:060e (remove the 1 part to continue). 
-	  \- Cache? Missing EISA?
-	- PCI banking doesn't work as intended
-	  \- cfr. GUI expansion ROM, host shadow RAM bit 15, misc
-	- Verify that PCI listing honors real HW
-	  \- Currently lists GUI only, which is amazing considering it's on the wrong place on the
-	     PCI bus.
-	- Identify flash ROM type;
-	- Video is sketchy;
-	  \- Shows SiS AGP header text in less than 1 frame (catchable with debugger only)
-	- PS/2 keyboard doesn't accept any key;
-	- Floppy drive 
-	  \- LPC accepts a SMC37C673 as default;
+
+    TODO:
+    - EISA check, wants two irqs at PC=e9507 then corrupts the GUI vector 0x40 with a
+      0xc001:060e (remove the 1 part to continue).
+      \- Cache? Missing EISA?
+    - PCI banking doesn't work as intended
+      \- cfr. GUI expansion ROM, host shadow RAM bit 15, misc
+    - Verify that PCI listing honors real HW
+      \- Currently lists GUI only, which is amazing considering it's on the wrong place on the
+         PCI bus.
+    - Identify flash ROM type;
+    - Video is sketchy;
+      \- Shows SiS AGP header text in less than 1 frame (catchable with debugger only)
+    - PS/2 keyboard doesn't accept any key;
+    - Floppy drive
+      \- LPC accepts a SMC37C673 as default;
     - SMBus isn't extensively tested
-	  \- POST fails with a CMOS crc error for CPU identifier/speed, may need sensible defaults;
-    - Either move gamecstl.cpp to here or convert that driver to reuse the base interface 
-	  declared here.
-	  \- With the aforementioned patch it loads Windows boot selection menu then crashes shortly
-	     after.
+      \- POST fails with a CMOS crc error for CPU identifier/speed, may need sensible defaults;
+    - Either move gamecstl.cpp to here or convert that driver to reuse the base interface
+      declared here.
+      \- With the aforementioned patch it loads Windows boot selection menu then crashes shortly
+         after.
 
 **************************************************************************************************/
 
@@ -54,8 +54,8 @@ private:
 	required_device<pentium3_device> m_maincpu;
 	required_device<sis5513_ide_device> m_ide;
 
-//	void main_io(address_map &map);
-//	void main_map(address_map &map);
+//  void main_io(address_map &map);
+//  void main_map(address_map &map);
 };
 
 
@@ -68,31 +68,31 @@ void sis630_state::sis630(machine_config &config)
 	// Slot 1/Socket 370, Coppermine FC-PGA @ 500~850+/100 MHz or Celeron PPGA 300~600+ MHz
 	// TODO: lowered rate for debugging aid, needs a slot option anyway
 	PENTIUM3(config, m_maincpu, 100'000'000);
-//	m_maincpu->set_addrmap(AS_PROGRAM, &sis630_state::main_map);
-//	m_maincpu->set_addrmap(AS_IO, &sis630_state::main_io);
+//  m_maincpu->set_addrmap(AS_PROGRAM, &sis630_state::main_map);
+//  m_maincpu->set_addrmap(AS_IO, &sis630_state::main_io);
 	m_maincpu->set_irq_acknowledge_callback("pci:01.0:pic_master", FUNC(pic8259_device::inta_cb));
-//	m_maincpu->smiact().set("pci:00.0", FUNC(sis950_lpc_device::smi_act_w));
+//  m_maincpu->smiact().set("pci:00.0", FUNC(sis950_lpc_device::smi_act_w));
 
 	PCI_ROOT(config, "pci", 0);
 	// up to 512MB, 2 x DIMM sockets
 	SIS630_HOST(config, "pci:00.0", 0, "maincpu", 256*1024*1024);
 	SIS5513_IDE(config, m_ide, 0);
-	m_ide->irq_pri().set("pci:01.0:pic_slave", FUNC(pic8259_device::ir6_w)); 
+	m_ide->irq_pri().set("pci:01.0:pic_slave", FUNC(pic8259_device::ir6_w));
 		//FUNC(sis950_lpc_device::pc_irq14_w));
-	m_ide->irq_sec().set("pci:01.0:pic_slave", FUNC(pic8259_device::ir7_w)); 
+	m_ide->irq_sec().set("pci:01.0:pic_slave", FUNC(pic8259_device::ir7_w));
 		//FUNC(sis950_lpc_device::pc_mirq0_w));
 
 	SIS950_LPC (config, "pci:01.0", 0, "maincpu");
 	LPC_ACPI   (config, "pci:01.0:acpi", 0);
 	SMBUS      (config, "pci:01.0:smbus", 0);
 
-//	SIS900_LAN(config, "pci:01.1"
+//  SIS900_LAN(config, "pci:01.1"
 	// USB config: 2 on back, 3 on front
-//	SIS7001_USB(config, "pci:01.2"
-//	SIS7001_USB(config, "pci:01.3"
-//	SIS7018_AC97(config, "pci:01.4"
+//  SIS7001_USB(config, "pci:01.2"
+//  SIS7001_USB(config, "pci:01.3"
+//  SIS7018_AUDIO_AC97(config, "pci:01.4"
 	// documentation doesn't mention modem part #, derived from Shuttle MS11 MB manual
-//	SIS7013_MODEM_AC97(config, "pci:01.6"
+//  SIS7013_MODEM_AC97(config, "pci:01.6"
 
 	// TODO: this should be pci:00.0:00.0 but for some reason it won't work with current model
 	// (crashes when regenerating config mapping)
@@ -108,7 +108,7 @@ void sis630_state::sis630(machine_config &config)
 
 	// TODO: AMR (Audio/modem riser) + UPT (?), assume EISA complaint
 	ISA16_SLOT(config, "isa1", 0, "pci:01.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa2", 0, "pci:01.0:isabus", pc_isa16_cards, nullptr, false);	
+	ISA16_SLOT(config, "isa2", 0, "pci:01.0:isabus", pc_isa16_cards, nullptr, false);
 }
 
 ROM_START(shutms11)

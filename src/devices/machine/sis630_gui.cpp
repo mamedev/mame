@@ -4,27 +4,27 @@
 
     SiS 630 Video GUI portion (SVGA-based) & 301 video bridge
 
-	- 630 core is SVGA based:
-	\- has two sets of extended CRTC ($3c4) regs;
-	\- a dedicated MPEG-2 video playback interface;
-	\- a digital video interface to 301;
-	- 301 draws to a separate monitor, and it was originally tied to a SiS300 AGP card,
-	  (which we don't have a dump of at the time of this writing):
-	\- can select VGA, NTSC, PAL or LCD sources;
-	\- Has separate set of VGA and RAMDAC regs;
-	\- Has TV encoder;
-	\- Has macrovision regs;
-	- GUI is the 630 PCI/AGP i/f
-	\- it's actually internal to the rest of 630;
-	\- 301 is external but closely tied to it;
+    - 630 core is SVGA based:
+    \- has two sets of extended CRTC ($3c4) regs;
+    \- a dedicated MPEG-2 video playback interface;
+    \- a digital video interface to 301;
+    - 301 draws to a separate monitor, and it was originally tied to a SiS300 AGP card,
+      (which we don't have a dump of at the time of this writing):
+    \- can select VGA, NTSC, PAL or LCD sources;
+    \- Has separate set of VGA and RAMDAC regs;
+    \- Has TV encoder;
+    \- Has macrovision regs;
+    - GUI is the 630 PCI/AGP i/f
+    \- it's actually internal to the rest of 630;
+    \- 301 is external but closely tied to it;
 
-	TODO:
-	- Very preliminary, enough to make it to draw basic VGA primary screen and not much else;
-	- Legacy BIOS (disable shadow RAM in host) draws in MDA mode, which doesn't work with this
-	  implementation;
-	- Understand how exactly 630 selects between the SVGA and extended register sets;
-	- Backward port 630 GUI/PCI implementation to 300;
-	- Confirm PCI IDs (they aren't well formed);
+    TODO:
+    - Very preliminary, enough to make it to draw basic VGA primary screen and not much else;
+    - Legacy BIOS (disable shadow RAM in host) draws in MDA mode, which doesn't work with this
+      implementation;
+    - Understand how exactly 630 selects between the SVGA and extended register sets;
+    - Backward port 630 GUI/PCI implementation to 300;
+    - Confirm PCI IDs (they aren't well formed);
 
 **************************************************************************************************/
 
@@ -34,8 +34,9 @@
 #define LOG_IO     (1U << 1) // log PCI register accesses
 #define LOG_TODO   (1U << 2) // log unimplemented registers
 #define LOG_MAP    (1U << 3) // log full remaps
+#define LOG_AGP    (1U << 4) // log AGP
 
-#define VERBOSE (LOG_GENERAL | LOG_IO | LOG_TODO | LOG_MAP)
+#define VERBOSE (LOG_GENERAL | LOG_IO | LOG_TODO | LOG_MAP | LOG_AGP)
 //#define LOG_OUTPUT_FUNC osd_printf_warning
 
 #include "logmacro.h"
@@ -43,6 +44,7 @@
 #define LOGIO(...)     LOGMASKED(LOG_IO,   __VA_ARGS__)
 #define LOGMAP(...)    LOGMASKED(LOG_MAP,  __VA_ARGS__)
 #define LOGTODO(...)   LOGMASKED(LOG_TODO, __VA_ARGS__)
+#define LOGAGP(...)    LOGMASKED(LOG_AGP, __VA_ARGS__)
 
 /**************************
  *
@@ -55,7 +57,7 @@ DEFINE_DEVICE_TYPE(SIS630_SVGA, sis630_svga_device, "sis630_svga", "SiS 630 SVGA
 sis630_svga_device::sis630_svga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: svga_device(mconfig, SIS630_SVGA, tag, owner, clock)
 {
-	
+
 }
 
 void sis630_svga_device::device_start()
@@ -81,7 +83,7 @@ uint8_t sis630_svga_device::crtc_reg_read(uint8_t index)
 
 	// TODO: if one of these is 0xff then it enables a single port transfer to $b8000
 	return m_crtc_ext_regs[index];
-} 
+}
 
 void sis630_svga_device::crtc_reg_write(uint8_t index, uint8_t data)
 {
@@ -97,15 +99,15 @@ void sis630_svga_device::crtc_reg_write(uint8_t index, uint8_t data)
 
 uint8_t sis630_svga_device::mem_r(offs_t offset)
 {
-//	printf("%08x %08llx\n", offset, vga.svga_intf.vram_size);
+//  printf("%08x %08llx\n", offset, vga.svga_intf.vram_size);
 
 	return svga_device::mem_r(offset);
 }
 
 void sis630_svga_device::mem_w(offs_t offset, uint8_t data)
 {
-//	printf("%08x %02x %08llx\n", offset, data, vga.svga_intf.vram_size);
-//	printf("%d %d %d %d\n",svga.rgb8_en, svga.rgb15_en, svga.rgb16_en, svga.rgb24_en);
+//  printf("%08x %02x %08llx\n", offset, data, vga.svga_intf.vram_size);
+//  printf("%d %d %d %d\n",svga.rgb8_en, svga.rgb15_en, svga.rgb16_en, svga.rgb24_en);
 	svga_device::mem_w(offset, data);
 }
 
@@ -126,7 +128,7 @@ sis630_gui_device::sis630_gui_device(const machine_config &mconfig, const char *
 }
 
 ROM_START( sis630gui )
-	ROM_REGION32_LE( 0x10000, "biosrom", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x8000, "biosrom", ROMREGION_ERASEFF )
 	// "SiS 630 (Ver. 2.02.1c) [AGP VGA] (Silicon Integrated Systems Corp.).bin"
 	ROM_LOAD( "sis630.bin", 0x0000, 0x8000, CRC(f04ef9b0) SHA1(2396a79cd4045362bfc511090b146daa85902b4d) )
 
@@ -158,31 +160,98 @@ void sis630_gui_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
 	map(0x10, 0x4f).unmaprw();
-	map(0x10, 0x5c).rw(FUNC(sis630_gui_device::unmap_log_r), FUNC(sis630_gui_device::unmap_log_w));
 	map(0x10, 0x13).rw(FUNC(sis630_gui_device::base_fb_r), FUNC(sis630_gui_device::base_fb_w));
 	map(0x14, 0x17).rw(FUNC(sis630_gui_device::base_io_r), FUNC(sis630_gui_device::base_io_w));
 	map(0x18, 0x1b).rw(FUNC(sis630_gui_device::space_io_r), FUNC(sis630_gui_device::space_io_w));
+	map(0x2c, 0x2d).r(FUNC(sis630_gui_device::subvendor_r));
+	map(0x2e, 0x2f).r(FUNC(sis630_gui_device::subsystem_r));
+	map(0x2c, 0x2f).w(FUNC(sis630_gui_device::subvendor_w));
 	map(0x30, 0x33).rw(FUNC(sis630_gui_device::exp_rom_r), FUNC(sis630_gui_device::exp_rom_w));
 
-//	map(0x3c, 0x3d) irq line/pin
+//  map(0x3c, 0x3d) irq line/pin
 
-	// TODO: AGP regs, available only when it's enabled
-//	map(0x34, 0x34) capabilities list offset pointer (0x50)
-//	map(0x50, 0x50) AGP config 0x00105c02
-//	map(0x54, 0x54) AGP id 0x01000003
-//	map(0x58, 0x5b) AGP control (bit 8 AGP enable)
+	map(0x34, 0x34).r(FUNC(sis630_gui_device::capptr_r));
+
+	map(0x50, 0x53).r(FUNC(sis630_gui_device::agp_id_r));
+	map(0x54, 0x57).r(FUNC(sis630_gui_device::agp_status_r));
+	map(0x58, 0x5b).rw(FUNC(sis630_gui_device::agp_command_r), FUNC(sis630_gui_device::agp_command_w));
+	map(0x5c, 0x5c).lr8(NAME([this] () { return 0; })); // NULL terminator
 }
 
-// TODO: debugging, to be removed
-u8 sis630_gui_device::unmap_log_r(offs_t offset)
+u8 sis630_gui_device::capptr_r()
 {
-	LOGTODO("GUI Unemulated [%02x] R\n", offset + 0x10);
-	return 0;
+	return 0x50;
 }
 
-void sis630_gui_device::unmap_log_w(offs_t offset, u8 data)
+u32 sis630_gui_device::agp_id_r()
 {
-	LOGTODO("GUI Unemulated [%02x] %02x W\n", offset + 0x10, data);
+	LOGAGP("Read AGP ID [$50]\n");
+	// bits 23-16 AGP v1.0
+	// bits 15-8 0x5c NEXT_PTR (which goes to NULL terminator, heh)
+	// bits 7-0 CAP_ID (0x02 for AGP)
+	return 0x00105c02;
+}
+
+u32 sis630_gui_device::agp_status_r()
+{
+	LOGAGP("Read AGP status [$54]\n");
+	// RQ (1 + 1), 2X and 1X capable
+	return 0x01000003;
+}
+
+u32 sis630_gui_device::agp_command_r(offs_t offset, uint32_t mem_mask)
+{
+	LOGAGP("Read AGP command [$58] %d %d %08x\n", m_agp.enable, m_agp.data_rate, mem_mask);
+	// TODO: enable gets cleared by AGP_RESET, or even from PCI RST#
+	return m_agp.enable << 8 | (m_agp.data_rate & 7);
+}
+
+void sis630_gui_device::agp_command_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	LOGAGP("Write AGP command [$c8] %08x & %08x\n", data, mem_mask);
+
+	if (ACCESSING_BITS_8_15)
+	{
+		m_agp.enable = bool(BIT(m_agp.enable, 8));
+		LOGAGP("- AGP_ENABLE = %d\n", m_agp.enable);
+	}
+
+	if (ACCESSING_BITS_0_7)
+	{
+		std::map<u8, std::string> agp_transfer_rates = {
+			{ 1, "1X" },
+			{ 2, "2X" },
+		};
+
+		// make sure the AGP DATA_RATE specs are honored
+		try {
+			const u8 data_rate = data & 3;
+			LOGAGP("- DATA_RATE = %s\n", agp_transfer_rates.at(data_rate));
+			m_agp.data_rate = data_rate;
+		}
+		catch (std::out_of_range& err) {
+			LOG("Warning: AGP illegal DATA_RATE set = %d enabled=%d\n", data & 3, m_agp.enable);
+		}
+	}
+}
+
+// TODO: may be common to PCI base interface, verify
+void sis630_gui_device::subvendor_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	// write once
+	if (m_subsystem_logger_mask & mem_mask)
+	{
+		LOG("Warning: subvendor ID possible rewrite! old=%08x & %08x data=%08x & %08x\n"
+			, subsystem_id
+			, m_subsystem_logger_mask
+			, data
+			, mem_mask
+		);
+	}
+	m_subsystem_logger_mask |= mem_mask;
+
+	COMBINE_DATA(&subsystem_id);
+	LOGIO("subsystem ID write [$2c] %08x & %08x (%08x)\n", data, mem_mask, subsystem_id);
 }
 
 void sis630_gui_device::memory_map(address_map &map)
@@ -192,7 +261,7 @@ void sis630_gui_device::memory_map(address_map &map)
 
 void sis630_gui_device::io_map(address_map &map)
 {
-	
+
 }
 
 
@@ -201,47 +270,43 @@ void sis630_gui_device::map_extra(uint64_t memory_window_start, uint64_t memory_
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	// TODO: understand how the full VRAM memory really maps up
-//	memory_space->install_device(0, 0xffffffff, *this, &sis630_gui_device::memory_map);
+//  memory_space->install_device(0, 0xffffffff, *this, &sis630_gui_device::memory_map);
 
 	memory_space->install_readwrite_handler(
-		0xa0000, 0xbffff, 
+		0xa0000, 0xbffff,
 		read8sm_delegate(*this, FUNC(sis630_gui_device::vram_r)),
 		write8sm_delegate(*this, FUNC(sis630_gui_device::vram_w))
 	);
-	
-	// TODO: expansion ROM doesn't work properly
-	
 
-	//printf("%08x\n", m_exp_rom_reg);
-	if (m_exp_rom_reg & 1)
-		memory_space->install_rom(0x000d0000, 0x000dffff, m_biosrom);
+	LOGMAP("GUI remapping table (%08x)\n", m_exp_rom_reg);
 
-#if 0
-	if (m_exp_rom_reg & 1)
 	{
-		const u32 start_offs = m_exp_rom_reg & ~1;
+		// TODO: expansion ROM doesn't work properly
+
+		const u32 start_offs = 0xd0000; //(m_exp_rom_reg & 1) ? m_exp_rom_reg & ~1 : 0xd0000;
 		const u32 end_offs = start_offs + m_biosrom.bytes() - 1;
-		
+
+		LOGMAP("- %08x-%08x\n", start_offs, end_offs);
+
 		if (start_offs < end_offs)
 			memory_space->install_rom(start_offs, end_offs, m_biosrom);
 	}
-#endif
 
 	// TODO: convert to io_map
 	io_space->install_device(0, 0xffff, *this, &sis630_gui_device::io_map);
-	
+
 	io_space->install_readwrite_handler(0x03b0, 0x03bf, read32s_delegate(*this, FUNC(sis630_gui_device::vga_3b0_r)), write32s_delegate(*this, FUNC(sis630_gui_device::vga_3b0_w)));
 	io_space->install_readwrite_handler(0x03c0, 0x03cf, read32s_delegate(*this, FUNC(sis630_gui_device::vga_3c0_r)), write32s_delegate(*this, FUNC(sis630_gui_device::vga_3c0_w)));
 	io_space->install_readwrite_handler(0x03d0, 0x03df, read32s_delegate(*this, FUNC(sis630_gui_device::vga_3d0_r)), write32s_delegate(*this, FUNC(sis630_gui_device::vga_3d0_w)));
 
 	// "128 I/O space" probably means the RIO "Relocate I/O" base
-	// at some point I've got extensive checks with 0xff84 (digital video interface regs),
+	// at some point I've got extensive checks with 0xff84 (digital video interface regs)
 	// TODO: pinpoint effective value base
 	// (doc mentions being 16-bit wide, should be 7-bit by logic)
 	if (m_space_io_base == 0xffffffff)
 	{
 		// all regs follow index/data pattern space
-		// RIO + 0x00: video capture regs on 300, omitted or missing on 630 
+		// RIO + 0x00: video capture regs on 300, omitted or missing on 630
 		// RIO + 0x02: MPEG-2 video playback
 		// RIO + 0x04: digital video interface (to 301 only?)
 		// RIO + 0x10: 301 TV encoder
@@ -272,13 +337,15 @@ void sis630_gui_device::device_start()
 void sis630_gui_device::device_reset()
 {
 	pci_device::device_reset();
-	
+
 	command = 0x0004;
 	status = 0x0220;
 	m_exp_rom_reg =   0x000c0001;
 	m_fb_base =       0x00000008;
 	m_io_base =       0x00000000;
 	m_space_io_base = 0x00000001;
+
+	m_subsystem_logger_mask = 0;
 }
 
 // TODO: remove these trampolines
@@ -289,7 +356,7 @@ uint8_t sis630_gui_device::vram_r(offs_t offset)
 
 void sis630_gui_device::vram_w(offs_t offset, uint8_t data)
 {
-//	printf("%08x %02x\n", offset, data);
+//  printf("%08x %02x\n", offset, data);
 	downcast<sis630_svga_device *>(m_svga.target())->mem_w(offset, data);
 }
 
@@ -372,7 +439,7 @@ void sis630_gui_device::vga_3d0_w(offs_t offset, uint32_t data, uint32_t mem_mas
 		downcast<sis630_svga_device *>(m_svga.target())->port_03d0_w(offset * 4 + 3, data >> 24);
 }
 
-u32 sis630_gui_device::base_fb_r(uint32_t mem_mask)
+u32 sis630_gui_device::base_fb_r(offs_t offset, uint32_t mem_mask)
 {
 	LOGIO("Read FB base [$10] %08x & %08x\n", m_fb_base, mem_mask);
 	return m_fb_base;
@@ -380,12 +447,12 @@ u32 sis630_gui_device::base_fb_r(uint32_t mem_mask)
 
 void sis630_gui_device::base_fb_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	COMBINE_DATA(&m_fb_base);	
+	COMBINE_DATA(&m_fb_base);
 	LOGIO("Write FB base [$10] %08x & %08x (%08x)\n", data, mem_mask, m_fb_base);
 	remap_cb();
 }
 
-u32 sis630_gui_device::base_io_r(uint32_t mem_mask)
+u32 sis630_gui_device::base_io_r(offs_t offset, uint32_t mem_mask)
 {
 	LOGIO("Read I/O base [$14] %08x & %08x\n", m_io_base, mem_mask);
 	return m_io_base;
@@ -394,12 +461,12 @@ u32 sis630_gui_device::base_io_r(uint32_t mem_mask)
 void sis630_gui_device::base_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_io_base);
-	
+
 	LOGIO("Write I/O base [$14] %08x & %08x\n", m_io_base, mem_mask);
 	remap_cb();
 }
 
-u32 sis630_gui_device::space_io_r(uint32_t mem_mask)
+u32 sis630_gui_device::space_io_r(offs_t offset, uint32_t mem_mask)
 {
 	LOGIO("Read RIO base [$18] %08x & %08x\n", m_space_io_base, mem_mask);
 	return m_space_io_base;
@@ -412,7 +479,7 @@ void sis630_gui_device::space_io_w(offs_t offset, uint32_t data, uint32_t mem_ma
 	remap_cb();
 }
 
-u32 sis630_gui_device::exp_rom_r(uint32_t mem_mask)
+u32 sis630_gui_device::exp_rom_r(offs_t offset, uint32_t mem_mask)
 {
 	LOGIO("Read expansion ROM base [$30] %08x & %08x\n", m_exp_rom_reg, mem_mask);
 	return m_exp_rom_reg;
@@ -422,8 +489,8 @@ u32 sis630_gui_device::exp_rom_r(uint32_t mem_mask)
 void sis630_gui_device::exp_rom_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_exp_rom_reg);
-//	m_exp_rom_reg &= 0xfffff801;
-	m_exp_rom_reg &= 0xfffff801 & (1-0x10000);
+//  m_exp_rom_reg &= 0xfffff801;
+	m_exp_rom_reg &= 0xfffff801 & (1-0x8000);
 	LOGIO("Write expansion ROM base [$30] %08x & %08x (%08x)\n", data, mem_mask, m_exp_rom_reg);
 	remap_cb();
 }
@@ -431,7 +498,7 @@ void sis630_gui_device::exp_rom_w(offs_t offset, uint32_t data, uint32_t mem_mas
 /*************************
 *
 * SiS 301 Virtual Bridge
-* 
+*
 *************************/
 
 DEFINE_DEVICE_TYPE(SIS301_VIDEO_BRIDGE, sis301_video_bridge_device, "sis630_bridge", "SiS 301 Virtual PCI-to-PCI Video Bridge")
@@ -451,8 +518,8 @@ void sis301_video_bridge_device::config_map(address_map &map)
 {
 	pci_bridge_device::config_map(map);
 	// shouldn't have any programming interface
-//	map(0x10, 0x4f).unmaprw();
-//	map(0x10, 0x3e).rw(FUNC(sis301_video_bridge_device::unmap_log_r), FUNC(sis301_video_bridge_device::unmap_log_w));
+//  map(0x10, 0x4f).unmaprw();
+//  map(0x10, 0x3e).rw(FUNC(sis301_video_bridge_device::unmap_log_r), FUNC(sis301_video_bridge_device::unmap_log_w));
 }
 
 void sis301_video_bridge_device::memory_map(address_map &map)
@@ -462,7 +529,7 @@ void sis301_video_bridge_device::memory_map(address_map &map)
 
 void sis301_video_bridge_device::io_map(address_map &map)
 {
-	
+
 }
 
 
@@ -491,7 +558,7 @@ void sis301_video_bridge_device::device_start()
 void sis301_video_bridge_device::device_reset()
 {
 	pci_device::device_reset();
-	
+
 	command = 0x0000;
 	status = 0x0000;
 }
