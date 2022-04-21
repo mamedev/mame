@@ -2346,6 +2346,10 @@ void apple2e_state::c000_w(offs_t offset, u8 data)
 			{
 				m_accel_gameio = data;
 			}
+			else
+			{
+				do_io(offset, false);
+			}
 			break;
 
 		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
