@@ -129,7 +129,6 @@ static const nes_pcb pcb_list[] =
 	{ "tcu01",            SACHEN_TCU01 },
 	{ "tcu02",            SACHEN_TCU02 },
 	{ "sa9602b",          SACHEN_SA9602B },
-	{ "tengen_800008",    TENGEN_800008 },  /* FIXME: Is this the same as mapper 3? */
 	{ "tengen_800032",    TENGEN_800032 },
 	{ "tengen_800037",    TENGEN_800037 },
 	{ "txc_22110",        TXC_22110 },
@@ -145,6 +144,7 @@ static const nes_pcb pcb_list[] =
 	{ "waixing_d",        WAIXING_TYPE_D },
 	{ "waixing_e",        WAIXING_TYPE_E },
 	{ "waixing_f",        WAIXING_TYPE_F },
+	{ "waixing_f1",       WAIXING_TYPE_F1 },
 	{ "waixing_g",        WAIXING_TYPE_G },
 	{ "waixing_h",        WAIXING_TYPE_H },
 	{ "waixing_h1",       WAIXING_TYPE_H1 },
@@ -412,7 +412,6 @@ static const nes_pcb pcb_list[] =
 	{ "ffe4",             FFE4_BOARD },
 	{ "ffe8",             FFE8_BOARD },
 	{ "unl_dance",        UNSUPPORTED_BOARD },
-	{ "bmc_hik_kof",      UNSUPPORTED_BOARD },
 	{ "onebus",           UNSUPPORTED_BOARD },
 	{ "pec586",           UNSUPPORTED_BOARD },
 	{ "test",             TEST_BOARD },

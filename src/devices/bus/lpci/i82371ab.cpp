@@ -19,6 +19,20 @@
 #include "emu.h"
 #include "i82371ab.h"
 
+#define LOG_ISA    (1U <<  1)
+#define LOG_IDE    (1U <<  2)
+#define LOG_USB    (1U <<  3)
+#define LOG_ACPI   (1U <<  4)
+
+#define VERBOSE (LOG_GENERAL | LOG_ISA | LOG_IDE | LOG_USB | LOG_ACPI)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+#include "logmacro.h"
+
+#define LOGISA(...)    LOGMASKED(LOG_ISA, __VA_ARGS__)
+#define LOGIDE(...)    LOGMASKED(LOG_IDE, __VA_ARGS__)
+#define LOGUSB(...)    LOGMASKED(LOG_USB, __VA_ARGS__)
+#define LOGACPI(...)   LOGMASKED(LOG_ACPI, __VA_ARGS__)
+
 DEFINE_DEVICE_TYPE(I82371AB, i82371ab_device, "i82371ab", "Intel 82371AB")
 
 
@@ -28,6 +42,8 @@ i82371ab_device::i82371ab_device(const machine_config &mconfig, const char *tag,
 {
 }
 
+
+
 uint32_t i82371ab_device::pci_isa_r(device_t *busdevice, int offset, uint32_t mem_mask)
 {
 	uint32_t result = m_regs[0][offset] |
@@ -35,7 +51,7 @@ uint32_t i82371ab_device::pci_isa_r(device_t *busdevice, int offset, uint32_t me
 			m_regs[0][offset+2] << 16|
 			m_regs[0][offset+3] << 24;
 
-	logerror("i82371ab_pci_isa_r, offset = %02x, mem_mask = %08x\n", offset, mem_mask);
+	LOGISA("ISA read: [%02x] -> %08x & %08x\n", offset, result, mem_mask);
 
 	return result;
 }
@@ -46,7 +62,7 @@ void i82371ab_device::pci_isa_w(device_t *busdevice, int offset, uint32_t data, 
 	int i;
 	COMBINE_DATA(&cdata);
 
-	logerror("i82371ab_pci_isa_w, offset = %02x, data = %08x, mem_mask = %08x\n", offset, data, mem_mask);
+	LOGISA("ISA write: [%02x] <- %08x & %08x\n", offset, data, mem_mask);
 
 	for(i = 0; i < 4; i++, offset++, cdata >>= 8)
 	{
@@ -74,7 +90,7 @@ uint32_t i82371ab_device::pci_ide_r(device_t *busdevice, int offset, uint32_t me
 			m_regs[1][offset+2] << 16|
 			m_regs[1][offset+3] << 24;
 
-	logerror("i82371ab_pci_ide_r, offset = %02x, mem_mask = %08x\n", offset, mem_mask);
+	LOGIDE("IDE read: [%02x] -> %08x & %08x\n", offset, result, mem_mask);
 
 	return result;
 }
@@ -85,7 +101,7 @@ void i82371ab_device::pci_ide_w(device_t *busdevice, int offset, uint32_t data, 
 	int i;
 	COMBINE_DATA(&cdata);
 
-	logerror("i82371ab_pci_isa_w, offset = %02x, data = %08x, mem_mask = %08x\n", offset, data, mem_mask);
+	LOGIDE("IDE write: [%02x] <- %08x & %08x\n", offset, data, mem_mask);
 
 	for(i = 0; i < 4; i++, offset++, cdata >>= 8)
 	{
@@ -113,7 +129,7 @@ uint32_t i82371ab_device::pci_usb_r(device_t *busdevice, int offset, uint32_t me
 			m_regs[2][offset+2] << 16|
 			m_regs[2][offset+3] << 24;
 
-	logerror("i82371ab_pci_usb_r, offset = %02x, mem_mask = %08x\n", offset, mem_mask);
+	LOGUSB("USB read: [%02x] -> %08x & %08x\n", offset, result, mem_mask);
 
 	return result;
 }
@@ -124,7 +140,7 @@ void i82371ab_device::pci_usb_w(device_t *busdevice, int offset, uint32_t data, 
 	int i;
 	COMBINE_DATA(&cdata);
 
-	logerror("i82371ab_pci_isa_w, offset = %02x, data = %08x, mem_mask = %08x\n", offset, data, mem_mask);
+	LOGUSB("USB write: [%02x] <- %08x & %08x\n", offset, data, mem_mask);
 
 	for(i = 0; i < 4; i++, offset++, cdata >>= 8)
 	{
@@ -152,7 +168,7 @@ uint32_t i82371ab_device::pci_acpi_r(device_t *busdevice, int offset, uint32_t m
 			m_regs[3][offset+2] << 16|
 			m_regs[3][offset+3] << 24;
 
-	logerror("i82371ab_pci_acpi_r, offset = %02x, mem_mask = %08x\n", offset, mem_mask);
+	LOGACPI("ACPI read: [%02x] -> %08x & %08x\n", offset, result, mem_mask);
 
 	return result;
 }
@@ -163,7 +179,7 @@ void i82371ab_device::pci_acpi_w(device_t *busdevice, int offset, uint32_t data,
 	int i;
 	COMBINE_DATA(&cdata);
 
-	logerror("i82371ab_pci_isa_w, offset = %02x, data = %08x, mem_mask = %08x\n", offset, data, mem_mask);
+	LOGACPI("ACPI write: [%02x] <- %08x & %08x\n", offset, data, mem_mask);
 
 	for(i = 0; i < 4; i++, offset++, cdata >>= 8)
 	{
@@ -194,7 +210,7 @@ uint32_t i82371ab_device::pci_read(pci_bus_device *pcibus, int function, int off
 	case 3: return pci_acpi_r(pcibus, offset, mem_mask);
 	}
 
-	logerror("i82371ab_pci_read: read from undefined function %d\n", function);
+	LOG("read from undefined function %d\n", function);
 
 	return 0;
 }

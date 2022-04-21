@@ -8,8 +8,6 @@
 
   M6809 for game, Z80 and YM-2203 for sound.
 
-2009/06 - DIP Location and Defaults verified against Speed Rumbler manual.
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -254,7 +252,6 @@ void srumbler_state::srumbler(machine_config &config)
 
 	z80_device &audiocpu(Z80(config, "audiocpu", 16_MHz_XTAL / 4));
 	audiocpu.set_addrmap(AS_PROGRAM, &srumbler_state::srumbler_sound_map);
-	audiocpu.set_periodic_int(FUNC(srumbler_state::irq0_line_hold), attotime::from_hz(4*60));
 
 	/* video hardware */
 	BUFFERED_SPRITERAM8(config, m_spriteram);
@@ -278,6 +275,7 @@ void srumbler_state::srumbler(machine_config &config)
 	GENERIC_LATCH_8(config, "soundlatch");
 
 	ym2203_device &ym1(YM2203(config, "ym1", 16_MHz_XTAL / 4));
+	ym1.irq_handler().set_inputline("audiocpu", 0);
 	ym1.add_route(0, "mono", 0.10);
 	ym1.add_route(1, "mono", 0.10);
 	ym1.add_route(2, "mono", 0.10);

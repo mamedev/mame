@@ -290,6 +290,7 @@ void photoply_state::photoply(machine_config &config)
 		.erase_all_time(attotime::from_usec(10));
 }
 
+// We asume that every Photo Play from 1999 onwards use a DX4 100MHz instead of a 75MHz one (both were compatible, the latter were recommended)
 void photoply_state::photoply_dx4_100(machine_config &config)
 {
 	photoply(config);
@@ -301,7 +302,7 @@ ROM_START(photoply98sp)
 	ROM_LOAD("funworld_award_486e_w83787.bin", 0x000000, 0x20000, CRC(af7ff1d4) SHA1(72eeecf798a03817ce7ba4d65cd4128ed3ef7e68) ) // 486E 96/7/19 W83787 PLUG & PLAY BIOS, AT27C010, Funworld sticker: Sept 1998
 
 	ROM_REGION(0x8000, "ex_bios", ROMREGION_ERASE00 ) // Multifunction board with a ESS AudioDrive chip, Funworld sticker: Sept 1998
-	ROM_LOAD("enhanced_bios_centos.bin", 0x000000, 0x8000, CRC(ee8ad003) SHA1(4814385117599a98da02155785d1e3fce4e485bd) ) // Centos CI-8000/PP2000 ROM BIOS Version 1.06, 27C256B
+	ROM_LOAD("enhanced_bios_centos.bin", 0x0000, 0x8000, CRC(ee8ad003) SHA1(4814385117599a98da02155785d1e3fce4e485bd) ) // Centos CI-8000/PP2000 ROM BIOS Version 1.06, 27C256B
 
 	ROM_REGION(0x8000, "video_bios", 0 )
 	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic/Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
@@ -387,6 +388,21 @@ ROM_START(photoply99sp)
 	DISK_IMAGE( "photoplay99sp", 0, BAD_DUMP SHA1(887e5b8c931d6122a1c3a8eda5cb919eb162eced) ) // From an operated HDD. A clean one must be recreated from the CDs
 ROM_END
 
+// BIOS not provided on this set
+ROM_START(photoply99nl)
+	ROM_REGION(0x20000, "bios", 0) // Motherboard BIOS
+	ROM_LOAD("funworld_award_486e_w83787.bin", 0x000000, 0x20000, BAD_DUMP CRC(af7ff1d4) SHA1(72eeecf798a03817ce7ba4d65cd4128ed3ef7e68) ) // 486E 96/7/19 W83787 PLUG & PLAY BIOS, AT29C010A
+
+	ROM_REGION(0x8000, "ex_bios", ROMREGION_ERASE00 )
+	ROM_LOAD("enhanced_bios_1.06.u13", 0x0000, 0x8000, CRC(d05e9d20) SHA1(854501b7b3bf988b10516109d058f7ca2aa07d3e) ) // Centos Combo I/O ROM BIOS for CI-8000/PP2000 v1.06, W27E257
+
+	ROM_REGION(0x8000, "video_bios", 0 )
+	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic/Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
+
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE( "photoplay99nl", 0, BAD_DUMP SHA1(e3ff2a64f51e0ba07d08cd49cd56cdc866401b4f) ) // Recreated from the CDs using a VM
+ROM_END
+
 ROM_START(photoply2k)
 	ROM_REGION(0x20000, "bios", 0) // Motherboard BIOS
 	ROM_LOAD("funworld_award_486e_w83787_alt.bin", 0x000000, 0x20000, CRC(e96d1bbc) SHA1(64d0726c4e9ecee8fddf4cc39d92aecaa8184d5c) ) // 486E 96/7/19 W83787 PLUG & PLAY BIOS (same string as 'photoply99sp' and 'photoply99sp' BIOSes, but different hash)
@@ -409,12 +425,12 @@ ROM_START(photoply2ksp)
 	ROM_LOAD("funworld_award_486e_w83787.bin", 0x000000, 0x20000, CRC(af7ff1d4) SHA1(72eeecf798a03817ce7ba4d65cd4128ed3ef7e68) ) // 486E 96/7/19 W83787 PLUG & PLAY BIOS, AT27C010
 
 	ROM_REGION(0x8000, "ex_bios", ROMREGION_ERASE00 ) // Multifunction board with a ESS AudioDrive chip
-	ROM_LOAD("enhanced_bios_centos.bin", 0x000000, 0x8000, CRC(ee8ad003) SHA1(4814385117599a98da02155785d1e3fce4e485bd) ) // Centos CI-8000/PP2000 ROM BIOS Version 1.06, 27C256B
+	ROM_LOAD("enhanced_bios_centos.bin", 0x0000, 0x8000, CRC(ee8ad003) SHA1(4814385117599a98da02155785d1e3fce4e485bd) ) // Centos CI-8000/PP2000 ROM BIOS Version 1.06, 27C256B
 
 	ROM_REGION(0x8000, "video_bios", 0 )
 	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic/Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
 
-	/* The PhotoPlay 2000 parallel port dongle contains, under resin:
+	/* The Photo Play 2000 parallel port dongle contains, under resin:
 	   Unknown MCU labeled "MARX(C)95,97 CBN/V/S" (UNDUMPED)
 	   74HC00 */
 	ROM_REGION(0x800, "dongle", 0)
@@ -424,6 +440,27 @@ ROM_START(photoply2ksp)
 	// CHS: 2100,16,63
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "photoplay2ksp", 0, BAD_DUMP SHA1(2b4b837d85bf8a41d832533afb9363fdb16f7a30) ) // From an operated HDD. A clean one must be recreated from the CDs
+ROM_END
+
+// BIOS not provided, might be different
+ROM_START(photoply2knl)
+	ROM_REGION(0x20000, "bios", 0) // Motherboard BIOS
+	ROM_LOAD("funworld_award_486e_w83787.bin", 0x000000, 0x20000, BAD_DUMP CRC(af7ff1d4) SHA1(72eeecf798a03817ce7ba4d65cd4128ed3ef7e68) ) // 486E 96/7/19 W83787 PLUG & PLAY BIOS, AT27C010
+
+	ROM_REGION(0x8000, "ex_bios", ROMREGION_ERASE00 ) // Multifunction board with a ESS AudioDrive chip
+	ROM_LOAD("enhanced_bios_centos.bin", 0x0000, 0x8000, CRC(ee8ad003) SHA1(4814385117599a98da02155785d1e3fce4e485bd) ) // Centos CI-8000/PP2000 ROM BIOS Version 1.06, 27C256B
+
+	ROM_REGION(0x8000, "video_bios", 0 )
+	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic/Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
+
+	/* The Photo Play 2000 parallel port dongle contains, under resin:
+	   Unknown MCU labeled "MARX(C)95,97 CBN/V/S" (UNDUMPED)
+	   74HC00 */
+	ROM_REGION(0x800, "dongle", 0)
+	ROM_LOAD("marx_cbn-v-s.bin", 0x000, 0x800, NO_DUMP ) // Size unknown
+
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE( "photoplay2knl", 0, BAD_DUMP SHA1(75aa190913e798d04db88325006c61965f5034ef) ) // Recreated from the CDs using a VM
 ROM_END
 
 // BIOS not provided, might be different
@@ -473,6 +510,82 @@ ROM_START(photoply2k1it)
 ROM_END
 
 // BIOS not provided, might be different
+ROM_START(photoply2k1nl)
+	ROM_REGION(0x20000, "bios", 0) // Motherboard BIOS
+	ROM_LOAD("funworld_award_486e_w83787.bin", 0x000000, 0x20000, BAD_DUMP CRC(af7ff1d4) SHA1(72eeecf798a03817ce7ba4d65cd4128ed3ef7e68) ) // 486E 96/7/19 W83787 PLUG & PLAY BIOS, AT27C010
+
+	ROM_REGION(0x8000, "ex_bios", ROMREGION_ERASE00 ) // Multifunction board with a ESS AudioDrive chip
+	ROM_LOAD("enhanced_bios_centos.bin", 0x0000, 0x8000, CRC(ee8ad003) SHA1(4814385117599a98da02155785d1e3fce4e485bd) ) // Centos CI-8000/PP2000 ROM BIOS Version 1.06, 27C256B
+
+	ROM_REGION(0x8000, "video_bios", 0 )
+	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic/Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
+
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE( "photoplay2k1nl", 0, BAD_DUMP SHA1(87c9417119e9566f65db0f1b0f2182db7712c634) ) // Recreated from the CDs using a VM
+
+	// Recovery discs for Photo Play 2001
+
+	/* UPDATE 2001 - Disc 1
+	   Info on the CD ring:
+	     A0100344917-0102  35  A1
+	     IFPI L555
+	     Sony DADC
+	     Inner ring, laser engraved: IFPI 94Z5
+	*/
+	DISK_REGION( "recover_upd2k1_d1" )
+	DISK_IMAGE_READONLY( "update_2001_cd1", 0, SHA1(c271c03ba8118203b9790dd924aac77ad68c2b17) )
+
+	/* UPDATE 2001 - Disc 2
+	   Info on the CD ring:
+	     A0100344917-0202  13  B1
+	     IFPI L553
+	     Sony DADC
+	     Inner ring, laser engraved: IFPI 94W6
+	*/
+	DISK_REGION( "recover_upd2k1_d2" )
+	DISK_IMAGE_READONLY( "update_2001_cd2", 0, SHA1(c5797d6a342407136af49443401e83fe9578f5f2) )
+
+	/* SNAKE II Service Release Update 2001
+	   Info on the CD ring:
+	     A0100360706-0101  15  A3
+	     IFPI L555
+	     Sony DADC
+	*/
+	DISK_REGION( "recover_snake2_upd2k1_d1" )
+	DISK_IMAGE_READONLY( "nokia_snake_ii_service_release_update_2001", 0, SHA1(09286cb8b63d3cc771cbbf4b9b3de77e3d15bb7b) )
+ROM_END
+
+// BIOS not provided, might be different
+ROM_START(photoply2k1mtnl)
+	ROM_REGION(0x20000, "bios", 0) // Motherboard BIOS
+	ROM_LOAD("funworld_award_486e_w83787.bin", 0x000000, 0x20000, BAD_DUMP CRC(af7ff1d4) SHA1(72eeecf798a03817ce7ba4d65cd4128ed3ef7e68) ) // 486E 96/7/19 W83787 PLUG & PLAY BIOS, AT27C010
+
+	ROM_REGION(0x8000, "ex_bios", ROMREGION_ERASE00 ) // Multifunction board with a ESS AudioDrive chip
+	ROM_LOAD("enhanced_bios_centos.bin", 0x0000, 0x8000, CRC(ee8ad003) SHA1(4814385117599a98da02155785d1e3fce4e485bd) ) // Centos CI-8000/PP2000 ROM BIOS Version 1.06, 27C256B
+
+	ROM_REGION(0x8000, "video_bios", 0 )
+	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic/Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
+
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE( "photoplay2k1mtnl", 0, BAD_DUMP SHA1(cfa25ce036be9c2379a104a3b50d2aefd851ceeb) ) // Recreated from the CDs using a VM
+ROM_END
+
+// BIOS not provided, might be different
+ROM_START(photoply2k2be)
+	ROM_REGION(0x20000, "bios", 0) // Motherboard BIOS
+	ROM_LOAD("funworld_award_486e_w83787.bin", 0x000000, 0x20000, BAD_DUMP CRC(af7ff1d4) SHA1(72eeecf798a03817ce7ba4d65cd4128ed3ef7e68) ) // 486E 96/7/19 W83787 PLUG & PLAY BIOS, AT27C010
+
+	ROM_REGION(0x8000, "ex_bios", ROMREGION_ERASE00 ) // Multifunction board with a ESS AudioDrive chip
+	ROM_LOAD("enhanced_bios_centos.bin", 0x0000, 0x8000, CRC(ee8ad003) SHA1(4814385117599a98da02155785d1e3fce4e485bd) ) // Centos CI-8000/PP2000 ROM BIOS Version 1.06, 27C256B
+
+	ROM_REGION(0x8000, "video_bios", 0 )
+	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic/Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
+
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE( "photoplay2k2be", 0, BAD_DUMP SHA1(29719b5db60f4cc3787a3a9f6a5937226e282d46) ) // Recreated from the CDs using a VM
+ROM_END
+
+// BIOS not provided, might be different
 ROM_START(photoply2k4)
 	ROM_REGION(0x20000, "bios", 0) // Motherboard BIOS
 	ROM_LOAD("funworld_award_486e_w83787_alt.bin", 0x000000, 0x20000, BAD_DUMP CRC(e96d1bbc) SHA1(64d0726c4e9ecee8fddf4cc39d92aecaa8184d5c) ) // 486E 96/7/19 W83787 PLUG & PLAY BIOS (same string as 'photoply99sp' and 'photoply99sp' BIOSes, but different hash)
@@ -491,9 +604,14 @@ ROM_START(photoply2k4)
 	DISK_IMAGE( "pp2004", 0, SHA1(a3f8861cf91cf7e7446ec931f812e774ada20802) )
 ROM_END
 
-GAME( 1998, photoply98sp,  0,          photoply,         photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 1998 (Spanish)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
-GAME( 1999, photoply99sp,  0,          photoply_dx4_100, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 1999 (Spanish)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
-GAME( 2000, photoply2k,    0,          photoply,         photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2000 (v2.01)",   MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
-GAME( 2000, photoply2ksp,  photoply2k, photoply_dx4_100, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2000 (Spanish)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
-GAME( 2001, photoply2k1it, 0,          photoply_dx4_100, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2001 (Italian)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
-GAME( 2004, photoply2k4,   0,          photoply,         photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2004",           MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
+GAME( 1998, photoply98sp,    0,             photoply,         photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 1998 (Spain)",               MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
+GAME( 1999, photoply99sp,    0,             photoply_dx4_100, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 1999 (Spain)",               MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
+GAME( 1999, photoply99nl,    photoply99sp,  photoply_dx4_100, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 1999 (Netherlands)",         MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
+GAME( 2000, photoply2k,      0,             photoply_dx4_100, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2000 (v2.01)",               MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
+GAME( 2000, photoply2ksp,    photoply2k,    photoply_dx4_100, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2000 (Spain)",               MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
+GAME( 2000, photoply2knl,    photoply2k,    photoply_dx4_100, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2000 (Netherlands)",         MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, photoply2k1it,   0,             photoply_dx4_100, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2001 (Italy)",               MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, photoply2k1nl,   photoply2k1it, photoply_dx4_100, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2001 (Netherlands)",         MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, photoply2k1mtnl, photoply2k1it, photoply_dx4_100, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play Masters 2001 (Netherlands)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
+GAME( 2002, photoply2k2be,   0,             photoply_dx4_100, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2002 (Belgium)",             MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
+GAME( 2004, photoply2k4,     0,             photoply_dx4_100, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2004",                       MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )

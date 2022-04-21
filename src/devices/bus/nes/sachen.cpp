@@ -9,8 +9,8 @@
  Here we emulate the following PCBs
 
  * Sachen SA-009 [mapper 160]
- * Sachen SA-0036 [mapper 148]
- * Sachen SA-0037 [mapper 149]
+ * Sachen SA-0036 [mapper 149]
+ * Sachen SA-0037 [mapper 148]
  * Sachen SA-72007 [mapper 145]
  * Sachen SA-72008 [mapper 133]
  * Sachen TCA-01 [mapper 143]
@@ -69,7 +69,7 @@ nes_sachen_sa009_device::nes_sachen_sa009_device(const machine_config &mconfig, 
 {
 }
 
-nes_sachen_sa0036_device::nes_sachen_sa0036_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_sachen_sa0036_device::nes_sachen_sa0036_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_SACHEN_SA0036, tag, owner, clock)
 {
 }
@@ -274,13 +274,16 @@ void nes_sachen_sa009_device::write_l(offs_t offset, uint8_t data)
 
  iNES: mapper 149
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_sachen_sa0036_device::write_h(offs_t offset, uint8_t data)
+void nes_sachen_sa0036_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("sa0036 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	// this pcb is subject to bus conflict
+	data = account_bus_conflict(offset, data);
 
 	chr8(data >> 7, CHRROM);
 }
@@ -288,16 +291,17 @@ void nes_sachen_sa0036_device::write_h(offs_t offset, uint8_t data)
 /*-------------------------------------------------
 
  Sachen SA0037 bootleg boards
+ Tengen 800008 board
 
- Games: Mahjong World, Shisen Mahjong
+ Games: Mahjong World, Shisen Mahjong, Tengen Tetris
 
  iNES: mapper 148
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_sachen_sa0037_device::write_h(offs_t offset, uint8_t data)
+void nes_sachen_sa0037_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("sa0037 write_h, offset: %04x, data: %02x\n", offset, data));
 

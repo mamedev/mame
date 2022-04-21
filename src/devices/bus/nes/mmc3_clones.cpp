@@ -158,7 +158,7 @@ ioport_constructor nes_bmc_kc885_device::device_input_ports() const
 //  LIVE DEVICE
 //**************************************************************************
 
-nes_nitra_device::nes_nitra_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_nitra_device::nes_nitra_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_txrom_device(mconfig, NES_NITRA, tag, owner, clock)
 {
 }
@@ -168,17 +168,17 @@ nes_bmw8544_device::nes_bmw8544_device(const machine_config &mconfig, const char
 {
 }
 
-nes_fs6_device::nes_fs6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_fs6_device::nes_fs6_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_txrom_device(mconfig, NES_FS6, tag, owner, clock)
 {
 }
 
-nes_sbros11_device::nes_sbros11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_sbros11_device::nes_sbros11_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_txrom_device(mconfig, NES_SBROS11, tag, owner, clock)
 {
 }
 
-nes_malisb_device::nes_malisb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_malisb_device::nes_malisb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_txrom_device(mconfig, NES_MALISB, tag, owner, clock)
 {
 }
@@ -929,8 +929,6 @@ void nes_bmc_f600_device::device_start()
 
 void nes_bmc_f600_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-
 	m_reg = 0;
 	mmc3_common_initialize(0x1f, 0x7f, 0);
 }
@@ -1041,8 +1039,6 @@ void nes_bmc_810305c_device::device_start()
 
 void nes_bmc_810305c_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-
 	m_outer = 0;
 	mmc3_common_initialize(0x1f, 0x7f, 0);
 }
@@ -1132,10 +1128,10 @@ void nes_smd133_device::pcb_reset()
 
  Bootleg Board by Nitra
 
- Games: Time Diver Avenger
+ Games: Queen Bee, Time Diver Avenger
 
- This acts basically like a MMC3 with different use of write
- address.
+ MMC3 clone with A10 tied to what is normally A0 and
+ data instead coming from the lower address lines.
 
  iNES: mapper 250
 
@@ -1238,6 +1234,8 @@ void nes_sbros11_device::write_h(offs_t offset, u8 data)
  This is very similar to mapper 196, but with additional
  data bit swap.
 
+ NES 2.0: mapper 325
+
  In MAME: Supported.
 
  -------------------------------------------------*/
@@ -1258,10 +1256,8 @@ void nes_malisb_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("malisb write_h, offset: %04x, data: %02x\n", offset, data));
 
-	if (offset > 0x4000)
-		txrom_write((offset & 0xfffe) | BIT(offset, 2) | BIT(offset, 3), data);
-	else
-		txrom_write((offset & 0xfffe) | BIT(offset, 3), data);
+	offset = (offset & 0x6000) | BIT(offset, 3) | (BIT(offset, 14) & BIT(offset, 2));
+	txrom_write(offset, data);
 }
 
 /*-------------------------------------------------
@@ -3085,12 +3081,12 @@ void nes_bmc_f600_device::write_h(offs_t offset, u8 data)
 		nes_txrom_device::write_h(offset, data);
 }
 
-void nes_bmc_f600_device::chr_cb(int start, int bank, int source)
+void nes_bmc_f600_device::set_chr(u8 chr, int chr_base, int chr_mask)
 {
 	if ((m_reg & 0x07) == 1)
-		nes_txsrom_device::chr_cb(start, bank, source);
+		nes_txsrom_device::set_chr(chr, chr_base, chr_mask);
 	else
-		nes_txrom_device::chr_cb(start, bank, source);
+		nes_txrom_device::set_chr(chr, chr_base, chr_mask);
 }
 
 /*-------------------------------------------------
@@ -3452,16 +3448,10 @@ void nes_bmc_810305c_device::set_chr(u8 chr, int chr_base, int chr_mask)
 {
 	if (m_outer == 2 && BIT(m_mmc_vrom_bank[0], 7))
 		chr8(0, CHRRAM);
-	else
+	else if (m_outer)
 		nes_txrom_device::set_chr(chr, chr_base, chr_mask);
-}
-
-void nes_bmc_810305c_device::chr_cb(int start, int bank, int source)
-{
-	if (m_outer)
-		nes_txrom_device::chr_cb(start, bank, source);
 	else
-		nes_txsrom_device::chr_cb(start, bank, source);
+		nes_txsrom_device::set_chr(chr, chr_base, chr_mask);
 }
 
 void nes_bmc_810305c_device::write_h(offs_t offset, u8 data)

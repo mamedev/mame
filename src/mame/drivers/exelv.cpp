@@ -115,6 +115,7 @@ private:
 	uint8_t   m_tms7041_portb = 0;
 	uint8_t   m_tms7041_portc = 0;
 	uint8_t   m_tms7041_portd = 0;
+	uint32_t  m_rom_size = 0;
 
 	/* mailbox data */
 	uint8_t   m_wx318 = 0;    /* data of 74ls374 labeled wx318 */
@@ -382,8 +383,13 @@ void exelv_state::tms7041_portd_w(uint8_t data)
 */
 uint8_t exelv_state::rom_r(offs_t offset)
 {
-	if (m_cart && m_cart->exists())
-		return m_cart->read_rom(offset + 0x200);
+	if (m_rom_size)
+	{
+		if (m_rom_size == 0x7e00)
+			return m_cart->read_rom(offset);
+		else
+			return m_cart->read_rom(offset + 0x200);
+	}
 
 	return 0;
 }
@@ -464,8 +470,13 @@ MACHINE_START_MEMBER( exelv_state, exl100)
 	save_item(NAME(m_tms7041_portb));
 	save_item(NAME(m_tms7041_portc));
 	save_item(NAME(m_tms7041_portd));
+	save_item(NAME(m_rom_size));
 	save_item(NAME(m_wx318));
 	save_item(NAME(m_wx319));
+
+	m_rom_size = 0;
+	if (m_cart && m_cart->exists())
+		m_rom_size = m_cart->get_rom_size();
 }
 
 MACHINE_START_MEMBER( exelv_state, exeltel)

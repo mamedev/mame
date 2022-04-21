@@ -111,6 +111,7 @@ public:
 	void init_maxidbl();
 	void init_cj3play();
 	void init_surpr5();
+	void init_super97();
 	void init_texasrls();
 	void init_cjbj();
 	void init_megadblj();
@@ -2463,6 +2464,29 @@ ROM_START( surpr5 ) // CJ-8L REV-D, same PCB as cjffruit and texasrls
 	ROM_LOAD( "gal16v8d_dec.u70", 0x000, 0x117, NO_DUMP )
 ROM_END
 
+ROM_START( super97 ) // CJ-8L REV-B, all labels but the MCU's one handwritten
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_WORD( "super 97 1.00-a.u65", 0x00000, 0x80000, CRC(934a121f) SHA1(9490537946364de38cae6428e2c212c7d2ee8588) ) // 27C040, 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x2000, "mcu", 0 )  // 68HC705C8P code
+	ROM_LOAD( "cj-super97 2.2 for cj-8l 10-02-1997.u30", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION16_BE( 0x200000, "blitter", ROMREGION_ERASE00 ) // data for the blitter
+	ROM_LOAD16_BYTE( "super97 0.02-d.u68", 0x000000, 0x80000, CRC(97526727) SHA1(12a39695aa7401e82e071c5d6fbb81d6ea6caaff) ) // 27C040
+	ROM_LOAD16_BYTE( "super97 0.02-c.u75", 0x000001, 0x80000, CRC(96d5f53a) SHA1(c160a44f4851fc5d333772b62ae4bf5a9298baf4) ) // 27C040
+	// u51 and u61 not populated
+
+	ROM_REGION( 0x40000, "samples", 0 ) // 8 bit unsigned
+	ROM_LOAD( "super97 0.02-g.u50", 0x00000, 0x40000, CRC(f97c2cc5) SHA1(e9b8d689aaac8e2e35f6a471b4b6a709617d9ec1) ) // 27C020, 1xxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "gal16v8d_vdp.u15", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_vdo.u53", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_ck2.u64", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_ck1.u69", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_dec.u70", 0x000, 0x117, NO_DUMP )
+ROM_END
+
 ROM_START( cjplus )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_WORD( "a.u65", 0x00000, 0x80000, CRC(7a98f02d) SHA1(60f6b6ae91f9be7ebff84b7f55d04045931bdb4e) )
@@ -3112,6 +3136,17 @@ void blitz68k_state::init_surpr5()
 	rom[0x1fd56/2] = 0x6054;
 }
 
+void blitz68k_state::init_super97()
+{
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+
+	// WRONG C8 #1
+	rom[0x9e9c/2] = 0x6028;
+
+	// ERROR CHECKSUM ROM PROGRAM
+	rom[0x17158/2] = 0x6054;
+}
+
 void blitz68k_state::init_cjplus()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
@@ -3233,6 +3268,7 @@ GAME( 1995,  dualgame, 0,       dualgame, dualgame, blitz68k_state, init_dualgam
 GAME( 1995,  hermit,   0,       hermit,   hermit,   blitz68k_state, init_hermit,   ROT0, "Dugamex",                        "The Hermit (Ver. 1.14)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 1995
 GAME( 1997,  deucesw2, 0,       deucesw2, deucesw2, blitz68k_state, init_deucesw2, ROT0, "<unknown>",                      "Deuces Wild 2 - American Heritage (Ver. 2.02F)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 10TH, 1997
 GAME( 1997,  surpr5,   0,       cjffruit, surpr5,   blitz68k_state, init_surpr5,   ROT0, "Cadillac Jack",                  "Surprise 5 (Ver. 1.19)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 25TH, 1997
+GAME( 1997,  super97,  0,       cjffruit, surpr5,   blitz68k_state, init_super97,  ROT0, "Cadillac Jack",                  "Super 97 (Ver. 1.00)",                           MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // OCTOBER 22ND, 1997
 GAME( 1998,  cj3play,  0,       cjffruit, cjffruit, blitz68k_state, init_cj3play,  ROT0, "Cadillac Jack",                  "Triple Play (Ver. 1.10)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // FEBRUARY 24TH, 1999
 GAME( 1998,  cjffruit, 0,       cjffruit, cjffruit, blitz68k_state, init_cjffruit, ROT0, "Cadillac Jack",                  "Funny Fruit (Ver. 1.13)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 21ST, 1999
 GAME( 1998,  texasrls, 0,       texasrls, cjffruit, blitz68k_state, init_texasrls, ROT0, "Cadillac Jack",                  "Texas Reels (Ver. 2.00)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // OCTOBER 15TH, 2002

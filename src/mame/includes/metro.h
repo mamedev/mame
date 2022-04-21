@@ -97,7 +97,6 @@ public:
 private:
 	enum
 	{
-		TIMER_KARATOUR_IRQ,
 		TIMER_MOUJA_IRQ
 	};
 
@@ -210,7 +209,6 @@ private:
 
 	/* irq_related */
 	emu_timer   *m_mouja_irq_timer = nullptr;
-	emu_timer   *m_karatour_irq_timer = nullptr;
 
 	/* sound related */
 	u8     m_sound_data = 0;
@@ -226,6 +224,10 @@ private:
 	int         m_gakusai_oki_bank_hi = 0;
 
 	void gakusai_oki_bank_set();
+
+	DECLARE_WRITE_LINE_MEMBER(ext_irq5_enable_w);
+
+	bool m_ext_irq_enable = false;
 };
 
 #endif // MAME_INCLUDES_METRO_H

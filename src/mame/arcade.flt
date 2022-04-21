@@ -954,6 +954,7 @@ pacman.cpp
 pandoras.cpp
 pangofun.cpp
 panicr.cpp
+paokaipc.cpp
 paradise.cpp
 paranoia.cpp
 parodius.cpp
@@ -1200,6 +1201,7 @@ skykid.cpp
 skylncr.cpp
 skyraid.cpp
 slapfght.cpp
+slapfght_ms.cpp
 slapshot.cpp
 sleic.cpp
 sliver.cpp

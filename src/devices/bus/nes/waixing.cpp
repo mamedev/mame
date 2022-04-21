@@ -38,6 +38,7 @@ DEFINE_DEVICE_TYPE(NES_WAIXING_C,     nes_waixing_c_device,     "nes_waixing_c",
 DEFINE_DEVICE_TYPE(NES_WAIXING_D,     nes_waixing_d_device,     "nes_waixing_d",     "NES Cart Waixing Type D PCB")
 DEFINE_DEVICE_TYPE(NES_WAIXING_E,     nes_waixing_e_device,     "nes_waixing_e",     "NES Cart Waixing Type E PCB")
 DEFINE_DEVICE_TYPE(NES_WAIXING_F,     nes_waixing_f_device,     "nes_waixing_f",     "NES Cart Waixing Type F PCB")
+DEFINE_DEVICE_TYPE(NES_WAIXING_F1,    nes_waixing_f1_device,    "nes_waixing_f1",    "NES Cart Waixing Type F1 PCB")
 DEFINE_DEVICE_TYPE(NES_WAIXING_G,     nes_waixing_g_device,     "nes_waixing_g",     "NES Cart Waixing Type G PCB")
 DEFINE_DEVICE_TYPE(NES_WAIXING_H,     nes_waixing_h_device,     "nes_waixing_h",     "NES Cart Waixing Type H PCB")
 DEFINE_DEVICE_TYPE(NES_WAIXING_H1,    nes_waixing_h1_device,    "nes_waixing_h1",    "NES Cart Waixing Type H (Alt) PCB")
@@ -88,8 +89,18 @@ nes_waixing_e_device::nes_waixing_e_device(const machine_config &mconfig, const 
 {
 }
 
-nes_waixing_f_device::nes_waixing_f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_waixing_a_device(mconfig, NES_WAIXING_F, tag, owner, clock)
+nes_waixing_f_device::nes_waixing_f_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, type, tag, owner, clock)
+{
+}
+
+nes_waixing_f_device::nes_waixing_f_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_waixing_f_device(mconfig, NES_WAIXING_F, tag, owner, clock)
+{
+}
+
+nes_waixing_f1_device::nes_waixing_f1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_waixing_f_device(mconfig, NES_WAIXING_F1, tag, owner, clock)
 {
 }
 
@@ -123,7 +134,7 @@ nes_waixing_j_device::nes_waixing_j_device(const machine_config &mconfig, const 
 {
 }
 
-nes_waixing_sh2_device::nes_waixing_sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_waixing_sh2_device::nes_waixing_sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_txrom_device(mconfig, NES_WAIXING_SH2, tag, owner, clock)
 {
 }
@@ -178,19 +189,6 @@ void nes_waixing_a_device::pcb_reset()
 	std::fill(std::begin(mapper_ram), std::end(mapper_ram), 0x00);
 }
 
-void nes_waixing_f_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	mmc3_common_initialize(0xff, 0xff, 0);
-
-	std::fill(std::begin(mapper_ram), std::end(mapper_ram), 0x00);
-	m_mmc_prg_bank[0] = 0x00;
-	m_mmc_prg_bank[1] = 0x01;
-	m_mmc_prg_bank[2] = 0x4e;
-	m_mmc_prg_bank[3] = 0x4f;
-	set_prg(m_prg_base, m_prg_mask);
-}
-
 void nes_waixing_g_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
@@ -239,10 +237,9 @@ void nes_waixing_sh2_device::device_start()
 
 void nes_waixing_sh2_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-
 	m_reg[0] = m_reg[1] = 0;
 	mmc3_common_initialize(0xff, 0xff, 0);
+	set_nt_mirroring(PPU_MIRROR_VERT); // first Fire Emblem doesn't properly set mirroring like the other games do
 }
 
 void nes_waixing_sec_device::device_start()
@@ -500,77 +497,49 @@ void nes_waixing_e_device::chr_cb(int start, int bank, int source)
 	chr1_x(start, bank, chr_src);
 }
 
-
 /*-------------------------------------------------
 
- Waixing Board Type F
+ Waixing Board Type F, F1
 
- Games: Tenchi wo Kurau II (C)
+ Games: Tenchi wo Kurau II translations (mapper 198),
+ and (mapper 199) Chengjisihan, Tangmu Lixian Ji,
+ Fengse Huanxiang, Datang Fengyun VI Dai
 
- MMC3 clone.
+ MMC3 clone with an extra 4K WRAM at 0x5000-0x5fff.
+ Mapper 198 banks its 8K CHR RAM and 199 does not.
 
- iNES: mapper 198
+ iNES: mappers 198, 199
 
- In MESS: Preliminary support.
+ In MAME: Supported.
+
+ TODO: Sort out G board games which were assigned
+ to mapper 199 previously.
 
  -------------------------------------------------*/
 
-void nes_waixing_f_device::chr_cb(int start, int bank, int source)
+u8 nes_waixing_f_device::read_l(offs_t offset)
 {
-	chr1_x(start, bank, CHRRAM);
+// LOG_MMC(("waixing_f read_l, offset: %04x\n", offset));
+
+	offset += 0x100;
+	if (!m_prgram.empty() && offset >= 0x1000)
+		return m_prgram[offset & 0x0fff & (m_prgram.size() - 1)];
+
+	return get_open_bus();
 }
 
-void nes_waixing_f_device::prg_cb(int start, int bank)
+void nes_waixing_f_device::write_l(offs_t offset, u8 data)
 {
-//  if (bank > 0x3f)
-//      bank = 0x40 | (bank & 0xf);
-	prg8_x(start, bank);
+// LOG_MMC(("waixing_f write_l, offset: %04x, data: %02x\n", offset, data));
+
+	offset += 0x100;
+	if (!m_prgram.empty() && offset >= 0x1000)
+		m_prgram[offset & 0x0fff & (m_prgram.size() - 1)] = data;
 }
 
-void nes_waixing_f_device::set_prg( int prg_base, int prg_mask )
+void nes_waixing_f1_device::set_chr(u8 chr, int chr_base, int chr_mask)
 {
-	uint8_t prg_flip = (m_latch & 0x40) ? 2 : 0;
-
-	prg_cb(0, m_mmc_prg_bank[0 ^ prg_flip]);
-	prg_cb(1, m_mmc_prg_bank[1]);
-	prg_cb(2, m_mmc_prg_bank[2 ^ prg_flip]);
-	prg_cb(3, m_mmc_prg_bank[3]);
-}
-
-void nes_waixing_f_device::write_h(offs_t offset, uint8_t data)
-{
-	uint8_t cmd;
-	LOG_MMC(("waixing_f write_h, offset: %04x, data: %02x\n", offset, data));
-
-	switch (offset & 0x6001)
-	{
-		case 0x0001:
-			cmd = m_latch & 0x07;
-			switch (cmd)
-			{
-				case 0: case 1: // these do not need to be separated: we take care of them in set_chr!
-				case 2: case 3: case 4: case 5:
-					m_mmc_vrom_bank[cmd] = data;
-					set_chr(m_chr_source, m_chr_base, m_chr_mask);
-					break;
-				case 6:
-				case 7:
-				case 8:
-				case 9:
-					m_mmc_prg_bank[cmd - 6] = data;
-					//printf("prg bank %d value %x\n", cmd - 6, data);
-					set_prg(m_prg_base, m_prg_mask);
-					break;
-			}
-			break;
-
-		case 0x2001:
-			break;
-
-		default:
-			waixing_write(offset, data);
-			break;
-	}
+// ignore CHR banking as all F1 games use 8K unbanked CHR RAM
 }
 
 /*-------------------------------------------------
@@ -813,40 +782,38 @@ void nes_waixing_j_device::write_h(offs_t offset, uint8_t data)
 
  Waixing SH2 Board
 
- Games: Fire Emblem (C) and Fire Emblem Gaiden (C)
+ Games: Fire Emblem (C), Fire Emblem Gaiden (C),
+ Zhentian Shi Yongshi
 
- MMC3 clone with different access to CHR
+ MMC3 clone with MMC2-like CHR banking.
 
  iNES: mapper 165
 
- In MESS: Partially Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_waixing_sh2_device::chr_cb(int start, int bank, int source)
+void nes_waixing_sh2_device::set_chr(u8 chr, int chr_base, int chr_mask)
 {
-	chr4_0(m_reg[0], m_reg[0] ? CHRRAM : CHRROM);
-	chr4_4(m_reg[1], m_reg[1] ? CHRRAM : CHRROM);
+	int bank1 = m_mmc_vrom_bank[m_reg[0] ? 1 : 0] >> 2;
+	int bank2 = m_mmc_vrom_bank[m_reg[1] ? 4 : 2] >> 2;
+
+	chr4_0(bank1, bank1 ? CHRROM : CHRRAM);
+	chr4_4(bank2, bank2 ? CHRROM : CHRRAM);
 }
 
-uint8_t nes_waixing_sh2_device::chr_r(offs_t offset)
+u8 nes_waixing_sh2_device::chr_r(offs_t offset)
 {
-	int bank = offset >> 10;
-	uint8_t val = m_chr_access[bank][offset & 0x3ff]; // this would be usual return value
-	int chr_helper;
+	int val = device_nes_cart_interface::chr_r(offset);
 
 	switch (offset & 0xff8)
 	{
-		case 0xfd0: chr_helper = (bank & 0x4) | 0x0; break;
-		case 0xfe8: chr_helper = (bank & 0x4) | 0x2; break;
-		default: return val;
+		case 0xfd0:
+		case 0xfe8:
+			m_reg[BIT(offset, 12)] = BIT(offset, 3);
+			set_chr(m_chr_source, m_chr_base, m_chr_mask);
+			break;
 	}
-
-	m_reg[offset >> 12] = chr_helper;
-	if (offset & 0x1000)
-		chr4_4(m_reg[1], m_reg[1] ? CHRRAM : CHRROM);
-	else
-		chr4_0(m_reg[0], m_reg[0] ? CHRRAM : CHRROM);
 
 	return val;
 }

@@ -14,9 +14,9 @@ class nes_lrog017_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_lrog017_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_lrog017_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_h(offs_t offset, uint8_t data) override;
+	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
 };
@@ -28,9 +28,9 @@ class nes_holydivr_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_holydivr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_holydivr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_h(offs_t offset, uint8_t data) override;
+	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
 };
@@ -42,9 +42,9 @@ class nes_tam_s1_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_tam_s1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_tam_s1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_h(offs_t offset, uint8_t data) override;
+	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
 };
@@ -56,29 +56,36 @@ class nes_g101_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_g101_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_g101_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_h(offs_t offset, uint8_t data) override;
+	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
 
 protected:
+	// construction/destruction
+	nes_g101_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 prg_mask);
+
 	// device-level overrides
 	virtual void device_start() override;
 
-	uint8_t     m_latch;
+	void set_prg();
+	u8 m_latch;
+
+private:
+	u8 m_reg, m_prg_mask;
 };
 
 
 // ======================> nes_h3001_device
 
-class nes_h3001_device : public nes_nrom_device
+class nes_h3001_device : public nes_g101_device
 {
 public:
 	// construction/destruction
-	nes_h3001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_h3001_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_h(offs_t offset, uint8_t data) override;
+	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
 
@@ -87,12 +94,14 @@ protected:
 	virtual void device_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
-	uint16_t     m_irq_count, m_irq_count_latch;
-	int        m_irq_enable;
+private:
+	u16 m_irq_count, m_irq_count_latch;
+	u8 m_irq_enable;
 
-	static const device_timer_id TIMER_IRQ = 0;
+	static constexpr device_timer_id TIMER_IRQ = 0;
 	emu_timer *irq_timer;
 };
+
 
 // device type definition
 DECLARE_DEVICE_TYPE(NES_LROG017,  nes_lrog017_device)
