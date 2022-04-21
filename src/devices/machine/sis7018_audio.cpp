@@ -25,7 +25,7 @@
 #define LOGIO(...)     LOGMASKED(LOG_IO,   __VA_ARGS__)
 #define LOGMAP(...)    LOGMASKED(LOG_MAP,  __VA_ARGS__)
 #define LOGTODO(...)   LOGMASKED(LOG_TODO, __VA_ARGS__)
-#define LOGPMC(...)   LOGMASKED(LOG_PMC, __VA_ARGS__)
+#define LOGPMC(...)    LOGMASKED(LOG_PMC, __VA_ARGS__)
 
 DEFINE_DEVICE_TYPE(SIS7018_AUDIO, sis7018_audio_device, "sis7018_audio", "SiS 7018 Audio AC97")
 

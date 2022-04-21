@@ -175,7 +175,7 @@ void sis630_gui_device::config_map(address_map &map)
 	map(0x50, 0x53).r(FUNC(sis630_gui_device::agp_id_r));
 	map(0x54, 0x57).r(FUNC(sis630_gui_device::agp_status_r));
 	map(0x58, 0x5b).rw(FUNC(sis630_gui_device::agp_command_r), FUNC(sis630_gui_device::agp_command_w));
-	map(0x5c, 0x5c).lr8(NAME([this] () { return 0; })); // NULL terminator
+	map(0x5c, 0x5c).lr8(NAME([] () { return 0; })); // NULL terminator
 }
 
 u8 sis630_gui_device::capptr_r()

@@ -17,10 +17,13 @@
       \- LPC accepts a SMC37C673 as default;
     - SMBus isn't extensively tested
       \- POST fails with a CMOS crc error for CPU identifier/speed, may need sensible defaults;
+	- Accesses I/O $294 for the ACPI fans in BIOS menu;
     - Either move gamecstl.cpp to here or convert that driver to reuse the base interface
       declared here.
-      \- With the aforementioned patch it loads Windows boot selection menu then crashes shortly
-         after. Most likely down to IDE;
+	  \- Currently black screens before booting normal Windows, reading $5004 from the LPC ACPI
+	    (flip EAX to non-zero to bypass);
+      \- Doesn't accept any PS/2 input, tries to install a "PCI standard CPU Host Bridge" (?),
+	     hangs there;
 
 **************************************************************************************************/
 
