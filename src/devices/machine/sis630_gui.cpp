@@ -121,14 +121,14 @@ DEFINE_DEVICE_TYPE(SIS630_GUI, sis630_gui_device, "sis630_gui", "SiS 630 GUI")
 
 sis630_gui_device::sis630_gui_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, SIS630_GUI, tag, owner, clock)
-	, m_biosrom(*this, "biosrom")
+	, m_gui_rom(*this, "gui_rom")
 	, m_svga(*this, "svga")
 {
 	set_ids(0x10396300, 0x00, 0x030000, 0x00);
 }
 
 ROM_START( sis630gui )
-	ROM_REGION32_LE( 0x8000, "biosrom", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x8000, "gui_rom", ROMREGION_ERASEFF )
 	// "SiS 630 (Ver. 2.02.1c) [AGP VGA] (Silicon Integrated Systems Corp.).bin"
 	ROM_LOAD( "sis630.bin", 0x0000, 0x8000, CRC(f04ef9b0) SHA1(2396a79cd4045362bfc511090b146daa85902b4d) )
 
@@ -285,12 +285,12 @@ void sis630_gui_device::map_extra(uint64_t memory_window_start, uint64_t memory_
 //	if (m_exp_rom_reg & 1)
 	{
 		const u32 start_offs = 0xd0000; //m_exp_rom_reg & ~1;
-		const u32 end_offs = start_offs + m_biosrom.bytes() - 1;
+		const u32 end_offs = start_offs + m_gui_rom.bytes() - 1;
 
 		LOGMAP("- %08x-%08x\n", start_offs, end_offs);
 
 		if (start_offs < end_offs)
-			memory_space->install_rom(start_offs, end_offs, m_biosrom);
+			memory_space->install_rom(start_offs, end_offs, m_gui_rom);
 	}
 
 	// TODO: convert to io_map

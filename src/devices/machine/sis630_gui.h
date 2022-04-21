@@ -52,7 +52,7 @@ protected:
 	void io_map(address_map &map);
 
 private:
-	required_region_ptr<u32> m_biosrom;
+	required_region_ptr<u32> m_gui_rom;
 	required_device<sis630_svga_device> m_svga;
 
 	u8 vram_r(offs_t offset);
