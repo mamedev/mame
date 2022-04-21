@@ -17,20 +17,122 @@
 #include <string_view>
 
 namespace fs {
+	const coco_rsdos_image COCO_RSDOS;
+};
 
-const coco_rsdos_image COCO_RSDOS;
+using namespace fs;
 
-const char *coco_rsdos_image::name() const
+namespace {
+
+class impl : public filesystem_t {
+public:
+	class root_dir : public idir_t {
+	public:
+		root_dir(impl &i) : m_fs(i) {}
+		virtual ~root_dir() = default;
+
+		virtual void drop_weak_references() override;
+		virtual meta_data metadata() override;
+		virtual std::vector<dir_entry> contents() override;
+		virtual file_t file_get(u64 key) override;
+		virtual dir_t dir_get(u64 key) override;
+
+	private:
+		impl &m_fs;
+	};
+
+	struct rsdos_dirent
+	{
+		char    m_filename[11];
+		u8      m_filetype;
+		u8      m_asciiflag;
+		u8      m_first_granule;
+		u8      m_last_sector_bytes_msb;
+		u8      m_last_sector_bytes_lsb;
+	};
+
+	struct rsdos_dirent_sector
+	{
+		struct
+		{
+			rsdos_dirent    m_dirent;
+			u8              m_unused[16];
+		} m_entries[4];
+	};
+
+	class granule_iterator {
+	public:
+		granule_iterator(impl &fs, const rsdos_dirent &dirent);
+		bool next(u8 &granule, u16 &byte_count);
+
+	private:
+		fsblk_t::block_t    m_granule_map;
+		std::optional<u8>   m_current_granule;
+		u8                  m_maximum_granules;
+		u16                 m_last_sector_bytes;
+	};
+
+	class file : public ifile_t {
+	public:
+		file(impl &fs, rsdos_dirent &&dirent);
+		virtual ~file() = default;
+
+		virtual void drop_weak_references() override;
+
+		virtual meta_data metadata() override;
+		virtual std::vector<u8> read_all() override;
+
+	private:
+		impl &m_fs;
+		rsdos_dirent    m_dirent;
+	};
+
+	impl(fsblk_t &blockdev);
+	virtual ~impl() = default;
+
+	virtual meta_data metadata() override;
+	virtual dir_t root() override;
+	virtual void format(const meta_data &meta) override;
+
+private:
+	dir_t m_root;
+
+	void drop_root_ref();
+	fsblk_t::block_t read_sector(int track, int sector) const;
+	u8 maximum_granules() const;
+	static std::string get_filename_from_dirent(const rsdos_dirent &dirent);
+};
+
+// methods
+bool validate_filename(std::string_view name);
+};
+
+
+//-------------------------------------------------
+//  name
+//-------------------------------------------------
+
+const char *fs::coco_rsdos_image::name() const
 {
 	return "coco_rsdos";
 }
 
-const char *coco_rsdos_image::description() const
+
+//-------------------------------------------------
+//  description
+//-------------------------------------------------
+
+const char *fs::coco_rsdos_image::description() const
 {
 	return "CoCo RS-DOS";
 }
 
-void coco_rsdos_image::enumerate_f(floppy_enumerator &fe, u32 form_factor, const std::vector<u32> &variants) const
+
+//-------------------------------------------------
+//  enumerate_f
+//-------------------------------------------------
+
+void fs::coco_rsdos_image::enumerate_f(floppy_enumerator &fe, u32 form_factor, const std::vector<u32> &variants) const
 {
 	if (has(form_factor, variants, floppy_image::FF_525, floppy_image::SSDD))
 	{
@@ -39,27 +141,52 @@ void coco_rsdos_image::enumerate_f(floppy_enumerator &fe, u32 form_factor, const
 	}
 }
 
-bool coco_rsdos_image::can_format() const
+
+//-------------------------------------------------
+//  can_format
+//-------------------------------------------------
+
+bool fs::coco_rsdos_image::can_format() const
 {
 	return true;
 }
 
-bool coco_rsdos_image::can_read() const
+
+//-------------------------------------------------
+//  can_read
+//-------------------------------------------------
+
+bool fs::coco_rsdos_image::can_read() const
 {
 	return true;
 }
 
-bool coco_rsdos_image::can_write() const
+
+//-------------------------------------------------
+//  can_write
+//-------------------------------------------------
+
+bool fs::coco_rsdos_image::can_write() const
 {
 	return false;
 }
 
-bool coco_rsdos_image::has_rsrc() const
+
+//-------------------------------------------------
+//  has_rsrc
+//-------------------------------------------------
+
+bool fs::coco_rsdos_image::has_rsrc() const
 {
 	return false;
 }
 
-std::vector<meta_description> coco_rsdos_image::file_meta_description() const
+
+//-------------------------------------------------
+//  file_meta_description
+//-------------------------------------------------
+
+std::vector<meta_description> fs::coco_rsdos_image::file_meta_description() const
 {
 	std::vector<meta_description> results;
 	results.emplace_back(meta_description(meta_name::name, "", false, [](const meta_value &m) { return validate_filename(m.as_string()); }, "File name, 8.3"));
@@ -70,12 +197,24 @@ std::vector<meta_description> coco_rsdos_image::file_meta_description() const
 	return results;
 }
 
-std::unique_ptr<filesystem_t> coco_rsdos_image::mount(fsblk_t &blockdev) const
+
+//-------------------------------------------------
+//  mount
+//-------------------------------------------------
+
+std::unique_ptr<filesystem_t> fs::coco_rsdos_image::mount(fsblk_t &blockdev) const
 {
 	return std::make_unique<impl>(blockdev);
 }
 
-bool coco_rsdos_image::validate_filename(std::string_view name)
+
+//-------------------------------------------------
+//  validate_filename
+//-------------------------------------------------
+
+namespace {
+
+bool validate_filename(std::string_view name)
 {
 	auto pos = name.find('.');
 	auto stem_length = pos != std::string::npos ? pos : name.size();
@@ -83,66 +222,121 @@ bool coco_rsdos_image::validate_filename(std::string_view name)
 	return stem_length > 0 && stem_length <= 8 && ext_length <= 3;
 }
 
-coco_rsdos_image::impl::impl(fsblk_t &blockdev)
+
+//-------------------------------------------------
+//  impl ctor
+//-------------------------------------------------
+
+impl::impl(fsblk_t &blockdev)
 	: filesystem_t(blockdev, 256)
 {
 }
 
-meta_data coco_rsdos_image::impl::metadata()
+
+//-------------------------------------------------
+//  impl::metadata
+//-------------------------------------------------
+
+meta_data impl::metadata()
 {
 	return meta_data();
 }
 
-filesystem_t::dir_t coco_rsdos_image::impl::root()
+
+//-------------------------------------------------
+//  impl::root
+//-------------------------------------------------
+
+filesystem_t::dir_t impl::root()
 {
 	if (!m_root)
 		m_root = new root_dir(*this);
 	return m_root.strong();
 }
 
-void coco_rsdos_image::impl::drop_root_ref()
+
+//-------------------------------------------------
+//  impl::drop_root_ref
+//-------------------------------------------------
+
+void impl::drop_root_ref()
 {
 	m_root = nullptr;
 }
 
-void coco_rsdos_image::impl::format(const meta_data &meta)
+
+//-------------------------------------------------
+//  impl::format
+//-------------------------------------------------
+
+void impl::format(const meta_data &meta)
 {
 	// formatting RS-DOS is easy - just fill everything with 0xFF
 	m_blockdev.fill(0xFF);
 }
 
-fsblk_t::block_t coco_rsdos_image::impl::read_sector(int track, int sector) const
+
+//-------------------------------------------------
+//  fsblk_t::block_t impl::read_sector
+//-------------------------------------------------
+
+fsblk_t::block_t impl::read_sector(int track, int sector) const
 {
 	// the CoCo RS-DOS world thinks in terms of tracks/sectors, but we have a block device
 	// abstraction
 	return m_blockdev.get(track * 18 + sector - 1);
 }
 
-u8 coco_rsdos_image::impl::maximum_granules() const
+
+//-------------------------------------------------
+//  impl::maximum_granules
+//-------------------------------------------------
+
+u8 impl::maximum_granules() const
 {
 	u32 sector_count = m_blockdev.block_count();
 	u32 granule_count = (sector_count / 9) - 2;
 	return granule_count <= 0xFF ? u8(granule_count) : 0xFF;
 }
 
-std::string coco_rsdos_image::impl::get_filename_from_dirent(const rsdos_dirent &dirent)
+
+//-------------------------------------------------
+//  impl::get_filename_from_dirent
+//-------------------------------------------------
+
+std::string impl::get_filename_from_dirent(const rsdos_dirent &dirent)
 {
 	std::string_view stem = strtrimrightspace(std::string_view(&dirent.m_filename[0], 8));
 	std::string_view ext = strtrimrightspace(std::string_view(&dirent.m_filename[8], 3));
 	return util::string_format("%s.%s", stem, ext);
 }
 
-void coco_rsdos_image::impl::root_dir::drop_weak_references()
+
+//-------------------------------------------------
+//  impl::root_dir::drop_weak_references
+//-------------------------------------------------
+
+void impl::root_dir::drop_weak_references()
 {
 	m_fs.drop_root_ref();
 }
 
-meta_data coco_rsdos_image::impl::root_dir::metadata()
+
+//-------------------------------------------------
+//  impl::root_dir::metadata
+//-------------------------------------------------
+
+meta_data impl::root_dir::metadata()
 {
 	return meta_data();
 }
 
-std::vector<dir_entry> coco_rsdos_image::impl::root_dir::contents()
+
+//-------------------------------------------------
+//  impl::root_dir::contents
+//-------------------------------------------------
+
+std::vector<dir_entry> impl::root_dir::contents()
 {
 	u64 key = 0;
 	std::vector<dir_entry> results;
@@ -169,7 +363,12 @@ std::vector<dir_entry> coco_rsdos_image::impl::root_dir::contents()
 	return results;
 }
 
-filesystem_t::file_t coco_rsdos_image::impl::root_dir::file_get(u64 key)
+
+//-------------------------------------------------
+//  impl::root_dir::file_get
+//-------------------------------------------------
+
+filesystem_t::file_t impl::root_dir::file_get(u64 key)
 {
 	auto dir_block = m_fs.read_sector(17, 3 + key / 4);
 	const rsdos_dirent_sector &sector = *reinterpret_cast<const rsdos_dirent_sector *>(dir_block.rodata());
@@ -177,12 +376,22 @@ filesystem_t::file_t coco_rsdos_image::impl::root_dir::file_get(u64 key)
 	return file_t(new file(m_fs, rsdos_dirent(ent)));
 }
 
-filesystem_t::dir_t coco_rsdos_image::impl::root_dir::dir_get(u64 key)
+
+//-------------------------------------------------
+//  impl::root_dir::dir_get
+//-------------------------------------------------
+
+filesystem_t::dir_t impl::root_dir::dir_get(u64 key)
 {
 	throw std::logic_error("Directories not supported");
 }
 
-coco_rsdos_image::impl::granule_iterator::granule_iterator(impl &fs, const rsdos_dirent &dirent)
+
+//-------------------------------------------------
+//  impl::granule_iterator ctor
+//-------------------------------------------------
+
+impl::granule_iterator::granule_iterator(impl &fs, const rsdos_dirent &dirent)
 	: m_granule_map(fs.read_sector(17, 2))
 	, m_current_granule(dirent.m_first_granule)
 	, m_maximum_granules(fs.maximum_granules())
@@ -190,7 +399,12 @@ coco_rsdos_image::impl::granule_iterator::granule_iterator(impl &fs, const rsdos
 {
 }
 
-bool coco_rsdos_image::impl::granule_iterator::next(u8 &granule, u16 &byte_count)
+
+//-------------------------------------------------
+//  impl::granule_iterator::next
+//-------------------------------------------------
+
+bool impl::granule_iterator::next(u8 &granule, u16 &byte_count)
 {
 	bool success = false;
 	granule = ~0;
@@ -225,17 +439,32 @@ bool coco_rsdos_image::impl::granule_iterator::next(u8 &granule, u16 &byte_count
 	return success;
 }
 
-coco_rsdos_image::impl::file::file(impl &fs, rsdos_dirent &&dirent)
+
+//-------------------------------------------------
+//  impl::file ctor
+//-------------------------------------------------
+
+impl::file::file(impl &fs, rsdos_dirent &&dirent)
 	: m_fs(fs)
 	, m_dirent(std::move(dirent))
 {
 }
 
-void coco_rsdos_image::impl::file::drop_weak_references()
+
+//-------------------------------------------------
+//  impl::file::drop_weak_references
+//-------------------------------------------------
+
+void impl::file::drop_weak_references()
 {
 }
 
-meta_data coco_rsdos_image::impl::file::metadata()
+
+//-------------------------------------------------
+//  impl::file::metadata
+//-------------------------------------------------
+
+meta_data impl::file::metadata()
 {
 	u32 file_size = 0;
 	int granule_count = 0;
@@ -263,7 +492,12 @@ meta_data coco_rsdos_image::impl::file::metadata()
 	return result;
 }
 
-std::vector<u8> coco_rsdos_image::impl::file::read_all()
+
+//-------------------------------------------------
+//  impl::file::read_all
+//-------------------------------------------------
+
+std::vector<u8> impl::file::read_all()
 {
 	std::vector<u8> result;
 
@@ -300,4 +534,4 @@ std::vector<u8> coco_rsdos_image::impl::file::read_all()
 	return result;
 }
 
-} // namespace fs
+}
