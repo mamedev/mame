@@ -6,7 +6,7 @@
 
     TODO:
 	- Stub interface, to be improved;
-	- PCI values omitted from docs, assumes same as OpenHCI 
+	- PCI values omitted from docs, assumes same as OpenHCI;
 
 **************************************************************************************************/
 
@@ -17,7 +17,7 @@
 #define LOG_MAP    (1U << 2) // log full remaps
 
 #define VERBOSE (LOG_GENERAL | LOG_IO | LOG_MAP)
-#define LOG_OUTPUT_FUNC osd_printf_warning
+//#define LOG_OUTPUT_FUNC osd_printf_warning
 
 #include "logmacro.h"
 

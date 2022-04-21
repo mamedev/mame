@@ -8,7 +8,7 @@
     - PCI banking doesn't work as intended
       \- cfr. GUI expansion ROM, host shadow RAM bit 15, misc
     - Verify that PCI listing honors real HW
-      \- Currently lists GUI and USB;
+      \- Currently lists GUI, USB, 7018, ACPI Controller;
     - Identify flash ROM type;
     - Video is sketchy;
       \- Shows SiS AGP header text in less than 1 frame (catchable with debugger only)
