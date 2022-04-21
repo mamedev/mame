@@ -9,10 +9,12 @@
 	- Flash ROM handling
 	  \- Doesn't survive a soft reset;
 	- Fix EISA;
-    - Make PS/2 to work;
+    - INIT register (reset & A20 control + fast gates + fast reset timing control);
+	- Override PS/2 ports if USB legacy mode is enabled;
 	- NMI & SMI handling;
 	- SMBus handling;
 	- RTC extended bank enable;
+	  \- Doesn't survive a CMOS write after fast reset;
 	- Shadow registers for PIC and PIT;
 	- IRQ remaps
 	  \- INTA GUI
@@ -91,6 +93,7 @@ void sis950_lpc_device::device_reset()
 	m_dma_channel = -1;
 	m_cur_eop = false;
 	m_dma_high_byte = 0;
+	m_init_reg = 0;
 	remap_cb();
 }
 
@@ -192,18 +195,27 @@ void sis950_lpc_device::device_add_mconfig(machine_config &config)
 	m_isabus->drq7_callback().set(m_dmac_slave, FUNC(am9517a_device::dreq3_w));
 	m_isabus->iochck_callback().set(FUNC(sis950_lpc_device::iochck_w));
 
+	// TODO: move connectors to client
+	PC_KBDC(config, m_pc_kbdc, pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL);
+	m_pc_kbdc->out_clock_cb().set(m_keybc, FUNC(ps2_keyboard_controller_device::kbd_clk_w));
+	m_pc_kbdc->out_data_cb().set(m_keybc, FUNC(ps2_keyboard_controller_device::kbd_data_w));
+
+	pc_kbdc_device &aux_con(PC_KBDC(config, "aux", ps2_mice, STR_HLE_PS2_MOUSE));
+	aux_con.out_clock_cb().set(m_keybc, FUNC(ps2_keyboard_controller_device::aux_clk_w));
+	aux_con.out_data_cb().set(m_keybc, FUNC(ps2_keyboard_controller_device::aux_data_w));
+
 	// TODO: selectable between PCI clock / 4 (33 MHz) or 7.159 MHz, via reg $47 bit 5
 	PS2_KEYBOARD_CONTROLLER(config, m_keybc, XTAL(33'000'000) / 4);
+	// TODO: default ibm BIOS doesn't cope with this too well
+	m_keybc->set_default_bios_tag("compaq");
 	m_keybc->hot_res().set(FUNC(sis950_lpc_device::cpu_reset_w));
 	m_keybc->gate_a20().set(FUNC(sis950_lpc_device::cpu_a20_w));
 	m_keybc->kbd_irq().set(m_pic_master, FUNC(pic8259_device::ir1_w));
 	m_keybc->kbd_clk().set(m_pc_kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
 	m_keybc->kbd_data().set(m_pc_kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
-
-	// TODO: move connectors to client
-	PC_KBDC(config, m_pc_kbdc, pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL);
-	m_pc_kbdc->out_clock_cb().set(m_keybc, FUNC(ps2_keyboard_controller_device::kbd_clk_w));
-	m_pc_kbdc->out_data_cb().set(m_keybc, FUNC(ps2_keyboard_controller_device::kbd_data_w));
+	m_keybc->aux_irq().set(m_pic_master, FUNC(pic8259_device::ir1_w));
+	m_keybc->aux_clk().set(aux_con, FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_keybc->aux_data().set(aux_con, FUNC(pc_kbdc_device::data_write_from_mb));
 
 	// TODO: unconfirmed RTC type
 	DS12885(config, m_rtc);
@@ -304,7 +316,9 @@ void sis950_lpc_device::init_enable_w(u8 data)
 {
 	LOGIO("Write INIT enable [$46] %02x\n", data);
 	m_init_reg = data;
+
 //	TODO: add HW reset here
+//	bits 7-6 ON, both on 0->1 transition
 }
 
 u8 sis950_lpc_device::keybc_reg_r()

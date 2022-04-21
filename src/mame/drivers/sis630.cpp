@@ -5,19 +5,14 @@
     SiS 630 chipset based PC
 
     TODO:
-    - USB check, wants a irq at PC=e9507 then corrupts the GUI vector 0x40 with a
-      0xc001:060e (remove the 1 part to continue).
-      \- cfr. memory buffer at $9e000, the fact that above debug trick doesn't work with
-         USB controllers defined on PCI bus;
     - PCI banking doesn't work as intended
       \- cfr. GUI expansion ROM, host shadow RAM bit 15, misc
     - Verify that PCI listing honors real HW
-      \- Currently lists GUI only, which is amazing considering it's on the wrong place on the
-         PCI bus.
+      \- Currently lists GUI and USB;
     - Identify flash ROM type;
     - Video is sketchy;
       \- Shows SiS AGP header text in less than 1 frame (catchable with debugger only)
-    - PS/2 keyboard doesn't accept any key;
+	  \- Needs VGA integrated control from host;
     - Floppy drive
       \- LPC accepts a SMC37C673 as default;
     - SMBus isn't extensively tested
@@ -25,7 +20,7 @@
     - Either move gamecstl.cpp to here or convert that driver to reuse the base interface
       declared here.
       \- With the aforementioned patch it loads Windows boot selection menu then crashes shortly
-         after.
+         after. Most likely down to IDE;
 
 **************************************************************************************************/
 
@@ -108,7 +103,7 @@ void sis630_state::sis630(machine_config &config)
 	// TODO: 1 game port
 	// TODO: move keyboard/mouse PS/2 connectors in here
 
-	// TODO: AMR (Audio/modem riser) + UPT (?), assume EISA complaint
+	// TODO: AMR (Audio/modem riser) + UPT (?), assume EISA complaint, needs specific slot options
 	ISA16_SLOT(config, "isa1", 0, "pci:01.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa2", 0, "pci:01.0:isabus", pc_isa16_cards, nullptr, false);
 }
