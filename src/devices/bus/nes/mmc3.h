@@ -107,11 +107,11 @@ public:
 	// construction/destruction
 	nes_tqrom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	virtual void chr_cb(int start, int bank, int source) override;
+
 protected:
 	// construction/destruction
 	nes_tqrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
-
-	virtual void set_chr(u8 chr, int chr_base, int chr_mask) override;
 };
 
 

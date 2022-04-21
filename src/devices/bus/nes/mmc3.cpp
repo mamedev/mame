@@ -495,32 +495,17 @@ void nes_txsrom_device::write_h(offs_t offset, u8 data)
 
  iNES: mapper 119
 
- In MESS: Supported. It also uses mmc3_irq.
+ In MAME: Supported. It also uses mmc3_irq.
 
  -------------------------------------------------*/
 
-void nes_tqrom_device::set_chr( uint8_t chr, int chr_base, int chr_mask )
+void nes_tqrom_device::chr_cb(int start, int bank, int source)
 {
-	uint8_t chr_page = (m_latch & 0x80) >> 5;
-	uint8_t src[6], mask[6];
-
-	// TQROM ignores the source, base and mask set by the MMC3 and determines them based on vrom bank bits
-	for (int i = 0; i < 6; i++)
-	{
-		src[i] = (m_mmc_vrom_bank[i] & 0x40) ? CHRRAM : CHRROM;
-		mask[i] =  (m_mmc_vrom_bank[i] & 0x40) ? 0x07 : 0x3f;
-	}
-
-	chr1_x(chr_page ^ 0, ((m_mmc_vrom_bank[0] & ~0x01) & mask[0]), src[0]);
-	chr1_x(chr_page ^ 1, ((m_mmc_vrom_bank[0] |  0x01) & mask[0]), src[0]);
-	chr1_x(chr_page ^ 2, ((m_mmc_vrom_bank[1] & ~0x01) & mask[1]), src[1]);
-	chr1_x(chr_page ^ 3, ((m_mmc_vrom_bank[1] |  0x01) & mask[1]), src[1]);
-	chr1_x(chr_page ^ 4, (m_mmc_vrom_bank[2] & mask[2]), src[2]);
-	chr1_x(chr_page ^ 5, (m_mmc_vrom_bank[3] & mask[3]), src[3]);
-	chr1_x(chr_page ^ 6, (m_mmc_vrom_bank[4] & mask[4]), src[4]);
-	chr1_x(chr_page ^ 7, (m_mmc_vrom_bank[5] & mask[5]), src[5]);
+	if (BIT(bank, 6))
+		chr1_x(start, bank & 0x07, CHRRAM);
+	else
+		chr1_x(start, bank & 0x3f, CHRROM);
 }
-
 
 /*-------------------------------------------------
 

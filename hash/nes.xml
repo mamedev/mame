@@ -16496,7 +16496,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="highspedu" cloneof="highsped" supported="partial">
+	<software name="highspedu" cloneof="highsped">
 		<description>High Speed (USA)</description>
 		<year>1991</year>
 		<publisher>Tradewest</publisher>
@@ -16518,7 +16518,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="highsped" supported="partial">
+	<software name="highsped">
 		<description>High Speed (Euro)</description>
 		<year>1994</year>
 		<publisher>Tradewest</publisher>
@@ -28848,7 +28848,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="pinbotu" cloneof="pinbot" supported="partial">
+	<software name="pinbotu" cloneof="pinbot">
 		<description>Pin-Bot (USA)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
@@ -28871,7 +28871,7 @@ license:CC0
 	</software>
 
 <!-- Glitched in NTSC -->
-	<software name="pinbot" supported="partial">
+	<software name="pinbot">
 		<description>Pin-Bot (Euro)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
