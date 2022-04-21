@@ -96,7 +96,7 @@ void sis630_state::sis630(machine_config &config)
 
 	// TODO: this should be pci:00.0:00.0 but for some reason it won't work with current model
 	// (crashes when regenerating config mapping)
-	// just install it on a different function for the time being
+	// just install it on a different device # for the time being
 	SIS630_GUI (config, "pci:03.0", 0);
 
 	SIS301_VIDEO_BRIDGE(config, "pci:02.0", 0);

@@ -350,8 +350,8 @@ void sis950_lpc_device::io_map(address_map &map)
 	map(0x0060, 0x0060).rw(m_keybc, FUNC(at_keyboard_controller_device::data_r), FUNC(at_keyboard_controller_device::data_w));
 	// map(0x0061, 0x0061) NMI Status Register
 	map(0x0061, 0x0061).rw(FUNC(sis950_lpc_device::at_portb_r), FUNC(sis950_lpc_device::at_portb_w));
-	// undocumented but read, assume same as standard southbridge
-	map(0x0064, 0x0067).rw(m_keybc, FUNC(at_keyboard_controller_device::status_r), FUNC(at_keyboard_controller_device::command_w));
+	// undocumented but read, assume LPC complaint
+	map(0x0064, 0x0064).rw(m_keybc, FUNC(at_keyboard_controller_device::status_r), FUNC(at_keyboard_controller_device::command_w));
 	// map(0x0070, 0x0070) CMOS and NMI Mask
 	map(0x0070, 0x007f).rw(m_rtc, FUNC(ds12885_device::read), FUNC(ds12885_device::write));
 	// map(0x0080, 0x008f) DMA low page registers
@@ -369,6 +369,42 @@ void sis950_lpc_device::io_map(address_map &map)
 	// map(0x00f0, 0x00f0) COPRO error
 	// map(0x0480, 0x048f) DMA high page registers
 	// map(0x04d0, 0x04d1) IRQ edge/level control registers
+
+	// Intel LPC interface specs (legacy host decode ranges)
+
+	// map(0x002e, 0x002f) Super I/O config
+	// map(0x004e, 0x004f) alt Super I/O config
+	// map(0x0062, 0x0062) ACPI embedded controller
+	// map(0x0066, 0x0066) /
+
+	// map(0x0220, 0x0227) serial 2
+	// map(0x0228, 0x022f) serial 2
+	// map(0x0220, 0x0233) sb compatible i/f 1
+	// map(0x0240, 0x0253) sb compatible i/f 2
+	// map(0x0260, 0x0273) sb compatible i/f 3
+	// map(0x0280, 0x0293) sb compatible i/f 4
+
+	// map(0x0238, 0x023f) serial 3
+
+	// map(0x0278, 0x027f) parallel port 2 & PnP
+	// map(0x02e8, 0x02ef) serial 3
+	// map(0x02f8, 0x02ff) serial 1
+
+	// map(0x0300, 0x0301).mirror(0x0030) MIDI
+
+	// map(0x0338, 0x033f) serial 4
+	// map(0x0370, 0x0377) FDC 2
+
+	// map(0x0378, 0x037f) parallel port 1
+	// map(0x0388, 0x0389) ADLIB
+	// map(0x03bc, 0x03bf) parallel port 3
+	// map(0x03e8, 0x03ef) serial 4
+	// map(0x03f0, 0x03f7) FDC 1
+	// map(0x03f8, 0x03ff) serial 1
+
+	// map(0x0678, 0x067f) ECP parallel port 1
+	// map(0x0778, 0x0779) ECP parallel port 2 & PnP
+	// map(0x07bc, 0x07bf) ECP parallel port 3
 }
 
 void sis950_lpc_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
