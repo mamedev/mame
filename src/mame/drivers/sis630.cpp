@@ -32,8 +32,9 @@
 #include "machine/sis630_host.h"
 #include "machine/sis630_gui.h"
 #include "machine/sis7001_usb.h"
+#include "machine/sis7018_audio.h"
 #include "machine/sis950_lpc.h"
-#include "machine/fdc37c93x.h"
+//#include "machine/fdc37c93x.h"
 
 class sis630_state : public driver_device
 {
@@ -87,7 +88,7 @@ void sis630_state::sis630(machine_config &config)
 	// USB config: 2 on back, 3 on front. Front is fn 2
 	SIS7001_USB(config, "pci:01.2", 0, 3);
 	SIS7001_USB(config, "pci:01.3", 0, 2);
-//  SIS7018_AUDIO_AC97(config, "pci:01.4"
+	SIS7018_AUDIO(config, "pci:01.4", 0);
 	// documentation doesn't mention modem part #, derived from Shuttle MS11 MB manual
 //  SIS7013_MODEM_AC97(config, "pci:01.6"
 

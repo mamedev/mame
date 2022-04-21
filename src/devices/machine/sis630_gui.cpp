@@ -183,6 +183,7 @@ u8 sis630_gui_device::capptr_r()
 	return 0x50;
 }
 
+// TODO: move to specific interface
 u32 sis630_gui_device::agp_id_r()
 {
 	LOGAGP("Read AGP ID [$50]\n");

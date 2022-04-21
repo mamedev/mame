@@ -24,10 +24,10 @@
 #define LOGIO(...)     LOGMASKED(LOG_IO,   __VA_ARGS__)
 #define LOGMAP(...)    LOGMASKED(LOG_MAP,  __VA_ARGS__)
 
-DEFINE_DEVICE_TYPE(sis7001_usb, sis7001_usb_device, "sis7001_usb", "SiS 7001 USB Host Controller")
+DEFINE_DEVICE_TYPE(SIS7001_USB, sis7001_usb_device, "sis7001_usb", "SiS 7001 USB Host Controller")
 
 sis7001_usb_device::sis7001_usb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, sis7001_usb, tag, owner, clock)
+	: pci_device(mconfig, SIS7001_USB, tag, owner, clock)
 
 {
 
