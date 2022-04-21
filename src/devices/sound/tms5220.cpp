@@ -312,7 +312,7 @@ Exidy's 'Victory' and 'Victor Banana' (need verify for both)
     Pinball: Several (don't know names offhand, have not checked schematics; likely Zaccaria's 'Farfalla')
     Home computer: Street Electronics Corp.'s Apple II 'Echo 2' Speech
 synthesizer (later cards only); Texas Instruments' 'Speak and Learn'
-scanner wand unit.
+scanner wand unit; HP 27201A Speech Output Module (serial port connection).
 
 TMS5220C AKA TSP5220C: (on stuff made from 1984 to 1992 or so)
     Arcade: Atari's 'Indiana Jones and the Temple of Doom', '720',
