@@ -39242,7 +39242,7 @@ license:CC0
 		<publisher>Tengen</publisher>
 		<info name="serial" value="TGN-002-TT"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="tengen_800008" />
+			<feature name="slot" value="sa0037" />
 			<feature name="pcb" value="TENGEN-800008" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
@@ -54569,11 +54569,11 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="tai16mj">
-		<description>Taiwan Mahjong - Tai Wan Ma Que 16 (Tw)</description>
+		<description>Taiwan Mahjong - Tai Wan Ma Que 16 (Taiwan)</description>
 		<year>1989</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="SA-001"/>
-		<info name="alt_title" value="台灣麻將"/>
+		<info name="alt_title" value="臺灣麻雀"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sa0036" />
 			<feature name="pcb" value="UNL-SA-0036" />
@@ -54588,9 +54588,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="tai16mja" cloneof="tai16mj">
-		<description>Taiwan Mahjong - Tai Wan Ma Que 16 (Tw, Alt)</description>
+		<description>Taiwan Mahjong - Tai Wan Ma Que 16 (Taiwan, alt)</description>
 		<year>1989</year>
 		<publisher>Sachen</publisher>
+		<info name="alt_title" value="臺灣麻雀"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sa0036" />
 			<feature name="pcb" value="UNL-SA-0036" />
@@ -54605,9 +54606,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="tai16mjb" cloneof="tai16mj">
-		<description>Taiwan Mahjong - Tai Wan Ma Que 16 (Tw, Pirate?)</description>
+		<description>Taiwan Mahjong - Tai Wan Ma Que 16 (Asia, pirate?)</description>
 		<year>1989</year>
 		<publisher>&lt;pirate&gt;</publisher>
+		<info name="alt_title" value="麻雀16"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="NES-CNROM" />
@@ -56097,6 +56099,77 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="3 in 1 supergun (asia) (unl).prg" size="32768" crc="789270e0" sha1="eb05d4cb13c3a334fa180c16f78ad4f8886afc88" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Haitai (Supercom) -->
+
+	<software name="blackdrg" cloneof="chaldrgn">
+		<description>Black Dragon (Korea)</description>
+		<year>1991</year>
+		<publisher>Haitai</publisher>
+		<info name="alt_title" value="블랙 드래곤"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="discrete_74x377" />
+			<feature name="pcb" value="COLORDREAMS-74*377" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="65536">
+				<rom name="beullaeg deulaegon.prg" size="65536" crc="93e2b8ef" sha1="1cbaf9aa401c7714a1673995d376574ecbee6943" />
+			</dataarea>
+			<dataarea name="chr" size="65536">
+				<rom name="beullaeg deulaegon.chr" size="65536" crc="367c87df" sha1="5290455811e31adc8ad7c0b508bb9623a117920f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flyingsb" cloneof="menaceb">
+		<description>Nar-ara Superboy (Korea)</description>
+		<year>1991?</year>
+		<publisher>Haitai</publisher>
+		<info name="alt_title" value="날아라 슈퍼보이"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="discrete_74x377" />
+			<feature name="pcb" value="COLORDREAMS-74*377" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="65536">
+				<rom name="flying superboy.prg" size="65536" crc="28acc254" sha1="225894caec0ffb9ae75b317421ab609c7455c0eb" />
+			</dataarea>
+			<dataarea name="chr" size="65536">
+				<rom name="flying superboy.chr" size="65536" crc="e9b4810d" sha1="7ca6956f689ee714283d7d0d9b9922448fefce88" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skullxbk" cloneof="skullxb" supported="no">
+		<description>Skull &amp; Crossbones (Korea)</description>
+		<year>1991</year>
+		<publisher>Haitai</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="tengen_800032" />
+			<feature name="pcb" value="TENGEN-800032" />
+			<dataarea name="prg" size="131072">
+				<rom name="skull &amp; crossbones (supercom).prg" size="131072" crc="0857df48" sha1="fa5b2faa0d5ad1bc342f57d5852f8baba7cd3005" />
+			</dataarea>
+			<dataarea name="chr" size="65536">
+				<rom name="skull &amp; crossbones (supercom).chr" size="65536" crc="88a6516d" sha1="3abdd977885259c93aef59d427c9455a7f8ee6b9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toobink" cloneof="toobin">
+		<description>Toobin' (Korea)</description>
+		<year>1991?</year>
+		<publisher>Haitai</publisher>
+		<info name="alt_title" value="튜브탐험"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="namcot_3433" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="131072">
+				<rom name="toobin (k).prg" size="131072" crc="05d70600" sha1="4b6e17a1e86a46c766c3a85c990854a19b901ade" />
+			</dataarea>
+			<dataarea name="chr" size="65536">
+				<rom name="toobin (k).chr" size="65536" crc="f772fcfd" sha1="c3583fbaf4248baea80e98f3229ee20d6793c2ad" />
 			</dataarea>
 		</part>
 	</software>
@@ -64125,24 +64198,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="blackdrg" cloneof="chaldrgn">
-		<description>Black Dragon (Korea)</description>
-		<year>19??</year>
-		<publisher>Haitai</publisher>
-		<info name="alt_title" value="블랙 드래곤"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="discrete_74x377" />
-			<feature name="pcb" value="COLORDREAMS-74*377" />
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="prg" size="65536">
-				<rom name="beullaeg deulaegon.prg" size="65536" crc="93e2b8ef" sha1="1cbaf9aa401c7714a1673995d376574ecbee6943" status="baddump" />
-			</dataarea>
-			<dataarea name="chr" size="65536">
-				<rom name="beullaeg deulaegon.chr" size="65536" crc="367c87df" sha1="5290455811e31adc8ad7c0b508bb9623a117920f" status="baddump"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="blockfrc">
 		<description>Block Force (Asia, Ripped from Tetris Family 9 in 1?)</description>
 		<year>19??</year>
@@ -64938,24 +64993,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="65536">
 				<rom name="fish fall (unl).prg" size="65536" crc="177989fe" sha1="4950fc00564e8740e9c78ba43e9521928e16854f" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="flyingsb" cloneof="menaceb">
-		<description>Nar-ara Superboy (Korea)</description>
-		<year>199?</year>
-		<publisher>Haitai</publisher>
-		<info name="alt_title" value="날아라 슈퍼보이"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="discrete_74x377" />
-			<feature name="pcb" value="COLORDREAMS-74*377" />
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="prg" size="65536">
-				<rom name="flying superboy.prg" size="65536" crc="28acc254" sha1="225894caec0ffb9ae75b317421ab609c7455c0eb" status="baddump" />
-			</dataarea>
-			<dataarea name="chr" size="65536">
-				<rom name="flying superboy.chr" size="65536" crc="e9b4810d" sha1="7ca6956f689ee714283d7d0d9b9922448fefce88" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -66586,23 +66623,6 @@ We don't include these hacks because they were not burned into real carts nor so
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="tom &amp; jerry 3 (199x)(dragon co.)(as)[p].prg" size="262144" crc="0ac705fe" sha1="ab38b9036b61cd8a82ca1d108dd2cc80d7cde12d" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="toobink" cloneof="toobin">
-		<description>Toobin' (Korea)</description>
-		<year>1991?</year>
-		<publisher>Haitai</publisher>
-		<info name="alt_title" value="튜브탐험"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="namcot_3433" />
-			<feature name="mirroring" value="horizontal" />
-			<dataarea name="prg" size="131072">
-				<rom name="toobin (k).prg" size="131072" crc="05d70600" sha1="4b6e17a1e86a46c766c3a85c990854a19b901ade" />
-			</dataarea>
-			<dataarea name="chr" size="65536">
-				<rom name="toobin (k).chr" size="65536" crc="f772fcfd" sha1="c3583fbaf4248baea80e98f3229ee20d6793c2ad" />
 			</dataarea>
 		</part>
 	</software>
