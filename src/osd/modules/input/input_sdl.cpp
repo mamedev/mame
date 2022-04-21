@@ -1111,7 +1111,7 @@ public:
 				else
 					itemid = ITEM_ID_OTHER_AXIS_ABSOLUTE;
 
-				snprintf(tempname, sizeof(tempname), "A%d %s", axis, devinfo->name().c_str());
+				snprintf(tempname, sizeof(tempname), "A%d", axis + 1);
 				devinfo->device()->add_item(tempname, itemid, generic_axis_get_state<std::int32_t>, &devinfo->joystick.axes[axis]);
 			}
 
@@ -1131,7 +1131,7 @@ public:
 				else
 					itemid = ITEM_ID_OTHER_SWITCH;
 
-				snprintf(tempname, sizeof(tempname), "button %d", button);
+				snprintf(tempname, sizeof(tempname), "Button %d", button + 1);
 				devinfo->device()->add_item(tempname, itemid, generic_button_get_state<std::int32_t>, &devinfo->joystick.buttons[button]);
 			}
 
@@ -1140,16 +1140,16 @@ public:
 			{
 				input_item_id itemid;
 
-				snprintf(tempname, sizeof(tempname), "hat %d Up", hat);
+				snprintf(tempname, sizeof(tempname), "Hat %d Up", hat + 1);
 				itemid = (input_item_id)((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1UP + 4 * hat : ITEM_ID_OTHER_SWITCH);
 				devinfo->device()->add_item(tempname, itemid, generic_button_get_state<std::int32_t>, &devinfo->joystick.hatsU[hat]);
-				snprintf(tempname, sizeof(tempname), "hat %d Down", hat);
+				snprintf(tempname, sizeof(tempname), "Hat %d Down", hat + 1);
 				itemid = (input_item_id)((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1DOWN + 4 * hat : ITEM_ID_OTHER_SWITCH);
 				devinfo->device()->add_item(tempname, itemid, generic_button_get_state<std::int32_t>, &devinfo->joystick.hatsD[hat]);
-				snprintf(tempname, sizeof(tempname), "hat %d Left", hat);
+				snprintf(tempname, sizeof(tempname), "Hat %d Left", hat + 1);
 				itemid = (input_item_id)((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1LEFT + 4 * hat : ITEM_ID_OTHER_SWITCH);
 				devinfo->device()->add_item(tempname, itemid, generic_button_get_state<std::int32_t>, &devinfo->joystick.hatsL[hat]);
-				snprintf(tempname, sizeof(tempname), "hat %d Right", hat);
+				snprintf(tempname, sizeof(tempname), "Hat %d Right", hat + 1);
 				itemid = (input_item_id)((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1RIGHT + 4 * hat : ITEM_ID_OTHER_SWITCH);
 				devinfo->device()->add_item(tempname, itemid, generic_button_get_state<std::int32_t>, &devinfo->joystick.hatsR[hat]);
 			}
@@ -1164,9 +1164,9 @@ public:
 				else
 					itemid = ITEM_ID_OTHER_AXIS_RELATIVE;
 
-				snprintf(tempname, sizeof(tempname), "R%d %s", ball * 2, devinfo->name().c_str());
+				snprintf(tempname, sizeof(tempname), "R%d X", ball + 1);
 				devinfo->device()->add_item(tempname, (input_item_id)itemid, generic_axis_get_state<std::int32_t>, &devinfo->joystick.balls[ball * 2]);
-				snprintf(tempname, sizeof(tempname), "R%d %s", ball * 2 + 1, devinfo->name().c_str());
+				snprintf(tempname, sizeof(tempname), "R%d Y", ball + 1);
 				devinfo->device()->add_item(tempname, (input_item_id)(itemid + 1), generic_axis_get_state<std::int32_t>, &devinfo->joystick.balls[ball * 2 + 1]);
 			}
 		}
