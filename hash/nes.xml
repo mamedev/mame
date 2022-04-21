@@ -66024,7 +66024,7 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
-	<software name="queenbee">
+	<software name="queenbee" cloneof="insectx">
 		<description>Queen Bee V (Asia)</description>
 		<year>1994</year>
 		<publisher>Nitra</publisher>
