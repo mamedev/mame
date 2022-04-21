@@ -89,7 +89,7 @@ void sis630_state::sis630(machine_config &config)
 	SMBUS      (config, "pci:01.0:smbus", 0);
 
 //  SIS900_LAN(config, "pci:01.1"
-	// USB config: 2 on back, 3 on front
+	// USB config: 2 on back, 3 on front. Front is fn 2
 	SIS7001_USB(config, "pci:01.2", 0);
 	SIS7001_USB(config, "pci:01.3", 0);
 //  SIS7018_AUDIO_AC97(config, "pci:01.4"

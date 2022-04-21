@@ -47,27 +47,29 @@ void sis7001_usb_device::config_map(address_map &map)
 
 void sis7001_usb_device::io_map(address_map &map)
 {
-	map(0x00, 0x00).lr8(NAME([this]() { return 0x00000110; }));
+	// operational mode
+	map(0x000, 0x000).lr8(NAME([this]() { return 0x00000110; }));
+	// ...
+//	map(0x05c, 0x05c) last item for function 2, missing on function 3
+
+	// legacy support mode (8-bit each)
+//	map(0x100, 0x100) control, bit 0 enables emulation mode
+//	map(0x104, 0x104) input
+//	map(0x108, 0x108) output
+//	map(0x10c, 0x10f) status
 }
 
 void sis7001_usb_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
-//	io_space->install_device(0xd00, 0x0dff, *this, &sis7001_usb_device::io_map);
+	// TODO: overrides I/O ports $0060-$0064 (emulation mode)
 }
 
 void sis7001_usb_device::device_start()
 {
 	pci_device::device_start();
 
-#if 0
-	memory_window_start = 0;
-	memory_window_end   = 0xffffffff;
-	memory_offset       = 0;
-	io_window_start = 0;
-	io_window_end   = 0xffff;
-	io_offset       = 0;
-#endif
+	add_map(512, M_MEM, FUNC(sis7001_usb_device::io_map));
 }
 
 
