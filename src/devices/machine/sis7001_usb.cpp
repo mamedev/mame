@@ -30,9 +30,7 @@ sis7001_usb_device::sis7001_usb_device(const machine_config &mconfig, const char
 	: pci_device(mconfig, sis7001_usb, tag, owner, clock)
 
 {
-	// 0x0c0310 - Serial Bus Controller, USB, OpenHCI Host
-	// Assume no rev.
-	set_ids(0x10397001, 0x00, 0x0c0310, 0x00);
+
 }
 
 void sis7001_usb_device::device_add_mconfig(machine_config &config)
@@ -49,6 +47,9 @@ void sis7001_usb_device::io_map(address_map &map)
 {
 	// operational mode
 	map(0x000, 0x000).lr8(NAME([this]() { return 0x00000110; }));
+	// ...
+	 // HcRhDescriptorA, writeable except for 0x4ff
+	map(0x048, 0x04c).lr8(NAME([this]() { return 0x01000000 | m_downstream_ports; }));
 	// ...
 //	map(0x05c, 0x05c) last item for function 2, missing on function 3
 

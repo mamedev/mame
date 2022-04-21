@@ -11,6 +11,17 @@
 class sis7001_usb_device : public pci_device 
 {
 public:
+	sis7001_usb_device(
+		const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, 
+		int num_ports
+	) : sis7001_usb_device(mconfig, tag, owner, clock)
+	{
+		// 0x0c0310 - Serial Bus Controller, USB, OpenHCI Host
+		// Assume no rev.
+		set_ids(0x10397001, 0x00, 0x0c0310, 0x00);
+		// TODO: should really read from a std::list interface
+		m_downstream_ports = num_ports;
+	}
 	sis7001_usb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
@@ -28,6 +39,8 @@ protected:
 	void io_map(address_map &map);
 	
 private:
+	u8 m_downstream_ports;
+
 	u8 unmap_log_r(offs_t offset);
 	void unmap_log_w(offs_t offset, u8 data);
 };

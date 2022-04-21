@@ -90,8 +90,8 @@ void sis630_state::sis630(machine_config &config)
 
 //  SIS900_LAN(config, "pci:01.1"
 	// USB config: 2 on back, 3 on front. Front is fn 2
-	SIS7001_USB(config, "pci:01.2", 0);
-	SIS7001_USB(config, "pci:01.3", 0);
+	SIS7001_USB(config, "pci:01.2", 0, 3);
+	SIS7001_USB(config, "pci:01.3", 0, 2);
 //  SIS7018_AUDIO_AC97(config, "pci:01.4"
 	// documentation doesn't mention modem part #, derived from Shuttle MS11 MB manual
 //  SIS7013_MODEM_AC97(config, "pci:01.6"
