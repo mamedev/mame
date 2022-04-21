@@ -59561,7 +59561,28 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- [NJ052] 宠物宝宝 ~ Chong Wu Bao Bao (Pet Baby?)-->
+	<software name="chongwbb">
+		<description>Chǒngwù Bǎobǎo (China)</description>
+		<year>20??</year>
+		<publisher>Nanjing</publisher>
+		<info name="serial" value="NJ052"/>
+		<info name="alt_title" value="宠物宝宝"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="smd133" />
+			<feature name="pcb" value="COOLBOY" />
+			<feature name="smd133-addr" value="6K" />
+			<dataarea name="prg" size="131072">
+				<rom name="chongwu baobao.prg" size="131072" crc="a8d17647" sha1="7bbad3164e7941582c661ac5203ac1b4b24a2560" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="chongwu baobao.chr" size="131072" crc="749a6890" sha1="c0c4c8127249efb7b8053fbe9820634c072aea6c" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="gardman">
 		<description>Gardman (Chi)</description>
@@ -60053,7 +60074,27 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- [NJ082] (大话西游2) 齐天大圣 ~ (Da Hua Xi You 2) Qi Tian Da Sheng -->
+	<software name="qitiands">
+		<description>Qítiān Dàshèng (China)</description>
+		<year>2008</year>
+		<publisher>Nanjing</publisher>
+		<info name="serial" value="NJ082"/>
+		<info name="alt_title" value="齐天大圣"/> <!-- Is this correct? (大话西游2) 齐天大圣 ~ (Da Hua Xi You 2) Qi Tian Da Sheng -->
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="waixing_sgzlz" />
+			<feature name="pcb" value="WAIXING-SGZLZ" />
+			<dataarea name="prg" size="524288">
+				<rom name="qitian dasheng.prg" size="524288" crc="90558b45" sha1="6220c429d095d329e892130eafaee47542f95594" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="sanguolb">
 		<description>San Guo Zhi - Liu Bei Zhuan (Chi)</description>
@@ -60565,6 +60606,29 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+<!-- Nantong -->
+
+	<software name="jxqy" cloneof="ffant">
+		<description>Jiànxiá Qíngyuán (China, Final Fantasy pirate)</description>
+		<year>20??</year>
+		<publisher>Nantong</publisher>
+		<info name="alt_title" value="剑侠情缘"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="smd133" />
+			<feature name="pcb" value="COOLBOY" />
+			<feature name="smd133-addr" value="6K" />
+			<dataarea name="prg" size="524288">
+				<rom name="jianxia qingyuan.prg" size="524288" crc="128f56ab" sha1="01621c175d522afa1d2432b45664b40df867e9c2" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
 
 <!-- Union Bond -->
 
@@ -61552,6 +61616,28 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="WAIXING-G" />
 			<dataarea name="prg" size="262144">
 				<rom name="long zhu ying xiong (ch).prg" size="262144" crc="77efb5d9" sha1="6d082c627d6503d6701f5d79a5f15be3e86f2dbd" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wumingcs" cloneof="hanjuher">
+		<description>Wúmíng Chuánshuō (China)</description>
+		<year>20??</year>
+		<publisher>Waixing?</publisher>
+		<info name="alt_title" value="无名传说"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="smd133" />
+			<feature name="pcb" value="COOLBOY" />
+			<feature name="smd133-addr" value="6K" />
+			<dataarea name="prg" size="262144">
+				<rom name="wuming chuanshuo.prg" size="262144" crc="c70b4ab9" sha1="6887683b7b96537830e4a2530e8cc908f160c84c" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -67192,8 +67278,8 @@ from the NEStopia source, hence they would require confirmation. -->
 	</software>
 
 	<software name="moshenfs">
-		<description>Mo Shen Fa Shi (Chi)</description>
-		<year>19??</year>
+		<description>Móshén Fǎshī (China)</description>
+		<year>1998</year>
 		<publisher>Waixing</publisher>
 		<info name="alt_title" value="魔神法师 (Demogorgon Monk?)"/>
 		<part name="cart" interface="nes_cart">
@@ -67204,6 +67290,32 @@ from the NEStopia source, hence they would require confirmation. -->
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="demogorgon monk (ch).prg" size="262144" crc="c14634ae" sha1="6bee703e359cb7254db14c49c4823d722ca0797d" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dishit" cloneof="moshenfs">
+		<description>Dì Shì Tiān (China)</description>
+		<year>19??</year>
+		<publisher>Waixing?</publisher>
+		<info name="alt_title" value="帝释天"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="smd133" />
+			<feature name="pcb" value="COOLBOY" />
+			<feature name="smd133-addr" value="6K" />
+			<dataarea name="prg" size="262144">
+				<rom name="dishitian.prg" size="262144" crc="d79e0f25" sha1="77cf0e983108ed9f751c60f79b4a5c4ef18a3787" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="dishitian.chr" size="262144" crc="4ecbcd53" sha1="6c657e4b6119cb4481cfe207785208cb5665fb8f" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
