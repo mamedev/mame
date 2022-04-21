@@ -35376,10 +35376,15 @@ kok                             //
 
 @source:photoply.cpp
 photoply98sp                    // (c) 1998 Funworld
+photoply99nl                    // (c) 1999 Funworld
 photoply99sp                    // (c) 1999 Funworld
 photoply2k                      // (c) 2000 Funworld
+photoply2knl                    // (c) 2000 Funworld
 photoply2ksp                    // (c) 2000 Funworld
 photoply2k1it                   // (c) 2001 Funworld
+photoply2k1nl                   // (c) 2001 Funworld
+photoply2k1mtnl                 // (c) 2001 Funworld
+photoply2k2be                   // (c) 2002 Funworld
 photoply2k4                     // (c) 2004 Funworld
 
 @source:photoplys.cpp
