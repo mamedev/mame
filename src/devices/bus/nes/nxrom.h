@@ -178,7 +178,6 @@ public:
 	// construction/destruction
 	nes_nochr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
 	virtual uint8_t chr_r(offs_t offset) override;
 	virtual void chr_w(offs_t offset, uint8_t data) override;
 };

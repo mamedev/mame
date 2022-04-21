@@ -51730,9 +51730,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="timedivr">
-		<description>Time Diver Eon Man (USA, Prototype)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Time Diver Eon Man (USA, prototype)</description>
+		<year>1993</year>
+		<publisher>Taito</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
@@ -57252,14 +57252,14 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up -->
-			<dataarea name="bwram" size="8192">
-				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			<!-- 32k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="32768">
+				<rom value="0x00" size="32768" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="sanxiawya" cloneof="sanxiawy"   supported="no">
+	<software name="sanxiawya" cloneof="sanxiawy" supported="no">
 		<description>San Xia Wu Yi (Chi, Decrypted WXN)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -57274,14 +57274,14 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up -->
-			<dataarea name="bwram" size="8192">
-				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			<!-- 32k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="32768">
+				<rom value="0x00" size="32768" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="sanxiawyb" cloneof="sanxiawy"   supported="no">
+	<software name="sanxiawyb" cloneof="sanxiawy" supported="no">
 		<description>San Xia Wu Yi (Chi, Alt?)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -57295,6 +57295,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -57760,7 +57764,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="zhentian">
+	<software name="zhentian" cloneof="sanada">
 		<description>Zhēntián Shí Yǒngshì (China)</description>
 		<year>2005</year>
 		<publisher>Waixing</publisher>
@@ -61147,6 +61151,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="metal fighter (asia) (hacker) (unl).prg" size="32768" crc="7b29979f" sha1="eaa991b7d38f2493ae5f8cf52564b732bedf2a6e" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mspeachw" cloneof="menaceb">
+		<description>Miss Peach World 1 - Super L.A. Cop (Japan)</description>
+		<year>1991</year>
+		<publisher>Hacker International</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="discrete_74x377" />
+			<feature name="pcb" value="COLORDREAMS-74*377" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="65536">
+				<rom name="miss peach world.prg" size="65536" crc="ea7af97e" sha1="2e68d334193d70f92619b656785f749eae82382a" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="65536">
+				<rom name="miss peach world.chr" size="65536" crc="a9d5bea7" sha1="2241cf3ea84889d50009928e66ead5f15bff2cca" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -65648,23 +65669,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="mickey mania 7 (pirate original).prg" size="262144" crc="60fb492c" sha1="4826b32e22a60985020acaf3a06f2d32e4ca0c8d" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mspeachw" cloneof="menaceb">
-		<description>Miss Peach World 1 - Super L.A. Cop (Japan)</description>
-		<year>1991</year>
-		<publisher>Hacker International</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="discrete_74x377" />
-			<feature name="pcb" value="COLORDREAMS-74*377" />
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="prg" size="65536">
-				<rom name="miss peach world.prg" size="65536" crc="ea7af97e" sha1="2e68d334193d70f92619b656785f749eae82382a" status="baddump" />
-			</dataarea>
-			<dataarea name="chr" size="65536">
-				<rom name="miss peach world.chr" size="65536" crc="a9d5bea7" sha1="2241cf3ea84889d50009928e66ead5f15bff2cca" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
