@@ -131,6 +131,7 @@ private:
 	DECLARE_MACHINE_START(exl100);
 	DECLARE_MACHINE_START(exeltel);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
+	void machine_reset() override;
 
 	/* tms7020 i/o ports */
 	uint8_t   m_tms7020_portb = 0;
@@ -152,7 +153,7 @@ private:
 	void tms7040_mem(address_map &map);
 
 	// variables for the keyboard
-	u16 k_channels[3] = { 0xff, 0xff, 0x3e }; // [0] = key down, [1] = key being sent; [2] = ch62
+	u8 k_channels[3] = { 0xff, 0xff, 0x3e }; // [0] = key down, [1] = key being sent; [2] = ch62
 	u8 k_ch_byte = 0; // 'k_channels' index; 0 = idly scanning the keyboard; 1 = sending a key; 2 = sending ch62
 	u8 k_ch_bit = 0; // bit# in the byte being sent; 0 = AGC, 1 = start bit, 2-7 = bits 0-5 of data, 8 = end of byte
 	bool k_bit_bit = 0; // the value of the bit of data being processed
@@ -740,6 +741,21 @@ MACHINE_START_MEMBER( exelv_state, exeltel)
 	save_item(NAME(m_tms7041_portd));
 	save_item(NAME(m_wx318));
 	save_item(NAME(m_wx319));
+	save_item(NAME(k_channels));
+	save_item(NAME(k_ch_byte));
+	save_item(NAME(k_ch_bit));
+	save_item(NAME(k_bit_bit));
+	save_item(NAME(k_bit_num));
+}
+
+void exelv_state::machine_reset()
+{
+	k_channels[0] = 0xff;
+	k_channels[1] = 0xff;
+	k_ch_byte = 0;
+	k_ch_bit = 0;
+	k_bit_bit = 0;
+	k_bit_num = 0;
 }
 
 
