@@ -389,7 +389,13 @@ void sis950_lpc_device::io_map(address_map &map)
 	// map(0x0480, 0x048f) DMA high page registers
 	// map(0x04d0, 0x04d1) IRQ edge/level control registers
 
-	// Intel LPC interface specs (legacy host decode ranges)
+	// http://bxr.su/DragonFly/share/man/man4/it.4
+	// 0x0290, 0xc00, 0xd00, 0x228: Motherboard Super I/O HW monitoring
+
+	// map(0x0295, 0x0295) - index register, $d-$e lower/upper RPM readback for fans (alternating on read)
+	// map(0x0296, 0x0296) - data ^
+
+	// Intel LPC interface specs (legacy host decode ranges, not necessarily present on '950)
 
 	// map(0x002e, 0x002f) Super I/O config
 	// map(0x004e, 0x004f) alt Super I/O config
