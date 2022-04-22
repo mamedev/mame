@@ -21353,7 +21353,7 @@ license:CC0
 		<year>1988</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="TFC-KHS-5500 (18)"/>
-		<info name="release" value="19880628"/>
+		<info name="release" value="19881216"/>
 		<info name="alt_title" value="究極ハリキリスタジアム"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="x1_005" />
