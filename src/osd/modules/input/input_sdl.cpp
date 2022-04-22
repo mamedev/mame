@@ -1087,8 +1087,17 @@ public:
 			devinfo->sdl_state.joystick_id = SDL_JoystickInstanceID(joy);
 			devinfo->sdl_state.hapdevice = SDL_HapticOpenFromJoystick(joy);
 
-			osd_printf_verbose("Joystick: %s [GUID %s]\n", SDL_JoystickNameForIndex(physical_stick), guid_str);
-			osd_printf_verbose("Joystick:   ...  %d axes, %d buttons %d hats %d balls\n", SDL_JoystickNumAxes(joy), SDL_JoystickNumButtons(joy), SDL_JoystickNumHats(joy), SDL_JoystickNumBalls(joy));
+			osd_printf_verbose("Joystick: %s [GUID %s] Vendor ID %04X, Product ID %04X, Revision %04X\n",
+					SDL_JoystickNameForIndex(physical_stick),
+					guid_str,
+					SDL_JoystickGetVendor(joy),
+					SDL_JoystickGetProduct(joy),
+					SDL_JoystickGetProductVersion(joy));
+			osd_printf_verbose("Joystick:   ...  %d axes, %d buttons %d hats %d balls\n",
+					SDL_JoystickNumAxes(joy),
+					SDL_JoystickNumButtons(joy),
+					SDL_JoystickNumHats(joy),
+					SDL_JoystickNumBalls(joy));
 			osd_printf_verbose("Joystick:   ...  Physical id %d mapped to logical id %d\n", physical_stick, stick + 1);
 			if (devinfo->sdl_state.hapdevice)
 			{
