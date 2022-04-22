@@ -21,7 +21,6 @@
 #include "emu.h"
 #include "jaleco.h"
 
-#include "sound/samples.h"
 #include "speaker.h"
 
 
