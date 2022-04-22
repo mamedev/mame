@@ -55,9 +55,30 @@ STATUS:
 * EXL 100
   - Exel Basic (exelbas) can be used in a limited way
   - Other software mostly ignores inputs, and usually freezes soon after start (cpu problems?)
-  - Poking into the debugger's memory viewer can simulate keypresses; location varies per game
 * EXELTEL can get to the inbuilt "cart" but stops with a black screen,
     presumably because the I/O processor is not emulated
+
+STATUS OF SOFTWARE:
+
+SWList name      KBD poke address       Status
+------------------------------------------------------------------------------------------------------
+exelbas          03                     works until autorepeat bug kicks in
+exelbasp                                Cyan screen, hangs
+exelmax                                 options 1-4 work, others hang
+exeldrum         32                     no inputs
+exelogo                                 no inputs?
+exeltext         3C                     hang at start
+exlpaint                                works until autorepeat bug kicks in
+exlmodem                                usually hangs after a few keystrokes or gets the autorepeat bug
+capmenkr                                Hang after a few seconds, large chars are corrupt.
+guppy                                   inputs not working, followed soon after by hang
+imagix                                  first screen corrupt, can't proceed
+pindo                                   first screen corrupt, can select a game, but then there's no control
+quizzy                                  Hang after a few secs; scores are corrupted
+tennis           12                     can select at first screen, followed by hang
+virus                                   Hang at start
+wizord                                  Hang at start
+
 
 TODO:
     * dump exeltel tms7042 I/O CPU ROM
@@ -750,6 +771,11 @@ MACHINE_START_MEMBER( exelv_state, exeltel)
 
 void exelv_state::machine_reset()
 {
+	if (m_subcpu)
+	{
+		m_subcpu->set_input_line(TMS7000_INT1_LINE, CLEAR_LINE);
+		m_subcpu->set_input_line(TMS7000_INT3_LINE, CLEAR_LINE);
+	}
 	k_channels[0] = 0xff;
 	k_channels[1] = 0xff;
 	k_ch_byte = 0;
