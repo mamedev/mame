@@ -20,12 +20,13 @@
 #include <SDL2/SDL.h>
 #include <cctype>
 // ReSharper disable once CppUnusedIncludeDirective
-#include <cstddef>
-#include <mutex>
-#include <memory>
-#include <queue>
-#include <iterator>
 #include <algorithm>
+#include <cstddef>
+#include <iterator>
+#include <memory>
+#include <mutex>
+#include <optional>
+#include <queue>
 
 // MAME headers
 #include "emu.h"
@@ -631,9 +632,10 @@ public:
 
 	struct sdl_api_state
 	{
-		SDL_Joystick *device;
-		SDL_Haptic *hapdevice;
+		SDL_Joystick *device = nullptr;
+		SDL_Haptic *hapdevice = nullptr;
 		SDL_JoystickID joystick_id;
+		std::optional<std::string> serial;
 	};
 
 	sdl_joystick_state    joystick;
@@ -641,8 +643,7 @@ public:
 
 	sdl_joystick_device(running_machine &machine, std::string &&name, std::string &&id, input_module &module) :
 		sdl_device(machine, std::move(name), std::move(id), DEVICE_CLASS_JOYSTICK, module),
-		joystick({{0}}),
-		sdl_state({ nullptr })
+		joystick({{0}})
 	{
 	}
 
@@ -1086,6 +1087,13 @@ public:
 			devinfo->sdl_state.device = joy;
 			devinfo->sdl_state.joystick_id = SDL_JoystickInstanceID(joy);
 			devinfo->sdl_state.hapdevice = SDL_HapticOpenFromJoystick(joy);
+#if SDL_VERSION_ATLEAST(2, 0, 14)
+			char const *const serial = SDL_JoystickGetSerial(joy);
+			if (serial)
+				devinfo->sdl_state.serial = serial;
+			else
+#endif // SDL_VERSION_ATLEAST(2, 0, 14)
+				devinfo->sdl_state.serial = std::nullopt;
 
 			osd_printf_verbose("Joystick: %s [GUID %s] Vendor ID %04X, Product ID %04X, Revision %04X\n",
 					SDL_JoystickNameForIndex(physical_stick),
@@ -1100,13 +1108,9 @@ public:
 					SDL_JoystickNumBalls(joy));
 			osd_printf_verbose("Joystick:   ...  Physical id %d mapped to logical id %d\n", physical_stick, stick + 1);
 			if (devinfo->sdl_state.hapdevice)
-			{
 				osd_printf_verbose("Joystick:   ...  Has haptic capability\n");
-			}
 			else
-			{
 				osd_printf_verbose("Joystick:   ...  Does not have haptic capability\n");
-			}
 
 			// loop over all axes
 			for (int axis = 0; axis < SDL_JoystickNumAxes(joy); axis++)
@@ -1205,13 +1209,20 @@ public:
 				char guid_str[256];
 				guid_str[0] = '\0';
 				SDL_JoystickGetGUIDString(guid, guid_str, sizeof(guid_str) - 1);
+				char const *serial = nullptr;
+#if SDL_VERSION_ATLEAST(2, 0, 14)
+				serial = SDL_JoystickGetSerial(joy);
+#endif
 				auto target_device = std::find_if(
 						devicelist().begin(),
 						devicelist().end(),
-						[&guid_str] (auto const &device)
+						[&guid_str, &serial] (auto const &device)
 						{
 							auto &devinfo = downcast<sdl_joystick_device &>(*device);
-							return !devinfo.sdl_state.device && (devinfo.id() == guid_str);
+							return
+									!devinfo.sdl_state.device &&
+									(devinfo.id() == guid_str) &&
+									((serial && devinfo.sdl_state.serial && (*devinfo.sdl_state.serial == serial)) || (!serial && !devinfo.sdl_state.serial));
 						});
 				if (devicelist().end() != target_device)
 				{
@@ -1244,7 +1255,7 @@ private:
 		for (auto &ptr : devicelist())
 		{
 			sdl_joystick_device *const device = downcast<sdl_joystick_device *>(ptr.get());
-			if (device->sdl_state.joystick_id == instance)
+			if (device->sdl_state.device && (device->sdl_state.joystick_id == instance))
 				return device;
 		}
 		return nullptr;
