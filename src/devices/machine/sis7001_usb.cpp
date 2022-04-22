@@ -46,7 +46,7 @@ void sis7001_usb_device::config_map(address_map &map)
 void sis7001_usb_device::io_map(address_map &map)
 {
 	// operational mode
-	map(0x000, 0x000).lr8(NAME([this]() { return 0x00000110; }));
+	map(0x000, 0x000).lr8(NAME([]() { return 0x00000110; }));
 	// ...
 	 // HcRhDescriptorA, writeable except for 0x4ff
 	map(0x048, 0x04c).lr8(NAME([this]() { return 0x01000000 | m_downstream_ports; }));
