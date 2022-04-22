@@ -150,6 +150,7 @@ protected:
 	uint8_t in(uint16_t port);
 	void out(uint16_t port, uint8_t value);
 	virtual uint8_t rm(uint16_t addr);
+	uint8_t rm_reg(uint16_t addr);
 	void rm16(uint16_t addr, PAIR &r);
 	virtual void wm(uint16_t addr, uint8_t value);
 	void wm16(uint16_t addr, PAIR &r);
@@ -235,7 +236,7 @@ protected:
 	void take_interrupt();
 	void take_nmi();
 	void nomreq_ir(s8 cycles);
-	u16 nomreq_addr(u16 addr, s8 cycles);
+	void nomreq_addr(u16 addr, s8 cycles);
 
 	// address spaces
 	const address_space_config m_program_config;
