@@ -302,13 +302,13 @@ void spectrum_128_state::machine_reset()
 bool spectrum_128_state::is_vram_write(offs_t offset) {
 	// TODO respect banks 2,5 mapped to 0xc000
 	return (BIT(m_port_7ffd_data, 3))
-		? offset >= 0x8000 && offset <= 0x97ff
+		? offset >= 0x8000 && offset < 0x9b00
 		: spectrum_state::is_vram_write(offset);
 }
 
 bool spectrum_128_state::is_contended(offs_t offset) {
 	// TODO Unlike the base 128K machine, RAM banks 4, 5, 6 and 7 are contended.
-	return spectrum_state::is_contended(offset);// || (offset >= 0x8000 && offset <= 0xbfff);
+	return spectrum_state::is_contended(offset);// || (offset >= 0x8000 && offset < 0xc000);
 }
 
 static const gfx_layout spectrum_charlayout =

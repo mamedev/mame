@@ -170,11 +170,11 @@ void spectrum_state::spectrum_update_screen(screen_device &screen_d, bitmap_ind1
 }
 
 bool spectrum_state::is_vram_write(offs_t offset) {
-	return offset >= 0x4000 && offset <= 0x57ff;
+	return offset >= 0x4000 && offset < 0x5b00;
 }
 
 bool spectrum_state::is_contended(offs_t offset) {
-	return offset >= 0x4000 && offset <= 0x7fff;
+	return offset >= 0x4000 && offset < 0x8000;
 }
 
 void spectrum_state::content_early(s8 shift)
