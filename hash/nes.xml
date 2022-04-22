@@ -67366,8 +67366,8 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
-	<software name="dishit" cloneof="moshenfs">
-		<description>Dì Shì Tiān (China)</description>
+	<software name="dshitian" cloneof="moshenfs">
+		<description>Dì Shìtiān (China)</description>
 		<year>19??</year>
 		<publisher>Waixing?</publisher>
 		<info name="alt_title" value="帝释天"/>
