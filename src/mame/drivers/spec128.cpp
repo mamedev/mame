@@ -323,7 +323,7 @@ void spectrum_128_state::spectrum_128(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
-	m_screen->set_raw(X1_128_SINCLAIR / 5, 456, 311, {get_screen_area().left() - 48, get_screen_area().right() + 48, get_screen_area().top() - 48, get_screen_area().bottom() + 48});
+	m_screen->set_raw(X1_128_SINCLAIR / 5, 456, 311, {get_screen_area().left() - 48, get_screen_area().right() + 48, get_screen_area().top() - 48, get_screen_area().bottom() + 56});
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(spec128);
 
