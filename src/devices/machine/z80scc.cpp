@@ -1019,11 +1019,9 @@ void z80scc_device::ab_dc_w(offs_t offset, uint8_t data)
 z80scc_channel::z80scc_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, Z80SCC_CHANNEL, tag, owner, clock),
 		device_serial_interface(mconfig, *this),
-#if Z80SCC_USE_LOCAL_BRG
+		m_baudtimer(0),
 		m_brg_counter(0),
-#else
 		m_brg_rate(0),
-#endif
 		m_delayed_tx_brg_change(0),
 		m_rx_error(0),
 		m_rx_clock(0),
@@ -1080,10 +1078,8 @@ void z80scc_channel::device_start()
 	m_rxc   = 0x00;
 	m_txc   = 0x00;
 
-#if Z80SCC_USE_LOCAL_BRG
 	// baudrate clocks and timers
-	baudtimer = timer_alloc(TIMER_ID_BAUD);
-#endif
+	m_baudtimer = timer_alloc(TIMER_ID_BAUD);
 
 	// state saving
 	save_item(NAME(m_rr0));
@@ -1145,6 +1141,7 @@ void z80scc_channel::device_start()
 	save_item(NAME(m_index));
 	save_item(NAME(m_brg_rate));
 	save_item(NAME(m_delayed_tx_brg_change));
+	save_item(NAME(m_brg_counter));
 }
 
 
@@ -1191,39 +1188,37 @@ void z80scc_channel::device_reset()
 		m_uart->reset_interrupts();
 	}
 	m_extint_states = m_rr0;
+	m_baudtimer->adjust(attotime::never);
+	m_brg_counter = 0;
 }
 
 void z80scc_channel::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 //  LOG("%s %d\n", FUNCNAME, id);
 
-#if Z80SCC_USE_LOCAL_BRG
+
 	switch(id)
 	{
 	case TIMER_ID_BAUD:
 		{
-			//int brconst = m_wr13 << 8 | m_wr12 | 1; // If the counter is 1 the effect is passthrough ehh?! To avoid div0...
 			if (m_wr14 & WR14_BRG_ENABLE)
 			{
-				//  int rate = owner()->clock() / brconst;
-				//  attotime attorate = attotime::from_hz(rate);
-				//  timer.adjust(attorate, id, attorate);
+#if Z80SCC_USE_LOCAL_BRG
 				txc_w(m_brg_counter & 1);
 				rxc_w(m_brg_counter & 1);
+#endif
 				m_brg_counter++; // Will just keep track of state in timer mode, not hardware counter value.
+
+				if (m_wr15 & WR15_ZEROCOUNT)
+					m_uart->trigger_interrupt(m_index, INT_EXTERNAL);
 			}
-			else
-			{
-				LOG(" - turning off Baudrate timer\n");
-				timer.adjust(attotime::never, 0, attotime::never);
-			}
+			update_baudtimer();
 		}
 		break;
 	default:
 		logerror("Spurious timer %d event\n", id);
 		break;
 	}
-#endif
 }
 
 
@@ -2231,6 +2226,8 @@ void z80scc_channel::do_sccreg_wr13(uint8_t data)
  WR14 contains some miscellaneous control bits */
 void z80scc_channel::do_sccreg_wr14(uint8_t data)
 {
+	bool brg_change = false;
+
 	switch (data & WR14_DPLL_CMD_MASK)
 	{
 	case WR14_CMD_NULL:
@@ -2291,11 +2288,11 @@ void z80scc_channel::do_sccreg_wr14(uint8_t data)
 	/* Based on baudrate code from 8530scc.cpp */
 	if ( !(m_wr14 & WR14_BRG_ENABLE) && (data & WR14_BRG_ENABLE) ) // baud rate generator being enabled?
 	{
+		brg_change = true;
 		LOG("%s: Misc Control Bits Baudrate generator enabled with %s source\n", FUNCNAME, (data & WR14_BRG_SOURCE) ? "PCLK" : "external clock");
 		if (data & WR14_BRG_SOURCE) // Do we use the PCLK as baudrate source
 		{
 #if Z80SCC_USE_LOCAL_BRG
-			baudtimer->adjust(attotime::from_hz(rate), TIMER_ID_BAUD, attotime::from_hz(rate)); // Start the baudrate generator
 #if START_BIT_HUNT
 			m_rcv_mode = RCV_SEEKING;
 #endif
@@ -2304,10 +2301,8 @@ void z80scc_channel::do_sccreg_wr14(uint8_t data)
 	}
 	else if ( (m_wr14 & WR14_BRG_ENABLE) && !(data & WR14_BRG_ENABLE) ) // baud rate generator being disabled?
 	{
-#if Z80SCC_USE_LOCAL_BRG
-		baudtimer->adjust(attotime::never, TIMER_ID_BAUD, attotime::never); // Stop the baudrate generator
+		m_baudtimer->adjust(attotime::never); // Stop the baudrate generator
 		m_brg_counter = 0;
-#endif
 	}
 
 	if (!(m_wr14 & WR14_LOCAL_LOOPBACK) && (data & WR14_LOCAL_LOOPBACK))
@@ -2316,6 +2311,7 @@ void z80scc_channel::do_sccreg_wr14(uint8_t data)
 	// TODO: Add info on the other bits of this register
 	m_wr14 = data;
 	update_serial();
+	if (brg_change) update_baudtimer();
 }
 
 /* WR15 is the External/Status Source Control register. If the External/Status interrupts are enabled
@@ -2889,6 +2885,31 @@ unsigned int z80scc_channel::get_brg_rate()
 	}
 
 	return (rate / (2 * get_clock_mode()));
+}
+
+void z80scc_channel::update_baudtimer()
+{
+	unsigned int rate;
+	unsigned int brg_const;
+
+	if (m_wr14 & WR14_BRG_ENABLE)
+	{
+		brg_const = 2 + (m_wr13 << 8 | m_wr12);
+		if (m_wr14 & WR14_BRG_SOURCE) // Do we use the PCLK as baudrate source
+		{
+			rate = owner()->clock() / (brg_const == 0 ? 1 : brg_const);
+		}
+		else // Else we use the RTxC as BRG source
+		{
+			unsigned int source = (m_index == z80scc_device::CHANNEL_A) ? m_uart->m_rxca : m_uart->m_rxcb;
+			rate = source / (brg_const == 0 ? 1 : brg_const);
+		}
+		m_baudtimer->adjust(attotime::from_hz(rate));
+	}
+	else
+	{
+		m_baudtimer->adjust(attotime::never);
+	}
 }
 
 //-------------------------------------------------

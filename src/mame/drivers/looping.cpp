@@ -99,6 +99,7 @@ public:
 		m_aysnd(*this, "aysnd"),
 		m_tms(*this, "tms"),
 		m_dac(*this, "dac"),
+		m_soundlatch(*this, "soundlatch"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_watchdog(*this, "watchdog")
@@ -132,7 +133,8 @@ private:
 	DECLARE_READ_LINE_MEMBER(cop_serial_r);
 	void cop_l_w(uint8_t data);
 	uint8_t protection_r();
-	DECLARE_WRITE_LINE_MEMBER(spcint);
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(spcint);
+	DECLARE_WRITE_LINE_MEMBER(int_update);
 	void sound_sw(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ay_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(speech_enable_w);
@@ -161,6 +163,7 @@ private:
 	required_device<ay8910_device> m_aysnd;
 	required_device<tms5220_device> m_tms;
 	required_device<dac_byte_interface> m_dac;
+	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<watchdog_timer_device> m_watchdog;
@@ -382,7 +385,7 @@ WRITE_LINE_MEMBER(looping_state::souint_clr)
 {
 	logerror("Soundint clr = %d\n", state);
 	if (state == 0)
-		m_audiocpu->set_input_line(0, CLEAR_LINE);
+		m_soundlatch->acknowledge_w();
 }
 
 
@@ -390,6 +393,18 @@ WRITE_LINE_MEMBER(looping_state::spcint)
 {
 	logerror("Speech /int = %d\n", state == ASSERT_LINE ? 1 : 0);
 	m_audiocpu->set_input_line(INT_9980A_LEVEL4, state == ASSERT_LINE ? CLEAR_LINE : ASSERT_LINE);
+}
+
+
+WRITE_LINE_MEMBER(looping_state::int_update)
+{
+	// hack necessitated by flawed input logic in TMS9980A core
+	if (m_soundlatch->pending_r())
+		m_audiocpu->set_input_line(INT_9980A_LEVEL2, ASSERT_LINE);
+	else if (!m_tms->intq_r())
+		m_audiocpu->set_input_line(INT_9980A_LEVEL4, ASSERT_LINE);
+	else
+		m_audiocpu->set_input_line(INT_9980A_CLEAR, CLEAR_LINE);
 }
 
 
@@ -482,7 +497,7 @@ READ_LINE_MEMBER(looping_state::cop_serial_r)
 void looping_state::cop_l_w(uint8_t data)
 {
 	m_cop_port_l = data;
-	logerror("%02x  ",data);
+	//logerror("%02x  ",data);
 }
 
 uint8_t looping_state::protection_r()
@@ -644,14 +659,18 @@ void looping_state::looping(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 
-	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, INT_9980A_LEVEL2);
+	GENERIC_LATCH_8(config, m_soundlatch);
+	//m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INT_9980A_LEVEL2);
+	m_soundlatch->data_pending_callback().set(FUNC(looping_state::int_update));
+	m_soundlatch->set_separate_acknowledge(true);
 
 	AY8910(config, m_aysnd, 8_MHz_XTAL / 4);
 	m_aysnd->port_a_read_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
 	m_aysnd->add_route(ALL_OUTPUTS, "speaker", 0.2);
 
 	TMS5220(config, m_tms, 640'000);
-	m_tms->irq_cb().set(FUNC(looping_state::spcint));
+	//m_tms->irq_cb().set(FUNC(looping_state::spcint));
+	m_tms->irq_cb().set(FUNC(looping_state::int_update));
 	m_tms->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	DAC_2BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.15); // unknown DAC

@@ -69,24 +69,27 @@ class nes_sunsoft_4_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_sunsoft_4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_sunsoft_4_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual uint8_t read_m(offs_t offset) override;
-	virtual void write_m(offs_t offset, uint8_t data) override;
-	void sun4_write(offs_t offset, uint8_t data);
-	virtual void write_h(offs_t offset, uint8_t data) override { sun4_write(offset, data); }
+	virtual u8 read_m(offs_t offset) override;
+	virtual void write_m(offs_t offset, u8 data) override;
+	void sun4_write(offs_t offset, u8 data);
+	virtual void write_h(offs_t offset, u8 data) override { sun4_write(offset, data); }
 
 	virtual void pcb_reset() override;
 
 protected:
-	nes_sunsoft_4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	nes_sunsoft_4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
 
-	void sun4_mirror(int mirror, int mirr0, int mirr1);
+	u8 m_wram_enable;
 
-	int m_reg, m_latch1, m_latch2, m_wram_enable;
+private:
+	void sun4_mirror();
+
+	u8 m_reg[3];
 };
 
 

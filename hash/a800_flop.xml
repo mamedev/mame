@@ -654,6 +654,23 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="ponderin">
+		<description>Pondering About Max's</description>
+		<year>1989</year>
+		<publisher>Change in Heat</publisher>
+		<sharedfeat name="compatibility" value="XL/XE"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="pondering about max's (1989)(us)(side a)(the dream + p.a.m.)[req 64k].atr" size="92176" crc="9ccb4ff4" sha1="853bfa63575fa24fae6092298a385065612510b1"/> <!-- Verified -->
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="pondering about max's (1989)(us)(side b)(barroom brawl + finis (demo))[req 64k].atr" size="92176" crc="503e8600" sha1="6d6ce66199bb607493933d3c175efd7c3136ac93"/> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="saracen">
 		<description>Saracen</description>
 		<year>1987</year>

@@ -68,29 +68,43 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "speaker.h"
 
 namespace {
 
-class sdamjes_state : public driver_device
+class spdamjes_state : public driver_device
 {
 
 public:
-	sdamjes_state(const machine_config &mconfig, device_type type, const char *tag)
+	spdamjes_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 	{
 	}
 
-	void sdamjes(machine_config &config);
+	void spdamjes(machine_config &config);
 
 private:
+	void mem_map(address_map &map);
+
 	required_device<cpu_device> m_maincpu;
 };
 
+void spdamjes_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0x8000, 0x9fff).ram().share("nvram");
+	map(0xa000, 0xa000).w("ay8910", FUNC(ay8910_device::address_w));
+	map(0xa001, 0xa001).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0xa002, 0xa002).w("ay8910", FUNC(ay8910_device::data_w));
+	map(0xc000, 0xc007).nopw(); // output latches
+	map(0xd000, 0xd007).nopw(); // more output latches
+}
 
-INPUT_PORTS_START(sdamjes)
+
+INPUT_PORTS_START(spdamjes)
 	PORT_START("DSW1")
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
 	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
@@ -112,9 +126,12 @@ INPUT_PORTS_START(sdamjes)
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW2:8")
 INPUT_PORTS_END
 
-void sdamjes_state::sdamjes(machine_config &config)
+void spdamjes_state::spdamjes(machine_config &config)
 {
 	Z80(config, m_maincpu, 8_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spdamjes_state::mem_map);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -134,4 +151,4 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(19??, spdamjes, 0, sdamjes, sdamjes, sdamjes_state, empty_init, ROT0, "T-90", "Sport Damjes 1", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(19??, spdamjes, 0, spdamjes, spdamjes, spdamjes_state, empty_init, ROT0, "T-90", "Sport Damjes 1", MACHINE_IS_SKELETON_MECHANICAL)

@@ -221,7 +221,6 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("s74x374a",         NES_SACHEN_74X374_ALT);  // FIXME: Made up boards some different handling
 	device.option_add_internal("tcu01",            NES_SACHEN_TCU01);
 	device.option_add_internal("tcu02",            NES_SACHEN_TCU02);
-	device.option_add_internal("tengen_800008",    NES_TENGEN_800008);   // FIXME: Is this the same as CNROM?
 	device.option_add_internal("tengen_800032",    NES_TENGEN_800032);
 	device.option_add_internal("tengen_800037",    NES_TENGEN_800037);
 	device.option_add_internal("txc_22110",        NES_TXC_22110);

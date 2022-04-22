@@ -245,14 +245,12 @@ protected:
 		TIMER_ID_TRXC
 	};
 
-#if Z80SCC_USE_LOCAL_BRG
-	emu_timer *baudtimer;
+	emu_timer *m_baudtimer;
 	uint16_t m_brg_counter;
-#else
 	unsigned int m_brg_rate;
-#endif
 	unsigned int m_delayed_tx_brg_change;
 	unsigned int get_brg_rate();
+	void update_baudtimer();
 
 	void scc_register_write(uint8_t reg, uint8_t data);
 	uint8_t scc_register_read(uint8_t reg);

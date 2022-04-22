@@ -2411,7 +2411,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="backtf23" supported="partial">
+	<software name="backtf23" supported="no">
 		<description>Back to the Future II &amp; III (USA)</description>
 		<year>1990</year>
 		<publisher>LJN</publisher>
@@ -16496,7 +16496,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="highspedu" cloneof="highsped" supported="partial">
+	<software name="highspedu" cloneof="highsped">
 		<description>High Speed (USA)</description>
 		<year>1991</year>
 		<publisher>Tradewest</publisher>
@@ -16518,7 +16518,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="highsped" supported="partial">
+	<software name="highsped">
 		<description>High Speed (Euro)</description>
 		<year>1994</year>
 		<publisher>Tradewest</publisher>
@@ -19229,7 +19229,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="jordanb" supported="partial">
+	<software name="jordanb" supported="no">
 		<description>Jordan vs. Bird - One on One (USA)</description>
 		<year>1989</year>
 		<publisher>Milton Bradley</publisher>
@@ -22689,7 +22689,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="machridr" supported="partial">
+<!-- glitches on NTSC -->
+	<software name="machridr">
 		<description>Mach Rider (Euro)</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
@@ -26216,8 +26217,9 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mylife" supported="partial">
-		<description>My Life My Love - Boku no Yume - Watashi no Negai (Jpn)</description>
+<!-- The in-game board graphics are completely corrupt making it unnavigable -->
+	<software name="mylife" supported="no">
+		<description>My Life My Love - Boku no Yume - Watashi no Negai (Japan)</description>
 		<year>1991</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="BAP-63"/>
@@ -27048,8 +27050,9 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ninjajag" cloneof="squashed" supported="partial">
-		<description>Ninja Jajamaru - Ginga Daisakusen (Jpn)</description>
+<!-- Missing sprites -->
+	<software name="ninjajag" cloneof="squashed" supported="no">
+		<description>Ninja Jajamaru - Ginga Daisakusen (Japan)</description>
 		<year>1991</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-32"/>
@@ -28848,7 +28851,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="pinbotu" cloneof="pinbot" supported="partial">
+	<software name="pinbotu" cloneof="pinbot">
 		<description>Pin-Bot (USA)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
@@ -28871,7 +28874,7 @@ license:CC0
 	</software>
 
 <!-- Glitched in NTSC -->
-	<software name="pinbot" supported="partial">
+	<software name="pinbot">
 		<description>Pin-Bot (Euro)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
@@ -30020,7 +30023,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="qix" supported="partial">
+	<software name="qix" supported="no">
 		<description>Qix (USA)</description>
 		<year>1991</year>
 		<publisher>Taito</publisher>
@@ -32254,8 +32257,9 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="sdbattle" supported="partial">
-		<description>SD Battle Oozumou - Heisei Hero Basho (Jpn)</description>
+<!-- Broken sprites. PPU bug? -->
+	<software name="sdbattle" supported="no">
+		<description>SD Battle Oozumou - Heisei Hero Basho (Japan)</description>
 		<year>1990</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="BAP-X3"/>
@@ -35682,8 +35686,9 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="squashed" supported="partial">
-		<description>Squashed (USA, Prototype)</description>
+<!-- Missing sprites -->
+	<software name="squashed" supported="no">
+		<description>Squashed (USA, prototype)</description>
 		<year>1991</year>
 		<publisher>Jaleco</publisher>
 		<part name="cart" interface="nes_cart">
@@ -39242,7 +39247,7 @@ license:CC0
 		<publisher>Tengen</publisher>
 		<info name="serial" value="TGN-002-TT"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="tengen_800008" />
+			<feature name="slot" value="sa0037" />
 			<feature name="pcb" value="TENGEN-800008" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
@@ -48711,6 +48716,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+<!-- Besides graphics issues when vertically scrolling the game can soft reset randomly! -->
 	<software name="megaman2u30" cloneof="megaman2" supported="no">
 		<description>Mega Man 2 - 30th Anniversary Classic Cartridge</description>
 		<year>2018</year>
@@ -49500,8 +49506,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="ninjajagp" cloneof="squashed" supported="partial">
-		<description>Ninja Jajamaru - Ginga Daisakusen (Jpn, Prototype)</description>
+<!-- Missing sprites -->
+	<software name="ninjajagp" cloneof="squashed" supported="no">
+		<description>Ninja Jajamaru - Ginga Daisakusen (Japan, prototype)</description>
 		<year>1991</year>
 		<publisher>Jaleco</publisher>
 		<part name="cart" interface="nes_cart">
@@ -51730,9 +51737,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="timedivr">
-		<description>Time Diver Eon Man (USA, Prototype)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Time Diver Eon Man (USA, prototype)</description>
+		<year>1993</year>
+		<publisher>Taito</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
@@ -52217,10 +52224,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="xybots" supported="partial">
-		<description>Xybots (USA, Prototype)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="xybots">
+		<description>Xybots (USA, prototype)</description>
+		<year>1990</year>
+		<publisher>Tengen</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="tengen_800032" />
 			<feature name="pcb" value="TENGEN-800032" />
@@ -54569,11 +54576,11 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="tai16mj">
-		<description>Taiwan Mahjong - Tai Wan Ma Que 16 (Tw)</description>
+		<description>Taiwan Mahjong - Tai Wan Ma Que 16 (Taiwan)</description>
 		<year>1989</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="SA-001"/>
-		<info name="alt_title" value="台灣麻將"/>
+		<info name="alt_title" value="臺灣麻雀"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sa0036" />
 			<feature name="pcb" value="UNL-SA-0036" />
@@ -54588,9 +54595,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="tai16mja" cloneof="tai16mj">
-		<description>Taiwan Mahjong - Tai Wan Ma Que 16 (Tw, Alt)</description>
+		<description>Taiwan Mahjong - Tai Wan Ma Que 16 (Taiwan, alt)</description>
 		<year>1989</year>
 		<publisher>Sachen</publisher>
+		<info name="alt_title" value="臺灣麻雀"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sa0036" />
 			<feature name="pcb" value="UNL-SA-0036" />
@@ -54605,9 +54613,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="tai16mjb" cloneof="tai16mj">
-		<description>Taiwan Mahjong - Tai Wan Ma Que 16 (Tw, Pirate?)</description>
+		<description>Taiwan Mahjong - Tai Wan Ma Que 16 (Asia, pirate?)</description>
 		<year>1989</year>
 		<publisher>&lt;pirate&gt;</publisher>
+		<info name="alt_title" value="麻雀16"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="NES-CNROM" />
@@ -55166,8 +55175,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="hugeins" supported="partial">
-		<description>Huge Insect (Tw)</description>
+<!-- Enemies never appear. Missing APU IRQ? Or PPU issue mentioned on NesDev wiki? -->
+	<software name="hugeins" supported="no">
+		<description>Huge Insect (Taiwan)</description>
 		<year>1993</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="SA-022"/>
@@ -55777,6 +55787,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+<!-- Works now except there's no way to reload your shots since the zapper can't point off screen -->
 	<software name="mstrshot" supported="no">
 		<description>Master Shooter (Asia)</description>
 		<year>1993</year>
@@ -56101,6 +56112,77 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+<!-- Haitai (Supercom) -->
+
+	<software name="blackdrg" cloneof="chaldrgn">
+		<description>Black Dragon (Korea)</description>
+		<year>1991</year>
+		<publisher>Haitai</publisher>
+		<info name="alt_title" value="블랙 드래곤"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="discrete_74x377" />
+			<feature name="pcb" value="COLORDREAMS-74*377" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="65536">
+				<rom name="beullaeg deulaegon.prg" size="65536" crc="93e2b8ef" sha1="1cbaf9aa401c7714a1673995d376574ecbee6943" />
+			</dataarea>
+			<dataarea name="chr" size="65536">
+				<rom name="beullaeg deulaegon.chr" size="65536" crc="367c87df" sha1="5290455811e31adc8ad7c0b508bb9623a117920f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flyingsb" cloneof="menaceb">
+		<description>Nar-ara Superboy (Korea)</description>
+		<year>1991?</year>
+		<publisher>Haitai</publisher>
+		<info name="alt_title" value="날아라 슈퍼보이"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="discrete_74x377" />
+			<feature name="pcb" value="COLORDREAMS-74*377" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="65536">
+				<rom name="flying superboy.prg" size="65536" crc="28acc254" sha1="225894caec0ffb9ae75b317421ab609c7455c0eb" />
+			</dataarea>
+			<dataarea name="chr" size="65536">
+				<rom name="flying superboy.chr" size="65536" crc="e9b4810d" sha1="7ca6956f689ee714283d7d0d9b9922448fefce88" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skullxbk" cloneof="skullxb" supported="no">
+		<description>Skull &amp; Crossbones (Korea)</description>
+		<year>1991</year>
+		<publisher>Haitai</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="tengen_800032" />
+			<feature name="pcb" value="TENGEN-800032" />
+			<dataarea name="prg" size="131072">
+				<rom name="skull &amp; crossbones (supercom).prg" size="131072" crc="0857df48" sha1="fa5b2faa0d5ad1bc342f57d5852f8baba7cd3005" />
+			</dataarea>
+			<dataarea name="chr" size="65536">
+				<rom name="skull &amp; crossbones (supercom).chr" size="65536" crc="88a6516d" sha1="3abdd977885259c93aef59d427c9455a7f8ee6b9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toobink" cloneof="toobin">
+		<description>Toobin' (Korea)</description>
+		<year>1991?</year>
+		<publisher>Haitai</publisher>
+		<info name="alt_title" value="튜브탐험"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="namcot_3433" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="131072">
+				<rom name="toobin (k).prg" size="131072" crc="05d70600" sha1="4b6e17a1e86a46c766c3a85c990854a19b901ade" />
+			</dataarea>
+			<dataarea name="chr" size="65536">
+				<rom name="toobin (k).chr" size="65536" crc="f772fcfd" sha1="c3583fbaf4248baea80e98f3229ee20d6793c2ad" />
+			</dataarea>
+		</part>
+	</software>
+
 
 
 <!-- Waixing ES-**** and clones -->
@@ -56132,12 +56214,12 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="dafuweng" supported="partial">
-		<description>Chao Ji Da Fu Weng - Super Rich (Chi)</description>
-		<year>199?</year>
+	<software name="dafuweng" supported="no">
+		<description>Chāojí Dà Fùwēng - Super Rich (China)</description>
+		<year>1997</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1004"/>
-		<info name="alt_title" value="超级大富翁"/>
+		<info name="alt_title" value="超級大富翁"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bmc_1200in1" />
 			<feature name="pcb" value="BMC-1200IN1" /> <!-- header says mapper 227, probably variant -->
@@ -56147,11 +56229,15 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
 		</part>
 	</software>
 
 	<software name="dafuweng1" cloneof="dafuweng" supported="no">
-		<description>Chao Ji Da Fu Weng - Super Rich (Chi, Decrypted WXN)</description>
+		<description>Chāojí Dà Fùwēng - Super Rich (China, decrypted WXN)</description>
 		<year>199?</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1004"/>
@@ -56374,12 +56460,13 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="linzexu" supported="partial">
-		<description>Lin Ze Xu Jin Yan (Chi)</description>
-		<year>19??</year>
+<!-- Broken sprites. PPU bug? -->
+	<software name="linzexu" supported="no">
+		<description>Lín Zéxú Jìnyān (China)</description>
+		<year>1996</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1013"/>
-		<info name="alt_title" value="林则徐禁烟"/>
+		<info name="alt_title" value="林則徐禁烟"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
@@ -56388,6 +56475,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="lin ze xu jin yan (china) (unl).prg" size="262144" crc="f70606cd" sha1="ed6ae1d959bebf5d17f2c663cca97d6d446eee7b" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -56499,12 +56590,13 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="duobaoxy" supported="partial">
-		<description>Duo Bao Xiao Ying Hao - Guang Ming Yu An Hei Chuan Shuo (Chi, Decrypted SmyNES)</description>
-		<year>19??</year>
+<!-- Broken sprites. PPU bug? -->
+	<software name="duobaoxy" supported="no">
+		<description>Duó Bǎo Xiǎo Yīngháo - Guāngmíng Yǔ Hēi'àn Chuánshuō (China, decrypted SmyNES)</description>
+		<year>1996</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1021"/>
-		<info name="alt_title" value="夺宝小英豪"/>
+		<info name="alt_title" value="夺宝小英豪 光明與黑暗傳說"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="waixing_sec" />
 			<feature name="pcb" value="WAIXING-SEC" />
@@ -56521,11 +56613,13 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="duobaoxya" cloneof="duobaoxy" supported="partial">
-		<description>Duo Bao Xiao Ying Hao - Guang Ming Yu An Hei Chuan Shuo (Chi)</description>
-		<year>19??</year>
+<!-- Broken sprites. PPU bug? -->
+	<software name="duobaoxya" cloneof="duobaoxy" supported="no">
+		<description>Duó Bǎo Xiǎo Yīngháo - Guāngmíng Yǔ Hēi'àn Chuánshuō (China)</description>
+		<year>1996</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1021"/>
+		<info name="alt_title" value="夺宝小英豪 光明與黑暗傳說"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="waixing_sec" />
 			<feature name="pcb" value="WAIXING-SEC" />
@@ -56560,12 +56654,13 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+<!-- Broken sprites. PPU bug? -->
 	<software name="zjshiji" supported="no">
-		<description>Zheng Jiu Shi Ji (Chi)</description>
-		<year>199?</year>
+		<description>Zhěngjiù Shìjì (China)</description>
+		<year>1996</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1025"/>
-		<info name="alt_title" value="拯救世纪"/>
+		<info name="alt_title" value="拯救世紀"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
@@ -56578,12 +56673,13 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+<!-- Broken sprites. PPU bug? -->
 	<software name="zjshiji1" cloneof="zjshiji" supported="no">
-		<description>Zheng Jiu Shi Ji (Chi, Decrypted WXN)</description>
-		<year>199?</year>
+		<description>Zhěngjiù Shìjì (China, decrypted WXN)</description>
+		<year>1996</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1025"/>
-		<info name="alt_title" value="拯救世纪"/>
+		<info name="alt_title" value="拯救世紀"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
@@ -56596,9 +56692,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+<!-- Broken sprites. PPU bug? -->
 	<software name="gmzs" cloneof="zjshiji" supported="no">
-		<description>Guang Ming Zhi Shen (Chi)</description>
-		<year>199?</year>
+		<description>Guāngmíng Zhī Shén (China)</description>
+		<year>1996</year>
 		<publisher>CoolBoy</publisher>
 		<info name="alt_title" value="光明之神"/>
 		<part name="cart" interface="nes_cart">
@@ -56699,9 +56796,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+<!-- Broken sprites. PPU bug? -->
 	<software name="xtqj2" supported="no">
 		<!-- Notes: AKA Journey to the West 2 -->
-		<description>Xi Tian Qu Jing II (Chi)</description>
+		<description>Xītiān Qǔjīng II (China)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1034"/>
@@ -57097,12 +57195,13 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+<!-- Broken sprites. PPU bug? -->
 	<software name="zjhwang" supported="no">
-		<description>Zhen Jia Hou Wang (Chi)</description>
-		<year>199?</year>
+		<description>Zhēn Jiǎ Hóu Wáng (China)</description>
+		<year>1996</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1061"/>
-		<info name="alt_title" value="真假猴王"/>
+		<info name="alt_title" value="眞假猴王"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="waixing_h" />
 			<feature name="pcb" value="WAIXING-H" />
@@ -57252,14 +57351,14 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up -->
-			<dataarea name="bwram" size="8192">
-				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			<!-- 32k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="32768">
+				<rom value="0x00" size="32768" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="sanxiawya" cloneof="sanxiawy"   supported="no">
+	<software name="sanxiawya" cloneof="sanxiawy" supported="no">
 		<description>San Xia Wu Yi (Chi, Decrypted WXN)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -57274,14 +57373,14 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up -->
-			<dataarea name="bwram" size="8192">
-				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			<!-- 32k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="32768">
+				<rom value="0x00" size="32768" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="sanxiawyb" cloneof="sanxiawy"   supported="no">
+	<software name="sanxiawyb" cloneof="sanxiawy" supported="no">
 		<description>San Xia Wu Yi (Chi, Alt?)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -57295,6 +57394,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -57355,9 +57458,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="dquest8" supported="partial">
-		<description>Dragon Quest VIII (Chi)</description>
-		<year>19??</year>
+<!-- Broken sprites. PPU bug? -->
+	<software name="dquest8" supported="no">
+		<description>Dragon Quest VIII (China)</description>
+		<year>1999</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1077"/>
 		<info name="alt_title" value="勇者斗恶龙Ⅷ"/>
@@ -57377,6 +57481,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+<!-- Broken sprites. PPU bug? -->
 	<software name="grandia" supported="no">
 		<description>Grandia (China)</description>
 		<year>1998</year>
@@ -57398,6 +57503,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+<!-- Broken sprites. PPU bug? -->
 	<software name="grandiaa" cloneof="grandia" supported="no">
 		<description>Grandia (China, alt)</description>
 		<year>1998</year>
@@ -57720,12 +57826,13 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+<!-- Broken sprites. PPU bug? -->
 	<software name="lingjihf" supported="no">
-		<description>Ling Jie Hu Fa - Shock (Chi)</description>
-		<year>19??</year>
+		<description>Língjiè Hùfǎ - Shock (China)</description>
+		<year>2001</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1099"/>
-		<info name="alt_title" value="灵界护法"/>
+		<info name="alt_title" value="靈界護法"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
@@ -57760,7 +57867,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="zhentian">
+	<software name="zhentian" cloneof="sanada">
 		<description>Zhēntián Shí Yǒngshì (China)</description>
 		<year>2005</year>
 		<publisher>Waixing</publisher>
@@ -59561,7 +59668,28 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- [NJ052] 宠物宝宝 ~ Chong Wu Bao Bao (Pet Baby?)-->
+	<software name="chongwbb">
+		<description>Chǒngwù Bǎobǎo (China)</description>
+		<year>20??</year>
+		<publisher>Nanjing</publisher>
+		<info name="serial" value="NJ052"/>
+		<info name="alt_title" value="宠物宝宝"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="smd133" />
+			<feature name="pcb" value="COOLBOY" />
+			<feature name="smd133-addr" value="6K" />
+			<dataarea name="prg" size="131072">
+				<rom name="chongwu baobao.prg" size="131072" crc="a8d17647" sha1="7bbad3164e7941582c661ac5203ac1b4b24a2560" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="chongwu baobao.chr" size="131072" crc="749a6890" sha1="c0c4c8127249efb7b8053fbe9820634c072aea6c" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="gardman">
 		<description>Gardman (Chi)</description>
@@ -60053,7 +60181,27 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- [NJ082] (大话西游2) 齐天大圣 ~ (Da Hua Xi You 2) Qi Tian Da Sheng -->
+	<software name="qitiands">
+		<description>Qítiān Dàshèng (China)</description>
+		<year>2008</year>
+		<publisher>Nanjing</publisher>
+		<info name="serial" value="NJ082"/>
+		<info name="alt_title" value="齐天大圣"/> <!-- Is this correct? (大话西游2) 齐天大圣 ~ (Da Hua Xi You 2) Qi Tian Da Sheng -->
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="waixing_sgzlz" />
+			<feature name="pcb" value="WAIXING-SGZLZ" />
+			<dataarea name="prg" size="524288">
+				<rom name="qitian dasheng.prg" size="524288" crc="90558b45" sha1="6220c429d095d329e892130eafaee47542f95594" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="sanguolb">
 		<description>San Guo Zhi - Liu Bei Zhuan (Chi)</description>
@@ -60565,6 +60713,29 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+<!-- Nantong -->
+
+	<software name="jxqy" cloneof="ffant">
+		<description>Jiànxiá Qíngyuán (China, Final Fantasy pirate)</description>
+		<year>20??</year>
+		<publisher>Nantong</publisher>
+		<info name="alt_title" value="剑侠情缘"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="smd133" />
+			<feature name="pcb" value="COOLBOY" />
+			<feature name="smd133-addr" value="6K" />
+			<dataarea name="prg" size="524288">
+				<rom name="jianxia qingyuan.prg" size="524288" crc="128f56ab" sha1="01621c175d522afa1d2432b45664b40df867e9c2" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
 
 <!-- Union Bond -->
 
@@ -60586,8 +60757,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="titan12" supported="partial">
-		<description>Titanic 1912 (Asia, Hacked)</description>
+<!-- Broken sprites. PPU bug? -->
+	<software name="titan12" supported="no">
+		<description>Titanic 1912 (Asia, hacked)</description>
 		<year>19??</year>
 		<publisher>Union Bond</publisher>
 		<info name="serial" value="G-0002"/>
@@ -60608,6 +60780,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+<!-- Broken sprites. PPU bug? -->
 	<software name="ffant5" supported="no">
 		<description>Final Fantasy V (Asia)</description>
 		<year>19??</year>
@@ -60673,12 +60846,13 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+<!-- Broken sprites. PPU bug? -->
 	<software name="yuefei" supported="no">
-		<description>Yuefei Chuan (Asia, Hacked)</description>
+		<description>Yuèfēi Chuán (Asia, hacked)</description>
 		<year>19??</year>
 		<publisher>Union Bond</publisher>
 		<info name="serial" value="G-0006"/>
-		<info name="alt_title" value="岳飞传"/>
+		<info name="alt_title" value="岳飛傳"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="waixing_wxzs2" />
 			<feature name="pcb" value="WAIXING-PS2" />
@@ -61087,6 +61261,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="mspeachw" cloneof="menaceb">
+		<description>Miss Peach World 1 - Super L.A. Cop (Japan)</description>
+		<year>1991</year>
+		<publisher>Hacker International</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="discrete_74x377" />
+			<feature name="pcb" value="COLORDREAMS-74*377" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="65536">
+				<rom name="miss peach world.prg" size="65536" crc="ea7af97e" sha1="2e68d334193d70f92619b656785f749eae82382a" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="65536">
+				<rom name="miss peach world.chr" size="65536" crc="a9d5bea7" sha1="2241cf3ea84889d50009928e66ead5f15bff2cca" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- nointro -->
 	<!-- Same as Galactic Crusader, but with nudity) -->
 	<software name="papillon">
@@ -61231,8 +61422,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="columbusc" cloneof="columbus">
-		<description>Columbus Chuan (Chi)</description>
-		<year>19??</year>
+		<description>Columbus Chuán (China)</description>
+		<year>2005</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1103"/>
 		<info name="alt_title" value="哥伦布传"/>
@@ -61255,15 +61446,15 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="columbusca" cloneof="columbus" supported="partial">
-		<description>Columbus Chuan (Chi, Alt?)</description>
-		<year>19??</year>
+	<software name="columbusca" cloneof="columbus" supported="no">
+		<description>Columbus Chuán (China, alt)</description>
+		<year>2005</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1103"/>
 		<info name="alt_title" value="哥伦布传"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="waixing_a" />
-			<feature name="pcb" value="WAIXING-A" />    <!-- probably wrong -->
+			<feature name="slot" value="waixing_e" />
+			<feature name="pcb" value="WAIXING-E" />
 			<dataarea name="chr" size="262144">
 				<rom name="[es-1103] ge lun bu zhuan (c).chr" size="262144" crc="8d38689f" sha1="e1643825ffee63d14b719f5c23490adde6265e7a" offset="00000" status="baddump" />
 			</dataarea>
@@ -61552,6 +61743,28 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="WAIXING-G" />
 			<dataarea name="prg" size="262144">
 				<rom name="long zhu ying xiong (ch).prg" size="262144" crc="77efb5d9" sha1="6d082c627d6503d6701f5d79a5f15be3e86f2dbd" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wumingcs" cloneof="hanjuher">
+		<description>Wúmíng Chuánshuō (China)</description>
+		<year>20??</year>
+		<publisher>Waixing?</publisher>
+		<info name="alt_title" value="无名传说"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="smd133" />
+			<feature name="pcb" value="COOLBOY" />
+			<feature name="smd133-addr" value="6K" />
+			<dataarea name="prg" size="262144">
+				<rom name="wuming chuanshuo.prg" size="262144" crc="c70b4ab9" sha1="6887683b7b96537830e4a2530e8cc908f160c84c" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -62578,7 +62791,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- TODO: Sort out the translations below! -->
 	<software name="dushen" cloneof="sugoro">
-		<description>Du Shen (Chi)</description>
+		<description>Dǔ Shén (China)</description>
 		<year>19??</year>
 		<publisher>XianFeng Katong</publisher>
 		<info name="alt_title" value="赌神"/>
@@ -62602,14 +62815,14 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="dushena" cloneof="sugoro">
-		<description>Du Shen (Chi, Fixed?)</description>
+		<description>Dǔ Shén (China, fixed?)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1105"/>
 		<info name="alt_title" value="赌神"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="waixing_a" />
-			<feature name="pcb" value="WAIXING-A" /> <!-- Header says mapper 74 -->
+			<feature name="slot" value="waixing_e" />
+			<feature name="pcb" value="WAIXING-E" />
 			<dataarea name="chr" size="262144">
 				<rom name="[es-1105] du shen (c).chr" size="262144" crc="a9757415" sha1="3d4bf391ddb5039399e3ae26e1f9b82112135b55" offset="00000" status="baddump" />
 			</dataarea>
@@ -62627,13 +62840,14 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="lkrx" cloneof="sugoro">
-		<description>Luo Ke Ren X (Chi)</description>
-		<year>19??</year>
+		<description>Luòkèrén X (China)</description>
+		<year>2005</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1105"/>
+		<info name="alt_title" value="洛克人X"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="waixing_a" />
-			<feature name="pcb" value="WAIXING-A" />
+			<feature name="slot" value="waixing_e" />
+			<feature name="pcb" value="WAIXING-E" />
 			<dataarea name="chr" size="262144">
 				<rom name="luo ke ren x (sugoro quest - dice no senshitachi) (ch).chr" size="262144" crc="50584595" sha1="c26b5017b323d9debc7737365915666ebad26045" offset="00000" status="baddump" />
 			</dataarea>
@@ -63752,7 +63966,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="aladdin2" supported="partial">
+<!-- Broken sprites. PPU bug? -->
+	<software name="aladdin2" supported="no">
 		<description>Aladdin 2 (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -64014,24 +64229,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="blackdrg" cloneof="chaldrgn">
-		<description>Black Dragon (Korea)</description>
-		<year>19??</year>
-		<publisher>Haitai</publisher>
-		<info name="alt_title" value="블랙 드래곤"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="discrete_74x377" />
-			<feature name="pcb" value="COLORDREAMS-74*377" />
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="prg" size="65536">
-				<rom name="beullaeg deulaegon.prg" size="65536" crc="93e2b8ef" sha1="1cbaf9aa401c7714a1673995d376574ecbee6943" status="baddump" />
-			</dataarea>
-			<dataarea name="chr" size="65536">
-				<rom name="beullaeg deulaegon.chr" size="65536" crc="367c87df" sha1="5290455811e31adc8ad7c0b508bb9623a117920f" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -64659,14 +64856,15 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 <!-- nointro -->
+<!-- Broken sprites. PPU bug? -->
 	<software name="fankong" supported="no">
-		<description>Fan Kong Jing Ying (Chi)</description>
+		<description>Fǎnkǒng Jīngyīng (China)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi</publisher>
 		<info name="alt_title" value="反恐精英"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="waixing_sgzlz" />
-			<feature name="pcb" value="WAIXING-SGZLZ" />
+			<feature name="slot" value="txc_commandos" />
+			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<dataarea name="prg" size="1048576">
 				<rom name="fan kong jing ying (china) (unl).prg" size="1048576" crc="fb2b6b10" sha1="bfa31777e077e64af0e274b5a22b57c6765d36e1" offset="00000" status="baddump" />
 			</dataarea>
@@ -64831,24 +65029,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="65536">
 				<rom name="fish fall (unl).prg" size="65536" crc="177989fe" sha1="4950fc00564e8740e9c78ba43e9521928e16854f" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="flyingsb" cloneof="menaceb">
-		<description>Nar-ara Superboy (Korea)</description>
-		<year>199?</year>
-		<publisher>Haitai</publisher>
-		<info name="alt_title" value="날아라 슈퍼보이"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="discrete_74x377" />
-			<feature name="pcb" value="COLORDREAMS-74*377" />
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="prg" size="65536">
-				<rom name="flying superboy.prg" size="65536" crc="28acc254" sha1="225894caec0ffb9ae75b317421ab609c7455c0eb" status="baddump" />
-			</dataarea>
-			<dataarea name="chr" size="65536">
-				<rom name="flying superboy.chr" size="65536" crc="e9b4810d" sha1="7ca6956f689ee714283d7d0d9b9922448fefce88" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -65193,6 +65373,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+<!-- Broken sprites. PPU bug? -->
 	<software name="jwest" supported="no">
 		<description>Xītiān Qǔjīng - Journey To The West (Asia)</description>
 		<year>19??</year>
@@ -65211,6 +65392,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 <!-- nointro. Is this a multicart extract? -->
+<!-- Broken sprites. PPU bug? -->
 	<software name="jwesta" cloneof="jwest" supported="no">
 		<description>Xītiān Qǔjīng - Journey To The West (Asia, alt)</description>
 		<year>19??</year>
@@ -65511,11 +65693,12 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 <!-- nointro -->
-	<software name="menghuan" supported="partial">
-		<description>Meng Huan - Xiang Shuai Chuan Qi Zhi Xue Hai (Chi)</description>
+<!-- Broken sprites. PPU bug? -->
+	<software name="menghuan" supported="no">
+		<description>Mènghuàn - Xiāng Shuài Chuánqí Zhī Xuè Hǎi Piāolíng (China)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi</publisher>
-		<info name="alt_title" value="梦幻 香帅传奇之血海飘零"/>
+		<info name="alt_title" value="梦幻 香帥傳奇之血海飄零"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
@@ -65562,23 +65745,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="mickey mania 7 (pirate original).prg" size="262144" crc="60fb492c" sha1="4826b32e22a60985020acaf3a06f2d32e4ca0c8d" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mspeachw" cloneof="menaceb">
-		<description>Miss Peach World 1 - Super L.A. Cop (Japan)</description>
-		<year>1991</year>
-		<publisher>Hacker International</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="discrete_74x377" />
-			<feature name="pcb" value="COLORDREAMS-74*377" />
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="prg" size="65536">
-				<rom name="miss peach world.prg" size="65536" crc="ea7af97e" sha1="2e68d334193d70f92619b656785f749eae82382a" status="baddump" />
-			</dataarea>
-			<dataarea name="chr" size="65536">
-				<rom name="miss peach world.chr" size="65536" crc="a9d5bea7" sha1="2241cf3ea84889d50009928e66ead5f15bff2cca" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -66500,23 +66666,6 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
-	<software name="toobink" cloneof="toobin">
-		<description>Toobin' (Korea)</description>
-		<year>1991?</year>
-		<publisher>Haitai</publisher>
-		<info name="alt_title" value="튜브탐험"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="namcot_3433" />
-			<feature name="mirroring" value="horizontal" />
-			<dataarea name="prg" size="131072">
-				<rom name="toobin (k).prg" size="131072" crc="05d70600" sha1="4b6e17a1e86a46c766c3a85c990854a19b901ade" />
-			</dataarea>
-			<dataarea name="chr" size="65536">
-				<rom name="toobin (k).chr" size="65536" crc="f772fcfd" sha1="c3583fbaf4248baea80e98f3229ee20d6793c2ad" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="toystory" supported="partial">
 		<description>Toy Story</description>
 		<year>19??</year>
@@ -66665,8 +66814,9 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
+<!-- Broken sprites. PPU bug? -->
 	<software name="wujimoji" supported="no">
-		<description>Wu Ji Mo Jie (Chi)</description>
+		<description>Wújí Mójiè (China)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi</publisher>
 		<info name="alt_title" value="无极魔界"/>
@@ -66911,8 +67061,9 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
+<!-- Broken sprites. PPU bug? -->
 	<software name="zhuoyzj" supported="no">
-		<description>Zhuo Yue Zhi Jian (Chi)</description>
+		<description>Zhuóyuè Zhī Jiàn (China)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi</publisher>
 		<info name="alt_title" value="卓越之剑"/>
@@ -67000,10 +67151,11 @@ from the NEStopia source, hence they would require confirmation. -->
 	</software>
 
 <!-- How is this exactly related with Super Rich games? -->
-	<software name="bwfuweng" supported="partial">
-		<description>Bai Wan Fu Weng (Chi)</description>
+	<software name="bwfuweng" supported="no">
+		<description>Bǎi Wàn Fùwēng (China)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="百万富翁"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bmc_1200in1" />
 			<feature name="pcb" value="BMC-1200IN1" /> <!-- header says mapper 227, probably variant -->
@@ -67123,10 +67275,12 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
-	<software name="chuliux" supported="partial">
-		<description>Chu Liu Xiang (Chi)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+<!-- Broken sprites. PPU bug? -->
+	<software name="chuliux" supported="no">
+		<description>Chǔ Liúxiāng (China)</description>
+		<year>1998</year>
+		<publisher>Waixing</publisher>
+		<info name="alt_title" value="楚留香"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
@@ -67192,8 +67346,8 @@ from the NEStopia source, hence they would require confirmation. -->
 	</software>
 
 	<software name="moshenfs">
-		<description>Mo Shen Fa Shi (Chi)</description>
-		<year>19??</year>
+		<description>Móshén Fǎshī (China)</description>
+		<year>1998</year>
 		<publisher>Waixing</publisher>
 		<info name="alt_title" value="魔神法师 (Demogorgon Monk?)"/>
 		<part name="cart" interface="nes_cart">
@@ -67204,6 +67358,32 @@ from the NEStopia source, hence they would require confirmation. -->
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="demogorgon monk (ch).prg" size="262144" crc="c14634ae" sha1="6bee703e359cb7254db14c49c4823d722ca0797d" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dishit" cloneof="moshenfs">
+		<description>Dì Shì Tiān (China)</description>
+		<year>19??</year>
+		<publisher>Waixing?</publisher>
+		<info name="alt_title" value="帝释天"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="smd133" />
+			<feature name="pcb" value="COOLBOY" />
+			<feature name="smd133-addr" value="6K" />
+			<dataarea name="prg" size="262144">
+				<rom name="dishitian.prg" size="262144" crc="d79e0f25" sha1="77cf0e983108ed9f751c60f79b4a5c4ef18a3787" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="dishitian.chr" size="262144" crc="4ecbcd53" sha1="6c657e4b6119cb4481cfe207785208cb5665fb8f" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -67463,8 +67643,9 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
+<!-- Broken sprites. PPU bug? -->
 	<software name="goldnaxe" supported="no">
-		<description>Golden Axe (Chi, Decrypted WXN)</description>
+		<description>Golden Axe (China, decrypted WXN)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<info name="alt_title" value="战斧 (Zhan Fu)"/>
@@ -67749,12 +67930,13 @@ All musics were removed in this game.
 	</software>
 
 <!-- to be removed? -->
-	<software name="linzexua" cloneof="linzexu" supported="partial">
-		<description>Lin Ze Xu Jin Yan (Chi, NTSC fix)</description>
-		<year>19??</year>
+<!-- Broken sprites. PPU bug? -->
+	<software name="linzexua" cloneof="linzexu" supported="no">
+		<description>Lín Zéxú Jìnyān (China, NTSC fix)</description>
+		<year>1996</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1013"/>
-		<info name="alt_title" value="林则徐禁烟"/>
+		<info name="alt_title" value="林則徐禁烟"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
@@ -67923,25 +68105,9 @@ All musics were removed in this game.
 		</part>
 	</software>
 
+<!-- FIXME: misstank and ddtank below look like underdumped multicarts with Tank 1990, Dr Mario, and Pinball? Also with Numen Wager (Dushen)? -->
 	<software name="misstank" cloneof="batlcity">
-		<description>Missile Tank (Chi)</description>
-		<year>1994</year>
-		<publisher>Y.S</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="cnrom" />
-			<feature name="pcb" value="NES-CNROM" />
-			<feature name="bus_conflict" value="no" />
-			<dataarea name="chr" size="16384">
-				<rom name="missile tank (ch).chr" size="16384" crc="1c370fa6" sha1="2b14e218060bebe5d4eeaf480394104f97ce0ad1" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="32768">
-				<rom name="missile tank (ch).prg" size="32768" crc="c4d3b9dd" sha1="7a4275cffcb2d2b632662e21d9f237efab51e602" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="misstank1" cloneof="batlcity">
-		<description>Missile Tank (Chi, Alt with 6 enemies)</description>
+		<description>Missile Tank (China, alt with 6 enemies)</description>
 		<year>1994</year>
 		<publisher>Y.S</publisher>
 		<part name="cart" interface="nes_cart">
@@ -68287,9 +68453,10 @@ All musics were removed in this game.
 		</part>
 	</software>
 
+<!-- Broken sprites. PPU bug? -->
 	<software name="dafuwen2" supported="no">
-		<description>Da Fu Weng 2 - Shanghai Da Heng (Chi)</description>
-		<year>19??</year>
+		<description>Dà Fùwēng 2 - Shànghǎi Dàhēng (China)</description>
+		<year>1996</year>
 		<publisher>Waixing</publisher>
 		<info name="alt_title" value="大富翁2-上海大亨 (Shanghai Tycoon)"/>
 		<part name="cart" interface="nes_cart">
@@ -68379,8 +68546,9 @@ All musics were removed in this game.
 		</part>
 	</software>
 
+<!-- Broken sprites. PPU bug? -->
 	<software name="silucq" supported="no">
-		<description>Si Lu Chuan Qi (Chi)</description>
+		<description>Sī Lù Chuánqí (China)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi</publisher>
 		<info name="alt_title" value="丝路传奇"/>
@@ -68577,6 +68745,7 @@ All musics were removed in this game.
 		</part>
 	</software>
 
+<!-- Broken sprites. PPU bug? -->
 	<software name="sdkongxj" supported="no">
 		<description>Super Donkey Kong - Xiang Jiao Chuan (Chi)</description>
 		<year>19??</year>
@@ -80130,6 +80299,24 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="ao">
+		<description>AO</description>
+		<year>2016</year>
+		<publisher>Second Dimension</publisher>
+		<info name="alt_title" value="青"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="32768">
+				<rom name="ao.prg" size="16384" crc="9cd99840" sha1="31151f2ee3e6cb40e40b36dc209e01d545d597c9" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="ao.chr" size="8192" crc="ddbe1993" sha1="0e39b401f20c713e3a8633812ce6c0f15506994c" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="assimil">
 		<description>Assimilate</description>
 		<year>2012</year>
@@ -80219,6 +80406,23 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="beatem">
+		<description>Beat'Em &amp; Eat'Em</description>
+		<year>2014</year>
+		<publisher>retroUSB</publisher>
+		<info name="serial" value="RET-BE-GBL"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="beatem.prg" size="32768" crc="c0805227" sha1="d6d6db6b4d35a3f19d816c39ecb15be111307d00" />
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="beatem.chr" size="8192" crc="b6be6e86" sha1="56ae1f4377ff274b26bdb0472e65b94a6fc3b845" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="candesto" supported="partial"> <!-- Restore/Options not yet supported -->
 		<description>Candelabra - Estoscerro</description>
 		<year>2020</year> <!-- cartridge release year -->
@@ -80231,6 +80435,22 @@ be better to redump them properly. -->
 			</dataarea>
 			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dushlan">
+		<description>Dúshlán</description>
+		<year>2016</year>
+		<publisher>Mega Cat Studios</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="32768">
+				<rom name="dushlan.prg" size="32768" crc="071ceb4e" sha1="214a08d06f75c306f3fb96736575211fef46677a" />
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="dushlan.chr" size="8192" crc="10493c00" sha1="76a730a19cba7a85718a33efebe0c227a17f683d" />
 			</dataarea>
 		</part>
 	</software>
@@ -80411,6 +80631,22 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="nesvirus">
+		<description>NES Virus Cleaner</description>
+		<year>2016</year>
+		<publisher>Second Dimension</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="32768">
+				<rom name="nesviruscleaner.prg" size="32768" crc="5f9194b3" sha1="9d222e2af4fda6e3a41ae9659fd6ba4fb89d805e" />
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="nesviruscleaner.chr" size="8192" crc="8437a790" sha1="a5b9a7efdaa46f3c85997b30b6864e5ab57a6eb5" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nomolos">
 		<description>Nomolos - Storming the Catsle</description>
 		<year>2014</year>
@@ -80464,6 +80700,22 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="solaris" supported="partial"> <!-- Save/Reset Data not implemented -->
+		<description>Solaris</description>
+		<year>2016</year>
+		<publisher>retroUSB</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="unrom512" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="524288">
+				<rom name="solaris.prg" size="524288" crc="3d095dc7" sha1="0dbf0b95e97a51940ee60b96141a05a6c6b78f6a" />
+			</dataarea>
+			<!-- 32k VRAM on cartridge? -->
+			<dataarea name="vram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="starvers">
 		<description>Star Versus</description>
 		<year>2015</year>
@@ -80495,6 +80747,23 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="dpcm" size="8388608">
 				<rom name="super russian roulette.dpcm" size="8388608" crc="e880dbe6" sha1="b05f2bd2845c3ec3aa63d7aec855c23058fc8412" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tictacxo">
+		<description>Tic-Tac XO</description>
+		<year>2008</year>
+		<publisher>RetroZone</publisher>
+		<info name="serial" value="SDS-TT-GBL"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="32768">
+				<rom name="tic-tac xo.prg" size="32768" crc="b3d665af" sha1="8ed322a4411c1bcdb9445c4dfc1d70370cbbc475" /> <!-- these are from the .nes file distributed by the author, Sly Dog Studios -->
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="tic-tac xo.chr" size="8192" crc="96e714ea" sha1="b12c986cd7d637627d06ce94161cdf42db714589" />
 			</dataarea>
 		</part>
 	</software>

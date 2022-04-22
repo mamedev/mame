@@ -8,12 +8,10 @@
 
  Here we emulate the following PCBs
 
- * Tengen 800008
  * Tengen 800032 [mapper 64]
  * Tengen 800037 [mapper 158]
 
- TODO:
- - emulated the IRQ delay in 800032 (possibly reason of Skull & Crossbones not working?)
+ Note, Tetris' Tengen 800008 [mapper 148] is implemented in sachen.cpp.
 
  ***********************************************************************************************************/
 
@@ -37,27 +35,21 @@
 //  constructor
 //-------------------------------------------------
 
-DEFINE_DEVICE_TYPE(NES_TENGEN_800008, nes_tengen008_device, "nes_tengen008", "NES Cart Tengen 800008 PCB")
 DEFINE_DEVICE_TYPE(NES_TENGEN_800032, nes_tengen032_device, "nes_tengen032", "NES Cart Tengen 800032 PCB")
 DEFINE_DEVICE_TYPE(NES_TENGEN_800037, nes_tengen037_device, "nes_tengen037", "NES Cart Tengen 800037 PCB")
 
 
-nes_tengen008_device::nes_tengen008_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_TENGEN_800008, tag, owner, clock)
+nes_tengen032_device::nes_tengen032_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_latch(0), m_irq_count(0), m_irq_count_latch(0), m_irq_mode(0), m_irq_reset(0), m_irq_enable(0), m_irq_pending(0), irq_timer(nullptr)
 {
 }
 
-nes_tengen032_device::nes_tengen032_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, type, tag, owner, clock), m_irq_count(0), m_irq_count_latch(0), m_irq_mode(0), m_irq_reset(0), m_irq_enable(0), m_latch(0), irq_timer(nullptr)
-{
-}
-
-nes_tengen032_device::nes_tengen032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_tengen032_device::nes_tengen032_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_tengen032_device(mconfig, NES_TENGEN_800032, tag, owner, clock)
 {
 }
 
-nes_tengen037_device::nes_tengen037_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_tengen037_device::nes_tengen037_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_tengen032_device(mconfig, NES_TENGEN_800037, tag, owner, clock)
 {
 }
@@ -69,8 +61,8 @@ void nes_tengen032_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->reset();
 	timer_freq = clocks_to_attotime(4);
+	irq_timer->adjust(attotime::zero, 0, timer_freq);
 
 	save_item(NAME(m_mmc_prg_bank));
 	save_item(NAME(m_mmc_vrom_bank));
@@ -79,51 +71,33 @@ void nes_tengen032_device::device_start()
 	save_item(NAME(m_irq_mode));
 	save_item(NAME(m_irq_reset));
 	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_irq_pending));
 	save_item(NAME(m_irq_count));
 	save_item(NAME(m_irq_count_latch));
 }
 
 void nes_tengen032_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg16_89ab(m_prg_chunks - 1);
+	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
-	memset(m_mmc_prg_bank, 0, sizeof(m_mmc_prg_bank));
-	memset(m_mmc_vrom_bank, 0, sizeof(m_mmc_vrom_bank));
+
+	std::fill(std::begin(m_mmc_prg_bank), std::end(m_mmc_prg_bank), 0x00);
+	std::fill(std::begin(m_mmc_vrom_bank), std::end(m_mmc_vrom_bank), 0x00);
 
 	m_latch = 0;
 	m_irq_mode = 0;
 	m_irq_reset = 0;
 	m_irq_enable = 0;
-	m_irq_count = m_irq_count_latch = 0;
+	m_irq_pending = 0;
+	m_irq_count = 0;
+	m_irq_count_latch = 0xff;
 }
 
 
 /*-------------------------------------------------
  mapper specific handlers
  -------------------------------------------------*/
-
-/*-------------------------------------------------
-
- Tengen 800008 Board
-
- iNES: mapper 3?
-
- In MESS: Supported.
-
- -------------------------------------------------*/
-
-void nes_tengen008_device::write_h(offs_t offset, uint8_t data)
-{
-	LOG_MMC(("tengen008 write_h, offset: %04x, data: %02x\n", offset, data));
-
-	// this pcb is subject to bus conflict
-	data = account_bus_conflict(offset, data);
-
-	prg32(data >> 3);
-	chr8(data, CHRROM);
-}
 
 /*-------------------------------------------------
 
@@ -138,10 +112,12 @@ void nes_tengen008_device::write_h(offs_t offset, uint8_t data)
 
  iNES: mapper 64
 
- In MESS: Partially Supported (there should be a small
- delay between the IRQ and its execution, but that is not
- emulated yet: this is possibly the problem with Skulls
- & Crossbones)
+ In MAME: Partially supported.
+
+ TODO: There are issues with IRQ. Skull & Crossbones
+ probably doesn't work because of this? It alone uses
+ the cycle-based IRQ (and it constantly switches
+ between IRQ modes).
 
  -------------------------------------------------*/
 
@@ -156,14 +132,15 @@ inline void nes_tengen032_device::irq_clock(int blanked)
 	if (m_irq_reset)
 	{
 		m_irq_reset = 0;
-		m_irq_count = m_irq_count_latch + 1;
+		m_irq_count = m_irq_count_latch | (m_irq_count_latch ? 1 : 0);
 	}
 	else if (!m_irq_count)
 		m_irq_count = m_irq_count_latch;
+	else
+		m_irq_count--;
 
-	m_irq_count--;
 	if (m_irq_enable && !blanked && !m_irq_count)
-		set_irq_line(ASSERT_LINE);
+		m_irq_pending = 1;
 }
 
 // we use the HBLANK IRQ latch from PPU for the scanline based IRQ mode
@@ -173,7 +150,14 @@ void nes_tengen032_device::device_timer(emu_timer &timer, device_timer_id id, in
 {
 	if (id == TIMER_IRQ)
 	{
-		irq_clock(0);
+		if (m_irq_pending)
+		{
+			set_irq_line(ASSERT_LINE);
+			m_irq_pending = 0;
+		}
+
+		if (m_irq_mode)
+			irq_clock(0);
 	}
 }
 
@@ -182,7 +166,7 @@ void nes_tengen032_device::hblank_irq(int scanline, int vblank, int blanked)
 {
 	if (!m_irq_mode) // we are in scanline mode!
 	{
-		if (scanline < ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE)
+		if (scanline <= ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE)
 		{
 			irq_clock(blanked);
 		}
@@ -191,47 +175,40 @@ void nes_tengen032_device::hblank_irq(int scanline, int vblank, int blanked)
 
 void nes_tengen032_device::set_prg()
 {
-	uint8_t prg_mode = m_latch & 0x40;
+	u8 prg_flip = (m_latch & 0x40) >> 5;
 
-	prg8_89(m_mmc_prg_bank[prg_mode ? 2: 0]);
-	prg8_ab(m_mmc_prg_bank[prg_mode ? 0: 1]);
-	prg8_cd(m_mmc_prg_bank[prg_mode ? 1: 2]);
-}
-
-void nes_tengen032_device::chr_cb(int start, int bank, int source)
-{
-	chr1_x(start, bank, source);
+	prg8_89(m_mmc_prg_bank[0 ^ prg_flip]);
+	prg8_ab(m_mmc_prg_bank[1]);
+	prg8_cd(m_mmc_prg_bank[2 ^ prg_flip]);
 }
 
 void nes_tengen032_device::set_chr()
 {
-	uint8_t chr_page = (m_latch & 0x80) >> 5;
+	u8 chr_flip = (m_latch & 0x80) >> 5;
 
 	if (m_latch & 0x20)
 	{
-		chr_cb(0 ^ chr_page, m_mmc_vrom_bank[0], CHRROM);
-		chr_cb(1 ^ chr_page, m_mmc_vrom_bank[6], CHRROM);
-		chr_cb(2 ^ chr_page, m_mmc_vrom_bank[1], CHRROM);
-		chr_cb(3 ^ chr_page, m_mmc_vrom_bank[7], CHRROM);
+		chr1_x(0 ^ chr_flip, m_mmc_vrom_bank[0], CHRROM);
+		chr1_x(1 ^ chr_flip, m_mmc_vrom_bank[6], CHRROM);
+		chr1_x(2 ^ chr_flip, m_mmc_vrom_bank[1], CHRROM);
+		chr1_x(3 ^ chr_flip, m_mmc_vrom_bank[7], CHRROM);
 	}
 	else
 	{
-		chr_cb(0 ^ chr_page, m_mmc_vrom_bank[0] & ~0x01, CHRROM);
-		chr_cb(1 ^ chr_page, m_mmc_vrom_bank[0] |  0x01, CHRROM);
-		chr_cb(2 ^ chr_page, m_mmc_vrom_bank[1] & ~0x01, CHRROM);
-		chr_cb(3 ^ chr_page, m_mmc_vrom_bank[1] |  0x01, CHRROM);
+		chr2_x(0 ^ chr_flip, m_mmc_vrom_bank[0] >> 1, CHRROM);
+		chr2_x(2 ^ chr_flip, m_mmc_vrom_bank[1] >> 1, CHRROM);
 	}
 
-	chr_cb(4 ^ chr_page, m_mmc_vrom_bank[2], CHRROM);
-	chr_cb(5 ^ chr_page, m_mmc_vrom_bank[3], CHRROM);
-	chr_cb(6 ^ chr_page, m_mmc_vrom_bank[4], CHRROM);
-	chr_cb(7 ^ chr_page, m_mmc_vrom_bank[5], CHRROM);
+	chr1_x(4 ^ chr_flip, m_mmc_vrom_bank[2], CHRROM);
+	chr1_x(5 ^ chr_flip, m_mmc_vrom_bank[3], CHRROM);
+	chr1_x(6 ^ chr_flip, m_mmc_vrom_bank[4], CHRROM);
+	chr1_x(7 ^ chr_flip, m_mmc_vrom_bank[5], CHRROM);
 }
 
-void nes_tengen032_device::tengen032_write(offs_t offset, uint8_t data)
+void nes_tengen032_device::write_h(offs_t offset, u8 data)
 {
-	uint8_t helper, cmd;
-	LOG_MMC(("tengen032_write, offset: %04x, data: %02x\n", offset, data));
+	u8 helper, cmd;
+	LOG_MMC(("tengen032 write_h, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x6001)
 	{
@@ -281,17 +258,16 @@ void nes_tengen032_device::tengen032_write(offs_t offset, uint8_t data)
 			m_irq_count_latch = data;
 			break;
 
-		case 0x4001: /* $c001 - IRQ scanline latch */
+		case 0x4001: // $c001 - IRQ scanline latch
 			m_irq_mode = data & 0x01;
 			if (m_irq_mode)
 				irq_timer->adjust(attotime::zero, 0, timer_freq);
-			else
-				irq_timer->adjust(attotime::never);
 			m_irq_reset = 1;
 			break;
 
 		case 0x6000:
 			m_irq_enable = 0;
+			m_irq_pending = 0;
 			set_irq_line(CLEAR_LINE);
 			break;
 
@@ -318,36 +294,23 @@ void nes_tengen032_device::tengen032_write(offs_t offset, uint8_t data)
 
  iNES: mapper 158
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_tengen037_device::set_mirror()
+void nes_tengen037_device::set_chr()
 {
-	if (m_latch & 0x80)
-	{
-		set_nt_page(0, CIRAM, BIT(m_mmc_vrom_bank[2],7), 1);
-		set_nt_page(1, CIRAM, BIT(m_mmc_vrom_bank[3],7), 1);
-		set_nt_page(2, CIRAM, BIT(m_mmc_vrom_bank[4],7), 1);
-		set_nt_page(3, CIRAM, BIT(m_mmc_vrom_bank[5],7), 1);
-	}
-	else
-	{
-		set_nt_page(0, CIRAM, BIT(m_mmc_vrom_bank[0],7), 1);
-		set_nt_page(1, CIRAM, BIT(m_mmc_vrom_bank[0],7), 1);
-		set_nt_page(2, CIRAM, BIT(m_mmc_vrom_bank[1],7), 1);
-		set_nt_page(3, CIRAM, BIT(m_mmc_vrom_bank[1],7), 1);
-	}
+	nes_tengen032_device::set_chr();
+
+	// do nametables
+	static constexpr u8 bank[8] = { 0, 0, 1, 1, 2, 3, 4, 5 };
+	int start = (m_latch & 0x80) >> 5;
+
+	for (int i = 0; i < 4; i++)
+		set_nt_page(i, CIRAM, BIT(m_mmc_vrom_bank[bank[start + i]], 7), 1);
 }
 
-void nes_tengen037_device::chr_cb( int start, int bank, int source )
-{
-	set_mirror();   // we could probably update only for one (e.g. the first) call, to slightly optimize the code
-	chr1_x(start, bank, source);
-}
-
-
-void nes_tengen037_device::write_h(offs_t offset, uint8_t data)
+void nes_tengen037_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("tengen037 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -355,9 +318,8 @@ void nes_tengen037_device::write_h(offs_t offset, uint8_t data)
 	{
 		case 0x2000:
 			break;
-
 		default:
-			tengen032_write(offset, data);
+			nes_tengen032_device::write_h(offset, data);
 			break;
 	}
 }

@@ -4359,6 +4359,7 @@ files {
 	MAME_DIR .. "src/mame/includes/slapfght.h",
 	MAME_DIR .. "src/mame/machine/slapfght.cpp",
 	MAME_DIR .. "src/mame/video/slapfght.cpp",
+	MAME_DIR .. "src/mame/drivers/slapfght_ms.cpp",
 	MAME_DIR .. "src/mame/drivers/snowbros.cpp",
 	MAME_DIR .. "src/mame/includes/snowbros.h",
 	MAME_DIR .. "src/mame/video/snowbros.cpp",
