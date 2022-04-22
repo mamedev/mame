@@ -55,6 +55,7 @@ STATUS:
 * EXL 100
   - Exel Basic (exelbas) can be used in a limited way
   - Other software mostly ignores inputs, and usually freezes soon after start (cpu problems?)
+  - Cassette interface has been added, but don't know the commands to use it.
 * EXELTEL can get to the inbuilt "cart" but stops with a black screen,
     presumably because the I/O processor is not emulated
 
@@ -93,7 +94,7 @@ TODO:
 #include "emu.h"
 
 #include "cpu/tms7000/tms7000.h"
-//#include "imagedev/cassette.h"
+#include "imagedev/cassette.h"
 #include "machine/spchrom.h"
 #include "machine/timer.h"
 #include "sound/tms5220.h"
@@ -121,6 +122,7 @@ public:
 		, m_tms3556(*this, "tms3556")
 		, m_tms5220c(*this, "tms5220c")
 		, m_cart(*this, "cartslot")
+		, m_cass(*this, "cassette")
 		, m_io_keyboard(*this, "X%d", 0U)
 		, m_timer_k(*this, "timer_k")
 	{ }
@@ -134,6 +136,7 @@ private:
 	required_device<tms3556_device> m_tms3556;
 	required_device<tms5220c_device> m_tms5220c;
 	optional_device<generic_slot_device> m_cart;
+	optional_device<cassette_image_device> m_cass;
 	required_ioport_array<8> m_io_keyboard;
 	optional_device<timer_device> m_timer_k;
 
@@ -292,7 +295,11 @@ void exelv_state::mailbox_wx318_w(uint8_t data)
 uint8_t exelv_state::tms7020_porta_r()
 {
 	LOG("tms7020_porta_r\n");
-	return ( m_tms7041_portb & 0x80 ) ? 0x01 : 0x00;
+	u8 data = ( m_tms7041_portb & 0x80 ) ? 0x01 : 0x00;
+	double level = (m_cass->input());
+	if (level > 0.02)
+		data |= 0x10;
+	return data;
 }
 
 
@@ -311,6 +318,7 @@ void exelv_state::tms7020_portb_w(uint8_t data)
 {
 	LOG("tms7020_portb_w: data = 0x%02x\n", data);
 	m_tms7020_portb = data;
+	m_cass->output(BIT(data, 3) ? -1.0 : +1.0);
 }
 
 
@@ -837,6 +845,10 @@ void exelv_state::exl100(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, "cartslot", generic_linear_slot, "exelvision_cart", "bin,rom");
+
+	CASSETTE(config, m_cass, 0);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("exl100");
 }
