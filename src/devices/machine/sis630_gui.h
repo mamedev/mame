@@ -34,6 +34,9 @@ class sis630_gui_device : public pci_device
 public:
 	sis630_gui_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void legacy_memory_map(address_map &map);
+	void legacy_io_map(address_map &map);
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -50,9 +53,9 @@ protected:
 
 	void memory_map(address_map &map);
 	void io_map(address_map &map);
+	void space_io_map(address_map &map);
 
 private:
-	required_region_ptr<u32> m_gui_rom;
 	required_device<sis630_svga_device> m_svga;
 
 	u8 vram_r(offs_t offset);
@@ -64,20 +67,7 @@ private:
 	u32 vga_3d0_r(offs_t offset, uint32_t mem_mask = ~0);
 	void vga_3d0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	u32 base_fb_r(offs_t offset, uint32_t mem_mask = ~0);
-	void base_fb_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	u32 base_io_r(offs_t offset, uint32_t mem_mask = ~0);
-	void base_io_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	u32 space_io_r(offs_t offset, uint32_t mem_mask = ~0);
-	void space_io_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	u32 exp_rom_r(offs_t offset, uint32_t mem_mask = ~0);
-	void exp_rom_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void subvendor_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-
-	u32 m_fb_base = 0;
-	u32 m_io_base = 0;
-	u32 m_space_io_base = 0;
-	u32 m_exp_rom_reg = 0;
 
 	virtual u8 capptr_r() override;
 	u32 agp_id_r();

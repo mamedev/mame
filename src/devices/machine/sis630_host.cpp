@@ -38,6 +38,7 @@ DEFINE_DEVICE_TYPE(SIS630_HOST, sis630_host_device, "sis630_host", "SiS 630 Host
 sis630_host_device::sis630_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_host_device(mconfig, SIS630_HOST, tag, owner, clock)
 	, m_host_cpu(*this, finder_base::DUMMY_TAG)
+	, m_vga(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -54,6 +55,7 @@ void sis630_host_device::device_start()
 
 	memory_space = &m_host_cpu->space(AS_PROGRAM);
 	io_space = &m_host_cpu->space(AS_IO);
+	add_map(8*1024*1024, M_MEM, FUNC(sis630_host_device::memory_map));
 
 	m_ram.resize(m_ram_size/4);
 }
@@ -67,6 +69,7 @@ void sis630_host_device::device_reset()
 
 	m_gfx_window_base = 0;
 	m_shadow_ram_ctrl = 0;
+	m_vga_control = 0;
 	std::fill(std::begin(m_agp_mailbox), std::end(m_agp_mailbox), 0);
 
 	remap_cb();
@@ -80,9 +83,6 @@ void sis630_host_device::device_add_mconfig(machine_config &config)
 void sis630_host_device::config_map(address_map &map)
 {
 	pci_host_device::config_map(map);
-	map(0x10, 0x4f).unmaprw();
-	map(0x10, 0xcb).rw(FUNC(sis630_host_device::unmap_log_r), FUNC(sis630_host_device::unmap_log_w));
-	map(0x10, 0x13).rw(FUNC(sis630_host_device::gfx_window_base_r), FUNC(sis630_host_device::gfx_window_base_w));
 	map(0x34, 0x34).r(FUNC(sis630_host_device::capptr_r));
 
 	// host & DRAM regs
@@ -136,7 +136,8 @@ void sis630_host_device::config_map(address_map &map)
 //  map(0x97, 0x97) Page table cache control
 //  map(0x98, 0x98) Page table cache invalidation control
 
-//  map(0x9c, 0x9c) Integrated VGA Control
+	// Integrated VGA control
+	map(0x9c, 0x9c).rw(FUNC(sis630_host_device::vga_control_r), FUNC(sis630_host_device::vga_control_w));
 
 //  AGP
 //  map(0xa0, 0xa3) DRAM priority timer control
@@ -199,6 +200,12 @@ void sis630_host_device::map_extra(
 //  memory_space->install_ram(0x000a0000, 0x000bffff, &m_ram[0x000a0000/4]);
 
 	LOGMAP("Host Remapping table (shadow: %08x smram: %02x):\n", m_shadow_ram_ctrl, m_smram);
+
+	if (!BIT(m_vga_control, 2))
+	{
+		memory_space->install_device(0, 0xfffff, *m_vga, &sis630_gui_device::legacy_memory_map);
+		io_space->install_device(0, 0x0fff, *m_vga, &sis630_gui_device::legacy_io_map);
+	}
 
 	for (int i = 0; i < 12; i ++)
 	{
@@ -330,6 +337,17 @@ void sis630_host_device::shadow_ram_ctrl_w(offs_t offset, uint32_t data, uint32_
 {
 	COMBINE_DATA(&m_shadow_ram_ctrl);
 	LOGMAP("Write shadow RAM setting [$70] %08x & %08x (%08x)\n", data, mem_mask, m_shadow_ram_ctrl);
+	remap_cb();
+}
+
+u8 sis630_host_device::vga_control_r()
+{
+	return m_vga_control;
+}
+
+void sis630_host_device::vga_control_w(offs_t offset, u8 data)
+{
+	m_vga_control = data;
 	remap_cb();
 }
 

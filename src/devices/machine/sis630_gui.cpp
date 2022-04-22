@@ -91,7 +91,6 @@ void sis630_svga_device::crtc_reg_write(uint8_t index, uint8_t data)
 		svga_device::crtc_reg_write(index, data);
 	else
 	{
-		//printf("%02x %02x\n", index, data);
 		m_crtc_ext_regs[index] = data;
 	}
 }
@@ -121,7 +120,6 @@ DEFINE_DEVICE_TYPE(SIS630_GUI, sis630_gui_device, "sis630_gui", "SiS 630 GUI")
 
 sis630_gui_device::sis630_gui_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, SIS630_GUI, tag, owner, clock)
-	, m_gui_rom(*this, "gui_rom")
 	, m_svga(*this, "svga")
 {
 	set_ids(0x10396300, 0x00, 0x030000, 0x00);
@@ -153,20 +151,17 @@ void sis630_gui_device::device_add_mconfig(machine_config &config)
 
 	SIS630_SVGA(config, m_svga, 0);
 	m_svga->set_screen("screen");
-	m_svga->set_vram_size(0x400000); // 64MB according to POST
+	// 64MB according to POST
+	// documentation claims 128MB, assume being wrong
+	m_svga->set_vram_size(64*1024*1024);
 }
 
 void sis630_gui_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
-	map(0x10, 0x4f).unmaprw();
-	map(0x10, 0x13).rw(FUNC(sis630_gui_device::base_fb_r), FUNC(sis630_gui_device::base_fb_w));
-	map(0x14, 0x17).rw(FUNC(sis630_gui_device::base_io_r), FUNC(sis630_gui_device::base_io_w));
-	map(0x18, 0x1b).rw(FUNC(sis630_gui_device::space_io_r), FUNC(sis630_gui_device::space_io_w));
 	map(0x2c, 0x2d).r(FUNC(sis630_gui_device::subvendor_r));
 	map(0x2e, 0x2f).r(FUNC(sis630_gui_device::subsystem_r));
 	map(0x2c, 0x2f).w(FUNC(sis630_gui_device::subvendor_w));
-	map(0x30, 0x33).rw(FUNC(sis630_gui_device::exp_rom_r), FUNC(sis630_gui_device::exp_rom_w));
 
 //  map(0x3c, 0x3d) irq line/pin
 
@@ -265,75 +260,44 @@ void sis630_gui_device::io_map(address_map &map)
 
 }
 
+// "Relocate I/O" -> RIO
+void sis630_gui_device::space_io_map(address_map &map)
+{
+	// RIO + 0x00: video capture regs on '300, omitted or missing on '630
+	// RIO + 0x02: MPEG-2 video playback
+	// RIO + 0x04: digital video interface (to '301 only?)
+	// RIO + 0x10: 301 TV encoder
+	// RIO + 0x12: 301 macrovision regs
+	// RIO + 0x14: 301 VGA regs
+	// RIO + 0x16: 301 RAMDAC
+	// RIO + 0x30/+0x40/+0x50: omitted, legacy '300/'630 VGA regs?
+}
 
+void sis630_gui_device::legacy_memory_map(address_map &map)
+{
+	map(0xa0000, 0xbffff).rw(FUNC(sis630_gui_device::vram_r), FUNC(sis630_gui_device::vram_w));
+}
+
+void sis630_gui_device::legacy_io_map(address_map &map)
+{
+	map(0x03b0, 0x03bf).rw(FUNC(sis630_gui_device::vga_3b0_r), FUNC(sis630_gui_device::vga_3b0_w));
+	map(0x03c0, 0x03cf).rw(FUNC(sis630_gui_device::vga_3c0_r), FUNC(sis630_gui_device::vga_3c0_w));
+	map(0x03d0, 0x03df).rw(FUNC(sis630_gui_device::vga_3d0_r), FUNC(sis630_gui_device::vga_3d0_w));
+}
 
 void sis630_gui_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
-	// TODO: understand how the full VRAM memory really maps up
-//  memory_space->install_device(0, 0xffffffff, *this, &sis630_gui_device::memory_map);
-
-	memory_space->install_readwrite_handler(
-		0xa0000, 0xbffff,
-		read8sm_delegate(*this, FUNC(sis630_gui_device::vram_r)),
-		write8sm_delegate(*this, FUNC(sis630_gui_device::vram_w))
-	);
-
-	LOGMAP("GUI remapping table (%08x)\n", m_exp_rom_reg);
-
-	// TODO: expansion ROM doesn't work properly
-
-//	if (m_exp_rom_reg & 1)
-	{
-		const u32 start_offs = 0xd0000; //m_exp_rom_reg & ~1;
-		const u32 end_offs = start_offs + m_gui_rom.bytes() - 1;
-
-		LOGMAP("- %08x-%08x\n", start_offs, end_offs);
-
-		if (start_offs < end_offs)
-			memory_space->install_rom(start_offs, end_offs, m_gui_rom);
-	}
-
-	// TODO: convert to io_map
-	io_space->install_device(0, 0xffff, *this, &sis630_gui_device::io_map);
-
-	io_space->install_readwrite_handler(0x03b0, 0x03bf, read32s_delegate(*this, FUNC(sis630_gui_device::vga_3b0_r)), write32s_delegate(*this, FUNC(sis630_gui_device::vga_3b0_w)));
-	io_space->install_readwrite_handler(0x03c0, 0x03cf, read32s_delegate(*this, FUNC(sis630_gui_device::vga_3c0_r)), write32s_delegate(*this, FUNC(sis630_gui_device::vga_3c0_w)));
-	io_space->install_readwrite_handler(0x03d0, 0x03df, read32s_delegate(*this, FUNC(sis630_gui_device::vga_3d0_r)), write32s_delegate(*this, FUNC(sis630_gui_device::vga_3d0_w)));
-
-	// "128 I/O space" probably means the RIO "Relocate I/O" base
-	// at some point I've got extensive checks with 0xff84 (digital video interface regs)
-	// TODO: pinpoint effective value base
-	// (doc mentions being 16-bit wide, should be 7-bit by logic)
-	if (m_space_io_base == 0xffffffff)
-	{
-		// all regs follow index/data pattern space
-		// RIO + 0x00: video capture regs on 300, omitted or missing on 630
-		// RIO + 0x02: MPEG-2 video playback
-		// RIO + 0x04: digital video interface (to 301 only?)
-		// RIO + 0x10: 301 TV encoder
-		// RIO + 0x12: 301 macrovision regs
-		// RIO + 0x14: 301 VGA regs
-		// RIO + 0x16: 301 RAMDAC
-		// RIO + 0x30/+0x40/+0x50: omitted, assume 300/630 VGA regs
-		io_space->install_readwrite_handler(0xffb0, 0xffbf, read32s_delegate(*this, FUNC(sis630_gui_device::vga_3b0_r)), write32s_delegate(*this, FUNC(sis630_gui_device::vga_3b0_w)));
-		io_space->install_readwrite_handler(0xffc0, 0xffcf, read32s_delegate(*this, FUNC(sis630_gui_device::vga_3c0_r)), write32s_delegate(*this, FUNC(sis630_gui_device::vga_3c0_w)));
-		io_space->install_readwrite_handler(0xffd0, 0xffdf, read32s_delegate(*this, FUNC(sis630_gui_device::vga_3d0_r)), write32s_delegate(*this, FUNC(sis630_gui_device::vga_3d0_w)));
-	}
 }
 
 void sis630_gui_device::device_start()
 {
 	pci_device::device_start();
 
-#if 0
-	memory_window_start = 0;
-	memory_window_end   = 0xffffffff;
-	memory_offset       = 0;
-	io_window_start = 0;
-	io_window_end   = 0xffff;
-	io_offset       = 0;
-#endif
+	add_map(64*1024*1024, M_MEM, FUNC(sis630_gui_device::memory_map));
+	// claims 128KB, which goes outside the pentium range. Assume memory mapped.
+	add_map(128*1024, M_MEM, FUNC(sis630_gui_device::io_map));
+	add_map(128, M_IO, FUNC(sis630_gui_device::space_io_map));
 }
 
 void sis630_gui_device::device_reset()
@@ -342,10 +306,6 @@ void sis630_gui_device::device_reset()
 
 	command = 0x0004;
 	status = 0x0220;
-	m_exp_rom_reg =   0x000c0001;
-	m_fb_base =       0x00000008;
-	m_io_base =       0x00000000;
-	m_space_io_base = 0x00000001;
 
 	m_subsystem_logger_mask = 0;
 }
@@ -439,62 +399,6 @@ void sis630_gui_device::vga_3d0_w(offs_t offset, uint32_t data, uint32_t mem_mas
 		downcast<sis630_svga_device *>(m_svga.target())->port_03d0_w(offset * 4 + 2, data >> 16);
 	if (ACCESSING_BITS_24_31)
 		downcast<sis630_svga_device *>(m_svga.target())->port_03d0_w(offset * 4 + 3, data >> 24);
-}
-
-u32 sis630_gui_device::base_fb_r(offs_t offset, uint32_t mem_mask)
-{
-	LOGIO("Read FB base [$10] %08x & %08x\n", m_fb_base, mem_mask);
-	return m_fb_base;
-}
-
-void sis630_gui_device::base_fb_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	COMBINE_DATA(&m_fb_base);
-	LOGIO("Write FB base [$10] %08x & %08x (%08x)\n", data, mem_mask, m_fb_base);
-	remap_cb();
-}
-
-u32 sis630_gui_device::base_io_r(offs_t offset, uint32_t mem_mask)
-{
-	LOGIO("Read I/O base [$14] %08x & %08x\n", m_io_base, mem_mask);
-	return m_io_base;
-}
-
-void sis630_gui_device::base_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	COMBINE_DATA(&m_io_base);
-
-	LOGIO("Write I/O base [$14] %08x & %08x\n", m_io_base, mem_mask);
-	remap_cb();
-}
-
-u32 sis630_gui_device::space_io_r(offs_t offset, uint32_t mem_mask)
-{
-	LOGIO("Read RIO base [$18] %08x & %08x\n", m_space_io_base, mem_mask);
-	return m_space_io_base;
-}
-
-void sis630_gui_device::space_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	COMBINE_DATA(&m_space_io_base);
-	LOGIO("Write RIO base [$18] %08x & %08x (%08x)\n", data, mem_mask, m_space_io_base);
-	remap_cb();
-}
-
-u32 sis630_gui_device::exp_rom_r(offs_t offset, uint32_t mem_mask)
-{
-	LOGIO("Read expansion ROM base [$30] %08x & %08x\n", m_exp_rom_reg, mem_mask);
-	return m_exp_rom_reg;
-}
-
-// TODO: remove, use the actual pci_device implementation
-void sis630_gui_device::exp_rom_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	COMBINE_DATA(&m_exp_rom_reg);
-//  m_exp_rom_reg &= 0xfffff801;
-	m_exp_rom_reg &= 0xfffff801 & (1-0x8000);
-	LOGIO("Write expansion ROM base [$30] %08x & %08x (%08x)\n", data, mem_mask, m_exp_rom_reg);
-	remap_cb();
 }
 
 /*************************
