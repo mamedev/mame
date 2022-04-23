@@ -97,6 +97,7 @@
   * Jolly Joker (Solid State module in suicide board).             Impera,             199?.
   * Multi Win (Ver.0167, encrypted),                               Fun World,          1992.
   * Multi Win (Ver.0091, encrypted),                               Fun World,          1991.
+  * Multi Win (EPM7032, encrypted),                                Amatic,             2001.
   * Power Card (Ver 0263, encrypted),                              Fun World,          1993.
   * Mega Card (Ver.0210, encrypted),                               Fun World,          1993.
   * Joker Card 300 (Ver.A267BC, encrypted),                        Amatic Trading,     1993.
@@ -6920,7 +6921,37 @@ ROM_END
 
 
 /*
+  Multi Win
+  Amatic, 2001.
 
+  Unknown version.
+  Game encrypted, using a daughterboard
+  with a Mexican R65C02 + Altera EPM7032.
+
+*/
+ROM_START( multiwinb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "win3.bin", 0x8000, 0x8000, CRC(5f01d620) SHA1(ddd86cba383f1e40e3821a58fc0ff7c1ac24de10) )
+
+	ROM_REGION( 0x0800, "altera", 0 )    // Altera EPM7032 object file
+	ROM_LOAD( "multiw1_epm7032.pof", 0x0000, 0x07ae, CRC(922d8d72) SHA1(2ad01fd0b4ddaa1098f3ffc203b6c502d1afd73a) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "win2.bin", 0x0000, 0x8000, CRC(bf031e5e) SHA1(1c971be5eb3e8c1a1b69ec9d00e46aa1fe26b8ee) )
+	ROM_LOAD( "win1.bin", 0x8000, 0x8000, CRC(8ea33d92) SHA1(5aa439181f0751040229ce75101dbdf8b3d68b6c) )
+
+	ROM_REGION( 0x0800, "proms", 0 )
+	ROM_LOAD( "291_n147.bin", 0x0000, 0x0800, CRC(e09e3a77) SHA1(2842875cff63650e15bf7eda3a730446c671c3ea) )
+
+	ROM_REGION( 0x0a00, "plds", 0 )
+	ROM_LOAD( "m1-20v8.bin",  0x0000, 0x0157, CRC(b05b51da) SHA1(5e43cc12cd8bcd820cb89d3008a02ea857daba6f) )
+	ROM_LOAD( "m2-20v8.bin",  0x0200, 0x0157, CRC(11852de6) SHA1(33fcf6f752a116e4df0492d17e0d5e53b31ce77d) )
+	ROM_LOAD( "16v8-3.bin",   0x0400, 0x0117, NO_DUMP )
+	ROM_LOAD( "jo393-4.bin",  0x0800, 0x0117, CRC(6eef3e7d) SHA1(2e1bb576f431743b133833c7c2f91a41a4fcbc37) )
+ROM_END
+
+
+/*
   Power Card (Fun World)
   Version 0263 / 1993-10-22
 
@@ -8921,8 +8952,9 @@ GAMEL( 199?, jolyjokrp,  jolyjokr, fw2ndpal, funworld,  funworld_state, init_imp
 GAMEL( 199?, jolyjokrm,  jolyjokr, fw1stpal, funworld,  funworld_state, empty_init,    ROT0, "Impera",            "Jolly Joker (Solid State module in suicide board)", 0,                     layout_jollycrd )
 
 // Encrypted games...
-GAME(  1992, multiwin,   0,        multiwin, funworld,  multiwin_state, driver_init,   ROT0, "Fun World",         "Multi Win (Ver.0167, encrypted)",                 0 )
+GAME(  1992, multiwin,   0,        multiwin, funworld,  multiwin_state, driver_init,   ROT0, "Fun World",         "Multi Win (Ver.0167, encrypted)",                 0 ) // original funworld, encrypted.
 GAME(  1991, multiwina,  multiwin, megacard, funworld,  megacard_state, empty_init,    ROT0, "Fun World",         "Multi Win (Ver.0091, encrypted)",                 0 ) // different encryption scheme.
+GAME(  2001, multiwinb,  multiwin, fw2ndpal, funworld,  funworld_state, empty_init,    ROT0, "Amatic",            "Multi Win (EPM7032, encrypted)",                  0 ) // daughterboard with R65C02 + Altera EPM7032.
 GAME(  1993, powercrd,   0,        powercrd, funworld,  powercrd_state, empty_init,    ROT0, "Fun World",         "Power Card (Ver 0263, encrypted)",                0 ) // clone of Bonus Card.
 GAME(  1993, megacard,   0,        megacard, funworld,  megacard_state, empty_init,    ROT0, "Fun World",         "Mega Card (Ver.0210, encrypted)",                 0 )
 GAME(  1993, jokercrd,   0,        jokercrd, funworld,  jokercrd_state, empty_init,    ROT0, "Amatic Trading",    "Joker Card 300 (Ver.A267BC, encrypted)",          0 )
