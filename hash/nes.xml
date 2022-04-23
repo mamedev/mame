@@ -29993,7 +29993,7 @@ license:CC0
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nina006" />
 			<feature name="pcb" value="AVE-NINA-06" />
-			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="pyr-prg b11e" size="16384" crc="be86ee6d" sha1="0c164a7b99028c17032e8021f3a9b5a590db7547" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -47778,6 +47778,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="NES-NROM-256" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="8192">
 				<rom name="igo shinan (japan).chr" size="8192" crc="1d2cd323" sha1="7e64a6dea791d2b6eaf71113cf31b859b6fa99f9" offset="00000" />
 			</dataarea>
@@ -50441,7 +50442,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="NES-CNROM" />
-			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="vertical" />
 			<feature name="chr-pin26" value="/CE" />
 			<feature name="chr-pin27" value="CE" />
 			<dataarea name="chr" size="8192">
@@ -51874,7 +51875,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="NES-UNROM" />
-			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="tsuri kichi sanpei - blue marlin hen (japan).prg" size="131072" crc="5a18f611" sha1="77241a57cb0b40d9ecac451f86198abbacbc717c" offset="00000" />
 			</dataarea>
@@ -54911,7 +54912,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nina006" />
 			<feature name="pcb" value="AVE-NINA-03" />
-			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="16384" crc="1ff8dace" sha1="d23b489dc965585888fbcf610931181430dd5d33" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -68397,6 +68398,7 @@ All musics were removed in this game.
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="NES-NROM-128" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="16384">
 				<rom name="pyramid (1990)(sachen)(tw)[p][o][sa-009].chr" size="16384" crc="4d044126" sha1="aadeefdf2a1bde6ab248e64d492ee9b8d9620722" offset="00000" status="baddump" />
 			</dataarea>
@@ -77994,7 +77996,7 @@ We include them here as reference if they should coincide with later revisions o
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="NES-NROM-128" />
-			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="8192">
 				<rom name="pinball (2002)(nintendo)(en)[h][ripped from animal crossing for gamecube].chr" size="8192" crc="f2a53b3d" sha1="0d2a521fd984c76cbf9b3cbd47e68c6ce4c6eeae" offset="00000" status="baddump" />
 			</dataarea>
