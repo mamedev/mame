@@ -58579,6 +58579,50 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="tiejiatj" cloneof="sdgndgs3">
+		<description>Tiějiǎ Tújí (China)</description>
+		<year>20??</year>
+		<publisher>Shenzhen Jncota</publisher>
+		<info name="serial" value="KT-1025"/>
+		<info name="alt_title" value="铁甲突击"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="5K" />
+			<dataarea name="prg" size="262144">
+				<rom name="tiejia tuji.prg" size="262144" crc="3bbfbd4b" sha1="df3d22d8b9b8d6847221144507b9ed9bb8d617a5" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="tiejia tuji.chr" size="262144" crc="453d84f1" sha1="42dbf442f9552db521f17eeed30db8fc7ddc7b42" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xinghezd" cloneof="sdgndgs3">
+		<description>Xīnghé Zhànduì (China)</description>
+		<year>20??</year>
+		<publisher>Shenzhen Jncota</publisher>
+		<info name="serial" value="KT-1026"/>
+		<info name="alt_title" value="星河战队"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="5K" />
+			<dataarea name="prg" size="262144">
+				<rom name="xinghe zhandui.prg" size="262144" crc="f7007490" sha1="07ac2b99535956cb2ef1d70180c9bcfe4cb8eeed" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="xinghe zhandui.chr" size="262144" crc="ec606450" sha1="177b62428c003d7bd69ef58b7453124eb10ea6e5" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- Seems like it's looping some bits of music incorrectly. Is this an emulation issue or is it like this on hardware? -->
 	<software name="shenmoda" supported="partial">
 		<description>Shénmó Dàlù (China)</description>
