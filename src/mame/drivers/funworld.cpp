@@ -6905,8 +6905,8 @@ ROM_START( multiwina )
 	ROM_LOAD( "multiwin_91-f-1.ic37",  0x8000, 0x8000, CRC(88f122e0) SHA1(6b218e614ac86089321ad2ecb35b956de10031f3) )  // code in the 2nd half
 	ROM_LOAD( "multiwin_91-f-2.ic41",  0x0000, 0x8000, CRC(a09eda44) SHA1(b8bb6a2aa1b703b56e5fb0887d7e5dca28c388ea) )  // code in the 2nd half
 
-	ROM_REGION( 0x0800, "decode", 0 )   // from the CY7C291A inside of the custom CPU, still missing.
-	ROM_LOAD( "multiwin_cy7c291a.bin",  0x0000, 0x0800, NO_DUMP )
+	ROM_REGION( 0x0800, "decode", 0 )   // from the CY7C291A inside of the custom CPU.
+	ROM_LOAD( "multiwin_cy7c291a.cpu",  0x0000, 0x0800, CRC(874abdaa) SHA1(b6457d5d501cdf0d38b01e3dadb48b8b97193db3) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "multiwin_zg2.ic11",   0x0000, 0x8000, CRC(2502778a) SHA1(04990c454ca55f1b3e6fdafebce3f2e9e6782329) )
