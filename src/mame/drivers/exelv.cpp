@@ -163,6 +163,7 @@ private:
 	DECLARE_MACHINE_START(exeltel);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
 	void machine_reset() override;
+	void machine_common();
 
 	/* tms7020 i/o ports */
 	uint8_t   m_tms7020_portb = 0;
@@ -512,7 +513,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(exelv_state::timer_k)
 	// Idling; nothing pressed, nothing to do
 	if (k_ch_byte == 0)
 	{
-		m_timer_k->adjust(attotime::from_msec(50));
+		m_timer_k->adjust(attotime::from_msec(25));
 		return;
 	}
 
@@ -560,7 +561,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(exelv_state::timer_k)
 	if (k_ch_bit == 8)
 	{
 		m_subcpu->set_input_line(TMS7000_INT1_LINE, CLEAR_LINE);
-		k_ch_bit = 1;
+		k_ch_bit = 0;
 		// just finished sending key
 		if (k_ch_byte == 1)
 		{
@@ -583,7 +584,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(exelv_state::timer_k)
 			// clean up and go back to looking at kbd
 			k_channels[1] = 0xff;
 			k_ch_byte = 0;
-			m_timer_k->adjust(attotime::from_msec(50));
+			m_timer_k->adjust(attotime::from_msec(20));
 		}
 		return;
 	}
@@ -758,28 +759,8 @@ INPUT_PORTS_END
 
 /* Machine Initialization */
 
-MACHINE_START_MEMBER( exelv_state, exl100)
+void exelv_state::machine_common()
 {
-	/* register for state saving */
-	save_item(NAME(m_tms7020_portb));
-	save_item(NAME(m_tms7041_portb));
-	save_item(NAME(m_tms7041_portc));
-	save_item(NAME(m_tms7041_portd));
-	save_item(NAME(m_rom_size));
-	save_item(NAME(m_wx318));
-	save_item(NAME(m_wx319));
-
-	m_rom_size = 0;
-	if (m_cart && m_cart->exists())
-		m_rom_size = m_cart->get_rom_size();
-}
-
-MACHINE_START_MEMBER( exelv_state, exeltel)
-{
-	uint8_t *rom = memregion("user1")->base() + 0x0200;
-	membank("bank1")->configure_entry(0, rom);
-	membank("bank1")->set_entry(0);
-
 	/* register for state saving */
 	save_item(NAME(m_tms7020_portb));
 	save_item(NAME(m_tms7041_portb));
@@ -794,6 +775,25 @@ MACHINE_START_MEMBER( exelv_state, exeltel)
 	save_item(NAME(k_bit_num));
 }
 
+MACHINE_START_MEMBER( exelv_state, exl100)
+{
+	machine_common();
+	save_item(NAME(m_rom_size));
+
+	m_rom_size = 0;
+	if (m_cart && m_cart->exists())
+		m_rom_size = m_cart->get_rom_size();
+}
+
+MACHINE_START_MEMBER( exelv_state, exeltel)
+{
+	machine_common();
+
+	uint8_t *rom = memregion("user1")->base() + 0x0200;
+	membank("bank1")->configure_entry(0, rom);
+	membank("bank1")->set_entry(0);
+}
+
 void exelv_state::machine_reset()
 {
 	k_channels[0] = 0xff;
@@ -804,7 +804,7 @@ void exelv_state::machine_reset()
 	k_bit_num = 0;
 
 	if (m_timer_k)
-		m_timer_k->adjust(attotime::from_seconds(3));
+		m_timer_k->adjust(attotime::from_seconds(2));
 
 	if (m_subcpu)
 	{
