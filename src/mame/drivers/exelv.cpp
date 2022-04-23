@@ -53,9 +53,7 @@ More info about the keyboard:
 
 STATUS:
 * EXL 100
-  - Exel Basic (exelbas) can be used in a limited way
-  - Other software mostly ignores inputs, and usually freezes soon after start (cpu problems?)
-  - Cassette interface has been added, but don't know the commands to use it.
+  - Most games do something, see table below
 * EXELTEL can get to the inbuilt "cart" but stops with a black screen,
     presumably because the I/O processor is not emulated
 
@@ -63,31 +61,37 @@ STATUS OF SOFTWARE:
 
 SWList name      KBD poke address       Status
 ------------------------------------------------------------------------------------------------------
-exelbas          03                     works until autorepeat bug kicks in
-exelbasp                                Cyan screen, hangs
-exelmax                                 options 1-4 work, others hang
-exeldrum         32                     no inputs
-exelogo                                 no inputs?
-exeltext         3C                     hang at start
-exlpaint                                works until autorepeat bug kicks in
-exlmodem                                usually hangs after a few keystrokes or gets the autorepeat bug
-capmenkr                                Hang after a few seconds, large chars are corrupt.
-guppy                                   inputs not working, followed soon after by hang
+exelbas          03                     works
+exelbasp                                Cyan screen, hangs at start
+exelmax                                 options 1-4 work, 5-7 do nothing
+exeldrum         32                     can get to the menu, which seems useless
+exelogo                                 can type into it but the usual commands get error
+exeltext         3C                     works but weird
+exlpaint                                works
+exlmodem                                it might work, need instructions
+capmenkr                                works, large chars are corrupt.
+guppy                                   works
 imagix                                  first screen corrupt, can't proceed
-pindo                                   first screen corrupt, can select a game, but then there's no control
-quizzy                                  Hang after a few secs; scores are corrupted
-tennis           12                     can select at first screen, followed by hang
-virus                                   Hang at start
-wizord                                  Hang at start
+pindo                                   first screen corrupt, can select a game, how to play?
+quizzy                                  works, scores are corrupted
+tennis           12                     the demo works, didn't try playing
+virus                                   works
+wizord                                  works
 
+
+Using the cassette:
+- You must be in Exel Basic. There's no motor control.
+- To save: SAVE"1"  hit enter, put player in Record, hit Esc, it saves.
+- To load: LOAD"1"  hit enter, hit esc, put player in Play, it loads.
+- The cassette output is connected to the audio section, so games could use it as a 1-bit dac.
 
 TODO:
     * dump exeltel tms7042 I/O CPU ROM
     * everything
     * The joysticks. No schematics of them have been found.
     * Keyboard layout is preliminary.
-    * Ramdomly the keyboard will go into uncontrollable auto-repeat; seems to be a cpu bug.
     * Keyboard response is terrible, but this might be normal.
+    * Add support for cassette k7 format - there's heaps of software for it.
 */
 
 
@@ -98,6 +102,7 @@ TODO:
 #include "machine/spchrom.h"
 #include "machine/timer.h"
 #include "sound/tms5220.h"
+#include "sound/spkrdev.h"
 #include "video/tms3556.h"
 
 #include "bus/generic/slot.h"
@@ -123,6 +128,7 @@ public:
 		, m_tms5220c(*this, "tms5220c")
 		, m_cart(*this, "cartslot")
 		, m_cass(*this, "cassette")
+		, m_speaker(*this, "speaker")
 		, m_io_keyboard(*this, "X%d", 0U)
 		, m_timer_k(*this, "timer_k")
 	{ }
@@ -137,6 +143,7 @@ private:
 	required_device<tms5220c_device> m_tms5220c;
 	optional_device<generic_slot_device> m_cart;
 	optional_device<cassette_image_device> m_cass;
+	optional_device<speaker_sound_device> m_speaker;
 	required_ioport_array<8> m_io_keyboard;
 	optional_device<timer_device> m_timer_k;
 
@@ -296,9 +303,12 @@ uint8_t exelv_state::tms7020_porta_r()
 {
 	LOG("tms7020_porta_r\n");
 	u8 data = ( m_tms7041_portb & 0x80 ) ? 0x01 : 0x00;
-	double level = (m_cass->input());
-	if (level > 0.02)
-		data |= 0x10;
+	if (m_cass)
+	{
+		double level = (m_cass->input());
+		if (level < 0.02)
+			data |= 0x10;
+	}
 	return data;
 }
 
@@ -318,7 +328,11 @@ void exelv_state::tms7020_portb_w(uint8_t data)
 {
 	LOG("tms7020_portb_w: data = 0x%02x\n", data);
 	m_tms7020_portb = data;
-	m_cass->output(BIT(data, 3) ? -1.0 : +1.0);
+	if (m_cass)
+	{
+		m_cass->output(BIT(data, 3) ? -1.0 : +1.0);
+		m_speaker->level_w(BIT(data, 3) ? -1.0 : +1.0);
+	}
 }
 
 
@@ -372,14 +386,18 @@ void exelv_state::tms7041_portb_w(uint8_t data)
 {
 	LOG("tms7041_portb_w: data = 0x%02x\n", data);
 
-	m_tms5220c->wsq_w((data & 0x01) ? 1 : 0);
-	m_tms5220c->rsq_w((data & 0x02) ? 1 : 0);
+	// optional code; tms5220 device works in different ways depending on if this exists or not
+	m_tms5220c->combined_rsq_wsq_w(data & 3);
 
 	LOG("TMS7020 %s int1\n",((data & 0x04) ? "clear" : "assert"));
-	m_maincpu->set_input_line(TMS7000_INT1_LINE, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+
+	/* Check for high->low transition on B2 */
+	// Using hold_line because the pulse is too short and can be missed by the other cpu
+	if ((BIT(m_tms7041_portb, 2)) && !BIT(data, 2))
+		m_maincpu->set_input_line(TMS7000_INT1_LINE, HOLD_LINE);
 
 	/* Check for low->high transition on B6 */
-	if (!(m_tms7041_portb & 0x40) && (data & 0x40))
+	if ((!BIT(m_tms7041_portb, 6)) && BIT(data, 6))
 	{
 		LOG("wx319 write 0x%02x\n", m_tms7041_portc);
 		m_wx319 = m_tms7041_portc;
@@ -754,7 +772,6 @@ MACHINE_START_MEMBER( exelv_state, exl100)
 	m_rom_size = 0;
 	if (m_cart && m_cart->exists())
 		m_rom_size = m_cart->get_rom_size();
-	m_timer_k->adjust(attotime::from_seconds(3));
 }
 
 MACHINE_START_MEMBER( exelv_state, exeltel)
@@ -779,17 +796,21 @@ MACHINE_START_MEMBER( exelv_state, exeltel)
 
 void exelv_state::machine_reset()
 {
-	if (m_subcpu)
-	{
-		m_subcpu->set_input_line(TMS7000_INT1_LINE, CLEAR_LINE);
-		m_subcpu->set_input_line(TMS7000_INT3_LINE, CLEAR_LINE);
-	}
 	k_channels[0] = 0xff;
 	k_channels[1] = 0xff;
 	k_ch_byte = 0;
 	k_ch_bit = 0;
 	k_bit_bit = 0;
 	k_bit_num = 0;
+
+	if (m_timer_k)
+		m_timer_k->adjust(attotime::from_seconds(3));
+
+	if (m_subcpu)
+	{
+		m_subcpu->set_input_line(TMS7000_INT1_LINE, CLEAR_LINE);
+		m_subcpu->set_input_line(TMS7000_INT3_LINE, CLEAR_LINE);
+	}
 }
 
 
@@ -839,6 +860,9 @@ void exelv_state::exl100(machine_config &config)
 
 	/* sound */
 	SPEAKER(config, "mono").front_center();
+	// The cassette output is connected into the audio circuit
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.30);
+
 	TMS5220C(config, m_tms5220c, 640000);
 	// m_tms5220c->set_speechrom_tag("vsm");
 	m_tms5220c->add_route(ALL_OUTPUTS, "mono", 1.00);
