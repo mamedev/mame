@@ -449,7 +449,9 @@ inline void z80_device::leave_halt()
  ***************************************************************/
 inline uint8_t z80_device::in(uint16_t port)
 {
-	return m_io.read_byte(port);
+	u8 res = m_io.read_byte(port);
+	T(4);
+	return res;
 }
 
 /***************************************************************
@@ -458,6 +460,7 @@ inline uint8_t z80_device::in(uint16_t port)
 inline void z80_device::out(uint16_t port, uint8_t value)
 {
 	m_io.write_byte(port, value);
+	T(4);
 }
 
 /***************************************************************
@@ -638,7 +641,11 @@ inline void z80_device::jr_cond(bool cond, uint8_t opcode)
 		jr();
 	}
 	else
+	{
 		WZ = arg();
+		//nomreq_addr(PCD, 3);
+		//PC++;
+	}
 }
 
 /***************************************************************
@@ -2993,7 +3000,7 @@ OP(op,36) { wm(HL, arg());                                                      
 OP(op,37) { F = (F & (SF | ZF | YF | XF | PF)) | CF | (A & (YF | XF));            } /* SCF              */
 
 OP(op,38) { jr_cond(F & CF, 0x38);                                                } /* JR   C,o         */
-OP(op,39) { add16(m_hl, m_sp);                                      } /* ADD  HL,SP       */
+OP(op,39) { add16(m_hl, m_sp);                                                    } /* ADD  HL,SP       */
 OP(op,3a) { m_ea = arg16(); A = rm(m_ea); WZ = m_ea + 1;                          } /* LD   A,(w)       */
 OP(op,3b) { nomreq_ir(2); SP--;                                                   } /* DEC  SP          */
 OP(op,3c) { A = inc(A);                                                           } /* INC  A           */
@@ -3231,7 +3238,7 @@ void z80_device::take_nmi()
 	m_iff1 = 0;
 	m_r++;
 
-	m_icount_executing = 5 + MTM * 2;
+	m_icount_executing = 11;
 	push(m_pc);
 	PCD = 0x0066;
 	WZ=PCD;
@@ -3257,8 +3264,7 @@ void z80_device::take_interrupt()
 	LOG(("Z80 single int. irq_vector $%02x\n", irq_vector));
 
 	/* 'interrupt latency' cycles */
-	m_icount_executing = 7 + MTM * 2;
-	push(m_pc); // ? or SP -= 2; wm16back(SPD, m_pc);
+	m_icount_executing = cc_ex[0xff];
 
 	/* Interrupt mode 2. Call [i:databyte] */
 	if( m_im == 2 )
@@ -3266,10 +3272,12 @@ void z80_device::take_interrupt()
 		// Zilog's datasheet claims that "the least-significant bit must be a zero."
 		// However, experiments have confirmed that IM 2 vectors do not have to be
 		// even, and all 8 bits will be used; even $FF is handled normally.
-		irq_vector = (irq_vector & 0xff) | (m_i << 8);
 		/* CALL opcode timing */
-		m_icount_executing = MTM * 2;
+		m_icount_executing += m_cc_op[0xcd];
+		irq_vector = (irq_vector & 0xff) | (m_i << 8);
+		PAIR tmp = m_pc;
 		rm16(irq_vector, m_pc);
+		push(tmp);
 		LOG(("Z80 IM2 [$%04x] = $%04x\n", irq_vector, PCD));
 	}
 	else
@@ -3278,6 +3286,8 @@ void z80_device::take_interrupt()
 	{
 		LOG(("Z80 '%s' IM1 $0038\n", tag()));
 		/* RST $38 */
+		m_icount_executing += m_cc_op[0xff];
+		push(m_pc);
 		PCD = 0x0038;
 	}
 	else
@@ -3294,20 +3304,23 @@ void z80_device::take_interrupt()
 			{
 				case 0xcd0000:  /* call */
 					/* CALL $xxxx cycles */
+					m_icount_executing += m_cc_op[0xcd];
+					push(m_pc);
 					PCD = irq_vector & 0xffff;
 					break;
 				case 0xc30000:  /* jump */
 					/* JP $xxxx cycles */
-					// ??? no push
+					m_icount_executing += m_cc_op[0xc3];
 					PCD = irq_vector & 0xffff;
 					break;
 				default:        /* rst (or other opcodes?) */
 					/* RST $xx cycles */
+					m_icount_executing += m_cc_op[0xff];
+					push(m_pc);
 					PCD = irq_vector & 0x0038;
 					break;
 			}
 		}
-
 	}
 	WZ=PCD;
 
@@ -3611,6 +3624,7 @@ void z80_device::execute_run()
 
 		// check for interrupts before each instruction
 		check_interrupts();
+		T(m_icount_executing);
 
 		m_after_ei = false;
 		m_after_ldair = false;
