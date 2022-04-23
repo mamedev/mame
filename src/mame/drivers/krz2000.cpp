@@ -26,21 +26,25 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/m6502/m3745x.h"
-#include "machine/tmp68301.h"
-#include "machine/bankdev.h"
-#include "machine/upd765.h"
-#include "machine/ncr5380.h"
+
+#include "bus/midi/midi.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
-#include "bus/midi/midi.h"
-#include "video/t6963c.h"
+#include "cpu/m6502/m3745x.h"
+#include "cpu/m68000/m68000.h"
 #include "imagedev/floppy.h"
-#include "screen.h"
+#include "machine/bankdev.h"
+#include "machine/ncr5380.h"
+#include "machine/tmp68301.h"
+#include "machine/upd765.h"
+#include "video/t6963c.h"
+
 #include "emupal.h"
+#include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
+
+namespace {
 
 class k2000_state : public driver_device
 {
@@ -246,9 +250,9 @@ void k2000_state::k2000_map(address_map &map)
 	//  down to 0x500004 (then 0x500006)
 
 	// Calvin memory?
-	map(0x500000, 0x5003FF).rw(FUNC(k2000_state::calvin_read), FUNC(k2000_state::calvin_write));
+	map(0x500000, 0x5003ff).rw(FUNC(k2000_state::calvin_read), FUNC(k2000_state::calvin_write));
 	// Calvin control registers?
-	map(0x500400, 0x5004FF).rw(FUNC(k2000_state::calvin_read), FUNC(k2000_state::calvin_write));
+	map(0x500400, 0x5004ff).rw(FUNC(k2000_state::calvin_read), FUNC(k2000_state::calvin_write));
 	// Reads and writes to 0x580000
 
 	// Hobbes (it seems) is connected in the 0x600000 range
@@ -263,9 +267,9 @@ void k2000_state::k2000_map(address_map &map)
 	// Each Hobbes chip seems to have two control registers, mapped at 0x600300/0x680300 and 0x600400/0x680400
 
 	// Hobbes memory?
-	map(0x600000, 0x6002FF).rw(FUNC(k2000_state::hobbes0_read), FUNC(k2000_state::hobbes0_write));
+	map(0x600000, 0x6002ff).rw(FUNC(k2000_state::hobbes0_read), FUNC(k2000_state::hobbes0_write));
 	// Hobbes control registers?
-	map(0x600300, 0x6005FF).rw(FUNC(k2000_state::hobbes0_read), FUNC(k2000_state::hobbes0_write));
+	map(0x600300, 0x6005ff).rw(FUNC(k2000_state::hobbes0_read), FUNC(k2000_state::hobbes0_write));
 
 	// Hobbes memory?
 	map(0x680000, 0x6802FF).rw(FUNC(k2000_state::hobbes1_read), FUNC(k2000_state::hobbes1_write));
@@ -288,11 +292,11 @@ void k2000_state::k2000_map(address_map &map)
 	// Writes to 0x7C0000
 
 	// Single byte reads seem to happen at 0x740000, which seems to be FDCCTLCSb?
-	// map(0x740000, 0x74000F).
+	// map(0x740000, 0x74000f).
 	map(0x7e0000, 0x7e0001).w(FUNC(k2000_state::swap_bit_ctrl_w));
 
 	// Some sort of hardware mapping - initial firmware boot expects a 4 at $78000B
-	map(0x780000, 0x78FFFF).ram();
+	map(0x780000, 0x78ffff).ram();
 
 	// When (CPUASb + GODOT I6) and (GODOT I/O0 + IOCSb) are low,
 	// Address bits 17, 18, 19 get demultiplexed onto:
@@ -472,5 +476,6 @@ ROM_START( k2000 )
 	// seem to be the Sample Bank address lines.
 ROM_END
 
-CONS( 1990, k2000, 0, 0, k2000, k2000, k2000_state, empty_init, "Kurzweil Music Systems", "K2000", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+} // anonymous namespace
 
+SYST( 1990, k2000, 0, 0, k2000, k2000, k2000_state, empty_init, "Kurzweil Music Systems", "K2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

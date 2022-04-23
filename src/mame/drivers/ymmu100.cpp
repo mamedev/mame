@@ -779,6 +779,6 @@ ROM_START( mu100b )
 	ROM_LOAD32_WORD( "xt463a0.ic38", 0x1000002, 0x400000, CRC(cce5f8d3) SHA1(bdca8c5158f452f2b5535c7d658c9b22c6d66048) )
 ROM_END
 
-CONS( 1997, mu100,  0,     0, mu100, mu100, mu100_state,  empty_init, "Yamaha", "MU100",                  MACHINE_NOT_WORKING )
-CONS( 1997, mu100r, mu100, 0, mu100, mu100, mu100r_state, empty_init, "Yamaha", "MU100 Rackable version", MACHINE_NOT_WORKING )
-CONS( 1998, mu100b, mu100, 0, mu100, mu100, mu100_state,  empty_init, "Yamaha", "MU100B", MACHINE_NOT_WORKING )
+SYST( 1997, mu100,  0,     0, mu100, mu100, mu100_state,  empty_init, "Yamaha", "MU100",                  MACHINE_NOT_WORKING )
+SYST( 1997, mu100r, mu100, 0, mu100, mu100, mu100r_state, empty_init, "Yamaha", "MU100 Rackable version", MACHINE_NOT_WORKING )
+SYST( 1998, mu100b, mu100, 0, mu100, mu100, mu100_state,  empty_init, "Yamaha", "MU100B",                 MACHINE_NOT_WORKING )

@@ -22,13 +22,12 @@ Bottom board - M75-B-A (all versions regardless of mask ROM/EPROM)
 ****************************************************************************
 
 Roberto Fresca 2022.04.23:
-Added Bowmen, from Ten-Level. Very rare and bizarre game.
-The kid peeks the girl's ass and get fulminated with a lightning bolt thrown by god.
+Added Bowmen, from Ten-Level.  A very rare Spanish game.
 
-The game uses a derivative hardware and have some odd things, like lack of
-some music codes or some clipped sample codes that make me think that they
-finished the development abruptly, without a final polish. Also seems to 
-finish in level 10 (30 stages), but the game is so hard to test it.
+The game uses derivative hardware, and has some oddities, like lack of some
+music codes or clipped samples.  They may have finished development
+abruptly, without time for final polish.  Seems to finish in level 10
+(30 stages), but the game is so hard, testing is difficult.
 
 ***************************************************************************/
 
@@ -132,21 +131,21 @@ void vigilant_state::kikcubic_io_map(address_map &map)
 void vigilant_state::bowmen_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("IN0").w("soundlatch", FUNC(generic_latch_8_device::write));	// SD seems BAD
-	map(0x01, 0x01).portr("IN1").w(FUNC(vigilant_state::vigilant_out2_w));				// OUT2?
+	map(0x00, 0x00).portr("IN0").w("soundlatch", FUNC(generic_latch_8_device::write));  // SD seems BAD
+	map(0x01, 0x01).portr("IN1").w(FUNC(vigilant_state::vigilant_out2_w));              // OUT2?
 	map(0x02, 0x02).portr("IN2");
 	map(0x03, 0x03).portr("DSW2");
 	map(0x04, 0x04).portr("DSW1").w(FUNC(vigilant_state::bank_select_w));  // PBANK?
-//	map(0x10, 0x11).w(FUNC(vigilant_state::vigilant_horiz_scroll_w));      // HSPL, HSPH
+//  map(0x10, 0x11).w(FUNC(vigilant_state::vigilant_horiz_scroll_w));      // HSPL, HSPH
 	map(0x12, 0x13).w(FUNC(vigilant_state::bowmen_rear_horiz_scroll_w));   // RHSPL, RHSPH
 	map(0x14, 0x14).w(FUNC(vigilant_state::bowmen_rear_color_w));          // RCOD
 /*
-	02;  w
-	10;  w
-	11;  w
-	12;  w
-	13;  w
-	14;  w
+    02;  w
+    10;  w
+    11;  w
+    12;  w
+    13;  w
+    14;  w
 */
 }
 
@@ -437,31 +436,31 @@ static INPUT_PORTS_START( bowmen )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "Screen Orientation" )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x01, "Screen Orientation" )    PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, "Normal Screen" )
 	PORT_DIPSETTING(    0x00, "Inverted Screen" )
-	PORT_DIPNAME( 0x02, 0x02, "Players" )				PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x02, 0x02, "Players" )               PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, "Two Players" )
 	PORT_DIPSETTING(    0x00, "One Player" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Time for Round" )		PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, "Time for Round" )        PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, "Free Time per Round" )
 	PORT_DIPSETTING(    0x04, "30 Seconds per Round" )
 	PORT_DIPSETTING(    0x08, "50 Seconds per Round" )
 	PORT_DIPSETTING(    0x0c, "60 Seconds per Round" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Very_Easy ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPNAME( 0x80, 0x80, "Test Type" )				PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, "Test Type" )             PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, "Easy Test" )
 	PORT_DIPSETTING(    0x00, "Advanced Test" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW2:1,2,3,4")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW2:1,2,3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_5C ) )
@@ -478,7 +477,7 @@ static INPUT_PORTS_START( bowmen )
 	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW2:5,6,7,8")
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW2:5,6,7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_2C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 4C_5C ) )
@@ -777,21 +776,21 @@ void vigilant_state::kikcubic(machine_config &config)
 void vigilant_state::bowmen(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 18_MHz_XTAL / 3);	// 5.99538 Mhz verified
+	Z80(config, m_maincpu, 18_MHz_XTAL / 3);    // 5.99538 MHz verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &vigilant_state::vigilant_map);
 	m_maincpu->set_addrmap(AS_IO, &vigilant_state::bowmen_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(vigilant_state::irq0_line_hold));
 
-	z80_device &soundcpu(Z80(config, "soundcpu", 18_MHz_XTAL / 3));	// 5.99528 Mhz verified
+	z80_device &soundcpu(Z80(config, "soundcpu", 18_MHz_XTAL / 3)); // 5.99528 MHz verified
 	soundcpu.set_addrmap(AS_PROGRAM, &vigilant_state::sound_map);
 	soundcpu.set_addrmap(AS_IO, &vigilant_state::buccanrs_sound_io_map);
-	soundcpu.set_periodic_int(FUNC(vigilant_state::nmi_line_pulse), attotime::from_hz(7806.5));	// 7.80650 KHz. measured
+	soundcpu.set_periodic_int(FUNC(vigilant_state::nmi_line_pulse), attotime::from_hz(7806.5)); // 7.80650 kHz measured
 
 	soundcpu.set_irq_acknowledge_callback("soundirq", FUNC(rst_neg_buffer_device::inta_cb));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(55);	// 54.9752 Hz. Verified
+	screen.set_refresh_hz(55);  // 54.9752 Hz verified
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(64 * 8, 32 * 8);
 	screen.set_visarea(16 * 8, (64 - 16) * 8 - 1, 0 * 8, 32 * 8 - 1);
