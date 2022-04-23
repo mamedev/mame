@@ -744,6 +744,12 @@ void upd7756_device::internal_start_w(int state)
 
 WRITE_LINE_MEMBER(upd7759_device::md_w)
 {
+	// When called from machine configs/during start up set the mode pin directly.
+	if (m_timer == nullptr)
+	{
+		m_md = state;
+		return;
+	}
 	synchronize(TID_MD_WRITE, state);
 }
 
