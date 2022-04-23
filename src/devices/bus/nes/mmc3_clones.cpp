@@ -1802,10 +1802,9 @@ void nes_txc_tw_device::write_l(offs_t offset, uint8_t data)
 	prg32((data >> 4) | data);
 }
 
-// writes to 0x8000-0xffff are like MMC3 but no PRG bankswitch (beacuse it is handled by low writes)
+// writes to 0x8000-0xffff are like MMC3 but no PRG bankswitch (because it is handled by low writes)
 void nes_txc_tw_device::prg_cb(int start, int bank)
 {
-	return;
 }
 
 /*-------------------------------------------------
@@ -2030,10 +2029,9 @@ u8 nes_gouder_device::read_l(offs_t offset)
 	return get_open_bus();
 }
 
-// writes to 0x8000-0xffff are like MMC3 but no PRG bankswitch (beacuse it is handled by low writes)
+// writes to 0x8000-0xffff are like MMC3 but no PRG bankswitch (because it is handled by low writes)
 void nes_gouder_device::prg_cb(int start, int bank)
 {
-	return;
 }
 
 
