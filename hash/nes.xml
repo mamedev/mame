@@ -58534,15 +58534,16 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="zhanssj" supported="no">
+<!-- Is this itself a clone of KT-1018 (which we are missing)? -->
+	<software name="zhanssj">
 		<description>Zhànshén Shìjiè (China)</description>
-		<year>19??</year>
+		<year>20??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1019"/>
 		<info name="alt_title" value="战神世界"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />    <!-- Wrong. It actually uses an extended mapper, based on TLROM, which we don't support yet -->
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="5K" />
 			<dataarea name="prg" size="1048576">
 				<rom name="[kt-1019] zhan shen shi jie (c).prg" size="1048576" crc="5f362198" sha1="98ddca1f07d778eea7447e9b4a20ae89f4a621f6" offset="00000" status="baddump" />
 			</dataarea>
@@ -58556,15 +58557,15 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="jianxqy" supported="no">
+	<software name="jianxqy" cloneof="zhanssj">
 		<description>Jiànxiá Qíngyuán (China)</description>
-		<year>19??</year>
+		<year>20??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1020"/>
 		<info name="alt_title" value="剑侠情缘"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />    <!-- Wrong. It actually uses an extended mapper, based on TLROM, which we don't support yet -->
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="5K" />
 			<dataarea name="prg" size="1048576">
 				<rom name="[kt-1020] jian xia qing yuan (c).prg" size="1048576" crc="ea831217" sha1="5859e95b9d4b64b7e95929bab80ee8c3c687be82" offset="00000" status="baddump" />
 			</dataarea>
@@ -58578,15 +58579,16 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="shenmoda" supported="no">
+<!-- Seems like it's looping some bits of music incorrectly. Is this an emulation issue or is it like this on hardware? -->
+	<software name="shenmoda" supported="partial">
 		<description>Shénmó Dàlù (China)</description>
-		<year>19??</year>
+		<year>20??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1052"/>
 		<info name="alt_title" value="神魔大陆"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />    <!-- Wrong. It actually uses an extended mapper, based on TLROM, which we don't support yet -->
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="5K" />
 			<dataarea name="prg" size="1048576">
 				<rom name="[kt-1052] shen mo da lu (c).prg" size="1048576" crc="a4c39535" sha1="6d72ed0293e112d10d08b99a20dac4707fbe3531" offset="00000" status="baddump" />
 			</dataarea>
@@ -58600,19 +58602,19 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="kdgsfc" supported="no">
+	<software name="kdgsfc">
 		<description>Kǒudài Guàishòu - Fěicuì Bǎn (China)</description>
-		<year>19??</year>
+		<year>20??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1063"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />    <!-- Wrong. It actually uses an extended mapper, based on TLROM, which we don't support yet -->
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="5K" />
 			<dataarea name="prg" size="1048576">
 				<rom name="[kt-1063] kou dai guai shou - fei cui ban (c).prg" size="1048576" crc="5464d7f8" sha1="8e783d45d05e4a30db3355d8ad1ae4a2f5385530" offset="00000" status="baddump" />
 			</dataarea>
-			<!-- 16k VRAM on cartridge? -->
-			<dataarea name="vram" size="16384">
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
@@ -58621,15 +58623,16 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="hundunds" supported="no">
+<!-- Are battle backgrounds really supposed to be all white? Is this working? -->
+	<software name="hundunds" supported="partial">
 		<description>Yǒngzhě Hēi'àn Shìjiè - Hùndùn De Shìjiè (China)</description>
-		<year>19??</year>
+		<year>20??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1066"/>
 		<info name="alt_title" value="勇者黑暗世界-混沌的世界"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />    <!-- Wrong. It actually uses an extended mapper, based on TLROM, which we don't support yet -->
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="5K" />
 			<dataarea name="prg" size="1048576">
 				<rom name="[kt-1066] yong zhe hei an shi jie - hun dun de shi jie (c).prg" size="1048576" crc="b5fdb3cb" sha1="7ce1b5a48aa14b0048389191ec88bd6db923b6e2" offset="00000" status="baddump" />
 			</dataarea>
@@ -58643,63 +58646,63 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="kdgszs" supported="partial">
+	<software name="kdgszs">
 		<description>Kǒudài Guàishòu - Zuànshí Bǎn (KT-008 PCB)</description>
-		<year>19??</year>
+		<year>20??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="alt_title" value="口袋怪兽 - 钻石版 ~ Pokemon Diamond"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="5K" />
 			<dataarea name="prg" size="1048576">
 				<rom name="pokemon platinum (kt-008 pcb)(ch).prg" size="1048576" crc="4d735cb1" sha1="7bdc865f0123a643cbfb7645957cf6cc0e30677e" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="16384">
+			<dataarea name="vram" size="8192">
 			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up ? -->
+			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
 				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="kdgszz" cloneof="kdgszs" supported="partial">
+	<software name="kdgszz" cloneof="kdgszs">
 		<description>Kǒudài Guàishòu - Zhēnzhū Bǎn (KT-008 PCB, alt)</description>
-		<year>19??</year>
+		<year>20??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="alt_title" value="口袋怪兽 - 珍珠版 ~ Pokemon Pearl"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="5K" />
 			<dataarea name="prg" size="1048576">
 				<rom name="pokemon platinum alt title 1 (kt-008 pcb)(ch).prg" size="1048576" crc="4f427110" sha1="d88dfadb681a61dfa36177afbec07364ed6c0011" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="16384">
+			<dataarea name="vram" size="8192">
 			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up ? -->
+			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
 				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="kdgsbj" cloneof="kdgszs" supported="partial">
+	<software name="kdgsbj" cloneof="kdgszs">
 		<description>Kǒudài Guàishòu - Báijīn Bǎn (KT-008 PCB, alt 2)</description>
 		<year>19??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="alt_title" value="口袋怪兽 - 白金版 ~ Pokemon Platinum"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="5K" />
 			<dataarea name="prg" size="1048576">
 				<rom name="pokemon platinum alt title 2 (kt-008 pcb)(ch).prg" size="1048576" crc="e001de16" sha1="6d57879ec66a523882813bcc0bc69d5bc8ff0ed0" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="16384">
+			<dataarea name="vram" size="8192">
 			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up ? -->
+			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
 				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
@@ -86971,20 +86974,22 @@ that the real dumps might surface -->
 
 <!-- TO SORT AND RENAME PROPERLY!!! -->
 
-	<software name="pokehg" supported="partial">
+<!-- This is KT-1062? Parent/clone with KT-1063? -->
+	<software name="pokehg">
 		<description>Pokemon HeartGold (KT-008 PCB)</description>
-		<year>19??</year>
+		<year>20??</year>
 		<publisher>Shenzhen Jncota</publisher>
+		<info name="alt_title" value="口袋怪兽 - 水晶版"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="5K" />
 			<dataarea name="prg" size="1048576">
 				<rom name="pokemon heartgold (kt-008 pcb)(ch).prg" size="1048576" crc="61fc4d20" sha1="6545611c3704b8624343f4bdab7c1096523a1ac9" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="16384">
+			<dataarea name="vram" size="8192">
 			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up ? -->
+			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
 				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
