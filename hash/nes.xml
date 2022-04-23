@@ -29993,7 +29993,7 @@ license:CC0
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nina006" />
 			<feature name="pcb" value="AVE-NINA-06" />
-			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="pyr-prg b11e" size="16384" crc="be86ee6d" sha1="0c164a7b99028c17032e8021f3a9b5a590db7547" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -44587,6 +44587,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="NES-UNROM" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="131072">
 				<rom name="1943 - the battle of midway (japan) (beta).prg" size="131072" crc="3ff10e3d" sha1="ee478a1d06be0bb0442183eb61a6e2bd067344ec" offset="00000" status="baddump" />
 			</dataarea>
@@ -44886,6 +44887,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="NES-UNROM" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="131072">
 				<rom name="arctic (japan).prg" size="131072" crc="1f74ea6c" sha1="37d8903ab381090873a6c51c39f6120a7213fb6d" offset="00000" />
 			</dataarea>
@@ -44938,6 +44940,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="NES-CNROM" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="32768">
 				<rom name="aso - armored scrum object (japan) (beta).chr" size="32768" crc="a7fca0d9" sha1="953949413afb5dce1fb4d765b926818bbffa01c1" offset="00000" status="baddump" />
 			</dataarea>
@@ -45439,6 +45442,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="NES-NROM-256" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="8192">
 				<rom name="bugtris (kor)(unl).chr" size="8192" crc="5725a190" sha1="820d7adec614a94376f842a7bb7d1bcc8b5317f0" offset="00000" status="baddump" />
 			</dataarea>
@@ -46599,6 +46603,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="TAITO-NROM-256" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="8192">
 				<rom name="elevator action (japan, rev a).chr" size="8192" crc="fac01d0f" sha1="f4c30bb45e92398088baabab04bc5650066781fc" offset="00000" />
 			</dataarea>
@@ -47557,6 +47562,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="NES-CNROM" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="32768">
 				<rom name="hokuto no ken (japan) (beta).chr" size="32768" crc="1fead99b" sha1="33c9a6f050e5a072c3273bc9ad34145b7e635c14" offset="00000" status="baddump" />
 			</dataarea>
@@ -47702,6 +47708,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="NES-NROM-256" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="8192">
 				<rom name="igo meikan (japan).chr" size="8192" crc="4201e877" sha1="98ae2abf2dfb557bbb783c0c7f40172f318a7bea" offset="00000" />
 			</dataarea>
@@ -47778,6 +47785,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="NES-NROM-256" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="8192">
 				<rom name="igo shinan (japan).chr" size="8192" crc="1d2cd323" sha1="7e64a6dea791d2b6eaf71113cf31b859b6fa99f9" offset="00000" />
 			</dataarea>
@@ -47957,6 +47965,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="NES-NROM-128" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="8192">
 				<rom name="joust (japan).chr" size="8192" crc="a7d11bbb" sha1="18b81e218900de0847b28217ba62bbee59cd9665" offset="00000" />
 			</dataarea>
@@ -48081,6 +48090,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="NES-NROM-128" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="karateka (japan) (beta).prg" size="16384" crc="8e9210d1" sha1="5db0567428c2dabe6900bb22cf884f44fb7da7c3" offset="00000" status="baddump" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -48946,6 +48956,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Namcot</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nrom" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="milli.prg" size="16384" crc="cfa0f7b9" sha1="88e78fdb6e91c65412f738259fe31149b99a71f4" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -48966,6 +48977,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="NES-NROM-128" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="8192">
 				<rom name="millipede (japan).chr" size="8192" crc="d219b570" sha1="b3f992f1a487cc13789dd994c9d3b566e148350c" offset="00000" />
 			</dataarea>
@@ -49750,6 +49762,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="NES-NROM-128" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="8192">
 				<rom name="pac-man (europe).chr" size="8192" crc="19c4aa76" sha1="6ab2a6cfd59e4e1fe9d8c5da6722bb5a6a173861" offset="00000" />
 			</dataarea>
@@ -49980,6 +49993,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="NES-CNROM" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="32768">
 				<rom name="puzzle (usa) (beta) (unl).chr" size="32768" crc="a41df259" sha1="433dd5933fb65bb88a2a2c1e3846e90554ae1ea8" offset="00000" status="baddump" />
 			</dataarea>
@@ -50441,7 +50455,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="NES-CNROM" />
-			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="vertical" />
 			<feature name="chr-pin26" value="/CE" />
 			<feature name="chr-pin27" value="CE" />
 			<dataarea name="chr" size="8192">
@@ -50884,6 +50898,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="NES-NROM-256" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="sqoon (japan) (rev a).prg" size="32768" crc="d034706c" sha1="ce36411118efa6d91bb5617808f37a36124f5480" offset="00000" status="baddump" />
 			</dataarea>
@@ -51300,6 +51315,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="NES-NROM-256" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="8192">
 				<rom name="special tag team pro wrestling (japan).chr" size="8192" crc="34a94f99" sha1="8e73516b91016023ffec2be20c0203949a7310a8" offset="00000" status="baddump" />
 			</dataarea>
@@ -51404,12 +51420,13 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<description>Tatakai no Banka (Jpn)</description>
 		<year>1986</year>
 		<publisher>Capcom</publisher>
-		<info name="serial" value=""/>
+		<info name="serial" value="CAP-TA"/>
 		<info name="release" value="19861224"/>
 		<info name="alt_title" value="闘いの挽歌"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="NES-UNROM" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="tatakai no banka (japan).prg" size="131072" crc="be95b219" sha1="563786be12f4c37c774fe1cab41f362606211277" offset="00000" />
 			</dataarea>
@@ -51602,6 +51619,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="HVC-CNROM" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="16384">
 				<rom name="tetris (bulletproof) (japan).chr" size="16384" crc="e201dd0e" sha1="b6743e40d3d56b314fcd2502f5eb4c30291bb270" offset="00000" />
 			</dataarea>
@@ -51874,7 +51892,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="NES-UNROM" />
-			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="tsuri kichi sanpei - blue marlin hen (japan).prg" size="131072" crc="5a18f611" sha1="77241a57cb0b40d9ecac451f86198abbacbc717c" offset="00000" />
 			</dataarea>
@@ -54911,7 +54929,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nina006" />
 			<feature name="pcb" value="AVE-NINA-03" />
-			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="16384" crc="1ff8dace" sha1="d23b489dc965585888fbcf610931181430dd5d33" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -58534,15 +58552,16 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="zhanssj" supported="no">
+<!-- Is this itself a clone of KT-1018 (which we are missing)? -->
+	<software name="zhanssj">
 		<description>Zhànshén Shìjiè (China)</description>
-		<year>19??</year>
+		<year>20??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1019"/>
 		<info name="alt_title" value="战神世界"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />    <!-- Wrong. It actually uses an extended mapper, based on TLROM, which we don't support yet -->
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="5K" />
 			<dataarea name="prg" size="1048576">
 				<rom name="[kt-1019] zhan shen shi jie (c).prg" size="1048576" crc="5f362198" sha1="98ddca1f07d778eea7447e9b4a20ae89f4a621f6" offset="00000" status="baddump" />
 			</dataarea>
@@ -58556,15 +58575,15 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="jianxqy" supported="no">
+	<software name="jianxqy" cloneof="zhanssj">
 		<description>Jiànxiá Qíngyuán (China)</description>
-		<year>19??</year>
+		<year>20??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1020"/>
 		<info name="alt_title" value="剑侠情缘"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />    <!-- Wrong. It actually uses an extended mapper, based on TLROM, which we don't support yet -->
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="5K" />
 			<dataarea name="prg" size="1048576">
 				<rom name="[kt-1020] jian xia qing yuan (c).prg" size="1048576" crc="ea831217" sha1="5859e95b9d4b64b7e95929bab80ee8c3c687be82" offset="00000" status="baddump" />
 			</dataarea>
@@ -58578,15 +58597,60 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="shenmoda" supported="no">
+	<software name="tiejiatj" cloneof="sdgndgs3">
+		<description>Tiějiǎ Tújí (China)</description>
+		<year>20??</year>
+		<publisher>Shenzhen Jncota</publisher>
+		<info name="serial" value="KT-1025"/>
+		<info name="alt_title" value="铁甲突击"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="5K" />
+			<dataarea name="prg" size="262144">
+				<rom name="tiejia tuji.prg" size="262144" crc="3bbfbd4b" sha1="df3d22d8b9b8d6847221144507b9ed9bb8d617a5" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="tiejia tuji.chr" size="262144" crc="453d84f1" sha1="42dbf442f9552db521f17eeed30db8fc7ddc7b42" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xinghezd" cloneof="sdgndgs3">
+		<description>Xīnghé Zhànduì (China)</description>
+		<year>20??</year>
+		<publisher>Shenzhen Jncota</publisher>
+		<info name="serial" value="KT-1026"/>
+		<info name="alt_title" value="星河战队"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="5K" />
+			<dataarea name="prg" size="262144">
+				<rom name="xinghe zhandui.prg" size="262144" crc="f7007490" sha1="07ac2b99535956cb2ef1d70180c9bcfe4cb8eeed" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="xinghe zhandui.chr" size="262144" crc="ec606450" sha1="177b62428c003d7bd69ef58b7453124eb10ea6e5" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Seems like it's looping some bits of music incorrectly. Is this an emulation issue or is it like this on hardware? -->
+	<software name="shenmoda" supported="partial">
 		<description>Shénmó Dàlù (China)</description>
-		<year>19??</year>
+		<year>20??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1052"/>
 		<info name="alt_title" value="神魔大陆"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />    <!-- Wrong. It actually uses an extended mapper, based on TLROM, which we don't support yet -->
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="5K" />
 			<dataarea name="prg" size="1048576">
 				<rom name="[kt-1052] shen mo da lu (c).prg" size="1048576" crc="a4c39535" sha1="6d72ed0293e112d10d08b99a20dac4707fbe3531" offset="00000" status="baddump" />
 			</dataarea>
@@ -58600,19 +58664,19 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="kdgsfc" supported="no">
+	<software name="kdgsfc">
 		<description>Kǒudài Guàishòu - Fěicuì Bǎn (China)</description>
-		<year>19??</year>
+		<year>20??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1063"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />    <!-- Wrong. It actually uses an extended mapper, based on TLROM, which we don't support yet -->
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="5K" />
 			<dataarea name="prg" size="1048576">
 				<rom name="[kt-1063] kou dai guai shou - fei cui ban (c).prg" size="1048576" crc="5464d7f8" sha1="8e783d45d05e4a30db3355d8ad1ae4a2f5385530" offset="00000" status="baddump" />
 			</dataarea>
-			<!-- 16k VRAM on cartridge? -->
-			<dataarea name="vram" size="16384">
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
@@ -58621,15 +58685,16 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="hundunds" supported="no">
+<!-- Are battle backgrounds really supposed to be all white? Is this working? -->
+	<software name="hundunds" supported="partial">
 		<description>Yǒngzhě Hēi'àn Shìjiè - Hùndùn De Shìjiè (China)</description>
-		<year>19??</year>
+		<year>20??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1066"/>
 		<info name="alt_title" value="勇者黑暗世界-混沌的世界"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />    <!-- Wrong. It actually uses an extended mapper, based on TLROM, which we don't support yet -->
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="5K" />
 			<dataarea name="prg" size="1048576">
 				<rom name="[kt-1066] yong zhe hei an shi jie - hun dun de shi jie (c).prg" size="1048576" crc="b5fdb3cb" sha1="7ce1b5a48aa14b0048389191ec88bd6db923b6e2" offset="00000" status="baddump" />
 			</dataarea>
@@ -58643,63 +58708,63 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="kdgszs" supported="partial">
+	<software name="kdgszs">
 		<description>Kǒudài Guàishòu - Zuànshí Bǎn (KT-008 PCB)</description>
-		<year>19??</year>
+		<year>20??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="alt_title" value="口袋怪兽 - 钻石版 ~ Pokemon Diamond"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="5K" />
 			<dataarea name="prg" size="1048576">
 				<rom name="pokemon platinum (kt-008 pcb)(ch).prg" size="1048576" crc="4d735cb1" sha1="7bdc865f0123a643cbfb7645957cf6cc0e30677e" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="16384">
+			<dataarea name="vram" size="8192">
 			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up ? -->
+			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
 				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="kdgszz" cloneof="kdgszs" supported="partial">
+	<software name="kdgszz" cloneof="kdgszs">
 		<description>Kǒudài Guàishòu - Zhēnzhū Bǎn (KT-008 PCB, alt)</description>
-		<year>19??</year>
+		<year>20??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="alt_title" value="口袋怪兽 - 珍珠版 ~ Pokemon Pearl"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="5K" />
 			<dataarea name="prg" size="1048576">
 				<rom name="pokemon platinum alt title 1 (kt-008 pcb)(ch).prg" size="1048576" crc="4f427110" sha1="d88dfadb681a61dfa36177afbec07364ed6c0011" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="16384">
+			<dataarea name="vram" size="8192">
 			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up ? -->
+			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
 				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="kdgsbj" cloneof="kdgszs" supported="partial">
+	<software name="kdgsbj" cloneof="kdgszs">
 		<description>Kǒudài Guàishòu - Báijīn Bǎn (KT-008 PCB, alt 2)</description>
 		<year>19??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="alt_title" value="口袋怪兽 - 白金版 ~ Pokemon Platinum"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="5K" />
 			<dataarea name="prg" size="1048576">
 				<rom name="pokemon platinum alt title 2 (kt-008 pcb)(ch).prg" size="1048576" crc="e001de16" sha1="6d57879ec66a523882813bcc0bc69d5bc8ff0ed0" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="16384">
+			<dataarea name="vram" size="8192">
 			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up ? -->
+			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
 				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
@@ -68350,6 +68415,7 @@ All musics were removed in this game.
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="NES-NROM-128" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="16384">
 				<rom name="pyramid (1990)(sachen)(tw)[p][o][sa-009].chr" size="16384" crc="4d044126" sha1="aadeefdf2a1bde6ab248e64d492ee9b8d9620722" offset="00000" status="baddump" />
 			</dataarea>
@@ -77947,7 +78013,7 @@ We include them here as reference if they should coincide with later revisions o
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="NES-NROM-128" />
-			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="8192">
 				<rom name="pinball (2002)(nintendo)(en)[h][ripped from animal crossing for gamecube].chr" size="8192" crc="f2a53b3d" sha1="0d2a521fd984c76cbf9b3cbd47e68c6ce4c6eeae" offset="00000" status="baddump" />
 			</dataarea>
@@ -86971,20 +87037,22 @@ that the real dumps might surface -->
 
 <!-- TO SORT AND RENAME PROPERLY!!! -->
 
-	<software name="pokehg" supported="partial">
+<!-- This is KT-1062? Parent/clone with KT-1063? -->
+	<software name="pokehg">
 		<description>Pokemon HeartGold (KT-008 PCB)</description>
-		<year>19??</year>
+		<year>20??</year>
 		<publisher>Shenzhen Jncota</publisher>
+		<info name="alt_title" value="口袋怪兽 - 水晶版"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="5K" />
 			<dataarea name="prg" size="1048576">
 				<rom name="pokemon heartgold (kt-008 pcb)(ch).prg" size="1048576" crc="61fc4d20" sha1="6545611c3704b8624343f4bdab7c1096523a1ac9" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="16384">
+			<dataarea name="vram" size="8192">
 			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up ? -->
+			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
 				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
