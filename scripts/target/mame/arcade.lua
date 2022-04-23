@@ -1187,6 +1187,7 @@ files {
 	MAME_DIR .. "src/mame/includes/badlands.h",
 	MAME_DIR .. "src/mame/machine/badlands.cpp",
 	MAME_DIR .. "src/mame/video/badlands.cpp",
+	MAME_DIR .. "src/mame/drivers/badlands_ms.cpp",
 	MAME_DIR .. "src/mame/drivers/badlandsbl.cpp",
 	MAME_DIR .. "src/mame/drivers/bartop52.cpp",
 	MAME_DIR .. "src/mame/drivers/batman.cpp",
