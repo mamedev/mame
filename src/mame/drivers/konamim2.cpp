@@ -696,7 +696,8 @@ void konamim2_state::machine_start()
 	m_ppc1->ppcdrc_add_fastram(m_bda->ram_start(), m_bda->ram_end(), false, m_bda->ram_ptr());
 	m_ppc2->ppcdrc_add_fastram(m_bda->ram_start(), m_bda->ram_end(), false, m_bda->ram_ptr());
 
-	m_available_cdroms = new cdrom_file(machine().rom_load().get_disk_handle(":cdrom"));
+	chd_file *chd = machine().rom_load().get_disk_handle(":cdrom");
+	m_available_cdroms = chd ? new cdrom_file(chd) : nullptr;
 
 	// TODO: REMOVE
 	m_atapi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(konamim2_state::atapi_delay), this));
