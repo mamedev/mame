@@ -98,7 +98,7 @@
         p911(all)           Goes in-game. Controllers are not emulated. Various graphical glitches.
         tsurugi,j           Goes in-game. Controllers are not emulated. Various graphical glitches.
 
-        gticlub2,ea         Attract mode works. Coins up. Hangs in various places. Will crash with "network error" after stage is selected.
+        gticlub2,drivprty   Attract mode works. Coins up. Hangs in various places. Will crash with "network error" after stage is selected.
         thrild2,a           Attract mode with partial graphics. Coins up. Hangs in various places.
 
         sscopefh            Graphics heavily glitched. Gun controller is not emulated. Sensor error and hopper error stop it from working.
@@ -3056,7 +3056,7 @@ ROM_START(p247) //*
 	DISK_IMAGE( "a00eaa02", 0, SHA1(81565a2dce2e2b0a7927078a784354948af1f87c) ) // Is actually UAD/EAD
 ROM_END
 
-ROM_START(p247a)
+ROM_START(p247ea)
 	VIPER_BIOS
 
 	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
@@ -3442,7 +3442,7 @@ GAME(2000, p911ac,    p911,      viper,     p911,       viper_state, init_viperc
 GAME(2000, p911kc,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver KAC)", MACHINE_NOT_WORKING)
 GAME(2000, p911ud,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 911 (ver UAD)", MACHINE_NOT_WORKING)
 GAME(2000, p247,      p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 24/7 (ver EAD)", MACHINE_NOT_WORKING)
-GAME(2000, p247a,     p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 24/7 (ver EAD, alt)", MACHINE_NOT_WORKING)
+GAME(2000, p247ea,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 24/7 (ver EAD, alt)", MACHINE_NOT_WORKING)
 GAME(2000, p911j,     p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver JAE)", MACHINE_NOT_WORKING)
 GAME(2001, p9112,     kviper,    viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 911 2 (VER. UAA:B)", MACHINE_NOT_WORKING)
 GAME(2001, sscopex,   kviper,    viper,     sscopex,    viper_state, init_vipercf,  ROT0,  "Konami", "Silent Scope EX (ver UAA)", MACHINE_NOT_WORKING)
