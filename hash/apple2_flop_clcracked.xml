@@ -47820,4 +47820,186 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="keybfing">
+		<description>Keyboard Fingerings (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-04-20"/>
+		<!--"Keyboard Fingerings" is a 1985 educational program developed by G. David Peters and distributed by Electronic Courseware Systems. It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="keyboard fingerings (4am crack).dsk" size="143360" crc="4698d95d" sha1="79fbb021fead12425f212f60ffcefef1e3d35d13"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keybintv">
+		<description>Keyboard Intervals (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-04-20"/>
+		<!--"Keyboard Intervals" is a 1985 educational program developed by G. David Peters and distributed by Electronic Courseware Systems. It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="keyboard intervals (4am crack).dsk" size="143360" crc="58528f13" sha1="3d8bf802ced06c1c21ee1f54f8dd8a2538d0fe63"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keybjazzh">
+		<description>Keyboard Jazz Harmonies (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-04-20"/>
+		<!--"Keyboard Jazz Harmonies" is a 1985 educational program developed by Joseph A. Brownlee and distributed by Electronic Courseware Systems. It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="keyboard jazz harmonies (4am crack).dsk" size="143360" crc="5ea5aa72" sha1="b2575b5fa2c9a0f7cde103fe928b0d752f4a2343"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keybejazzh">
+		<description>Keyboard Extended Jazz Harmonies (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-04-20"/>
+		<!--"Keyboard Extended Jazz Harmonies" is a 1987 educational program developed by Joseph A. Brownlee and distributed by Electronic Courseware Systems. It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="keyboard extended jazz harmonies (4am crack).dsk" size="143360" crc="07cefb6f" sha1="7bd20ae0b41957185dcdce40c96c97a7983a0e5b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keybsread">
+		<description>Keyboard Speed Reading (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-04-20"/>
+		<!--"Keyboard Speed Reading" is a 1985 educational program developed by Ray E. Zubler and distributed by Electronic Courseware Systems. It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="keyboard speed reading (4am crack).dsk" size="143360" crc="accbe520" sha1="d81dc34cbf3cae530b084928f00159a129792af9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musicstairs">
+		<description>Musical Stairs (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-04-20"/>
+		<!--"Musical Stairs" is a 1985 educational program developed by Stephen L. Walker and distributed by Electronic Courseware Systems. It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="musical stairs (4am crack).dsk" size="143360" crc="808705d0" sha1="5aea1cfdad848820ddbedf63584147de4b60ec9b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="notedet2int">
+		<description>Note Detective II: Intermediate Level (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-04-20"/>
+		<!--"Note Detective II: Intermediate Level" is a 1989 educational program developed by Reid Alexander and JoEllen DeVilbiss, and distributed by Electronic Courseware Systems. It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="note detective ii- intermediate level (4am crack).dsk" size="143360" crc="c8620d0d" sha1="ab05536d490cc7dfc9118403109e6d6558523581"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geosearch">
+		<description>Geography Search (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>McGraw-Hill</publisher>
+		<info name="release" value="2022-04-21"/>
+		<!--"Geography Search" is a 1982 educational program developed by Thomas F.F. Snyder and distributed by McGraw-Hill. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="geography search (4am crack).dsk" size="143360" crc="f778dd18" sha1="28cca898a47c89fa97459c3c926df1cb6b7dd426"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cubpricyl">
+		<description>Cubes, Prisms, and Cylinders (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Educational Activities</publisher>
+		<info name="release" value="2022-04-21"/>
+		<!--"Cubes, Prisms, and Cylinders" is a 1988 educational program developed by Jason A. Dylan and distributed by Educational Activities. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="cubes, prisms, and cylinders (4am crack).dsk" size="143360" crc="c36a007c" sha1="109131498188be0fe0f91d6953481c7a250838d7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="erlymussk">
+		<description>Early Music Skills (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-04-20"/>
+		<!--"Early Music Skills" is a 1985 educational program developed by Lolita Walker Gilkes and distributed by Electronic Courseware Systems. It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="early music skills (4am crack).dsk" size="143360" crc="f8dc4380" sha1="40cbaaaf0441c80794f2b92dba1a612d985deb47"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keybarpeg">
+		<description>Keyboard Arpeggios (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-04-20"/>
+		<!--"Keyboard Arpeggios" is a 1985 educational program developed by Reid Alexander and distributed by Electronic Courseware Systems. It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="keyboard arpeggios (4am crack).dsk" size="143360" crc="fa3e26a4" sha1="9e66acc9367a65ab219c4fb29651d31a38f917e1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keyblues">
+		<description>Keyboard Blues (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-04-20"/>
+		<!--"Keyboard Blues" is a 1985 educational program developed by G. David Peters and distributed by Electronic Courseware Systems. It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="keyboard blues (4am crack).dsk" size="143360" crc="c32ddf6a" sha1="bddd4ca4b792050bef3702b38e977375855ac27c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keybchords">
+		<description>Keyboard Chords (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-04-20"/>
+		<!--"Keyboard Chords" is a 1985 educational program developed by G. David Peters and distributed by Electronic Courseware Systems. It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="keyboard chords (4am crack).dsk" size="143360" crc="5d41b232" sha1="70856b9d56282d6b0218d32611638f15a4e0b1c7"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
