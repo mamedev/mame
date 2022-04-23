@@ -215,13 +215,10 @@ upd7756_device::upd7756_device(const machine_config &mconfig, device_type type, 
 
 void upd775x_device::device_start()
 {
-	// allocate a stream channel
 	m_channel = stream_alloc(0, 1, clock()/4);
 
-	// compute the stepping rate based on the chip's clock speed
 	m_step = 4 * FRAC_ONE;
 
-	// compute the clock period
 	m_clock_period = clock() ? attotime::from_hz(clock()) : attotime::zero;
 
 	save_item(NAME(m_pos));
@@ -269,14 +266,12 @@ void upd7759_device::device_start()
 {
 	upd775x_device::device_start();
 
-	// chip configuration
 	m_sample_offset_shift = 1;
 
 	m_timer = timer_alloc(TID_SLAVE_UPDATE);
 
 	m_drqcallback.resolve_safe();
 
-	// toggle the reset line to finish the reset
 	device_reset();
 }
 
@@ -285,7 +280,6 @@ void upd7756_device::device_start()
 {
 	upd775x_device::device_start();
 
-	// toggle the reset line to finish the reset
 	device_reset();
 }
 
@@ -320,7 +314,6 @@ void upd7759_device::device_reset()
 {
 	upd775x_device::device_reset();
 
-	// turn off any timer
 	m_timer->adjust(attotime::never);
 
 	if (m_drq)
@@ -337,11 +330,11 @@ void upd7756_device::device_reset()
 	m_drq = 0;
 }
 
-//-----------------------------------------------------------
-//
-//  Local variables
-//
-//-----------------------------------------------------------
+/************************************************************
+
+    Local variables
+
+*************************************************************/
 
 static const int upd775x_step[16][16] =
 {
@@ -366,19 +359,17 @@ static const int upd775x_step[16][16] =
 static const int upd775x_state_table[16] = { -1, -1, 0, 0, 1, 2, 2, 3, -1, -1, 0, 0, 1, 2, 2, 3 };
 
 
-//-----------------------------------------------------------
-//
-//  ADPCM sample updater
-//
-//-----------------------------------------------------------
+/************************************************************
+
+    ADPCM sample updater
+
+*************************************************************/
 
 void upd775x_device::update_adpcm(int data)
 {
-	// update the sample and the state
 	m_sample += upd775x_step[m_adpcm_state][data];
 	m_adpcm_state += upd775x_state_table[data];
 
-	// clamp the state to 0..15
 	if (m_adpcm_state < 0)
 		m_adpcm_state = 0;
 	else if (m_adpcm_state > 15)
@@ -387,11 +378,11 @@ void upd775x_device::update_adpcm(int data)
 
 
 
-//-----------------------------------------------------------
-//
-//  Master chip state machine
-//
-//-----------------------------------------------------------
+/************************************************************
+
+    Master chip state machine
+
+*************************************************************/
 
 void upd775x_device::advance_state()
 {
@@ -417,84 +408,78 @@ void upd775x_device::advance_state()
 			m_req_sample = (m_mode == MODE_STAND_ALONE) ? m_fifo_in : 0x10;
 			LOG_STATE("req_sample = %02X\n", m_req_sample);
 
-			// 35+ cycles after we get here, the /DRQ goes low
-			//     (first byte (number of samples in ROM) should be sent in response)
-			//
-			// (35 is the minimum number of cycles I found during heavy tests.
-			// Depending on the state the chip was in just before the /MD was set to 0 (reset, standby
-			// or just-finished-playing-previous-sample) this number can range from 35 up to ~24000).
-			// It also varies slightly from test to test, but not much - a few cycles at most.)
-			m_clocks_left = 70 + m_start_delay; // 35 - breaks cotton
+			/* 35+ cycles after we get here, the /DRQ goes low
+			 *     (first byte (number of samples in ROM) should be sent in response)
+			 *
+			 * (35 is the minimum number of cycles I found during heavy tests.
+			 * Depending on the state the chip was in just before the /MD was set to 0 (reset, standby
+			 * or just-finished-playing-previous-sample) this number can range from 35 up to ~24000).
+			 * It also varies slightly from test to test, but not much - a few cycles at most.) */
+			m_clocks_left = 70 + m_start_delay;
 			m_state = STATE_FIRST_REQ;
 			break;
 
-		// First request state: issue a request for the first byte
-		// The expected response will be the index of the last sample
+		/* First request state: issue a request for the first byte */
+		/* The expected response will be the index of the last sample */
 		case STATE_FIRST_REQ:
 			LOG_STATE("first data request\n");
 			m_drq = 1;
 
-			// 44 cycles later, we will latch this value and request another byte
 			m_clocks_left = 44;
 			m_state = STATE_LAST_SAMPLE;
 			break;
 
-		// Last sample state: latch the last sample value and issue a request for the second byte
-		// The second byte read will be just a dummy
+		/* Last sample state: latch the last sample value and issue a request for the second byte */
+		/* The second byte read will be just a dummy */
 		case STATE_LAST_SAMPLE:
 			m_last_sample = (m_mode == MODE_STAND_ALONE) ? read_byte(0) : m_fifo_in;
 			LOG_STATE("last_sample = %02X, requesting dummy 1\n", m_last_sample);
 			m_drq = 1;
 
-			// 28 cycles later, we will latch this value and request another byte
-			m_clocks_left = 28; // 28 - breaks cotton 
+			m_clocks_left = 28;
 			m_state = (m_req_sample > m_last_sample) ? STATE_IDLE : STATE_DUMMY1;
 			break;
 
-		// First dummy state: ignore any data here and issue a request for the third byte
-		// The expected response will be the MSB of the sample address
+		/* First dummy state: ignore any data here and issue a request for the third byte */
+		/* The expected response will be the MSB of the sample address */
 		case STATE_DUMMY1:
 			LOG_STATE("dummy1, requesting offset_hi\n");
 			m_drq = 1;
 
-			// 32 cycles later, we will latch this value and request another byte
 			m_clocks_left = 32;
 			m_state = STATE_ADDR_MSB;
 			break;
 
-		// Address MSB state: latch the MSB of the sample address and issue a request for the fourth byte
-		// The expected response will be the LSB of the sample address
+		/* Address MSB state: latch the MSB of the sample address and issue a request for the fourth byte */
+		/* The expected response will be the LSB of the sample address */
 		case STATE_ADDR_MSB:
 			m_offset = ((m_mode == MODE_STAND_ALONE) ? read_byte(m_req_sample * 2 + 5) : m_fifo_in) << (8 + m_sample_offset_shift);
 			LOG_STATE("offset_hi = %02X, requesting offset_lo\n", m_offset >> (8 + m_sample_offset_shift));
 			m_drq = 1;
 
-			// 44 cycles later, we will latch this value and request another byte
 			m_clocks_left = 44;
 			m_state = STATE_ADDR_LSB;
 			break;
 
-		// Address LSB state: latch the LSB of the sample address and issue a request for the fifth byte
-		// The expected response will be just a dummy
+		/* Address LSB state: latch the LSB of the sample address and issue a request for the fifth byte */
+		/* The expected response will be just a dummy */
 		case STATE_ADDR_LSB:
 			m_offset |= ((m_mode == MODE_STAND_ALONE) ? read_byte(m_req_sample * 2 + 6) : m_fifo_in) << m_sample_offset_shift;
 			LOG_STATE("offset_lo = %02X, requesting dummy 2\n", (m_offset >> m_sample_offset_shift) & 0xff);
 			m_drq = 1;
 
-			// 36 cycles later, we will latch this value and request another byte
 			m_clocks_left = 36;
 			m_state = STATE_DUMMY2;
 			break;
 
-		// Second dummy state: ignore any data here and issue a request for the sixth byte
-		// The expected response will be the first block header
+		/* Second dummy state: ignore any data here and issue a request for the sixth byte */
+		/* The expected response will be the first block header */
 		case STATE_DUMMY2:
 			m_offset++;
 			m_first_valid_header = 0;
 			LOG_STATE("dummy2, requesting block header\n");
 			m_drq = 1;
 
-			// 36?? cycles later, we will latch this value and request another byte
 			m_clocks_left = 36;
 			m_state = STATE_BLOCK_HEADER;
 			break;
@@ -502,7 +487,6 @@ void upd775x_device::advance_state()
 		// Block header state: latch the header and issue a request for the first byte afterwards
 		case STATE_BLOCK_HEADER:
 
-			// if we're in a repeat loop, reset the offset to the repeat point and decrement the count
 			if (m_repeat_count)
 			{
 				m_repeat_count--;
@@ -512,7 +496,6 @@ void upd775x_device::advance_state()
 			LOG_STATE("header (@%05X) = %02X, requesting next byte\n", m_offset, m_block_header);
 			m_drq = 1;
 
-			// our next step depends on the top two bits
 			switch (m_block_header & 0xc0)
 			{
 				case 0x00:  // silence
@@ -543,31 +526,28 @@ void upd775x_device::advance_state()
 					break;
 			}
 
-			// set a flag when we get the first non-zero header
 			if (m_block_header != 0)
 				m_first_valid_header = 1;
 			break;
 
-		// Nibble count state: latch the number of nibbles to play and request another byte
-		// The expected response will be the first data byte
+		/* Nibble count state: latch the number of nibbles to play and request another byte */
+		/* The expected response will be the first data byte */
 		case STATE_NIBBLE_COUNT:
 			m_nibbles_left = ((m_mode == MODE_STAND_ALONE) ? read_byte(m_offset++) : m_fifo_in) + 1;
 			LOG_STATE("nibble_count = %u, requesting next byte\n", (unsigned)m_nibbles_left);
 			m_drq = 1;
 
-			// 36?? cycles later, we will latch this value and request another byte
 			m_clocks_left = 36; // just a guess
 			m_state = STATE_NIBBLE_MSN;
 			break;
 
-		// MSN state: latch the data for this pair of samples and request another byte
-		// The expected response will be the next sample data or another header
+		/* MSN state: latch the data for this pair of samples and request another byte */
+		/* The expected response will be the next sample data or another header */
 		case STATE_NIBBLE_MSN:
 			m_adpcm_data = (m_mode == MODE_STAND_ALONE) ? read_byte(m_offset++) : m_fifo_in;
 			update_adpcm(m_adpcm_data >> 4);
 			m_drq = 1;
 
-			// we stay in this state until the time for this sample is complete
 			m_clocks_left = m_sample_rate * 4;
 			if (--m_nibbles_left == 0)
 				m_state = STATE_BLOCK_HEADER;
@@ -579,7 +559,6 @@ void upd775x_device::advance_state()
 		case STATE_NIBBLE_LSN:
 			update_adpcm(m_adpcm_data & 15);
 
-			// we stay in this state until the time for this sample is complete
 			m_clocks_left = m_sample_rate * 4;
 			if (--m_nibbles_left == 0)
 				m_state = STATE_BLOCK_HEADER;
@@ -588,7 +567,6 @@ void upd775x_device::advance_state()
 			break;
 	}
 
-	// if there's a DRQ, fudge the state
 	if (m_drq)
 	{
 		m_post_drq_state = m_state;
@@ -598,11 +576,11 @@ void upd775x_device::advance_state()
 	}
 }
 
-//-----------------------------------------------------------
-//
-//  DRQ callback
-//
-//-----------------------------------------------------------
+/************************************************************
+
+    DRQ callback
+
+*************************************************************/
 
 void upd7759_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
@@ -628,13 +606,10 @@ void upd7759_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			break;
 
 		case TID_SLAVE_UPDATE:
-			// update the stream
 			m_channel->update();
 
-			// advance the state
 			advance_state();
 
-			// if the DRQ changed, update it
 			LOG_STATE("upd7759_slave_update: DRQ %d->%d\n", olddrq, m_drq);
 			if (olddrq != m_drq)
 			{
@@ -642,7 +617,6 @@ void upd7759_device::device_timer(emu_timer &timer, device_timer_id id, int para
 				m_drqcallback(m_drq);
 			}
 
-			// set a timer to go off when that is done
 			if (m_state != STATE_IDLE || old_state != STATE_IDLE)
 				m_timer->adjust(m_clock_period * m_clocks_left);
 			break;
@@ -652,11 +626,11 @@ void upd7759_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-//-----------------------------------------------------------
-//
-//  I/O handlers
-//
-//-----------------------------------------------------------
+/************************************************************
+
+    I/O handlers
+
+*************************************************************/
 
 WRITE_LINE_MEMBER( upd775x_device::reset_w )
 {
@@ -665,25 +639,20 @@ WRITE_LINE_MEMBER( upd775x_device::reset_w )
 
 void upd775x_device::internal_reset_w(int state)
 {
-	// update the reset value
 	uint8_t oldreset = m_reset;
 	m_reset = (state != 0);
 
-	// update the stream first
 	m_channel->update();
 
-	// on the falling edge, reset everything
 	if (oldreset && !m_reset)
 		device_reset();
 }
 
 void upd7759_device::internal_reset_w(int state)
 {
-	// update the reset value
 	uint8_t oldreset = m_reset;
 	upd775x_device::internal_reset_w(state);
 
-	// When leaving RESET, check level of MD pin
 	if (!oldreset && m_reset)
 	{
 		if (!m_md)
@@ -702,21 +671,17 @@ WRITE_LINE_MEMBER( upd775x_device::start_w )
 
 void upd7759_device::internal_start_w(int state)
 {
-	// update the start value
 	uint8_t oldstart = m_start;
 	m_start = (state != 0);
 
 	LOG_STATE("upd7759_start_w: %d->%d\n", oldstart, m_start);
 
-	// update the stream first
 	m_channel->update();
 
-	// on the faling edge, if we're idle, start going, but not if we're held in reset
 	if (m_state == STATE_IDLE && oldstart && !m_start && m_reset)
 	{
 		m_state = STATE_START;
 
-		// for slave mode, start the timer going
 		if (m_mode == MODE_SLAVE)
 			m_timer->adjust(attotime::zero);
 	}
@@ -725,16 +690,13 @@ void upd7759_device::internal_start_w(int state)
 void upd7756_device::internal_start_w(int state)
 {
 
-	// update the start value
 	uint8_t oldstart = m_start;
 	m_start = (state != 0);
 
 	LOG_STATE("upd7759_start_w: %d->%d\n", oldstart, m_start);
 
-	// update the stream first
 	m_channel->update();
 
-	// on the falling edge, if we're idle, start going, but not if we're held in reset
 	if (m_state == STATE_IDLE && oldstart && !m_start && m_reset)
 	{
 		m_state = STATE_START;
@@ -763,7 +725,6 @@ void upd7759_device::internal_md_w(int state)
 
 	m_channel->update();
 
-	// on the falling edge, if we're idle, switch to slave mode, but not if we're held in reset
 	if (m_state == STATE_IDLE && old_md && !m_md && m_reset)
 	{
 		m_mode = MODE_SLAVE;
@@ -775,14 +736,12 @@ void upd7759_device::internal_md_w(int state)
 
 void upd775x_device::port_w(u8 data)
 {
-	// update the FIFO value
 	synchronize(TID_PORT_WRITE, data);
 }
 
 
 READ_LINE_MEMBER( upd775x_device::busy_r )
 {
-	// update the stream first
 	m_channel->update();
 
 	// return /BUSY
@@ -802,37 +761,29 @@ void upd775x_device::sound_stream_update(sound_stream &stream, std::vector<read_
 	uint32_t step = m_step;
 	uint32_t pos = m_pos;
 
-	// loop until done
 	u32 index = 0;
 	if (m_state != STATE_IDLE)
 		for ( ; index < outputs[0].samples(); index++)
 		{
-			// store the current sample
 			outputs[0].put(index, sample);
 
-			// advance by the number of clocks/output sample
 			pos += step;
 
-			// handle clocks, but only in standalone mode
 			while ((m_mode == MODE_STAND_ALONE) && pos >= FRAC_ONE)
 			{
 				int clocks_this_time = pos >> FRAC_BITS;
 				if (clocks_this_time > clocks_left)
 					clocks_this_time = clocks_left;
 
-				// clock once
 				pos -= clocks_this_time * FRAC_ONE;
 				clocks_left -= clocks_this_time;
 
-				// if we're out of clocks, time to handle the next state
 				if (clocks_left == 0)
 				{
-					// advance one state; if we hit idle, bail
 					advance_state();
 					if (m_state == STATE_IDLE)
 						break;
 
-					// reimport the variables that we cached
 					clocks_left = m_clocks_left;
 					sample = stream_buffer::sample_t(m_sample) * sample_scale;
 				}
@@ -843,7 +794,6 @@ void upd775x_device::sound_stream_update(sound_stream &stream, std::vector<read_
 	for (; index < outputs[0].samples(); index++)
 		outputs[0].put(index, 0);
 
-	// flush the state back
 	m_clocks_left = clocks_left;
 	m_pos = pos;
 }
