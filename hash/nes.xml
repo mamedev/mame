@@ -2734,7 +2734,7 @@ license:CC0
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="HVC-CNROM" />
-			<feature name="mirroring" value="vertical" />   <!-- CHECK! Also found as horizontal? does it resume fine after pressing Select when is horizontal? -->
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="vfr-b1-0 prg" size="32768" crc="9cf17fab" sha1="73f05a931ad15639979907bc3ac4300138a7000e" offset="00000" />
 			</dataarea>
@@ -9792,7 +9792,7 @@ license:CC0
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="gxrom" />
 			<feature name="pcb" value="NES-GNROM" />
-			<feature name="mirroring" value="vertical" />   <!-- Also found horizontal -->
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="pal-b8-1 prg" size="131072" crc="e2ab39a2" sha1="2338059ab6dc540e59283edee65714bcd94ac188" offset="00000" />
 			</dataarea>
@@ -45025,7 +45025,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="HVC-CNROM" />
-			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="16384">
 				<rom name="banana (6-30 prototype).chr" size="16384" crc="83e98784" sha1="a1125941c884e5ddbf119e0cb34d6381f18852ef" offset="00000" status="baddump" />
 			</dataarea>
@@ -46563,7 +46563,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="NES-CNROM" />
-			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="32768">
 				<rom name="dynamite bowl (japan).chr" size="32768" crc="ff39fc7d" sha1="9bd8d768580143c982554f72cb8f5df0587eb52b" offset="00000" />
 			</dataarea>
@@ -47267,7 +47267,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="ss88006" />
 			<feature name="pcb" value="JALECO-JF-38" /> <!-- Board type to be confirmed (but the game runs on Mapper 18 hw) -->
-			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="131072">
 				<rom name="goal (japan).chr" size="131072" crc="ed57b3fb" sha1="bd1c583da897200a197b27a0151e442ac02f0a53" offset="00000" status="baddump" />
 			</dataarea>
@@ -48073,7 +48072,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="karastudio" />
 			<feature name="pcb" value="BANDAI-KARAOKE" />
-			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="131072">
 				<rom name="karaoke studio (japan).prg" size="131072" crc="adfad6b6" sha1="5ab1d9cd55978af770a87749bd375741a63cb3d8" offset="00000" status="baddump" />
 			</dataarea>
@@ -56058,7 +56056,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<!-- From GoodNES -->
-	<software name="strikwlf">
+	<software name="strikwlf" supported="no"> <!-- crashes right before first boss -->
 		<description>Strike Wolf (Tw)</description>
 		<year>19??</year>
 		<publisher>TXC Corp</publisher>
@@ -57406,7 +57404,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="alt_title" value="三侠五义"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bmc_1200in1" />
-			<feature name="pcb" value="BMC-1200IN1" /> <!-- Header says mapper 227, but mirroring issues are present! -->
+			<feature name="pcb" value="BMC-1200IN1" />
 			<dataarea name="prg" size="1048576">
 				<rom name="[es-1071] san xia wu yi (c) (alt).prg" size="1048576" crc="a76b8d4f" sha1="fb44a1cc74c062dd928d2d811d58517827e420c3" offset="00000" status="baddump" />
 			</dataarea>
@@ -86706,7 +86704,6 @@ that the real dumps might surface -->
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SAROM" />
-			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="arcadia vi (proto).prg" size="131072" crc="25974957" sha1="cb12efbf4dc60faf53f1fb6ba961d65d0d005e2f" offset="00000" />
 			</dataarea>
