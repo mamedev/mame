@@ -370,7 +370,6 @@ void royalmah_state::machine_start()
 {
 	save_item(NAME(m_input_port_select));
 	save_item(NAME(m_dsw_select));
-	save_item(NAME(m_rombank));
 	save_item(NAME(m_palette_base));
 	save_item(NAME(m_flip_screen));
 
@@ -5586,16 +5585,25 @@ void royalmah_state::init_daisyari()
 void royalmah_state::init_mjtensin()
 {
 	m_mainbank->configure_entries(0, 80, memregion("maincpu")->base() + 0x10000, 0x8000);
+
+	save_item(NAME(m_rombank));
+	m_rombank = 0;
 }
 
 void royalmah_state::init_cafetime()
 {
 	m_mainbank->configure_entries(0, 64, memregion("maincpu")->base() + 0x10000, 0x8000);
+
+	save_item(NAME(m_rombank));
+	m_rombank = 0;
 }
 
 void royalmah_state::init_mjvegasa()
 {
 	m_mainbank->configure_entries(0, 128, memregion("maincpu")->base() + 0x10000, 0x8000);
+
+	save_item(NAME(m_rombank));
+	m_rombank = 0;
 }
 
 void royalmah_state::init_jongshin()
@@ -5606,6 +5614,9 @@ void royalmah_state::init_jongshin()
 void royalmah_state::init_mjifb()
 {
 	m_mainbank->configure_entries(0, 256, memregion("maincpu")->base() + 0x10000, 0x4000);
+
+	save_item(NAME(m_rombank));
+	m_rombank = 0;
 }
 
 void royalmah_state::init_tontonb()
