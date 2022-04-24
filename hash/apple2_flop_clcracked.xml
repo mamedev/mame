@@ -48002,4 +48002,21 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="drugefct">
+		<description>Drugs: Their Effects on You (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Marshware</publisher>
+		<info name="release" value="2022-04-23"/>
+		<!--"Drugs: Their Effects on You" is a 1987 educational program developed by EduSystems, illustrated by Morse Software Illustrations, with consultants Donna L. Osness and James M. Schaefer, and distributed by Marshware. It is preserved here for the first time.-->
+        <!-- Be sure to read the story of actually obtaining and dumping this disk at
+        https://archive.org/details/PreservingDrugsTheirEffectsOnYou
+        It might leave you taped to your seat. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="drugs- their effects on you (4am crack).dsk" size="143360" crc="6540b35f" sha1="b8965f31c71c09e5b72f465ba2783377a7b9ec93"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
