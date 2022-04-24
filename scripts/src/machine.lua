@@ -2747,6 +2747,8 @@ if (MACHINES["PCI"]~=null) then
 		MAME_DIR .. "src/devices/machine/sis7001_usb.h",
 		MAME_DIR .. "src/devices/machine/sis7018_audio.cpp",
 		MAME_DIR .. "src/devices/machine/sis7018_audio.h",
+		MAME_DIR .. "src/devices/machine/sis900_eth.cpp",
+		MAME_DIR .. "src/devices/machine/sis900_eth.h",
 		MAME_DIR .. "src/devices/machine/sis950_lpc.cpp",
 		MAME_DIR .. "src/devices/machine/sis950_lpc.h",
 		MAME_DIR .. "src/devices/machine/sis85c496.cpp",

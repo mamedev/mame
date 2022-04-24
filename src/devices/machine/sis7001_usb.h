@@ -24,6 +24,8 @@ public:
 	}
 	sis7001_usb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	static constexpr feature_type unemulated_features() { return feature::MEDIA; }
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;

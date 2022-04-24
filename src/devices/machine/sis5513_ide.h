@@ -17,6 +17,8 @@ public:
 	auto irq_pri() { return m_irq_pri_callback.bind(); }
 	auto irq_sec() { return m_irq_sec_callback.bind(); }
 
+	static constexpr feature_type unemulated_features() { return feature::DISK; }
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;

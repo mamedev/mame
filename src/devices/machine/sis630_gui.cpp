@@ -252,16 +252,18 @@ sis630_gui_device::sis630_gui_device(const machine_config &mconfig, const char *
 }
 
 ROM_START( sis630gui )
-	ROM_REGION32_LE( 0x8000, "gui_rom", ROMREGION_ERASEFF )
-	// "SiS 630 (Ver. 2.02.1c) [AGP VGA] (Silicon Integrated Systems Corp.).bin"
-	ROM_LOAD( "sis630.bin", 0x0000, 0x8000, CRC(f04ef9b0) SHA1(2396a79cd4045362bfc511090b146daa85902b4d) )
-
+	ROM_REGION32_LE( 0xc000, "gui_rom", ROMREGION_ERASEFF )
 	// TODO: why the OEM ROM is 0xc000 in size?
-	// 0x8000-0xbfff mostly contains a charset, may not be visible by HW or that part is programmable
-	// via a dedicated interface.
+	// 0x8000-0xbfff mostly contains a charset, may be either programmable via a dedicated interface
+	// or the dump above is half size.
 	// gamecstl dump ver. 2.06.50
 	// (which actually writes to VRAM with the actual expansion ROM enabled, uh?)
-	//ROM_LOAD( "oemrom.bin", 0x0000, 0xc000, CRC(03d8df9d) SHA1(8fb80a2bf4067d9bebc90fb498448869ae795b2b) )
+	ROM_SYSTEM_BIOS( 0, "2.06.50", "Ver. 2.06.50 OEM" )
+	ROMX_LOAD( "oemrom.bin", 0x0000, 0xc000, BAD_DUMP CRC(03d8df9d) SHA1(8fb80a2bf4067d9bebc90fb498448869ae795b2b), ROM_BIOS(0) )
+
+	// "SiS 630 (Ver. 2.02.1c) [AGP VGA] (Silicon Integrated Systems Corp.).bin"
+	ROM_SYSTEM_BIOS( 1, "2.02.1c", "Ver. 2.02.1c" )
+	ROMX_LOAD( "sis630.bin", 0x0000, 0x8000, BAD_DUMP CRC(f04ef9b0) SHA1(2396a79cd4045362bfc511090b146daa85902b4d), ROM_BIOS(1) )
 ROM_END
 
 const tiny_rom_entry *sis630_gui_device::device_rom_region() const
@@ -378,7 +380,6 @@ void sis630_gui_device::subvendor_w(offs_t offset, u32 data, u32 mem_mask)
 
 void sis630_gui_device::memory_map(address_map &map)
 {
-
 }
 
 void sis630_gui_device::io_map(address_map &map)
@@ -428,6 +429,9 @@ void sis630_gui_device::device_start()
 	add_map(128, M_IO, FUNC(sis630_gui_device::space_io_map));
 
 	add_rom((u8 *)m_gui_rom->base(), m_gui_rom->bytes());
+
+	// TODO: INTA, correct as 0?
+	intr_pin = 0;
 }
 
 void sis630_gui_device::device_reset()

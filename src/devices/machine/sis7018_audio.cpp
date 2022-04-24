@@ -6,6 +6,7 @@
 
     TODO:
 	- Stub interface, to be improved;
+	- Should be easy to at least inherit SB16/MIDI/game port devices;
 
 **************************************************************************************************/
 
@@ -25,7 +26,7 @@
 #define LOGIO(...)     LOGMASKED(LOG_IO,   __VA_ARGS__)
 #define LOGMAP(...)    LOGMASKED(LOG_MAP,  __VA_ARGS__)
 #define LOGTODO(...)   LOGMASKED(LOG_TODO, __VA_ARGS__)
-#define LOGPMC(...)    LOGMASKED(LOG_PMC, __VA_ARGS__)
+#define LOGPMC(...)    LOGMASKED(LOG_PMC,  __VA_ARGS__)
 
 DEFINE_DEVICE_TYPE(SIS7018_AUDIO, sis7018_audio_device, "sis7018_audio", "SiS 7018 Audio AC97")
 
@@ -103,7 +104,7 @@ void sis7018_audio_device::device_reset()
 	
 	command = 0x0000;
 	status = 0x0000;
-	// hardwired
+	// hardwired, INTB
 	intr_pin = 0x01;
 	// TODO: can be written to with $46=1
 	subsystem_id = 0x10397018;

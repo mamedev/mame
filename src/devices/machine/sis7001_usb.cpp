@@ -71,6 +71,10 @@ void sis7001_usb_device::device_start()
 	pci_device::device_start();
 
 	add_map(512, M_MEM, FUNC(sis7001_usb_device::io_map));
+	
+	// INTD
+	// TODO: not explicitly stated
+//	intr_pin = 4;
 }
 
 
