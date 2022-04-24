@@ -1447,5 +1447,5 @@ GAME( 2001, bigdeal0,  0,        hotslots, magicard, magicard_state, init_magica
 GAME( 199?, puzzleme,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Puzzle Me!",                                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 199?, unkte06,   0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "unknown Poker 'TE06'",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // strings in ROM
 GAME( 199?, lucky7i,   0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Lucky 7 (Impera)",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1993, unkpkr_w,  0,        magicard, magicard, magicard_state, init_magicard, ROT0, "unknown", "Unknown Poker W",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1993, dallaspk,  0,        magicard, magicard, magicard_state, init_magicard, ROT0, "unknown", "Dallas Poker",                              MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1993, unkpkr_w,  0,        magicard, magicard, magicard_state, init_magicard, ROT0, "<unknown>", "unknown Poker W",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1993, dallaspk,  0,        magicard, magicard, magicard_state, init_magicard, ROT0, "<unknown>", "Dallas Poker",                            MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
