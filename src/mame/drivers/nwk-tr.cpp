@@ -344,7 +344,7 @@ private:
 	optional_shared_ptr_array<uint32_t, 2> m_sharc_dataram;
 	memory_view m_cg_view;
 
-	emu_timer *m_sound_irq_timer;
+	emu_timer *m_sound_irq_timer = nullptr;
 	void paletteram32_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint8_t sysreg_r(offs_t offset);
 	void sysreg_w(offs_t offset, uint8_t data);
@@ -352,7 +352,7 @@ private:
 	void soundtimer_count_w(uint16_t data);
 	double adc12138_input_callback(uint8_t input);
 
-	bool m_exrgb;
+	bool m_exrgb = false;
 
 	TIMER_CALLBACK_MEMBER(sound_irq);
 
