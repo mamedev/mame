@@ -1,5 +1,5 @@
-// license:GPL-2.0+
-// copyright-holders:Raphael Nabet
+// license:GPL-2.0+, BSD-3-Clause
+// copyright-holders:Raphael Nabet,Robbbert
 /*
     Experimental exelvision driver
 
@@ -75,7 +75,7 @@ imagix                                  first screen corrupt, can't proceed
 pindo                                   first screen corrupt, can select a game, how to play?
 quizzy                                  works, scores are corrupted
 tennis           12                     the demo works, didn't try playing
-virus                                   works
+virus                                   works, 2nd screen is corrupt, press 1 there.
 wizord                                  works
 
 
