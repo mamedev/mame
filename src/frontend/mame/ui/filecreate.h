@@ -94,8 +94,8 @@ private:
 	virtual void handle(event const *ev) override;
 
 	// internal state
-	std::vector<std::reference_wrapper<const floppy_image_device::fs_info>>	m_fs;
-	int *																	m_result;
+	std::vector<std::reference_wrapper<const floppy_image_device::fs_info>> m_fs;
+	int *                                                                   m_result;
 };
 
 

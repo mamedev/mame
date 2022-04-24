@@ -3628,9 +3628,9 @@ license:CC0
 		<!-- It requires a 48K Apple II or II+.
 		Due to compatibility issues created by the copy protection,
 		it will not run on later models. -->
-        <!-- This disk was redumped on March 30th, 2022 to fix
-        corruption related to a bug in early Applesauce FDC
-        firmware. -->
+		<!-- This disk was redumped on March 30th, 2022 to fix
+		corruption related to a bug in early Applesauce FDC
+		firmware. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="360719">
@@ -21836,7 +21836,7 @@ license:CC0
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Locksmith 6.0B parameter disk 1D"/>
-            <!-- This disk upgrades 6.0A to 6.0B -->
+			<!-- This disk upgrades 6.0A to 6.0B -->
 			<dataarea name="flop" size="234799">
 				<rom name="locksmith v6.0b parameter disk 1d.woz" size="234799" crc="e31292d4" sha1="bab8cc7a5f34a2a44954648b17f85997cacd443a"/>
 			</dataarea>

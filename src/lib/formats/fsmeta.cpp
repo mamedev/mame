@@ -42,10 +42,10 @@ meta_type meta_value::type() const
 	std::optional<meta_type> result;
 	std::visit(overloaded
 	{
-		[&result](const std::string &)				{ result = meta_type::string; },
-		[&result](std::uint64_t)					{ result = meta_type::number; },
-		[&result](bool)								{ result = meta_type::flag; },
-		[&result](const util::arbitrary_datetime &)	{ result = meta_type::date; }
+		[&result](const std::string &)              { result = meta_type::string; },
+		[&result](std::uint64_t)                    { result = meta_type::number; },
+		[&result](bool)                             { result = meta_type::flag; },
+		[&result](const util::arbitrary_datetime &) { result = meta_type::date; }
 	}, value);
 	return *result;
 }

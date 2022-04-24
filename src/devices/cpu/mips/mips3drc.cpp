@@ -35,7 +35,7 @@
 
 /* Use with STRICT_VERIFY to print debug info to console for extra validation checks */
 /* Set to 1 to activate and use MIPS3DRC_STRICT_VERIFY in the drc options */
-#define DEBUG_STRICT_VERIFY	0
+#define DEBUG_STRICT_VERIFY 0
 
 
 /***************************************************************************
@@ -161,7 +161,7 @@ void mips3_device::mips3drc_set_options(uint32_t options)
 }
 
 /*-------------------------------------------------
-	mips3drc_get_options - return current DRC options
+    mips3drc_get_options - return current DRC options
 -------------------------------------------------*/
 
 uint32_t mips3_device::mips3drc_get_options()

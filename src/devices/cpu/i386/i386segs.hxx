@@ -2479,7 +2479,7 @@ void i386_device::i386_protected_mode_iret(int operand32)
 inline void i386_device::dri_changed()
 {
 	int dr;
-	
+
 	if(m_dri_changed_active)
 		return;
 	m_dri_changed_active = true;

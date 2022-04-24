@@ -112,16 +112,16 @@ void m92_state::videocontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	    be a different motherboard revision (most games use M92-A-B top
 	    pcb, a M92-A-A revision could exist...).
 
-		There is a further test case with R-Type Leo. The flickering
-		invulnerability effect when you spawn does not work correctly
-		with the palette bank hooked up, and also causes a 2nd player
-		spawning in to have the incorrect palette at first.
+	    There is a further test case with R-Type Leo. The flickering
+	    invulnerability effect when you spawn does not work correctly
+	    with the palette bank hooked up, and also causes a 2nd player
+	    spawning in to have the incorrect palette at first.
 
-		It appears that the only games requiring the palette bank logic
-		are Major Title 2, Ninja Baseball Bat Man, Dream Soccer '94
-		and Gun Force 2.  These are also the games with the extended
-		ROM banking, suggesting a difference on those boards is a more
-		likely explanation.
+	    It appears that the only games requiring the palette bank logic
+	    are Major Title 2, Ninja Baseball Bat Man, Dream Soccer '94
+	    and Gun Force 2.  These are also the games with the extended
+	    ROM banking, suggesting a difference on those boards is a more
+	    likely explanation.
 	*/
 
 	/*

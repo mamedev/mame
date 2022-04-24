@@ -128,7 +128,7 @@ public:
 	virtual std::error_condition length(std::uint64_t &result) noexcept override { result = m_size; return std::error_condition(); }
 
 	virtual bool eof() const override;
-	
+
 protected:
 	core_basic_file(std::uint32_t openflags, std::uint64_t length) noexcept
 		: core_text_file(openflags)

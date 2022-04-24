@@ -428,8 +428,8 @@ void nes_x1_017_device::write_m(offs_t offset, u8 data)
 
 	// 2+2+1 KB of Internal RAM can be independently enabled/disabled!
 	if ((offset < 0x0800 && m_reg[0] == 0xca) ||
-	    (offset < 0x1000 && m_reg[1] == 0x69) ||
-	    (offset < 0x1400 && m_reg[2] == 0x84))
+		(offset < 0x1000 && m_reg[1] == 0x69) ||
+		(offset < 0x1400 && m_reg[2] == 0x84))
 	{
 		m_x1_017_ram[offset] = data;
 
@@ -444,8 +444,8 @@ u8 nes_x1_017_device::read_m(offs_t offset)
 
 	// 2+2+1 KB of Internal RAM can be independently enabled/disabled!
 	if ((offset < 0x0800 && m_reg[0] == 0xca) ||
-	    (offset < 0x1000 && m_reg[1] == 0x69) ||
-	    (offset < 0x1400 && m_reg[2] == 0x84))
+		(offset < 0x1000 && m_reg[1] == 0x69) ||
+		(offset < 0x1400 && m_reg[2] == 0x84))
 	{
 		u8 ret = m_x1_017_ram[offset];
 

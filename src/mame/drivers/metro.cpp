@@ -77,7 +77,7 @@ To Do:
     excessive slowdown in said games however.
 -   karatour, ladykill, 3kokushi: understand what the irq source 5 is really tied to.
     All these games also have a vblank delay check outside irq routine,
-	cfr. PC=1322 in karatour;
+    cfr. PC=1322 in karatour;
 -   vmetal: ES8712 actually controls a M6585 and an unknown logic selector chip.
 -   split these games into different files, check PCB markings.
 -   Coin lockout;
@@ -182,7 +182,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(metro_state::bangball_scanline)
 /* lev 2-7 (lev 1 seems sound related) */
 WRITE_LINE_MEMBER(metro_state::karatour_vblank_irq)
 {
-//	printf("%d %d %lld\n", state, m_screen->vpos(), m_screen->frame_number());
+//  printf("%d %d %lld\n", state, m_screen->vpos(), m_screen->frame_number());
 
 	if (state)
 	{
@@ -2847,7 +2847,7 @@ void metro_state::i4100_config_360x224(machine_config &config)
 {
 	i4100_config(config);
 
-//	m_screen->set_size(392, 263);
+//  m_screen->set_size(392, 263);
 	m_screen->set_visarea(0, 360-1, 0, 224-1);
 }
 
@@ -2855,7 +2855,7 @@ void metro_state::i4220_config_320x240(machine_config &config)
 {
 	i4220_config(config);
 
-//	m_screen->set_size(320, 240);
+//  m_screen->set_size(320, 240);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
 }
 
@@ -2871,7 +2871,7 @@ void metro_state::i4300_config_384x224(machine_config &config)
 	i4300_config(config);
 	m_vdp3->set_clock(32_MHz_XTAL);
 
-//	m_screen->set_size(384, 240);
+//  m_screen->set_size(384, 240);
 	m_screen->set_visarea(0, 384-1, 0, 224-1);
 }
 
@@ -2879,7 +2879,7 @@ void metro_state::i4300_config_320x240(machine_config &config)
 {
 	i4300_config(config);
 
-//	m_screen->set_size(384, 240);
+//  m_screen->set_size(384, 240);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
 }
 

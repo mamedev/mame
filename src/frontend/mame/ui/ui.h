@@ -250,7 +250,7 @@ private:
 	float                   m_target_font_height;
 	bool                    m_has_warnings;
 	bool                    m_unthrottle_mute;
-	bool					m_image_display_enabled;
+	bool                    m_image_display_enabled;
 
 	std::unique_ptr<ui::machine_info> m_machine_info;
 	device_feature_set      m_unemulated_features;

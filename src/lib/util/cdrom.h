@@ -184,11 +184,11 @@ public:
 	static inline uint32_t lba_to_msf_alt(int lba)
 	{
 		uint32_t ret = 0;
-		
+
 		ret |= ((lba / (60 * 75))&0xff)<<16;
 		ret |= (((lba / 75) % 60)&0xff)<<8;
 		ret |= ((lba % 75)&0xff)<<0;
-		
+
 		return ret;
 	}
 
@@ -210,17 +210,17 @@ private:
 	static constexpr int SYNC_OFFSET = 0x000;
 	/** @brief  12 bytes. */
 	static constexpr int SYNC_NUM_BYTES = 12;
-	
+
 	/** @brief  offset within sector. */
 	static constexpr int MODE_OFFSET = 0x00f;
-	
+
 	/** @brief  offset within sector. */
 	static constexpr int ECC_P_OFFSET = 0x81c;
 	/** @brief  2 lots of 86. */
 	static constexpr int ECC_P_NUM_BYTES = 86;
 	/** @brief  24 bytes each. */
 	static constexpr int ECC_P_COMP = 24;
-	
+
 	/** @brief  The ECC q offset. */
 	static constexpr int ECC_Q_OFFSET = ECC_P_OFFSET + 2 * ECC_P_NUM_BYTES;
 	/** @brief  2 lots of 52. */

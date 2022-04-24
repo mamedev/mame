@@ -471,6 +471,6 @@ uint32_t vigilant_state::screen_update_bowmen(screen_device &screen, bitmap_ind1
 		draw_foreground_bowmen(bitmap, cliprect, 0, 0);
 	}
 	draw_sprites(bitmap, bowmenvisiblearea);
-//	draw_foreground_bowmen(bitmap, cliprect, 1, 0); // priority tiles
+//  draw_foreground_bowmen(bitmap, cliprect, 1, 0); // priority tiles
 	return 0;
 }

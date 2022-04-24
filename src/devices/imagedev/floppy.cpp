@@ -1384,7 +1384,7 @@ void floppy_image_device::wspan_write(const std::vector<wspan> &wspans, std::vec
 				track[si] = floppy_image::MG_E | (ws.start-1);
 				si ++;
 			}
-		} 
+		}
 
 		// Check for a neutral zone at the end and reduce it if needed
 		if(ei != track.size() && (track[ei] & floppy_image::MG_MASK) == floppy_image::MG_E) {

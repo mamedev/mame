@@ -706,7 +706,7 @@ ROM_END
 
   Running in 487 System I.
 
-*/  
+*/
 ROM_START( unkdarts )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "diana_iv_video_27-1-92.bin",  0x0000, 0x8000, CRC(f23b5313) SHA1(488cf9bedce7b0c7b474bd93da70181c81fa300b) )

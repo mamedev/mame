@@ -112,7 +112,7 @@ Clock mode:
     counts down by 1 every 64 clock ticks. On every update, the value is copied
     into the read register, but only in interrupt mode. In clock mode, the read
     register is locked so that it can be read without being changed.
-    Whenever the counter reaches 0, it is reloaded from the clock register on 
+    Whenever the counter reaches 0, it is reloaded from the clock register on
     the next update.
     Setting the clock register is possible via CRU addresses 1 to 14 in clock
     mode, with bit 1 being the LSB and bit 14 being the MSB. On each bit write
