@@ -1233,6 +1233,189 @@ ROM_START( lucky7i )
 ROM_END
 
 
+/*
+  Unknown W
+  Poker Game.
+  Version: 1.2 200/93
+
+  PCB layout:
+
+  +---------------------------------------------------------------------------------------+
+  |                                                                                       |
+  |        +--------+                   +----------+          +---------+  +--+           |
+  |        |74LS14N |                   |KM44C256CP|          |SAA1099P |  |  |           |
+  | +--+   +--------+                   +----------+          +---------+  |E |           +---+
+  | |GA|                                +----------+                       |  |             --|
+  | |L |       +----+                   |KM44C256CP|                       |  |             --|
+  | |16|       | A  |                   +----------+                       +--+             --|
+  | |V8|       +----+                   +----------+                                        --|
+  | |B |                                |KM44C256CP|       +--------------+                 --|
+  | |  |                                +----------+       | KDA0476CN-66 |                 --|
+  | +--+                                +----------+       | KOREA    219 |                 --|
+  |   +------+                          |KM44C256CP|       |              |                 --|
+  |   |DS1207|                          +----------+       +--------------+               +---+
+  |   +------+                                                                            |
+  |                                                                                       |
+  |           +--+                    +-------------+        +---------+                  |
+  | +--+ +--+ |  |   +------+         |SCC 66470 CAB|        |PIC16C58 |                  |
+  | |  | |  | |  |   |LH5164|         |206880       |        +---------+                  +---+  
+  | |B | |C | |D |   |D-10L |         |DfD9210I3 Y  |                                       --|
+  | |  | |  | |  |   |      |         |             |                                       --|
+  | |  | |  | |  |   |      |         | PHILIPS 1988|                                       --|
+  | +--+ +--+ |  |   |      |         |             |                     +--+              --|
+  |           +--+   |      |         |             |        +----------+ |  | +--+         --|
+  |                  |      |         |             |        |PC74HC245P| |  | |  |         --|
+  |                  |      |         +-------------+        +----------+ |F | |G |         --|
+  |                  |      |                                             |  | |  |         --|
+  |                  +------+                                             |  | |  |         --|
+  |               +------+ +------+                          +----------+ +--+ +--+         --|
+  |               |      | |      |                          |PC74HC245P| +--+              --|
+  |     +----+    |      | |  W   |    +-------------+       +----------+ |  | +--+         --|
+  |     | H  |    |      | |      |    |SCC 68070 CCA|                    |  | |  |         --|
+  |     +----+    |      | |      |    |           84|                    |F | |G |         --|
+  |               |      | |      |    |268340       |       +----------+ |  | |  |         --|
+  |     +--+ +--+ |EMPTY | |M     |    |DfD9349V3 Y  |       |PC74HC245P| |  | |  |         --|
+  |+--+ |PA| |PA| |  SLOT| |2     |    |             |       +----------+ +--+ +--+         --|
+  ||D | |L | |L | |      | |7     |    | PHILIPS 1988|                    +--------+        --|
+  ||I | |  | |  | |      | |C     |    |             |                    | PC849  |        --|
+  ||P | |16| |16| |      | |4     |    |             |       +----------+ +--------+        --|
+  ||  | |L8| |L8| |      | |0     |    +-------------+       |PC74HC245P|                   --|
+  ||2 | |  | |  | |      | |0     |                          +----------+                   --|
+  |+--+ +--+ +--+ |      | |2     |                                                       +---+
+  |               +------+ +------+                                       +---------+     |
+  |                                                                       |  DIP 1  |     |
+  |                                                                       +---------+     |
+  +---------------------------------------------------------------------------------------+
+
+  A: TL7705ACP
+  B: CD4040BE
+  C: HEF40098BP
+  D: PC74HC273P
+  E: LT1081CN
+  F: PC74HC273P
+  G: ULN2803A
+  H: DS1210
+
+
+  DIP 1:
+  +-------------------------------+
+  |O N                            |
+  |+-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+|
+  || | | | |#| |#| |#| |#| |#| |#||
+  |+-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+|
+  ||#| |#| | | | | | | | | | | | ||
+  |+-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+|
+  | 1   2   3   4   5   6   7   8 |
+  +-------------------------------+
+
+  DIP 2:
+  +-------------------------------+
+  |O N                            |
+  |+-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+|
+  ||#| |#| |#| |#| |#| | | |#| | ||
+  |+-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+|
+  || | | | | | | | | | |#| | | |#||
+  |+-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+|
+  | 1   2   3   4   5   6   7   8 |
+  +-------------------------------+
+
+*/
+ROM_START( unkpkr_w )
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
+	ROM_LOAD16_WORD_SWAP( "w.bin", 0x00000, 0x80000, CRC(28300427) SHA1(83ea014a818246f476d769ad06cb2eba1ce699e8) )
+ROM_END
+
+/*
+  Dallas Poker
+
+  PCB layout:
+  +------------------------------------------------------------------------------+
+  |                                                           +-------------+    |
+  | +---------+    XTAL1                                      |    +------+S|    |
+  | |  EMPTY  |                                               |    |AHF   |u|    |
+  | +---------+       +-------------+                         |    |Automa|b|    +---+
+  | +---------+       |SCC 66470 CAB|                         |    |tentec|b|      --|
+  | |P21014-07|       |466006       |       +---------+       |    |hnik  |o|      --|
+  | +---------+       |IfD9205I3 Y  |       |SAA1099P |       | X  |      |a|      --|
+  | +---------+       |             |       +---------+       | T  |8430 L|r|      --|
+  | |  EMPTY  |       | PHILIPS 1988|                         | A  |eibnit|d|      --|
+  | +---------+       |             |                         | L  |z     | |      --|
+  | +---------+       |             |                         | 3  |      | |      --|
+  | |P21014-07|       |             |       +---------------+ +--+ |Tel. 0| |      --|
+  | +---------+       +-------------+       |  ADV476KN35E  |    | |3452/3| |    +---+
+  | +---------+                             |   03-24 0S    |    | |249   | |    |
+  | |  EMPTY  |                             |   0F19802.3   |    | +------+ |    |
+  | +---------+                             +---------------+    +----------+    |
+  | +---------+         XTAL2                                                    |
+  | |P21014-07|       +-------------+                                            |
+  | +---------+       |SCC 68070 CBA|      +----+                                |
+  | +---------+       |           84|      | F  |                                +---+
+  | |  EMPTY  |       |             |      +----+                                  --|
+  | +---------+       |   203590    |                                              --|
+  | +---------+       | DfD9218V3 Y |                       +---------+            --|
+  | |P21014-07|       |             |                       |ULN 2803A|            --|
+  | +---------+       | PHILIPS 1988|                       +---------+            --|
+  |                   |             |      +----+                                  --|
+  |+--+ +--+ +--+     +-------------+      | F  |             +----+               --|
+  ||  | |A | |B |                          +----+             | G  |               --|
+  ||C | +--+ +--+                                             +----+               --|
+  ||  |                                                                            --|
+  |+--++--+                                                                        --|
+  |    |  |  +--+                          +----+                                  --|
+  |    |D |  |  |                          | F  |           +---------+            --|
+  |    |  |  |E |                          +----+           |ULN 2803A|            --|
+  |    |  |  |  | +--------------------+                    +---------+            --|
+  |    +--+  |  | |DALLAS POKER CZ/V1 P|                                           --|
+  |          +--+ |VNR:19-09-93        |                      +----+               --|
+  |               |SUM:8F8A/w   D27C210|                      | G  |               --|
+  |    +--+  +--+ +--------------------+   +----+             +----+               --|
+  |    |PA|  |PA|                          | F  |                                  --|
+  |    |L |  |L | +--------------------+   +----+            +--------+            --|
+  |    |16|  |16| |DALLAS POKER CZ/V1 B|                     | PC849  |            --|
+  |    |L8|  |L8| |VNR:19-09-93        |                     +--------+          +---+
+  |    |AC|  |AC| |SUM:EB91/w   D27C210|                     +---------+         |
+  |    |  |  |  | +--------------------+                     |  DIP 1  |         |
+  |    +--+  +--+                                            +---------+         |
+  +------------------------------------------------------------------------------+
+
+  XTAL1: 30.0000
+  XTAL2: 19.6608
+  XTAL3: 16.000
+
+  A: TL7705ACP
+  B: DS1210
+  C: DS1207
+  D: HEF40098BP / 759690T / Hnn9210P3
+  E: SN74LS14N
+  F: HC245A
+  G: PC74HC273T
+
+  Under the "DALLAS POKER CZ/V1 B" chip is a PC74HC273T chip soldered on the PCB.
+  Under the "DALLAS POKER CZ/V1 P" chip is a MB8464A-10L chip soldered on the PCB.
+
+  Subboard: Looks like an 40PIN MCU or PIC...only four wires connect the subboard 
+  with the mainboard. (GND & VCC and PIN21 and PIN22 from the 40pin-MCU/PIC)
+
+
+  DIP 1:
+  +-------------------------------+
+  |O N                            |
+  |+-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+|
+  || | |O| | | | | |O| |O| |O| |O||
+  |+-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+|
+  ||O| | | |O| |O| | | | | | | | ||
+  |+-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+|
+  | 1   2   3   4   5   6   7   8 |
+  +-------------------------------+
+
+*/
+ROM_START( dallaspk )
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
+	ROM_LOAD16_WORD_SWAP( "cz-v1-p.bin", 0x00000, 0x20000, CRC(ad575e3f) SHA1(4e22957c42610fec0a96bd85f4b766422b020d88) )
+	ROM_LOAD16_WORD_SWAP( "cz-v1-b.bin", 0x20000, 0x20000, CRC(2595d346) SHA1(34f09931d82b5376e4f3922222645c796dad0440) )
+ROM_END
+
+
 /*************************
 *      Driver Init       *
 *************************/
@@ -1254,7 +1437,7 @@ GAME( 199?, magicarda, magicard, magicard, magicard, magicard_state, init_magica
 GAME( 199?, magicardb, magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card (set 3)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1994, magicarde, magicard, hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card Export 94",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1994, magicardf, magicard, hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Export (V.211A)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1998, magicardj, 0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card III Jackpot (4.01)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1998, magicardj, 0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card III Jackpot (4.01)",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1993, magicardw, magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card - Wien (Sicherheitsversion 1.2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2001, magicle,   0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Lotto Export (5.03)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2002, hotslots,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Hot Slots (6.00)",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
@@ -1262,5 +1445,7 @@ GAME( 1999, quingo,    0,        hotslots, magicard, magicard_state, init_magica
 GAME( 1999, belslots,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Bel Slots Export (5.01)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2001, bigdeal0,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Big Deal Belgien (5.04)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 199?, puzzleme,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Puzzle Me!",                                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 199?, unkte06,   0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "unknown Poker 'TE06'",                             MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // strings in ROM
+GAME( 199?, unkte06,   0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "unknown Poker 'TE06'",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // strings in ROM
 GAME( 199?, lucky7i,   0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Lucky 7 (Impera)",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1993, unkpkr_w,  0,        magicard, magicard, magicard_state, init_magicard, ROT0, "unknown", "Unknown Poker W",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1993, dallaspk,  0,        magicard, magicard, magicard_state, init_magicard, ROT0, "unknown", "Dallas Poker",                              MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
