@@ -31,8 +31,11 @@ protected:
 
 	virtual void config_map(address_map &map) override;
 
-	void io_map(address_map &map);
-	
+	void ide1_command_map(address_map &map);
+	void ide1_control_map(address_map &map);
+	void ide2_command_map(address_map &map);
+	void ide2_control_map(address_map &map);
+	void bus_master_ide_control_map(address_map &map);
 private:
 	required_device<bus_master_ide_controller_device> m_ide1;
 	required_device<bus_master_ide_controller_device> m_ide2;

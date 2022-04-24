@@ -52,8 +52,8 @@ void sis5513_ide_device::device_add_mconfig(machine_config &config)
 void sis5513_ide_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
-	map(0x10, 0x4f).unmaprw();
-	map(0x10, 0x52).rw(FUNC(sis5513_ide_device::unmap_log_r), FUNC(sis5513_ide_device::unmap_log_w));
+//	map(0x10, 0x4f).unmaprw();
+	map(0x40, 0x52).rw(FUNC(sis5513_ide_device::unmap_log_r), FUNC(sis5513_ide_device::unmap_log_w));
 
 	// base I/O relocation (effective only when native mode is on)
 //	map(0x10, 0x13) Primary channel command base
@@ -82,6 +82,7 @@ void sis5513_ide_device::config_map(address_map &map)
 //	map(0x52, 0x52) IDE misc control regs
 }
 
+#if 0
 void sis5513_ide_device::io_map(address_map &map)
 {
 	map(0x0170, 0x0177).rw(FUNC(sis5513_ide_device::ide2_read32_cs0_r), FUNC(sis5513_ide_device::ide2_write32_cs0_w));
@@ -89,11 +90,42 @@ void sis5513_ide_device::io_map(address_map &map)
 	map(0x0376, 0x0376).rw(FUNC(sis5513_ide_device::ide2_read_cs1_r), FUNC(sis5513_ide_device::ide2_write_cs1_w));
 	map(0x03f6, 0x03f6).rw(FUNC(sis5513_ide_device::ide1_read_cs1_r), FUNC(sis5513_ide_device::ide1_write_cs1_w));
 }
+#endif
+
+// $1f0
+void sis5513_ide_device::ide1_command_map(address_map &map)
+{
+	map(0, 7).rw(FUNC(sis5513_ide_device::ide1_read32_cs0_r), FUNC(sis5513_ide_device::ide1_write32_cs0_w));
+}
+
+// $3f4
+void sis5513_ide_device::ide1_control_map(address_map &map)
+{
+	map(2, 2).rw(FUNC(sis5513_ide_device::ide1_read_cs1_r), FUNC(sis5513_ide_device::ide1_write_cs1_w));
+}
+
+// $170
+void sis5513_ide_device::ide2_command_map(address_map &map)
+{
+	map(0, 7).rw(FUNC(sis5513_ide_device::ide2_read32_cs0_r), FUNC(sis5513_ide_device::ide2_write32_cs0_w));
+}
+
+// $374
+void sis5513_ide_device::ide2_control_map(address_map &map)
+{
+	map(2, 2).rw(FUNC(sis5513_ide_device::ide2_read_cs1_r), FUNC(sis5513_ide_device::ide2_write_cs1_w));
+}
+
+void sis5513_ide_device::bus_master_ide_control_map(address_map &map)
+{
+	// ...
+}
 
 void sis5513_ide_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
-	io_space->install_device(0, 0x03ff, *this, &sis5513_ide_device::io_map);
+	// TODO: compatible mode
+//	io_space->install_device(0, 0x03ff, *this, &sis5513_ide_device::io_map);
 }
 
 void sis5513_ide_device::device_start()
@@ -102,14 +134,12 @@ void sis5513_ide_device::device_start()
 
 	m_irq_pri_callback.resolve();
 	m_irq_sec_callback.resolve();
-#if 0
-	memory_window_start = 0;
-	memory_window_end   = 0xffffffff;
-	memory_offset       = 0;
-	io_window_start = 0;
-	io_window_end   = 0xffff;
-	io_offset       = 0;
-#endif
+
+	add_map(8, M_IO, FUNC(sis5513_ide_device::ide1_command_map));
+	add_map(4, M_IO, FUNC(sis5513_ide_device::ide1_control_map));
+	add_map(8, M_IO, FUNC(sis5513_ide_device::ide2_command_map));
+	add_map(4, M_IO, FUNC(sis5513_ide_device::ide2_control_map));
+	add_map(16, M_IO, FUNC(sis5513_ide_device::bus_master_ide_control_map));
 }
 
 
