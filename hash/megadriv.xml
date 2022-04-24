@@ -347,6 +347,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Disney's Aladdin (Euro)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<info name="serial" value="MK-1058-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
@@ -363,6 +364,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Disney's Aladdin (Euro, Alt PCB)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<info name="serial" value="MK-1058-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6330A"/>
@@ -381,6 +383,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Disney's Aladdin (Jpn)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<info name="serial" value="G-4111"/>
 		<info name="release" value="19931112"/>
 		<info name="alt_title" value="アラジン"/>
@@ -398,6 +401,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Disney's Aladdin (USA)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<info name="serial" value="MK-1058"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
@@ -444,6 +448,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Alien Soldier (Euro)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<info name="serial" value="MK-1186-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
@@ -522,6 +527,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Animaniacs (Euro)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<info name="serial" value="T-95176-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353536"/>
@@ -679,6 +685,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Art of Fighting (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<info name="serial" value="MK-1146-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
@@ -694,6 +701,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Astérix and the Great Rescue (Euro)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<info name="serial" value="MK-1532-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
@@ -710,6 +718,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Astérix and the Great Rescue (Euro, Alt PCB)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<info name="serial" value="MK-1532-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6330A"/>
@@ -728,6 +737,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Astérix and the Power of the Gods (Euro)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<info name="serial" value="MK-1095-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
@@ -1003,6 +1013,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Bio-Hazard Battle (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL,NTSC-U"/>
 		<info name="serial" value="MK-1060 (USA), MK-1060-50 (Euro)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA, 171-5978B"/>
@@ -1054,6 +1065,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Bloodshot (Euro) ~ Battle Frenzy (Ger)</description>
 		<year>1994</year>
 		<publisher>Domark</publisher>
+		<sharedfeat name="compatibility" value="PAL,NTSC-U"/>
 		<info name="serial" value="T-88126-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="670128 REV 1"/>
@@ -1426,6 +1438,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Castlevania - The New Generation (Euro)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<info name="serial" value="T-95076-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353490"/>
@@ -1673,6 +1686,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Comix Zone (Euro)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<info name="serial" value="MK-1569-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
@@ -2096,6 +2110,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Donald in Maui Mallard (Euro, Rev. A)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-7147A"/>
 			<feature name="ic1" value="MPR-18563A-S"/>
@@ -2352,6 +2367,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Earthworm Jim (Euro)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6570A"/>
 			<feature name="ic1" value="MPR-17118-H"/>
@@ -2369,6 +2385,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Earthworm Jim 2 (Euro)</description>
 		<year>1995</year>
 		<publisher>Virgin Interactive</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6570A"/>
 			<feature name="ic1" value="MPR-18589-MX"/>
@@ -3377,6 +3394,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Gods (Euro)</description>
 		<year>1993</year>
 		<publisher>Accolade</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="ACSGPC291 REV.B"/>
 			<feature name="ic1" value="ACGOSG"/>
@@ -3551,6 +3569,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Gunstar Heroes (USA)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B"/>
 			<feature name="u1" value="MPR-15813 T59"/> <!-- location not really marked on PCB, using u1 for consistency -->
@@ -3746,6 +3765,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Hyper Dunk (Euro)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353490"/>
 			<feature name="u1" value="FX009A1"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -3892,6 +3912,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>International Superstar Soccer Deluxe (Euro, Bra)</description>
 		<year>1996</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="PAL,NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="670128-1 REV 1"/>
 			<feature name="u1" value="FX016A1"/>
@@ -4338,6 +4359,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Kick Off 3 - European Challenge (Euro)</description>
 		<year>1994</year>
 		<publisher>Vic Tokai</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-17359-F"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -4530,6 +4552,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Lemmings (Euro)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-15233-F"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -4545,6 +4568,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Lemmings (Jpn, USA, Kor, v1.1)</description>
 		<year>1992</year>
 		<publisher>Sunsoft</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<info name="serial" value="T-15063 (JPN)"/>
 		<info name="release" value="19921120 (JPN)"/>
 		<info name="alt_title" value="レミングス"/>
@@ -4562,6 +4586,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Lemmings 2 - The Tribes (Euro)</description>
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-17026-SM"/>
@@ -4576,6 +4601,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Lethal Enforcers (USA)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353490"/>
 			<feature name="u1" value="FV008A1"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -4626,6 +4652,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Lightening Force (USA)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<info name="alt_title" value="Lightening Force - Quest for the Darkstar (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B"/>
@@ -5834,6 +5861,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Nigel Mansell's World Championship Racing (Euro)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353536"/>
 			<feature name="u1" value="FX015A1"/> <!-- location not really marked on PCB, using u1 for consistency -->
@@ -5879,6 +5907,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>The Ottifants (Euro)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-16214 R04"/> <!-- location not really marked on PCB, using u1 for consistency -->
@@ -6492,6 +6521,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Probotector (Euro)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353536"/>
 			<feature name="u1" value="FX010A1"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -6659,6 +6689,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Ranger-X (USA)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-15759 T54"/> <!-- location not really marked on PCB, using u1 for consistency -->
@@ -6899,6 +6930,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Rocket Knight Adventures (Euro)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353490"/>
 			<feature name="u1" value="FX004"/> <!-- location not really marked on PCB, using u1 for consistency -->
@@ -7040,6 +7072,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Sensible Soccer (Euro)</description>
 		<year>1993</year>
 		<publisher>Renegade</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<feature name="pcb" value="171-5919"/>
@@ -7061,6 +7094,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Sensible Soccer - International Edition (Euro)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<info name="alt_title" value="International Sensible Soccer - Limited Edition: World Champions (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -7191,6 +7225,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Shining Force II (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<feature name="pcb" value="171-6278A"/>
@@ -7327,6 +7362,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>The Smurfs (Euro, Rev. A)</description>
 		<year>1995</year>
 		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-17019A-F"/>  <!-- location not really marked on PCB, using u1 for consistency -->
@@ -7355,6 +7391,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Soleil (Spa)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<feature name="pcb" value="171-6278A"/>
@@ -7425,6 +7462,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Sonic Spinball (USA)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-15753 T71"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -7513,6 +7551,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Sonic Spinball (Euro)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA,171-5978B"/>
 			<feature name="u1" value="MPR-16077 W08, MPR-16077-F"/>    <!-- location not really marked on PCB, using u1 for consistency -->
@@ -7543,6 +7582,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Sparkster (Euro)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353536"/>
 			<feature name="u1" value="FX011A1"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -7557,6 +7597,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Speedball 2 (Euro)</description>
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703"/>
 			<feature name="ic1" value="MPR-14990-T"/>
@@ -7696,6 +7737,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>The Story of Thor - A Successor of The Light (Fra)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<info name="alt_title" value="La Légende de Thor (Box and cart)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -7865,6 +7907,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Striker (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<feature name="pcb" value="?? (Sega)"/>
@@ -7901,6 +7944,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Sunset Riders (USA)</description>
 		<year>1992</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353585"/>
 			<feature name="u1" value="FV002A1 056194"/>    <!-- location not really marked on PCB, using u1 for consistency -->
@@ -8374,6 +8418,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Teenage Mutant Hero Turtles - The Hyperstone Heist (Euro)</description>
 		<year>1992</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353490"/>
 			<feature name="u1" value="MPR-15289"/> <!-- location not really marked on PCB, using u1 for consistency -->
@@ -8388,6 +8433,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Teenage Mutant Ninja Turtles - The Hyperstone Heist (USA)</description>
 		<year>1992</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353585"/>
 			<feature name="u1" value="FV001A1"/> <!-- location not really marked on PCB, using u1 for consistency -->
@@ -8402,6 +8448,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Teenage Mutant Hero Turtles - Tournament Fighters (Euro)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353490"/>
 			<feature name="u1" value="MPR-16017-SM"/>  <!-- location not really marked on PCB, using u1 for consistency -->
@@ -8416,6 +8463,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Teenage Mutant Ninja Turtles - Tournament Fighters (USA)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353536"/>
 			<feature name="u1" value="MPR-16018-U"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -8487,6 +8535,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Thunder Force IV (Euro)</description>
 		<year>1993</year>
 		<publisher>Technosoft</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B"/>
 			<feature name="u1" value="MPR-15209-SM"/>  <!-- location not really marked on PCB, using u1 for consistency -->
@@ -8501,6 +8550,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Tiny Toon Adventures - Acme All-Stars (Euro)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353490"/>
 			<feature name="u1" value="MPR-17066-F"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -8515,6 +8565,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Tiny Toon Adventures - Buster's Hidden Treasure (Euro)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353536"/>
 			<feature name="u1" value="MPR-15406"/> <!-- location not really marked on PCB, using u1 for consistency -->
@@ -8529,6 +8580,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Tiny Toon Adventures - Buster's Hidden Treasure (USA)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353490"/>
 			<feature name="u1" value="MPR-15405"/> <!-- location not really marked on PCB, using u1 for consistency -->
@@ -8579,6 +8631,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Toe Jam &amp; Earl in Panic auf Funkotron (Ger)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-16363-S"/>
@@ -8593,6 +8646,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Toe Jam &amp; Earl in Panic on Funkotron (USA)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-16112-H"/>
@@ -8780,6 +8834,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Two Tribes - Populous II (Euro)</description>
 		<year>1993</year>
 		<publisher>Virgin Games</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B"/>
 			<feature name="u1" value="MPR-15652-S"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -9494,6 +9549,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Xenon 2 - Megablast (Euro)</description>
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703"/>
 			<feature name="ic1" value="MPR-15064-H"/>
@@ -9569,6 +9625,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Zombies (Euro)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353490"/>
 			<feature name="u1" value="FX005"/> <!-- location not really marked on PCB, using u1 for consistency -->
@@ -9706,6 +9763,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Soleil (Fra)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<feature name="pcb" value="171-6278A"/>
@@ -9721,6 +9779,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Soleil (Ger)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<feature name="pcb" value="171-6278A"/>
@@ -10600,6 +10659,7 @@ but dumps still have to be confirmed.
 		<description>Animaniacs (USA)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="animaniacs (usa).bin" size="1048576" crc="86224d86" sha1="7e9d70b5172b4ea9e1b3f5b6009325fa39315a7c"/>
@@ -11893,6 +11953,7 @@ but dumps still have to be confirmed.
 		<description>Crying - Aseimei Sensou (Jpn)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<info name="serial" value="G-4087"/>
 		<info name="release" value="19921030"/>
 		<info name="alt_title" value="クライング亜生命戦争"/>
@@ -11969,6 +12030,7 @@ but dumps still have to be confirmed.
 		<description>Body Count (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="body count (euro).bin" size="1048576" crc="3575a030" sha1="3098f3c7ea9e25bf86219d7ed0795bf363338714"/>
@@ -12450,6 +12512,7 @@ but dumps still have to be confirmed.
 		<description>Castlevania - Bloodlines (USA)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<!-- Dump To Be Confirmed -->
 			<feature name="pcb" value="353536"/>
@@ -12486,6 +12549,7 @@ but dumps still have to be confirmed.
 		<description>Akumajou Dracula - Vampire Killer (Jpn)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<info name="serial" value="T-95043"/>
 		<info name="release" value="19940318"/>
 		<info name="alt_title" value="バンパイアキラー"/>
@@ -12595,6 +12659,7 @@ but dumps still have to be confirmed.
 		<description>The Chaos Engine (Euro)</description>
 		<year>1994</year>
 		<publisher>Microprose</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1572864">
 				<rom name="chaos engine, the (euro).bin" size="1572864" crc="bd9eecf4" sha1="b72d36565e13ab04dc20c547e0dcee1f67bcdb42"/>
@@ -12606,6 +12671,7 @@ but dumps still have to be confirmed.
 		<description>Soldiers of Fortune (USA)</description>
 		<year>1993</year>
 		<publisher>Spectrum Holobyte</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<!-- Dump To Be Confirmed and split appropriately, info based on nointro pcb pic -->
 			<feature name="pcb" value="171-6331A"/>
@@ -12658,6 +12724,7 @@ but dumps still have to be confirmed.
 		<description>Cheese Cat-Astrophe Starring Speedy Gonzales (Euro)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="cheese cat-astrophe starring speedy gonzales (euro).bin" size="2097152" crc="ff634b28" sha1="12bb0d838c675b34cecc9041d3560fe35145ec39"/>
@@ -13254,6 +13321,7 @@ but dumps still have to be confirmed.
 		<description>Comix Zone (Jpn)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<info name="serial" value="G-4132"/>
 		<info name="release" value="19950901"/>
 		<info name="alt_title" value="コミックスゾーン"/>
@@ -13412,6 +13480,7 @@ but dumps still have to be confirmed.
 		<description>Comix Zone (USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<!-- Dump To Be Confirmed -->
 			<feature name="pcb" value="171-5978B-8/16"/>
@@ -14892,8 +14961,10 @@ but dumps still have to be confirmed.
 	<!-- Majesco re-release comes on a 670128 REV 1 PCB with a single chip, while original release is split into two chips. -->
 	<software name="ejimu" cloneof="ejim">
 		<description>Earthworm Jim (USA)</description>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<year>1994</year>
 		<publisher>Playmates Interactive</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom name="earthworm jim (usa).bin" size="3145728" crc="df3acf59" sha1="a544211d1ebab1f096f6e72a0d724f74f9ddbce8"/>
@@ -14905,6 +14976,7 @@ but dumps still have to be confirmed.
 		<description>Earthworm Jim 2 (USA)</description>
 		<year>1996</year>
 		<publisher>Playmates Interactive</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom name="earthworm jim 2 (usa).bin" size="3145728" crc="d57f8ba7" sha1="ef7cccfc5eafa32fc6acc71dd9b71693f64eac94"/>
@@ -16588,6 +16660,7 @@ but dumps still have to be confirmed.
 		<description>Gods (Jpn)</description>
 		<year>1993</year>
 		<publisher>PCM Complete</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<info name="serial" value="T-85013"/>
 		<info name="release" value="19930326"/>
 		<info name="alt_title" value="ゴッズ"/>
@@ -16602,6 +16675,7 @@ but dumps still have to be confirmed.
 		<description>Gods (USA)</description>
 		<year>1992</year>
 		<publisher>Mindscape</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="gods (usa).bin" size="1048576" crc="fd234ccd" sha1="bfc84beba074c7dc58b0b4fcac73fffcf0c6b585"/>
@@ -16857,6 +16931,7 @@ but dumps still have to be confirmed.
 		<description>Gunstar Heroes (Euro)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="gunstar heroes (euro).bin" size="1048576" crc="866ed9d0" sha1="a7b265f49ec74f7febb8463c64535ceda15c8398"/>
@@ -16868,6 +16943,7 @@ but dumps still have to be confirmed.
 		<description>Gunstar Heroes (Jpn)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<info name="serial" value="G-4103"/>
 		<info name="release" value="19930910"/>
 		<info name="alt_title" value="ガンスターヒーローズ"/>
@@ -17147,6 +17223,7 @@ but dumps still have to be confirmed.
 		<description>Hyper Dunk - The Playoff Edition (Jpn)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<info name="serial" value="T-95083"/>
 		<info name="release" value="19940304"/>
 		<info name="alt_title" value="ハイパーダンク ザ プレイオフ エディション"/>
@@ -17172,6 +17249,7 @@ but dumps still have to be confirmed.
 		<description>Double Dribble - The Playoff Edition (USA)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="double dribble - the playoff edition (usa).bin" size="2097152" crc="8352b1d0" sha1="d97bbe009e9667709e04a1bed9f71cea7893a495"/>
@@ -18238,6 +18316,7 @@ but dumps still have to be confirmed.
 		<description>Landstalker - The Treasures of King Nole (Euro)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -18252,6 +18331,7 @@ but dumps still have to be confirmed.
 		<description>Landstalker - Koutei no Zaihou (Jpn)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<info name="serial" value="G-5517"/>
 		<info name="release" value="19921030"/>
 		<info name="alt_title" value="ランドストーカー ～皇帝の財宝～"/>
@@ -18269,6 +18349,7 @@ but dumps still have to be confirmed.
 		<description>Landstalker - The Treasures of King Nole (USA)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<info name="alt_title" value="Landstalker (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -18414,6 +18495,7 @@ but dumps still have to be confirmed.
 		<description>Lemmings (Jpn, USA)</description>
 		<year>1992</year>
 		<publisher>Sunsoft</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<info name="serial" value="T-15063 (JPN)"/>
 		<info name="release" value="19921120 (JPN)"/>
 		<info name="alt_title" value="レミングス"/>
@@ -18428,6 +18510,7 @@ but dumps still have to be confirmed.
 		<description>Lemmings 2 - The Tribes (USA)</description>
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="lemmings 2 - the tribes (usa).bin" size="2097152" crc="de59a3a3" sha1="1de84f5c9b25f6af4c2c3e18bb710b9572fc0a10"/>
@@ -18439,6 +18522,7 @@ but dumps still have to be confirmed.
 		<description>Lethal Enforcers (Euro)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="lethal enforcers (euro).bin" size="2097152" crc="ca2bf99d" sha1="b9cc7ff3c6a50b2624358785bcadd1451e23993e"/>
@@ -18450,6 +18534,7 @@ but dumps still have to be confirmed.
 		<description>Lethal Enforcers (Jpn)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<info name="serial" value="T-95073"/>
 		<info name="release" value="19931210"/>
 		<info name="alt_title" value="リーサルエンフォーサーズ"/>
@@ -18475,6 +18560,7 @@ but dumps still have to be confirmed.
 		<description>Lethal Enforcers II - Gun Fighters (Euro)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="lethal enforcers ii - gun fighters (euro).bin" size="2097152" crc="4bfe045c" sha1="0c99f93ef90d6242b198c99a1e940be432ec861f"/>
@@ -18486,6 +18572,7 @@ but dumps still have to be confirmed.
 		<description>Lethal Enforcers II - Gun Fighters (USA)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="lethal enforcers ii - gun fighters (usa).bin" size="2097152" crc="e5fdd28b" sha1="823a59b1177665313a1114a622ee98a795141eec"/>
@@ -21676,6 +21763,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>The Ooze (Euro)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="ooze, the (euro).bin" size="1048576" crc="e16b102c" sha1="0e45b84e875aa4e27bf003cbc0f857f2e5659625"/>
@@ -21687,6 +21775,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>The Ooze (Jpn, USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<info name="serial" value="G-4134 (JPN)"/>
 		<info name="release" value="19950922 (JPN)"/>
 		<info name="alt_title" value="ジ ウーズ"/>
@@ -22494,6 +22583,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Phantasy Star - The End of the Millennium (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<info name="alt_title" value="Phantasy Star IV (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -22510,6 +22600,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Phantasy Star - The End of the Millennium (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<info name="alt_title" value="Phantasy Star IV (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -22525,6 +22616,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Phantasy Star - Sennenki no Owari ni (Jpn)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<info name="serial" value="G-5524"/>
 		<info name="release" value="19931217"/>
 		<info name="alt_title" value="ァンタシースター ～千年紀の終りに～"/>
@@ -23002,6 +23094,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Contra - Hard Corps (USA, Kor)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U,NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<!-- Dump To Be Confirmed, PCB info based on US cart -->
 			<feature name="pcb" value="353536"/>
@@ -23016,6 +23109,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Contra - The Hard Corps (Jpn)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<info name="serial" value="T-95093"/>
 		<info name="release" value="19940925"/>
 		<info name="alt_title" value="魂斗羅 ザ・ハードコア"/>
@@ -23502,6 +23596,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Ranger-X (Euro)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="ranger-x (euro).bin" size="1048576" crc="b8c04804" sha1="53908ee1c47f0d9d49e81fc295379552e2198948"/>
@@ -23513,6 +23608,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Ex-Ranza (Jpn)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<info name="serial" value="G-4097"/>
 		<info name="release" value="19930528"/>
 		<info name="alt_title" value="エクスランザー"/>
@@ -24103,6 +24199,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Rocket Knight Adventures (Jpn)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<info name="serial" value="T-95063"/>
 		<info name="release" value="19930806"/>
 		<info name="alt_title" value="ロケットナイト アドベンチャーズ"/>
@@ -24117,6 +24214,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Rocket Knight Adventures (USA)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="rocket knight adventures (usa).bin" size="1048576" crc="a6efec47" sha1="49634bb09c38fa03549577f977e6afb6cebaac48"/>
@@ -24553,6 +24651,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Shadowrun (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -24567,6 +24666,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Shadowrun (Jpn)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -24682,6 +24782,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Shining Force - The Legacy of Great Intention (USA)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="1572864">
@@ -24727,6 +24828,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Shining Force II - Koe no Fuuin (Jpn)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<info name="serial" value="G-5521"/>
 		<info name="release" value="19931001"/>
 		<info name="alt_title" value="シャイニング・フォースII 「古えの封印」"/>
@@ -24772,6 +24874,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Shining Force II (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -25125,6 +25228,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>The Smurfs Travel the World (Euro)</description>
 		<year>1996</year>
 		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="smurfs travel the world, the (euro).bin" size="1048576" crc="b28bdd69" sha1="b4368369e1d5b9a60bc565fe09a9c5fff6b79fd4"/>
@@ -25197,6 +25301,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Soleil (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -25211,6 +25316,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Crusader of Centy (USA)</description>
 		<year>1994</year>
 		<publisher>Atlus</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -25225,6 +25331,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Shin Souseiki Ragnacenty (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<info name="serial" value="G-5536"/>
 		<info name="release" value="19940617"/>
 		<info name="alt_title" value="新創世紀ラグナセンティ"/>
@@ -25254,6 +25361,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Ragnacenty (Kor)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -25567,6 +25675,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Sonic Spinball (Jpn)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<info name="serial" value="G-4112"/>
 		<info name="release" value="19931210"/>
 		<info name="alt_title" value="ソニック・スピンボール"/>
@@ -25581,6 +25690,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Sonic Spinball (USA, Alt)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="sonic spinball (usa) (alt).bin" size="1048576" crc="e9960371" sha1="8f372e3552e309d3462adeb700242b251f59def1"/>
@@ -25804,6 +25914,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Sonic the Hedgehog 3 (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_fram"/>
 			<!-- Dump To Be Confirmed -->
@@ -25984,6 +26095,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Sparkster (USA)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="sparkster (usa).bin" size="1048576" crc="6bdb14ed" sha1="d6e2f4aa87633aeea2ec1c05a6100b8905549095"/>
@@ -25995,6 +26107,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Sparkster (Jpn)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<info name="serial" value="T-95103"/>
 		<info name="release" value="19940923"/>
 		<info name="alt_title" value="スパークスター ロケットナイトアドベンチャーズ2 ~ Sparkster - Rocket Knight Adventures 2 (Box)"/>
@@ -26009,6 +26122,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Speedball 2 (Jpn)</description>
 		<year>1992</year>
 		<publisher>CRI</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<info name="serial" value="T-68023"/>
 		<info name="release" value="19920619"/>
 		<info name="alt_title" value="スピードボール2"/>
@@ -26023,6 +26137,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Speedball 2 - Brutal Deluxe (USA)</description>
 		<year>1991</year>
 		<publisher>Arena</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="speedball 2 - brutal deluxe (usa).bin" size="524288" crc="9fc340a7" sha1="4598f1714fd05e74ab758c09263f7948c8ca1883"/>
@@ -26530,6 +26645,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>The Story of Thor (Euro)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -26544,6 +26660,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>The Story of Thor (Ger)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -26558,6 +26675,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>The Story of Thor - Hikari o Tsugumono (Jpn)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<info name="serial" value="G-5543"/>
 		<info name="release" value="19941209"/>
 		<info name="alt_title" value="ストーリー オブ トア 〜光を継ぐ者〜"/>
@@ -26576,6 +26694,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>The Story of Thor (Jpn, Prototype)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<info name="alt_title" value="ストーリー オブ トア 〜光を継ぐ者〜"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1769472">
@@ -26588,6 +26707,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>The Story of Thor (Kor)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -26602,6 +26722,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>The Story of Thor (USA, Prototype, 19941004)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -26616,6 +26737,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>The Story of Thor (USA, Prototype, 19941017)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -26630,6 +26752,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Beyond Oasis (USA, Prototype, 19941101)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -26644,6 +26767,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>The Story of Thor (Spa)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -26658,6 +26782,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Beyond Oasis (USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -27120,6 +27245,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Sunset Riders (Euro)</description>
 		<year>1992</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<!-- Dump To Be Confirmed -->
 			<feature name="pcb" value="?? (Konami)"/>
@@ -27310,6 +27436,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Super Monaco GP (Jpn)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<info name="serial" value="G-4026 (JPN)"/>
 		<info name="release" value="19900809 (JPN)"/>
 		<info name="alt_title" value="スーパーモナコGP"/>
@@ -28004,6 +28131,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Teenage Mutant Ninja Turtles - Return of the Shredder (Jpn)</description>
 		<year>1992</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<info name="serial" value="T-95013"/>
 		<info name="release" value="19921222"/>
 		<info name="alt_title" value="ティーンエージ ミュータントニンジャ タートルズ リターン オブ ザ シュレッダー"/>
@@ -28018,6 +28146,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Teenage Mutant Ninja Turtles - Tournament Fighters (Jpn)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<info name="serial" value="T-95053"/>
 		<info name="release" value="19931203"/>
 		<info name="alt_title" value="ティーンエージ ミュータントニンジャ タートルズ トーナメント ファイターズ"/>
@@ -28204,6 +28333,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Thunder Force IV (Jpn)</description>
 		<year>1992</year>
 		<publisher>Technosoft</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<info name="serial" value="T-18063"/>
 		<info name="release" value="19920724"/>
 		<info name="alt_title" value="サンダーフォースIV"/>
@@ -28345,6 +28475,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Tiny Toon Adventures - Acme All-Stars (USA, Kor)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher> <!-- In Korea it's been published by Samsung, in fact -->
+		<sharedfeat name="compatibility" value="NTSC-U,NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="tiny toon adventures - acme all-stars (usa, kor).bin" size="1048576" crc="2f9faa1d" sha1="d64736a69fca430fc6a84a60335add0c765feb71"/>
@@ -28356,6 +28487,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Tiny Toon Adventures (Kor)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="tiny toon adventures (kor).bin" size="524288" crc="4ca3a8fb" sha1="365d190088d78813f65610ff2b5b50c0e4060e24"/>
@@ -28420,6 +28552,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Toe Jam &amp; Earl in Panic on Funkotron (Euro)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<!-- Dump To Be Confirmed -->
 			<feature name="pcb" value="171-6329A"/>
@@ -28434,6 +28567,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Toe Jam &amp; Earl in Panic on Funkotron (Jpn)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="toe jam &amp; earl in panic on funkotron (jpn).bin" size="2097152" crc="e1b36850" sha1="141af8fd1e5b4ba5118a384771b0d75f40af312f"/>
@@ -30917,6 +31051,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Worms (Euro)</description>
 		<year>1995</year>
 		<publisher>Ocean</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="worms (euro).bin" size="2097152" crc="b9a8b299" sha1="1a15447a4a791c02b6ad0a609f788d39fe6c3aa6"/>
@@ -31544,6 +31679,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Zombies Ate My Neighbors (USA)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<!-- Dump To Be Confirmed -->
 			<feature name="pcb" value="353536"/>
