@@ -4808,7 +4808,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 	A2BUS_SLOT(config, "sl6", m_a2bus, apple2gs_cards, nullptr);
 	A2BUS_SLOT(config, "sl7", m_a2bus, apple2gs_cards, nullptr);
 
-	IWM(config, m_iwm, A2GS_7M, 1021800*2);
+	IWM(config, m_iwm, A2GS_7M, A2GS_MASTER_CLOCK/14);
 	m_iwm->phases_cb().set(FUNC(apple2gs_state::phases_w));
 	m_iwm->sel35_cb().set(FUNC(apple2gs_state::sel35_w));
 	m_iwm->devsel_cb().set(FUNC(apple2gs_state::devsel_w));
