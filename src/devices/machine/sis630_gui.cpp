@@ -25,6 +25,10 @@
     - Understand how exactly 630 selects between the SVGA and extended register sets;
     - Backward port 630 GUI/PCI implementation to 300;
     - Confirm PCI IDs (they aren't well formed);
+    - With current config it claims memory size to be 3MB instead of 64
+      (regressed during development)
+    - Hardware cursor is supposed to be extended reg $6 bit 6, but it's apparently not the
+      right trigger by gamecstl Windows non-safe mode;
 
 **************************************************************************************************/
 
@@ -35,8 +39,9 @@
 #define LOG_TODO   (1U << 2) // log unimplemented registers
 #define LOG_MAP    (1U << 3) // log full remaps
 #define LOG_AGP    (1U << 4) // log AGP
+#define LOG_SVGA   (1U << 5) // log SVGA
 
-#define VERBOSE (LOG_GENERAL | LOG_IO | LOG_TODO | LOG_MAP | LOG_AGP)
+#define VERBOSE (LOG_GENERAL | LOG_IO | LOG_TODO | LOG_MAP | LOG_AGP | LOG_SVGA)
 //#define LOG_OUTPUT_FUNC osd_printf_warning
 
 #include "logmacro.h"
@@ -44,7 +49,8 @@
 #define LOGIO(...)     LOGMASKED(LOG_IO,   __VA_ARGS__)
 #define LOGMAP(...)    LOGMASKED(LOG_MAP,  __VA_ARGS__)
 #define LOGTODO(...)   LOGMASKED(LOG_TODO, __VA_ARGS__)
-#define LOGAGP(...)    LOGMASKED(LOG_AGP, __VA_ARGS__)
+#define LOGAGP(...)    LOGMASKED(LOG_AGP,  __VA_ARGS__)
+#define LOGSVGA(...)   LOGMASKED(LOG_SVGA, __VA_ARGS__)
 
 /**************************
  *
@@ -52,6 +58,8 @@
  *
  *************************/
 
+// TODO: later variant of 5598
+// (definitely doesn't have dual segment mode for instance)
 DEFINE_DEVICE_TYPE(SIS630_SVGA, sis630_svga_device, "sis630_svga", "SiS 630 SVGA")
 
 sis630_svga_device::sis630_svga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -72,7 +80,17 @@ void sis630_svga_device::device_start()
 	vga.read_dipswitch.set(nullptr); //read_dipswitch;
 	vga.svga_intf.seq_regcount = 0x05;
 	vga.svga_intf.crtc_regcount = 0x27;
+	vga.svga_intf.vram_size = 64*1024*1024;
 	//vga.memory = std::make_unique<uint8_t []>(vga.svga_intf.vram_size);
+}
+
+void sis630_svga_device::device_reset()
+{
+	svga_device::device_reset();
+
+	m_svga_bank_reg_w = m_svga_bank_reg_r = 0;
+	m_unlock_reg = false;
+	//m_dual_seg_mode = false;
 }
 
 // Page 144
@@ -95,18 +113,125 @@ void sis630_svga_device::crtc_reg_write(uint8_t index, uint8_t data)
 	}
 }
 
+uint8_t sis630_svga_device::seq_reg_read(uint8_t index)
+{
+	// extended id register
+	if (index == 0x05)
+		return m_unlock_reg ? 0xa1 : 0x21;
+	//LOGSVGA("%02x\n", index);
+	if (index == 0x06)
+		return m_ramdac_mode;
+	return m_seq_ext_regs[index];
+}
+
+void sis630_svga_device::seq_reg_write(uint8_t index, uint8_t data)
+{
+	if (index < vga.svga_intf.seq_regcount)
+		svga_device::seq_reg_write(index, data);
+	else
+	{
+		if (index == 0x05)
+		{
+			m_unlock_reg = (data == 0x86);
+			LOGSVGA("Unlock register write %02x (%s)\n", data, m_unlock_reg ? "unlocked" : "locked");
+		}
+		else
+		{
+			if (!m_unlock_reg)
+			{
+				LOGSVGA("Attempt to write to extended SVGA while locked [$%02x] -> %02x\n", index, data);
+				return;
+			}
+
+			m_seq_ext_regs[index] = data;
+
+			switch(index)
+			{
+				/*
+				 * x--- ---- GFX mode linear addressing enable
+				 * -x-- ---- GFX hardware cursor display
+				 * --x- ---- GFX mode interlace
+				 * ---x ---- True Color enable (ties with index 0x07 bit 2)
+				 * ---- x--- RGB16 enable
+				 * ---- -x-- RGB15 enable
+				 * ---- --x- enhanced GFX mode enable
+				 * ---- ---x enhanced text mode enable
+				 */
+				case 0x06:
+					m_ramdac_mode = data;
+					LOGSVGA("RAMDAC mode %02x\n", data);
+
+					if (!BIT(data, 1))
+					{
+						svga.rgb8_en = svga.rgb15_en = svga.rgb16_en = svga.rgb24_en = svga.rgb32_en = 0;
+					}
+					else
+					{
+						if (BIT(data, 2))
+							svga.rgb15_en = 1;
+					}
+					break;
+				case 0x0b:
+					//m_dual_seg_mode = bool(BIT(data, 3));
+					LOGSVGA("Extended Misc. Control register (%02x) %02x\n", index, data);
+					break;
+				default:
+					LOGSVGA("Extended write %02x %02x\n", index, data);
+					break;
+			}
+		}
+	}
+}
+
+uint16_t sis630_svga_device::offset()
+{
+	// TODO: extended CRT pitch register $0e
+	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en || svga.rgb32_en)
+		return vga.crtc.offset << 3;
+	return svga_device::offset();
+}
+
+void sis630_svga_device::port_03c0_w(offs_t offset, uint8_t data)
+{
+	// TODO: for '630 it's always with dual segment enabled?
+
+	if (offset == 0xd)
+	{
+		//if (m_dual_seg_mode)
+			m_svga_bank_reg_w = (data & 0x3f) * 0x10000;
+		//else
+		{
+		//  m_svga_bank_reg_w = (data >> 4) * 0x10000;
+		//  m_svga_bank_reg_r = (data & 0xf) * 0x10000;
+		}
+		return;
+	}
+
+	if (offset == 0xb)
+	{
+		//if (m_dual_seg_mode)
+			m_svga_bank_reg_r = (data & 0x3f) * 0x10000;
+		// otherwise ignored if dual segment mode disabled
+		return;
+	}
+
+	svga_device::port_03c0_w(offset, data);
+}
 
 uint8_t sis630_svga_device::mem_r(offs_t offset)
 {
-//  printf("%08x %08llx\n", offset, vga.svga_intf.vram_size);
-
+	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en || svga.rgb32_en)
+		return svga_device::mem_linear_r(offset + m_svga_bank_reg_r);
 	return svga_device::mem_r(offset);
 }
 
 void sis630_svga_device::mem_w(offs_t offset, uint8_t data)
 {
-//  printf("%08x %02x %08llx\n", offset, data, vga.svga_intf.vram_size);
-//  printf("%d %d %d %d\n",svga.rgb8_en, svga.rgb15_en, svga.rgb16_en, svga.rgb24_en);
+	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en || svga.rgb32_en)
+	{
+		svga_device::mem_linear_w(offset + m_svga_bank_reg_w, data);
+		return;
+	}
 	svga_device::mem_w(offset, data);
 }
 
@@ -121,6 +246,7 @@ DEFINE_DEVICE_TYPE(SIS630_GUI, sis630_gui_device, "sis630_gui", "SiS 630 GUI")
 sis630_gui_device::sis630_gui_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, SIS630_GUI, tag, owner, clock)
 	, m_svga(*this, "svga")
+	, m_gui_rom(*this, "gui_rom")
 {
 	set_ids(0x10396300, 0x00, 0x030000, 0x00);
 }
@@ -288,6 +414,7 @@ void sis630_gui_device::legacy_io_map(address_map &map)
 void sis630_gui_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
+
 }
 
 void sis630_gui_device::device_start()
@@ -295,9 +422,12 @@ void sis630_gui_device::device_start()
 	pci_device::device_start();
 
 	add_map(64*1024*1024, M_MEM, FUNC(sis630_gui_device::memory_map));
-	// claims 128KB, which goes outside the pentium range. Assume memory mapped.
+	// claims 128KB, which goes outside the pentium range.
+	// Assume memory mapped, given the size should be yet another VGA memory compatible window.
 	add_map(128*1024, M_MEM, FUNC(sis630_gui_device::io_map));
 	add_map(128, M_IO, FUNC(sis630_gui_device::space_io_map));
+
+	add_rom((u8 *)m_gui_rom->base(), m_gui_rom->bytes());
 }
 
 void sis630_gui_device::device_reset()

@@ -17,13 +17,24 @@ public:
 	virtual uint8_t mem_r(offs_t offset) override;
 	virtual void mem_w(offs_t offset, uint8_t data) override;
 
+	virtual void port_03c0_w(offs_t offset, uint8_t data) override;
+
 protected:
 	virtual void device_start() override;
+	virtual void device_reset() override;
 	virtual uint8_t crtc_reg_read(uint8_t index) override;
 	virtual void crtc_reg_write(uint8_t index, uint8_t data) override;
-
+	virtual uint8_t seq_reg_read(uint8_t index) override;
+	virtual void seq_reg_write(uint8_t index, uint8_t data) override;
+	virtual uint16_t offset() override;
 
 	u8 m_crtc_ext_regs[0x100]{};
+	u8 m_seq_ext_regs[0x100]{};
+	u8 m_ramdac_mode = 0;
+	u32 m_svga_bank_reg_w = 0;
+	u32 m_svga_bank_reg_r = 0;
+	bool m_unlock_reg = false;
+//  bool m_dual_seg_mode = false;
 };
 
 DECLARE_DEVICE_TYPE(SIS630_SVGA, sis630_svga_device)
@@ -57,6 +68,7 @@ protected:
 
 private:
 	required_device<sis630_svga_device> m_svga;
+	required_memory_region m_gui_rom;
 
 	u8 vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint8_t data);

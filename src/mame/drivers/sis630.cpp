@@ -76,12 +76,12 @@ void sis630_state::sis630(machine_config &config)
 
 	PCI_ROOT(config, "pci", 0);
 	// up to 512MB, 2 x DIMM sockets
-	SIS630_HOST(config, "pci:00.0", 0, "maincpu", "pci:03.0", 256*1024*1024);
+	SIS630_HOST(config, "pci:00.0", 0, "maincpu", "pci:00.2", 256*1024*1024);
 	SIS5513_IDE(config, m_ide, 0);
 	// TODO: this should be pci:00.0:00.0 but for some reason it won't work with current model
 	// (crashes when regenerating config mapping)
 	// just install it on a different device # for the time being
-	SIS630_GUI (config, "pci:03.0", 0);
+	SIS630_GUI (config, "pci:00.2", 0);
 	m_ide->irq_pri().set("pci:01.0:pic_slave", FUNC(pic8259_device::ir6_w));
 		//FUNC(sis950_lpc_device::pc_irq14_w));
 	m_ide->irq_sec().set("pci:01.0:pic_slave", FUNC(pic8259_device::ir7_w));
