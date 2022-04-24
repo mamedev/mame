@@ -62,7 +62,7 @@ private:
 	double m_q3_fclk_ratio, m_fclk_q3_ratio;
 	u64 m_last_sync, m_next_state_change, m_sync_update, m_async_update;
 	u64 m_flux_write_start;
-	std::array<u64, 16> m_flux_write;
+	std::array<u64, 65536> m_flux_write;
 	u32 m_flux_write_count;
 	u32 m_q3_clock;
 	int m_active, m_rw, m_rw_state;
