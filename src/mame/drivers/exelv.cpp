@@ -1,4 +1,4 @@
-// license:GPL-2.0+, BSD-3-Clause
+// license:GPL-2.0+
 // copyright-holders:Raphael Nabet,Robbbert
 /*
     Experimental exelvision driver
@@ -59,24 +59,24 @@ STATUS:
 
 STATUS OF SOFTWARE:
 
-SWList name      KBD poke address       Status
-------------------------------------------------------------------------------------------------------
-exelbas          03                     works
-exelbasp                                Cyan screen, hangs at start
-exelmax                                 options 1-4 work, 5-7 do nothing
-exeldrum         32                     can get to the menu, which seems useless
-exelogo                                 can type into it but the usual commands get error
-exeltext         3C                     works but weird
-exlpaint                                works
-exlmodem                                it might work, need instructions
-capmenkr                                works, large chars are corrupt.
-guppy                                   works
-imagix                                  first screen corrupt, can't proceed
-pindo                                   first screen corrupt, can select a game, how to play?
-quizzy                                  works, scores are corrupted
-tennis           12                     the demo works, didn't try playing
-virus                                   works, 2nd screen is corrupt, press 1 there.
-wizord                                  works
+SWList name      Status
+---------------------------------------------------------------------------
+exelbas          works
+exelbasp         Cyan screen, hangs at start
+exelmax          options 1-4 work, 5-7 do nothing
+exeldrum         can get to the menu, which seems useless
+exelogo          can type into it but the usual commands get error
+exeltext         works but weird
+exlpaint         works
+exlmodem         it might work, need instructions
+capmenkr         works, video corruptions
+guppy            works
+imagix           video corruptions, can't proceed
+pindo            video corruptions, can select a game, how to play?
+quizzy           works, video corruptions
+tennis           the demo works, didn't try playing
+virus            works, 2nd screen is corrupt, press 1 there.
+wizord           works
 
 
 Using the cassette:
