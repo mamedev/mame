@@ -82,7 +82,7 @@ public:
 	const std::vector<const floppy_image_format_t *> &get_formats() const;
 	const std::vector<fs_info> &get_fs() const { return m_fs; }
 	const floppy_image_format_t *get_load_format() const;
-	const floppy_image_format_t *identify(std::string filename);
+	const floppy_image_format_t *identify(std::string_view filename);
 	void set_rpm(float rpm);
 
 	void init_fs(const fs_info *fs, const fs::meta_data &meta);
