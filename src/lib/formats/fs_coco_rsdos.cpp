@@ -13,6 +13,7 @@
 #include "util/corestr.h"
 #include "util/strformat.h"
 
+#include <bitset>
 #include <optional>
 #include <string_view>
 
@@ -70,6 +71,7 @@ public:
 		std::optional<u8>   m_current_granule;
 		u8                  m_maximum_granules;
 		u16                 m_last_sector_bytes;
+		std::bitset<256>	m_visited_granules;
 	};
 
 	class file : public ifile_t {
@@ -397,6 +399,8 @@ impl::granule_iterator::granule_iterator(impl &fs, const rsdos_dirent &dirent)
 	, m_maximum_granules(fs.maximum_granules())
 	, m_last_sector_bytes((u16(dirent.m_last_sector_bytes_msb) << 8) | dirent.m_last_sector_bytes_lsb)
 {
+	// visit the first granule
+	m_visited_granules.set(dirent.m_first_granule);
 }
 
 
@@ -412,6 +416,7 @@ bool impl::granule_iterator::next(u8 &granule, u16 &byte_count)
 
 	if (m_current_granule)
 	{
+		std::optional<u8> next_granule;
 		const u8 *granule_map_data = m_granule_map.rodata();
 		if (granule_map_data[*m_current_granule] < m_maximum_granules)
 		{
@@ -419,7 +424,13 @@ bool impl::granule_iterator::next(u8 &granule, u16 &byte_count)
 			success = true;
 			granule = *m_current_granule;
 			byte_count = 9 * 256;
-			m_current_granule = granule_map_data[*m_current_granule];
+			next_granule = granule_map_data[*m_current_granule];
+
+			// check for cycles, which should only happen if the disk is corrupt (or not in RS-DOS format)
+			if (m_visited_granules[*next_granule])
+				next_granule = std::nullopt;	// this is corrupt!
+			else
+				m_visited_granules.set(*next_granule);
 		}
 		else if (granule_map_data[*m_current_granule] >= 0xC0 && granule_map_data[*m_current_granule] <= 0xC9)
 		{
@@ -428,13 +439,14 @@ bool impl::granule_iterator::next(u8 &granule, u16 &byte_count)
 			granule = *m_current_granule;
 			u16 sector_count = std::max(granule_map_data[*m_current_granule], u8(0xC1)) - 0xC1;
 			byte_count = sector_count * 256 + m_last_sector_bytes;
-			m_current_granule = std::nullopt;
+			next_granule = std::nullopt;
 		}
 		else
 		{
 			// should not happen; but we'll treat this as an EOF
-			m_current_granule = std::nullopt;
+			next_granule = std::nullopt;
 		}
+		m_current_granule = next_granule;
 	}
 	return success;
 }
