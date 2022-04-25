@@ -165,6 +165,13 @@ resulting mess can be seen in the F4 viewer display.
 /****************************************************************************************************/
 /* Spectrum 128 specific functions */
 
+void spectrum_128_state::video_start()
+{
+	m_frame_invert_count = 16;
+	m_screen_location = m_ram->pointer() + (5 << 14);
+	m_contention_pattern = {1, 0, 7, 6, 5, 4, 3, 2};
+}
+
 uint8_t spectrum_128_state::spectrum_128_pre_opcode_fetch_r(offs_t offset)
 {
 	/* this allows expansion devices to act upon opcode fetches from MEM addresses
@@ -172,6 +179,7 @@ uint8_t spectrum_128_state::spectrum_128_pre_opcode_fetch_r(offs_t offset)
 	   enable paged ROM and then fetches at 0700 to disable it
 	*/
 	m_exp->pre_opcode_fetch(offset);
+	if (is_contended(offset)) content_early();
 	uint8_t retval = m_maincpu->space(AS_PROGRAM).read_byte(offset);
 	m_exp->post_opcode_fetch(offset);
 	return retval;
@@ -289,6 +297,18 @@ void spectrum_128_state::machine_reset()
 	m_port_7ffd_data = 0;
 	m_port_1ffd_data = -1;
 	spectrum_128_update_memory();
+}
+
+bool spectrum_128_state::is_vram_write(offs_t offset) {
+	// TODO respect banks 2,5 mapped to 0xc000
+	return (BIT(m_port_7ffd_data, 3))
+		? offset >= 0x8000 && offset < 0x9b00
+		: spectrum_state::is_vram_write(offset);
+}
+
+bool spectrum_128_state::is_contended(offs_t offset) {
+	// TODO Unlike the base 128K machine, RAM banks 4, 5, 6 and 7 are contended.
+	return spectrum_state::is_contended(offset);// || (offset >= 0x8000 && offset < 0xc000);
 }
 
 static const gfx_layout spectrum_charlayout =
