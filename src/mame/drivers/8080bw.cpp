@@ -1323,9 +1323,9 @@ void _8080bw_state::invasion_io_map(address_map &map)
   map(0x00, 0x00).portr("IN0");
   map(0x01, 0x01).portr("IN1");
   map(0x02, 0x02).portr("IN2");
-  /* That's probably wrong. Sidam Invasion uses a totally redesign hardware layout. To be done later... */
-  map(0x03, 0x03).w("soundboard", FUNC(invaders_audio_device::p1_w)).r(FUNC(_8080bw_state::invasion_port_3_r));
-//  map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
+  map(0x03, 0x03).portr("IN3");
+  /* That's probably wrong. Sidam Invasion uses a totally redesigned hardware layout. To be done later... */
+  map(0x03, 0x03).w("soundboard", FUNC(invaders_audio_device::p1_w));
   map(0x05, 0x05).w("soundboard", FUNC(invaders_audio_device::p2_w));
   map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 
@@ -1356,6 +1356,20 @@ static INPUT_PORTS_START( invasion )
   /* SW1:5-8 Unused but mapped to port 0 in hw. */
   PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW1:5" )
   PORT_DIPUNUSED_DIPLOC( 0x07, 0x00, "SW1:6,7,8" )
+
+  /* Port 3 
+      Bit 1 is checked one-shot, at start, in the first seven bytes of code. If set to low the code continues normally to the init code, if set to high the CPU is halted. 
+            I don't know if this is some sort of protection. From PCB, I traced it to pin 12B on edge connector. That pin on the original SIDAM Invasion manual is marked as SPARE.
+      Bit 2 Coin counter protection: If coin counter is disconnected the game didn't start as described in the original SIDAM user manual:
+            "4. Protezione contatore: il microprocessore controlla che il contatore sia inserito e funzioni regolarmente. Nel caso il contatore venga staccato il
+             programma si arresta e non riprende finchè il contatore non viene regolar-mente ricollegato."
+            In hardware this value is driven by a transistor connected between pin 16A and pin 22A of the edge connector.
+            In software it is handled by the code at address $0079
+  */     
+  PORT_START("IN3")
+  PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Spare") // Pin 12B of edge connector
+  PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Coin counter protection")
+  PORT_BIT( 0xF9, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 
@@ -1374,18 +1388,10 @@ void _8080bw_state::invasion(machine_config &config)
   /* video hardware */
   m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_invaders));
 
+  /* That's probably wrong. Sidam Invasion uses a totally redesigned hardware layout. To be done later... */
   /* sound hardware */
   INVADERS_AUDIO(config, "soundboard");
 }
-
-
-uint8_t _8080bw_state::invasion_port_3_r()
-{
-  return 0x04; // Coin counter present, Spare not connected
-}
-
-
-
 
 /*******************************************************/
 /*                                                     */
