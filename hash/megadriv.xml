@@ -14963,7 +14963,6 @@ but dumps still have to be confirmed.
 	<!-- Majesco re-release comes on a 670128 REV 1 PCB with a single chip, while original release is split into two chips. -->
 	<software name="ejimu" cloneof="ejim">
 		<description>Earthworm Jim (USA)</description>
-		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<year>1994</year>
 		<publisher>Playmates Interactive</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
