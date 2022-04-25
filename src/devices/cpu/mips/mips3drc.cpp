@@ -1163,43 +1163,74 @@ void mips3_device::generate_checksum_block(drcuml_block &block, compiler_state &
 #else
 		uint32_t sum = 0;
 		const void *base = m_prptr(seqhead->physpc);
-		uint32_t low_bits = (seqhead->physpc & (m_data_bits == 64 ? 4 : 0)) ^ m_dword_xor;
+		const uint32_t data_bits_mask = (m_data_bits == 64 ? 4 : 0);
+		uint32_t low_bits = (seqhead->physpc & data_bits_mask) ^ m_dword_xor;
 		UML_LOAD(block, I0, base, low_bits, SIZE_DWORD, SCALE_x1);             // load    i0,base,0,dword
 		sum += seqhead->opptr.l[0];
 		if ((m_drcoptions & MIPS3DRC_EXTRA_INSTR_CHECK) && !(codelast->flags & OPFLAG_VIRTUAL_NOOP) && codelast->physpc != seqhead->physpc)
 		{
 			base = m_prptr(codelast->physpc);
 			assert(base != nullptr);
-			low_bits = (codelast->physpc & (m_data_bits == 64 ? 4 : 0)) ^ m_dword_xor;
+			low_bits = (codelast->physpc & data_bits_mask) ^ m_dword_xor;
 			UML_LOAD(block, I1, base, low_bits, SIZE_DWORD, SCALE_x1);     // load    i1,base,dword
 			UML_ADD(block, I0, I0, I1);                         // add     i0,i0,i1
 			sum += codelast->opptr.l[0];
 		}
-		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
+		if (!(m_drcoptions & MIPS3DRC_EXTRA_INSTR_CHECK))
 		{
-			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
+			for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
 			{
-				// Skip the last if it was already included above
-				if (!(m_drcoptions & MIPS3DRC_EXTRA_INSTR_CHECK) || curdesc->physpc != codelast->physpc)
+				if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 				{
 					base = m_prptr(curdesc->physpc);
 					assert(base != nullptr);
-					low_bits = (curdesc->physpc & (m_data_bits == 64 ? 4 : 0)) ^ m_dword_xor;
+					low_bits = (curdesc->physpc & data_bits_mask) ^ m_dword_xor;
 					UML_LOAD(block, I1, base, low_bits, SIZE_DWORD, SCALE_x1);     // load    i1,base,dword
 					UML_ADD(block, I0, I0, I1);                         // add     i0,i0,i1
 					sum += curdesc->opptr.l[0];
-				}
 
-				if (curdesc->delay.first() != nullptr
-					&& !(curdesc->delay.first()->flags & OPFLAG_VIRTUAL_NOOP)
-					&& (curdesc == seqlast || (curdesc->next() != nullptr && curdesc->next()->physpc != curdesc->delay.first()->physpc)))
+					if (curdesc->delay.first() != nullptr
+						&& !(curdesc->delay.first()->flags & OPFLAG_VIRTUAL_NOOP)
+						&& (curdesc == seqlast || (curdesc->next() != nullptr && curdesc->next()->physpc != curdesc->delay.first()->physpc)))
+					{
+						base = m_prptr(curdesc->delay.first()->physpc);
+						assert(base != nullptr);
+						low_bits = (curdesc->delay.first()->physpc & data_bits_mask) ^ m_dword_xor;
+						UML_LOAD(block, I1, base, low_bits, SIZE_DWORD, SCALE_x1); // load    i1,base,dword
+						UML_ADD(block, I0, I0, I1);                     // add     i0,i0,i1
+						sum += curdesc->delay.first()->opptr.l[0];
+					}
+				}
+			}
+		}
+		else
+		{
+			for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
+			{
+				if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 				{
-					base = m_prptr(curdesc->delay.first()->physpc);
-					assert(base != nullptr);
-					low_bits = (curdesc->delay.first()->physpc & (m_data_bits == 64 ? 4 : 0)) ^ m_dword_xor;
-					UML_LOAD(block, I1, base, low_bits, SIZE_DWORD, SCALE_x1); // load    i1,base,dword
-					UML_ADD(block, I0, I0, I1);                     // add     i0,i0,i1
-					sum += curdesc->delay.first()->opptr.l[0];
+					// Skip the last if it was already included above
+					if (curdesc->physpc != codelast->physpc)
+					{
+						base = m_prptr(curdesc->physpc);
+						assert(base != nullptr);
+						low_bits = (curdesc->physpc & (m_data_bits == 64 ? 4 : 0)) ^ m_dword_xor;
+						UML_LOAD(block, I1, base, low_bits, SIZE_DWORD, SCALE_x1);     // load    i1,base,dword
+						UML_ADD(block, I0, I0, I1);                         // add     i0,i0,i1
+						sum += curdesc->opptr.l[0];
+					}
+
+					if (curdesc->delay.first() != nullptr
+						&& !(curdesc->delay.first()->flags & OPFLAG_VIRTUAL_NOOP)
+						&& (curdesc == seqlast || (curdesc->next() != nullptr && curdesc->next()->physpc != curdesc->delay.first()->physpc)))
+					{
+						base = m_prptr(curdesc->delay.first()->physpc);
+						assert(base != nullptr);
+						low_bits = (curdesc->delay.first()->physpc & (m_data_bits == 64 ? 4 : 0)) ^ m_dword_xor;
+						UML_LOAD(block, I1, base, low_bits, SIZE_DWORD, SCALE_x1); // load    i1,base,dword
+						UML_ADD(block, I0, I0, I1);                     // add     i0,i0,i1
+						sum += curdesc->delay.first()->opptr.l[0];
+					}
 				}
 			}
 		}
