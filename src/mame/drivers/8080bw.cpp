@@ -1318,29 +1318,72 @@ void _8080bw_state::cosmicmo(machine_config &config)
 /*                                                     */
 /*******************************************************/
 
+void _8080bw_state::invasion_io_map(address_map &map)
+{
+  map(0x00, 0x00).portr("IN0");
+  map(0x01, 0x01).portr("IN1");
+  map(0x02, 0x02).portr("IN2");
+  /* That's probably wrong. Sidam Invasion uses a totally redesign hardware layout. To be done later... */
+  map(0x03, 0x03).w("soundboard", FUNC(invaders_audio_device::p1_w)).r(FUNC(_8080bw_state::invasion_port_3_r));
+//  map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
+  map(0x05, 0x05).w("soundboard", FUNC(invaders_audio_device::p2_w));
+  map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+
+}
+
+
 static INPUT_PORTS_START( invasion )
 	PORT_INCLUDE( sicv )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
 	PORT_MODIFY("IN2")
-	/* SW1:5-8 Unused according to manual. */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:4,3") /* Default is OFF, OFF (6) */
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW1:8" )        /* Default OFF */
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:2") /* Default is ON (2500) */
-	PORT_DIPSETTING(    0x08, "1500" )
-	PORT_DIPSETTING(    0x00, "2500" )
-	/* SW1:5,6,7 Default ON */
 	PORT_DIPNAME( 0x80, 0x80, "Laser Bonus Info" )      PORT_DIPLOCATION("SW1:1") /* Default is OFF (Info on) */
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+  PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:2") /* Default is ON (2500) */
+  PORT_DIPSETTING(    0x08, "1500" )
+  PORT_DIPSETTING(    0x00, "2500" )
+  PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:4,3") /* Default is OFF, OFF (6) */
+  PORT_DIPSETTING(    0x00, "3" )
+  PORT_DIPSETTING(    0x01, "4" )
+  PORT_DIPSETTING(    0x02, "5" )
+  PORT_DIPSETTING(    0x03, "6" )
+
+  PORT_MODIFY("IN0")
+  PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(mw8080bw_state, invaders_in1_control_r)  
+  /* SW1:5-8 Unused but mapped to port 0 in hw. */
+  PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW1:5" )
+  PORT_DIPUNUSED_DIPLOC( 0x07, 0x00, "SW1:6,7,8" )
 INPUT_PORTS_END
+
+
+/* same as regular invaders without hw shifter */
+void _8080bw_state::invasion(machine_config &config)
+{
+  mw8080bw_root(config);
+
+  /* basic machine hardware */
+  m_maincpu->set_addrmap(AS_IO, &_8080bw_state::invasion_io_map);
+
+  /* 60 Hz signal clocks two LS161. Ripple carry will */
+  /* reset circuit, if LS161 not cleared before.      */
+  WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 255);
+
+  /* video hardware */
+  m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_invaders));
+
+  /* sound hardware */
+  INVADERS_AUDIO(config, "soundboard");
+}
+
+
+uint8_t _8080bw_state::invasion_port_3_r()
+{
+  return 0x04; // Coin counter present, Spare not connected
+}
+
 
 
 
@@ -5760,7 +5803,7 @@ GAMEL(1978, cosmicin,    invaders, invaders,  sicv,      mw8080bw_state, empty_i
 GAMEL(1978, galmonst,    invaders, invaders,  sicv,      mw8080bw_state, empty_init,    ROT270, "bootleg (Laguna S.A.)",              "Galaxy Monsters (Laguna S.A. Spanish bootleg of Space Invaders)", MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1979, spacecom,    invaders, spacecom,  spacecom,  _8080bw_state,  init_spacecom, ROT270, "bootleg",                            "Space Combat (bootleg of Space Invaders)",                        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_spacecom )
 GAME( 1978, spacerng,    invaders, spacerng,  sitv,      _8080bw_state,  empty_init,    ROT90,  "bootleg (Leisure Time Electronics)", "Space Ranger",                                                    MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // Many modifications
-GAMEL(19??, invasion,    invaders, invaders,  invasion,  mw8080bw_state, empty_init,    ROT270, "bootleg (Sidam)",                    "Invasion (Sidam)",                                                MACHINE_SUPPORTS_SAVE, layout_invaders )
+GAMEL(19??, invasion,    invaders, invasion,  invasion,  _8080bw_state, empty_init,    ROT270, "bootleg (Sidam)",                    "Invasion (Sidam)",                                                MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1979, invasiona,   invaders, invaders,  invasion,  mw8080bw_state, empty_init,    ROT270, "bootleg",                            "UFO Robot Attack (bootleg of Invasion, newer set)",               MACHINE_SUPPORTS_SAVE, layout_invaders ) // Has Sidam replaced with 'UFO Monster Attack' and standard GFX
 GAMEL(1979, invasiona2,  invaders, invaders,  invasion,  mw8080bw_state, empty_init,    ROT270, "bootleg",                            "UFO Robot Attack (bootleg of Invasion, older set)",               MACHINE_SUPPORTS_SAVE, layout_invaders ) // Has Sidam replaced with 'UFO Monster Attack' and standard GFX
 GAMEL(1979, invasionb,   invaders, invaders,  invasion,  mw8080bw_state, empty_init,    ROT270, "bootleg",                            "Invasion (Italian bootleg)",                                      MACHINE_SUPPORTS_SAVE, layout_invaders )

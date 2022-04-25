@@ -67,6 +67,7 @@ public:
 	void invadpt2(machine_config &config);
 	void lupin3a(machine_config &config);
 	void indianbt(machine_config &config);
+	void invasion(machine_config &config);
 	void starw1(machine_config &config);
 	void cosmo(machine_config &config);
 	void spcewars(machine_config &config);
@@ -167,6 +168,7 @@ private:
 	uint8_t invrvnge_02_r();
 	void invrvnge_port03_w(uint8_t data);
 	void invrvnge_port05_w(uint8_t data);
+	uint8_t invasion_port_3_r();
 	void lupin3_00_w(uint8_t data);
 	void lupin3_sh_port_1_w(uint8_t data);
 	void lupin3_sh_port_2_w(uint8_t data);
@@ -253,6 +255,7 @@ private:
 	void indianbt_io_map(address_map &map);
 	void indianbtbr_io_map(address_map &map);
 	void invadpt2_io_map(address_map &map);
+	void invasion_io_map(address_map &map);
 	void invmulti_map(address_map &map);
 	void invrvnge_io_map(address_map &map);
 	void invrvnge_sound_map(address_map &map);
