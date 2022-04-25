@@ -8,7 +8,7 @@ Three board system consisting of a P5TX-LA PC motherboard, a Taito main board an
 
 TODO:
 - program ROM is read via parallel port (for offset write, encrypted) and game port.
-  It's the first thing that the BIOS does at boot (cfr. accesses at $20x), 
+  It's the first thing that the BIOS does at boot (cfr. accesses at $20x),
   if these ports are fed with proper values then it sets up PnP then tries a DMA ch. 3 transfer,
   otherwise it just boots the normal P5TX-LA bootstrap sequence.
   cfr. PC=e850b, PC=e4fc8, PC=fd84a (reading I/O $0006).

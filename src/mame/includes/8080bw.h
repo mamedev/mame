@@ -24,7 +24,7 @@
 #include "screen.h"
 
 
-/* for games in 8080bw.c */
+/* for games in 8080bw.cpp */
 #define CABINET_PORT_TAG                  "CAB"
 
 

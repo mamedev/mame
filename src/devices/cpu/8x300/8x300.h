@@ -90,8 +90,8 @@ protected:
 	memory_access<13, 1, -1, ENDIANNESS_BIG>::specific m_program;
 	memory_access< 9, 0,  0, ENDIANNESS_BIG>::specific m_io;
 
-	devcb_write_line m_sc_callback;	// address latch
-	devcb_write_line m_wc_callback;	// data latch
+	devcb_write_line m_sc_callback; // address latch
+	devcb_write_line m_wc_callback; // data latch
 	devcb_write_line m_lb_callback;
 	devcb_write_line m_rb_callback;
 	devcb_write_line m_mclk_callback;

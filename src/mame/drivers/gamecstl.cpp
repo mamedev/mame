@@ -41,8 +41,8 @@
     - C:\GH4\mvs contains movie clips of the emulated games.
       These are MS-CRAM encoded, 288x208 at 20 fps, stereo MS ADPCM with 11025 Hz sample rate,
       36 seconds length.
-	  Mentioning this because SiS 630 has several HW registers dedicated to video playback,
-	  which will be most likely used once we get there.
+      Mentioning this because SiS 630 has several HW registers dedicated to video playback,
+      which will be most likely used once we get there.
 
     Updates 27/11/2007 (Diego Nappino):
     The COM1 port is opened at 19200 bps, No parity, 8 bit data, 1 stop bit.

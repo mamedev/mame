@@ -433,6 +433,6 @@ GAME(199?, dibifuca, 0,        microdar, microdar, microdar_state, empty_init, R
 GAME(199?, dibif743, dibifuca, microdar, microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca (v7.43)",                           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(199?, dibif727, dibifuca, microdar, microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca (v7.27)",                           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1997, cfarwest, 0,        microdar, microdar, microdar_state, empty_init, ROT0, "Compumatic",          "Far West (Compumatic)",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1997, prospdp,  0,        prospdp,  microdar, microdar_state, empty_init, ROT0, "Compumatic",          "Unknown Compumatic ProSPDP based darts machine", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1997, prospdp,  0,        prospdp,  microdar, microdar_state, empty_init, ROT0, "Compumatic",          "unknown Compumatic ProSPDP based darts machine", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1997, diolakoa, 0,        microdv5, microdar, microdar_state, empty_init, ROT0, "Compumatic / Olakoa", "Diana Olakoa (v8.38)",                           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1997, diola827, diolakoa, microdv5, microdar, microdar_state, empty_init, ROT0, "Compumatic / Olakoa", "Diana Olakoa (v8.27)",                           MACHINE_IS_SKELETON_MECHANICAL)

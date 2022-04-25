@@ -2619,7 +2619,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 					(m_rombank ? 0x02 : 0x00) |
 					(m_intcxrom ? 0x01 : 0x00);
 
-		case 0x70:	// PTRIG - triggers paddles on read or write
+		case 0x70:  // PTRIG - triggers paddles on read or write
 			if (!machine().side_effects_disabled())
 			{
 				// Zip paddle slowdown (does ZipGS also use the old Zip flag?)

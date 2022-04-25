@@ -11,7 +11,7 @@
     - Needs proper AWE64 emulation defined as a slot option default, with
       fallbacks to AWE32 and SB16;
 
-	- ISA bus needs IRQ and DMA hookups. 
+    - ISA bus needs IRQ and DMA hookups.
       \- Will otherwise hang indefinitely after booting, waiting for sound card irqs.
          There's a C:\sb16\diagnose.exe tool if you want to test this.
 
@@ -19,7 +19,7 @@
 
     - Currently fails because it doesn't find the Voodoo card in the PCI model;
 
-    - When switching gfx mode during boot routine it still sets a terminal debug mode (with cut down screen portions) 
+    - When switching gfx mode during boot routine it still sets a terminal debug mode (with cut down screen portions)
       instead of normal Voodoo drawing. Culprit may be an I/O port reading or a Voodoo bug;
 
     - Aforementioned debug mode shows that it can't find several assets on loading;

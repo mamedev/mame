@@ -31,9 +31,9 @@ license:CC0
     various PC software and/or emulators handle them?  There are multiple second audio offset issues with
     several games in MESS/MAME which could be related.
 
-	TODO:
-	- Fix sharedfeat for Arcade Card (ACD) games, once that we split implementation from scdsys;
-	- What [Imperfect] means in some sets? Is it an alias for baddump?
+    TODO:
+    - Fix sharedfeat for Arcade Card (ACD) games, once that we split implementation from scdsys;
+    - What [Imperfect] means in some sets? Is it an alias for baddump?
 
 -->
 

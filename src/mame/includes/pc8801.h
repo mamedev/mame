@@ -121,7 +121,7 @@ private:
 	std::unique_ptr<uint8_t[]> m_ext_work_ram;
 	std::unique_ptr<uint8_t[]> m_gvram;
 
-    std::array<std::array<u16, 80>, 400> m_attr_info = {};
+	std::array<std::array<u16, 80>, 400> m_attr_info = {};
 
 	uint8_t m_ext_rom_bank = 0;
 	uint8_t m_vram_sel = 0;

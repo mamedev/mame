@@ -413,9 +413,9 @@ ROM_START( slapfighm )
 	ROM_LOAD( "1_snd_fi_0101.ic12", 0x0000, 0x4000, CRC(4e3ae13e) SHA1(4ab29064f3a4cb4fd70a9eb8ddbffb4f5ee74057) ) // 1xxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x4000, "chars", 0 ) // on one MOD 4/2 board, contains the same data as the original among the weirdness
-	ROM_LOAD( "4-2_f1_401.ic17", 0x0000, 0x4000, CRC(fbdc3ded) SHA1(5c1db5fe0ce32d996f40acf51b9ea09f7709a032) ) // BADADDR         --xxxxxxxxxxxxx, 4-2_f1_401.ic17  [3/4] a77_03.6g IDENTICAL
+	ROM_LOAD( "4-2_fi_401.ic17", 0x0000, 0x4000, CRC(fbdc3ded) SHA1(5c1db5fe0ce32d996f40acf51b9ea09f7709a032) ) // BADADDR         --xxxxxxxxxxxxx, 4-2_fi_401.ic17  [3/4] a77_03.6g IDENTICAL
 	ROM_CONTINUE(                0x0000, 0x4000 )
-	ROM_LOAD( "4-2_f1_402.ic16", 0x2000, 0x2000, CRC(6e9ce9ea) SHA1(9b80360050022fb7b938a874d5c9adb344907bab) ) // BADADDR         x-xxxxxxxxxxxxx, 4-2_f1_402.ic16  [3/4] a77_04.6f IDENTICAL
+	ROM_LOAD( "4-2_fi_402.ic16", 0x2000, 0x2000, CRC(6e9ce9ea) SHA1(9b80360050022fb7b938a874d5c9adb344907bab) ) // BADADDR         x-xxxxxxxxxxxxx, 4-2_fi_402.ic16  [3/4] a77_04.6f IDENTICAL
 	ROM_CONTINUE(                0x2000, 0x2000 )
 	ROM_CONTINUE(                0x2000, 0x2000 )
 	ROM_IGNORE(                          0x2000 )

@@ -246,6 +246,14 @@ void gdrom_device::ExecCommand()
 		// READ TOC (GD-ROM ver.)
 		case 0x14:
 		{
+			if (m_cdrom == nullptr)
+			{
+				m_phase = SCSI_PHASE_STATUS;
+				m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
+				m_transfer_length = 0;
+				break;
+			}
+
 			// TODO: is this correct?
 			int start_trk = command[2];
 			int end_trk = m_cdrom->get_last_track();

@@ -6,6 +6,7 @@
 #pragma once
 
 #include "nxrom.h"
+#include "sound/samples.h"
 
 
 // ======================> nes_bandai_pt554_device

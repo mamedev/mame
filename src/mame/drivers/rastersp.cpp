@@ -8,11 +8,11 @@
 
     Games supported:
         * Rise of the Robots (prototype)
-	    * Football Crazy
+        * Football Crazy
 
     ROMs wanted:
         * Zool (prototype)
-		* Wiggle
+        * Wiggle
 
 ****************************************************************************/
 
@@ -179,7 +179,7 @@ private:
 	uint32_t  m_speedup_count = 0;
 	uint32_t  m_tms_io_regs[0x80]{};
 	bitmap_ind16 m_update_bitmap;
-	
+
 	uint8_t m_port2_data = 0;
 	uint32_t m_last_watchdog = 0;
 	int m_left_volume = 0;
@@ -293,7 +293,7 @@ void rastersp_state::machine_reset()
 	m_irq_status = 0;
 	m_dlba = 0;
 	m_palette_number = 0;
-	
+
 	m_last_watchdog = 0;
 	m_port2_data = 0;
 	m_left_volume = 0;
@@ -479,8 +479,8 @@ void rastersp_state::dpylist_w(uint32_t data)
 void rastersp_state::upload_palette(uint32_t word1, uint32_t word2)
 {
 	/*
-		Palette entry format:
-		........ ........ ........ ...xxxxx - Blue
+	    Palette entry format:
+	    ........ ........ ........ ...xxxxx - Blue
 	    ........ ........ .....xxx xxx..... - Green
 	    ........ ........ xxxxx... ........ - Red
 	    .......x xxxxxxxx ........ ........ - Entry number
@@ -503,28 +503,28 @@ void rastersp_state::upload_palette(uint32_t word1, uint32_t word2)
 
 /*******************************************************************************
 
-	Display pointer word:
+    Display pointer word:
 
     xxxxxxxx xxxxxxxx xxxxxxxx ........ DLBA pointer (DWORD aligned)
-	........ ........ ........ x....... Display enable
-	........ ........ ........ ......xx Mode:
-									   00: 384x288 50Hz overscan
-									   01: 320x240 64Hz overscan
-									   02: 320x240 50Hz underscan
-									   03: invalid
- 
-	Control words:
- 
+    ........ ........ ........ x....... Display enable
+    ........ ........ ........ ......xx Mode:
+                                       00: 384x288 50Hz overscan
+                                       01: 320x240 64Hz overscan
+                                       02: 320x240 50Hz underscan
+                                       03: invalid
+
+    Control words:
+
     Set address
     0.xxxxxx xxxxxxxx xxxxxxxx xxxxxxxx  Address
 
     Palette update:
-	1P0..... ........ ........ ........  P specifies whether palette entry is the bottom (when 0) or top (when 1) 4 bits of palette number
+    1P0..... ........ ........ ........  P specifies whether palette entry is the bottom (when 0) or top (when 1) 4 bits of palette number
     ...01... ........ ........ ........  Palette upload
     .....10. ........ ........ ........  X address only
     .......x xxxxxxxx ........ ........  Entry count
     ........ ........ xxxx.... ........  Palette (top 4 bits if 'P' is 1 or bottom 4 bits if 'P' is 0
-	........ ........ ....xxxx xxxxxxxx  Scale (4.8 signed fixed point)
+    ........ ........ ....xxxx xxxxxxxx  Scale (4.8 signed fixed point)
 
     Pixel data, 8-bit palettized:
     1P0..... ........ ........ ........  P specifies whether palette entry is the bottom (when 0) or top (when 1) 4 bits of palette number
@@ -605,7 +605,7 @@ void rastersp_state::update_irq(uint32_t which, uint32_t state)
 WRITE_LINE_MEMBER( rastersp_state::scsi_irq )
 {
 	update_irq(IRQ_SCSI, state);
-	
+
 	if (state && BIT(m_dsp_ctrl_data, 5))
 	{
 		m_dsp->set_input_line(TMS3203X_IRQ0, ASSERT_LINE);
@@ -632,15 +632,15 @@ WRITE_LINE_MEMBER( fbcrazy_state::trackball_rts )
 }
 
 /*
-	Mimic trackball unit. This uses a small PIC based interface board
-	which converts the trackball movement into RS232 data.
-	The data format is as follows:
-	Byte 0 : 0100abAB bits 7 & 6 = 01 signifies 1st byte
-	Byte 1 : 00CDEFGH bits 7 & 6 = 00 signifies 2 or 3rd byte (not identified)
-	Byte 2 : 00cdefgh
+    Mimic trackball unit. This uses a small PIC based interface board
+    which converts the trackball movement into RS232 data.
+    The data format is as follows:
+    Byte 0 : 0100abAB bits 7 & 6 = 01 signifies 1st byte
+    Byte 1 : 00CDEFGH bits 7 & 6 = 00 signifies 2 or 3rd byte (not identified)
+    Byte 2 : 00cdefgh
 
-	The trackball X movement is ABCDEFGH and Y movement abcdefgh
-	We do not have a PCB nor a dump of the PIC :(
+    The trackball X movement is ABCDEFGH and Y movement abcdefgh
+    We do not have a PCB nor a dump of the PIC :(
 */
 TIMER_CALLBACK_MEMBER(fbcrazy_state::trackball_timer)
 {
@@ -757,7 +757,7 @@ void rastersp_state::port1_w(uint32_t data)
 		m_dsp->set_input_line(TMS3203X_IRQ2, ASSERT_LINE);
 		m_dsp->set_input_line(TMS3203X_IRQ2, CLEAR_LINE);
 	}
-	
+
 	if (BIT(data, 7) != m_last_watchdog)
 	{
 		m_last_watchdog = BIT(data, 7);
@@ -1067,7 +1067,7 @@ void rastersp_state::dsp_ctrl_w(uint32_t data)
 	// ..x. .... - Enable SCSI, UART, and 486 int to DSP
 
 	m_maincpu->set_input_line(INPUT_LINE_RESET, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
-	
+
 	m_dsp_ctrl_data = data;
 }
 
@@ -1452,7 +1452,7 @@ void rastersp_state::rs_config_base(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	NSCSI_BUS(config, "scsibus", 0);
-	
+
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_seconds(1));
 
 	nscsi_connector &connector7(NSCSI_CONNECTOR(config, "scsibus:7", 0));
@@ -1482,7 +1482,7 @@ void rastersp_state::rs_config_base(machine_config &config)
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0);
 	m_ldac->add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
 	m_rdac->add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
-	
+
 	SCC85C30(config, m_duart, 8'000'000);
 	m_duart->configure_channels(1'843'200, 0, 1'843'200, 0);
 	m_duart->out_int_callback().set(FUNC(rastersp_state::duart_irq));
@@ -1498,7 +1498,7 @@ void rastersp_state::rastersp(machine_config &config)
 {
 	rs_config_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rastersp_state::cpu_map);
-	
+
 	m_dsp->set_addrmap(AS_PROGRAM, &rastersp_state::dsp_map);
 
 	nscsi_connector &connector0(NSCSI_CONNECTOR(config, "scsibus:0", 0));

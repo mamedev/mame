@@ -19,6 +19,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_vram(*this, "vram")
+		, m_bram_data(*this, "bram", 0x2000, ENDIANNESS_BIG)
 	{ }
 
 	void att630(machine_config &config);
@@ -38,16 +39,11 @@ private:
 
 	required_device<m68000_device> m_maincpu;
 	required_shared_ptr<u16> m_vram;
-
-	std::unique_ptr<u8[]> m_bram_data;
+	memory_share_creator<u8> m_bram_data;
 };
 
 void att630_state::machine_start()
 {
-	m_bram_data = std::make_unique<u8[]>(0x2000);
-	subdevice<nvram_device>("bram")->set_base(m_bram_data.get(), 0x2000);
-
-	save_pointer(NAME(m_bram_data), 0x2000);
 }
 
 u32 att630_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -88,7 +84,7 @@ void att630_state::att730_map(address_map &map)
 	att630_map(map);
 	map(0x040000, 0x05ffff).rom().region("maincpu", 0x40000);
 	map(0x100000, 0x15ffff).rom().region("cart", 0);
-	map(0x800000, 0x83ffff).ram(); // expansion RAM
+	map(0x800000, 0x87ffff).ram(); // expansion RAM
 	map(0xde0000, 0xdfffff).rom().region("starlan", 0);
 }
 

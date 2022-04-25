@@ -477,7 +477,7 @@ static const nes_mmc mmc_list[] =
 	// 439 YS2309 multicart
 	// 440 Dongda Sonic REC-9388 educational computer
 	// 441 841026C and 850335C multicarts
-	// 442 "Golden Key" educational computer 
+	// 442 "Golden Key" educational computer
 	// 443 NC3000M multicart
 	// 444 NC7000M multicart
 	// 445 DG574B MMC3-compatible multicart

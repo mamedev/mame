@@ -26,21 +26,25 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/m6502/m3745x.h"
-#include "machine/tmp68301.h"
-#include "machine/bankdev.h"
-#include "machine/upd765.h"
-#include "machine/ncr5380.h"
+
+#include "bus/midi/midi.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
-#include "bus/midi/midi.h"
-#include "video/t6963c.h"
+#include "cpu/m6502/m3745x.h"
+#include "cpu/m68000/m68000.h"
 #include "imagedev/floppy.h"
-#include "screen.h"
+#include "machine/bankdev.h"
+#include "machine/ncr5380.h"
+#include "machine/tmp68301.h"
+#include "machine/upd765.h"
+#include "video/t6963c.h"
+
 #include "emupal.h"
+#include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
+
+namespace {
 
 class k2000_state : public driver_device
 {
@@ -91,20 +95,20 @@ private:
 
 /**
  * From the K2000/K2000R service manual:
- * 
- * 	The 68301 processor's 16 megabits (sic) of address space are divided into 16 equal memory blocks,
+ *
+ *  The 68301 processor's 16 megabits (sic) of address space are divided into 16 equal memory blocks,
  *  numbered 0-15. The first time the K2000 is powered up, Block 0 processes data for the boot
  *  EPROM and setup EPROM, while Block 1 processes data for the PSRAM. Many of the K2000's basic
  *  functions utilize the PSRAM, which accesses the higher address space of Block 1 in the CPU.
  *  This slows down the access time somewhat, since the address space of the CPU is accessed in
  *  sequence, beginning with Block 0.
- * 
+ *
  *  To optimize the processing speed, the K2000 performs a one-time software operation when
  *  powered up for the first time. The memory management unit (MMU) in the gate array logic chip
  *  (GAL) located at U35 on the engine board executes a "swap bit" function which makes Block 0
  *  of the CPU responsible for the PSRAM, and Block 1 responsible for the Boot EPROM and Setup
  *  EPROM. Consequently the PSRAM functions are processed as early as possible.
- * 
+ *
  * Note this "16 equal memory blocks" idea is really just the top hex digit of the address -
  * i.e.: 0x?FFFFF
  */
@@ -196,10 +200,10 @@ void k2000_state::k2000_map(address_map &map)
 	// Block 4: PRAM?
 	// "The K2000 comes standard with 116KB, and with the PRAM upgrade, totals 760KB."
 	// Another source says:
-	//	For the K2000 Series, the total memory allocated to all of these objects is
-	//	120K expandable to 760K with the PRAM option. For the K2500 Series, it is 256k,
-	// 	expandable to 1280k with the PRAM option. For the K2600 Series, it is 486k,
-	//	expandable to 1506k with the PRAM option.
+	//  For the K2000 Series, the total memory allocated to all of these objects is
+	//  120K expandable to 760K with the PRAM option. For the K2500 Series, it is 256k,
+	//  expandable to 1280k with the PRAM option. For the K2600 Series, it is 486k,
+	//  expandable to 1506k with the PRAM option.
 	// These are pretty odd numbers - but it sounds like ~8KB of the RAM space is used
 	// for OS functions, meaning the built-in RAM might only be 128KB in total.
 	// The K2000 schematic shows 2x 1M "NVRAM" chips, one for the low byte, and one for
@@ -215,12 +219,12 @@ void k2000_state::k2000_map(address_map &map)
 	// HOBBES1CSb = NAND(CS1', !CA19) = high unless CS1 is high and CA19 is low
 	// 0xFFFC00 is the Address Decoder area that controls which part of memory causes CS1 to be "enabled" (low)
 	// At runtime,
-	//  0xFFFC00 = 0x50 = 
-	// 	0xFFFC01 = 0x3F
-	// 	0xFFFC02 = 0x00
+	//  0xFFFC00 = 0x50 =
+	//  0xFFFC01 = 0x3F
+	//  0xFFFC02 = 0x00
 	//  0xFFFC03 = 0x30
 	//   For CS1:
-	//  0xFFFC04 = 0x60 = 0b0110 0000 = Start address of the memory area for CS1 = A21 + A22 
+	//  0xFFFC04 = 0x60 = 0b0110 0000 = Start address of the memory area for CS1 = A21 + A22
 	//  0xFFFC05 = 0x3F = 0b0011 1111 = Size of memory area = M19 + M18 + M17 + M16 + M15-M9 + M8 = 1MB
 	//  0xFFFC06 = 0x00
 	//  0xFFFC07 = 0x30 = 0b0011 0000 = Area enabled, use external DTACK
@@ -233,7 +237,7 @@ void k2000_state::k2000_map(address_map &map)
 	// Internal sample ROM is switched on SBA20,SBA21, which corresponds to CA21,CA22 (one bit off)
 	// meaning the internal address space for accessing the sample ROM is 0x200000 through 0x6fffff (?)
 	// Blocks 2, 3, 4, 5, 6
-	// map(0x200000, 0x2fffff).rom().region("pcm", 0);		  // Block 2: Sample ROM
+	// map(0x200000, 0x2fffff).rom().region("pcm", 0);        // Block 2: Sample ROM
 	// map(0x300000, 0x3fffff).rom().region("pcm", 0x100000); // Block 3: Sample ROM
 	// map(0x400000, 0x4fffff).rom().region("pcm", 0x200000); // Block 4: Sample ROM
 	// Writes to 0x4FFD82, 0x4FFD88, 0x4FFE24
@@ -246,9 +250,9 @@ void k2000_state::k2000_map(address_map &map)
 	//  down to 0x500004 (then 0x500006)
 
 	// Calvin memory?
-	map(0x500000, 0x5003FF).rw(FUNC(k2000_state::calvin_read), FUNC(k2000_state::calvin_write));
+	map(0x500000, 0x5003ff).rw(FUNC(k2000_state::calvin_read), FUNC(k2000_state::calvin_write));
 	// Calvin control registers?
-	map(0x500400, 0x5004FF).rw(FUNC(k2000_state::calvin_read), FUNC(k2000_state::calvin_write));
+	map(0x500400, 0x5004ff).rw(FUNC(k2000_state::calvin_read), FUNC(k2000_state::calvin_write));
 	// Reads and writes to 0x580000
 
 	// Hobbes (it seems) is connected in the 0x600000 range
@@ -263,9 +267,9 @@ void k2000_state::k2000_map(address_map &map)
 	// Each Hobbes chip seems to have two control registers, mapped at 0x600300/0x680300 and 0x600400/0x680400
 
 	// Hobbes memory?
-	map(0x600000, 0x6002FF).rw(FUNC(k2000_state::hobbes0_read), FUNC(k2000_state::hobbes0_write));
+	map(0x600000, 0x6002ff).rw(FUNC(k2000_state::hobbes0_read), FUNC(k2000_state::hobbes0_write));
 	// Hobbes control registers?
-	map(0x600300, 0x6005FF).rw(FUNC(k2000_state::hobbes0_read), FUNC(k2000_state::hobbes0_write));
+	map(0x600300, 0x6005ff).rw(FUNC(k2000_state::hobbes0_read), FUNC(k2000_state::hobbes0_write));
 
 	// Hobbes memory?
 	map(0x680000, 0x6802FF).rw(FUNC(k2000_state::hobbes1_read), FUNC(k2000_state::hobbes1_write));
@@ -288,11 +292,11 @@ void k2000_state::k2000_map(address_map &map)
 	// Writes to 0x7C0000
 
 	// Single byte reads seem to happen at 0x740000, which seems to be FDCCTLCSb?
-	// map(0x740000, 0x74000F).
+	// map(0x740000, 0x74000f).
 	map(0x7e0000, 0x7e0001).w(FUNC(k2000_state::swap_bit_ctrl_w));
 
 	// Some sort of hardware mapping - initial firmware boot expects a 4 at $78000B
-	map(0x780000, 0x78FFFF).ram();
+	map(0x780000, 0x78ffff).ram();
 
 	// When (CPUASb + GODOT I6) and (GODOT I/O0 + IOCSb) are low,
 	// Address bits 17, 18, 19 get demultiplexed onto:
@@ -472,5 +476,6 @@ ROM_START( k2000 )
 	// seem to be the Sample Bank address lines.
 ROM_END
 
-CONS( 1990, k2000, 0, 0, k2000, k2000, k2000_state, empty_init, "Kurzweil Music Systems", "K2000", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+} // anonymous namespace
 
+SYST( 1990, k2000, 0, 0, k2000, k2000, k2000_state, empty_init, "Kurzweil Music Systems", "K2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

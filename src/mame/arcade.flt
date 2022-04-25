@@ -96,6 +96,7 @@ avt.cpp
 aztarac.cpp
 backfire.cpp
 badlands.cpp
+badlands_ms.cpp
 badlandsbl.cpp
 bagman.cpp
 bailey.cpp

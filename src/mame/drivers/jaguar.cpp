@@ -1225,6 +1225,9 @@ void jaguarcd_state::butch_regs_w(offs_t offset, uint32_t data, uint32_t mem_mas
 {
 	COMBINE_DATA(&m_butch_regs[offset]);
 
+	if (!m_cd_file)
+		return;
+
 	switch(offset*4)
 	{
 		case 8: //DS DATA

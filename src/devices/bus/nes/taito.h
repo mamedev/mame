@@ -14,15 +14,14 @@ class nes_tc0190fmc_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_tc0190fmc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_tc0190fmc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void tc0190fmc_write(offs_t offset, uint8_t data);
-	virtual void write_h(offs_t offset, uint8_t data) override { tc0190fmc_write(offset, data); }
+	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
 
 protected:
-	nes_tc0190fmc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	nes_tc0190fmc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 };
 
 
@@ -32,9 +31,9 @@ class nes_tc0190fmc_pal16r4_device : public nes_tc0190fmc_device
 {
 public:
 	// construction/destruction
-	nes_tc0190fmc_pal16r4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_tc0190fmc_pal16r4_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_h(offs_t offset, uint8_t data) override;
+	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void hblank_irq(int scanline, int vblank, int blanked) override;
 	virtual void pcb_reset() override;
@@ -44,8 +43,8 @@ protected:
 	virtual void device_start() override;
 
 private:
-	uint16_t     m_irq_count, m_irq_count_latch;
-	int        m_irq_enable;
+	u8 m_irq_count, m_irq_count_latch;
+	u8 m_irq_enable;
 };
 
 
@@ -55,10 +54,10 @@ class nes_x1_005_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_x1_005_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_x1_005_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual uint8_t read_m(offs_t offset) override;
-	virtual void write_m(offs_t offset, uint8_t data) override;
+	virtual u8 read_m(offs_t offset) override;
+	virtual void write_m(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
 
@@ -67,9 +66,9 @@ protected:
 	virtual void device_start() override;
 
 private:
-	uint8_t m_latch;
+	u8 m_latch;
 	// Taito X1-005 chip contains 80 bytes of internal ram, possibly battery backed up
-	uint8_t m_x1_005_ram[0x80];
+	u8 m_x1_005_ram[0x80];
 };
 
 

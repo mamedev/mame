@@ -1762,7 +1762,7 @@ WRITE_LINE_MEMBER(rainbow_base_state::hdc_read_sector)
 
 				// Pointer to info + C + H + S
 				uint32_t lbasector = get_and_print_lbasector(this, info, cylinder, sdh & 0x07, sector_number);
-				
+
 				if ((cylinder <= info.cylinders) &&                          // filter invalid ranges
 					(SECTOR_SIZES[(sdh >> 5) & 0x03] == info.sectorbytes)    // may not vary in image!
 					)

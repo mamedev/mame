@@ -2,10 +2,10 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-	HAL PCG-8100
+    HAL PCG-8100
 
-	Used on a bunch of PC-8001 games, adds a Programmable Character Generator overlay,
-	a write-only 8253 with channels tied to three DAC1BIT
+    Used on a bunch of PC-8001 games, adds a Programmable Character Generator overlay,
+    a write-only 8253 with channels tied to three DAC1BIT
 
 **************************************************************************************************/
 
@@ -15,8 +15,8 @@
 
 DEFINE_DEVICE_TYPE(PCG8100, pcg8100_device, "pcg8100", "HAL Laboratory PCG-8100")
 
-pcg8100_device::pcg8100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) 
-    : pc8801_exp_device(mconfig, PCG8100, tag, owner, clock)
+pcg8100_device::pcg8100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pc8801_exp_device(mconfig, PCG8100, tag, owner, clock)
 	, m_pit(*this, "pit")
 	, m_dac1bit(*this, "dac1bit%u", 0L)
 	, m_cg_rom(*this, "^^cgrom")
@@ -60,7 +60,7 @@ void pcg8100_device::device_start()
 	// Save a local copy of the original data here, card can eventually restore data at later time.
 	for (int i = 0x000; i < 0x400; i++)
 		m_original_rom[i] = m_cg_rom[i | 0x400];
-	
+
 	save_item(NAME(m_original_rom));
 }
 
@@ -73,7 +73,7 @@ void pcg8100_device::device_reset()
 
 	for (i = 0x000; i < 0x400; i++)
 		m_cg_rom[i | 0x400] = m_original_rom[i];
-	
+
 	for (i = 0; i < 3; i++)
 		audio_channel(i, false);
 }
@@ -102,7 +102,7 @@ void pcg8100_device::pcg_latch_w(u8 data)
 	}
 	m_pcg_address = (m_pcg_address & 0xff) | ((data & 0x3) << 8);
 	m_pcg_latch = data;
-	
+
 	audio_channel(0, bool(BIT(data, 3)));
 	audio_channel(1, bool(BIT(data, 6)));
 	audio_channel(2, bool(BIT(data, 7)));
