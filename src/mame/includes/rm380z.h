@@ -68,6 +68,10 @@ public:
 	void init_rm380z34e();
 	void init_rm480z();
 
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+
 private:
 	void put_point(int charnum,int x,int y,int col);
 	void init_graphic_chars();
@@ -78,17 +82,14 @@ private:
 	void config_videomode();
 	void check_scroll_register();
 
-	int writenum;
+	int writenum = 0;
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-
-	uint8_t m_port0;
-	uint8_t m_port0_mask;
-	uint8_t m_port0_kbd;
-	uint8_t m_port1;
-	uint8_t m_fbfd;
-	uint8_t m_fbfe;
+	uint8_t m_port0 = 0;
+	uint8_t m_port0_mask = 0;
+	uint8_t m_port0_kbd = 0;
+	uint8_t m_port1 = 0;
+	uint8_t m_fbfd = 0;
+	uint8_t m_fbfe = 0;
 
 	uint8_t m_graphic_chars[0x80][(RM380Z_CHDIMX+1)*(RM380Z_CHDIMY+1)];
 
@@ -97,16 +98,16 @@ private:
 	uint8_t   m_vramattribs[RM380Z_SCREENSIZE];
 	uint8_t   m_vram[RM380Z_SCREENSIZE];
 
-	int m_rasterlineCtr;
-	emu_timer* m_vblankTimer;
+	int m_rasterlineCtr = 0;
+	emu_timer* m_vblankTimer = nullptr;
 
-	int m_old_fbfd;
-	int m_old_old_fbfd;
+	int m_old_fbfd = 0;
+	int m_old_old_fbfd = 0;
 
-	int m_videomode;
-	int m_old_videomode;
+	int m_videomode = 0;
+	int m_old_videomode = 0;
 
-	emu_timer *m_static_vblank_timer;
+	emu_timer *m_static_vblank_timer = nullptr;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cassette_image_device> m_cassette;
@@ -115,24 +116,20 @@ private:
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 
-	DECLARE_WRITE8_MEMBER( port_write );
-	DECLARE_READ8_MEMBER( port_read );
-	DECLARE_WRITE8_MEMBER( port_write_1b00 );
-	DECLARE_READ8_MEMBER( port_read_1b00 );
+	void port_write(offs_t offset, uint8_t data);
+	uint8_t port_read(offs_t offset);
+	void port_write_1b00(offs_t offset, uint8_t data);
+	uint8_t port_read_1b00(offs_t offset);
 
-	DECLARE_READ8_MEMBER( videoram_read );
-	DECLARE_WRITE8_MEMBER( videoram_write );
+	uint8_t videoram_read(offs_t offset);
+	void videoram_write(offs_t offset, uint8_t data);
 
-	uint8_t hiram[0x1000];
-	DECLARE_READ8_MEMBER( hiram_read );
-	DECLARE_WRITE8_MEMBER( hiram_write );
+	uint8_t rm380z_portlow_r();
+	void rm380z_portlow_w(offs_t offset, uint8_t data);
+	uint8_t rm380z_porthi_r();
+	void rm380z_porthi_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( rm380z_portlow_r );
-	DECLARE_WRITE8_MEMBER( rm380z_portlow_w );
-	DECLARE_READ8_MEMBER( rm380z_porthi_r );
-	DECLARE_WRITE8_MEMBER( rm380z_porthi_w );
-
-	DECLARE_WRITE8_MEMBER(disk_0_control);
+	void disk_0_control(uint8_t data);
 
 	void keyboard_put(u8 data);
 

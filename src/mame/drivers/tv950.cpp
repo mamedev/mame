@@ -82,9 +82,9 @@ private:
 
 	void tv950_mem(address_map &map);
 
-	uint8_t m_via_row;
-	uint8_t m_attr_row;
-	uint8_t m_attr_screen;
+	uint8_t m_via_row = 0;
+	uint8_t m_attr_row = 0;
+	uint8_t m_attr_screen = 0;
 
 	required_device<m6502_device> m_maincpu;
 	required_device<via6522_device> m_via;
@@ -95,8 +95,8 @@ private:
 	required_region_ptr<uint16_t> m_gfx;
 	required_ioport_array<4> m_dsw;
 
-	int m_row_addr;
-	int m_row;
+	int m_row_addr = 0;
+	int m_row = 0;
 };
 
 void tv950_state::machine_start()
@@ -259,7 +259,7 @@ MC6845_UPDATE_ROW( tv950_state::crtc_update_row )
 	else
 		m_attr_screen = m_attr_row;
 
-	uint32_t *p = &bitmap.pix32(m_row);
+	uint32_t *p = &bitmap.pix(m_row);
 	rgb_t fg(255,255,255,255);
 	rgb_t bg(0,0,0,0);
 
@@ -304,7 +304,7 @@ void tv950_state::tv950(machine_config &config)
 	m_crtc->out_vsync_callback().set(FUNC(tv950_state::crtc_vs_w));
 	m_crtc->set_screen(nullptr);
 
-	VIA6522(config, m_via, MASTER_CLOCK/14);
+	MOS6522(config, m_via, MASTER_CLOCK/14);
 	//m_via->irq_handler().set_inputline(m_maincpu, M6502_NMI_LINE);
 	m_via->writepa_handler().set(FUNC(tv950_state::via_a_w));
 	m_via->writepb_handler().set(FUNC(tv950_state::via_b_w));

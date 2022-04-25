@@ -85,7 +85,7 @@ uint32_t super80_state::screen_update_super80(screen_device &screen, bitmap_ind1
 	{
 		for (uint8_t ra = 0; ra < 10; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
 			for (uint16_t x = 0; x < 32; x++)    // done this way to avoid x overflowing on page FF
 			{
@@ -141,7 +141,7 @@ uint32_t super80_state::screen_update_super80d(screen_device &screen, bitmap_ind
 	{
 		for (uint8_t ra = 0; ra < 10; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
 			for (uint16_t x = 0; x < 32; x++)
 			{
@@ -191,7 +191,7 @@ uint32_t super80_state::screen_update_super80e(screen_device &screen, bitmap_ind
 	{
 		for (uint8_t ra = 0; ra < 10; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
 			for (uint16_t x = 0; x < 32; x++)
 			{
@@ -245,7 +245,7 @@ uint32_t super80_state::screen_update_super80m(screen_device &screen, bitmap_ind
 	{
 		for (uint8_t ra = 0; ra < 10; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
 			for (uint16_t x = 0; x < 32; x++)
 			{
@@ -372,7 +372,7 @@ uint32_t super80v_state::screen_update_super80v(screen_device &screen, bitmap_rg
 MC6845_UPDATE_ROW( super80v_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix(y);
 
 	for (uint16_t x = 0; x < x_count; x++)               // for each character
 	{

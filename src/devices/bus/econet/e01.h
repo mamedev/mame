@@ -44,7 +44,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -82,7 +82,7 @@ private:
 	uint8_t rtc_data_r();
 	void rtc_data_w(uint8_t data);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats_afs);
+	static void floppy_formats_afs(format_registration &fr);
 
 	required_device<m65c02_device> m_maincpu;
 	required_device<wd2793_device> m_fdc;

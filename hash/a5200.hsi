@@ -6,7 +6,7 @@ license:CC0
 	<!-- use A13MIRRORING for 16kb cartridge which do not work without it -->
 	<!-- (normally 16kb cartridges ignore address line A14, but ...) -->
 	<!-- BOUNTYBOB for special bountybob cartridge with bankswitching -->
-	<!-- This MESS CRC file is based on a generated one from Cowering's Good databases -->
+	<!-- This CRC file is based on a generated one from Cowering's Good databases -->
 	<!-- crc= Game Name | Year | Manufacturer | Emulation Status -->
 	<hash crc32="4019ecec" name="Astro Chase (Parker Brothers-First Star Software) (U)">
 		<year>1982</year>

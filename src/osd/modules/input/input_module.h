@@ -5,9 +5,10 @@
 //  input_module.h - OSD input module contracts
 //
 //============================================================
+#ifndef MAME_OSD_INPUT_INPUT_MODULE_H
+#define MAME_OSD_INPUT_INPUT_MODULE_H
 
-#ifndef INPUT_MODULE_H_
-#define INPUT_MODULE_H_
+#pragma once
 
 #include "osdepend.h"
 
@@ -39,4 +40,4 @@ public:
 #define OSD_LIGHTGUNINPUT_PROVIDER   "lightgunprovider"
 #define OSD_JOYSTICKINPUT_PROVIDER   "joystickprovider"
 
-#endif /* INPUT_MODULE_H_ */
+#endif // MAME_OSD_INPUT_INPUT_MODULE_H

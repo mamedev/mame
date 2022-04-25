@@ -70,8 +70,8 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 
 	/* video-related */
-	int        m_timer;
-	uint8_t      m_clear_tv;
+	int        m_timer = 0;
+	uint8_t      m_clear_tv = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -121,20 +121,16 @@ WRITE_LINE_MEMBER(toratora_state::cb2_u2_w)
 
 uint32_t toratora_state::screen_update_toratora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	offs_t offs;
-
-	for (offs = 0; offs < m_videoram.bytes(); offs++)
+	for (offs_t offs = 0; offs < m_videoram.bytes(); offs++)
 	{
-		int i;
-
 		uint8_t y = offs >> 5;
 		uint8_t x = offs << 3;
 		uint8_t data = m_videoram[offs];
 
-		for (i = 0; i < 8; i++)
+		for (int i = 0; i < 8; i++)
 		{
 			pen_t pen = (data & 0x80) ? rgb_t::white() : rgb_t::black();
-			bitmap.pix32(y, x) = pen;
+			bitmap.pix(y, x) = pen;
 
 			data = data << 1;
 			x = x + 1;

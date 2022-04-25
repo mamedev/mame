@@ -19,7 +19,6 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( reset );
 	DECLARE_WRITE_LINE_MEMBER( chip_select );
-	DECLARE_WRITE_LINE_MEMBER(read_request);
 	uint8_t read();
 
 protected:
@@ -43,7 +42,6 @@ private:
 	uint8_t R3_r();
 	void O_w(uint8_t data);
 	void P_w(uint8_t data);
-	TIMER_CALLBACK_MEMBER( chip_select_sync );
 };
 
 DECLARE_DEVICE_TYPE(NAMCO_53XX, namco_53xx_device)

@@ -21,9 +21,9 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> joystick_interface_device
+// ======================> vtech_joystick_interface_device
 
-class vtech_joystick_interface_device : public device_t, public device_vtech_ioexp_interface
+class vtech_joystick_interface_device : public vtech_ioexp_device
 {
 public:
 	// construction/destruction
@@ -34,7 +34,8 @@ public:
 protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
+
+	virtual void io_map(address_map &map) override;
 
 private:
 	required_ioport m_joy0;

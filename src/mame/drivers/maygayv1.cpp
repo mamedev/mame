@@ -136,12 +136,14 @@ Find lamps/reels after UPD changes.
 #include "machine/mc68681.h"
 #include "machine/nvram.h"
 #include "sound/upd7759.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 /*************************************
  *
@@ -161,7 +163,7 @@ Find lamps/reels after UPD changes.
  *************************************/
 
 
-#define VREG(a)     i82716.r[a]
+#define VREG(a)     m_i82716.r[a]
 
 enum
 {
@@ -201,14 +203,6 @@ static const uint32_t banks[4] = { 0, 0x40000/2, 0x20000/2, 0x60000/2 };
 
 #define DRAM_BANK_SEL       (banks[(VREG(DSBA) >> 7) & 3])
 
-struct i82716_t
-{
-	uint16_t  r[16];
-	std::unique_ptr<uint16_t[]>  dram;
-
-	std::unique_ptr<uint8_t[]>   line_buf;  // there's actually two
-};
-
 
 class maygayv1_state : public driver_device
 {
@@ -227,6 +221,11 @@ public:
 	void maygayv1(machine_config &config);
 
 	void init_screenpl();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	void i82716_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -253,10 +252,6 @@ private:
 	void sound_prg(address_map &map);
 	void cpu_space_map(address_map &map);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
 	required_device<cpu_device> m_maincpu;
 	required_device<i8052_device> m_soundcpu;
 	required_device<upd7759_device> m_upd7759;
@@ -264,12 +259,20 @@ private:
 	required_device<palette_device> m_palette;
 	required_ioport_array<8> m_kbd_ports;
 
-	int m_lamp_strobe;
-	int m_old_lamp_strobe;
-	int m_vsync_latch_preset;
-	uint8_t m_p1;
-	uint8_t m_p3;
-	int m_d68681_val;
+	struct i82716_t
+	{
+		uint16_t  r[16];
+		std::unique_ptr<uint16_t[]>  dram;
+
+		std::unique_ptr<uint8_t[]>   line_buf;  // there's actually two
+	};
+
+	int m_lamp_strobe = 0;
+	int m_old_lamp_strobe = 0;
+	int m_vsync_latch_preset = 0;
+	uint8_t m_p1 = 0;
+	uint8_t m_p3 = 0;
+	int m_d68681_val = 0;
 	i82716_t m_i82716;
 	output_finder<8 * 256> m_lamp;
 };
@@ -279,12 +282,11 @@ private:
 
 void maygayv1_state::i82716_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	i82716_t &i82716 = m_i82716;
 	// Accessing register window?
 	if ((VREG(RWBA) & 0xfff0) == (offset & 0xfff0))
 	{
 		// Register segment is fixed at start of DRAM
-		COMBINE_DATA(&i82716.dram[offset & 0xf]);
+		COMBINE_DATA(&m_i82716.dram[offset & 0xf]);
 	}
 
 	// Accessing data window?
@@ -292,17 +294,16 @@ void maygayv1_state::i82716_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	if (offset >= (VREG(DWBA) & 0xf800))
 	{
 		offset -= (VREG(DWBA) & 0xf800);
-		COMBINE_DATA(&i82716.dram[DRAM_BANK_SEL + (VREG(DSBA) & 0xf800) + offset]);
+		COMBINE_DATA(&m_i82716.dram[DRAM_BANK_SEL + (VREG(DSBA) & 0xf800) + offset]);
 	}
 }
 
 uint16_t maygayv1_state::i82716_r(offs_t offset)
 {
-	i82716_t &i82716 = m_i82716;
 	// Accessing register window?
 	if ((VREG(RWBA) & ~0xf) == (offset & ~0xf))
 	{
-		return(i82716.r[offset & 0xf]);
+		return(m_i82716.r[offset & 0xf]);
 	}
 
 	// Accessing data window? TODO: mask?
@@ -311,7 +312,7 @@ uint16_t maygayv1_state::i82716_r(offs_t offset)
 		if (offset >= (VREG(DWBA) & 0xf800))
 		{
 			offset -= (VREG(DWBA) & 0xf800);
-			return i82716.dram[DRAM_BANK_SEL +(VREG(DSBA) & 0xf800) + (offset)];
+			return m_i82716.dram[DRAM_BANK_SEL +(VREG(DSBA) & 0xf800) + (offset)];
 		}
 	}
 
@@ -325,11 +326,9 @@ void maygayv1_state::video_start()
 
 uint32_t maygayv1_state::screen_update_maygayv1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	i82716_t &i82716 = m_i82716;
-	uint16_t *atable = &i82716.dram[VREG(ATBA)];
-	uint16_t *otable = &i82716.dram[VREG(ODTBA) & 0xfc00];  // both must be bank 0
+	uint16_t *atable = &m_i82716.dram[VREG(ATBA)];
+	uint16_t *otable = &m_i82716.dram[VREG(ODTBA) & 0xfc00];  // both must be bank 0
 
-	int sl, sx;
 	int slmask = 0xffff;     // TODO: Save if using scanline callbacks
 	int xbound = (VREG(DWBA) & 0x3f8) | 7;
 
@@ -344,22 +343,21 @@ uint32_t maygayv1_state::screen_update_maygayv1(screen_device &screen, bitmap_in
 	}
 
 	/* For every scanline... */
-	for (sl = cliprect.min_x; sl <= cliprect.max_y; ++sl)
+	for (int sl = cliprect.min_x; sl <= cliprect.max_y; ++sl)
 	{
-		int obj;
 		uint16_t aflags = atable[sl];
 		uint16_t slmask_old = slmask;
 
-		uint16_t *bmp_ptr = &bitmap.pix16(sl);
+		uint16_t *bmp_ptr = &bitmap.pix(sl);
 
 		slmask = 0xffff ^ (slmask ^ aflags);
 
 		/* Clear the frame buffer on each line to BG colour (palette entry 2) */
 		/* 4bpp only ! */
-		memset(i82716.line_buf.get(), 0x22, 512);
+		memset(m_i82716.line_buf.get(), 0x22, 512);
 
 		/* Parse the list of 16 objects */
-		for (obj = 0; obj < 16; ++obj)
+		for (int obj = 0; obj < 16; ++obj)
 		{
 			int offs = obj * 4;
 
@@ -367,7 +365,7 @@ uint32_t maygayv1_state::screen_update_maygayv1(screen_device &screen, bitmap_in
 			if ( !BIT(slmask, obj) )
 			{
 				uint32_t  objbase, trans, width;
-				int32_t   x, xpos;
+				int32_t   xpos;
 				uint16_t  w0, w1, w2;
 				uint16_t  *objptr;
 				uint8_t *bmpptr; // ?
@@ -413,13 +411,13 @@ uint32_t maygayv1_state::screen_update_maygayv1(screen_device &screen, bitmap_in
 
 				/* Bitmap data pointer */
 				objbase = ((w0 & 0x00c0) << 10) | w2;
-				objptr = &i82716.dram[objbase + ((4 * width) * otable[offs + 3])];
+				objptr = &m_i82716.dram[objbase + ((4 * width) * otable[offs + 3])];
 
 				// endian alert
 				bmpptr = (uint8_t*)objptr;
 
 				// 4bpp
-				for (x = xpos; x < std::min(xbound, int(xpos + width * 8)); ++x)
+				for (int x = xpos; x < std::min(xbound, int(xpos + width * 8)); ++x)
 				{
 					if (x >= 0)
 					{
@@ -427,10 +425,10 @@ uint32_t maygayv1_state::screen_update_maygayv1(screen_device &screen, bitmap_in
 						uint8_t p2 = *bmpptr >> 4;
 
 						if (!trans || p1)
-							i82716.line_buf[x] = p1;
+							m_i82716.line_buf[x] = p1;
 
 						if (!trans || p2)
-							i82716.line_buf[x] |= p2 << 4;
+							m_i82716.line_buf[x] |= p2 << 4;
 					}
 					bmpptr++;
 				}
@@ -441,9 +439,9 @@ uint32_t maygayv1_state::screen_update_maygayv1(screen_device &screen, bitmap_in
 		}
 
 		// Write it out
-		for (sx = cliprect.min_x; sx < cliprect.max_x; sx += 2)
+		for (int sx = cliprect.min_x; sx < cliprect.max_x; sx += 2)
 		{
-			uint8_t pix = i82716.line_buf[sx / 2];
+			uint8_t pix = m_i82716.line_buf[sx / 2];
 
 			bmp_ptr[sx + 0] = pix & 0xf;
 			bmp_ptr[sx + 1] = pix >> 4;
@@ -458,25 +456,24 @@ WRITE_LINE_MEMBER(maygayv1_state::screen_vblank_maygayv1)
 	// rising edge
 	if (state)
 	{
-		i82716_t &i82716 = m_i82716;
 		// UCF
 		if (VREG(VCR0) & VCR0_UCF)
 		{
 			int i;
 
 			for (i = 0; i < 16; ++i)
-				VREG(i) = i82716.dram[i];
+				VREG(i) = m_i82716.dram[i];
 		}
 		else
 		{
-			VREG(VCR0) = i82716.dram[VCR0];
-			VREG(ATBA) = i82716.dram[ATBA];
+			VREG(VCR0) = m_i82716.dram[VCR0];
+			VREG(ATBA) = m_i82716.dram[ATBA];
 		}
 
 		if (!(VREG(VCR0) & VCR0_DEI))
 		{
 			int i;
-			uint16_t *palbase = &i82716.dram[VREG(CTBA)];
+			uint16_t *palbase = &m_i82716.dram[VREG(CTBA)];
 
 			for (i = 0; i < 16; ++i)
 			{
@@ -866,19 +863,18 @@ void maygayv1_state::b_writ(uint8_t data)
 void maygayv1_state::machine_start()
 {
 	m_lamp.resolve();
-	i82716_t &i82716 = m_i82716;
-	i82716.dram = std::make_unique<uint16_t[]>(0x80000/2);   // ???
-	i82716.line_buf = std::make_unique<uint8_t[]>(512);
+	m_i82716.dram = std::make_unique<uint16_t[]>(0x80000/2);   // ???
+	m_i82716.line_buf = std::make_unique<uint8_t[]>(512);
 
-	save_pointer(NAME(i82716.dram), 0x40000);
+	save_pointer(NAME(m_i82716.dram), 0x40000);
 }
 
 void maygayv1_state::machine_reset()
 {
-	i82716_t &i82716 = m_i82716;
 	// ?
-	memset(i82716.dram.get(), 0, 0x40000);
-	i82716.r[RWBA] = 0x0200;
+	memset(m_i82716.dram.get(), 0, 0x40000);
+	std::fill(std::begin(m_i82716.r), std::end(m_i82716.r), 0);
+	m_i82716.r[RWBA] = 0x0200;
 }
 
 
@@ -918,7 +914,7 @@ void maygayv1_state::maygayv1(machine_config &config)
 
 	MC68681(config, m_duart68681, DUART_CLOCK);
 	m_duart68681->irq_cb().set(FUNC(maygayv1_state::duart_irq_handler));
-	m_duart68681->a_tx_cb().set(FUNC(maygayv1_state::duart_txa));;
+	m_duart68681->a_tx_cb().set(FUNC(maygayv1_state::duart_txa));
 
 	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/4));         // unknown clock
 	kbdc.out_sl_callback().set(FUNC(maygayv1_state::strobe_w));         // scan SL lines
@@ -1269,6 +1265,9 @@ void maygayv1_state::init_screenpl()
 {
 	m_p1 = m_p3 = 0xff;
 }
+
+} // Anonymous namespace
+
 
 #define GAME_FLAGS MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK
 

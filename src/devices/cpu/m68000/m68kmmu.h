@@ -373,10 +373,10 @@ void update_sr(const int type, const u32 tbl_entry, const int fc)
 		{
 			m_mmu_tmp_sr |= M68K_MMU_SR_MODIFIED;
 		}
-		// fall through
+		[[fallthrough]];
 
 	case M68K_MMU_DF_DT_TABLE_4BYTE:
-		// fall through
+		[[fallthrough]];
 
 	case M68K_MMU_DF_DT_TABLE_8BYTE:
 
@@ -1045,11 +1045,13 @@ void m68851_pmove_put(u32 ea, u16 modes)
 		}
 		break;
 
+		// FIXME: unreachable
 		if (!(modes & 0x100))
 		{
 			pmmu_atc_flush();
 		}
 	}
+	[[fallthrough]];
 	case 1:
 		logerror("680x0: unknown PMOVE case 1, PC %x\n", m_pc);
 		break;
@@ -1084,6 +1086,7 @@ void m68851_pmove_put(u32 ea, u16 modes)
 				m_pmmu_enabled = 0;
 				MMULOG("PMMU disabled\n");
 			}
+			m_instruction_restart = m_pmmu_enabled || m_emmu_enabled;
 
 			if (!(modes & 0x100))   // flush ATC on moves to TC, SRP, CRP with FD bit clear
 			{
@@ -1140,7 +1143,7 @@ void m68851_pmove_put(u32 ea, u16 modes)
 				break;
 			}
 			// fall through; unknown PMOVE mode unless MC68020 with MC68851
-
+			[[fallthrough]];
 		default:
 			logerror("680x0: PMOVE to unknown MMU register %x, PC %x\n", (modes>>10) & 7, m_pc);
 			break;

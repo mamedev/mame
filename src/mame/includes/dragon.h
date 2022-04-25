@@ -69,7 +69,7 @@ public:
 	void dragon64(machine_config &config);
 	void tanodr64h(machine_config &config);
 	void dragon64h(machine_config &config);
-	DECLARE_WRITE_LINE_MEMBER( acia_irq );
+
 protected:
 	void d64_rom0(address_map &map);
 	void d64_rom1(address_map &map);
@@ -93,14 +93,17 @@ public:
 	dragon200e_state(const machine_config &mconfig, device_type type, const char *tag)
 		: dragon64_state(mconfig, type, tag)
 		, m_char_rom(*this, "chargen")
+		, m_lk1(*this, "LK1")
 	{
 	}
 
+	uint8_t sam_read(offs_t offset);
 	MC6847_GET_CHARROM_MEMBER(char_rom_r);
 
 	void dragon200e(machine_config &config);
 private:
 	required_memory_region m_char_rom;
+	required_ioport m_lk1;
 };
 
 
@@ -112,8 +115,10 @@ public:
 		: dragon64_state(mconfig, type, tag)
 		, m_crtc(*this, "crtc")
 		, m_palette(*this, "palette")
-		, m_plus_ram(*this, "plus_ram")
-		, m_video_ram(*this, "video_ram")
+		, m_plus_ram(*this, "plus_ram", 0x10000, ENDIANNESS_BIG)
+		, m_video_ram(*this, "video_ram", 0x800, ENDIANNESS_BIG)
+		, m_pram_bank(*this, "pram_bank")
+		, m_vram_bank(*this, "vram_bank")
 		, m_char_rom(*this, "chargen")
 	{
 	}
@@ -130,8 +135,10 @@ protected:
 private:
 	required_device<hd6845s_device> m_crtc;
 	required_device<palette_device> m_palette;
-	optional_shared_ptr<uint8_t> m_plus_ram;
-	optional_shared_ptr<uint8_t> m_video_ram;
+	memory_share_creator<uint8_t> m_plus_ram;
+	memory_share_creator<uint8_t> m_video_ram;
+	memory_bank_creator m_pram_bank;
+	memory_bank_creator m_vram_bank;
 	required_memory_region m_char_rom;
 };
 

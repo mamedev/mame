@@ -1,12 +1,12 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Couriersud
 
 #include "pexception.h"
 #include "pfmtlog.h"
 
 #include <cfenv>
-#include <iostream>
 #include <cfloat>
+#include <iostream>
 
 #if (defined(__x86_64__) || defined(__i386__)) && defined(__linux__)
 #define HAS_FEENABLE_EXCEPT     (1)
@@ -102,7 +102,7 @@ namespace plib {
 	}
 
 
-	bool fpsignalenabler::m_enable = false;
+	bool fpsignalenabler::m_enable = false; // NOLINT
 
 	//FIXME: mingw needs to be compiled with "-fnon-call-exceptions"
 
@@ -117,7 +117,8 @@ namespace plib {
 			if (fpexceptions & plib::FP_UNDERFLOW) b = b | FE_UNDERFLOW;
 			if (fpexceptions & plib::FP_OVERFLOW) b = b | FE_OVERFLOW;
 			if (fpexceptions & plib::FP_INVALID) b = b | FE_INVALID;
-			m_last_enabled = feenableexcept(b);
+			if ((b & m_last_enabled) != b)
+				m_last_enabled = feenableexcept(b);
 		}
 	#elif defined(_WIN32) && defined(_EM_INEXACT)
 		if (m_enable)
@@ -135,7 +136,6 @@ namespace plib {
 		m_last_enabled = 0;
 	#endif
 	}
-
 
 	fpsignalenabler::~fpsignalenabler()
 	{

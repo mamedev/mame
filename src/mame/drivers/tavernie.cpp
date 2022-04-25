@@ -2,25 +2,25 @@
 // copyright-holders: Robbbert
 /*********************************************************************************
 
-    Tavernier CPU09 and IVG09 (Realisez votre ordinateur individuel)
+Tavernier CPU09 and IVG09 (Realisez votre ordinateur individuel)
 
-    2013-12-08 Skeleton driver.
+2013-12-08 Skeleton driver.
 
-    This system was described in a French computer magazine "Micro-Informatique".
+This system was described in a French computer magazine "Micro-Informatique".
 
-    CPU09 includes 6809, 6821, 6840, 6850, cassette, rs232
-    IVG09 includes 6845, another 6821, beeper
-    IFD09 includes WD1795
+CPU09 includes 6809, 6821, 6840, 6850, cassette, rs232
+IVG09 includes 6845, another 6821, beeper
+IFD09 includes WD1795
 
 ToDo:
-    - Graphics
-    - Character rom is not dumped
-    - Graphics rom is not dumped
+- Graphics
+- Character rom is not dumped
+- Graphics rom is not dumped
         (note 2020-05-29: added what are thought to be the correct roms, but the proper
                           operation is uncertain).
-    - 3x 7611 proms not dumped
-    - Test FDC
-    - Need software (there are floppy images, but they are not yet in a supported format)
+- 3x 7611 proms not dumped
+- Test FDC
+- Need software (there are floppy images, but they are not yet in a supported format)
 
 
 List of commands (must be in UPPERCASE):
@@ -70,6 +70,8 @@ Z - more scan lines per row (cursor is bigger)
 #include "screen.h"
 #include "speaker.h"
 
+namespace {
+
 class cpu09_state : public driver_device
 {
 public:
@@ -91,8 +93,8 @@ protected:
 	void pb_w(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	void cpu09_mem(address_map &map);
-	u8 m_pa;
-	bool m_cassold;
+	u8 m_pa = 0U;
+	bool m_cassold = false;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<pia6821_device> m_pia0;
@@ -132,9 +134,9 @@ private:
 	void kbd_put(u8 data);
 	void ds_w(u8 data);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	u8 m_term_data;
-	u8 m_ivg_pa;
-	u8 m_flashcnt;
+	u8 m_term_data = 0U;
+	u8 m_ivg_pa = 0U;
+	u8 m_flashcnt = 0U;
 	std::unique_ptr<u16[]> m_vram; // 12x 4044
 	required_device<pia6821_device> m_pia1;
 	required_device<mc6845_device> m_crtc;
@@ -255,19 +257,17 @@ void ivg09_state::ds_w(u8 data)
 // Attributes when high: 0 = alpha rom; 1 = flash; 2 = reverse video; 3 = highlight off
 MC6845_UPDATE_ROW( ivg09_state::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	u8 gfx,attr;
-	u16 mem,x;
-	u32 *p = &bitmap.pix32(y);
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	u32 *p = &bitmap.pix(y);
 	m_flashcnt++;
 
-	for (x = 0; x < x_count; x++)
+	for (u16 x = 0; x < x_count; x++)
 	{
-		mem = (ma + x) & 0xfff;
-		attr = m_vram[mem] >> 8;
-		u8 inv = ((x == cursor_x) ^ (BIT(attr, 2)) ^ (BIT(attr, 1) && BIT(m_flashcnt, 6))) ? 0xff : 0;
-		gfx = m_p_chargen[((m_vram[mem] & 0x1ff)<<4) | ra] ^ inv;   // takes care of attr bit 0 too
-		u8 pen = BIT(attr, 3) ? 1 : 2;
+		u16 const mem = (ma + x) & 0xfff;
+		u8 const attr = m_vram[mem] >> 8;
+		u8 const inv = ((x == cursor_x) ^ (BIT(attr, 2)) ^ (BIT(attr, 1) && BIT(m_flashcnt, 6))) ? 0xff : 0;
+		u8 const gfx = m_p_chargen[((m_vram[mem] & 0x1ff)<<4) | ra] ^ inv;   // takes care of attr bit 0 too
+		u8 const pen = BIT(attr, 3) ? 1 : 2;
 
 		/* Display a scanline of a character */
 		*p++ = palette[BIT(gfx, 7) ? pen : 0];
@@ -391,7 +391,6 @@ void ivg09_state::kbd_put(u8 data)
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_1200 )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_1200 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
@@ -473,7 +472,7 @@ void ivg09_state::ivg09(machine_config &config)
 	m_pia1->cb2_handler().set(m_beep, FUNC(beep_device::set_state));
 
 	WD2795(config, m_fdc, 8_MHz_XTAL / 8);
-	FLOPPY_CONNECTOR(config, "fdc:0", ifd09_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", ifd09_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 
 /* ROM definition */
@@ -495,7 +494,7 @@ ROM_START( ivg09 )
 	ROM_LOAD( "small.bin", 0x1000, 0x1000, CRC(16e25eed) SHA1(5d31f127fe635be4bca06840b15a1bd77f971492)) // small
 ROM_END
 
-/* Driver */
+} // Anonymous namespace
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS           INIT        COMPANY         FULLNAME                      FLAGS
 COMP( 1982, cpu09, 0,      0,      cpu09,   cpu09, cpu09_state, empty_init, "C. Tavernier", "CPU09",                      MACHINE_NOT_WORKING )

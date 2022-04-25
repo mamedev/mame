@@ -81,7 +81,7 @@ Component Side   A   B   Solder Side
 #include "cpu/m68000/m68000.h"
 #include "machine/timer.h"
 #include "sound/okim6295.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -117,8 +117,8 @@ private:
 	required_shared_ptr<uint16_t> m_vregs;
 
 	std::vector<uint16_t> m_vram_rearranged;
-	int m_tilemap_base[4];
-	tilemap_t    *m_bg_tilemap[4];
+	int m_tilemap_base[4]{};
+	tilemap_t    *m_bg_tilemap[4]{};
 
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
@@ -343,7 +343,7 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 						// colours on game over screen are still wrong without the weird param kludge above
 						if (pix&0x3f)
 						{
-							bitmap.pix16(y_draw, x_draw) = m_palette->pen(((pix+(add_it))&0xff)+0x100);
+							bitmap.pix(y_draw, x_draw) = m_palette->pen(((pix+(add_it))&0xff)+0x100);
 						}
 					}
 

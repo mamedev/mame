@@ -41,13 +41,23 @@ public:
 		m_burst_clock[3] = clk4;
 	}
 
-	DECLARE_READ16_MEMBER( read );
-	DECLARE_WRITE16_MEMBER( write );
+	uint16_t read(offs_t offset);
+	void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(drq0_w);
 	DECLARE_WRITE_LINE_MEMBER(drq1_w);
 	DECLARE_WRITE_LINE_MEMBER(drq2_w);
 	DECLARE_WRITE_LINE_MEMBER(drq3_w);
 	uint8_t iack();
+
+	enum {
+		ERR_RESET = 0,
+		ERR_FREE_BUS_RETRY = 3,
+		ERR_RETRY = 4,
+		ERR_BUS = 5,
+		ERR_HALT = 6,
+		ERR_NONE= 7
+	};
+	void bec_w(offs_t offset, uint8_t data) { m_bec = data; }
 
 	void single_transfer(int x);
 	void set_timer(int channel, const attotime &tm);
@@ -97,6 +107,7 @@ private:
 	bool m_drq_state[4];
 
 	int8_t m_irq_channel;
+	uint8_t m_bec;
 
 	// tell if a channel is in use
 	bool dma_in_progress(int channel) const { return (m_reg[channel].csr & 0x08) != 0; }

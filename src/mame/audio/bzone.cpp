@@ -236,17 +236,17 @@ static const discrete_mixer_desc bzone_final_mixer_desc =
 #define CD4066_R_ON     270
 
 DISCRETE_CLASS_STEP_RESET(bzone_custom_filter, 1,
-	double  m_v_in1_gain;
-	double  m_v_p;
-	double  m_exponent;
-	double  m_gain[2];
-	double  m_out_v;
+	double  m_v_in1_gain = 0;
+	double  m_v_p = 0;
+	double  m_exponent = 0;
+	double  m_gain[2]{};
+	double  m_out_v = 0;
 );
 
 DISCRETE_STEP(bzone_custom_filter)
 {
 	int     in0 = (BZONE_CUSTOM_FILTER__IN0 == 0) ? 0 : 1;
-	double  v;
+	double  v = 0;
 
 	if (BZONE_CUSTOM_FILTER__IN1 > 0)
 		v = 0;
@@ -267,7 +267,7 @@ DISCRETE_RESET(bzone_custom_filter)
 	m_gain[1] = BZONE_CUSTOM_FILTER__R5 / m_gain[1] + 1;
 	m_v_in1_gain = RES_VOLTAGE_DIVIDER(BZONE_CUSTOM_FILTER__R3, BZONE_CUSTOM_FILTER__R4);
 	m_v_p = BZONE_CUSTOM_FILTER__VP - OP_AMP_VP_RAIL_OFFSET;
-	m_exponent = RC_CHARGE_EXP(BZONE_CUSTOM_FILTER__R5 * BZONE_CUSTOM_FILTER__C);;
+	m_exponent = RC_CHARGE_EXP(BZONE_CUSTOM_FILTER__R5 * BZONE_CUSTOM_FILTER__C);
 	m_out_v = 0.0;
 }
 
@@ -393,7 +393,7 @@ void bzone_state::bzone_sounds_w(uint8_t data)
 	m_discrete->write(BZ_INPUT, data);
 
 	m_startled = BIT(data, 6);
-	machine().sound().system_enable(data & 0x20);
+	machine().sound().system_mute(!BIT(data, 5));
 }
 
 void bzone_state::bzone_audio(machine_config &config)

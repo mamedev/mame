@@ -32,12 +32,13 @@ protected:
 	virtual void device_post_load() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// device_rom_interface overrides
 	virtual void rom_bank_updated() override;
 
 	virtual offs_t get_start_position(int channel);
+	virtual u32 get_sample_rate();
 
 	/* struct describing a single playing ADPCM voice */
 	struct ADPCMVoice
@@ -88,10 +89,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( cmd_w );
 
 protected:
-	// device-level overrides
-	virtual void device_clock_changed() override;
-
 	virtual offs_t get_start_position(int channel) override;
+	virtual u32 get_sample_rate() override;
 };
 
 DECLARE_DEVICE_TYPE(OKIM6376, okim6376_device)

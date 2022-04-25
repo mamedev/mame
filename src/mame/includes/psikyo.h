@@ -24,7 +24,7 @@ class psikyo_state : public driver_device
 public:
 	psikyo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_vram(*this, "vram_%u", 0U, (u8)32)
+		, m_vram(*this, "vram_%u", 0U, 0x2000U, ENDIANNESS_BIG)
 		, m_vregs(*this, "vregs")
 		, m_bootleg_spritebuffer(*this, "boot_spritebuf")
 		, m_spritelut(*this, "spritelut")
@@ -66,7 +66,7 @@ public:
 
 private:
 	/* memory pointers */
-	required_shared_ptr_array<u16, 2> m_vram;
+	memory_share_array_creator<u16, 2> m_vram;
 	required_shared_ptr<u32> m_vregs;
 	optional_shared_ptr<u32> m_bootleg_spritebuffer;
 
@@ -80,50 +80,50 @@ private:
 	/* video-related */
 	struct sprite_t
 	{
-		u8 gfx;
-		u32 code,color;
-		bool flipx,flipy;
-		s32 x,y;
-		u32 zoomx,zoomy;
-		u32 primask;
+		u8 gfx = 0;
+		u32 code = 0, color = 0;
+		bool flipx = false, flipy = false;
+		s32 x = 0, y = 0;
+		u32 zoomx = 0, zoomy = 0;
+		u32 primask = 0;
 	};
 
-	tilemap_t   *m_tilemap[2];
-	u8          m_tilemap_bank[2];
-	bool        m_ka302c_banking;
-	u32         m_old_linescroll[2];
-	u32         m_old_tmapsize[2];
-	u32         m_tmapsize[2];
+	tilemap_t   *m_tilemap[2]{};
+	u8          m_tilemap_bank[2]{};
+	bool        m_ka302c_banking = false;
+	u32         m_old_linescroll[2]{};
+	u32         m_old_tmapsize[2]{};
+	u32         m_tmapsize[2]{};
 	std::unique_ptr<sprite_t[]> m_spritelist;
 	struct sprite_t *m_sprite_ptr_pre;
-	u16         m_sprite_ctrl;
+	u16         m_sprite_ctrl = 0;
 
 	/* game-specific */
 	// 1945 MCU
-	int         m_mcu_status;
-	u8          m_s1945_mcu_direction;
-	u8          m_s1945_mcu_latch1;
-	u8          m_s1945_mcu_latch2;
-	u8          m_s1945_mcu_inlatch;
-	u8          m_s1945_mcu_index;
-	u8          m_s1945_mcu_latching;
-	u8          m_s1945_mcu_mode;
-	u8          m_s1945_mcu_control;
-	u8          m_s1945_mcu_bctrl;
-	const u8    *m_s1945_mcu_table;
+	int         m_mcu_status = 0;
+	u8          m_s1945_mcu_direction = 0;
+	u8          m_s1945_mcu_latch1 = 0;
+	u8          m_s1945_mcu_latch2 = 0;
+	u8          m_s1945_mcu_inlatch = 0;
+	u8          m_s1945_mcu_index = 0;
+	u8          m_s1945_mcu_latching = 0;
+	u8          m_s1945_mcu_mode = 0;
+	u8          m_s1945_mcu_control = 0;
+	u8          m_s1945_mcu_bctrl = 0;
+	const u8    *m_s1945_mcu_table = nullptr;
 
-	DECLARE_READ32_MEMBER(sngkace_input_r);
-	DECLARE_READ32_MEMBER(gunbird_input_r);
+	u32 sngkace_input_r(offs_t offset);
+	u32 gunbird_input_r(offs_t offset);
 	void s1945_mcu_data_w(uint8_t data);
 	void s1945_mcu_control_w(uint8_t data);
 	void s1945_mcu_direction_w(uint8_t data);
 	void s1945_mcu_bctrl_w(uint8_t data);
 	void s1945_mcu_command_w(uint8_t data);
-	uint32_t s1945_mcu_data_r();
+	u32 s1945_mcu_data_r();
 	uint8_t s1945_mcu_control_r();
-	DECLARE_READ32_MEMBER(s1945_input_r);
-	DECLARE_WRITE8_MEMBER(s1945bl_okibank_w);
-	template<int Shift> DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	u32 s1945_input_r(offs_t offset);
+	void s1945bl_okibank_w(u8 data);
+	template<int Shift> void sound_bankswitch_w(u8 data);
 	template<int Layer> u16 vram_r(offs_t offset);
 	template<int Layer> void vram_w(offs_t offset, u16 data, u16 mem_mask);
 

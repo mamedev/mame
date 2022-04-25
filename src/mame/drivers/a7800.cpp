@@ -106,7 +106,7 @@
 #include "bus/a7800/a78_carts.h"
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #define A7800_NTSC_Y1   XTAL(14'318'181)
@@ -345,8 +345,8 @@ static INPUT_PORTS_START( a7800 )
 	PORT_BIT(0xF0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("console_buttons")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)  PORT_NAME("Reset")         PORT_CODE(KEYCODE_R)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER)  PORT_NAME("Select")        PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)  PORT_NAME("Reset")         PORT_CODE(KEYCODE_U)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER)  PORT_NAME("Select")        PORT_CODE(KEYCODE_I)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER)  PORT_NAME(DEF_STR(Pause))  PORT_CODE(KEYCODE_O)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -445,7 +445,7 @@ some variation of proportions even within the same display type.
 One side effect of this on the console's palette is that some values of
 red may appear too pinkish - Too much blue to red.  This is not the same
 as a traditional tint-hue control adjustment; rather, can be demonstrated
-by changing the blue ratio values via MESS HLSL settings.
+by changing the blue ratio values via MAME HLSL settings.
 
 Lastly, the Atari 2600 & 5200 NTSC color palettes hold the same hue
 structure order and have similar appearance differences that are dependent
@@ -1387,7 +1387,7 @@ void a7800_state::a7800_ntsc(machine_config &config)
 	m_screen->set_screen_update("maria", FUNC(atari_maria_device::screen_update));
 	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(a7800_state::a7800_palette), ARRAY_LENGTH(a7800_colors));
+	PALETTE(config, "palette", FUNC(a7800_state::a7800_palette), std::size(a7800_colors));
 
 	ATARI_MARIA(config, m_maria, 0);
 	m_maria->set_dmacpu_tag(m_maincpu);

@@ -54,14 +54,15 @@ private:
 
 class qbus_device : public device_t,
 	public device_memory_interface,
-    public device_z80daisy_interface
+	public device_z80daisy_interface
 {
 public:
 	// construction/destruction
-	qbus_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *cputag)
+	template <typename T>
+	qbus_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cputag, int spacenum)
 		: qbus_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		set_cputag(cputag);
+		set_cputag(std::forward<T>(cputag), spacenum);
 	}
 
 	qbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -69,7 +70,7 @@ public:
 	~qbus_device() { m_device_list.detach_all(); }
 
 	// inline configuration
-	void set_cputag(const char *tag) { m_cputag = tag; }
+	template <typename T> void set_space(T &&tag, int spacenum) { m_space.set_tag(std::forward<T>(tag), spacenum); }
 
 	virtual space_config_vector memory_space_config() const override
 	{
@@ -84,7 +85,7 @@ public:
 	auto birq7() { return m_out_birq7_cb.bind(); }
 
 	void add_card(device_qbus_card_interface *card);
-	void install_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler, uint32_t mask=0xffffffff);
+	void install_device(offs_t start, offs_t end, read16sm_delegate rhandler, write16sm_delegate whandler, uint32_t mask=0xffffffff);
 
 	DECLARE_WRITE_LINE_MEMBER(birq4_w) { m_out_birq4_cb(state); }
 	DECLARE_WRITE_LINE_MEMBER(birq5_w) { m_out_birq5_cb(state); }
@@ -106,8 +107,7 @@ protected:
 	virtual void z80daisy_irq_reti() override;
 
 	// internal state
-	cpu_device *m_maincpu;
-	const char *m_cputag;
+	required_address_space m_space;
 
 private:
 	devcb_write_line m_out_birq4_cb;

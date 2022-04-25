@@ -34,7 +34,6 @@ Boards:
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -65,7 +64,7 @@ WRITE_LINE_MEMBER(pandoras_state::cpub_irq_enable_w)
 	m_irq_enable_b = state;
 }
 
-WRITE8_MEMBER(pandoras_state::pandoras_cpua_irqtrigger_w)
+void pandoras_state::pandoras_cpua_irqtrigger_w(uint8_t data)
 {
 	if (!m_firq_old_data_a && data)
 		m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
@@ -73,7 +72,7 @@ WRITE8_MEMBER(pandoras_state::pandoras_cpua_irqtrigger_w)
 	m_firq_old_data_a = data;
 }
 
-WRITE8_MEMBER(pandoras_state::pandoras_cpub_irqtrigger_w)
+void pandoras_state::pandoras_cpub_irqtrigger_w(uint8_t data)
 {
 	if (!m_firq_old_data_b && data)
 		m_subcpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
@@ -81,7 +80,7 @@ WRITE8_MEMBER(pandoras_state::pandoras_cpub_irqtrigger_w)
 	m_firq_old_data_b = data;
 }
 
-WRITE8_MEMBER(pandoras_state::pandoras_i8039_irqtrigger_w)
+void pandoras_state::pandoras_i8039_irqtrigger_w(uint8_t data)
 {
 	m_mcu->set_input_line(0, ASSERT_LINE);
 }
@@ -96,7 +95,7 @@ void pandoras_state::i8039_irqen_and_status_w(uint8_t data)
 	m_i8039_status = (data & 0x20) >> 5;
 }
 
-WRITE8_MEMBER(pandoras_state::pandoras_z80_irqtrigger_w)
+void pandoras_state::pandoras_z80_irqtrigger_w(uint8_t data)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
@@ -244,17 +243,6 @@ INPUT_PORTS_END
 
 
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
 static const gfx_layout spritelayout =
 {
 	16,16,
@@ -269,8 +257,8 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_pandoras )
-	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,     0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   16*16, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,             0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_msb, 16*16, 16 )
 GFXDECODE_END
 
 /***************************************************************************
@@ -361,9 +349,6 @@ void pandoras_state::pandoras(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.4);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.12); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

@@ -6,10 +6,14 @@ license:CC0
 
 <softwarelist name="apple2_cass" description="Apple II cassettes">
 
-<!-- To load and run a tape:
+<!-- To enter Basic after powering on:
+AppleII : Type Ctrl-B (nothing shows) and press <Enter>
+AppleIIe : Press Ctrl-F12
+
+To load and run a tape:
 1. Set up the machine for the type of tape: Monitor "*", Integer BASIC ">", or Applesoft BASIC "]".
 2. Enter the address information or type LOAD for BASIC programs but do not press <Return>.
-3. Play the tape then press <Return>.
+3. Play the tape, wait for the leader sound then press <Return>.
 4. Enter the address information or type RUN for BASIC programs and press <Return> to run the program. -->
 
 	<software name="3dartgra">
@@ -340,7 +344,7 @@ license:CC0
 		<year>1978</year>
 		<publisher>Apple Computer, Inc.</publisher>
 		<info name="serial" value="600-2006-00" />
-		<info name="P/N" value="A2T0004X" />
+		<info name="partno" value="A2T0004X" />
 		<info name="usage" value="cass1 >Load 16K, cass2 ]Load 16K" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Applesoft ][ floating point BASIC" />
@@ -2205,7 +2209,7 @@ license:CC0
 		<year>1978</year>
 		<publisher>Apple Computer, Inc.</publisher>
 		<info name="serial" value="600-2003-00" />
-		<info name="P/N" value="A2T0006X" />
+		<info name="partno" value="A2T0006X" />
 		<info name="usage" value="*280.3FFR start.length CTRL+Y 4K" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="RAM Test" />

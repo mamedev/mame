@@ -7,7 +7,7 @@ static class std::vector<std::unique_ptr<osd_netdev::entry_t>> netdev_list;
 
 void add_netdev(const char *name, const char *description, create_netdev func)
 {
-	auto entry = make_unique_clear<osd_netdev::entry_t>();
+	auto entry = std::make_unique<osd_netdev::entry_t>();
 	entry->id = netdev_list.size();
 	strncpy(entry->name, name, 255);
 	entry->name[255] = '\0';
@@ -61,7 +61,7 @@ int osd_netdev::send(uint8_t *buf, int len)
 	return 0;
 }
 
-void osd_netdev::recv(void *ptr, int param)
+void osd_netdev::recv(int param)
 {
 	uint8_t *buf;
 	int len;

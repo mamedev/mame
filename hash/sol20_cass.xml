@@ -7,7 +7,7 @@ license:CC0
 <softwarelist name="sol20_cass" description="PTC SOL-20 cassettes">
 
 <!--
-These programs were .svt (Solace Virtual Tape) files, currently only partially supported in Mame emulator and therefore marked as unsupported.
+These programs were .svt (Solace Virtual Tape) files, currently only partially supported in MAME emulator and therefore marked as unsupported.
 Downloaded from http://www.sol20.org (Note: .svt files: pilot, space and strategy, for which exist recreated .wav version, were rejected.)
 -->
 
@@ -131,7 +131,7 @@ Owner's Manual at http://primepuzzle.com/tc/tiny_c_docs_8080_PDP11.zip
 
 
 <!--
-These programs were downloaded as ASCII text format files (.bs5, .ecb, .ent) and using Mame emu text paste option recreated into .wav tape files.
+These programs were downloaded as ASCII text format files (.bs5, .ecb, .ent) and using MAME emu text paste option recreated into .wav tape files.
 NOTE: ALL RECREATED FILES HAVE BEEN TESTED TO WORK FINE WITH MAME EMULATOR ... THE COMPATIBILITY WITH A REAL SOL-20 SYSTEM IS UNKNOWN/UNTESTED!
 http://www.sol20.org/programs.html (Note: On the same link exist manuals for most programs, and some are necessary in order to know how to use.)
 -->
@@ -504,7 +504,7 @@ User Manual at http://www.sol20.org/manuals/img/pilot-img.pdf
 Space Games from Creative Computing Software
 
     ASTER   3000 0901           ;asteroids; not to be confused with arcade game
-    LUNAR C 3C20 1FFC   (Ext BASIC) ;lunar lander (Note: a problem with keyboard not responding in Mame emu!)
+    LUNAR C 3C20 1FFC   (Ext BASIC) ;lunar lander (Note: a problem with keyboard not responding in MAME emu!)
     STRWR C 3C20 144D   (Ext BASIC) ;star wars
     ROMLN C 3C20 13F4   (Ext BASIC) ;romulan
 
@@ -629,7 +629,7 @@ Various games written by Ray White
 
 In SOLOS monitor "XEQ name" to load/autorun or "GET name" and then "EXEC 0".
 
-Note: If in some games the screen starts blinking, then in Mame select in "Dip Switches" Cursor Type "Solid".
+Note: If in some games the screen starts blinking, then in MAME select in "Dip Switches" Cursor Type "Solid".
 -->
 	<software name="various1">
 		<description>Various games written by Ray White</description>
@@ -698,7 +698,7 @@ Standalone software of various origins
 
 In SOLOS monitor "XEQ name" to load/autorun or "GET name" and then "EXEC 0".
 
-Note: If in some games the screen starts blinking, then in Mame select in "Dip Switches" Cursor Type "Solid".
+Note: If in some games the screen starts blinking, then in MAME select in "Dip Switches" Cursor Type "Solid".
 
 Note for #5: Moves are entered using decimal coordinates, using this grid:
 

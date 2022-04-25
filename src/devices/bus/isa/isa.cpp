@@ -107,10 +107,10 @@ isa8_device::isa8_device(const machine_config &mconfig, const char *tag, device_
 isa8_device::isa8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
-	m_mem_config("ISA 8-bit mem", ENDIANNESS_LITTLE, 8, 24, 0, address_map_constructor()),
-	m_io_config("ISA 8-bit I/O", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor()),
-	m_mem16_config("ISA 16-bit mem", ENDIANNESS_LITTLE, 16, 24, 0, address_map_constructor()),
-	m_io16_config("ISA 16-bit I/O", ENDIANNESS_LITTLE, 16, 16, 0, address_map_constructor()),
+	m_mem_config("mem8", ENDIANNESS_LITTLE, 8, 24, 0, address_map_constructor()),
+	m_io_config("io8", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor()),
+	m_mem16_config("mem16", ENDIANNESS_LITTLE, 16, 24, 0, address_map_constructor()),
+	m_io16_config("io16", ENDIANNESS_LITTLE, 16, 16, 0, address_map_constructor()),
 	m_memspace(*this, finder_base::DUMMY_TAG, -1),
 	m_iospace(*this, finder_base::DUMMY_TAG, -1),
 	m_memwidth(0),
@@ -258,7 +258,7 @@ void isa8_device::device_reset()
 }
 
 
-template<typename R, typename W> void isa8_device::install_space(int spacenum, offs_t start, offs_t end, R rhandler, W whandler)
+template <typename R, typename W> void isa8_device::install_space(int spacenum, offs_t start, offs_t end, R rhandler, W whandler)
 {
 	int buswidth;
 	address_space *space;
@@ -278,24 +278,35 @@ template<typename R, typename W> void isa8_device::install_space(int spacenum, o
 		fatalerror("Unknown space passed to isa8_device::install_space!\n");
 	}
 
-	switch(buswidth)
+	switch (buswidth)
 	{
 		case 8:
-			space->install_readwrite_handler(start, end, rhandler, whandler, 0);
+			space->install_read_handler(start, end, rhandler, 0);
+			space->install_write_handler(start, end, whandler, 0);
 			break;
 		case 16:
-			space->install_readwrite_handler(start, end, rhandler, whandler, 0xffff);
+			space->install_read_handler(start, end, rhandler, 0xffff);
+			space->install_write_handler(start, end, whandler, 0xffff);
 			break;
 		case 32:
-			if ((start % 4) == 0) {
-				if ((end-start)==1) {
-					space->install_readwrite_handler(start, end+2, rhandler, whandler, 0x0000ffff);
-				} else {
-					space->install_readwrite_handler(start, end,   rhandler, whandler, 0xffffffff);
+			if ((start % 4) == 0)
+			{
+				if ((end - start) == 1)
+				{
+					space->install_read_handler(start, end + 2, rhandler, 0x0000ffff);
+					space->install_write_handler(start, end + 2, whandler, 0x0000ffff);
 				}
-			} else {
+				else
+				{
+					space->install_read_handler(start, end, rhandler, 0xffffffff);
+					space->install_write_handler(start, end, whandler, 0xffffffff);
+				}
+			}
+			else
+			{
 				// we handle just misaligned by 2
-				space->install_readwrite_handler(start-2, end, rhandler, whandler, 0xffff0000);
+				space->install_read_handler(start - 2, end, rhandler, 0xffff0000);
+				space->install_write_handler(start - 2, end, whandler, 0xffff0000);
 			}
 			break;
 		default:
@@ -303,42 +314,56 @@ template<typename R, typename W> void isa8_device::install_space(int spacenum, o
 	}
 }
 
-template<typename R, typename W> void isa8_device::install_memory(offs_t start, offs_t end, R rhandler, W whandler)
-{
-	install_space(AS_ISA_MEM, start, end, rhandler, whandler);
-}
-
-template<typename R, typename W> void isa8_device::install_device(offs_t start, offs_t end, R rhandler, W whandler)
-{
-	install_space(AS_ISA_IO, start, end, rhandler, whandler);
-}
-
 template void isa8_device::install_space<read8_delegate,    write8_delegate   >(int spacenum, offs_t start, offs_t end, read8_delegate rhandler,    write8_delegate whandler);
+template void isa8_device::install_space<read8_delegate,    write8m_delegate  >(int spacenum, offs_t start, offs_t end, read8_delegate rhandler,    write8m_delegate whandler);
+template void isa8_device::install_space<read8_delegate,    write8s_delegate  >(int spacenum, offs_t start, offs_t end, read8_delegate rhandler,    write8s_delegate whandler);
+template void isa8_device::install_space<read8_delegate,    write8sm_delegate >(int spacenum, offs_t start, offs_t end, read8_delegate rhandler,    write8sm_delegate whandler);
+template void isa8_device::install_space<read8_delegate,    write8mo_delegate >(int spacenum, offs_t start, offs_t end, read8_delegate rhandler,    write8mo_delegate whandler);
+template void isa8_device::install_space<read8_delegate,    write8smo_delegate>(int spacenum, offs_t start, offs_t end, read8_delegate rhandler,    write8smo_delegate whandler);
+
+template void isa8_device::install_space<read8m_delegate,   write8_delegate   >(int spacenum, offs_t start, offs_t end, read8m_delegate rhandler,   write8_delegate whandler);
 template void isa8_device::install_space<read8m_delegate,   write8m_delegate  >(int spacenum, offs_t start, offs_t end, read8m_delegate rhandler,   write8m_delegate whandler);
+template void isa8_device::install_space<read8m_delegate,   write8s_delegate  >(int spacenum, offs_t start, offs_t end, read8m_delegate rhandler,   write8s_delegate whandler);
+template void isa8_device::install_space<read8m_delegate,   write8sm_delegate >(int spacenum, offs_t start, offs_t end, read8m_delegate rhandler,   write8sm_delegate whandler);
+template void isa8_device::install_space<read8m_delegate,   write8mo_delegate >(int spacenum, offs_t start, offs_t end, read8m_delegate rhandler,   write8mo_delegate whandler);
+template void isa8_device::install_space<read8m_delegate,   write8smo_delegate>(int spacenum, offs_t start, offs_t end, read8m_delegate rhandler,   write8smo_delegate whandler);
+
+template void isa8_device::install_space<read8s_delegate,   write8_delegate   >(int spacenum, offs_t start, offs_t end, read8s_delegate rhandler,   write8_delegate whandler);
+template void isa8_device::install_space<read8s_delegate,   write8m_delegate  >(int spacenum, offs_t start, offs_t end, read8s_delegate rhandler,   write8m_delegate whandler);
 template void isa8_device::install_space<read8s_delegate,   write8s_delegate  >(int spacenum, offs_t start, offs_t end, read8s_delegate rhandler,   write8s_delegate whandler);
+template void isa8_device::install_space<read8s_delegate,   write8sm_delegate >(int spacenum, offs_t start, offs_t end, read8s_delegate rhandler,   write8sm_delegate whandler);
+template void isa8_device::install_space<read8s_delegate,   write8mo_delegate >(int spacenum, offs_t start, offs_t end, read8s_delegate rhandler,   write8mo_delegate whandler);
+template void isa8_device::install_space<read8s_delegate,   write8smo_delegate>(int spacenum, offs_t start, offs_t end, read8s_delegate rhandler,   write8smo_delegate whandler);
+
+template void isa8_device::install_space<read8sm_delegate,  write8_delegate   >(int spacenum, offs_t start, offs_t end, read8sm_delegate rhandler,  write8_delegate whandler);
+template void isa8_device::install_space<read8sm_delegate,  write8m_delegate  >(int spacenum, offs_t start, offs_t end, read8sm_delegate rhandler,  write8m_delegate whandler);
+template void isa8_device::install_space<read8sm_delegate,  write8s_delegate  >(int spacenum, offs_t start, offs_t end, read8sm_delegate rhandler,  write8s_delegate whandler);
 template void isa8_device::install_space<read8sm_delegate,  write8sm_delegate >(int spacenum, offs_t start, offs_t end, read8sm_delegate rhandler,  write8sm_delegate whandler);
+template void isa8_device::install_space<read8sm_delegate,  write8mo_delegate >(int spacenum, offs_t start, offs_t end, read8sm_delegate rhandler,  write8mo_delegate whandler);
+template void isa8_device::install_space<read8sm_delegate,  write8smo_delegate>(int spacenum, offs_t start, offs_t end, read8sm_delegate rhandler,  write8smo_delegate whandler);
+
+template void isa8_device::install_space<read8mo_delegate,  write8_delegate   >(int spacenum, offs_t start, offs_t end, read8mo_delegate rhandler,  write8_delegate whandler);
+template void isa8_device::install_space<read8mo_delegate,  write8m_delegate  >(int spacenum, offs_t start, offs_t end, read8mo_delegate rhandler,  write8m_delegate whandler);
+template void isa8_device::install_space<read8mo_delegate,  write8s_delegate  >(int spacenum, offs_t start, offs_t end, read8mo_delegate rhandler,  write8s_delegate whandler);
+template void isa8_device::install_space<read8mo_delegate,  write8sm_delegate >(int spacenum, offs_t start, offs_t end, read8mo_delegate rhandler,  write8sm_delegate whandler);
 template void isa8_device::install_space<read8mo_delegate,  write8mo_delegate >(int spacenum, offs_t start, offs_t end, read8mo_delegate rhandler,  write8mo_delegate whandler);
+template void isa8_device::install_space<read8mo_delegate,  write8smo_delegate>(int spacenum, offs_t start, offs_t end, read8mo_delegate rhandler,  write8smo_delegate whandler);
+
+template void isa8_device::install_space<read8smo_delegate, write8_delegate   >(int spacenum, offs_t start, offs_t end, read8smo_delegate rhandler, write8_delegate whandler);
+template void isa8_device::install_space<read8smo_delegate, write8m_delegate  >(int spacenum, offs_t start, offs_t end, read8smo_delegate rhandler, write8m_delegate whandler);
+template void isa8_device::install_space<read8smo_delegate, write8s_delegate  >(int spacenum, offs_t start, offs_t end, read8smo_delegate rhandler, write8s_delegate whandler);
+template void isa8_device::install_space<read8smo_delegate, write8sm_delegate >(int spacenum, offs_t start, offs_t end, read8smo_delegate rhandler, write8sm_delegate whandler);
+template void isa8_device::install_space<read8smo_delegate, write8mo_delegate >(int spacenum, offs_t start, offs_t end, read8smo_delegate rhandler, write8mo_delegate whandler);
 template void isa8_device::install_space<read8smo_delegate, write8smo_delegate>(int spacenum, offs_t start, offs_t end, read8smo_delegate rhandler, write8smo_delegate whandler);
 
-template void isa8_device::install_memory<read8_delegate,    write8_delegate   >(offs_t start, offs_t end, read8_delegate rhandler,    write8_delegate whandler);
-template void isa8_device::install_memory<read8m_delegate,   write8m_delegate  >(offs_t start, offs_t end, read8m_delegate rhandler,   write8m_delegate whandler);
-template void isa8_device::install_memory<read8s_delegate,   write8s_delegate  >(offs_t start, offs_t end, read8s_delegate rhandler,   write8s_delegate whandler);
-template void isa8_device::install_memory<read8sm_delegate,  write8sm_delegate >(offs_t start, offs_t end, read8sm_delegate rhandler,  write8sm_delegate whandler);
-template void isa8_device::install_memory<read8mo_delegate,  write8mo_delegate >(offs_t start, offs_t end, read8mo_delegate rhandler,  write8mo_delegate whandler);
-template void isa8_device::install_memory<read8smo_delegate, write8smo_delegate>(offs_t start, offs_t end, read8smo_delegate rhandler, write8smo_delegate whandler);
-
-template void isa8_device::install_device<read8_delegate,    write8_delegate   >(offs_t start, offs_t end, read8_delegate rhandler,    write8_delegate whandler);
-template void isa8_device::install_device<read8m_delegate,   write8m_delegate  >(offs_t start, offs_t end, read8m_delegate rhandler,   write8m_delegate whandler);
-template void isa8_device::install_device<read8s_delegate,   write8s_delegate  >(offs_t start, offs_t end, read8s_delegate rhandler,   write8s_delegate whandler);
-template void isa8_device::install_device<read8sm_delegate,  write8sm_delegate >(offs_t start, offs_t end, read8sm_delegate rhandler,  write8sm_delegate whandler);
-template void isa8_device::install_device<read8mo_delegate,  write8mo_delegate >(offs_t start, offs_t end, read8mo_delegate rhandler,  write8mo_delegate whandler);
-template void isa8_device::install_device<read8smo_delegate, write8smo_delegate>(offs_t start, offs_t end, read8smo_delegate rhandler, write8smo_delegate whandler);
-
-
-void isa8_device::install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data)
+void isa8_device::install_bank(offs_t start, offs_t end, uint8_t *data)
 {
-	m_memspace->install_readwrite_bank(start, end, 0, tag );
-	machine().root_device().membank(m_memspace->device().siblingtag(tag).c_str())->set_base(data);
+	m_memspace->install_ram(start, end, data);
+}
+
+void isa8_device::install_bank(offs_t start, offs_t end, memory_bank *bank)
+{
+	m_memspace->install_readwrite_bank(start, end, bank);
 }
 
 void isa8_device::unmap_bank(offs_t start, offs_t end)
@@ -346,16 +371,15 @@ void isa8_device::unmap_bank(offs_t start, offs_t end)
 	m_memspace->unmap_readwrite(start, end);
 }
 
-void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, const char *tag, const char *region)
+void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, const char *region)
 {
 	if (machine().root_device().memregion("isa")) {
 		uint8_t *src = dev->memregion(region)->base();
 		uint8_t *dest = machine().root_device().memregion("isa")->base() + start - 0xc0000;
 		memcpy(dest,src, end - start + 1);
 	} else {
-		m_memspace->install_read_bank(start, end, 0, tag);
+		m_memspace->install_rom(start, end, machine().root_device().memregion(dev->subtag(region).c_str())->base());
 		m_memspace->unmap_write(start, end);
-		machine().root_device().membank(m_memspace->device().siblingtag(tag).c_str())->set_base(machine().root_device().memregion(dev->subtag(region).c_str())->base());
 	}
 }
 
@@ -518,7 +542,7 @@ void isa16_device::device_start()
 	m_out_drq7_cb.resolve_safe();
 }
 
-void isa16_device::install16_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler)
+template<typename R, typename W> void isa16_device::install16_device(offs_t start, offs_t end, R rhandler, W whandler)
 {
 	int buswidth = m_iowidth;
 	switch(buswidth)
@@ -535,7 +559,7 @@ void isa16_device::install16_device(offs_t start, offs_t end, read16_delegate rh
 					m_iospace->install_readwrite_handler(start, end,   rhandler, whandler, 0xffffffff);
 				}
 			} else {
-				// we handle just misalligned by 2
+				// we handle just misaligned by 2
 				m_iospace->install_readwrite_handler(start-2, end, rhandler, whandler, 0xffff0000);
 			}
 
@@ -545,32 +569,10 @@ void isa16_device::install16_device(offs_t start, offs_t end, read16_delegate rh
 	}
 }
 
-void isa16_device::install16_device(offs_t start, offs_t end, read16s_delegate rhandler, write16s_delegate whandler)
-{
-	int buswidth = m_iowidth;
-	switch(buswidth)
-	{
-		case 16:
-			m_iospace->install_readwrite_handler(start, end, rhandler, whandler, 0);
-			break;
-		case 32:
-			m_iospace->install_readwrite_handler(start, end, rhandler, whandler, 0xffffffff);
-			if ((start % 4) == 0) {
-				if ((end-start)==1) {
-					m_iospace->install_readwrite_handler(start, end+2, rhandler, whandler, 0x0000ffff);
-				} else {
-					m_iospace->install_readwrite_handler(start, end,   rhandler, whandler, 0xffffffff);
-				}
-			} else {
-				// we handle just misalligned by 2
-				m_iospace->install_readwrite_handler(start-2, end, rhandler, whandler, 0xffff0000);
-			}
-
-			break;
-		default:
-			fatalerror("ISA16: Bus width %d not supported\n", buswidth);
-	}
-}
+template void isa16_device::install16_device<read16_delegate,    write16_delegate   >(offs_t start, offs_t end, read16_delegate rhandler,    write16_delegate whandler);
+template void isa16_device::install16_device<read16s_delegate,   write16s_delegate  >(offs_t start, offs_t end, read16s_delegate rhandler,   write16s_delegate whandler);
+template void isa16_device::install16_device<read16sm_delegate,  write16sm_delegate >(offs_t start, offs_t end, read16sm_delegate rhandler,  write16sm_delegate whandler);
+template void isa16_device::install16_device<read16smo_delegate, write16smo_delegate>(offs_t start, offs_t end, read16smo_delegate rhandler, write16smo_delegate whandler);
 
 uint16_t isa16_device::mem16_r(offs_t offset, uint16_t mem_mask)
 {

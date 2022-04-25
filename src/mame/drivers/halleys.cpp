@@ -174,6 +174,8 @@ Video sync   6 F   Video sync                 Post   6 F   Post
 #include "speaker.h"
 
 
+namespace {
+
 #define HALLEYS_DEBUG 0
 
 
@@ -235,37 +237,40 @@ public:
 	void init_halleysp();
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
 private:
-	uint16_t *m_render_layer[MAX_LAYERS];
-	uint8_t *m_gfx_plane02;
-	uint8_t *m_gfx_plane13;
+	std::unique_ptr<uint16_t[]> m_render_layer_alloc;
+	uint16_t *m_render_layer[MAX_LAYERS]{};
+	std::unique_ptr<uint8_t[]> m_gfx_plane_alloc;
+	uint8_t *m_gfx_plane02 = nullptr;
+	uint8_t *m_gfx_plane13 = nullptr;
 	std::unique_ptr<uint8_t[]> m_collision_list;
-	uint8_t *m_scrolly0;
-	uint8_t *m_scrollx0;
-	uint8_t *m_scrolly1;
-	uint8_t *m_scrollx1;
+	uint8_t *m_scrolly0 = nullptr;
+	uint8_t *m_scrollx0 = nullptr;
+	uint8_t *m_scrolly1 = nullptr;
+	uint8_t *m_scrollx1 = nullptr;
 	std::unique_ptr<uint32_t[]> m_internal_palette;
 	std::unique_ptr<uint32_t[]> m_alpha_table;
-	uint8_t *m_cpu1_base;
+	uint8_t *m_cpu1_base = nullptr;
 	std::unique_ptr<uint8_t[]> m_gfx1_base;
 	required_shared_ptr<uint8_t> m_blitter_ram;
 	required_shared_ptr<uint8_t> m_io_ram;
-	int m_game_id;
-	int m_blitter_busy;
-	int m_collision_count;
-	int m_stars_enabled;
-	int m_bgcolor;
-	int m_ffcount;
-	int m_ffhead;
-	int m_fftail;
-	int m_mVectorType;
-	int m_sndnmi_mask;
-	int m_firq_level;
-	emu_timer *m_blitter_reset_timer;
-	offs_t m_collision_detection;
+	int m_game_id = 0;
+	int m_blitter_busy = 0;
+	int m_collision_count = 0;
+	int m_stars_enabled = 0;
+	int m_bgcolor = 0;
+	int m_ffcount = 0;
+	int m_ffhead = 0;
+	int m_fftail = 0;
+	int m_mVectorType = 0;
+	int m_sndnmi_mask = 0;
+	int m_firq_level = 0;
+	emu_timer *m_blitter_reset_timer = nullptr;
+	offs_t m_collision_detection = 0;
 	std::vector<uint8_t> m_paletteram;
 
 	void bgtile_w(offs_t offset, uint8_t data);
@@ -1310,7 +1315,7 @@ void halleys_state::copy_scroll_op(bitmap_ind16 &bitmap, uint16_t *source, int s
 
 	// draw top split
 	for (int y=0; y != bch; y++) {
-		uint16_t *dest = &bitmap.pix16(VIS_MINY + y, VIS_MINX);
+		uint16_t *dest = &bitmap.pix(VIS_MINY + y, VIS_MINX);
 		memcpy(dest, src+sx, 2*rcw);
 		memcpy(dest + rcw, src, 2*(CLIP_W - rcw));
 		src += SCREEN_WIDTH;
@@ -1320,7 +1325,7 @@ void halleys_state::copy_scroll_op(bitmap_ind16 &bitmap, uint16_t *source, int s
 
 	// draw bottom split
 	for (int y = bch; y != CLIP_H; y++) {
-		uint16_t *dest = &bitmap.pix16(VIS_MINY + y, VIS_MINX);
+		uint16_t *dest = &bitmap.pix(VIS_MINY + y, VIS_MINX);
 		memcpy(dest, src+sx, 2*rcw);
 		memcpy(dest + rcw, src, 2*(CLIP_W - rcw));
 		src += SCREEN_WIDTH;
@@ -1345,7 +1350,7 @@ void halleys_state::copy_scroll_xp(bitmap_ind16 &bitmap, uint16_t *source, int s
 
 	// draw top split
 	for (int y=0; y != bch; y++)  {
-		uint16_t *dest = &bitmap.pix16(VIS_MINY + y, VIS_MINX);
+		uint16_t *dest = &bitmap.pix(VIS_MINY + y, VIS_MINX);
 		const uint16_t *src = src_base + sx;
 		for(int x=0; x != rcw; x++) {
 			uint16_t pixel = *src++;
@@ -1370,7 +1375,7 @@ void halleys_state::copy_scroll_xp(bitmap_ind16 &bitmap, uint16_t *source, int s
 
 	// draw bottom split
 	for (int y = bch; y != CLIP_H; y++) {
-		uint16_t *dest = &bitmap.pix16(VIS_MINY + y, VIS_MINX);
+		uint16_t *dest = &bitmap.pix(VIS_MINY + y, VIS_MINX);
 		const uint16_t *src = src_base + sx;
 		for(int x=0; x != rcw; x++) {
 			uint16_t pixel = *src++;
@@ -1398,7 +1403,7 @@ void halleys_state::copy_fixed_xp(bitmap_ind16 &bitmap, uint16_t *source)
 {
 	uint16_t *src = source + CLIP_SKIP;
 	for(int y=0; y != CLIP_H; y++) {
-		uint16_t *dest = &bitmap.pix16(VIS_MINY + y, VIS_MINX);
+		uint16_t *dest = &bitmap.pix(VIS_MINY + y, VIS_MINX);
 		for(int x=0; x != CLIP_W; x++) {
 			uint16_t pixel = src[x];
 
@@ -1414,7 +1419,7 @@ void halleys_state::copy_fixed_2b(bitmap_ind16 &bitmap, uint16_t *source)
 {
 	uint16_t *src = source + CLIP_SKIP;
 	for(int y=0; y != CLIP_H; y++) {
-		uint16_t *dest = &bitmap.pix16(VIS_MINY + y, VIS_MINX);
+		uint16_t *dest = &bitmap.pix(VIS_MINY + y, VIS_MINX);
 		for(int x=0; x != CLIP_W; x++) {
 			uint16_t pixel = src[x];
 
@@ -1429,6 +1434,7 @@ void halleys_state::copy_fixed_2b(bitmap_ind16 &bitmap, uint16_t *source)
 void halleys_state::filter_bitmap(bitmap_ind16 &bitmap, int mask)
 {
 	return;
+#ifdef UNUSED
 	int dst_pitch;
 
 	uint32_t *pal_ptr, *edi;
@@ -1436,7 +1442,7 @@ void halleys_state::filter_bitmap(bitmap_ind16 &bitmap, int mask)
 
 	pal_ptr = m_internal_palette.get();
 	esi = mask | 0xffffff00;
-	edi = (uint32_t*)&bitmap.pix16(VIS_MINY, VIS_MINX + CLIP_W);
+	edi = (uint32_t*)&bitmap.pix(VIS_MINY, VIS_MINX + CLIP_W);
 	dst_pitch = bitmap.rowpixels() >> 1;
 	ecx = -(CLIP_W>>1);
 	edx = CLIP_H;
@@ -1464,6 +1470,7 @@ void halleys_state::filter_bitmap(bitmap_ind16 &bitmap, int mask)
 		edi += dst_pitch;
 	}
 	while (--edx);
+#endif
 }
 
 
@@ -1916,9 +1923,13 @@ INPUT_PORTS_END
 //**************************************************************************
 // Machine Definitions and Initializations
 
-void halleys_state::machine_reset()
+void halleys_state::machine_start()
 {
 	m_mVectorType     = 0;
+}
+
+void halleys_state::machine_reset()
+{
 	m_firq_level      = 0;
 	m_blitter_busy    = 0;
 	m_collision_count = 0;
@@ -2162,14 +2173,15 @@ void halleys_state::init_common()
 
 
 	// allocate memory for unpacked graphics
-	buf = auto_alloc_array(machine(), uint8_t, 0x100000);
-	m_gfx_plane02 = buf;
-	m_gfx_plane13 = buf + 0x80000;
+	m_gfx_plane_alloc = std::make_unique<uint8_t[]>(0x100000);
+	m_gfx_plane02 = &m_gfx_plane_alloc[0];
+	m_gfx_plane13 = &m_gfx_plane_alloc[0x80000];
 
 
 	// allocate memory for render layers
-	buf = auto_alloc_array(machine(), uint8_t, SCREEN_BYTESIZE * MAX_LAYERS);
-	for (i=0; i<MAX_LAYERS; buf+=SCREEN_BYTESIZE, i++) m_render_layer[i] = (uint16_t*)buf;
+	m_render_layer_alloc = std::make_unique<uint16_t[]>(SCREEN_BYTESIZE * MAX_LAYERS / 2);
+	for (i=0; i<MAX_LAYERS; i++)
+		m_render_layer[i] = &m_render_layer_alloc[SCREEN_BYTESIZE * i / 2];
 
 
 	// allocate memory for pre-processed ROMs
@@ -2269,6 +2281,8 @@ void halleys_state::init_halley87()
 
 	init_common();
 }
+
+} // Anonymous namespace
 
 
 //**************************************************************************

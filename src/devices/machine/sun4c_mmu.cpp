@@ -33,15 +33,15 @@ DEFINE_DEVICE_TYPE(SUN4C_MMU, sun4c_mmu_device, "sun4c_mmu", "Sun 4c MMU")
 #define LOG_TYPE1_TIMEOUT   (1U << 12)
 #define LOG_UNKNOWN_SPACE   (1U << 13)
 #define LOG_WRITE_PROTECT   (1U << 14)
-#define LOG_READ_PROTECT	(1U << 15)
+#define LOG_READ_PROTECT    (1U << 15)
 #define LOG_PARITY          (1U << 16)
 #define LOG_ALL_ASI         (1U << 17) // WARNING: Heavy!
-#define LOG_UNKNOWN_ASI		(1U << 18)
-#define LOG_SEGMENT_FLUSH	(1U << 19)
-#define LOG_PAGE_FLUSH		(1U << 20)
-#define LOG_CONTEXT_FLUSH	(1U << 21)
-#define LOG_CACHE_FILLS		(1U << 22)
-#define LOG_PAGE_ENTRIES	(1U << 23)
+#define LOG_UNKNOWN_ASI     (1U << 18)
+#define LOG_SEGMENT_FLUSH   (1U << 19)
+#define LOG_PAGE_FLUSH      (1U << 20)
+#define LOG_CONTEXT_FLUSH   (1U << 21)
+#define LOG_CACHE_FILLS     (1U << 22)
+#define LOG_PAGE_ENTRIES    (1U << 23)
 
 #if SUN4CMMU_LOG_MEM_ACCESSES
 static FILE* s_mem_log = nullptr;
@@ -151,7 +151,7 @@ void sun4_mmu_base_device::device_start()
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
-		machine().debugger().console().register_command("l2p", CMDFLAG_NONE, 0, 1, 1, std::bind(&sun4_mmu_base_device::l2p_command, this, _1, _2));
+		machine().debugger().console().register_command("l2p", CMDFLAG_NONE, 1, 1, std::bind(&sun4_mmu_base_device::l2p_command, this, _1));
 	}
 
 	m_cache_word_size = m_cache_line_size >> 2;
@@ -221,7 +221,7 @@ void sun4_mmu_base_device::device_reset()
 	memset(&m_cachedata[0], 0, sizeof(uint32_t) * 16384);
 }
 
-void sun4_mmu_base_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void sun4_mmu_base_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_RESET)
 	{
@@ -985,7 +985,7 @@ bool sun4_mmu_base_device::translate(uint32_t &addr)
 	return entry.valid;
 }
 
-void sun4_mmu_base_device::l2p_command(int ref, const std::vector<std::string> &params)
+void sun4_mmu_base_device::l2p_command(const std::vector<std::string> &params)
 {
 	uint64_t addr, offset;
 

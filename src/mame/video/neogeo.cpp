@@ -88,13 +88,13 @@ WRITE_LINE_MEMBER(neogeo_base_state::set_palette_bank)
 }
 
 
-READ16_MEMBER(neogeo_base_state::paletteram_r)
+uint16_t neogeo_base_state::paletteram_r(offs_t offset)
 {
 	return m_paletteram[m_palette_bank + offset];
 }
 
 
-WRITE16_MEMBER(neogeo_base_state::paletteram_w)
+void neogeo_base_state::paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset += m_palette_bank;
 	data = COMBINE_DATA(&m_paletteram[offset]);
@@ -226,13 +226,13 @@ void neogeo_base_state::set_video_control(uint16_t data)
 }
 
 
-READ16_MEMBER(neogeo_base_state::video_register_r)
+uint16_t neogeo_base_state::video_register_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret;
 
 	/* accessing the LSB only is not mapped */
 	if (mem_mask == 0x00ff)
-		ret = unmapped_r(space, 0, 0xffff) & 0x00ff;
+		ret = unmapped_r(space) & 0x00ff;
 	else
 	{
 		switch (offset)
@@ -249,7 +249,7 @@ READ16_MEMBER(neogeo_base_state::video_register_r)
 }
 
 
-WRITE16_MEMBER(neogeo_base_state::video_register_w)
+void neogeo_base_state::video_register_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* accessing the LSB only is not mapped */
 	if (mem_mask != 0x00ff)

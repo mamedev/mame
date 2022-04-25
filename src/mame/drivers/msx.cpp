@@ -527,15 +527,15 @@ PCB Layouts missing
 
 
 #include "emu.h"
+#include "cpu/z80/r800.h"
 #include "includes/msx.h"
 #include "formats/dsk_dsk.h"
 #include "formats/dmk_dsk.h"
 #include "machine/msx_matsushita.h"
 #include "machine/msx_s1985.h"
 #include "machine/msx_systemflags.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -1273,10 +1273,12 @@ void msx2_state::msxr_floplist(machine_config &config)
 	SOFTWARE_LIST(config, "msx1_flp_l").set_compatible("msx1_flop");    // maybe not?
 }
 
-FLOPPY_FORMATS_MEMBER( msx_state::floppy_formats )
-	FLOPPY_MSX_FORMAT,
-	FLOPPY_DMK_FORMAT
-FLOPPY_FORMATS_END
+void msx_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_MSX_FORMAT);
+	fr.add(FLOPPY_DMK_FORMAT);
+}
 
 static void msx_floppies(device_slot_interface &device)
 {
@@ -1369,8 +1371,6 @@ void msx_state::msx(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.1);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	AY8910(config, m_ay8910, 10.738635_MHz_XTAL / 3 / 2);
 	m_ay8910->set_flags(AY8910_SINGLE_OUTPUT);
@@ -1441,8 +1441,6 @@ void msx2_state::msx2(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.1);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	AY8910(config, m_ay8910, 21.477272_MHz_XTAL / 6 / 2);
 	m_ay8910->set_flags(AY8910_SINGLE_OUTPUT);
@@ -1504,8 +1502,6 @@ void msx2_state::msx2p(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.1);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	AY8910(config, m_ay8910, 21.477272_MHz_XTAL / 6 / 2);
 	m_ay8910->set_flags(AY8910_SINGLE_OUTPUT);
@@ -1546,6 +1542,15 @@ void msx2_state::msx2_pal(machine_config &config)
 {
 	msx2(config);
 	m_v9938->set_screen_pal("screen");
+}
+
+void msx2_state::turbor(machine_config &config)
+{
+	msx2p(config);
+
+	R800(config.replace(), m_maincpu, 28.636363_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &msx2_state::msx_memory_map);
+	m_maincpu->set_addrmap(AS_IO, &msx2_state::msx2p_io_map);
 }
 
 
@@ -1712,7 +1717,7 @@ ROM_END
 
 void msx_state::mx10(machine_config &config)
 {
-	msx1(TMS9918, config);
+	msx1(TMS9118, config);
 	// FDC: None, 0 drives
 	// 2? Cartridge slots
 	// Z80: uPD780C-1
@@ -1778,7 +1783,7 @@ ROM_END
 
 void msx_state::pv7(machine_config &config)
 {
-	msx1(TMS9918, config);
+	msx1(TMS9118, config);
 	// AY8910?
 	// FDC: None, 0 drives
 	// 1 Cartridge slot + expansion slot, or 2 cartridge slots?
@@ -1804,7 +1809,7 @@ ROM_END
 
 void msx_state::pv16(machine_config &config)
 {
-	msx1(TMS9918, config);
+	msx1(TMS9118, config);
 	// AY8910
 	// FDC: None, 0 drives
 	// 1 Cartridge slot
@@ -1945,7 +1950,7 @@ ROM_END
 
 void msx_state::cpc50a(machine_config &config)
 {
-	msx1(TMS9918, config);
+	msx1(TMS9118, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 1? Cartridge slot
@@ -1969,7 +1974,7 @@ ROM_END
 
 void msx_state::cpc50b(machine_config &config)
 {
-	msx1(TMS9918, config);
+	msx1(TMS9118, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 1? Cartridge slot
@@ -1993,7 +1998,7 @@ ROM_END
 
 void msx_state::cpc51(machine_config &config)
 {
-	msx1(TMS9918, config);
+	msx1(TMS9118, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 1 Cartridge slot
@@ -8568,7 +8573,7 @@ ROM_END
 
 void msx2_state::fsa1gt(machine_config &config)
 {
-	msx2(config);
+	turbor(config);
 	// AY8910/YM2149?
 	// FDC: tc8566af, 1 3.5" DSDD drive
 	// 2 Cartridge slots
@@ -8613,7 +8618,7 @@ ROM_END
 
 void msx2_state::fsa1st(machine_config &config)
 {
-	msx2(config);
+	turbor(config);
 	// AY8910/YM2149?
 	// FDC: tc8566af, 1 3.5" DSDD drive
 	// 2 Cartridge slots
@@ -8840,7 +8845,7 @@ COMP(1987, hbf1xd,     0,        0,     hbf1xd,     msx2jp,   msx2_state, empty_
 COMP(1988, hbf1xdm2,   0,        0,     hbf1xdm2,   msx2jp,   msx2_state, empty_init, "Sony", "HB-F1XDMK2 (Japan) (MSX2)", 0)
 COMP(19??, hbf5,       0,        0,     hbf5,       msx2,     msx2_state, empty_init, "Sony", "HB-F5 (MSX2)", 0)
 COMP(1985, hbf9p,      0,        0,     hbf9p,      msx2,     msx2_state, empty_init, "Sony", "HB-F9P (MSX2)", 0)
-COMP(19??, hbf9pr,     hbf9p,    0,     hbf9pr,     msx2,     msx2_state, empty_init, "Sony", "HB-F9P Russion (MSX2)", MACHINE_NOT_WORKING) // Keyboard responds differently
+COMP(19??, hbf9pr,     hbf9p,    0,     hbf9pr,     msx2,     msx2_state, empty_init, "Sony", "HB-F9P Russian (MSX2)", MACHINE_NOT_WORKING) // Keyboard responds differently
 COMP(1985, hbf9s,      hbf9p,    0,     hbf9s,      msx2,     msx2_state, empty_init, "Sony", "HB-F9S (MSX2)", 0)
 COMP(1986, hbf500,     hbf500p,  0,     hbf500,     msx2jp,   msx2_state, empty_init, "Sony", "HB-F500 (Japan) (MSX2)", 0)
 COMP(198?, hbf500f,    hbf500p,  0,     hbf500f,    msx2,     msx2_state, empty_init, "Sony", "HB-F500F (MSX2)", 0) // French keyboard?

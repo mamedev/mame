@@ -66,8 +66,8 @@ private:
 	// keyboard state
 	int m_key_d6;
 	int m_key_d7;
-	int m_key_a4;
-	int m_key_a5;
+	int m_key_a4 = 0;
+	int m_key_a5 = 0;
 	int m_key_a8;
 
 	// video state
@@ -79,8 +79,8 @@ private:
 	void amu880_mem(address_map &map);
 
 	// cassette variables
-	u8 m_cnt;
-	bool m_cassbit;
+	u8 m_cnt = 0;
+	bool m_cassbit = false;
 };
 
 #endif

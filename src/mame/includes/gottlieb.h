@@ -47,18 +47,21 @@ public:
 		, m_track_x(*this, "TRACKX")
 		, m_track_y(*this, "TRACKY")
 		, m_leds(*this, "led%u", 0U)
+		, m_knockers(*this, "knocker%d", 0U)
 	{ }
 
 	void gottlieb_core(machine_config &config);
 	void cobram3(machine_config &config);
 	void screwloo(machine_config &config);
 	void gottlieb2(machine_config &config);
+	void gottlieb2_ram_rom(machine_config &config);
 	void reactor(machine_config &config);
 	void tylz(machine_config &config);
 	void g2laser(machine_config &config);
 	void qbert(machine_config &config);
 	void qbert_knocker(machine_config &config);
 	void gottlieb1(machine_config &config);
+	void gottlieb1_rom(machine_config &config);
 	void gottlieb1_votrax(machine_config &config);
 
 	void init_romtiles();
@@ -71,6 +74,12 @@ public:
 
 	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(track_delta_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(stooges_joystick_r);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	enum
@@ -113,13 +122,11 @@ private:
 	void audio_handle_zero_crossing(const attotime &zerotime, bool logit);
 	void laserdisc_audio_process(int samplerate, int samples, const int16_t *ch0, const int16_t *ch1);
 
-	void gottlieb_map(address_map &map);
+	void gottlieb_base_map(address_map &map);
+	void gottlieb_ram_map(address_map &map);
+	void gottlieb_ram_rom_map(address_map &map);
+	void gottlieb_rom_map(address_map &map);
 	void reactor_map(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -140,28 +147,29 @@ private:
 	optional_ioport m_track_x;
 	optional_ioport m_track_y;
 	output_finder<3> m_leds;  // only used by reactor
+	output_finder<1> m_knockers;  // only used by qbert
 
-	u8 m_knocker_prev;
-	u8 m_joystick_select;
-	u8 m_track[2];
-	emu_timer *m_laserdisc_bit_timer;
-	emu_timer *m_laserdisc_philips_timer;
-	u8 m_laserdisc_select;
-	u8 m_laserdisc_status;
-	uint16_t m_laserdisc_philips_code;
+	u8 m_knocker_prev = 0U;
+	u8 m_joystick_select = 0U;
+	u8 m_track[2]{};
+	emu_timer *m_laserdisc_bit_timer = nullptr;
+	emu_timer *m_laserdisc_philips_timer = nullptr;
+	u8 m_laserdisc_select = 0U;
+	u8 m_laserdisc_status = 0U;
+	uint16_t m_laserdisc_philips_code = 0U;
 	std::unique_ptr<u8[]> m_laserdisc_audio_buffer;
-	uint16_t m_laserdisc_audio_address;
-	int16_t m_laserdisc_last_samples[2];
+	uint16_t m_laserdisc_audio_address = 0U;
+	int16_t m_laserdisc_last_samples[2]{};
 	attotime m_laserdisc_last_time;
 	attotime m_laserdisc_last_clock;
-	u8 m_laserdisc_zero_seen;
-	u8 m_laserdisc_audio_bits;
-	u8 m_laserdisc_audio_bit_count;
-	u8 m_gfxcharlo;
-	u8 m_gfxcharhi;
-	u8 m_background_priority;
-	u8 m_spritebank;
-	u8 m_transparent0;
-	tilemap_t *m_bg_tilemap;
-	double m_weights[4];
+	u8 m_laserdisc_zero_seen = 0U;
+	u8 m_laserdisc_audio_bits = 0U;
+	u8 m_laserdisc_audio_bit_count = 0U;
+	u8 m_gfxcharlo = 0U;
+	u8 m_gfxcharhi = 0U;
+	u8 m_background_priority = 0U;
+	u8 m_spritebank = 0U;
+	u8 m_transparent0 = 0U;
+	tilemap_t *m_bg_tilemap = nullptr;
+	double m_weights[4]{};
 };

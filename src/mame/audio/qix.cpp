@@ -2,7 +2,7 @@
 // copyright-holders:Derrick Renaud,Couriersud
 /*************************************************************************
 
-    audio/qix.c
+    audio/qix.cpp
 
 *************************************************************************/
 
@@ -98,7 +98,9 @@ DISCRETE_SOUND_END
 
 void qix_state::sndpia_2_warning_w(uint8_t data)
 {
-	popmessage("PIA 5 write!!");
+	// this PIA is supposedly unused
+	if (machine().phase() > machine_phase::RESET)
+		logerror("PIA 5 write!!\n");
 }
 
 

@@ -29,24 +29,24 @@
         - MK5089N - DTMF generator
         - ...
 
-	high-resolution motherboard photo (enough to read chip numbers): http://deltacxx.insomnia247.nl/gridcompass/motherboard.jpg
+    high-resolution motherboard photo (enough to read chip numbers): http://deltacxx.insomnia247.nl/gridcompass/motherboard.jpg
 
-	differences between models:
-	- Compass 110x do not have GRiDROM slots.
-	- Compass II (112x, 113x) have 4 of them.
-	- Compass II 113x have 512x256 screen size
-	- Compass 11x9 have 512K ram
-	- Compass II have DMA addresses different from Compass 110x
+    differences between models:
+    - Compass 110x do not have GRiDROM slots.
+    - Compass II (112x, 113x) have 4 of them.
+    - Compass II 113x have 512x256 screen size
+    - Compass 11x9 have 512K ram
+    - Compass II have DMA addresses different from Compass 110x
 
     to do:
 
     - keyboard: decode and add the rest of keycodes
-	    keycode table can be found here on page A-2:
-	    http://deltacxx.insomnia247.nl/gridcompass/large_files/Yahoo%20group%20backup/RuGRiD-Laptop/files/6_GRiD-OS-Programming/3_GRiD-OS-Reference.pdf
+        keycode table can be found here on page A-2:
+        http://deltacxx.insomnia247.nl/gridcompass/large_files/Yahoo%20group%20backup/RuGRiD-Laptop/files/6_GRiD-OS-Programming/3_GRiD-OS-Reference.pdf
     - EAROM, RTC
     - serial port (incomplete), modem (incl. DTMF generator)
-	- proper custom DMA logic timing
-	- implement units other than 1101
+    - proper custom DMA logic timing
+    - implement units other than 1101
 
     missing dumps:
 
@@ -56,9 +56,9 @@
     - external floppy and hard disk (2101, 2102)
 
     to boot CCOS 3.0.1:
-	- convert GRIDOS.IMD to IMG format
+    - convert GRIDOS.IMD to IMG format
     - create zero-filled 384K bubble memory image and attach it as -memcard
-	- attach floppy with `-ieee_grid grid2102 -flop GRIDOS.IMG`
+    - attach floppy with `-ieee_grid grid2102 -flop GRIDOS.IMG`
     - use grid1101 with 'ccos' ROM
 
 ***************************************************************************/
@@ -83,18 +83,19 @@
 #include "softlist.h"
 #include "speaker.h"
 
-
 //#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
 #define LOG_KEYBOARD  (1U <<  1)
 #define LOG_DEBUG     (1U <<  2)
 
 #define VERBOSE (LOG_GENERAL)
-//#define LOG_OUTPUT_FUNC printf
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGKBD(...) LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
 #define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
 
+
+namespace {
 
 #define I80130_TAG      "osp"
 
@@ -113,6 +114,8 @@ public:
 		, m_tms9914(*this, "hpib")
 	{ }
 
+	static constexpr feature_type unemulated_features() { return feature::WAN; }
+
 	void grid1129(machine_config &config);
 	void grid1131(machine_config &config);
 	void grid1121(machine_config &config);
@@ -120,7 +123,9 @@ public:
 	void grid1109(machine_config &config);
 	void grid1101(machine_config &config);
 
-	void init_gridcomp();
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -131,9 +136,6 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;
 	required_device<tms9914_device> m_tms9914;
-
-	DECLARE_MACHINE_START(gridcomp);
-	DECLARE_MACHINE_RESET(gridcomp);
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
@@ -156,14 +158,14 @@ private:
 	void grid1101_map(address_map &map);
 	void grid1121_map(address_map &map);
 
-	bool m_kbd_ready;
-	uint16_t m_kbd_data;
+	bool m_kbd_ready = false;
+	uint16_t m_kbd_data = 0;
 
-	uint16_t *m_videoram;
+	uint16_t *m_videoram = nullptr;
 };
 
 
-uint16_t gridcomp_state::grid_9ff0_r(offs_t offset)
+[[maybe_unused]] uint16_t gridcomp_state::grid_9ff0_r(offs_t offset)
 {
 	uint16_t data = 0;
 
@@ -244,18 +246,15 @@ uint8_t gridcomp_state::grid_dma_r(offs_t offset)
 
 uint32_t gridcomp_state::screen_update_generic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int px)
 {
-	int x, y, offset;
-	uint16_t gfx, *p;
-
-	for (y = 0; y < 240; y++)
+	for (int y = 0; y < 240; y++)
 	{
-		p = &bitmap.pix16(y);
+		uint16_t *p = &bitmap.pix(y);
 
-		offset = y * (px / 16);
+		int const offset = y * (px / 16);
 
-		for (x = offset; x < offset + px / 16; x++)
+		for (int x = offset; x < offset + px / 16; x++)
 		{
-			gfx = m_videoram[x];
+			uint16_t const gfx = m_videoram[x];
 
 			for (int i = 15; i >= 0; i--)
 			{
@@ -277,22 +276,16 @@ uint32_t gridcomp_state::screen_update_113x(screen_device &screen, bitmap_ind16 
 	return screen_update_generic(screen, bitmap, cliprect, 512);
 }
 
-
-void gridcomp_state::init_gridcomp()
-{
-}
-
-MACHINE_START_MEMBER(gridcomp_state, gridcomp)
+void gridcomp_state::machine_start()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	program.install_readwrite_bank(0, m_ram->size() - 1, "bank10");
-	membank("bank10")->set_base(m_ram->pointer());
+	program.install_ram(0, m_ram->size() - 1, m_ram->pointer());
 
 	m_videoram = (uint16_t *)m_maincpu->space(AS_PROGRAM).get_write_ptr(0x400);
 }
 
-MACHINE_RESET_MEMBER(gridcomp_state, gridcomp)
+void gridcomp_state::machine_reset()
 {
 	m_kbd_ready = false;
 }
@@ -360,9 +353,6 @@ void gridcomp_state::grid1101(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &gridcomp_state::grid1101_io);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(gridcomp_state::irq_callback));
 
-	MCFG_MACHINE_START_OVERRIDE(gridcomp_state, gridcomp)
-	MCFG_MACHINE_RESET_OVERRIDE(gridcomp_state, gridcomp)
-
 	I80130(config, m_osp, XTAL(15'000'000)/3);
 	m_osp->irq().set_inputline("maincpu", 0);
 
@@ -385,6 +375,7 @@ void gridcomp_state::grid1101(machine_config &config)
 
 	i7220_device &i7220(I7220(config, "i7220", XTAL(4'000'000)));
 	i7220.set_data_size(3); // 3 1-Mbit MBM's
+	i7220.set_must_be_loaded(true);
 	i7220.irq_callback().set(I80130_TAG, FUNC(i80130_device::ir1_w));
 	i7220.drq_callback().set(I80130_TAG, FUNC(i80130_device::ir1_w));
 
@@ -612,6 +603,8 @@ ROM_START( grid1139 )
 	ROMX_LOAD("1139odd.bin",  0x0001, 0x2000, CRC(13ed4bf0) SHA1(f7087f86dbbc911bee985125bccd2417e0374e8e), ROM_SKIP(1) | ROM_BIOS(0))
 ROM_END
 
+} // Anonymous namespace
+
 
 /***************************************************************************
 
@@ -620,7 +613,7 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY           FULLNAME           FLAGS
-COMP( 1982, grid1101, 0,        0,      grid1101, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass 1101",    MACHINE_TYPE_COMPUTER | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_CONTROLS | MACHINE_NODEVICE_PRINTER | MACHINE_NODEVICE_LAN )
+COMP( 1982, grid1101, 0,        0,      grid1101, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass 1101",    MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_CONTROLS )
 COMP( 1982, grid1109, grid1101, 0,      grid1109, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass 1109",    MACHINE_IS_SKELETON )
 COMP( 1984, grid1121, 0,        0,      grid1121, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass II 1121", MACHINE_IS_SKELETON )
 COMP( 1984, grid1129, grid1121, 0,      grid1129, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass II 1129", MACHINE_IS_SKELETON )

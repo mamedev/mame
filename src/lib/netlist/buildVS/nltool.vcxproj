@@ -149,6 +149,7 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)..\;$(SolutionDir)..\..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/bigobj</AdditionalOptions>
     </ClCompile>
+    <ClCompile Include="..\tests\test_pfunction.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="netlistlib.vcxproj">

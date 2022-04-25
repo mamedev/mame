@@ -141,9 +141,9 @@
 #define COUNT2_TAG "u12_counter"
 #define COUNT3_TAG "u10_counter"
 
-DEFINE_DEVICE_TYPE_NS(TI99_PGRAM, bus::ti99::peb, pgram_device, "ti99_pgram", "PGRAM(+) memory card")
+DEFINE_DEVICE_TYPE(TI99_PGRAM, bus::ti99::peb::pgram_device, "ti99_pgram", "PGRAM(+) memory card")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 pgram_device::pgram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
 	  device_t(mconfig, TI99_PGRAM, tag, owner, clock),
@@ -168,7 +168,7 @@ pgram_device::pgram_device(const machine_config &mconfig, const char *tag, devic
 
     Decoding is done by the 74ls138 and 74ls139 circuits on the board.
 */
-READ8Z_MEMBER(pgram_device::readz)
+void pgram_device::readz(offs_t offset, uint8_t *value)
 {
 	if (!m_active) return;
 
@@ -231,7 +231,7 @@ void pgram_device::write(offs_t offset, uint8_t data)
     area 6000-7fff. A second bank can be selected for both DSR and RAM using
     CRU bits 3 and 4.
 */
-READ8Z_MEMBER(pgram_device::dsr_ram_read)
+void pgram_device::dsr_ram_read(offs_t offset, uint8_t *value)
 {
 	// ..0. .... .... .... = DSR
 	// ..1. .... .... .... = RAM
@@ -248,8 +248,8 @@ READ8Z_MEMBER(pgram_device::dsr_ram_read)
 	m_bankff->clear_w(m_crulatch->q3_r());
 	m_bankff->preset_w(m_crulatch->q4_r());
 
-	uint16_t base = (offset & 0x2000)<<1;   // DSR:0000, RAM:4000
-	uint16_t address = base | (offset & 0x1fff) | (m_bankff->output_r()? 0x2000 : 0);
+	offs_t base = (offset & 0x2000)<<1;   // DSR:0000, RAM:4000
+	offs_t address = base | (offset & 0x1fff) | (m_bankff->output_r()? 0x2000 : 0);
 
 	if ((dsr && m_crulatch->q0_r()) || (!dsr && m_crulatch->q1_r()))
 	{
@@ -294,8 +294,8 @@ void pgram_device::dsr_ram_write(offs_t offset, uint8_t data)
 
 		if (m_crulatch->q2_r()==0)  // not write-protected
 		{
-			uint16_t base = (offset & 0x2000)<<1;
-			uint16_t address = base | (offset & 0x1fff) | (m_bankff->output_r()? 0x2000 : 0);
+			offs_t base = (offset & 0x2000)<<1;
+			offs_t address = base | (offset & 0x1fff) | (m_bankff->output_r()? 0x2000 : 0);
 
 			m_dsrram->write(address, data);
 			if (base==0)
@@ -317,7 +317,7 @@ void pgram_device::dsr_ram_write(offs_t offset, uint8_t data)
     When the GROM address is outside the area for G3-G7, the access is ignored.
     GRAM access requires setting CRU bit 1 before.
 */
-READ8Z_MEMBER(pgram_device::gram_read)
+void pgram_device::gram_read(offs_t offset, uint8_t *value)
 {
 	// Don't let the debugger mess with the GRAM emulation
 	if (machine().side_effects_disabled())
@@ -561,4 +561,4 @@ ioport_constructor pgram_device::device_input_ports() const
 	return INPUT_PORTS_NAME( pgram_switches );
 }
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb

@@ -1,4 +1,6 @@
-#include <asio/ts/executor.hpp>
+#include <asio/associated_executor.hpp>
+#include <asio/bind_executor.hpp>
+#include <asio/execution.hpp>
 #include <condition_variable>
 #include <future>
 #include <memory>
@@ -6,30 +8,21 @@
 #include <queue>
 #include <thread>
 #include <vector>
+#include <cctype>
 
-using asio::execution_context;
 using asio::executor_binder;
 using asio::get_associated_executor;
-using asio::post;
-using asio::system_executor;
-using asio::use_future;
-using asio::use_service;
+namespace execution = asio::execution;
 
 // An executor that launches a new thread for each function submitted to it.
-// This class satisfies the Executor requirements.
+// This class satisfies the executor requirements.
 class thread_executor
 {
 private:
-  // Service to track all threads started through a thread_executor.
-  class thread_bag : public execution_context::service
+  // Singleton execution context that manages threads launched by the new_thread_executor.
+  class thread_bag
   {
-  public:
-    typedef thread_bag key_type;
-
-    explicit thread_bag(execution_context& ctx)
-      : execution_context::service(ctx)
-    {
-    }
+    friend class thread_executor;
 
     void add_thread(std::thread&& t)
     {
@@ -37,8 +30,9 @@ private:
       threads_.push_back(std::move(t));
     }
 
-  private:
-    virtual void shutdown()
+    thread_bag() = default;
+
+    ~thread_bag()
     {
       for (auto& t : threads_)
         t.join();
@@ -49,38 +43,22 @@ private:
   };
 
 public:
-  execution_context& context() const noexcept
+  static thread_bag& query(execution::context_t)
   {
-    return system_executor().context();
+    static thread_bag threads;
+    return threads;
   }
 
-  void on_work_started() const noexcept
+  static constexpr auto query(execution::blocking_t)
   {
-    // This executor doesn't count work.
+    return execution::blocking.never;
   }
 
-  void on_work_finished() const noexcept
+  template <class Func>
+  void execute(Func f) const
   {
-    // This executor doesn't count work.
-  }
-
-  template <class Func, class Alloc>
-  void dispatch(Func&& f, const Alloc& a) const
-  {
-    post(std::forward<Func>(f), a);
-  }
-
-  template <class Func, class Alloc>
-  void post(Func f, const Alloc&) const
-  {
-    thread_bag& bag = use_service<thread_bag>(context());
+    thread_bag& bag = query(execution::context);
     bag.add_thread(std::thread(std::move(f)));
-  }
-
-  template <class Func, class Alloc>
-  void defer(Func&& f, const Alloc& a) const
-  {
-    post(std::forward<Func>(f), a);
   }
 
   friend bool operator==(const thread_executor&,
@@ -185,7 +163,16 @@ std::future<void> pipeline(queue_back<T> in, F f)
 
   // Run the function, and as we're the last stage return a future so that the
   // caller can wait for the pipeline to finish.
-  return post(ex, use_future([in, f = std::move(f)]() mutable { f(in); }));
+  std::packaged_task<void()> task(
+      [in, f = std::move(f)]() mutable
+      {
+        f(in);
+      });
+  std::future<void> fut = task.get_future();
+  execution::execute(
+      asio::require(ex, execution::blocking.never),
+      std::move(task));
+  return fut;
 }
 
 // Launch an intermediate stage in a pipeline.
@@ -204,7 +191,9 @@ std::future<void> pipeline(queue_back<T> in, F f, Tail... t)
   auto ex = get_associated_executor(f, thread_executor());
 
   // Run the function.
-  post(ex, [in, out, f = std::move(f)]() mutable
+  execution::execute(
+      asio::require(ex, execution::blocking.never),
+      [in, out, f = std::move(f)]() mutable
       {
         f(in, out);
         out.stop();
@@ -230,7 +219,9 @@ std::future<void> pipeline(F f, Tail... t)
   auto ex = get_associated_executor(f, thread_executor());
 
   // Run the function.
-  post(ex, [out, f = std::move(f)]() mutable
+  execution::execute(
+      asio::require(ex, execution::blocking.never),
+      [out, f = std::move(f)]() mutable
       {
         f(out);
         out.stop();
@@ -242,12 +233,12 @@ std::future<void> pipeline(F f, Tail... t)
 
 //------------------------------------------------------------------------------
 
-#include <asio/thread_pool.hpp>
+#include <asio/static_thread_pool.hpp>
 #include <iostream>
 #include <string>
 
 using asio::bind_executor;
-using asio::thread_pool;
+using asio::static_thread_pool;
 
 void reader(queue_front<std::string> out)
 {
@@ -286,8 +277,8 @@ void writer(queue_back<std::string> in)
 
 int main()
 {
-  thread_pool pool;
+  static_thread_pool pool(1);
 
-  auto f = pipeline(reader, filter, bind_executor(pool, upper), writer);
+  auto f = pipeline(reader, filter, bind_executor(pool.executor(), upper), writer);
   f.wait();
 }

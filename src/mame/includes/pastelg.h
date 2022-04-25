@@ -29,9 +29,9 @@ protected:
 	required_device<screen_device> m_screen;
 	required_region_ptr<uint8_t> m_blitter_rom;
 
-	uint8_t m_gfxbank;
-	uint8_t m_palbank;
-	uint16_t m_blitter_src_addr;
+	uint8_t m_gfxbank = 0;
+	uint8_t m_palbank = 0;
+	uint16_t m_blitter_src_addr = 0;
 
 	uint8_t irq_ack_r();
 	void blitter_w(offs_t offset, uint8_t data);
@@ -43,19 +43,19 @@ protected:
 private:
 	required_shared_ptr<uint8_t> m_clut;
 
-	uint8_t m_blitter_destx;
-	uint8_t m_blitter_desty;
-	uint8_t m_blitter_sizex;
-	uint8_t m_blitter_sizey;
-	bool m_dispflag;
-	bool m_flipscreen;
-	bool m_blitter_direction_x;
-	bool m_blitter_direction_y;
+	uint8_t m_blitter_destx = 0;
+	uint8_t m_blitter_desty = 0;
+	uint8_t m_blitter_sizex = 0;
+	uint8_t m_blitter_sizey = 0;
+	bool m_dispflag = false;
+	bool m_flipscreen = false;
+	bool m_blitter_direction_x = false;
+	bool m_blitter_direction_y = false;
 	std::unique_ptr<uint8_t[]> m_videoram;
-	bool m_flipscreen_old;
-	emu_timer *m_blitter_timer;
+	bool m_flipscreen_old = false;
+	emu_timer *m_blitter_timer = nullptr;
 
-	void blitter_timer_callback(void *ptr, s32 param);
+	void blitter_timer_callback(s32 param);
 
 	void vramflip();
 	void gfxdraw();
@@ -99,7 +99,7 @@ private:
 	required_ioport_array<5> m_p1_keys;
 	required_ioport_array<5> m_p2_keys;
 
-	uint8_t m_mux_data;
+	uint8_t m_mux_data = 0;
 
 	uint8_t inputport1_r();
 	uint8_t inputport2_r();

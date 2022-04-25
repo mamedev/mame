@@ -28,9 +28,9 @@
 #include "emu.h"
 #include "samsmem.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_SAMSMEM, bus::ti99::peb, sams_memory_expansion_device, "ti99_sams", "SuperAMS memory expansion card")
+DEFINE_DEVICE_TYPE(TI99_SAMSMEM, bus::ti99::peb::sams_memory_expansion_device, "ti99_sams", "SuperAMS memory expansion card")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 #define SAMS_CRU_BASE 0x1e00
 
@@ -48,7 +48,7 @@ sams_memory_expansion_device::sams_memory_expansion_device(const machine_config 
     0x2000-0x3fff and 0xa000-0xffff, and the mapper area is at 0x4000-0x401e
     (only even addresses).
 */
-READ8Z_MEMBER(sams_memory_expansion_device::readz)
+void sams_memory_expansion_device::readz(offs_t offset, uint8_t *value)
 {
 	int base;
 
@@ -99,7 +99,7 @@ void sams_memory_expansion_device::write(offs_t offset, uint8_t data)
 /*
     CRU read. None here.
 */
-READ8Z_MEMBER(sams_memory_expansion_device::crureadz)
+void sams_memory_expansion_device::crureadz(offs_t offset, uint8_t *value)
 {
 }
 
@@ -144,4 +144,4 @@ void sams_memory_expansion_device::device_reset()
 	for (auto & elem : m_mapper) elem = 0;
 }
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb

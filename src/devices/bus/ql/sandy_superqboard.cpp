@@ -75,9 +75,11 @@ static void sandy_superqboard_floppies(device_slot_interface &device)
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( sandy_superqboard_device::floppy_formats )
-	FLOPPY_QL_FORMAT
-FLOPPY_FORMATS_END
+void sandy_superqboard_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_QL_FORMAT);
+}
 
 
 //-------------------------------------------------
@@ -219,7 +221,7 @@ sandy_superqboard_device::sandy_superqboard_device(const machine_config &mconfig
 	m_centronics(*this, CENTRONICS_TAG),
 	m_latch(*this, TTL74273_TAG),
 	m_rom(*this, "rom"),
-	m_ram(*this, "ram"),
+	m_ram(*this, "ram", ram_size, ENDIANNESS_BIG),
 	m_buttons(*this, "mouse_buttons"),
 	m_ram_size(ram_size),
 	m_fd6(0),
@@ -250,9 +252,6 @@ sandy_superqmouse_512k_device::sandy_superqmouse_512k_device(const machine_confi
 
 void sandy_superqboard_device::device_start()
 {
-	// allocate memory
-	m_ram.allocate(m_ram_size);
-
 	// state saving
 	save_item(NAME(m_fd6));
 	save_item(NAME(m_fd7));

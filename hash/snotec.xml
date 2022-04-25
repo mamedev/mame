@@ -44,7 +44,7 @@ license:CC0
 	</software>
 
 	<software name="catdog">
-		<description>Cats and Dogs</description>
+		<description>Ochame na PetMate</description>
 		<year>1995</year>
 		<publisher>Bandai</publisher>
 		<part name="rom" interface="genius_cart">
@@ -66,7 +66,7 @@ license:CC0
 	</software>
 
 	<software name="notepadn">
-		<description>Notepad</description>
+		<description>Nakayoshi Diary</description>
 		<year>1995</year>
 		<publisher>Bandai</publisher>
 		<part name="rom" interface="genius_cart">
@@ -107,6 +107,32 @@ license:CC0
 		<part name="rom" interface="genius_cart">
 			<dataarea name="rom" size="0x40000">
 				<rom name="LH532KWU.ic1" size="0x40000" crc="b0017e0d" sha1="0147f0c61fa47509971222cbacfafd382ed2e31d"/>
+			</dataarea>
+			<dataarea name="eeprom" size="0x800">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gokinjom" supported="no">
+		<description>Gokinjo Monogatari</description>
+		<year>1996</year>
+		<publisher>Bandai</publisher>
+		<part name="rom" interface="genius_cart">
+			<dataarea name="rom" size="0x40000">
+				<rom name="ic1.bin" size="0x40000" crc="bcaf2210" sha1="0aba90745fe6c9aa2dd979d162cd8dc43ea3e602"/>
+			</dataarea>
+			<dataarea name="eeprom" size="0x800">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tpanda" supported="no">
+		<description>Tare Panda</description>
+		<year>2000</year>
+		<publisher>Bandai</publisher>
+		<part name="rom" interface="genius_cart">
+			<dataarea name="rom" size="0x80000">
+				<rom name="snc_tarepanda-c.ic1" size="0x80000" crc="ea57c308" sha1="7fdb42e422a12b86e87b22ac8038b578e8183eaa"/>
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
 			</dataarea>

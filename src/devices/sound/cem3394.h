@@ -5,14 +5,10 @@
 
 #pragma once
 
-#define CEM3394_EXT_INPUT(_name) void _name(int count, short *buffer)
-
 
 class cem3394_device : public device_t, public device_sound_interface
 {
 public:
-	static constexpr unsigned SAMPLE_RATE = 44100*4;
-
 	// inputs
 	enum
 	{
@@ -26,11 +22,8 @@ public:
 		FINAL_GAIN
 	};
 
-	typedef device_delegate<void (int count, short *buffer)> ext_input_delegate;
+	cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	template <typename... T> void set_ext_input_callback(T &&... args) { m_ext_cb.set(std::forward<T>(args)...); }
 	void set_vco_zero_freq(double freq) { m_vco_zero_freq = freq; }
 	void set_filter_zero_freq(double freq) { m_filter_zero_freq = freq; }
 
@@ -39,7 +32,7 @@ protected:
 	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 public:
 	// Set the voltage going to a particular parameter
@@ -58,37 +51,34 @@ public:
 
 private:
 	double compute_db(double voltage);
-	uint32_t compute_db_volume(double voltage);
+	stream_buffer::sample_t compute_db_volume(double voltage);
 
 private:
-	ext_input_delegate m_ext_cb; /* callback to generate external samples */
+	double filter(double input, double cutoff);
 
-	sound_stream *m_stream;           /* our stream */
-	double m_vco_zero_freq;           /* frequency of VCO at 0.0V */
-	double m_filter_zero_freq;        /* frequency of filter at 0.0V */
+	sound_stream *m_stream;           // our stream
+	double m_vco_zero_freq;           // frequency of VCO at 0.0V
+	double m_filter_zero_freq;        // frequency of filter at 0.0V
 
-	double m_values[8];               /* raw values of registers */
-	uint8_t m_wave_select;              /* flags which waveforms are enabled */
+	double m_values[8];               // raw values of registers
+	u8 m_wave_select;                 // flags which waveforms are enabled
 
-	uint32_t m_volume;                  /* linear overall volume (0-256) */
-	uint32_t m_mixer_internal;          /* linear internal volume (0-256) */
-	uint32_t m_mixer_external;          /* linear external volume (0-256) */
+	double m_volume;                  // linear overall volume (0-1)
+	double m_mixer_internal;          // linear internal volume (0-1)
+	double m_mixer_external;          // linear external volume (0-1)
 
-	uint32_t m_position;                /* current VCO frequency position (0.FRACTION_BITS) */
-	uint32_t m_step;                    /* per-sample VCO step (0.FRACTION_BITS) */
+	double m_vco_position;            // current VCO frequency position (always < 1.0)
+	double m_vco_step;                // per-sample VCO step
 
-	uint32_t m_filter_position;         /* current filter frequency position (0.FRACTION_BITS) */
-	uint32_t m_filter_step;             /* per-sample filter step (0.FRACTION_BITS) */
-	uint32_t m_modulation_depth;        /* fraction of total by which we modulate (0.FRACTION_BITS) */
-	int16_t m_last_ext;                 /* last external sample we read */
+	double m_filter_frequency;        // baseline filter frequency
+	double m_filter_modulation;       // depth of modulation (up to 1.0)
+	double m_filter_resonance;        // depth of modulation (up to 1.0)
+	double m_filter_in[4];            // filter input history
+	double m_filter_out[4];           // filter output history
 
-	uint32_t m_pulse_width;             /* fractional pulse width (0.FRACTION_BITS) */
+	double m_pulse_width;             // fractional pulse width
 
-	double m_inv_sample_rate;
-	int m_sample_rate;
-
-	std::unique_ptr<int16_t[]> m_mixer_buffer;
-	std::unique_ptr<int16_t[]> m_external_buffer;
+	double m_inv_sample_rate;         // 1/current sample rate
 };
 
 DECLARE_DEVICE_TYPE(CEM3394, cem3394_device)

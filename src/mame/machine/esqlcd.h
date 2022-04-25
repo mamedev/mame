@@ -22,9 +22,9 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	uint8_t m_lcdpg[4][32];
-	int m_lcdPage;
-	int m_lcdPos, m_lcdSavedPos;
+	uint8_t m_lcdpg[4][32]{};
+	int m_lcdPage = 0;
+	int m_lcdPos = 0, m_lcdSavedPos = 0;
 	output_finder<4, 32*7> m_lcdPix;
 
 	output_finder<16> m_leds;
@@ -35,7 +35,7 @@ private:
 
 	static char rotate_lcd_char(uint8_t lcdChar, int charRow);
 
-	int m_lcd_command;
+	int m_lcd_command = 0;
 };
 
 DECLARE_DEVICE_TYPE(ESQ2X16_SQ1, esq2x16_sq1_device)

@@ -1,13 +1,15 @@
 // license:LGPL-2.1+
-// copyright-holders:Angelo Salese, Olivier Galibert, David Haywood, Samuele Zannoli, R. Belmont, ElSemi
+// copyright-holders: Samuele Zannoli, R. Belmont, ElSemi, David Haywood, Angelo Salese, Olivier Galibert, MetalliC
 /*
 
-    dc.c - Sega Dreamcast hardware
+    dc.cpp - Sega Dreamcast hardware
+
+    Misc interfacing to common DC buses over the various clients.
 
 */
 
 #include "emu.h"
-#include "debugger.h"
+//#include "debugger.h"
 #include "includes/dc.h"
 #include "cpu/sh/sh4.h"
 #include "cpu/arm7/arm7core.h"
@@ -87,17 +89,28 @@ void dc_state::generic_dma(uint32_t main_adr, void *dma_ptr, uint32_t length, ui
 		ddt.source = main_adr;
 	ddt.buffer = dma_ptr;
 	ddt.length = length;
-	ddt.size =size;
+	ddt.size = size;
 	ddt.direction = to_mainram;
 	ddt.channel = 0;
 	ddt.mode = -1;
 	m_maincpu->sh4_dma_ddt(&ddt);
 }
 
-TIMER_CALLBACK_MEMBER(dc_state::g2_dma_irq)
+void dc_state::g2_dma_end_w(offs_t channel, u8 state)
 {
-	m_g2_dma[param].start = g2bus_regs[SB_ADST + (param * 8)] = 0;
-	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_AICA << param;
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_AICA << channel;
+	dc_update_interrupt_status();
+}
+
+void dc_state::g2_dma_error_ia_w(offs_t channel, u8 state)
+{
+	dc_sysctrl_regs[SB_ISTERR] |= 0x8000 << channel;
+	dc_update_interrupt_status();
+}
+
+void dc_state::g2_dma_error_ov_w(offs_t channel, u8 state)
+{
+	dc_sysctrl_regs[SB_ISTERR] |= 0x80000 << channel;
 	dc_update_interrupt_status();
 }
 
@@ -189,49 +202,10 @@ void dc_state::maple_irq(uint8_t data)
 
 TIMER_CALLBACK_MEMBER(dc_state::ch2_dma_irq)
 {
-	dc_sysctrl_regs[SB_C2DLEN]=0;
-	dc_sysctrl_regs[SB_C2DST]=0;
+	dc_sysctrl_regs[SB_C2DLEN] = 0;
+	dc_sysctrl_regs[SB_C2DST] = 0;
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_CH2;
 	dc_update_interrupt_status();
-}
-
-void dc_state::g2_dma_execute(address_space &space, int channel)
-{
-	uint32_t src,dst,size;
-	dst = m_g2_dma[channel].g2_addr;
-	src = m_g2_dma[channel].root_addr;
-	size = 0;
-
-	/* 0 rounding size = 32 Mbytes */
-	if (m_g2_dma[channel].size == 0) { m_g2_dma[channel].size = 0x200000; }
-
-	if (m_g2_dma[channel].dir == 0)
-	{
-		for (; size<m_g2_dma[channel].size; size += 4)
-		{
-			space.write_dword(dst,space.read_dword(src));
-			src+=4;
-			dst+=4;
-		}
-	}
-	else
-	{
-		for (; size<m_g2_dma[channel].size; size += 4)
-		{
-			space.write_dword(src,space.read_dword(dst));
-			src+=4;
-			dst+=4;
-		}
-	}
-
-	/* update the params*/
-	m_g2_dma[channel].g2_addr = g2bus_regs[SB_ADSTAG + (channel * 8)] = dst;
-	m_g2_dma[channel].root_addr = g2bus_regs[SB_ADSTAR + (channel * 8)] = src;
-	m_g2_dma[channel].size = g2bus_regs[SB_ADLEN + (channel * 8)] = 0;
-	m_g2_dma[channel].flag = (m_g2_dma[channel].indirect & 1) ? 1 : 0;
-	/* Note: if you trigger an instant DMA IRQ trigger, sfz3upper doesn't play any bgm. */
-	/* TODO: timing of this */
-	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(m_g2_dma[channel].size / 4), timer_expired_delegate(FUNC(dc_state::g2_dma_irq), this), channel);
 }
 
 // register decode helpers
@@ -340,19 +314,10 @@ void dc_state::dc_update_interrupt_status()
 	m_maincpu->sh4_set_irln_input(15-level);
 
 	/* Wave DMA HW trigger */
-	for (int i = 0; i < 4; i++)
-	{
-		if (m_g2_dma[i].flag && ((m_g2_dma[i].sel & 2) == 2))
-		{
-			if ((dc_sysctrl_regs[SB_G2DTNRM] & dc_sysctrl_regs[SB_ISTNRM]) || (dc_sysctrl_regs[SB_G2DTEXT] & dc_sysctrl_regs[SB_ISTEXT]))
-			{
-				address_space &space = m_maincpu->space(AS_PROGRAM);
-
-				printf("Wave DMA HW trigger\n");
-				g2_dma_execute(space, i);
-			}
-		}
-	}
+	m_g2if->hw_irq_trigger_hs(
+		dc_sysctrl_regs[SB_G2DTNRM] & dc_sysctrl_regs[SB_ISTNRM],
+		dc_sysctrl_regs[SB_G2DTEXT] & dc_sysctrl_regs[SB_ISTEXT]
+	);
 
 	/* PVR-DMA HW trigger */
 	if(m_powervr2->m_pvr_dma.flag && ((m_powervr2->m_pvr_dma.sel & 1) == 1))
@@ -361,12 +326,13 @@ void dc_state::dc_update_interrupt_status()
 		{
 			address_space &space = m_maincpu->space(AS_PROGRAM);
 
-			printf("PVR-DMA HW trigger\n");
+			logerror("PVR-DMA HW trigger\n");
 			m_powervr2->pvr_dma_execute(space);
 		}
 	}
 }
 
+// TODO: convert SYSCTRL to device I/F (NAOMI2 needs two of these)
 uint64_t dc_state::dc_sysctrl_r(offs_t offset, uint64_t mem_mask)
 {
 	int reg;
@@ -519,74 +485,6 @@ void dc_state::dc_gdrom_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 	osd_printf_verbose("GDROM: [%08x=%x]write %x to %x, mask %x\n", 0x5f7000+off*4, dat, data, offset, mem_mask);
 }
 
-uint64_t dc_state::dc_g2_ctrl_r(offs_t offset, uint64_t mem_mask)
-{
-	int reg;
-	uint64_t shift;
-
-	reg = decode_reg32_64(offset, mem_mask, &shift);
-	osd_printf_verbose("G2CTRL:  Unmapped read %08x\n", 0x5f7800+reg*4);
-	return (uint64_t)g2bus_regs[reg] << shift;
-}
-
-void dc_state::dc_g2_ctrl_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
-{
-	int reg;
-	uint64_t shift;
-	uint32_t dat;
-	uint8_t old;
-
-	reg = decode_reg32_64(offset, mem_mask, &shift);
-	dat = (uint32_t)(data >> shift);
-
-	g2bus_regs[reg] = dat; // 5f7800+reg*4=dat
-
-	if (reg >= (0x80 / 4))
-		return;
-	int g2chan = reg >> 3;
-	switch (reg & 7)
-	{
-		/*G2 Address register*/
-		case SB_ADSTAG: m_g2_dma[g2chan].g2_addr = dat; break;
-		/*Root address (work ram)*/
-		case SB_ADSTAR: m_g2_dma[g2chan].root_addr = dat; break;
-		/*DMA size (in dword units, bit 31 is "set dma initiation enable setting to 0"*/
-		case SB_ADLEN:
-			m_g2_dma[g2chan].size = dat & 0x7fffffff;
-			m_g2_dma[g2chan].indirect = (dat & 0x80000000) >> 31;
-			break;
-		/*0 = root memory to aica / 1 = aica to root memory*/
-		case SB_ADDIR: m_g2_dma[g2chan].dir = (dat & 1); break;
-		/*dma flag (active HIGH, bug in docs)*/
-		case SB_ADEN: m_g2_dma[g2chan].flag = (dat & 1); break;
-		/*
-		SB_ADTSEL
-		bit 1: (0) Wave DMA through SB_ADST flag (1) Wave DMA through irq trigger, defined by SB_G2DTNRM / SB_G2DTEXT
-		*/
-		case SB_ADTSEL: m_g2_dma[g2chan].sel = dat & 7; break;
-		/*ready for dma'ing*/
-		case SB_ADST:
-			old = m_g2_dma[g2chan].start & 1;
-			m_g2_dma[g2chan].start = dat & 1;
-
-			#if DEBUG_AICA_DMA
-			printf("AICA: G2-DMA start \n");
-			printf("DST %08x SRC %08x SIZE %08x IND %02x\n",m_g2_dma[g2chan].g2_addr,m_g2_dma[g2chan].root_addr,m_g2_dma[g2chan].size,m_g2_dma[g2chan].indirect);
-			printf("SEL %08x ST  %08x FLAG %08x DIR %02x\n",m_g2_dma[g2chan].sel,m_g2_dma[g2chan].start,m_g2_dma[g2chan].flag,m_g2_dma[g2chan].dir);
-			#endif
-
-			//osd_printf_verbose("SB_ADST data %08x\n",dat);
-			if (((old & 1) == 0) && m_g2_dma[g2chan].flag && m_g2_dma[g2chan].start && ((m_g2_dma[g2chan].sel & 2) == 0)) // 0 -> 1
-				g2_dma_execute(space, g2chan);
-			break;
-
-		default:
-			/* might access the unhandled DMAs, so tell us if this happens. */
-			//printf("Unhandled G2 register [%08x] -> %08x\n",reg,dat);
-			break;
-	}
-}
-
 int dc_state::decode_reg_64(uint32_t offset, uint64_t mem_mask, uint64_t *shift)
 {
 	int reg = offset * 2;
@@ -638,16 +536,6 @@ void dc_state::dc_modem_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 	osd_printf_verbose("MODEM: [%08x=%x] write %x to %x, mask %x\n", 0x600000+reg*4, dat, data, offset, mem_mask);
 }
 
-#define SAVE_G2DMA(x) \
-	save_item(NAME(m_g2_dma[x].g2_addr)); \
-	save_item(NAME(m_g2_dma[x].root_addr)); \
-	save_item(NAME(m_g2_dma[x].size)); \
-	save_item(NAME(m_g2_dma[x].dir)); \
-	save_item(NAME(m_g2_dma[x].flag)); \
-	save_item(NAME(m_g2_dma[x].indirect)); \
-	save_item(NAME(m_g2_dma[x].start)); \
-	save_item(NAME(m_g2_dma[x].sel));
-
 void dc_state::machine_start()
 {
 	// dccons doesn't have a specific g1 device yet
@@ -655,15 +543,11 @@ void dc_state::machine_start()
 		m_naomig1->set_dma_cb(naomi_g1_device::dma_cb(&dc_state::generic_dma, this));
 
 	m_maincpu->sh2drc_set_options(SH2DRC_STRICT_VERIFY | SH2DRC_STRICT_PCREL);
+	// TODO: repeated in dccons.cpp init_dc (NAOMI also uses double RAM)
 	m_maincpu->sh2drc_add_fastram(0x0c000000, 0x0cffffff, false, dc_ram);
 
 	// save states
 	save_pointer(NAME(dc_sysctrl_regs), 0x200/4);
-	save_pointer(NAME(g2bus_regs), 0x100/4);
-	SAVE_G2DMA(0)
-	SAVE_G2DMA(1)
-	SAVE_G2DMA(2)
-	SAVE_G2DMA(3)
 }
 
 void dc_state::machine_reset()
@@ -767,4 +651,13 @@ MACHINE_RESET_MEMBER(dc_state,dc_console)
 TIMER_DEVICE_CALLBACK_MEMBER(dc_state::dc_scanline)
 {
 	m_powervr2->pvr_scanline_timer(param);
+}
+
+void dc_state::system_bus_config(machine_config &config, const char *cpu_tag)
+{
+	DC_G2IF(config, m_g2if, XTAL(25'000'000));
+	m_g2if->set_host_space(cpu_tag, AS_PROGRAM);
+	m_g2if->int_cb().set(FUNC(dc_state::g2_dma_end_w));
+	m_g2if->error_ia_cb().set(FUNC(dc_state::g2_dma_error_ia_w));
+	m_g2if->error_ov_cb().set(FUNC(dc_state::g2_dma_error_ov_w));
 }

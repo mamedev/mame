@@ -13,7 +13,6 @@
 *************************************************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "tlcs90.h"
 #include "tlcs90d.h"
 
@@ -1022,6 +1021,7 @@ void tlcs90_device::decode()
 				if (b0 == 0xfe) {
 					OPCC( LDI+b1-0x58,14,18 )   NONE( 1 )       NONE( 2 )                   return;
 				}
+				break;
 
 				case 0x60:                                                                              // ADD A,g
 				case 0x61:                                                                              // ADC A,g
@@ -1077,6 +1077,7 @@ void tlcs90_device::decode()
 				if (b0 == 0xfe) {
 					OPCC( RET,6,14 )    CC( 1, b1 - 0xd0 )      NONE( 2 )                   return;     // RET cc
 				}
+				break;
 			}   break;
 
 		case 0xff:
@@ -2776,6 +2777,7 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer_callback )
 	case 0x03: // 8bit PWM
 		logerror("CPU Timer %d expired with unhandled mode %d\n", i, mode);
 		// TODO: hmm...
+		[[fallthrough]]; // FIXME: really?
 	case 0x00: // 8bit
 		m_timer_value[i]++;
 		if ( m_timer_value[i] == m_treg_8bit[i] )
@@ -2803,7 +2805,7 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer_callback )
 		if(i & 1)
 			break;
 		if ( (m_tclk & (0x0C << (i * 2))) == 0 ) // T0/T1 match signal clocks T1/T3
-			t90_timer_callback(ptr, i+1);
+			t90_timer_callback(i+1);
 		break;
 		case 0x01: // 16bit, only can happen for i=0,2
 		m_timer_value[i+1] = 0;
@@ -2970,7 +2972,6 @@ void tlcs90_device::device_start()
 
 	state_add(STATE_GENPC, "GENPC", m_pc.w.l).formatstr("%04X").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_prvpc.w.l).formatstr("%04X").noshow();
-	state_add(STATE_GENSP, "GENSP", m_sp.w.l).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", F ).formatstr("%8s").noshow();
 
 	set_icountptr(m_icount);

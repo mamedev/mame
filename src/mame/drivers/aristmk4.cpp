@@ -383,7 +383,7 @@ private:
 		TIMER_POWER_FAIL
 	};
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc146818_device> m_rtc;
@@ -400,23 +400,23 @@ private:
 	output_finder<> m_hopper_motor_out;
 	output_finder<21> m_lamps;
 
-	int m_rtc_address_strobe;
-	int m_rtc_data_strobe;
-	uint8_t *m_shapeRomPtr;
-	uint8_t m_shapeRom[0xc000];
-	std::unique_ptr<uint8_t[]> m_nvram;
-	uint8_t m_psg_data;
-	int m_ay8910_1;
-	int m_ay8910_2;
-	int m_u3_p0_w;
-	uint8_t m_cgdrsw;
-	uint8_t m_ripple;
-	int m_hopper_motor;
-	int m_inscrd;
-	int m_insnote;
-	int m_cashcade_c;
-	int m_printer_motor;
-	emu_timer *m_power_timer;
+	int m_rtc_address_strobe = 0;
+	int m_rtc_data_strobe = 0;
+	uint8_t *m_shapeRomPtr = nullptr;
+	uint8_t m_shapeRom[0xc000]{};
+	std::unique_ptr<uint8_t[]> m_nvram{};
+	uint8_t m_psg_data = 0;
+	int m_ay8910_1 = 0;
+	int m_ay8910_2 = 0;
+	int m_u3_p0_w = 0;
+	uint8_t m_cgdrsw = 0;
+	uint8_t m_ripple = 0;
+	int m_hopper_motor = 0;
+	int m_inscrd = 0;
+	int m_insnote = 0;
+	int m_cashcade_c = 0;
+	int m_printer_motor = 0;
+	emu_timer *m_power_timer = nullptr;
 
 	uint8_t ldsw();
 	uint8_t cgdrr();
@@ -1027,14 +1027,13 @@ ADDRESS MAP - SLOT GAMES
 
 void aristmk4_state::slots_mem(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().share("mkiv_vram"); // video ram -  chips U49 / U50
-	map(0x0800, 0x17ff).ram();
+	map(0x0000, 0x17ff).ram().share("mkiv_vram"); // video ram -  chips U49 / U50
 	map(0x1800, 0x1800).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x1801, 0x1801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x1c00, 0x1cff).w(FUNC(aristmk4_state::mk4_printer_w));
 	map(0x1900, 0x19ff).r(FUNC(aristmk4_state::mk4_printer_r));
 	map(0x2000, 0x3fff).rom();  // graphics rom map
-	map(0x4000, 0x4fff).bankrw("bank1").share("nvram");
+	map(0x4000, 0x4fff).ram().share("nvram");
 
 	map(0x5000, 0x5000).w(FUNC(aristmk4_state::u3_p0));
 	map(0x5002, 0x5002).r(FUNC(aristmk4_state::u3_p2));
@@ -1072,13 +1071,12 @@ The U87 personality rom is not required, therefore game rom code mapping is from
 
 void aristmk4_state::poker_mem(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().share("mkiv_vram"); // video ram -  chips U49 / U50
-	map(0x0800, 0x17ff).ram();
+	map(0x0000, 0x17ff).ram().share("mkiv_vram"); // video ram -  chips U49 / U50
 	map(0x1800, 0x1800).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x1801, 0x1801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x1c00, 0x1cff).w(FUNC(aristmk4_state::mk4_printer_w));
 	map(0x1900, 0x19ff).r(FUNC(aristmk4_state::mk4_printer_r));
-	map(0x4000, 0x4fff).bankrw("bank1").share("nvram");
+	map(0x4000, 0x4fff).ram().share("nvram");
 
 	map(0x5000, 0x5000).w(FUNC(aristmk4_state::u3_p0));
 	map(0x5002, 0x5002).r(FUNC(aristmk4_state::u3_p2));
@@ -1642,7 +1640,7 @@ static INPUT_PORTS_START(gldnpkr)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_CODE(KEYCODE_F)
 
 	PORT_MODIFY("500e")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_BET ) PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_CODE(KEYCODE_W)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Change") PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1 / Red") PORT_CODE(KEYCODE_S)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Hold 5 / Black") PORT_CODE(KEYCODE_H)
@@ -1749,7 +1747,7 @@ void aristmk4_state::machine_reset()
 	m_power_timer->adjust(attotime::from_hz(1), 0, attotime::from_hz(1));
 }
 
-void aristmk4_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void aristmk4_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -1807,7 +1805,7 @@ void aristmk4_state::aristmk4(machine_config &config)
 	ppi.in_pb_callback().set(FUNC(aristmk4_state::pb1_r));
 	ppi.in_pc_callback().set(FUNC(aristmk4_state::pc1_r));
 
-	via6522_device &via(VIA6522(config, "via6522_0", MAIN_CLOCK/8)); // R65C22P2
+	via6522_device &via(R65C22(config, "via6522_0", MAIN_CLOCK/8)); // R65C22P2
 	via.readpa_handler().set(FUNC(aristmk4_state::via_a_r));
 	via.readpb_handler().set(FUNC(aristmk4_state::via_b_r));
 	via.writepa_handler().set(FUNC(aristmk4_state::via_a_w));
@@ -2342,47 +2340,49 @@ ROM_END
 ROM_START( fhunter )
 	ROM_REGION(0x10000, "maincpu", 0 )
 		/* VIDEO AND SOUND EPROM */
-	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe))
-
+	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // VIDEO SOUND 2VA/S004 U59/7 1AAA/FP34/8E00
+											// Alternate label:       VIDEO SOUND 2VA/S004/MEM/59/7 FP34/8E00
 		/* GAME EPROMs */
 	ROM_LOAD("2xf5196i01.u87", 0x06000, 0x2000, CRC(f9e6b760) SHA1(af7f16727e84ba8f07400f7f02302862e02d1af4))
 	ROM_LOAD("2xf5196i01.u86", 0x08000, 0x8000, CRC(6971ccee) SHA1(1292cfa8125cbaec3bcd9d136cb385a3574bfa4a))
 
 		/* SHAPE EPROMs */
 	ROM_REGION(0xc000, "tile_gfx", 0 )
-	ROM_LOAD("2xf5196.u20", 0x00000, 0x2000, CRC(96c81134) SHA1(e5e75e8b4897ee7cd9c27b0546fe4006cf384cba)) // unknown EPROM names, should contain VLSH or VL/SH letters on sticker
-	ROM_LOAD("2xf5196.u21", 0x02000, 0x2000, CRC(ad7bc6a0) SHA1(145e9a094212841e8a684136ea813bd1bea070fb))
-	ROM_LOAD("2xf5196.u22", 0x04000, 0x2000, CRC(450d47bb) SHA1(219a0eeca3989da8cec68405466c9a20f2ee9bfa))
-	ROM_LOAD("2xf5196.u45", 0x06000, 0x2000, CRC(560b2417) SHA1(1ed26ceaff87150d2f0115825f952348e34e0414))
-	ROM_LOAD("2xf5196.u46", 0x08000, 0x2000, CRC(7704c13f) SHA1(4cfca6ee9e2e543714e8bf0c6de4d9e9406ce250))
-	ROM_LOAD("2xf5196.u47", 0x0a000, 0x2000, CRC(a9e6da98) SHA1(3b7d8920d3ef4ae17a55d2e1968318eb3c70264d))
+	ROM_LOAD("1vlsh293.u20", 0x00000, 0x2000, CRC(96c81134) SHA1(e5e75e8b4897ee7cd9c27b0546fe4006cf384cba)) // F. HUNTER BLU-L 1VL/SH293 U20/8  516C/3780/8F37
+	ROM_LOAD("1vlsh293.u21", 0x02000, 0x2000, CRC(ad7bc6a0) SHA1(145e9a094212841e8a684136ea813bd1bea070fb)) // F. HUNTER GRN-L 1VL/SH293 U21/10 PC01/0649/05A6
+	ROM_LOAD("1vlsh293.u22", 0x04000, 0x2000, CRC(450d47bb) SHA1(219a0eeca3989da8cec68405466c9a20f2ee9bfa)) // F. HUNTER RED-L 1VL/SH293 U22/12 2H12/6AH8/EA7A
+	ROM_LOAD("1vlsh293.u45", 0x06000, 0x2000, CRC(560b2417) SHA1(1ed26ceaff87150d2f0115825f952348e34e0414)) // F. HUNTER BLU-M 1VL/SH293 U45/9  A0C8/0A1F/88C5
+	ROM_LOAD("1vlsh293.u46", 0x08000, 0x2000, CRC(7704c13f) SHA1(4cfca6ee9e2e543714e8bf0c6de4d9e9406ce250)) // F. HUNTER GRN-M 1VL/SH293 U46/11 2648/8H31/CEDD
+	ROM_LOAD("1vlsh293.u47", 0x0a000, 0x2000, CRC(a9e6da98) SHA1(3b7d8920d3ef4ae17a55d2e1968318eb3c70264d)) // F. HUNTER RED-M 1VL/SH293 U47/13 FFP8/AA7A/F5AD
 
 		/* COLOR PROM */
 	ROM_REGION(0x200, "proms", 0 )
-	ROM_LOAD("1cm48.u71", 0x0000, 0x0200, CRC(81daeeb0) SHA1(7dfe198c6def5c4ae4ecac488d65c2911fb3a890))
+	ROM_LOAD("1cm48.u71", 0x0000, 0x0200, CRC(81daeeb0) SHA1(7dfe198c6def5c4ae4ecac488d65c2911fb3a890)) // FORTUNE HUNTER 1CM48 8CFA U71/40
+											// Alternate label:    FH/3BF/LGF 1CM48 8CFA U71/40
 ROM_END
 
 ROM_START( fhuntera )
 	ROM_REGION(0x10000, "maincpu", 0 )
 		/* VIDEO AND SOUND EPROM */
-	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe))
-
+	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // VIDEO SOUND 2VA/S004 U59/7 1AAA/FP34/8E00
+											// Alternate label:       VIDEO SOUND 2VA/S004/MEM/59/7 FP34/8E00
 		/* GAME EPROMs */
 	ROM_LOAD("2xf5196i02.u87", 0x06000, 0x2000, CRC(4b532a14) SHA1(98d1753ad1d0d041f81a535947ed501d0eb1d85c))
 	ROM_LOAD("2xf5196i01.u86", 0x08000, 0x8000, CRC(6971ccee) SHA1(1292cfa8125cbaec3bcd9d136cb385a3574bfa4a))
 
 		/* SHAPE EPROMs */
 	ROM_REGION(0xc000, "tile_gfx", 0 )
-	ROM_LOAD("2xf5196.u20", 0x00000, 0x2000, CRC(96c81134) SHA1(e5e75e8b4897ee7cd9c27b0546fe4006cf384cba)) // unknown EPROM names, should contain VLSH or VL/SH letters on sticker
-	ROM_LOAD("2xf5196.u21", 0x02000, 0x2000, CRC(ad7bc6a0) SHA1(145e9a094212841e8a684136ea813bd1bea070fb))
-	ROM_LOAD("2xf5196.u22", 0x04000, 0x2000, CRC(450d47bb) SHA1(219a0eeca3989da8cec68405466c9a20f2ee9bfa))
-	ROM_LOAD("2xf5196.u45", 0x06000, 0x2000, CRC(560b2417) SHA1(1ed26ceaff87150d2f0115825f952348e34e0414))
-	ROM_LOAD("2xf5196.u46", 0x08000, 0x2000, CRC(7704c13f) SHA1(4cfca6ee9e2e543714e8bf0c6de4d9e9406ce250))
-	ROM_LOAD("2xf5196.u47", 0x0a000, 0x2000, CRC(a9e6da98) SHA1(3b7d8920d3ef4ae17a55d2e1968318eb3c70264d))
+	ROM_LOAD("1vlsh293.u20", 0x00000, 0x2000, CRC(96c81134) SHA1(e5e75e8b4897ee7cd9c27b0546fe4006cf384cba)) // F. HUNTER BLU-L 1VL/SH293 U20/8 516C/3780/8F37
+	ROM_LOAD("1vlsh293.u21", 0x02000, 0x2000, CRC(ad7bc6a0) SHA1(145e9a094212841e8a684136ea813bd1bea070fb)) // F. HUNTER GRN-L 1VL/SH293 U21/10 PC01/0649/05A6
+	ROM_LOAD("1vlsh293.u22", 0x04000, 0x2000, CRC(450d47bb) SHA1(219a0eeca3989da8cec68405466c9a20f2ee9bfa)) // F. HUNTER RED-L 1VL/SH293 U22/12 2H12/6AH8/EA7A
+	ROM_LOAD("1vlsh293.u45", 0x06000, 0x2000, CRC(560b2417) SHA1(1ed26ceaff87150d2f0115825f952348e34e0414)) // F. HUNTER BLU-M 1VL/SH293 U45/9 A0C8/0A1F/88C5
+	ROM_LOAD("1vlsh293.u46", 0x08000, 0x2000, CRC(7704c13f) SHA1(4cfca6ee9e2e543714e8bf0c6de4d9e9406ce250)) // F. HUNTER GRN-M 1VL/SH293 U46/11 2648/8H31/CEDD
+	ROM_LOAD("1vlsh293.u47", 0x0a000, 0x2000, CRC(a9e6da98) SHA1(3b7d8920d3ef4ae17a55d2e1968318eb3c70264d)) // F. HUNTER RED-M 1VL/SH293 U47/13 FFP8/AA7A/F5AD
 
 		/* COLOR PROM */
 	ROM_REGION(0x200, "proms", 0 )
-	ROM_LOAD("1cm48.u71", 0x0000, 0x0200, CRC(81daeeb0) SHA1(7dfe198c6def5c4ae4ecac488d65c2911fb3a890))
+	ROM_LOAD("1cm48.u71", 0x0000, 0x0200, CRC(81daeeb0) SHA1(7dfe198c6def5c4ae4ecac488d65c2911fb3a890)) // FORTUNE HUNTER 1CM48 8CFA U71/40
+											// Alternate label:    FH/3BF/LGF 1CM48 8CFA U71/40
 ROM_END
 
 ROM_START( arcwins )

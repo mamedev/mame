@@ -224,7 +224,6 @@ vme_mvme350_card_device::vme_mvme350_card_device(const machine_config &mconfig, 
 void vme_mvme350_card_device::device_start()
 {
 	LOG("%s %s\n", tag(), FUNCNAME);
-	set_vme_device();
 
 	/* Setup r/w handlers for shared memory area */
 #if 0
@@ -252,12 +251,12 @@ void vme_mvme350_card_device::device_reset()
 }
 
 #if 0
-READ16_MEMBER (vme_mvme350_card_device::read16){
+uint16_t vme_mvme350_card_device::read16(){
 	LOG("%s()\n", FUNCNAME);
 	return (uint8_t) 0;
 }
 
-WRITE16_MEMBER (vme_mvme350_card_device::write16){
+void vme_mvme350_card_device::write16(uint16_t data){
 	LOG("%s()\n", FUNCNAME);
 }
 #endif

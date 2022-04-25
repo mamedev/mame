@@ -89,11 +89,11 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 
-	uint16_t m_paloff;
-	uint16_t m_port10;
-	uint8_t m_rombank;
-	uint16_t m_videoram0[0x10000 / 2];
-	uint16_t m_videoram2[0x10000 / 2];
+	uint16_t m_paloff = 0;
+	uint16_t m_port10 = 0;
+	uint8_t m_rombank = 0;
+	uint16_t m_videoram0[0x10000 / 2]{};
+	uint16_t m_videoram2[0x10000 / 2]{};
 
 	enum class picmode : u8
 	{
@@ -104,22 +104,22 @@ private:
 		SET_READLATCH = 4
 	};
 
-	picmode m_picmodex;
+	picmode m_picmodex{};
 
-	int m_pic_readaddr;
-	int m_pic_writeaddr;
-	int m_pic_latched;
-	int m_pic_writelatched;
+	int m_pic_readaddr = 0;
+	int m_pic_writeaddr = 0;
+	int m_pic_latched = 0;
+	int m_pic_writelatched = 0;
 
 	std::unique_ptr<uint8_t[]> m_bakram;
 
 	uint16_t m_mainram[0x10000 / 2];
 
-	int m_spritesinit;
-	int m_spriteswidth;
-	int m_spritesaddr;
-	uint16_t* m_rom16;
-	uint8_t* m_rom8;
+	int m_spritesinit = 0;
+	int m_spriteswidth = 0;
+	int m_spritesaddr = 0;
+	uint16_t* m_rom16 = nullptr;
+	uint8_t* m_rom8 = nullptr;
 
 	void paloff_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void paldat_w(uint16_t data);
@@ -186,45 +186,43 @@ void ttchamp_state::video_start()
 uint32_t ttchamp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	logerror("update\n");
-	int y,x,count;
+	int count;
 
 	static const int xxx=320,yyy=204;
 
 	bitmap.fill(m_palette->black_pen());
-	uint8_t *videoramfg;
-	uint8_t* videorambg;
+	uint8_t const *const videoramfg = (uint8_t*)m_videoram2;
+	uint8_t const *const videorambg = (uint8_t*)m_videoram0;
 
 	count=0;
-	videorambg = (uint8_t*)m_videoram0;
-	videoramfg = (uint8_t*)m_videoram2;
 
-	for (y=0;y<yyy;y++)
+	for (int y=0;y<yyy;y++)
 	{
-		for(x=0;x<xxx;x++)
+		for(int x=0;x<xxx;x++)
 		{
-			bitmap.pix16(y, x) = videorambg[BYTE_XOR_LE(count)]+0x300;
+			bitmap.pix(y, x) = videorambg[BYTE_XOR_LE(count)]+0x300;
 			count++;
 		}
 	}
 
-	/*
+#if 0
 	count=0;
 	videoram = (uint8_t*)m_videoram1;
-	for (y=0;y<yyy;y++)
+	for (int y=0;y<yyy;y++)
 	{
-	    for(x=0;x<xxx;x++)
-	    {
-	        uint8_t pix = videoram[BYTE_XOR_LE(count)];
-	        if (pix) bitmap.pix16(y, x) = pix+0x200;
-	        count++;
-	    }
+		for (int x=0;x<xxx;x++)
+		{
+			uint8_t pix = videoram[BYTE_XOR_LE(count)];
+			if (pix) bitmap.pix(y, x) = pix+0x200;
+			count++;
+		}
 	}
-	*/
+#endif
 
 	count=0;
-	for (y=0;y<yyy;y++)
+	for (int y=0;y<yyy;y++)
 	{
-		for(x=0;x<xxx;x++)
+		for(int x=0;x<xxx;x++)
 		{
 			uint8_t pix = videoramfg[BYTE_XOR_LE(count)];
 			if (pix)
@@ -239,16 +237,16 @@ uint32_t ttchamp_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 				if (pix == 0x01) // blend mode 1
 				{
 					uint8_t pix = videorambg[BYTE_XOR_LE(count)];
-					bitmap.pix16(y, x) = pix + 0x200;
+					bitmap.pix(y, x) = pix + 0x200;
 				}
 				else if (pix == 0x02) // blend mode 2
 				{
 					uint8_t pix = videorambg[BYTE_XOR_LE(count)];
-					bitmap.pix16(y, x) = pix + 0x100;
+					bitmap.pix(y, x) = pix + 0x100;
 				}
 				else
 				{
-					bitmap.pix16(y, x) = pix + 0x000;
+					bitmap.pix(y, x) = pix + 0x000;
 				}
 			}
 			count++;

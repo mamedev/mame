@@ -21,10 +21,6 @@ isbc_208_device::isbc_208_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-FLOPPY_FORMATS_MEMBER( isbc_208_device::floppy_formats )
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
-
 static void isbc_208_floppies(device_slot_interface &device)
 {
 	device.option_add("8dd", FLOPPY_8_DSDD);
@@ -44,8 +40,8 @@ void isbc_208_device::device_add_mconfig(machine_config &config)
 	I8272A(config, m_fdc, 8_MHz_XTAL, true);
 	m_fdc->intrq_wr_callback().set(FUNC(isbc_208_device::irq_w));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq0_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", isbc_208_floppies, "525dd", isbc_208_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", isbc_208_floppies, "525dd", isbc_208_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", isbc_208_floppies, "525dd", floppy_image_device::default_pc_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", isbc_208_floppies, "525dd", floppy_image_device::default_pc_floppy_formats);
 }
 
 void isbc_208_device::map(address_map &map)

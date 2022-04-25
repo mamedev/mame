@@ -9,7 +9,6 @@ Undumped:
   Diagnostic Cartridge
   Iron Soldier (Prototype)
   Skycopter (Carousel Entertainment)(K-Mart and Walmart any different?)
-  Speedster II (Carousel Entertainment)(K-Mart and Walmart any different?)
 
 Homebrew:
   GORF pluz - Earth GOD's Troopers (FORCE Design)(finished?)
@@ -829,6 +828,18 @@ Unreleased (possibly no prototypes exist):
 				<rom name="space war 2000 (world).j64" size="4194304" crc="53df6440" sha1="b5da0b1231a6e6532268c4e04f74e56f047dd5a5" offset="000000" />
 				-->
 				<rom name="space war 2000 (world).j64" size="2097152" crc="45aa46ba" sha1="0e7aacd65ecd6210d914e1c00a98dce5d00569af" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- crashes when coin is input (P1 Pause) -->
+	<software name="speedst2" supported="no">
+		<description>Speedster II</description>
+		<year>1995?</year>
+		<publisher>Carousel Entertainment</publisher>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152" width="32" endianness="big">
+				<rom name="speedster_ii.j64" size="2097152" crc="f7cfe6e6" sha1="508692e1b9bb57cdec35bb95829b23e49d6ec17e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

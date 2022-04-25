@@ -9,7 +9,6 @@
 
 #include "emu.h"
 #include "i186.h"
-#include "debugger.h"
 #include "i86inline.h"
 
 #define LOG_PORTS           0
@@ -566,7 +565,7 @@ void i80186_cpu_device::execute_run()
 						break;
 					}
 				}
-				// through to default
+				[[fallthrough]];
 			default:
 				if(!common_op(op))
 				{
@@ -634,27 +633,14 @@ void i80186_cpu_device::device_start()
 	state_add( I80186_POLLSTS, "POLLSTS", m_intr.poll_status ).formatstr("%04X");
 
 	// register for savestates
-	save_item(NAME(m_timer[0].control));
-	save_item(NAME(m_timer[0].maxA));
-	save_item(NAME(m_timer[0].maxB));
-	save_item(NAME(m_timer[0].active_count));
-	save_item(NAME(m_timer[0].count));
-	save_item(NAME(m_timer[1].control));
-	save_item(NAME(m_timer[1].maxA));
-	save_item(NAME(m_timer[1].maxB));
-	save_item(NAME(m_timer[1].active_count));
-	save_item(NAME(m_timer[1].count));
-	save_item(NAME(m_timer[2].control));
-	save_item(NAME(m_timer[2].maxA));
-	save_item(NAME(m_timer[2].count));
-	save_item(NAME(m_dma[0].source));
-	save_item(NAME(m_dma[0].dest));
-	save_item(NAME(m_dma[0].count));
-	save_item(NAME(m_dma[0].control));
-	save_item(NAME(m_dma[1].source));
-	save_item(NAME(m_dma[1].dest));
-	save_item(NAME(m_dma[1].count));
-	save_item(NAME(m_dma[1].control));
+	save_item(STRUCT_MEMBER(m_timer, control));
+	save_item(STRUCT_MEMBER(m_timer, maxA));
+	save_item(STRUCT_MEMBER(m_timer, maxB));
+	save_item(STRUCT_MEMBER(m_timer, count));
+	save_item(STRUCT_MEMBER(m_dma, source));
+	save_item(STRUCT_MEMBER(m_dma, dest));
+	save_item(STRUCT_MEMBER(m_dma, count));
+	save_item(STRUCT_MEMBER(m_dma, control));
 	save_item(NAME(m_intr.vector));
 	save_item(NAME(m_intr.pending));
 	save_item(NAME(m_intr.ack_mask));
@@ -732,7 +718,6 @@ void i80186_cpu_device::device_reset()
 		elem.control = 0;
 		elem.maxA = 0;
 		elem.maxB = 0;
-		elem.active_count = false;
 		elem.count = 0;
 	}
 }
@@ -742,9 +727,9 @@ uint8_t i80186_cpu_device::read_port_byte(uint16_t port)
 	if(!(m_reloc & 0x1000) && (port >> 8) == (m_reloc & 0xff))
 	{
 		if(port & 1)
-			return internal_port_r(*m_io, (port >> 1) & 0x7f, 0xff00) >> 8;
+			return internal_port_r((port >> 1) & 0x7f, 0xff00) >> 8;
 		else
-			return internal_port_r(*m_io, (port >> 1) & 0x7f, 0x00ff) & 0xff;
+			return internal_port_r((port >> 1) & 0x7f, 0x00ff) & 0xff;
 	}
 	return m_io->read_byte(port);
 }
@@ -755,9 +740,9 @@ uint16_t i80186_cpu_device::read_port_word(uint16_t port)
 	{
 		// Unaligned reads from the internal bus are swapped rather than split
 		if(port & 1)
-			return swapendian_int16(internal_port_r(*m_io, (port >> 1) & 0x7f));
+			return swapendian_int16(internal_port_r((port >> 1) & 0x7f));
 		else
-			return internal_port_r(*m_io, (port >> 1) & 0x7f);
+			return internal_port_r((port >> 1) & 0x7f);
 	}
 	return m_io->read_word_unaligned(port);
 }
@@ -767,9 +752,9 @@ void i80186_cpu_device::write_port_byte(uint16_t port, uint8_t data)
 	if(!(m_reloc & 0x1000) && (port >> 8) == (m_reloc & 0xff))
 	{
 		if(port & 1)
-			internal_port_w(*m_io, (port >> 1) & 0x7f, data << 8, 0xff00);
+			internal_port_w((port >> 1) & 0x7f, data << 8);
 		else
-			internal_port_w(*m_io, (port >> 1) & 0x7f, data, 0x00ff);
+			internal_port_w((port >> 1) & 0x7f, data);
 	}
 	else
 		m_io->write_byte(port, data);
@@ -781,9 +766,9 @@ void i80186_cpu_device::write_port_byte_al(uint16_t port)
 	{
 		// Both AH and AL are written onto the internal bus
 		if(port & 1)
-			internal_port_w(*m_io, (port >> 1) & 0x7f, swapendian_int16(m_regs.w[AX]), 0xff00);
+			internal_port_w((port >> 1) & 0x7f, swapendian_int16(m_regs.w[AX]));
 		else
-			internal_port_w(*m_io, (port >> 1) & 0x7f, m_regs.w[AX], 0x00ff);
+			internal_port_w((port >> 1) & 0x7f, m_regs.w[AX]);
 	}
 	else
 		m_io->write_byte(port, m_regs.w[AL]);
@@ -795,9 +780,9 @@ void i80186_cpu_device::write_port_word(uint16_t port, uint16_t data)
 	{
 		// Unaligned writes to the internal bus are swapped rather than split
 		if(port & 1)
-			internal_port_w(*m_io, (port >> 1) & 0x7f, swapendian_int16(data));
+			internal_port_w((port >> 1) & 0x7f, swapendian_int16(data));
 		else
-			internal_port_w(*m_io, (port >> 1) & 0x7f, data);
+			internal_port_w((port >> 1) & 0x7f, data);
 	}
 	else
 		m_io->write_word_unaligned(port, data);
@@ -807,7 +792,7 @@ uint8_t i80186_cpu_device::read_byte(uint32_t addr)
 {
 	if((m_reloc & 0x1000) && (addr >> 8) == (m_reloc & 0xfff))
 	{
-		uint16_t ret = internal_port_r(*m_program, (addr >> 1) & 0x7f, (addr & 1) ? 0xff00 : 0x00ff);
+		uint16_t ret = internal_port_r((addr >> 1) & 0x7f, (addr & 1) ? 0xff00 : 0x00ff);
 		return (addr & 1) ? (ret >> 8) : (ret & 0xff);
 	}
 	return m_program->read_byte(addr);
@@ -819,9 +804,9 @@ uint16_t i80186_cpu_device::read_word(uint32_t addr)
 	{
 		// Unaligned reads from the internal bus are swapped rather than split
 		if(addr & 1)
-			return swapendian_int16(internal_port_r(*m_program, (addr >> 1) & 0x7f));
+			return swapendian_int16(internal_port_r((addr >> 1) & 0x7f));
 		else
-			return internal_port_r(*m_program, (addr >> 1) & 0x7f);
+			return internal_port_r((addr >> 1) & 0x7f);
 	}
 	return m_program->read_word_unaligned(addr);
 }
@@ -829,7 +814,7 @@ uint16_t i80186_cpu_device::read_word(uint32_t addr)
 void i80186_cpu_device::write_byte(uint32_t addr, uint8_t data)
 {
 	if((m_reloc & 0x1000) && (addr >> 8) == (m_reloc & 0xfff))
-		internal_port_w(*m_program, (addr >> 1) & 0x7f, (addr & 1) ? (data << 8) : data, (addr & 1) ? 0xff00 : 0x00ff);
+		internal_port_w((addr >> 1) & 0x7f, (addr & 1) ? (data << 8) : data);
 	else
 		m_program->write_byte(addr, data);
 }
@@ -840,9 +825,9 @@ void i80186_cpu_device::write_word(uint32_t addr, uint16_t data)
 	{
 		// Unaligned writes from the internal bus are swapped rather than split
 		if(addr & 1)
-			internal_port_w(*m_program, (addr >> 1) & 0x7f, swapendian_int16(data));
+			internal_port_w((addr >> 1) & 0x7f, swapendian_int16(data));
 		else
-			internal_port_w(*m_program, (addr >> 1) & 0x7f, data);
+			internal_port_w((addr >> 1) & 0x7f, data);
 	}
 	else
 		m_program->write_word_unaligned(addr, data);
@@ -1213,7 +1198,7 @@ void i80186_cpu_device::external_int(uint16_t intno, int state)
  *
  *************************************/
 
-void i80186_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void i80186_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{
@@ -1260,36 +1245,21 @@ void i80186_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int p
 				else
 				{
 					if(which)
-						m_out_tmrout1_func(t->active_count);
+						m_out_tmrout1_func((t->control & 0x1000) ? 1 : 0);
 					else
-						m_out_tmrout0_func(t->active_count);
+						m_out_tmrout0_func((t->control & 0x1000) ? 1 : 0);
 				}
 			}
 
 			/* if we're continuous or altcounting, reset */
-			if((t->control & 1) || ((t->control & 2) && (which != 2) && !t->active_count))
+			if((t->control & 1) || ((t->control & 2) && !(t->control & 0x1000)))
 			{
-				int count;
-				if((t->control & 2) && (which != 2))
-				{
-					count = t->active_count ? t->maxA : t->maxB;
-					if(!t->active_count)
-					{
-						t->active_count = 1;
-						t->control |= 0x1000;
-					}
-					else
-					{
-						t->active_count = 0;
-						t->control &= ~0x1000;
-					}
-				}
+				if((t->control & 2) && !(t->control & 0x1000))
+					t->control |= 0x1000;
 				else
-					count = t->maxA;
+					t->control &= ~0x1000;
 
-				count = count ? count : 0x10000;
-				if(!(t->control & 4))
-					t->int_timer->adjust((attotime::from_hz(clock()/8) * count), which);
+				restart_timer(which);
 				if (LOG_TIMER) logerror("  Repriming interrupt\n");
 			}
 			else
@@ -1307,13 +1277,21 @@ void i80186_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int p
 }
 
 
+void i80186_cpu_device::restart_timer(int which)
+{
+	timer_state *t = &m_timer[which];
+	int count = (t->control & 0x1000) ? t->maxB : t->maxA;
+	if(!(t->control & 4))
+		t->int_timer->adjust((attotime::from_hz(clock()/8) * (count ? count : 0x10000)), which);
+}
+
 void i80186_cpu_device::internal_timer_sync(int which)
 {
 	timer_state *t = &m_timer[which];
 
 	/* if we have a timing timer running, adjust the count */
-	if ((t->control & 0x8000) && !(t->control & 0x0c))
-		t->count = (((which != 2) && t->active_count) ? t->maxB : t->maxA) - t->int_timer->remaining().as_ticks(clock() / 8);
+	if ((t->control & 0x8000) && !(t->control & 0x0c) && t->int_timer->enabled())
+		t->count = ((t->control & 0x1000) ? t->maxB : t->maxA) - t->int_timer->remaining().as_ticks(clock() / 8);
 }
 
 void i80186_cpu_device::inc_timer(int which)
@@ -1323,11 +1301,11 @@ void i80186_cpu_device::inc_timer(int which)
 	t->count++;
 	if (t->control & 2)
 	{
-		if (t->count == (t->active_count ? t->maxB : t->maxA))
-			device_timer(*t->int_timer, which, which, nullptr);
+		if (t->count == ((t->control & 0x1000) ? t->maxB : t->maxA))
+			device_timer(*t->int_timer, which, which);
 	}
 	else if (t->count == t->maxA)
-		device_timer(*t->int_timer, which, which, nullptr);
+		device_timer(*t->int_timer, which, which);
 }
 
 void i80186_cpu_device::internal_timer_update(int which, int new_count, int new_maxA, int new_maxB, int new_control)
@@ -1386,7 +1364,6 @@ void i80186_cpu_device::internal_timer_update(int which, int new_count, int new_
 	/* handle control changes */
 	if (new_control != -1)
 	{
-		int diff;
 		uint16_t resbits = (which == 2) ? 0x1fde : 0x1fc0;
 
 		/* merge back in the bits we don't modify */
@@ -1397,12 +1374,8 @@ void i80186_cpu_device::internal_timer_update(int which, int new_count, int new_
 			new_control = (new_control & ~0x8000) | (t->control & 0x8000);
 		new_control &= ~0x4000;
 
-		/* check for control bits we don't handle */
-		diff = new_control ^ t->control;
-		if (diff & 0x0010)
-			logerror("%05X:ERROR! -unsupported timer mode %04X\n", m_pc, new_control);
-
 		/* if we have real changes, update things */
+		uint16_t diff = new_control ^ t->control;
 		if (diff != 0)
 		{
 			/* if we're going off, make sure our timers are gone */
@@ -1427,6 +1400,10 @@ void i80186_cpu_device::internal_timer_update(int which, int new_count, int new_
 			}
 		}
 
+		/* RIU is cleared whenever ALT = 0 */
+		if (!(new_control & 0x0002))
+			new_control &= ~0x1000;
+
 		/* set the new control register */
 		t->control = new_control;
 	}
@@ -1434,11 +1411,9 @@ void i80186_cpu_device::internal_timer_update(int which, int new_count, int new_
 	/* update the interrupt timer */
 	if (update_int_timer)
 	{
-		t->active_count = 0;
-		t->control &= ~0x1000;
-		if ((t->control & 0x8000) && !(t->control & 4))
+		if ((t->control & 0x8004) == 0x8000 && (!(t->control & 0x10) || t->int_timer->enabled()))
 		{
-			int diff = t->maxA - t->count;
+			int diff = ((t->control & 0x1000) ? t->maxB : t->maxA) - t->count;
 			if (diff <= 0)
 				diff += 0x10000;
 			t->int_timer->adjust(attotime::from_hz(clock()/8) * diff, which);
@@ -1447,6 +1422,22 @@ void i80186_cpu_device::internal_timer_update(int which, int new_count, int new_
 		else
 		{
 			t->int_timer->adjust(attotime::never, which);
+		}
+	}
+}
+
+void i80186_cpu_device::external_tmrin(int which, int state)
+{
+	// TODO: make this an actual edge trigger
+	if (state)
+	{
+		if ((m_timer[which].control & 0x8004) == 0x8004)
+			inc_timer(which);
+		else if ((m_timer[which].control & 0x8014) == 0x8010)
+		{
+			m_timer[which].count = 0;
+			restart_timer(which);
+			if (LOG_TIMER) logerror("Retriggered timer %d\n", which);
 		}
 	}
 }
@@ -1555,7 +1546,7 @@ void i80186_cpu_device::drq_callback(int which)
 	}
 }
 
-READ16_MEMBER(i80186_cpu_device::internal_port_r)
+uint16_t i80186_cpu_device::internal_port_r(offs_t offset, uint16_t mem_mask)
 {
 	int temp, which;
 
@@ -1759,7 +1750,7 @@ READ16_MEMBER(i80186_cpu_device::internal_port_r)
  *
  *************************************/
 
-WRITE16_MEMBER(i80186_cpu_device::internal_port_w)
+void i80186_cpu_device::internal_port_w(offs_t offset, uint16_t data)
 {
 	int which;
 

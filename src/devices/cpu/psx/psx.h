@@ -128,37 +128,37 @@ public:
 	auto cd_write() { return m_cd_write_handler.bind(); }
 
 	// public interfaces
-	DECLARE_WRITE32_MEMBER( berr_w );
-	DECLARE_READ32_MEMBER( berr_r );
+	void berr_w(uint32_t data);
+	uint32_t berr_r();
 
 	uint32_t exp_base();
 
-	DECLARE_WRITE32_MEMBER( exp_base_w );
-	DECLARE_READ32_MEMBER( exp_base_r );
+	void exp_base_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t exp_base_r();
 
-	DECLARE_WRITE32_MEMBER( exp_config_w );
-	DECLARE_READ32_MEMBER( exp_config_r );
+	void exp_config_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t exp_config_r();
 
-	DECLARE_WRITE32_MEMBER( ram_config_w );
-	DECLARE_READ32_MEMBER( ram_config_r );
+	void ram_config_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t ram_config_r();
 
-	DECLARE_WRITE32_MEMBER( rom_config_w );
-	DECLARE_READ32_MEMBER( rom_config_r );
+	void rom_config_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t rom_config_r();
 
-	DECLARE_WRITE32_MEMBER( biu_w );
-	DECLARE_READ32_MEMBER( biu_r );
+	void biu_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t biu_r();
 
-	DECLARE_WRITE32_MEMBER( gpu_w );
-	DECLARE_READ32_MEMBER( gpu_r );
+	void gpu_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t gpu_r(offs_t offset, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE16_MEMBER( spu_w );
-	DECLARE_READ16_MEMBER( spu_r );
+	void spu_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t spu_r(offs_t offset, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE8_MEMBER( cd_w );
-	DECLARE_READ8_MEMBER( cd_r );
+	void cd_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	uint8_t cd_r(offs_t offset, uint8_t mem_mask = ~0);
 
-	DECLARE_WRITE32_MEMBER( com_delay_w );
-	DECLARE_READ32_MEMBER( com_delay_r );
+	void com_delay_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t com_delay_r(offs_t offset, uint32_t mem_mask = ~0);
 
 	static psxcpu_device *getcpu( device_t &device, const char *cputag ) { return downcast<psxcpu_device *>( device.subdevice( cputag ) ); }
 	void set_disable_rom_berr(bool mode);

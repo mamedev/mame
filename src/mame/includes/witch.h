@@ -16,8 +16,8 @@ Witch / Pinball Champ '95 / Keirin Ou
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "sound/ay8910.h"
-#include "sound/2203intf.h"
 #include "sound/es8712.h"
+#include "sound/ymopn.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -56,26 +56,26 @@ public:
 
 	void init_witch();
 
-	DECLARE_WRITE8_MEMBER(gfx0_vram_w);
-	DECLARE_WRITE8_MEMBER(gfx0_cram_w);
-	DECLARE_WRITE8_MEMBER(gfx1_vram_w);
-	DECLARE_WRITE8_MEMBER(gfx1_cram_w);
-	DECLARE_READ8_MEMBER(gfx1_vram_r);
-	DECLARE_READ8_MEMBER(gfx1_cram_r);
+	void gfx0_vram_w(offs_t offset, uint8_t data);
+	void gfx0_cram_w(offs_t offset, uint8_t data);
+	void gfx1_vram_w(offs_t offset, uint8_t data);
+	void gfx1_cram_w(offs_t offset, uint8_t data);
+	uint8_t gfx1_vram_r(offs_t offset);
+	uint8_t gfx1_cram_r(offs_t offset);
 	uint8_t read_a000();
 	void write_a002(uint8_t data);
 	void write_a006(uint8_t data);
-	DECLARE_WRITE8_MEMBER(main_write_a008);
-	DECLARE_WRITE8_MEMBER(sub_write_a008);
-	DECLARE_READ8_MEMBER(prot_read_700x);
+	void main_write_a008(uint8_t data);
+	void sub_write_a008(uint8_t data);
+	uint8_t prot_read_700x(offs_t offset);
 	void xscroll_w(uint8_t data);
 	void yscroll_w(uint8_t data);
 
 protected:
 	void common_map(address_map &map);
 
-	tilemap_t *m_gfx0_tilemap;
-	tilemap_t *m_gfx1_tilemap;
+	tilemap_t *m_gfx0_tilemap = nullptr;
+	tilemap_t *m_gfx1_tilemap = nullptr;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -93,10 +93,10 @@ protected:
 
 	optional_memory_bank m_mainbank;
 
-	int m_scrollx;
-	int m_scrolly;
-	uint8_t m_reg_a002;
-	uint8_t m_motor_active;
+	int m_scrollx = 0;
+	int m_scrolly = 0;
+	uint8_t m_reg_a002 = 0;
+	uint8_t m_motor_active = 0;
 
 	TILE_GET_INFO_MEMBER(get_gfx0_tile_info);
 	TILE_GET_INFO_MEMBER(get_gfx1_tile_info);
@@ -110,8 +110,8 @@ protected:
 	void witch_sub_map(address_map &map);
 
 	void video_common_init();
-	bool has_spr_rom_bank;
-	uint8_t m_spr_bank;
+	bool has_spr_rom_bank = false;
+	uint8_t m_spr_bank = 0;
 };
 
 class keirinou_state : public witch_state
@@ -130,12 +130,12 @@ private:
 	void keirinou_sub_map(address_map &map);
 
 	void write_keirinou_a002(uint8_t data);
-	DECLARE_WRITE8_MEMBER(palette_w);
+	void palette_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_keirinou_gfx1_tile_info);
 
 	virtual void video_start() override;
 
-	uint8_t m_bg_bank;
+	uint8_t m_bg_bank = 0;
 	required_shared_ptr<uint8_t> m_paletteram;
 };
 

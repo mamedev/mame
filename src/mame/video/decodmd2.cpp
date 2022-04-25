@@ -102,16 +102,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(decodmd_type2_device::dmd_firq)
 
 MC6845_UPDATE_ROW( decodmd_type2_device::crtc_update_row )
 {
-	uint8_t *RAM = m_ram->pointer();
-	uint8_t intensity;
 	uint16_t addr = (ma & 0xfc00) + ((ma & 0x100)<<2) + (ra << 4);
 
 	for (int x = 0; x < 128; x += 8)
 	{
 		for (int dot = 0; dot < 8; dot++)
 		{
-			intensity = ((RAM[addr] >> (7-dot) & 0x01) << 1) | (RAM[addr + 0x200] >> (7-dot) & 0x01);
-			bitmap.pix32(y, x + dot) = rgb_t(0x3f * intensity, 0x2a * intensity, 0x00);
+			uint8_t intensity = ((m_ram[addr] >> (7-dot) & 0x01) << 1) | (m_ram[addr + 0x200] >> (7-dot) & 0x01);
+			bitmap.pix(y, x + dot) = rgb_t(0x3f * intensity, 0x2a * intensity, 0x00);
 		}
 		addr++;
 	}
@@ -119,7 +117,7 @@ MC6845_UPDATE_ROW( decodmd_type2_device::crtc_update_row )
 
 void decodmd_type2_device::decodmd2_map(address_map &map)
 {
-	map(0x0000, 0x2fff).bankrw("dmdram");
+	map(0x0000, 0x2fff).ram().share("dmdram");
 	map(0x3000, 0x3000).rw(FUNC(decodmd_type2_device::crtc_status_r), FUNC(decodmd_type2_device::crtc_address_w));
 	map(0x3001, 0x3001).w(FUNC(decodmd_type2_device::crtc_register_w));
 	map(0x3002, 0x3002).w(FUNC(decodmd_type2_device::bank_w));
@@ -150,8 +148,6 @@ void decodmd_type2_device::device_add_mconfig(machine_config &config)
 	screen.set_visarea(0, 128-1, 0, 32-1);
 	screen.set_screen_update("dmd6845", FUNC(mc6845_device::screen_update));
 	screen.set_refresh_hz(60);
-
-	RAM(config, RAM_TAG).set_default_size("12K");
 }
 
 
@@ -161,8 +157,7 @@ decodmd_type2_device::decodmd_type2_device(const machine_config &mconfig, const 
 	, m_mc6845(*this, "dmd6845")
 	, m_rombank1(*this, "dmdbank1")
 	, m_rombank2(*this, "dmdbank2")
-	, m_rambank(*this, "dmdram")
-	, m_ram(*this, RAM_TAG)
+	, m_ram(*this, "dmdram")
 	, m_rom(*this, finder_base::DUMMY_TAG)
 {
 }
@@ -173,15 +168,9 @@ void decodmd_type2_device::device_start()
 
 void decodmd_type2_device::device_reset()
 {
-	uint8_t* RAM = m_ram->pointer();
-
-	memset(RAM,0,0x3000);
-
 	m_rombank1->configure_entries(0, 32, &m_rom[0x0000], 0x4000);
 	m_rombank2->configure_entry(0, &m_rom[0x78000]);
-	m_rambank->configure_entry(0, &RAM[0]);
 	m_rombank1->set_entry(0);
 	m_rombank2->set_entry(0);
-	m_rambank->set_entry(0);
 	m_busy = false;
 }

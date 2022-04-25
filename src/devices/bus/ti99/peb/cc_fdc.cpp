@@ -59,16 +59,16 @@
 
 #define BUFFER "ram"
 
-DEFINE_DEVICE_TYPE_NS(TI99_CCDCC, bus::ti99::peb, corcomp_dcc_device, CCDCC_TAG, "CorComp Disk Controller Card")
-DEFINE_DEVICE_TYPE_NS(TI99_CCFDC, bus::ti99::peb, corcomp_fdca_device, CCFDC_TAG, "CorComp Floppy Disk Controller Card Rev A")
+DEFINE_DEVICE_TYPE(TI99_CCDCC, bus::ti99::peb::corcomp_dcc_device, CCDCC_TAG, "CorComp Disk Controller Card")
+DEFINE_DEVICE_TYPE(TI99_CCFDC, bus::ti99::peb::corcomp_fdca_device, CCFDC_TAG, "CorComp Floppy Disk Controller Card Rev A")
 
-DEFINE_DEVICE_TYPE_NS(CCDCC_PALU2, bus::ti99::peb, ccdcc_palu2_device, CCDCC_PALU2_TAG, "CorComp DCC PAL u2")
-DEFINE_DEVICE_TYPE_NS(CCDCC_PALU1, bus::ti99::peb, ccdcc_palu1_device, CCDCC_PALU1_TAG, "CorComp DCC PAL u1")
+DEFINE_DEVICE_TYPE(CCDCC_PALU2, bus::ti99::peb::ccdcc_palu2_device, CCDCC_PALU2_TAG, "CorComp DCC PAL u2")
+DEFINE_DEVICE_TYPE(CCDCC_PALU1, bus::ti99::peb::ccdcc_palu1_device, CCDCC_PALU1_TAG, "CorComp DCC PAL u1")
 
-DEFINE_DEVICE_TYPE_NS(CCFDC_PALU12, bus::ti99::peb, ccfdc_palu12_device, CCFDC_PALU12_TAG, "CorComp FDC PAL u12")
-DEFINE_DEVICE_TYPE_NS(CCFDC_PALU6, bus::ti99::peb, ccfdc_palu6_device, CCFDC_PALU6_TAG, "CorComp FDC PAL u6")
+DEFINE_DEVICE_TYPE(CCFDC_PALU12, bus::ti99::peb::ccfdc_palu12_device, CCFDC_PALU12_TAG, "CorComp FDC PAL u12")
+DEFINE_DEVICE_TYPE(CCFDC_PALU6, bus::ti99::peb::ccfdc_palu6_device, CCFDC_PALU6_TAG, "CorComp FDC PAL u6")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 // ----------------------------------
 
@@ -90,7 +90,7 @@ corcomp_fdc_device::corcomp_fdc_device(const machine_config &mconfig, device_typ
 {
 }
 
-SETADDRESS_DBIN_MEMBER( corcomp_fdc_device::setaddress_dbin )
+void corcomp_fdc_device::setaddress_dbin(offs_t offset, int state)
 {
 	// Do not allow setaddress for debugger
 	if (machine().side_effects_disabled()) return;
@@ -102,7 +102,7 @@ SETADDRESS_DBIN_MEMBER( corcomp_fdc_device::setaddress_dbin )
 /*
     Provides the current address to the PALs.
 */
-uint16_t corcomp_fdc_device::get_address()
+offs_t corcomp_fdc_device::get_address()
 {
 	return m_address;
 }
@@ -133,7 +133,7 @@ bool corcomp_fdc_device::write_access()
 */
 void corcomp_fdc_device::debug_read(offs_t offset, uint8_t* value)
 {
-	uint16_t saveaddress = m_address;
+	offs_t saveaddress = m_address;
 
 	m_address = offset;
 	*value = 0x00;
@@ -147,7 +147,7 @@ void corcomp_fdc_device::debug_read(offs_t offset, uint8_t* value)
 	if (m_ctrlpal->selectdsr())
 	{
 		// EPROM selected
-		uint16_t base = m_banksel? 0x2000 : 0;
+		offs_t base = m_banksel? 0x2000 : 0;
 		uint8_t* rom = &m_dsrrom[base | (m_address & 0x1fff)];
 		*value = *rom;
 	}
@@ -156,7 +156,7 @@ void corcomp_fdc_device::debug_read(offs_t offset, uint8_t* value)
 
 void corcomp_fdc_device::debug_write(offs_t offset, uint8_t data)
 {
-	uint16_t saveaddress = m_address;
+	offs_t saveaddress = m_address;
 	m_address = offset;
 	if (m_ctrlpal->selectram())
 	{
@@ -194,7 +194,7 @@ WRITE_LINE_MEMBER( corcomp_fdc_device::fdc_hld_w )
 	LOGMASKED(LOG_SIGNALS, "HLD callback = %d\n", state);
 }
 
-READ8Z_MEMBER(corcomp_fdc_device::readz)
+void corcomp_fdc_device::readz(offs_t offset, uint8_t *value)
 {
 	if (machine().side_effects_disabled())
 	{
@@ -219,7 +219,7 @@ READ8Z_MEMBER(corcomp_fdc_device::readz)
 	if (m_ctrlpal->selectdsr())
 	{
 		// EPROM selected
-		uint16_t base = m_banksel? 0x2000 : 0;
+		offs_t base = m_banksel? 0x2000 : 0;
 		uint8_t* rom = &m_dsrrom[base | (m_address & 0x1fff)];
 		*value = *rom;
 
@@ -253,7 +253,7 @@ void corcomp_fdc_device::write(offs_t offset, uint8_t data)
 	}
 }
 
-READ8Z_MEMBER( corcomp_fdc_device::crureadz )
+void corcomp_fdc_device::crureadz(offs_t offset, uint8_t *value)
 {
 	m_address = offset; // Copy the CRU address on the address variable
 	if (m_decpal->address9901())
@@ -448,32 +448,34 @@ void corcomp_fdc_device::connect_drives()
 
 INPUT_PORTS_START( cc_fdc )
 	PORT_START( "HEADSTEP" )
-	PORT_DIPNAME( 0x03, 0x00, "DSK1 head step time" )
+	PORT_DIPNAME( 0x03, 0x02, "DSK1 head step time" )
 		PORT_DIPSETTING( 0x00, "15 ms")
 		PORT_DIPSETTING( 0x01, "10 ms")
 		PORT_DIPSETTING( 0x02, "6 ms")
 		PORT_DIPSETTING( 0x03, "3 ms")
-	PORT_DIPNAME( 0x0c, 0x00, "DSK2 head step time" )
+	PORT_DIPNAME( 0x0c, 0x08, "DSK2 head step time" )
 		PORT_DIPSETTING( 0x00, "15 ms")
 		PORT_DIPSETTING( 0x04, "10 ms")
 		PORT_DIPSETTING( 0x08, "6 ms")
 		PORT_DIPSETTING( 0x0c, "3 ms")
-	PORT_DIPNAME( 0x30, 0x00, "DSK3 head step time" )
+	PORT_DIPNAME( 0x30, 0x20, "DSK3 head step time" )
 		PORT_DIPSETTING( 0x00, "15 ms")
 		PORT_DIPSETTING( 0x10, "10 ms")
 		PORT_DIPSETTING( 0x20, "6 ms")
 		PORT_DIPSETTING( 0x30, "3 ms")
-	PORT_DIPNAME( 0xc0, 0x00, "DSK4 head step time" )
+	PORT_DIPNAME( 0xc0, 0x80, "DSK4 head step time" )
 		PORT_DIPSETTING( 0x00, "15 ms")
 		PORT_DIPSETTING( 0x40, "10 ms")
 		PORT_DIPSETTING( 0x80, "6 ms")
 		PORT_DIPSETTING( 0xc0, "3 ms")
 INPUT_PORTS_END
 
-FLOPPY_FORMATS_MEMBER(corcomp_fdc_device::floppy_formats)
-	FLOPPY_TI99_SDF_FORMAT,
-	FLOPPY_TI99_TDF_FORMAT
-FLOPPY_FORMATS_END
+void corcomp_fdc_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_TI99_SDF_FORMAT);
+	fr.add(FLOPPY_TI99_TDF_FORMAT);
+}
 
 static void ccfdc_floppies(device_slot_interface &device)
 {
@@ -518,7 +520,7 @@ void corcomp_fdc_device::common_config(machine_config& config)
 
 	// Motor monoflop
 	TTL74123(config, m_motormf, 0);
-	m_motormf->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
+	m_motormf->set_connection_type(TTL74123_GROUNDED);
 	m_motormf->set_resistor_value(RES_K(100));
 	m_motormf->set_capacitor_value(CAP_U(47));
 	m_motormf->set_a_pin_value(0);
@@ -826,4 +828,5 @@ void ccfdc_palu6_device::device_config_complete()
 	m_board = static_cast<corcomp_fdca_device*>(owner());
 	m_decpal = static_cast<ccfdc_dec_pal_device*>(owner()->subdevice(CCFDC_PALU12_TAG));
 }
-} } } // end namespace bus::ti99::peb
+
+} // end namespace bus::ti99::peb

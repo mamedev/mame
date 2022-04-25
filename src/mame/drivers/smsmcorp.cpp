@@ -259,10 +259,10 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	uint8_t m_communication_port[4];
-	uint8_t m_communication_port_status;
+	uint8_t m_communication_port[4]{};
+	uint8_t m_communication_port_status = 0;
 	bitmap_ind16 m_bitmap;
-	uint8_t m_vid_regs[7];
+	uint8_t m_vid_regs[7]{};
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	output_finder<10> m_lamps;
@@ -448,7 +448,6 @@ void smsmfg_state::video_w(offs_t offset, uint8_t data)
 	m_vid_regs[offset] = data;
 	if ( offset == 5 )
 	{
-		int x,y;
 		int xstart = m_vid_regs[0] + m_vid_regs[1]*256;
 		int width = m_vid_regs[2];
 		int ystart = m_vid_regs[3];
@@ -461,12 +460,12 @@ void smsmfg_state::video_w(offs_t offset, uint8_t data)
 		if ( width == 0 )
 			width = 256;
 
-		for ( y = ystart; y < ystart + height; y++ )
+		for ( int y = ystart; y < ystart + height; y++ )
 		{
-			for ( x = xstart; x < xstart + width; x++ )
+			for ( int x = xstart; x < xstart + width; x++ )
 			{
 				if ( y < 256 )
-				m_bitmap.pix16(y, x) = color;
+				m_bitmap.pix(y, x) = color;
 			}
 		}
 	}
@@ -866,7 +865,21 @@ ROM_START( trvhanga )
 ROM_END
 
 
-ROM_START( sms4in1 )
+ROM_START( sms4in1 ) // VERSION SWS1-052587
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "sms_26.19", 0xf8000, 0x02000, CRC(f6da0e37) SHA1(e7c64bb1915955dacb01ab0b19c327066615b5bb) )
+	ROM_LOAD( "sms_26.18", 0xfa000, 0x02000, CRC(6685c236) SHA1(7cc96d4b6253f3a57f5dd1da115997eb89184c0b) )
+	ROM_LOAD( "sms_26.17", 0xfc000, 0x02000, CRC(9972f206) SHA1(afcfbf004ee5457cb576ad421bee61ec42f5c057) )
+	ROM_LOAD( "sms_26.16", 0xfe000, 0x02000, CRC(0290772b) SHA1(7e7b68598473b86fcf770f3472560c828241d966) )
+	ROM_COPY( "maincpu",   0xf8000, 0x08000, 0x8000 )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "sms_26.26", 0x0000, 0x1000, CRC(e04bb922) SHA1(1df90720f11a5b736273f43272d7727b3020f848) )
+	ROM_RELOAD(            0x1000, 0x1000 )
+ROM_END
+
+
+ROM_START( sms4in1a ) // VERSION SWS1-110984
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "set4_u19_2764.bin", 0xf8000, 0x02000, CRC(6f6116b9) SHA1(f91412ca9b911e2a822dab91c96e5f655e7ebb1b) )
 	ROM_LOAD( "set4_u18_2764.bin", 0xfa000, 0x02000, CRC(cc13a404) SHA1(1c00d173706c5e88cee69f9c52efa64dbdf4c15b) )
@@ -957,9 +970,11 @@ ROM_START( secondch )
 	ROM_RELOAD(         0x1000, 0x1000 )
 ROM_END
 
-GAME( 1984, trvhang,  0, sms,      sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Trivia Hangup (question set 1)",   MACHINE_SUPPORTS_SAVE ) /* Version Trivia-1-050185 */
-GAME( 1984, trvhanga, 0, sms,      sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Trivia Hangup (question set 2)",   MACHINE_NOT_WORKING ) /* Version Trivia-2-011586 */
-GAME( 1984, sms4in1,  0, sureshot, sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "4-in-1",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1985, smsjoker, 0, sureshot, sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Joker Poker With Hi-Lo Double-Up", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, sureshot, 0, sureshot, sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Sure Shot",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1985, secondch, 0, sureshot, sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Second Chance",                    MACHINE_SUPPORTS_SAVE )
+
+GAME( 1984, trvhang,  0,       sms,      sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Trivia Hangup (question set 1)",   MACHINE_SUPPORTS_SAVE ) // Version Trivia-1-050185
+GAME( 1984, trvhanga, 0,       sms,      sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Trivia Hangup (question set 2)",   MACHINE_NOT_WORKING )   // Version Trivia-2-011586
+GAME( 1984, sms4in1,  0,       sureshot, sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "4-in-1 (version SWS1-052587)",     MACHINE_SUPPORTS_SAVE ) // still shows 1984 copyright on title screen
+GAME( 1984, sms4in1a, sms4in1, sureshot, sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "4-in-1 (version SWS1-110984)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1985, smsjoker, 0,       sureshot, sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Joker Poker With Hi-Lo Double-Up", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sureshot, 0,       sureshot, sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Sure Shot",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1985, secondch, 0,       sureshot, sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Second Chance",                    MACHINE_SUPPORTS_SAVE )

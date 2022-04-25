@@ -9,18 +9,18 @@ driver by Angelo Salese & Pierpaolo Prazzoli
 Uses the same Seibu custom chips of the D-Con HW.
 
 TODO:
-- Find what the remaining video C.R.T. registers does;
+- Find what the remaining video C.R.T. registers do;
 - Fix sprites bugs at a start of a play;
-- Check NVRAM boudaries;
-- How the "SW Service Mode" (press F2 during gameplay) really works (inputs etc)? Nothing mapped works with it...
+- Check NVRAM boundaries;
+- How does the "SW Service Mode" (press F2 during gameplay) really work (inputs etc)? Nothing mapped works with it...
 
 Notes:
-- Some strings written in the sound rom:
+- Some strings written in the sound ROM:
   "SENGOKU-MAHJONG Z80 PROGRAM ROM VERSION 1.00 WRITTEN BY K.SAEKI" at location 0x00c0-0x00ff.
   "Copyright 1990/1991 Sigma" at location 0x770-0x789.
 - To bypass the startup message, toggle "Reset" dip-switch or reset with F3.
-- If the Work RAM is not hooked-up (areas $67xx),a sound sample is played.I can't understand what it says though,
-  appears to japanese words for "RAM failed".
+- If the Work RAM is not hooked-up (areas $67xx), a sound sample is played. I can't understand what it says though,
+  appears to be the Japanese words for "RAM failed".
 - Snippets of a non-BET Version are scattered thru the code (for example a credit display).
   Might be either undumped revision or selectable somehow.
 
@@ -58,8 +58,8 @@ RSSENGO2.72   chr.
 
 #include "cpu/nec/nec.h"
 #include "machine/nvram.h"
-#include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "sound/ymopl.h"
 #include "video/seibu_crtc.h"
 #include "emupal.h"
 #include "screen.h"
@@ -99,15 +99,15 @@ private:
 	required_shared_ptr<uint16_t> m_sc3_vram;
 	required_shared_ptr<uint16_t> m_spriteram16;
 
-	tilemap_t *m_sc0_tilemap;
-	tilemap_t *m_sc1_tilemap;
-	tilemap_t *m_sc2_tilemap;
-	tilemap_t *m_sc3_tilemap;
+	tilemap_t *m_sc0_tilemap = nullptr;
+	tilemap_t *m_sc1_tilemap = nullptr;
+	tilemap_t *m_sc2_tilemap = nullptr;
+	tilemap_t *m_sc3_tilemap = nullptr;
 
-	uint16_t m_mux_data;
-	uint8_t m_hopper_io;
-	uint16_t m_layer_en;
-	uint16_t m_scrollram[6];
+	uint16_t m_mux_data = 0;
+	uint8_t m_hopper_io = 0;
+	uint16_t m_layer_en = 0;
+	uint16_t m_scrollram[6]{};
 
 	uint16_t mahjong_panel_r();
 	void mahjong_panel_w(uint16_t data);

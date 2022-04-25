@@ -57,15 +57,17 @@ void msx_matsushita_device::nvram_default()
 }
 
 
-void msx_matsushita_device::nvram_read(emu_file &file)
+bool msx_matsushita_device::nvram_read(util::read_stream &file)
 {
-	file.read(&m_sram[0], m_sram.size());
+	size_t actual;
+	return !file.read(&m_sram[0], m_sram.size(), actual) && actual == m_sram.size();
 }
 
 
-void msx_matsushita_device::nvram_write(emu_file &file)
+bool msx_matsushita_device::nvram_write(util::write_stream &file)
 {
-	file.write(&m_sram[0], m_sram.size());
+	size_t actual;
+	return !file.write(&m_sram[0], m_sram.size(), actual) && actual == m_sram.size();
 }
 
 

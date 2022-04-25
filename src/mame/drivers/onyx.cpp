@@ -58,12 +58,13 @@ public:
 	void c8002(machine_config &config);
 	void c5000(machine_config &config);
 	void c5000_io(address_map &map);
+
+private:
 	void c5000_mem(address_map &map);
 	void c8002_io(address_map &map);
 	void c8002_mem(address_map &map);
 	void subio(address_map &map);
 	void submem(address_map &map);
-private:
 	void z8002_m1_w(uint8_t data);
 
 	required_device<cpu_device> m_maincpu; // z8002 or z80 depending on driver
@@ -80,9 +81,9 @@ INPUT_PORTS_END
 
 void onyx_state::c8002_mem(address_map &map)
 {
-	map(0x00000, 0x00fff).rom().share("share0");
-	map(0x01000, 0x07fff).ram().share("share1");
-	map(0x08000, 0x0ffff).ram().share("share2"); // Z8002 has 64k memory
+	map(0x00000, 0x00fff).rom();
+	map(0x01000, 0x07fff).ram();
+	map(0x08000, 0x0ffff).ram(); // Z8002 has 64k memory
 }
 
 void onyx_state::z8002_m1_w(uint8_t data)

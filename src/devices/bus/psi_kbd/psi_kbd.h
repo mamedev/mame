@@ -67,7 +67,7 @@ public:
 
 	// called from host
 	DECLARE_WRITE_LINE_MEMBER( tx_w );
-	DECLARE_READ8_MEMBER( key_data_r ) { return m_key_data; }
+	uint8_t key_data_r() { return m_key_data; }
 
 protected:
 	// device-level overrides

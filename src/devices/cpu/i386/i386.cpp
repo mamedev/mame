@@ -25,7 +25,6 @@
 #include "cycles.h"
 #include "i386ops.h"
 
-#include "debugger.h"
 #include "debug/debugcpu.h"
 #include "debug/express.h"
 
@@ -56,7 +55,6 @@ i386_device::i386_device(const machine_config &mconfig, device_type type, const 
 	, device_vtlb_interface(mconfig, *this, AS_PROGRAM)
 	, m_program_config("program", ENDIANNESS_LITTLE, program_data_width, program_addr_width, 0, 32, 12)
 	, m_io_config("io", ENDIANNESS_LITTLE, io_data_width, 16, 0)
-	, m_dr_breakpoints{nullptr, nullptr, nullptr, nullptr}
 	, m_smiact(*this)
 	, m_ferr_handler(*this)
 {
@@ -1557,10 +1555,13 @@ void i386_device::report_invalid_opcode()
 #ifndef DEBUG_MISSING_OPCODE
 	logerror("i386: Invalid opcode %02X at %08X %s\n", m_opcode, m_pc - 1, m_lock ? "with lock" : "");
 #else
-	logerror("i386: Invalid opcode");
+	logerror("Invalid opcode");
 	for (int a = 0; a < m_opcode_bytes_length; a++)
 		logerror(" %02X", m_opcode_bytes[a]);
-	logerror(" at %08X\n", m_opcode_pc);
+	logerror(" at %08X %s\n", m_opcode_pc, m_lock ? "with lock" : "");
+	logerror("Backtrace:\n");
+	for (uint32_t i = 1; i < 16; i++)
+		logerror("  %08X\n", m_opcode_addrs[(m_opcode_addrs_index - i) & 15]);
 #endif
 }
 
@@ -1569,10 +1570,13 @@ void i386_device::report_invalid_modrm(const char* opcode, uint8_t modrm)
 #ifndef DEBUG_MISSING_OPCODE
 	logerror("i386: Invalid %s modrm %01X at %08X\n", opcode, modrm, m_pc - 2);
 #else
-	logerror("i386: Invalid %s modrm %01X", opcode, modrm);
+	logerror("Invalid %s modrm %01X", opcode, modrm);
 	for (int a = 0; a < m_opcode_bytes_length; a++)
 		logerror(" %02X", m_opcode_bytes[a]);
-	logerror(" at %08X\n", m_opcode_pc);
+	logerror(" at %08X %s\n", m_opcode_pc, m_lock ? "with lock" : "");
+	logerror("Backtrace:\n");
+	for (uint32_t i = 1; i < 16; i++)
+		logerror("  %08X\n", m_opcode_addrs[(m_opcode_addrs_index - i) & 15]);
 #endif
 	i386_trap(6, 0, 0);
 }
@@ -2020,10 +2024,7 @@ void i386_device::i386_common_init()
 	m_ferr_handler(0);
 
 	set_icountptr(m_cycles);
-	m_notifier = m_program->add_change_notifier([this](read_or_write mode)
-	{
-		dri_changed();
-	});
+	m_notifier = m_program->add_change_notifier([this] (read_or_write mode) { dri_changed(); });
 }
 
 void i386_device::device_start()
@@ -2123,7 +2124,6 @@ void i386_device::register_state_i386()
 	state_add( STATE_GENPC, "GENPC", m_pc).noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_pc).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%32s").noshow();
-	state_add( STATE_GENSP, "GENSP", REG32(ESP)).noshow();
 }
 
 void i386_device::register_state_i386_x87()
@@ -2442,6 +2442,9 @@ void i386_device::zero_state()
 	memset( m_opcode_bytes, 0, sizeof(m_opcode_bytes) );
 	m_opcode_pc = 0;
 	m_opcode_bytes_length = 0;
+	memset(m_opcode_addrs, 0, sizeof(m_opcode_addrs));
+	m_opcode_addrs_index = 0;
+	m_dri_changed_active = false;
 }
 
 void i386_device::device_reset()
@@ -2791,6 +2794,8 @@ void i386_device::execute_run()
 #ifdef DEBUG_MISSING_OPCODE
 		m_opcode_bytes_length = 0;
 		m_opcode_pc = m_pc;
+		m_opcode_addrs[m_opcode_addrs_index] = m_opcode_pc;
+		m_opcode_addrs_index = (m_opcode_addrs_index + 1) & 15;
 #endif
 		try
 		{

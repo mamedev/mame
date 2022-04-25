@@ -45,77 +45,77 @@ license:CC0
 	<view name="AWP Simulated Video (No Artwork)">
 
 	<!-- 'BANK' Digits -->
-	<backdrop name="digit0" element="digit" state="0">
+	<element name="digit0" ref="digit" state="0">
 		<bounds x="180" y="64" width="9" height="19"/>
-	</backdrop>
-	<backdrop name="digit1" element="digit" state="0">
+	</element>
+	<element name="digit1" ref="digit" state="0">
 		<bounds x="190" y="64" width="9" height="19"/>
-	</backdrop>
-	<backdrop name="digit2" element="digit" state="0">
+	</element>
+	<element name="digit2" ref="digit" state="0">
 		<bounds x="200" y="64" width="9" height="19"/>
-	</backdrop>
-	<backdrop name="digit3" element="digit" state="0">
+	</element>
+	<element name="digit3" ref="digit" state="0">
 		<bounds x="210" y="64" width="9" height="19"/>
-	</backdrop>
-	<backdrop name="digit4" element="digit" state="0">
+	</element>
+	<element name="digit4" ref="digit" state="0">
 		<bounds x="220" y="64" width="9" height="19"/>
-	</backdrop>
-	<backdrop name="digit5" element="digit" state="0">
+	</element>
+	<element name="digit5" ref="digit" state="0">
 		<bounds x="230" y="64" width="9" height="19"/>
-	</backdrop>
-	<backdrop name="digit6" element="digit" state="0">
+	</element>
+	<element name="digit6" ref="digit" state="0">
 		<bounds x="240" y="64" width="9" height="19"/>
-	</backdrop>
-	<backdrop name="digit7" element="digit" state="0">
+	</element>
+	<element name="digit7" ref="digit" state="0">
 		<bounds x="250" y="64" width="9" height="19"/>
-	</backdrop>
+	</element>
 
 	<!-- Credit Digits -->
-	<backdrop name="digit8" element="digit" state="0">
+	<element name="digit8" ref="digit" state="0">
 		<bounds x="180" y="90" width="9" height="19"/>
-	</backdrop>
-	<backdrop name="digit9" element="digit" state="0">
+	</element>
+	<element name="digit9" ref="digit" state="0">
 		<bounds x="190" y="90" width="9" height="19"/>
-	</backdrop>
-	<backdrop name="digit10" element="digit" state="0">
+	</element>
+	<element name="digit10" ref="digit" state="0">
 		<bounds x="200" y="90" width="9" height="19"/>
-	</backdrop>
-	<backdrop name="digit11" element="digit" state="0">
+	</element>
+	<element name="digit11" ref="digit" state="0">
 		<bounds x="210" y="90" width="9" height="19"/>
-	</backdrop>
-	<backdrop name="digit12" element="digit" state="0">
+	</element>
+	<element name="digit12" ref="digit" state="0">
 		<bounds x="220" y="90" width="9" height="19"/>
-	</backdrop>
-	<backdrop name="digit13" element="digit" state="0">
+	</element>
+	<element name="digit13" ref="digit" state="0">
 		<bounds x="230" y="90" width="9" height="19"/>
-	</backdrop>
-	<backdrop name="digit14" element="digit" state="0">
+	</element>
+	<element name="digit14" ref="digit" state="0">
 		<bounds x="240" y="90" width="9" height="19"/>
-	</backdrop>
-	<backdrop name="digit15" element="digit" state="0">
+	</element>
+	<element name="digit15" ref="digit" state="0">
 		<bounds x="250" y="90" width="9" height="19"/>
-	</backdrop>
+	</element>
 
 
-	<backdrop name="sreel1" element="SteppersReel1" state="0">
+	<element name="sreel1" ref="SteppersReel1" state="0">
 		<bounds x="17" y="300" width="32" height="32"/>
-	</backdrop>
-	<backdrop name="sreel2" element="SteppersReel2" state="0">
+	</element>
+	<element name="sreel2" ref="SteppersReel2" state="0">
 		<bounds x="50" y="300" width="32" height="32"/>
-	</backdrop>
-	<backdrop name="sreel3" element="SteppersReel3" state="0">
+	</element>
+	<element name="sreel3" ref="SteppersReel3" state="0">
 		<bounds x="83" y="300" width="32" height="32"/>
-	</backdrop>
+	</element>
 
-	<backdrop name="reel1" element="Steppers" state="0">
+	<element name="reel1" ref="Steppers" state="0">
 		<bounds x="20" y="330" width="5" height="2"/>
-	</backdrop>
-	<backdrop name="reel2" element="Steppers" state="0">
+	</element>
+	<element name="reel2" ref="Steppers" state="0">
 		<bounds x="52" y="330" width="5" height="2"/>
-	</backdrop>
-	<backdrop name="reel3" element="Steppers" state="0">
+	</element>
+	<element name="reel3" ref="Steppers" state="0">
 		<bounds x="85" y="330" width="5" height="2"/>
-	</backdrop>
+	</element>
 
 	</view>
 </mamelayout>

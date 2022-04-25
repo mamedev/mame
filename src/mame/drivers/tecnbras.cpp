@@ -53,8 +53,8 @@ private:
 	required_device<i80c31_device> m_maincpu;
 	output_finder<14 * 7> m_dmds;
 
-	int m_xcoord;
-	char m_digit[14][7];
+	int m_xcoord = 0;
+	char m_digit[14][7]{};
 };
 
 void tecnbras_state::i80c31_prg(address_map &map)
@@ -79,7 +79,7 @@ void tecnbras_state::print_column_w(offs_t offset, uint8_t data)
 {
 	int const x = m_xcoord + offset;
 	int const ch = x / 5;
-	if (ch < ARRAY_LENGTH(m_digit)) {
+	if (ch < std::size(m_digit)) {
 		int const row = x % 5;
 		for (int i = 0; i < 7; i++) {
 			m_digit[ch][i] &= ~(1 << row);
@@ -101,7 +101,7 @@ void tecnbras_state::machine_start()
 		std::fill(std::begin(elem), std::end(elem), 0);
 
 #if 0
-	for (int x = 0; x < ARRAY_LENGTH(m_digit); x++)
+	for (int x = 0; x < std::size(m_digit); x++)
 		for (int y = 0; y < 7; y++)
 			m_dmds[(x * 7) + y] = y;
 #endif

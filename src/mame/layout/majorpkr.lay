@@ -185,56 +185,56 @@ license:CC0
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
 
-		<bezel name="lamp0" element="hold1">
+		<element name="lamp0" ref="hold1">
 			<bounds x="0" y="3.02" width="0.50" height="0.24" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp9" element="cancel">
+		<element name="lamp9" ref="cancel">
 			<bounds x="0" y="3.28" width="0.50" height="0.24" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp1" element="hold2">
+		<element name="lamp1" ref="hold2">
 			<bounds x="0.60" y="3.02" width="0.50" height="0.24" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp11" element="dup">
+		<element name="lamp11" ref="dup">
 			<bounds x="0.60" y="3.28" width="0.50" height="0.24" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp2" element="hold3">
+		<element name="lamp2" ref="hold3">
 			<bounds x="1.2" y="3.02" width="0.50" height="0.24" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp10" element="take">
+		<element name="lamp10" ref="take">
 			<bounds x="1.2" y="3.28" width="0.50" height="0.24" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp3" element="hold4">
+		<element name="lamp3" ref="hold4">
 			<bounds x="1.8" y="3.02" width="0.50" height="0.24" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp5" element="big">
+		<element name="lamp5" ref="big">
 			<bounds x="1.8" y="3.28" width="0.50" height="0.24" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp4" element="hold5">
+		<element name="lamp4" ref="hold5">
 			<bounds x="2.4" y="3.02" width="0.50" height="0.24" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp6" element="small">
+		<element name="lamp6" ref="small">
 			<bounds x="2.4" y="3.28" width="0.50" height="0.24" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp12" element="fever">
+		<element name="lamp12" ref="fever">
 			<bounds x="3" y="3.02" width="0.40" height="0.50" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp8" element="deal">
+		<element name="lamp8" ref="deal">
 			<bounds x="3.50" y="3.02" width="0.50" height="0.24" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp7" element="bet">
+		<element name="lamp7" ref="bet">
 			<bounds x="3.50" y="3.28" width="0.50" height="0.24" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

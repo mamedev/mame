@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /***************************************************************************
 
-    cop400op.inc
+    cop400op.hxx
 
     National Semiconductor COP400 Emulator.
 

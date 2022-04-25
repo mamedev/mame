@@ -34,11 +34,15 @@ license:CC0
 		<screen index="0">
 			<bounds x="0" y="0" width="738.46" height="480" />
 		</screen>
-		<bezel element="black">
-			<bounds x="640" y="0" width="100" height="480" />
-		</bezel>
-		<overlay element="overlay">
-			<bounds x="0" y="0" width="738.46" height="480" />
-		</overlay>
+		<collection name="Overlay">
+			<element ref="overlay" blend="multiply">
+				<bounds x="0" y="0" width="738.46" height="480" />
+			</element>
+		</collection>
+		<collection name="Overscan Mask">
+			<element ref="black">
+				<bounds x="640" y="0" width="100" height="480" />
+			</element>
+		</collection>
 	</view>
 </mamelayout>

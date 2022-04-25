@@ -43,14 +43,14 @@ private:
 	required_shared_ptr<uint8_t> m_fgvideoram;
 	required_shared_ptr<uint8_t> m_bgvideoram;
 
-	int m_palette_bank;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
+	int m_palette_bank = 0;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
 
-	DECLARE_WRITE8_MEMBER(fgvideoram_w);
-	DECLARE_WRITE8_MEMBER(bgvideoram_w);
-	DECLARE_WRITE8_MEMBER(c804_w);
-	DECLARE_WRITE8_MEMBER(palette_bank_w);
+	void fgvideoram_w(offs_t offset, uint8_t data);
+	void bgvideoram_w(offs_t offset, uint8_t data);
+	void c804_w(uint8_t data);
+	void palette_bank_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

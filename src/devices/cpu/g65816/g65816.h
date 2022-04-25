@@ -32,7 +32,7 @@ All rights reserved.
 /* Interrupt lines - used with g65816_set_irq_line() */
 enum
 {
-	G65816_LINE_NONE,
+	G65816_LINE_NONE, // FIXME: there is no such pin
 	G65816_LINE_IRQ,
 	G65816_LINE_NMI,
 	G65816_LINE_ABORT,
@@ -140,8 +140,8 @@ protected:
 	int bus_5A22_cycle_burst(unsigned addr);
 	unsigned g65816_get_pc();
 	void g65816_set_pc(unsigned val);
-	unsigned g65816_get_sp();
-	void g65816_set_sp(unsigned val);
+	[[maybe_unused]] unsigned g65816_get_sp();
+	[[maybe_unused]] void g65816_set_sp(unsigned val);
 public:
 	unsigned g65816_get_reg(int regnum);
 	void g65816_set_reg(int regnum, unsigned value);

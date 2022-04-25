@@ -27,48 +27,48 @@ public:
 	void lucky74(machine_config &config);
 
 protected:
-	virtual void machine_start() override { m_lamps.resolve(); }
+	virtual void machine_start() override;
 	virtual void video_start() override;
 	virtual void machine_reset() override;
 	virtual void sound_start() override;
 
 private:
-	DECLARE_READ8_MEMBER(custom_09R81P_port_r);
-	DECLARE_WRITE8_MEMBER(custom_09R81P_port_w);
-	DECLARE_READ8_MEMBER(usart_8251_r);
-	DECLARE_WRITE8_MEMBER(usart_8251_w);
-	DECLARE_READ8_MEMBER(copro_sm7831_r);
-	DECLARE_WRITE8_MEMBER(copro_sm7831_w);
-	DECLARE_WRITE8_MEMBER(lucky74_fg_videoram_w);
-	DECLARE_WRITE8_MEMBER(lucky74_fg_colorram_w);
-	DECLARE_WRITE8_MEMBER(lucky74_bg_videoram_w);
-	DECLARE_WRITE8_MEMBER(lucky74_bg_colorram_w);
+	uint8_t custom_09R81P_port_r(offs_t offset);
+	void custom_09R81P_port_w(offs_t offset, uint8_t data);
+	uint8_t usart_8251_r();
+	void usart_8251_w(uint8_t data);
+	uint8_t copro_sm7831_r();
+	void copro_sm7831_w(uint8_t data);
+	void fg_videoram_w(offs_t offset, uint8_t data);
+	void fg_colorram_w(offs_t offset, uint8_t data);
+	void bg_videoram_w(offs_t offset, uint8_t data);
+	void bg_colorram_w(offs_t offset, uint8_t data);
 	void ym2149_portb_w(uint8_t data);
 	void lamps_a_w(uint8_t data);
 	void lamps_b_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	void lucky74_palette(palette_device &palette) const;
-	uint32_t screen_update_lucky74(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(nmi_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(lucky74_adpcm_int);
-	void lucky74_map(address_map &map);
-	void lucky74_portmap(address_map &map);
+	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void prg_map(address_map &map);
+	void portmap(address_map &map);
 
-	uint8_t m_ym2149_portb;
-	uint8_t m_usart_8251;
-	uint8_t m_copro_sm7831;
-	int m_adpcm_pos;
-	int m_adpcm_end;
-	int m_adpcm_data;
-	uint8_t m_adpcm_reg[6];
-	uint8_t m_adpcm_busy_line;
+	uint8_t m_ym2149_portb = 0U;
+	uint8_t m_usart_8251 = 0U;
+	uint8_t m_copro_sm7831 = 0U;
+	int m_adpcm_pos = 0;
+	int m_adpcm_end = 0;
+	int m_adpcm_data = 0;
+	uint8_t m_adpcm_reg[6]{};
+	uint8_t m_adpcm_busy_line = 0;
 	required_shared_ptr<uint8_t> m_fg_videoram;
 	required_shared_ptr<uint8_t> m_fg_colorram;
 	required_shared_ptr<uint8_t> m_bg_videoram;
 	required_shared_ptr<uint8_t> m_bg_colorram;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;

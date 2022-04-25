@@ -65,8 +65,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( delay_w ) { m_write_delay(state); }
 	DECLARE_WRITE_LINE_MEMBER( baud_w ) { m_write_baud(state); }
 
-	DECLARE_READ16_MEMBER( io_r );
-	DECLARE_WRITE16_MEMBER( io_w );
+	uint16_t io_r(offs_t offset, uint16_t mem_mask = ~0);
+	void io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 };
 
 

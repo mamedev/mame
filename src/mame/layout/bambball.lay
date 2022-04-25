@@ -6,9 +6,24 @@ license:CC0
 
 <!-- define elements -->
 
-	<element name="white"><rect><color red="0.85" green="0.85" blue="0.85" /></rect></element>
-	<element name="disk_white"><disk><color red="0.85" green="0.85" blue="0.85" /></disk></element>
-	<element name="disk_black"><disk><color red="0" green="0" blue="0" /></disk></element>
+	<element name="basket">
+		<rect>
+			<color red="0.85" green="0.85" blue="0.85" />
+			<bounds x="0" y="0.95" width="1.3" height="0.3" />
+		</rect>
+		<rect>
+			<color red="0.85" green="0.85" blue="0.85" />
+			<bounds x="0" y="1.65" width="1.3" height="0.3" />
+		</rect>
+		<disk>
+			<color red="0.85" green="0.85" blue="0.85" />
+			<bounds x="1" y="0" width="5" height="3" />
+		</disk>
+		<disk>
+			<color red="0" green="0" blue="0" />
+			<bounds x="1.3" y="0.3" width="4.4" height="2.4" />
+		</disk>
+	</element>
 
 	<element name="text_1"><text string="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_2"><text string="2"><color red="0.8" green="0.8" blue="0.8" /></text></element>
@@ -27,44 +42,47 @@ license:CC0
 
 	<view name="Internal Layout">
 		<bounds left="8.3" right="107.6" top="5.8" bottom="37.9" />
+
 		<screen index="0"><bounds x="10" y="10" width="96" height="23.9" /></screen>
 
 	<!-- baskets (simplified) -->
 
-		<backdrop element="disk_white"><bounds x="9.3" y="13.7" width="5" height="3" /></backdrop>
-		<backdrop element="disk_black"><bounds x="9.6" y="14.0" width="4.4" height="2.4" /></backdrop>
-		<backdrop element="white"><bounds x="8.3" y="14.65" width="1.3" height="0.3" /></backdrop>
-		<backdrop element="white"><bounds x="8.3" y="15.35" width="1.3" height="0.3" /></backdrop>
-
-		<backdrop element="disk_white"><bounds x="101.6" y="13.65" width="5" height="3" /></backdrop>
-		<backdrop element="disk_black"><bounds x="101.9" y="13.95" width="4.4" height="2.4" /></backdrop>
-		<backdrop element="white"><bounds x="106.3" y="14.65" width="1.3" height="0.3" /></backdrop>
-		<backdrop element="white"><bounds x="106.3" y="15.35" width="1.3" height="0.3" /></backdrop>
+		<collection name="Baskets">
+			<element ref="basket" blend="add">
+				<bounds x="8.3" y="13.7" width="6" height="3" />
+			</element>
+			<element ref="basket" blend="add">
+				<bounds x="101.6" y="13.7" width="6" height="3" />
+				<orientation flipx="yes" />
+			</element>
+		</collection>
 
 	<!-- labels -->
 
-		<bezel element="text_1"><bounds x="11.1" y="6.2" width="5" height="3" /></bezel>
-		<bezel element="text_2"><bounds x="22.2" y="6.2" width="5" height="3" /></bezel>
-		<bezel element="text_3"><bounds x="33.3" y="6.2" width="5" height="3" /></bezel>
-		<bezel element="text_4"><bounds x="44.4" y="6.2" width="5" height="3" /></bezel>
-		<bezel element="text_5"><bounds x="55.5" y="6.2" width="5" height="3" /></bezel>
-		<bezel element="text_6"><bounds x="66.6" y="6.2" width="5" height="3" /></bezel>
-		<bezel element="text_7"><bounds x="77.7" y="6.2" width="5" height="3" /></bezel>
-		<bezel element="text_8"><bounds x="88.8" y="6.2" width="5" height="3" /></bezel>
-		<bezel element="text_9"><bounds x="99.9" y="6.2" width="5" height="3" /></bezel>
+		<collection name="Labels">
+			<element ref="text_1"><bounds x="11.1" y="6.2" width="5" height="3" /></element>
+			<element ref="text_2"><bounds x="22.2" y="6.2" width="5" height="3" /></element>
+			<element ref="text_3"><bounds x="33.3" y="6.2" width="5" height="3" /></element>
+			<element ref="text_4"><bounds x="44.4" y="6.2" width="5" height="3" /></element>
+			<element ref="text_5"><bounds x="55.5" y="6.2" width="5" height="3" /></element>
+			<element ref="text_6"><bounds x="66.6" y="6.2" width="5" height="3" /></element>
+			<element ref="text_7"><bounds x="77.7" y="6.2" width="5" height="3" /></element>
+			<element ref="text_8"><bounds x="88.8" y="6.2" width="5" height="3" /></element>
+			<element ref="text_9"><bounds x="99.9" y="6.2" width="5" height="3" /></element>
 
-		<bezel element="text_1"><bounds x="11.1" y="34.5" width="5" height="3" /></bezel>
-		<bezel element="text_2"><bounds x="22.2" y="34.5" width="5" height="3" /></bezel>
-		<bezel element="text_3"><bounds x="33.3" y="34.5" width="5" height="3" /></bezel>
-		<bezel element="text_4"><bounds x="44.4" y="34.5" width="5" height="3" /></bezel>
-		<bezel element="text_5"><bounds x="55.5" y="34.5" width="5" height="3" /></bezel>
-		<bezel element="text_6"><bounds x="66.6" y="34.5" width="5" height="3" /></bezel>
-		<bezel element="text_7"><bounds x="77.7" y="34.5" width="5" height="3" /></bezel>
-		<bezel element="text_8"><bounds x="88.8" y="34.5" width="5" height="3" /></bezel>
-		<bezel element="text_9"><bounds x="99.9" y="34.5" width="5" height="3" /></bezel>
+			<element ref="text_1"><bounds x="11.1" y="34.5" width="5" height="3" /></element>
+			<element ref="text_2"><bounds x="22.2" y="34.5" width="5" height="3" /></element>
+			<element ref="text_3"><bounds x="33.3" y="34.5" width="5" height="3" /></element>
+			<element ref="text_4"><bounds x="44.4" y="34.5" width="5" height="3" /></element>
+			<element ref="text_5"><bounds x="55.5" y="34.5" width="5" height="3" /></element>
+			<element ref="text_6"><bounds x="66.6" y="34.5" width="5" height="3" /></element>
+			<element ref="text_7"><bounds x="77.7" y="34.5" width="5" height="3" /></element>
+			<element ref="text_8"><bounds x="88.8" y="34.5" width="5" height="3" /></element>
+			<element ref="text_9"><bounds x="99.9" y="34.5" width="5" height="3" /></element>
 
-		<bezel element="text_h"><bounds x="7.8" y="6.2" width="5" height="3" /></bezel>
-		<bezel element="text_v"><bounds x="103.1" y="34.5" width="5" height="3" /></bezel>
+			<element ref="text_h"><bounds x="7.8" y="6.2" width="5" height="3" /></element>
+			<element ref="text_v"><bounds x="103.1" y="34.5" width="5" height="3" /></element>
+		</collection>
 
 	</view>
 </mamelayout>

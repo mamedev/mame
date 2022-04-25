@@ -2,10 +2,10 @@
 // copyright-holders:Michael Zapf
 /****************************************************************************
 
-    The MESS TI-99/8 emulation driver
+    TI-99/8
 
     The TI-99/8 was the envisaged successor to the TI-99/4A but never passed
-    its prototype state. Only a few dozens of consoles were built. The ROMs
+    its prototype state. Only a few dozen consoles were built. The ROMs
     were not even finalized, so the few available consoles have different
     operating system versions and capabilities.
 
@@ -15,7 +15,7 @@
 
     Name: "Texas Instruments Computer TI-99/8" (no "Home")
 
-    Inofficial nickname: "Armadillo"
+    Unofficial nickname: "Armadillo"
 
     CPU: Single-CPU system using a TMS9995, but as a variant named MP9537. This
          variant does not offer on-chip RAM or decrementer.
@@ -81,7 +81,7 @@
     Modes:
          - Compatibility mode (TI-99/4A mode): Memory-mapped devices are
            placed at the same location as found in the TI-99/4A, thereby
-           providing a good downward compatibility.
+           providing good downward compatibility.
            The console starts up in compatibility mode.
          - Native mode (Armadillo mode): Devices are located at positions above
            0xF000 that allow for a contiguous usage of memory.
@@ -94,7 +94,7 @@
     From the 32 bits, 24 bits define the physical address, so this allows for
     a maximum of 16 MiB of mapped-addressable memory.
 
-    See more about the mapper in the file mapper8.c.
+    See more about the mapper in the file 998board.cpp
 
 
     Availability of ROMs and documentation
@@ -164,8 +164,6 @@ Known Issues (MZ, 2019-05-10)
 #include "emu.h"
 #include "cpu/tms9900/tms9995.h"
 
-#include "bus/ti99/ti99defs.h"
-
 #include "sound/sn76496.h"
 #include "machine/tms9901.h"
 #include "machine/tmc0430.h"
@@ -178,7 +176,7 @@ Known Issues (MZ, 2019-05-10)
 #include "bus/ti99/joyport/joyport.h"
 #include "bus/ti99/internal/ioport.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 // Debugging
@@ -193,6 +191,9 @@ Known Issues (MZ, 2019-05-10)
 #define VERBOSE ( LOG_CONFIG | LOG_WARN | LOG_RESETLOAD )
 
 #include "logmacro.h"
+
+
+namespace {
 
 /*
     READY bits.
@@ -214,7 +215,7 @@ public:
 	ti99_8_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_cpu(*this, "maincpu"),
-		m_tms9901(*this, TI_TMS9901_TAG),
+		m_tms9901(*this, TI998_TMS9901_TAG),
 		m_gromport(*this, TI99_GROMPORT_TAG),
 		m_ioport(*this, TI99_IOPORT_TAG),
 		m_mainboard(*this, TI998_MAINBOARD_TAG),
@@ -233,10 +234,6 @@ public:
 	void driver_reset() override;
 
 private:
-	// Machine management
-	DECLARE_MACHINE_START(ti99_8);
-	DECLARE_MACHINE_RESET(ti99_8);
-
 	// Processor connections with the main board
 	uint8_t cruread(offs_t offset);
 	void cruwrite(offs_t offset, uint8_t data);
@@ -273,14 +270,14 @@ private:
 
 	// Keyboard support
 	void    set_keyboard_column(int number, int data);
-	int     m_keyboard_column;
+	int     m_keyboard_column = 0;
 
 	// READY handling
-	int m_ready_old;
+	int m_ready_old = 0;
 
 	// Latch for 9901 INT2, INT1 lines
-	int  m_int1;
-	int  m_int2;
+	int  m_int1 = 0;
+	int  m_int2 = 0;
 
 	// Connected devices
 	required_device<tms9995_device>     m_cpu;
@@ -467,19 +464,19 @@ uint8_t ti99_8_state::psi_input(offs_t offset)
 	case tms9901_device::INT6:
 		if (m_keyboard_column >= 14)
 			return BIT(m_joyport->read_port(),0);
-
+		[[fallthrough]];
 	case tms9901_device::INT7_P15:
 		if (m_keyboard_column >= 14)
 			return BIT(m_joyport->read_port(),4);
-
+		[[fallthrough]];
 	case tms9901_device::INT8_P14:
 		if (m_keyboard_column >= 14)
 			return BIT(m_joyport->read_port(),1);
-
+		[[fallthrough]];
 	case tms9901_device::INT9_P13:
 		if (m_keyboard_column >= 14)
 			return BIT(m_joyport->read_port(),2);
-
+		[[fallthrough]];
 	case tms9901_device::INT10_P12:
 		if (m_keyboard_column >= 14)
 			return BIT(m_joyport->read_port(),3);
@@ -631,7 +628,7 @@ WRITE_LINE_MEMBER( ti99_8_state::extint )
 	m_tms9901->set_int_line(1, state);
 }
 
-WRITE_LINE_MEMBER( ti99_8_state::notconnected )
+[[maybe_unused]] WRITE_LINE_MEMBER( ti99_8_state::notconnected )
 {
 	LOGMASKED(LOG_INTERRUPTS, "Setting a not connected line ... ignored\n");
 }
@@ -674,6 +671,8 @@ void ti99_8_state::driver_reset()
 	//  m_cpu->ready_line(ASSERT_LINE);
 
 	// m_gromport->set_grom_base(0x9800, 0xfff1);
+
+	m_keyboard_column = 0;
 
 	// Clear INT1 and INT2 latch
 	m_int1 = CLEAR_LINE;
@@ -734,11 +733,11 @@ void ti99_8_state::ti99_8(machine_config& config)
 	m_ioport->ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::pbox_ready));
 
 	// Hexbus
-	HEXBUS(config, TI_HEXBUS_TAG, 0, hexbus_options, nullptr);
+	HEXBUS(config, TI998_HEXBUS_TAG, 0, hexbus_options, nullptr);
 
 	// Sound hardware
 	SPEAKER(config, "sound_out").front_center();
-	sn76496_device& soundgen(SN76496(config, TI_SOUNDCHIP_TAG, 3579545));
+	sn76496_device& soundgen(SN76496(config, TI998_SOUNDCHIP_TAG, 3579545));
 	soundgen.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::sound_ready));
 	soundgen.add_route(ALL_OUTPUTS, "sound_out", 0.75);
 
@@ -754,7 +753,7 @@ void ti99_8_state::ti99_8(machine_config& config)
 
 	// Cassette drive
 	SPEAKER(config, "cass_out").front_center();
-	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "cass_out", 0.25);;
+	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "cass_out", 0.25);
 
 	// GROM library
 	using namespace bus::ti99::internal;
@@ -795,7 +794,7 @@ void ti99_8_state::ti99_8_60hz(machine_config &config)
 {
 	ti99_8(config);
 	// Video hardware
-	tms9118_device &video(TMS9118(config, TI_VDP_TAG, XTAL(10'738'635)));
+	tms9118_device &video(TMS9118(config, TI998_VDP_TAG, XTAL(10'738'635)));
 	video.set_vram_size(0x4000);
 	video.int_callback().set(FUNC(ti99_8_state::video_interrupt));
 	video.set_screen("screen");
@@ -810,7 +809,7 @@ void ti99_8_state::ti99_8_50hz(machine_config &config)
 {
 	ti99_8(config);
 	// Video hardware
-	tms9129_device &video(TMS9129(config, TI_VDP_TAG, XTAL(10'738'635)));
+	tms9129_device &video(TMS9129(config, TI998_VDP_TAG, XTAL(10'738'635)));
 	video.set_vram_size(0x4000);
 	video.int_callback().set(FUNC(ti99_8_state::video_interrupt));
 	video.set_screen("screen");
@@ -887,6 +886,9 @@ ROM_START(ti99_8)
 ROM_END
 
 #define rom_ti99_8e rom_ti99_8
+
+} // Anonymous namespace
+
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE      INPUT   CLASS         INIT        COMPANY              FULLNAME                     FLAGS
 COMP( 1983, ti99_8,  0,      0,      ti99_8_60hz, ti99_8, ti99_8_state, empty_init, "Texas Instruments", "TI-99/8 Computer (US)",     MACHINE_SUPPORTS_SAVE )

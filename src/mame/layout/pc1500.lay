@@ -80,56 +80,56 @@ license:CC0
 	</element>
 
 	<view name="Default Layout">
-		<!-- LCD background -->
-		<bezel element="background">
-			<bounds left="0" top="0" right="156" bottom="4" />
-		</bezel>
-
-		<bezel name="BUSY" element="busy_text">
-			<bounds left="0" top="0" right="7" bottom="3" />
-		</bezel>
-		<bezel name="SHIFT" element="shift_text">
-			<bounds left="15" top="0" right="23" bottom="3" />
-		</bezel>
-		<bezel name="SML" element="sml_text">
-			<bounds left="30" top="0" right="35" bottom="3" />
-		</bezel>
-		<bezel name="SMALL" element="small_text">
-			<bounds left="40" top="0" right="60" bottom="3" />
-		</bezel>
-		<bezel name="I" element="i_text">
-			<bounds left="138" top="0" right="140" bottom="3" />
-		</bezel>
-		<bezel name="II" element="ii_text">
-			<bounds left="141" top="0" right="144" bottom="3" />
-		</bezel>
-		<bezel name="III" element="iii_text">
-			<bounds left="145" top="0" right="150" bottom="3" />
-		</bezel>
-		<bezel name="DEF" element="def_text">
-			<bounds left="125" top="0" right="130" bottom="3" />
-		</bezel>
-		<bezel name="DE" element="de_text">
-			<bounds left="56" top="0" right="59" bottom="3" />
-		</bezel>
-		<bezel name="G" element="g_text">
-			<bounds left="59" top="0" right="61" bottom="3" />
-		</bezel>
-		<bezel name="RAD" element="rad_text">
-			<bounds left="63" top="0" right="68" bottom="3" />
-		</bezel>
-		<bezel name="RESERVE" element="reserve_text">
-			<bounds left="105" top="0" right="118" bottom="3" />
-		</bezel>
-		<bezel name="PRO" element="pro_text">
-			<bounds left="95" top="0" right="100" bottom="3" />
-		</bezel>
-		<bezel name="RUN" element="run_text">
-			<bounds left="80" top="0" right="85" bottom="3" />
-		</bezel>
-
 		<screen index="0">
 			<bounds left="0" top="4" right="156" bottom="11" />
 		</screen>
+
+		<!-- LCD background -->
+		<element ref="background">
+			<bounds left="0" top="0" right="156" bottom="4" />
+		</element>
+
+		<element name="BUSY" ref="busy_text">
+			<bounds left="0" top="0" right="7" bottom="3" />
+		</element>
+		<element name="SHIFT" ref="shift_text">
+			<bounds left="15" top="0" right="23" bottom="3" />
+		</element>
+		<element name="SML" ref="sml_text">
+			<bounds left="30" top="0" right="35" bottom="3" />
+		</element>
+		<element name="SMALL" ref="small_text">
+			<bounds left="40" top="0" right="60" bottom="3" />
+		</element>
+		<element name="I" ref="i_text">
+			<bounds left="138" top="0" right="140" bottom="3" />
+		</element>
+		<element name="II" ref="ii_text">
+			<bounds left="141" top="0" right="144" bottom="3" />
+		</element>
+		<element name="III" ref="iii_text">
+			<bounds left="145" top="0" right="150" bottom="3" />
+		</element>
+		<element name="DEF" ref="def_text">
+			<bounds left="125" top="0" right="130" bottom="3" />
+		</element>
+		<element name="DE" ref="de_text">
+			<bounds left="56" top="0" right="59" bottom="3" />
+		</element>
+		<element name="G" ref="g_text">
+			<bounds left="59" top="0" right="61" bottom="3" />
+		</element>
+		<element name="RAD" ref="rad_text">
+			<bounds left="63" top="0" right="68" bottom="3" />
+		</element>
+		<element name="RESERVE" ref="reserve_text">
+			<bounds left="105" top="0" right="118" bottom="3" />
+		</element>
+		<element name="PRO" ref="pro_text">
+			<bounds left="95" top="0" right="100" bottom="3" />
+		</element>
+		<element name="RUN" ref="run_text">
+			<bounds left="80" top="0" right="85" bottom="3" />
+		</element>
 	</view>
 </mamelayout>

@@ -70,7 +70,7 @@ private:
 	required_device<speaker_sound_device>   m_speaker;
 	required_ioport_array<4>                m_keypad;
 
-	uint8_t m_keypad_col_mask;
+	uint8_t m_keypad_col_mask = 0;
 };
 
 #endif // VERIFONE_TRANZ330_H

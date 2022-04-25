@@ -213,7 +213,7 @@ CUSTOM_INPUT_MEMBER(lethalj_state::cclownz_paddle)
  *
  *************************************/
 
-WRITE16_MEMBER(lethalj_state::ripribit_control_w)
+void lethalj_state::ripribit_control_w(uint16_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 	m_ticket->motor_w(BIT(data, 1));
@@ -221,7 +221,7 @@ WRITE16_MEMBER(lethalj_state::ripribit_control_w)
 }
 
 
-WRITE16_MEMBER(lethalj_state::cfarm_control_w)
+void lethalj_state::cfarm_control_w(uint16_t data)
 {
 	m_ticket->motor_w(BIT(data, 0));
 	m_lamps[0] = BIT(data, 2);
@@ -231,7 +231,7 @@ WRITE16_MEMBER(lethalj_state::cfarm_control_w)
 }
 
 
-WRITE16_MEMBER(lethalj_state::cclownz_control_w)
+void lethalj_state::cclownz_control_w(uint16_t data)
 {
 	m_ticket->motor_w(BIT(data, 0));
 	m_lamps[0] = BIT(data, 2);
@@ -816,11 +816,11 @@ void lethalj_state::gameroom(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, "oki1", SOUND_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.8);
+	OKIM6295(config, "oki1", SOUND_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.33);
 
-	OKIM6295(config, "oki2", SOUND_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.8);
+	OKIM6295(config, "oki2", SOUND_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.33);
 
-	OKIM6295(config, "oki3", SOUND_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.8);
+	OKIM6295(config, "oki3", SOUND_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.33);
 }
 
 
@@ -1204,19 +1204,19 @@ ROM_END
 
 void lethalj_state::init_ripribit()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(*this, FUNC(lethalj_state::ripribit_control_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16smo_delegate(*this, FUNC(lethalj_state::ripribit_control_w)));
 }
 
 
 void lethalj_state::init_cfarm()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(*this, FUNC(lethalj_state::cfarm_control_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16smo_delegate(*this, FUNC(lethalj_state::cfarm_control_w)));
 }
 
 
 void lethalj_state::init_cclownz()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(*this, FUNC(lethalj_state::cclownz_control_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16smo_delegate(*this, FUNC(lethalj_state::cclownz_control_w)));
 }
 
 

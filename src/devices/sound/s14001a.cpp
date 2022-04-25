@@ -116,19 +116,7 @@ uint8_t Mux8To2(bool bVoicedP2, uint8_t uPPQtrP2, uint8_t uDeltaAdrP2, uint8_t u
 		uDeltaAdrP2 ^= 0x03; // count backwards
 
 	// emulate 8 to 2 mux to obtain delta from byte (bigendian)
-	switch (uDeltaAdrP2)
-	{
-	case 0x00:
-		return (uRomDataP2 & 0xC0) >> 6;
-	case 0x01:
-		return (uRomDataP2 & 0x30) >> 4;
-	case 0x02:
-		return (uRomDataP2 & 0x0C) >> 2;
-	case 0x03:
-		return (uRomDataP2 & 0x03) >> 0;
-	default:
-		return 0xFF;
-	}
+	return uRomDataP2 >> (~uDeltaAdrP2 << 1 & 0x06) & 0x03;
 }
 
 
@@ -226,7 +214,7 @@ ALLOW_SAVE_TYPE(s14001a_device::states); // allow save_item on a non-fundamental
 
 void s14001a_device::device_start()
 {
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() ? clock() : machine().sample_rate());
+	m_stream = stream_alloc(0, 1, clock() ? clock() : machine().sample_rate());
 
 	// resolve callbacks
 	m_ext_read_handler.resolve();
@@ -314,13 +302,13 @@ void s14001a_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void s14001a_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void s14001a_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	for (int i = 0; i < samples; i++)
+	for (int i = 0; i < outputs[0].samples(); i++)
 	{
 		Clock();
 		int16_t sample = m_uOutputP2 - 7; // range -7..8
-		outputs[0][i] = sample * 0xf00;
+		outputs[0].put_int(i, sample, 8);
 	}
 }
 

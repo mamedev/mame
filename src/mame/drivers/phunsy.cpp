@@ -2,26 +2,26 @@
 // copyright-holders:Wilbert Pol
 /***************************************************************************
 
-    PHUNSY (Philipse Universal System)
+PHUNSY (Philipse Universal System)
 
-    2010-11-04 Skeleton driver.
-    2012-05-24 Cassette added.
-    2014-01-13 Quickload added.
+2010-11-04 Skeleton driver.
+2012-05-24 Cassette added.
+2014-01-13 Quickload added.
 
-    http://www.tubedata.info/phunsy/index.html
+http://www.tubedata.info/phunsy/index.html
 
-    Baud Rate ~ 6000 baud
-    W command to save data, eg 800-8FFW
-    R command to read data, eg 1100R to load the file at 1100,
-       or R to load the file where it came from.
-    The tape must already be playing the leader when you press the Enter
-       key, or it errors immediately.
+Baud Rate ~ 6000 baud
+W command to save data, eg 800-8FFW
+R command to read data, eg 1100R to load the file at 1100,
+   or R to load the file where it came from.
+The tape must already be playing the leader when you press the Enter
+   key, or it errors immediately.
 
-    Rom banking (in U bank):
-    0U: RAM
-    1U: MDCR program
-    2U: Disassembler
-    3U: Label handler
+Rom banking (in U bank):
+ 0U: RAM
+ 1U: MDCR program
+ 2U: Disassembler
+ 3U: Label handler
 
 
 ****************************************************************************/
@@ -71,8 +71,8 @@ private:
 	void phunsy_io(address_map &map);
 	void phunsy_mem(address_map &map);
 
-	uint8_t       m_data_out;
-	uint8_t       m_keyboard_input;
+	uint8_t       m_data_out = 0U;
+	uint8_t       m_keyboard_input = 0U;
 	virtual void machine_reset() override;
 	required_device<s2650_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
@@ -218,19 +218,19 @@ void phunsy_state::phunsy_palette(palette_device &palette) const
 
 uint32_t phunsy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,chr,gfx,col;
-	uint16_t sy=0,ma=0,x;
+	uint16_t sy=0,ma=0;
 
-	for (y = 0; y < 32; y++)
+	for (uint8_t y = 0; y < 32; y++)
 	{
-		for (ra = 0; ra < 8; ra++)
+		for (uint8_t ra = 0; ra < 8; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
-			for (x = ma; x < ma+64; x++)
+			for (uint16_t x = ma; x < ma+64; x++)
 			{
-				chr = m_p_videoram[x];
+				uint8_t const chr = m_p_videoram[x];
 
+				uint8_t gfx,col;
 				if (BIT(chr, 7))
 				{
 					/* Graphics mode */
@@ -291,7 +291,7 @@ QUICKLOAD_LOAD_MEMBER(phunsy_state::quickload_cb)
 	int quick_length = image.length();
 	if (quick_length > 0x4000)
 	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
+		image.seterror(image_error::INVALIDIMAGE, "File too long");
 		image.message(" File too long");
 	}
 	else

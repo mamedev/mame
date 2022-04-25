@@ -69,7 +69,7 @@ protected:
 	void add_common_devices(machine_config &config);
 	inline void update_ieee_signals();
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	required_device<m6502_device> m_maincpu;
 	required_device<m6504_device> m_fdccpu;
@@ -106,7 +106,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 };
 
 
@@ -124,7 +124,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 };
 
 

@@ -17,7 +17,7 @@ driver by David Haywood and few bits by Pierpaolo Prazzoli
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
-#include "sound/2203intf.h"
+#include "sound/ymopn.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -67,11 +67,11 @@ private:
 	required_shared_ptr<uint16_t> m_mdtilemap_ram;
 	required_shared_ptr<uint16_t> m_bgtilemap_ram;
 
-	uint16_t m_out;
-	uint8_t m_interrupt_line_active;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_md_tilemap;
-	tilemap_t *m_bg_tilemap;
+	uint16_t m_out = 0;
+	uint8_t m_interrupt_line_active = 0;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_md_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
 };
 
 

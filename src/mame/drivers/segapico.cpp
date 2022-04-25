@@ -385,10 +385,11 @@ static void pico_cart(device_slot_interface &device)
 
 MACHINE_START_MEMBER(pico_state,pico)
 {
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7fffff, read16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read)), write16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read_a13)), write16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_a13)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read_a15)), write16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_a15)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_tmss_bank)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000000, 0x7fffff, read16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x000000, 0x7fffff, write16s_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read_a13)), write16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_a13)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read_a15)), write16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_a15)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_tmss_bank)));
 
 	m_vdp->stop_timers();
 }
@@ -403,9 +404,8 @@ void pico_state::pico(machine_config &config)
 	config.device_remove("ymsnd");
 
 	MCFG_MACHINE_START_OVERRIDE( pico_state, pico )
-	MCFG_MACHINE_RESET_OVERRIDE( pico_base_state, ms_megadriv )
 
-	PICO_CART_SLOT(config, m_picocart, pico_cart, nullptr);
+	PICO_CART_SLOT(config, m_picocart, pico_cart, nullptr).set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("pico");
 
 	SEGA_315_5641_PCM(config, m_sega_315_5641_pcm, upd7759_device::STANDARD_CLOCK*2);
@@ -424,9 +424,8 @@ void pico_state::picopal(machine_config &config)
 	config.device_remove("ymsnd");
 
 	MCFG_MACHINE_START_OVERRIDE( pico_state, pico )
-	MCFG_MACHINE_RESET_OVERRIDE( pico_base_state, ms_megadriv )
 
-	PICO_CART_SLOT(config, m_picocart, pico_cart, nullptr);
+	PICO_CART_SLOT(config, m_picocart, pico_cart, nullptr).set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("pico");
 
 	SEGA_315_5641_PCM(config, m_sega_315_5641_pcm, upd7759_device::STANDARD_CLOCK*2);
@@ -600,10 +599,11 @@ static void copera_cart(device_slot_interface &device)
 
 MACHINE_START_MEMBER(copera_state,copera)
 {
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7fffff, read16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read)), write16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read_a13)), write16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_a13)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read_a15)), write16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_a15)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_tmss_bank)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000000, 0x7fffff, read16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x000000, 0x7fffff, write16s_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read_a13)), write16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_a13)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read_a15)), write16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_a15)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_tmss_bank)));
 
 	m_sega_315_5641_pcm->reset_w(0);
 	m_sega_315_5641_pcm->start_w(0);
@@ -622,9 +622,8 @@ void copera_state::copera(machine_config &config)
 	config.device_remove("ymsnd");
 
 	MCFG_MACHINE_START_OVERRIDE( copera_state, copera )
-	MCFG_MACHINE_RESET_OVERRIDE( copera_state, ms_megadriv )
 
-	COPERA_CART_SLOT(config, m_picocart, copera_cart, nullptr);
+	COPERA_CART_SLOT(config, m_picocart, copera_cart, nullptr).set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("copera");
 
 	SEGA_315_5641_PCM(config, m_sega_315_5641_pcm, upd7759_device::STANDARD_CLOCK);

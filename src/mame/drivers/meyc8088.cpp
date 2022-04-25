@@ -28,7 +28,6 @@
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/resnet.h"
 #include "emupal.h"
 #include "screen.h"
@@ -63,8 +62,8 @@ private:
 
 	output_finder<16> m_lamps;
 
-	uint8_t m_status;
-	uint8_t m_common;
+	uint8_t m_status = 0;
+	uint8_t m_common = 0;
 
 	void drive_w(uint8_t data);
 	void video5_flip_w(uint8_t data);
@@ -163,7 +162,7 @@ uint32_t meyc8088_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		v[3] = m_vram[offs|0x4001]; // video4: color prom d3
 
 		for (int i = 0; i < 8; i++)
-			bitmap.pix16(y, x | i) = ((v[0] << i) >> 7 & 1) | ((v[1] << i) >> 6 & 2) | ((v[2] << i) >> 5 & 4) | ((v[3] << i) >> 4 & 8) | v[4];
+			bitmap.pix(y, x | i) = ((v[0] << i) >> 7 & 1) | ((v[1] << i) >> 6 & 2) | ((v[2] << i) >> 5 & 4) | ((v[3] << i) >> 4 & 8) | v[4];
 	}
 
 	return 0;
@@ -245,10 +244,10 @@ uint8_t meyc8088_state::input_r()
 	uint8_t ret = 0xff;
 
 	// multiplexed switch inputs
-	if (~m_common & 1) ret &= m_switches[0].read_safe(0); // bit switches
-	if (~m_common & 2) ret &= m_switches[1].read_safe(0); // control switches
-	if (~m_common & 4) ret &= m_switches[2].read_safe(0); // light switches
-	if (~m_common & 8) ret &= m_switches[3].read_safe(0); // light switches
+	if (~m_common & 1) ret &= m_switches[0]->read(); // bit switches
+	if (~m_common & 2) ret &= m_switches[1]->read(); // control switches
+	if (~m_common & 4) ret &= m_switches[2]->read(); // light switches
+	if (~m_common & 8) ret &= m_switches[3]->read(); // light switches
 
 	return ret;
 }
@@ -401,8 +400,6 @@ void meyc8088_state::meyc8088(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 

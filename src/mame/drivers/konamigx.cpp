@@ -106,8 +106,9 @@
 #include "sound/k054539.h"
 //#include "machine/k056230.h"
 #include "sound/k056800.h"
-#include "rendlay.h"
 #include "speaker.h"
+
+#include "layout/generic.h"
 
 
 // TODO: check on PCB
@@ -344,7 +345,7 @@ void konamigx_state::sexyparo_esc(address_space &space, uint32_t p1, uint32_t p2
 {
 	// The d20000 should probably be p3
 	// TODO: debugging bootcamp, remove once finished
-#ifdef UNUSED_FUNCTION
+#if 0
 	if (p1 != 0)
 	{
 		logerror("sexyparo_esc P1 param: %02x\n", p1);
@@ -363,7 +364,7 @@ void konamigx_state::daiskiss_esc(address_space &space, uint32_t p1, uint32_t p2
 	generate_sprites(space, 0xc00000, 0xd20000, 0x100);
 }
 
-WRITE32_MEMBER(konamigx_state::esc_w)
+void konamigx_state::esc_w(address_space &space, uint32_t data)
 {
 	uint32_t opcode;
 	uint32_t params;
@@ -453,7 +454,7 @@ CUSTOM_INPUT_MEMBER(konamigx_state::gx_rdport1_3_r)
 	return (m_gx_rdport1_3 >> 1);
 }
 
-WRITE32_MEMBER(konamigx_state::eeprom_w)
+void konamigx_state::eeprom_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t odata;
 
@@ -501,7 +502,7 @@ WRITE32_MEMBER(konamigx_state::eeprom_w)
 	}
 }
 
-WRITE32_MEMBER(konamigx_state::control_w)
+void konamigx_state::control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// TODO: derive from reported PCB XTALs
 	const uint32_t pixclock[4] = { 6'000'000, 8'000'000, 12'000'000, 16'000'000 };
@@ -735,7 +736,7 @@ double konamigx_state::adc0834_callback(uint8_t input)
 }
 
 
-READ32_MEMBER(konamigx_state::le2_gun_H_r)
+uint32_t konamigx_state::le2_gun_H_r()
 {
 	int p1x = m_light0_x->read()*290/0xff+20;
 	int p2x = m_light1_x->read()*290/0xff+20;
@@ -743,7 +744,7 @@ READ32_MEMBER(konamigx_state::le2_gun_H_r)
 	return (p1x<<16)|p2x;
 }
 
-READ32_MEMBER(konamigx_state::le2_gun_V_r)
+uint32_t konamigx_state::le2_gun_V_r()
 {
 	int p1y = m_light0_y->read()*224/0xff;
 	int p2y = m_light1_y->read()*224/0xff;
@@ -758,14 +759,14 @@ READ32_MEMBER(konamigx_state::le2_gun_V_r)
 /**********************************************************************************/
 /* system or game dependent handlers */
 
-READ32_MEMBER(konamigx_state::type1_roz_r1)
+uint32_t konamigx_state::type1_roz_r1(offs_t offset)
 {
 	uint32_t *ROM = (uint32_t *)memregion("gfx3")->base();
 
 	return ROM[offset];
 }
 
-READ32_MEMBER(konamigx_state::type1_roz_r2)
+uint32_t konamigx_state::type1_roz_r2(offs_t offset)
 {
 	uint32_t *ROM = (uint32_t *)memregion("gfx3")->base();
 
@@ -774,7 +775,7 @@ READ32_MEMBER(konamigx_state::type1_roz_r2)
 	return ROM[offset];
 }
 
-READ32_MEMBER(konamigx_state::type3_sync_r)
+uint32_t konamigx_state::type3_sync_r()
 {
 	if(m_konamigx_current_frame==0)
 		return -1;  //  return 0xfffffffe | 1;
@@ -859,7 +860,7 @@ READ32_MEMBER(konamigx_state::type3_sync_r)
     move.l  #$C10400,($C102EC).l       move.l  #$C10400,($C102EC).l
 */
 
-WRITE32_MEMBER(konamigx_state::type4_prot_w)
+void konamigx_state::type4_prot_w(address_space &space, offs_t offset, uint32_t data)
 {
 	int clk;
 	int i;
@@ -1012,7 +1013,7 @@ WRITE32_MEMBER(konamigx_state::type4_prot_w)
 }
 
 // cabinet lamps for type 1 games
-WRITE32_MEMBER(konamigx_state::type1_cablamps_w)
+void konamigx_state::type1_cablamps_w(uint32_t data)
 {
 	m_lamp = BIT(data, 24);
 }
@@ -1028,9 +1029,7 @@ void konamigx_state::gx_base_memmap(address_map &map)
 	map(0x400000, 0x7fffff).rom(); // data ROM
 	map(0xc00000, 0xc1ffff).ram().share("workram");
 	map(0xd00000, 0xd01fff).r(m_k056832, FUNC(k056832_device::k_5bpp_rom_long_r));
-	map(0xd20000, 0xd20fff).rw(m_k055673, FUNC(k055673_device::k053247_word_r), FUNC(k055673_device::k053247_word_w));
-	map(0xd21000, 0xd21fff).ram(); // second bank of sprite RAM, accessed thru ESC
-	map(0xd22000, 0xd23fff).ram(); // extra bank checked at least by sexyparo, pending further investigation.
+	map(0xd20000, 0xd23fff).rw(m_k055673, FUNC(k055673_device::k053247_word_r), FUNC(k055673_device::k053247_word_w));
 	map(0xd40000, 0xd4003f).w(m_k056832, FUNC(k056832_device::word_w));
 	map(0xd44000, 0xd4400f).w(FUNC(konamigx_state::konamigx_tilebank_w));
 	map(0xd48000, 0xd48007).w(m_k055673, FUNC(k055673_device::k053246_w));
@@ -1085,7 +1084,6 @@ void konamigx_state::gx_type2_map(address_map &map)
 void konamigx_state::gx_type3_map(address_map &map)
 {
 	gx_base_memmap(map);
-	map(0xd20000, 0xd21fff).rw(m_k055673, FUNC(k055673_device::k053247_word_r), FUNC(k055673_device::k053247_word_w));
 	map(0xd90000, 0xd97fff).ram();
 	//map(0xcc0000, 0xcc0007).w(FUNC(konamigx_state::type4_prot_w));
 	map(0xe00000, 0xe0001f).ram().share("k053936_0_ctrl");
@@ -1102,7 +1100,6 @@ void konamigx_state::gx_type4_map(address_map &map)
 {
 	gx_base_memmap(map);
 	map(0xcc0000, 0xcc0007).w(FUNC(konamigx_state::type4_prot_w));
-	map(0xd20000, 0xd21fff).rw(m_k055673, FUNC(k055673_device::k053247_word_r), FUNC(k055673_device::k053247_word_w));
 	map(0xd90000, 0xd97fff).ram();
 	map(0xe00000, 0xe0001f).ram().share("k053936_0_ctrl");
 	map(0xe20000, 0xe20003).nopw();
@@ -1118,14 +1115,14 @@ void konamigx_state::gx_type4_map(address_map &map)
 /**********************************************************************************/
 /* Sound handling */
 
-READ16_MEMBER(konamigx_state::tms57002_status_word_r)
+uint16_t konamigx_state::tms57002_status_word_r()
 {
 	return (m_dasp->dready_r() ? 4 : 0) |
 		(m_dasp->pc0_r() ? 2 : 0) |
 		(m_dasp->empty_r() ? 1 : 0);
 }
 
-WRITE16_MEMBER(konamigx_state::tms57002_control_word_w)
+void konamigx_state::tms57002_control_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -2246,6 +2243,39 @@ ROM_START( daiskiss )
 	ROM_LOAD( "535a22.9g", 0x000000, 2*1024*1024, CRC(7ee59acb) SHA1(782bf15f205e9fe7bd069f6445eb8187837dee32) )
 ROM_END
 
+/* Magical Twinbee */
+ROM_START( mtwinbee )
+	/* main program */
+	ROM_REGION( 0x800000, "maincpu", 0 )
+	GX_BIOS
+	ROM_LOAD32_WORD_SWAP( "424eaa02.31b", 0x200002, 512*1024, CRC(34659905) SHA1(011df093502644ab7ceb7fd1fbca41d09af89566) )
+	ROM_LOAD32_WORD_SWAP( "424eaa04.27b", 0x200000, 512*1024, CRC(f42d3139) SHA1(e03006b4a87a70dfba9ec5e4857442424269986c) )
+
+	/* sound program */
+	ROM_REGION( 0x40000, "soundcpu", 0 )
+	ROM_LOAD16_BYTE("424a06.9c", 0x000000, 128*1024, CRC(a4760e14) SHA1(78dbd309f3f7fa61e92c9554e594449a7d4eed5a) )
+	ROM_LOAD16_BYTE("424a07.7c", 0x000001, 128*1024, CRC(fa90d7e2) SHA1(6b6dee29643309005834416bdfdb18d74f34cb1b) )
+
+	/* tiles */
+	ROM_REGION( 0x500000, "k056832", ROMREGION_ERASE00 )
+	TILE_WORD_ROM_LOAD( "424a14.17h", 0x000000, 2*1024*1024, CRC(b1d9fce8) SHA1(143ed2f03ac10a0f18d878c0ee0509a5714e4664) )
+	TILE_BYTE_ROM_LOAD( "424a12.13g", 0x000004, 512*1024, CRC(7f9cb8b1) SHA1(f5e18d70fcb572bb85f9b064995fc0ab0bb581e8) )
+
+	/* sprites */
+	ROM_REGION( 0x500000, "k055673", ROMREGION_ERASE00 )
+	ROM_LOAD32_WORD( "424a11.25g", 0x000000, 2*1024*1024, CRC(29592688) SHA1(a4b44e9153988a510915af83116e3c18dd15642f) )
+	ROM_LOAD32_WORD( "424a10.28g", 0x000002, 2*1024*1024, CRC(cf24e5e3) SHA1(095bf2ae4f47c6e4768515ae5e22c982fbc660a5) )
+	ROM_LOAD( "424a09.30g", 0x400000, 1*1024*1024, CRC(daa07224) SHA1(198cafa3d0ead2aa2593be066c6f372e66c11c44) )
+
+	/* sound data */
+	ROM_REGION( 0x400000, "k054539", 0 )
+	ROM_LOAD( "424a17.9g", 0x000000, 2*1024*1024, CRC(e9dd9692) SHA1(c289019c8d1dd71b3cec26479c39b649de804707) )
+	ROM_LOAD( "424a18.7g", 0x200000, 2*1024*1024, CRC(0f0d9f3a) SHA1(57f6b113b80f06964b7e672ad517c1654c5569c5) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting with error
+	ROM_LOAD( "mtwinbee.nv", 0x0000, 0x080, CRC(942b4323) SHA1(2f6799bf187510355df5e52c4d416f5c5e70fa05) )
+ROM_END
+
 /* Sexy Parodius version JAA (Japan) */
 ROM_START( sexyparo )
 	/* main program */
@@ -2548,6 +2578,35 @@ ROM_START( winspike )
 	ROM_LOAD( "705a22.9g", 0x000000, 4*1024*1024, CRC(1a9246f6) SHA1(a40ff43310d035f7b88c4e397a4ee75151578c17) )
 ROM_END
 
+/* Winning Spike - Version AAA (Asia) */
+ROM_START( winspikea )
+	/* main program */
+	ROM_REGION( 0x800000, "maincpu", 0 )
+	GX_BIOS
+	ROM_LOAD32_WORD_SWAP( "705aaa02.31b", 0x200002, 512*1024, CRC(43d1bad9) SHA1(e7c9c50270112e027f88d05e664c35abedc6b2e2) )
+	ROM_LOAD32_WORD_SWAP( "705aaa03.27b", 0x200000, 512*1024, CRC(2af78cca) SHA1(9f6fa586cd4cd0a3e863d67d1bc1d67d35e21ca8) )
+
+	/* sound program */
+	ROM_REGION( 0x40000, "soundcpu", 0 )
+	ROM_LOAD16_BYTE("705a08.9c", 0x000000, 128*1024, CRC(0d531639) SHA1(14a72925f75528e7b4d6b701b2b51f4557f031f0) )
+	ROM_LOAD16_BYTE("705a09.7c", 0x000001, 128*1024, CRC(24e58845) SHA1(a01caced5bad9d98a3f33d72ca5eb9096c45e4ba) )
+
+	ROM_REGION( 0x800000, "k056832", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "705a19.17h", 0x000000, 0x100000, CRC(bab84b30) SHA1(8522a0dc5e37524f51d632e9d975e949a14c0dc3) )
+	ROM_LOAD16_BYTE( "705a18.22h", 0x000001, 0x100000, CRC(eb97fb5f) SHA1(13de0ad060fd6f1312fa10edde1fef6481e8df64) )
+
+	/* sprites */
+	ROM_REGION( 0x1000000, "k055673", ROMREGION_ERASE00 )
+	ROM_LOAD64_WORD( "705a17.25g",   0x000000, 0x400000, CRC(971d2812) SHA1(ee0819faf6f6c8420d5d3742cb39dfb76b9ce7a4) )
+	ROM_LOAD64_WORD( "705a13.28g",   0x000002, 0x400000, CRC(3b62584b) SHA1(69718f47ff1e8d65a11972af1ed5068db175f625) )
+	ROM_LOAD64_WORD( "705a11.30g",   0x000004, 0x400000, CRC(68542ce9) SHA1(a4294da1d1026e3a9d070575e5855935389a705f) )
+	ROM_LOAD64_WORD( "705a10.33g",   0x000006, 0x400000, CRC(fc4dc78b) SHA1(520cdcf9ca20ec1c84be734e06e183e7a871090b) )
+
+	/* sound data */
+	ROM_REGION( 0x400000, "k054539", 0 )
+	ROM_LOAD( "705a22.9g", 0x000000, 4*1024*1024, CRC(1a9246f6) SHA1(a40ff43310d035f7b88c4e397a4ee75151578c17) )
+ROM_END
+
 
 /*
 Winning Spike (Version JAA)
@@ -2753,7 +2812,7 @@ ROM_START( dragoona )
 	ROM_LOAD( "dragoona.nv", 0x0000, 0x080, CRC(7980ad2b) SHA1(dccaab02d23edbd81ae13441fbac0dbd7112c258) )
 ROM_END
 
-/* Soccer Superstars (94.12.19 - Europe ver EAC) Writes EAA to EEPROM and reports as EAA despite chip labels EAC */
+/* Soccer Superstars (94.12.19 - Europe ver EAC) Writes EAA to EEPROM and reports as EAA despite chip labels EAC, confirmed on at least two separate ROM sets */
 ROM_START( soccerss )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
@@ -3851,6 +3910,7 @@ static const GXGameInfoT gameDefs[] =
 	{ "fantjour",  7, 9, BPP5 },
 	{ "fantjoura", 7, 9, BPP5 },
 	{ "puzldama",  7, 0, BPP5 },
+	{ "mtwinbee",  7, 8, BPP5 },
 	{ "tbyahhoo",  7, 8, BPP5 },
 	{ "tkmmpzdm",  7, 2, BPP6 },
 	{ "dragoonj",  7, 3, BPP4 },
@@ -3862,6 +3922,7 @@ static const GXGameInfoT gameDefs[] =
 	{ "salmndr2",  7, 6, BPP66 },
 	{ "salmndr2a", 7, 6, BPP66 },
 	{ "winspike",  8, 7, BPP4 },
+	{ "winspikea", 8, 7, BPP4 },
 	{ "winspikej", 8, 7, BPP4 },
 	{ "soccerss",  7, 0, BPP4 },
 	{ "soccerssu", 7, 0, BPP4 },
@@ -3879,7 +3940,7 @@ static const GXGameInfoT gameDefs[] =
 	{ "",        0xff,0xff,0xff },
 };
 
-READ32_MEMBER( konamigx_state::k_6bpp_rom_long_r )
+uint32_t konamigx_state::k_6bpp_rom_long_r(offs_t offset, uint32_t mem_mask)
 {
 	return m_k056832->k_6bpp_rom_long_r(offset, mem_mask);
 }
@@ -3908,8 +3969,8 @@ void konamigx_state::init_konamigx()
 			switch (gameDefs[i].special)
 			{
 				case 1: // LE2 guns
-					m_maincpu->space(AS_PROGRAM).install_read_handler(0xd44000, 0xd44003, read32_delegate(*this, FUNC(konamigx_state::le2_gun_H_r)));
-					m_maincpu->space(AS_PROGRAM).install_read_handler(0xd44004, 0xd44007, read32_delegate(*this, FUNC(konamigx_state::le2_gun_V_r)));
+					m_maincpu->space(AS_PROGRAM).install_read_handler(0xd44000, 0xd44003, read32smo_delegate(*this, FUNC(konamigx_state::le2_gun_H_r)));
+					m_maincpu->space(AS_PROGRAM).install_read_handler(0xd44004, 0xd44007, read32smo_delegate(*this, FUNC(konamigx_state::le2_gun_V_r)));
 					break;
 				case 2: // tkmmpzdm hack
 				{
@@ -3944,7 +4005,7 @@ void konamigx_state::init_konamigx()
 					break;
 
 				case 7: // install type 4 Xilinx protection for non-type 3/4 games
-					m_maincpu->space(AS_PROGRAM).install_write_handler(0xcc0000, 0xcc0007, write32_delegate(*this, FUNC(konamigx_state::type4_prot_w)));
+					m_maincpu->space(AS_PROGRAM).install_write_handler(0xcc0000, 0xcc0007, write32m_delegate(*this, FUNC(konamigx_state::type4_prot_w)));
 					break;
 
 				case 8: // tbyahhoo
@@ -3961,7 +4022,7 @@ void konamigx_state::init_konamigx()
 	}
 
 	if (readback == BPP66)
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xd00000, 0xd01fff, read32_delegate(*this, FUNC(konamigx_state::k_6bpp_rom_long_r)));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xd00000, 0xd01fff, read32s_delegate(*this, FUNC(konamigx_state::k_6bpp_rom_long_r)));
 
 
 #undef BPP5
@@ -3983,7 +4044,7 @@ void konamigx_state::init_posthack()
 GAME( 1994, konamigx,  0,        konamigx_bios, common, konamigx_state, init_konamigx, ROT0, "Konami", "System GX", MACHINE_IS_BIOS_ROOT )
 
 /* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-   Type 1: standard with an add-on 53936 on the ROM board, analog inputs, 
+   Type 1: standard with an add-on 53936 on the ROM board, analog inputs,
    and optional 056230 networking for Racin' Force only.
    needs the ROZ layer to be playable
    --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -4012,6 +4073,7 @@ GAME( 1994, crzcross,  konamigx, gokuparo,     puzldama, konamigx_state, init_po
 GAME( 1994, puzldama,  crzcross, gokuparo,     puzldama, konamigx_state, init_posthack, ROT0, "Konami", "Taisen Puzzle-dama (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1995, tbyahhoo,  konamigx, tbyahhoo,     gokuparo, konamigx_state, init_posthack, ROT0, "Konami", "Twin Bee Yahhoo! (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, mtwinbee,  tbyahhoo, tbyahhoo,     gokuparo, konamigx_state, init_posthack, ROT0, "Konami", "Magical Twin Bee (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1995, tkmmpzdm,  konamigx, konamigx_6bpp, tokkae,   konamigx_state, init_konamigx, ROT0, "Konami", "Tokimeki Memorial Taisen Puzzle-dama (ver JAB)", MACHINE_IMPERFECT_GRAPHICS )
 
@@ -4031,6 +4093,7 @@ GAME( 1996, salmndr2a, salmndr2, salmndr2,      gokuparo, konamigx_state, init_k
 
 // bad sprite colours, part of tilemap gets blanked out when a game starts (might be more protection)
 GAME( 1997, winspike,  konamigx, winspike,      common, konamigx_state, init_konamigx, ROT0, "Konami", "Winning Spike (ver EAA)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, winspikea, winspike, winspike,      common, konamigx_state, init_konamigx, ROT0, "Konami", "Winning Spike (ver AAA)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, winspikej, winspike, winspike,      common, konamigx_state, init_konamigx, ROT0, "Konami", "Winning Spike (ver JAA)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
 
 /* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------

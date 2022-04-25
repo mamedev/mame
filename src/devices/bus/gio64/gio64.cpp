@@ -68,7 +68,7 @@ gio64_device::gio64_device(const machine_config &mconfig, const char *tag, devic
 gio64_device::gio64_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
-	, m_space_config("GIO64 Space", ENDIANNESS_BIG, 64, 32, 0)
+	, m_space_config("gio64", ENDIANNESS_BIG, 64, 32, 0)
 	, m_interrupt_cb(*this)
 {
 }

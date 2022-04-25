@@ -31,17 +31,35 @@ public:
 		FF_FLAG = 1 << 8
 	};
 
+	enum {
+		RX_RUN = 0,
+		RX_12_BIT,
+		RX_DATA
+	};
+
 	// device type constructor
 	rx01_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	// callback configuration
+	auto error_callback() { return m_interface_callback[0].bind(); }
+	auto transfer_request_callback() { return m_interface_callback[1].bind(); }
+	auto out_callback() { return m_interface_callback[2].bind(); }
+	auto done_callback() { return m_interface_callback[3].bind(); }
+	auto shift_callback() { return m_interface_callback[4].bind(); }
+
+	// serial input for controller
+	DECLARE_READ_LINE_MEMBER(data_r) { return !data_in(); }
+
 protected:
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 4); }
+	virtual void execute_set_input(int linenum, int state) override;
 	virtual void execute_run() override;
 
 	// device_disasm_interface overrides
@@ -73,6 +91,9 @@ private:
 	memory_access<12, 0, 0, ENDIANNESS_LITTLE>::cache m_inst_cache;
 	memory_access<10, 0, 0, ENDIANNESS_LITTLE>::cache m_data_cache;
 
+	// interface output callbacks
+	devcb_write_line::array<5> m_interface_callback;
+
 	// internal state
 	u16 m_pc;
 	u16 m_ppc;
@@ -87,6 +108,9 @@ private:
 	u16 m_bar;
 	u16 m_crc;
 	u16 m_flags;
+	bool m_run;
+	bool m_12_bit;
+	bool m_data_in;
 	bool m_unit;
 	bool m_load_head;
 	bool m_syn_index;

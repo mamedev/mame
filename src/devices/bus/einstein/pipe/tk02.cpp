@@ -185,14 +185,14 @@ MC6845_UPDATE_ROW( tk02_device::crtc_update_row )
 		if (i == cursor_x)
 			data ^= 0xff;
 
-		bitmap.pix32(y, i * 8 + 0) = pen[BIT(data, 7)];
-		bitmap.pix32(y, i * 8 + 1) = pen[BIT(data, 6)];
-		bitmap.pix32(y, i * 8 + 2) = pen[BIT(data, 5)];
-		bitmap.pix32(y, i * 8 + 3) = pen[BIT(data, 4)];
-		bitmap.pix32(y, i * 8 + 4) = pen[BIT(data, 3)];
-		bitmap.pix32(y, i * 8 + 5) = pen[BIT(data, 2)];
-		bitmap.pix32(y, i * 8 + 6) = pen[BIT(data, 1)];
-		bitmap.pix32(y, i * 8 + 7) = pen[BIT(data, 0)];
+		bitmap.pix(y, i * 8 + 0) = pen[BIT(data, 7)];
+		bitmap.pix(y, i * 8 + 1) = pen[BIT(data, 6)];
+		bitmap.pix(y, i * 8 + 2) = pen[BIT(data, 5)];
+		bitmap.pix(y, i * 8 + 3) = pen[BIT(data, 4)];
+		bitmap.pix(y, i * 8 + 4) = pen[BIT(data, 3)];
+		bitmap.pix(y, i * 8 + 5) = pen[BIT(data, 2)];
+		bitmap.pix(y, i * 8 + 6) = pen[BIT(data, 1)];
+		bitmap.pix(y, i * 8 + 7) = pen[BIT(data, 0)];
 	}
 }
 

@@ -350,7 +350,7 @@ void splndrbt_state::splndrbt_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 							int pen = srcgfx[offset];
 
 							if ((transmask & (1 << pen)) == 0)
-								bitmap.pix16(y, bx) = paldata[pen];
+								bitmap.pix(y, bx) = paldata[pen];
 						}
 					}
 				}
@@ -383,9 +383,9 @@ void splndrbt_state::splndrbt_copy_bg(bitmap_ind16 &dst_bitmap, const rectangle 
 		if (dst_y >= cliprect.top() && dst_y <= cliprect.bottom())
 		{
 			const uint8_t * const romline = &xrom[(dst_y ^ dinvert) << 5];
-			const uint16_t * const src_line = &src_bitmap.pix16((src_y + scroll_y) & 0x1ff);
-			const uint8_t * const flags_line = &flags_bitmap.pix8((src_y + scroll_y) & 0x1ff);
-			uint16_t * const dst_line = &dst_bitmap.pix16(dst_y);
+			const uint16_t * const src_line = &src_bitmap.pix((src_y + scroll_y) & 0x1ff);
+			const uint8_t * const flags_line = &flags_bitmap.pix((src_y + scroll_y) & 0x1ff);
+			uint16_t * const dst_line = &dst_bitmap.pix(dst_y);
 			int dst_x = 0;
 			int src_x;
 

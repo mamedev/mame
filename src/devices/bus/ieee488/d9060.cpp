@@ -19,8 +19,8 @@
     Start the PET emulator with the D9060 attached on the IEEE-488 bus,
     with the new CHD mounted:
 
-    $ mess pet8032 -ieee8 d9060 -hard tm602s.chd
-    $ mess pet8032 -ieee8 d9090 -hard tm603s.chd
+    $ mame pet8032 -ieee8 d9060 -hard tm602s.chd
+    $ mame pet8032 -ieee8 d9090 -hard tm603s.chd
 
     Enter 'HEADER "LABEL",D0,I01' to format the hard drive.
     Wait up to 1 hour and 20 minutes.
@@ -383,7 +383,7 @@ void d9060_device_base::device_add_mconfig(machine_config &config)
 	M6502(config, m_hdccpu, XTAL(4'000'000)/4);
 	m_hdccpu->set_addrmap(AS_PROGRAM, &d9060_device::hdc_mem);
 
-	VIA6522(config, m_via, XTAL(4'000'000)/4);
+	MOS6522(config, m_via, XTAL(4'000'000)/4);
 	m_via->writepa_handler().set(FUNC(d9060_device_base::scsi_data_w));
 	m_via->writepb_handler().set(FUNC(d9060_device_base::via_pb_w));
 	m_via->ca2_handler().set(FUNC(d9060_device_base::ack_w));

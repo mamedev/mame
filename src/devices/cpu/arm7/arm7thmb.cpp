@@ -654,18 +654,22 @@ void arm7_cpu_device::tg04_00_06(uint32_t pc, uint32_t op)  /* SBC Rd, Rs */
 
 void arm7_cpu_device::tg04_00_07(uint32_t pc, uint32_t op) /* ROR Rd, Rs */
 {
-	uint32_t rs = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
-	uint32_t rd = (op & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
-	uint32_t rrd = GetRegister(rd);
-	uint32_t imm = GetRegister(rs) & 0x0000001f;
-	SetRegister(rd, (rrd >> imm) | (rrd << (32 - imm)));
-	if (rrd & (1 << (imm - 1)))
+	const uint32_t rs = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
+	const uint32_t rd = (op & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
+	const uint32_t rrd = GetRegister(rd);
+	const uint32_t imm = GetRegister(rs) & 0xff;
+	const uint32_t imm_masked = imm & 0x1f;
+	if (imm > 0)
 	{
-		set_cpsr(GET_CPSR | C_MASK);
-	}
-	else
-	{
-		set_cpsr(GET_CPSR & ~C_MASK);
+		SetRegister(rd, (rrd >> imm_masked) | (rrd << (32 - imm_masked)));
+		if (rrd & (1 << ((imm - 1) & 0x1f)))
+		{
+			set_cpsr(GET_CPSR | C_MASK);
+		}
+		else
+		{
+			set_cpsr(GET_CPSR & ~C_MASK);
+		}
 	}
 	set_cpsr(GET_CPSR & ~(Z_MASK | N_MASK));
 	set_cpsr(GET_CPSR | HandleALUNZFlags(GetRegister(rd)));

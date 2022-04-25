@@ -1,64 +1,72 @@
-#include <asio/ts/executor.hpp>
+#include <asio/execution.hpp>
 #include <condition_variable>
 #include <iostream>
 #include <memory>
 #include <mutex>
 #include <queue>
 
-using asio::dispatch;
-using asio::execution_context;
+namespace execution = asio::execution;
 
-class priority_scheduler : public execution_context
+namespace custom_props {
+
+  struct priority
+  {
+    template <typename T>
+    static constexpr bool is_applicable_property_v =
+      execution::is_executor<T>::value;
+
+    static constexpr bool is_requirable = true;
+    static constexpr bool is_preferable = true;
+
+    using polymorphic_query_result_type = int;
+
+    int value() const { return value_; }
+
+    int value_ = 1;
+  };
+
+  constexpr priority low_priority{0};
+  constexpr priority normal_priority{1};
+  constexpr priority high_priority{2};
+
+} // namespace custom_props
+
+class priority_scheduler
 {
 public:
   // A class that satisfies the Executor requirements.
   class executor_type
   {
   public:
-    executor_type(priority_scheduler& ctx, int pri) noexcept
-      : context_(ctx), priority_(pri)
+    executor_type(priority_scheduler& ctx) noexcept
+      : context_(ctx), priority_(custom_props::normal_priority.value())
     {
     }
 
-    priority_scheduler& context() const noexcept
+    priority_scheduler& query(execution::context_t) const noexcept
     {
       return context_;
     }
 
-    void on_work_started() const noexcept
+    int query(custom_props::priority) const noexcept
     {
-      // This executor doesn't count work. Instead, the scheduler simply runs
-      // until explicitly stopped.
+      return priority_;
     }
 
-    void on_work_finished() const noexcept
+    executor_type require(custom_props::priority pri) const
     {
-      // This executor doesn't count work. Instead, the scheduler simply runs
-      // until explicitly stopped.
+      executor_type new_ex(*this);
+      new_ex.priority_ = pri.value();
+      return new_ex;
     }
 
-    template <class Func, class Alloc>
-    void dispatch(Func&& f, const Alloc& a) const
+    template <class Func>
+    void execute(Func f) const
     {
-      post(std::forward<Func>(f), a);
-    }
-
-    template <class Func, class Alloc>
-    void post(Func f, const Alloc& a) const
-    {
-      auto p(std::allocate_shared<item<Func>>(
-            typename std::allocator_traits<
-              Alloc>::template rebind_alloc<char>(a),
-            priority_, std::move(f)));
+      auto p(std::make_shared<item<Func>>(priority_, std::move(f)));
       std::lock_guard<std::mutex> lock(context_.mutex_);
       context_.queue_.push(p);
       context_.condition_.notify_one();
-    }
-
-    template <class Func, class Alloc>
-    void defer(Func&& f, const Alloc& a) const
-    {
-      post(std::forward<Func>(f), a);
     }
 
     friend bool operator==(const executor_type& a,
@@ -78,9 +86,9 @@ public:
     int priority_;
   };
 
-  executor_type get_executor(int pri = 0) noexcept
+  executor_type executor() noexcept
   {
-    return executor_type(*const_cast<priority_scheduler*>(this), pri);
+    return executor_type(*const_cast<priority_scheduler*>(this));
   }
 
   void run()
@@ -152,16 +160,22 @@ private:
 int main()
 {
   priority_scheduler sched;
-  auto low = sched.get_executor(0);
-  auto med = sched.get_executor(1);
-  auto high = sched.get_executor(2);
-  dispatch(low, []{ std::cout << "1\n"; });
-  dispatch(low, []{ std::cout << "11\n"; });
-  dispatch(med, []{ std::cout << "2\n"; });
-  dispatch(med, []{ std::cout << "22\n"; });
-  dispatch(high, []{ std::cout << "3\n"; });
-  dispatch(high, []{ std::cout << "33\n"; });
-  dispatch(high, []{ std::cout << "333\n"; });
-  dispatch(sched.get_executor(-1), [&]{ sched.stop(); });
+  auto ex = sched.executor();
+  auto prefer_low = asio::prefer(ex, custom_props::low_priority);
+  auto low = asio::require(ex, custom_props::low_priority);
+  auto med = asio::require(ex, custom_props::normal_priority);
+  auto high = asio::require(ex, custom_props::high_priority);
+  execution::any_executor<custom_props::priority> poly_high(high);
+  execution::execute(prefer_low, []{ std::cout << "1\n"; });
+  execution::execute(low, []{ std::cout << "11\n"; });
+  execution::execute(low, []{ std::cout << "111\n"; });
+  execution::execute(med, []{ std::cout << "2\n"; });
+  execution::execute(med, []{ std::cout << "22\n"; });
+  execution::execute(high, []{ std::cout << "3\n"; });
+  execution::execute(high, []{ std::cout << "33\n"; });
+  execution::execute(high, []{ std::cout << "333\n"; });
+  execution::execute(poly_high, []{ std::cout << "3333\n"; });
+  execution::execute(asio::require(ex, custom_props::priority{-1}), [&]{ sched.stop(); });
   sched.run();
+  std::cout << "polymorphic query result = " << asio::query(poly_high, custom_props::priority{}) << "\n";
 }

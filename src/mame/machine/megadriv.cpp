@@ -79,7 +79,7 @@ void md_base_state::megadriv_68k_YM2612_write(offs_t offset, uint8_t data, uint8
 // this is used by 6 button pads and gets installed in machine_start for drivers requiring it
 TIMER_CALLBACK_MEMBER(md_base_state::io_timeout_timer_callback)
 {
-	m_io_stage[(int)(uintptr_t)ptr] = -1;
+	m_io_stage[(int)param] = -1;
 }
 
 
@@ -366,7 +366,7 @@ void md_base_state::megadrive_io_write_data_port_6button(offs_t offset, uint16_t
 		if (((m_megadrive_io_data_regs[portnum]&0x40)==0x00) && ((data&0x40) == 0x40))
 		{
 			m_io_stage[portnum]++;
-			m_io_timeout[portnum]->adjust(m_maincpu->cycles_to_attotime(8192));
+			m_io_timeout[portnum]->adjust(m_maincpu->cycles_to_attotime(8192), portnum);
 		}
 
 	}
@@ -741,7 +741,7 @@ uint8_t md_base_state::megadriv_z80_unmapped_read()
 void md_base_state::megadriv_z80_map(address_map &map)
 {
 	map(0x0000, 0x1fff).bankrw("bank1").mirror(0x2000); // RAM can be accessed by the 68k
-	map(0x4000, 0x4003).rw(m_ymsnd, FUNC(ym2612_device::read), FUNC(ym2612_device::write));
+	map(0x4000, 0x4003).rw(m_ymsnd, FUNC(ym_generic_device::read), FUNC(ym_generic_device::write));
 
 	map(0x6000, 0x6000).w(FUNC(md_base_state::megadriv_z80_z80_bank_w));
 	map(0x6001, 0x6001).w(FUNC(md_base_state::megadriv_z80_z80_bank_w)); // wacky races uses this address
@@ -764,11 +764,11 @@ uint32_t md_base_state::screen_update_megadriv(screen_device &screen, bitmap_rgb
 	/* Copy our screen buffer here */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint32_t* desty = &bitmap.pix32(y, 0);
-		uint32_t* srcy;
+		uint32_t *const desty = &bitmap.pix(y, 0);
+		uint32_t const *srcy;
 
 		if (!m_vdp->m_use_alt_timing)
-			srcy = &m_vdp->m_render_bitmap->pix32(y, 0);
+			srcy = &m_vdp->m_render_bitmap->pix(y, 0);
 		else
 			srcy = m_vdp->m_render_line.get();
 
@@ -785,11 +785,12 @@ uint32_t md_base_state::screen_update_megadriv(screen_device &screen, bitmap_rgb
 
 /*****************************************************************************************/
 
-VIDEO_START_MEMBER(md_base_state,megadriv)
+void md_base_state::video_start()
 {
+	// nothing?
 }
 
-MACHINE_START_MEMBER(md_base_state,megadriv)
+void md_base_state::machine_start()
 {
 	m_io_pad_3b[0] = ioport("PAD1");
 	m_io_pad_3b[1] = ioport("PAD2");
@@ -802,7 +803,7 @@ MACHINE_START_MEMBER(md_base_state,megadriv)
 	save_item(NAME(m_megadrive_io_tx_regs));
 }
 
-MACHINE_RESET_MEMBER(md_base_state,megadriv)
+void md_base_state::machine_reset()
 {
 	/* default state of z80 = reset, with bus */
 	osd_printf_debug("Resetting Megadrive / Genesis\n");
@@ -908,9 +909,6 @@ void md_base_state::md_ntsc(machine_config &config)
 	m_z80snd->set_addrmap(AS_IO, &md_base_state::megadriv_z80_io_map);
 	/* IRQ handled via the timers */
 
-	MCFG_MACHINE_START_OVERRIDE(md_base_state,megadriv)
-	MCFG_MACHINE_RESET_OVERRIDE(md_base_state,megadriv)
-
 	megadriv_timers(config);
 
 	SEGA315_5313(config, m_vdp, MASTER_CLOCK_NTSC, m_maincpu);
@@ -922,16 +920,14 @@ void md_base_state::md_ntsc(machine_config &config)
 	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
-	screen_device &screen(SCREEN(config, "megadriv", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(double(MASTER_CLOCK_NTSC) / 10.0 / 262.0 / 342.0); // same as SMS?
-//  screen.set_refresh_hz(double(MASTER_CLOCK_NTSC) / 8.0 / 262.0 / 427.0); // or 427 Htotal?
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0)); // Vblank handled manually.
-	screen.set_size(64*8, 620);
-	screen.set_visarea(0, 32*8-1, 0, 28*8-1);
-	screen.set_screen_update(FUNC(md_base_state::screen_update_megadriv)); /* Copies a bitmap */
-	screen.screen_vblank().set(FUNC(md_base_state::screen_vblank_megadriv)); /* Used to Sync the timing */
-
-	MCFG_VIDEO_START_OVERRIDE(md_base_state, megadriv)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(double(MASTER_CLOCK_NTSC) / 10.0 / 262.0 / 342.0); // same as SMS?
+//  m_screen->set_refresh_hz(double(MASTER_CLOCK_NTSC) / 8.0 / 262.0 / 427.0); // or 427 Htotal?
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0)); // Vblank handled manually.
+	m_screen->set_size(64*8, 620);
+	m_screen->set_visarea(0, 32*8-1, 0, 28*8-1);
+	m_screen->set_screen_update(FUNC(md_base_state::screen_update_megadriv)); /* Copies a bitmap */
+	m_screen->screen_vblank().set(FUNC(md_base_state::screen_vblank_megadriv)); /* Used to Sync the timing */
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -973,9 +969,6 @@ void md_base_state::md_pal(machine_config &config)
 	m_z80snd->set_addrmap(AS_IO, &md_base_state::megadriv_z80_io_map);
 	/* IRQ handled via the timers */
 
-	MCFG_MACHINE_START_OVERRIDE(md_base_state,megadriv)
-	MCFG_MACHINE_RESET_OVERRIDE(md_base_state,megadriv)
-
 	megadriv_timers(config);
 
 	SEGA315_5313(config, m_vdp, MASTER_CLOCK_PAL, m_maincpu);
@@ -987,16 +980,14 @@ void md_base_state::md_pal(machine_config &config)
 	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
-	screen_device &screen(SCREEN(config, "megadriv", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(double(MASTER_CLOCK_PAL) / 10.0 / 313.0 / 342.0); // same as SMS?
-//  screen.set_refresh_hz(double(MASTER_CLOCK_PAL) / 8.0 / 313.0 / 423.0); // or 423 Htotal?
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0)); // Vblank handled manually.
-	screen.set_size(64*8, 620);
-	screen.set_visarea(0, 32*8-1, 0, 28*8-1);
-	screen.set_screen_update(FUNC(md_base_state::screen_update_megadriv)); /* Copies a bitmap */
-	screen.screen_vblank().set(FUNC(md_base_state::screen_vblank_megadriv)); /* Used to Sync the timing */
-
-	MCFG_VIDEO_START_OVERRIDE(md_base_state, megadriv)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(double(MASTER_CLOCK_PAL) / 10.0 / 313.0 / 342.0); // same as SMS?
+//  m_screen->set_refresh_hz(double(MASTER_CLOCK_PAL) / 8.0 / 313.0 / 423.0); // or 423 Htotal?
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0)); // Vblank handled manually.
+	m_screen->set_size(64*8, 620);
+	m_screen->set_visarea(0, 32*8-1, 0, 28*8-1);
+	m_screen->set_screen_update(FUNC(md_base_state::screen_update_megadriv)); /* Copies a bitmap */
+	m_screen->screen_vblank().set(FUNC(md_base_state::screen_vblank_megadriv)); /* Used to Sync the timing */
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1041,20 +1032,6 @@ void md_base_state::megadriv_init_common()
 	m_megadrive_io_read_data_port_ptr = read8sm_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_3button));
 	m_megadrive_io_write_data_port_ptr = write16sm_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_3button));
 }
-
-void md_base_state::init_megadriv_c2()
-{
-	megadriv_init_common();
-
-	m_vdp->set_use_cram(0); // C2 uses its own palette ram
-	m_vdp->set_vdp_pal(false);
-	m_vdp->set_framerate(60);
-	m_vdp->set_total_scanlines(262);
-
-	m_version_hi_nibble = 0x20; // JPN NTSC no-SCD
-}
-
-
 
 void md_base_state::init_megadriv()
 {

@@ -50,30 +50,32 @@ protected:
 	required_shared_ptr<uint16_t> m_regs;
 	required_shared_ptr<uint16_t> m_spriteram;
 
-	emu_timer *m_music_timer;
+	emu_timer *m_music_timer = nullptr;
 
-	int m_sound;
-	int m_melody;
-	int m_bar;
-	int m_track;
-	int m_snd_bank;
+	int m_sound = 0;
+	int m_melody = 0;
+	int m_bar = 0;
+	int m_track = 0;
+	int m_snd_bank = 0;
 
-	uint8_t m_oki_control;
-	uint8_t m_oki_command;
-	uint8_t m_oki_bank;
+	uint8_t m_oki_control = 0;
+	uint8_t m_oki_command = 0;
+	uint8_t m_oki_bank = 0;
 
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_tx_tilemap;
-	tilemap_t *m_md_tilemap;
+	uint32_t m_unk_458 = 0;
 
-	int m_sprites_x_offset;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_tx_tilemap = nullptr;
+	tilemap_t *m_md_tilemap = nullptr;
+
+	int m_sprites_x_offset = 0;
 	uint8_t playmark_snd_command_r();
 	void playmark_oki_w(uint8_t data);
 	void playmark_snd_control_w(uint8_t data);
-	DECLARE_WRITE16_MEMBER(sslam_tx_tileram_w);
-	DECLARE_WRITE16_MEMBER(sslam_md_tileram_w);
-	DECLARE_WRITE16_MEMBER(sslam_bg_tileram_w);
-	DECLARE_WRITE8_MEMBER(sslam_snd_w);
+	void sslam_tx_tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sslam_md_tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sslam_bg_tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sslam_snd_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_sslam_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_sslam_md_tile_info);
@@ -109,8 +111,8 @@ protected:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE16_MEMBER(powerbls_sound_w);
-	DECLARE_WRITE16_MEMBER(powerbls_bg_tileram_w);
+	void powerbls_sound_w(uint16_t data);
+	void powerbls_bg_tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 };
 
 #endif // MAME_INCLUDES_SSLAM_H

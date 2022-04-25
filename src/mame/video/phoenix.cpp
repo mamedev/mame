@@ -163,7 +163,7 @@ TILE_GET_INFO_MEMBER(phoenix_state::get_bg_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(phoenix_state,phoenix)
+void phoenix_state::video_start()
 {
 	m_videoram_pg[0] = std::make_unique<uint8_t[]>(0x1000);
 	memset(m_videoram_pg[0].get(), 0x00, 0x1000 * sizeof(uint8_t));
@@ -211,7 +211,7 @@ VIDEO_START_MEMBER(phoenix_state,phoenix)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(phoenix_state::phoenix_videoram_w)
+void phoenix_state::phoenix_videoram_w(offs_t offset, uint8_t data)
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -230,7 +230,7 @@ WRITE8_MEMBER(phoenix_state::phoenix_videoram_w)
 }
 
 
-WRITE8_MEMBER(phoenix_state::phoenix_videoreg_w)
+void phoenix_state::phoenix_videoreg_w(uint8_t data)
 {
 	if (m_videoram_pg_index != (data & 1))
 	{
@@ -253,7 +253,7 @@ WRITE8_MEMBER(phoenix_state::phoenix_videoreg_w)
 	}
 }
 
-WRITE8_MEMBER(phoenix_state::pleiads_videoreg_w)
+void phoenix_state::pleiads_videoreg_w(uint8_t data)
 {
 	if (m_videoram_pg_index != (data & 1))
 	{
@@ -288,7 +288,7 @@ WRITE8_MEMBER(phoenix_state::pleiads_videoreg_w)
 }
 
 
-WRITE8_MEMBER(phoenix_state::phoenix_scroll_w)
+void phoenix_state::phoenix_scroll_w(uint8_t data)
 {
 	m_bg_tilemap->set_scrollx(0,data);
 }
@@ -350,7 +350,7 @@ READ_LINE_MEMBER(phoenix_state::pleiads_protection_r)
 */
 
 #define REMAP_JS(js) ((ret & 0xf) | ( (js & 0xf)  << 4))
-READ8_MEMBER(phoenix_state::survival_input_port_0_r)
+uint8_t phoenix_state::survival_input_port_0_r()
 {
 	uint8_t ret;
 

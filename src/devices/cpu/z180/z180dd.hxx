@@ -236,7 +236,7 @@ OP(dd,c7) { illegal_1(); op_c7();                                   }         /*
 OP(dd,c8) { illegal_1(); op_c8();                                   } /* DB   DD          */
 OP(dd,c9) { illegal_1(); op_c9();                                   } /* DB   DD          */
 OP(dd,ca) { illegal_1(); op_ca();                                   } /* DB   DD          */
-OP(dd,cb) { m_R++; EAX(); m_extra_cycles += exec_xycb(ARG());                          } /* **   DD CB xx    */
+OP(dd,cb) { m_R++; EAX(); m_extra_cycles += exec_xycb(ROP());                          } /* **   DD CB xx    */
 OP(dd,cc) { illegal_1(); op_cc();                                   } /* DB   DD          */
 OP(dd,cd) { illegal_1(); op_cd();                                   } /* DB   DD          */
 OP(dd,ce) { illegal_1(); op_ce();                                   } /* DB   DD          */

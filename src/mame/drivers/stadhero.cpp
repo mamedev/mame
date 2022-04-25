@@ -94,16 +94,16 @@
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
-#include "sound/2203intf.h"
-#include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "sound/ymopn.h"
+#include "sound/ymopl.h"
 #include "emupal.h"
 #include "speaker.h"
 
 
 /******************************************************************************/
 
-WRITE16_MEMBER(stadhero_state::int_ack_w)
+void stadhero_state::int_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(M68K_IRQ_5, CLEAR_LINE);
 }

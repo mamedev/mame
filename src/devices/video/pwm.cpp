@@ -2,32 +2,36 @@
 // copyright-holders:hap
 /*
 
-This thing is a generic helper for PWM(strobed) display elements, to prevent flickering
-and optionally handle perceived brightness levels.
+This thing is a generic helper for PWM(strobed) display elements, to prevent
+flickering and optionally handle perceived brightness levels.
 
-Common usecase is to call matrix(selmask, datamask), a collision between the 2 masks
-implies a powered-on display element (eg, a LED, or VFD sprite). The maximum matrix
-size is 64 by 64, simply due to uint64_t constraints. If a larger size is needed,
-create an array of pwm_display_device.
+Common usecase is to call matrix(selmask, datamask), a collision between the
+2 masks implies a powered-on display element (eg. a LED, or VFD sprite).
+The maximum matrix size is 64 by 64, simply due to uint64_t constraints.
+If a larger size is needed, create an array of pwm_display_device.
 
-If display elements are directly addressable, you can also use write_element or write_row
-to set them. In this case it is required to call update() to apply the changes.
+If display elements are directly addressable, you can also use write_element
+or write_row to set them.
 
-Display element states are sent to output tags "y.x" where y is the matrix row number,
-x is the row bit. It is also sent to "y.a" for all rows. The output state is 0 for off,
-and >0 for on, depending on brightness level. If segmask is defined, it is also sent
-to "digity", for use with multi-state elements, eg. 7seg leds.
+Display element states are sent to output tags "y.x" where y is the matrix row
+number, x is the row bit. It is also sent to "y.a" for all rows. The output state
+is 0 for off, and >0 for on, depending on brightness level.
 
-If you use this device in a slot, or use multiple of them (or just don't want to use
-the default output tags), set a callback.
+If segmask is defined, it is also sent to "multiy.b" where b is brightness level,
+for use with multi-state elements. This usecase is not common though (one example
+is Coleco Quarterback where some digit segments are brighter). And when brightness
+level does not matter, it is also sent to "digity", for common 7seg leds.
 
-Brightness tresholds (0.0 to 1.0) indicate how long an element was powered on in the last
-frame, eg. 0.01 means a minimum on-time for 1%. Some games use two levels of brightness
-by strobing elements longer.
+If you use this device in a slot, or use multiple of them (or just don't want
+to use the default output tags), set a callback.
 
+Brightness tresholds (0.0 to 1.0) indicate how long an element was powered on
+in the last frame, eg. 0.01 means a minimum on-time for 1%. Some games use two
+levels of brightness by strobing elements longer.
 
 TODO:
-- multiple brightness levels doesn't work for SVGs
+- SVG screens and rendlay digit elements don't support multiple brightness levels,
+  the latter can be worked around with by stacking digits on top of eachother
 
 */
 
@@ -43,13 +47,15 @@ DEFINE_DEVICE_TYPE(PWM_DISPLAY, pwm_display_device, "pwm_display", "PWM Display"
 //  constructor
 //-------------------------------------------------
 
-pwm_display_device::pwm_display_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pwm_display_device::pwm_display_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, PWM_DISPLAY, tag, owner, clock),
 	m_out_x(*this, "%u.%u", 0U, 0U),
 	m_out_a(*this, "%u.a", 0U),
+	m_out_multi(*this, "multi%u.%u", 0U, 0U),
 	m_out_digit(*this, "digit%u", 0U),
 	m_output_x_cb(*this),
 	m_output_a_cb(*this),
+	m_output_multi_cb(*this),
 	m_output_digit_cb(*this)
 {
 	// set defaults
@@ -63,7 +69,6 @@ pwm_display_device::pwm_display_device(const machine_config &mconfig, const char
 }
 
 
-
 //-------------------------------------------------
 //  device_start/reset
 //-------------------------------------------------
@@ -71,28 +76,30 @@ pwm_display_device::pwm_display_device(const machine_config &mconfig, const char
 void pwm_display_device::device_start()
 {
 	// resolve handlers
-	m_external_output = !m_output_x_cb.isnull() || !m_output_a_cb.isnull() || !m_output_digit_cb.isnull();
+	m_external_output = !m_output_x_cb.isnull() || !m_output_a_cb.isnull() || !m_output_multi_cb.isnull() || !m_output_digit_cb.isnull();
 	m_output_x_cb.resolve_safe();
 	m_output_a_cb.resolve_safe();
+	m_output_multi_cb.resolve_safe();
 	m_output_digit_cb.resolve_safe();
 
 	if (!m_external_output)
 	{
 		m_out_x.resolve();
 		m_out_a.resolve();
+		m_out_multi.resolve();
 		m_out_digit.resolve();
 	}
 
 	// initialize
-	std::fill_n(m_rowdata, ARRAY_LENGTH(m_rowdata), 0);
-	std::fill_n(m_rowdata_prev, ARRAY_LENGTH(m_rowdata_prev), 0);
-	std::fill_n(*m_bri, ARRAY_LENGTH(m_bri) * ARRAY_LENGTH(m_bri[0]), 0.0);
+	m_rowsel = 0;
+	m_rowdata_last = 0;
+	std::fill(std::begin(m_rowdata), std::end(m_rowdata), 0);
+
+	for (auto &bri : m_bri)
+		std::fill(std::begin(bri), std::end(bri), 0.0);
 
 	m_frame_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pwm_display_device::frame_tick),this));
-	m_update_time = machine().time();
-
-	m_rowsel = 0;
-	m_rowsel_prev = 0;
+	m_sync_time = machine().time();
 
 	// register for savestates
 	save_item(NAME(m_width));
@@ -106,14 +113,12 @@ void pwm_display_device::device_start()
 
 	save_item(NAME(m_segmask));
 	save_item(NAME(m_rowsel));
-	save_item(NAME(m_rowsel_prev));
 	save_item(NAME(m_rowdata));
-	save_item(NAME(m_rowdata_prev));
+	save_item(NAME(m_rowdata_last));
 
 	save_item(NAME(m_bri));
-	save_item(NAME(m_update_time));
-	save_item(NAME(m_acc_attos));
-	save_item(NAME(m_acc_secs));
+	save_item(NAME(m_sync_time));
+	save_item(NAME(m_acc));
 }
 
 void pwm_display_device::device_reset()
@@ -122,32 +127,8 @@ void pwm_display_device::device_reset()
 		fatalerror("%s: Invalid size %d*%d, maximum is 64*64!\n", tag(), m_height, m_width);
 
 	schedule_frame();
-	m_update_time = machine().time();
+	m_sync_time = machine().time();
 }
-
-
-
-//-------------------------------------------------
-//  custom savestate handling (MAME doesn't save array of attotime)
-//-------------------------------------------------
-
-void pwm_display_device::device_pre_save()
-{
-	for (int y = 0; y < ARRAY_LENGTH(m_acc); y++)
-		for (int x = 0; x < ARRAY_LENGTH(m_acc[0]); x++)
-		{
-			m_acc_attos[y][x] = m_acc[y][x].attoseconds();
-			m_acc_secs[y][x] = m_acc[y][x].seconds();
-		}
-}
-
-void pwm_display_device::device_post_load()
-{
-	for (int y = 0; y < ARRAY_LENGTH(m_acc); y++)
-		for (int x = 0; x < ARRAY_LENGTH(m_acc[0]); x++)
-			m_acc[y][x] = attotime(m_acc_secs[y][x], m_acc_attos[y][x]);
-}
-
 
 
 //-------------------------------------------------
@@ -179,8 +160,10 @@ pwm_display_device &pwm_display_device::set_segmask(u64 digits, u64 mask)
 	return *this;
 }
 
-void pwm_display_device::matrix_partial(u8 start, u8 height, u64 rowsel, u64 rowdata, bool upd)
+void pwm_display_device::matrix_partial(u8 start, u8 height, u64 rowsel, u64 rowdata)
 {
+	sync();
+
 	u64 selmask = (u64(1) << height) - 1;
 	rowsel &= selmask;
 	selmask <<= start;
@@ -188,49 +171,13 @@ void pwm_display_device::matrix_partial(u8 start, u8 height, u64 rowsel, u64 row
 
 	// update selected rows
 	u64 rowmask = (u64(1) << m_width) - 1;
+	m_rowdata_last = rowdata & rowmask;
 	for (int y = start; y < (start + height) && y < m_height; y++)
 	{
 		m_rowdata[y] = (rowsel & 1) ? (rowdata & rowmask) : 0;
 		rowsel >>= 1;
 	}
-
-	if (upd)
-		update();
 }
-
-void pwm_display_device::update()
-{
-	// call this every time after m_rowdata is changed (automatic with matrix)
-	const attotime now = machine().time();
-	const attotime diff = (m_update_time >= now) ? attotime::zero : now - m_update_time;
-
-	u64 sel = m_rowsel_prev;
-	m_rowsel_prev = m_rowsel;
-
-	// accumulate active time
-	for (int y = 0; y < m_height; y++)
-	{
-		u64 row = m_rowdata_prev[y];
-		m_rowdata_prev[y] = m_rowdata[y];
-
-		if (diff != attotime::zero)
-		{
-			if (sel & 1)
-				m_acc[y][m_width] += diff;
-
-			for (int x = 0; x < m_width; x++)
-			{
-				if (row & 1)
-					m_acc[y][x] += diff;
-				row >>= 1;
-			}
-		}
-		sel >>= 1;
-	}
-
-	m_update_time = now;
-}
-
 
 
 //-------------------------------------------------
@@ -239,7 +186,7 @@ void pwm_display_device::update()
 
 void pwm_display_device::schedule_frame()
 {
-	std::fill_n(*m_acc, m_height * ARRAY_LENGTH(m_acc[0]), attotime::zero);
+	std::fill_n(*m_acc, m_height * std::size(m_acc[0]), attotime::zero);
 
 	m_framerate = m_framerate_set;
 	m_frame_timer->adjust(m_framerate);
@@ -252,21 +199,21 @@ TIMER_CALLBACK_MEMBER(pwm_display_device::frame_tick)
 	const double factor1 = 1.0 - factor0;
 
 	// determine brightness cutoff
+	u8 max_levels = 1;
+	for (; m_levels[max_levels] < 1.0; max_levels++) { ; }
 	double cutoff = m_level_max;
+
 	if (cutoff == 0.0)
-	{
-		u8 level;
-		for (level = 1; m_levels[level] < 1.0; level++) { ; }
-		cutoff = 4 * m_levels[level - 1];
-	}
+		cutoff = 4 * m_levels[max_levels - 1];
 	if (cutoff > 1.0)
 		cutoff = 1.0;
 
-	update(); // final timeslice
+	sync(); // final timeslice
 
 	for (int y = 0; y < m_height; y++)
 	{
-		u64 row = 0;
+		u64 multi_row[0x40];
+		std::fill(std::begin(multi_row), std::end(multi_row), 0);
 
 		for (int x = 0; x <= m_width; x++)
 		{
@@ -282,8 +229,7 @@ TIMER_CALLBACK_MEMBER(pwm_display_device::frame_tick)
 			// output to y.x, or y.a when always-on
 			if (x != m_width)
 			{
-				if (level > m_level_min)
-					row |= (u64(1) << x);
+				multi_row[level] |= (u64(1) << x);
 
 				if (m_external_output)
 					m_output_x_cb(x << 6 | y, level);
@@ -299,17 +245,61 @@ TIMER_CALLBACK_MEMBER(pwm_display_device::frame_tick)
 			}
 		}
 
-		// output to digity (does not support multiple brightness levels)
+		// multi-state outputs
 		if (m_segmask[y] != 0)
 		{
-			row &= m_segmask[y];
+			u64 digit_row = 0;
 
+			for (int b = 0; b <= max_levels; b++)
+			{
+				multi_row[b] &= m_segmask[y];
+				if (b > m_level_min)
+					digit_row |= multi_row[b];
+
+				// output to multiy.b
+				if (m_external_output)
+					m_output_multi_cb(b << 6 | y, digit_row);
+				else
+					m_out_multi[y][b] = multi_row[b];
+			}
+
+			// output to digity (single brightness level)
 			if (m_external_output)
-				m_output_digit_cb(y, row);
+				m_output_digit_cb(y, digit_row);
 			else
-				m_out_digit[y] = row;
+				m_out_digit[y] = digit_row;
 		}
 	}
 
 	schedule_frame();
+}
+
+void pwm_display_device::sync()
+{
+	const attotime now = machine().time();
+	const attotime last = m_sync_time;
+	m_sync_time = now;
+
+	if (last >= now)
+		return;
+
+	const attotime diff = now - last;
+	u64 sel = m_rowsel;
+
+	// accumulate active time
+	for (int y = 0; y < m_height; y++)
+	{
+		u64 row = m_rowdata[y];
+
+		if (sel & 1)
+			m_acc[y][m_width] += diff;
+
+		for (int x = 0; x < m_width; x++)
+		{
+			if (row & 1)
+				m_acc[y][x] += diff;
+			row >>= 1;
+		}
+		sel >>= 1;
+	}
 }

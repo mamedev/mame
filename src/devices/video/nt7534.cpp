@@ -100,7 +100,7 @@ void nt7534_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void nt7534_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nt7534_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -148,7 +148,7 @@ uint32_t nt7534_device::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		{
 			uint8_t py = (y + m_display_start_line - 32) % 65;
 			uint8_t page = py/8;
-			bitmap.pix16(y, x) = BIT(m_ddram[page*132 + px], py%8);
+			bitmap.pix(y, x) = BIT(m_ddram[page*132 + px], py%8);
 		}
 	}
 
@@ -331,7 +331,7 @@ void nt7534_device::data_write(uint8_t data)
 
 	LOG("RAM write %x %x '%c'\n", m_page*132 + m_column, m_dr, isprint(m_dr) ? m_dr : '.');
 
-	if (m_page*132 + m_column < ARRAY_LENGTH(m_ddram))
+	if (m_page*132 + m_column < std::size(m_ddram))
 		m_ddram[m_page*132 + m_column] = m_dr;
 
 	if (m_column < 131)
@@ -342,7 +342,7 @@ void nt7534_device::data_write(uint8_t data)
 
 uint8_t nt7534_device::data_read()
 {
-	if (m_page*132 + m_column >= ARRAY_LENGTH(m_ddram))
+	if (m_page*132 + m_column >= std::size(m_ddram))
 		return 0;
 
 	uint8_t data = m_ddram[m_page*132 + m_column];

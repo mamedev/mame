@@ -15,8 +15,7 @@
 
 // ======================> dio16_98644_device
 
-namespace bus {
-	namespace hp_dio {
+namespace bus::hp_dio {
 
 class dio16_98644_device :
 		public device_t,
@@ -38,8 +37,8 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	DECLARE_READ16_MEMBER(io_r);
-	DECLARE_WRITE16_MEMBER(io_w);
+	uint16_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint16_t data);
 
 	required_device<ins8250_device> m_uart;
 
@@ -53,7 +52,6 @@ private:
 };
 
 } // namespace bus::hp_dio
-} // namespace bus
 
 // device type definition
 DECLARE_DEVICE_TYPE_NS(HPDIO_98644, bus::hp_dio, dio16_98644_device)

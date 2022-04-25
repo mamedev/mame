@@ -19,10 +19,9 @@
 //#define VERBOSE 1
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(HPDIO_HUMAN_INTERFACE, bus::hp_dio, human_interface_device, "human_interface", "HP human interface card")
+DEFINE_DEVICE_TYPE(HPDIO_HUMAN_INTERFACE, bus::hp_dio::human_interface_device, "human_interface", "HP human interface card")
 
-namespace bus {
-	namespace hp_dio {
+namespace bus::hp_dio {
 
 void human_interface_device::device_add_mconfig(machine_config &config)
 {
@@ -108,7 +107,18 @@ human_interface_device::human_interface_device(const machine_config &mconfig, de
 	m_sound(*this, "sn76494"),
 	m_tms9914(*this, "tms9914"),
 	m_rtc(*this, "rtc"),
-	m_ieee488(*this, IEEE488_TAG)
+	m_ieee488(*this, IEEE488_TAG),
+	m_hil_read(false),
+	m_kbd_nmi(false),
+	m_gpib_irq_line(false),
+	m_gpib_dma_line(false),
+	m_old_latch_enable(false),
+	m_gpib_dma_enable(false),
+	m_hil_data(0),
+	m_latch_data(0),
+	m_rtc_data(0),
+	m_ppoll_sc(0),
+	m_ppoll_mask(0)
 {
 }
 
@@ -119,8 +129,8 @@ void human_interface_device::device_start()
 			write8sm_delegate(*m_iocpu, FUNC(upi41_cpu_device::upi41_master_w)), 0x00ff00ff);
 
 	program_space().install_readwrite_handler(0x470000, 0x47001f, 0x1f, 0xffe0, 0,
-			read8_delegate(*this, FUNC(human_interface_device::gpib_r)),
-			write8_delegate(*this, FUNC(human_interface_device::gpib_w)), 0x00ff00ff);
+			read8sm_delegate(*this, FUNC(human_interface_device::gpib_r)),
+			write8sm_delegate(*this, FUNC(human_interface_device::gpib_w)), 0x00ff00ff);
 
 	save_item(NAME(m_hil_read));
 	save_item(NAME(m_kbd_nmi));
@@ -137,11 +147,17 @@ void human_interface_device::device_start()
 
 void human_interface_device::device_reset()
 {
-	m_ppoll_sc = 0;
-	m_gpib_irq_line = false;
+	m_hil_read = false;
 	m_kbd_nmi = false;
-	m_old_latch_enable = true;
+	m_gpib_irq_line = false;
+	m_gpib_dma_line = false;
 	m_gpib_dma_enable = false;
+	m_old_latch_enable = true;
+	m_ppoll_sc = 0;
+	m_hil_data = 0;
+	m_latch_data = 0;
+	m_rtc_data = 0;
+	m_ppoll_mask = 0;
 	m_rtc->cs1_w(ASSERT_LINE);
 	m_rtc->cs2_w(CLEAR_LINE);
 	m_rtc->write_w(CLEAR_LINE);
@@ -192,7 +208,7 @@ void human_interface_device::ieee488_dio_w(uint8_t data)
 	}
 }
 
-WRITE8_MEMBER(human_interface_device::gpib_w)
+void human_interface_device::gpib_w(offs_t offset, uint8_t data)
 {
 	if (offset & 0x08) {
 		m_tms9914->write(offset & 0x07, data);
@@ -230,7 +246,7 @@ WRITE8_MEMBER(human_interface_device::gpib_w)
 	LOG("gpib_w: %s %02X = %02X\n", machine().describe_context().c_str(), offset, data);
 }
 
-READ8_MEMBER(human_interface_device::gpib_r)
+uint8_t human_interface_device::gpib_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -372,4 +388,3 @@ uint8_t human_interface_device::dmack_r_in(int channel)
 }
 
 } // namespace bus::hp_dio
-} // namespace bus

@@ -1,10 +1,28 @@
+<p align="center">
+<img src="https://repository-images.githubusercontent.com/3925242/a4566200-912a-11ea-984f-c387546a3126">
+</p>
+
 [bgfx](https://github.com/bkaradzic/bgfx) - Cross-platform rendering library
 ============================================================================
 
-[![Build Status](https://travis-ci.org/bkaradzic/bgfx.svg?branch=master)](https://travis-ci.org/bkaradzic/bgfx)
+<p align="center">
+    <a href="#what-is-it">What is it?</a> -
+    <a href="https://bkaradzic.github.io/bgfx/build.html">Building</a> -
+    <a href="https://bkaradzic.github.io/bgfx/overview.html#getting-involved">Getting Involved</a> -
+    <a href="https://bkaradzic.github.io/bgfx/examples.html">Examples</a> -
+    <a href="https://bkaradzic.github.io/bgfx/bgfx.html">API Reference</a> -
+    <a href="https://bkaradzic.github.io/bgfx/tools.html">Tools</a> -
+    <a href="#who-is-using-it-madewithbgfx">Who is using it?</a> -
+    <a href="#license-bsd-2-clause">License</a>
+</p>
+
 [![Build status](https://ci.appveyor.com/api/projects/status/ipa3ojgeaet1oko5?svg=true)](https://ci.appveyor.com/project/bkaradzic/bgfx)
 [![License](https://img.shields.io/badge/license-BSD--2%20clause-blue.svg)](https://bkaradzic.github.io/bgfx/license.html)
-[![Join the chat at https://gitter.im/bkaradzic/bgfx](https://badges.gitter.im/bkaradzic/bgfx.svg)](https://gitter.im/bkaradzic/bgfx)
+[![Join the chat at https://discord.gg/9eMbv7J](https://img.shields.io/discord/712512073522872352?color=%237289DA&label=bgfx&logo=discord&logoColor=white)](https://discord.gg/9eMbv7J)
+
+ * [GitHub Discussions](https://github.com/bkaradzic/bgfx/discussions)
+ * [Discord Chat](https://discord.gg/9eMbv7J)
+ * [AppVeyor CI](https://ci.appveyor.com/project/bkaradzic/bgfx)
 
 [What is it?](https://bkaradzic.github.io/bgfx/overview.html)
 -------------------------------------------------------------
@@ -17,6 +35,7 @@ Supported rendering backends:
  * Direct3D 9
  * Direct3D 11
  * Direct3D 12
+ * GNM (only for licensed PS4 developers, search DevNet forums for source)
  * Metal
  * OpenGL 2.1
  * OpenGL 3.1+
@@ -25,6 +44,7 @@ Supported rendering backends:
  * Vulkan
  * WebGL 1.0
  * WebGL 2.0
+ * WebGPU/Dawn (experimental)
 
 Supported platforms:
 
@@ -35,8 +55,8 @@ Supported platforms:
  * Linux
  * MIPS Creator CI20
  * OSX (10.12+)
+ * PlayStation 4
  * RaspberryPi
- * SteamLink
  * Windows (XP, Vista, 7, 8, 10)
  * UWP (Universal Windows, Xbox One)
 
@@ -49,6 +69,7 @@ Supported compilers:
 Languages:
 
  * [C/C++ API documentation](https://bkaradzic.github.io/bgfx/bgfx.html)
+ * [Beef API bindings](https://github.com/bkaradzic/bgfx/tree/master/bindings/bf)
  * [C# language API bindings #1](https://github.com/bkaradzic/bgfx/tree/master/bindings/cs)
  * [C#/VB/F# language API bindings #2](https://github.com/MikePopoloski/SharpBgfx)
  * [D language API bindings](https://github.com/GoaLitiuM/bindbc-bgfx)
@@ -57,28 +78,12 @@ Languages:
  * [Lightweight Java Game Library 3 bindings](https://github.com/LWJGL/lwjgl3)
  * [Lua language API bindings](https://github.com/cloudwu/lua-bgfx)
  * [Nim language API bindings](https://github.com/Halsys/nim-bgfx)
- * [Python language API bindings](https://github.com/jnadro/pybgfx#pybgf)
- * [Python language API bindings (alternative)](https://github.com/fbertola/bgfx-python#-----bgfx-python--)
- * [Rust language API bindings](https://github.com/rhoot/bgfx-rs)
+ * [Pascal language API bindings](https://github.com/Akira13641/PasBGFX)
+ * [Python language API bindings #1](https://github.com/fbertola/bgfx-python#-----bgfx-python--)
+ * [Python language API bindings #2](https://github.com/jnadro/pybgfx#pybgfx)
+ * [Rust language API bindings (obsolete)](https://github.com/rhoot/bgfx-rs)
+ * [Rust language API bindings (new)](https://github.com/emoon/bgfx-rs)
  * [Swift language API bindings](https://github.com/stuartcarnie/SwiftBGFX)
-
-[Building](https://bkaradzic.github.io/bgfx/build.html)
-----------------------------------------------------
-
- - AppVeyor https://ci.appveyor.com/project/bkaradzic/bgfx
- - TravisCI https://travis-ci.org/bkaradzic/bgfx
-
-[Getting involved](https://bkaradzic.github.io/bgfx/overview.html#getting-involved)
------------------------------------------------------------------------------------
-
-[Examples](https://bkaradzic.github.io/bgfx/examples.html)
-----------------------------------------------------------
-
-[API Reference](https://bkaradzic.github.io/bgfx/bgfx.html)
------------------------------------------------------------
-
-[Tools](https://bkaradzic.github.io/bgfx/tools.html)
-----------------------------------------------------
 
 Who is using it? [#madewithbgfx](https://twitter.com/search?q=%23madewithbgfx&f=live)
 -------------------------------------------------------------------------------------
@@ -365,6 +370,124 @@ An open source reimplementation of the game Black & White (2001).
 
 ![openblack](https://user-images.githubusercontent.com/1388267/67631321-93c85380-f88c-11e9-9103-804807844af2.png)
 
+## Cluster
+
+Implementation of Clustered Shading and Physically Based Rendering with the bgfx rendering library.
+
+[Cluster](https://github.com/pezcode/Cluster#cluster)
+
+![cluster](https://raw.githubusercontent.com/pezcode/Cluster/master/images/sponza.jpg)
+
+## NIMBY Rails
+
+NIMBY Rails is a management and design sandbox game for railways you build in the real world.
+
+[NIMBY Rails](https://store.steampowered.com/app/1134710/NIMBY_Rails/)
+
+![NIMBY Rails](https://user-images.githubusercontent.com/28320/78472283-03d5e200-7727-11ea-8bd4-db8754f52dc3.jpg)
+
+## Minecraft
+
+https://www.minecraft.net/zh-hant/attribution/
+
+![home-hero-1200x600](https://user-images.githubusercontent.com/814772/79185288-57050000-7dcb-11ea-87b4-2126fcd1545b.jpg)
+
+
+## FFNx
+
+Next generation driver for Final Fantasy VII and Final Fantasy VIII
+(with native Steam 2013 release support!)
+
+[FFNx](https://github.com/julianxhokaxhiu/FFNx#ffnx)
+
+![FFVIII](https://raw.githubusercontent.com/julianxhokaxhiu/FFNx/master/.screens/ff8.png)
+
+
+## Shadow Gangs
+
+Shadow Gangs is an arcade style ninja action game.
+
+https://www.microsoft.com/en-gb/p/shadow-gangs/9n6hkcr65qdq
+
+![Shadow Gangs](https://user-images.githubusercontent.com/814772/94508248-64ba1080-01c6-11eb-800f-47dc374ef054.jpeg)
+
+## Growtopia
+
+Growtopia is a free-to-play sandbox MMO game with almost endless possibilities
+for world creation, customization and having fun with your friends. Enjoy
+thousands of items, challenges and events.
+
+https://growtopiagame.com/
+
+![growtopia](https://s3.eu-west-1.amazonaws.com/cdn.growtopiagame.com/website/resources/assets/images/grow_header.jpg)
+
+## Galaxy Trucker
+
+Digital implementation of tabletop spaceship building in real-time or turn-based mode,
+then surviving space adventures, with AI opponents, multiplayer, achievements
+and solo campaign.
+
+https://galaxytrucker.com/
+
+![Galaxy Trucker](https://press.galaxytrucker.com/images/GTAT_junk.png)
+
+## Through the Ages
+
+The card tabletop deep strategy game in your devices. Lead your civilization from pyramids
+to space flights. Challenges, achievements, skilled AIs and online multiplayer.
+
+https://throughtheages.com/
+
+![Through the Ages](https://press.throughtheages.com/images/tta01.png)
+
+## Codenames
+
+One of the best party game. Two rival spymasters know the secret identities of 25 agents.
+Their teammates know the agents only by their codenames. Simple to explain,
+easy to understand, challenging gameplay.
+
+https://codenamesgame.com/
+
+![Codenames](https://codenamesgame.com/img/game-features-img-1.jpg)
+
+## PeakFinder
+
+PeakFinder shows the names of all mountains and peaks with a 360° panorama display.
+More than 850'000 peaks - from Mount Everest to the little hill around the corner.
+
+https://www.peakfinder.org/
+
+![PeakFinder](https://pfweb-c125.kxcdn.com/images/mobile/cards//en/cameramode.jpg)
+
+## Ember Sword
+
+Ember Sword is a free to play MMORPG running directly in your browser and is
+being developed and published by Bright Star Studios.
+
+https://embersword.com
+
+![Ember-Sword-ConceptArt5](https://user-images.githubusercontent.com/814772/120714133-a860ca80-c477-11eb-8680-f5a948dfd050.png)
+
+## Off The Road Unleashed
+
+Off The Road Unleashed is a sandbox driving game for the Nintendo Switch.  
+If you see a vehicle you bet you can hop into it! Pilot big rigs, helicopters, boats, airplanes or even trains. Sand dunes, frozen plains, mountains to climb and conquer.
+
+https://www.nintendo.com/games/detail/off-the-road-unleashed-switch/
+
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=cwDR0Wj3LO4" 
+target="_blank"><img src="http://img.youtube.com/vi/cwDR0Wj3LO4/0.jpg" 
+alt="Off The Road Unleashed"
+width="640" height="480" border="0" /></a>
+
+## Guild Wars 2
+
+Guild Wars 2 is an online role-playing game with fast-paced action combat, a rich and detailed universe of stories, awe-inspiring landscapes to explore, two challenging player vs. player modes—and no subscription fees!
+
+https://www.guildwars2.com/
+
+![Guild-Wars-2-wallpaper](https://d3b4yo2b5lbfy.cloudfront.net/wp-content/uploads/wallpapers/GuildWars2-01-800x600.jpg)
+
 [License (BSD 2-clause)](https://bkaradzic.github.io/bgfx/license.html)
 -----------------------------------------------------------------------
 
@@ -372,7 +495,7 @@ An open source reimplementation of the game Black & White (2001).
 <img align="right" src="http://opensource.org/trademarks/opensource/OSI-Approved-License-100x137.png">
 </a>
 
-	Copyright 2010-2019 Branimir Karadzic
+	Copyright 2010-2021 Branimir Karadzic
 	
 	Redistribution and use in source and binary forms, with or without modification,
 	are permitted provided that the following conditions are met:

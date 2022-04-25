@@ -157,20 +157,20 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_ioport_array<4> m_in_track;
 
-	tilemap_t *m_tilemap;
+	tilemap_t *m_tilemap = nullptr;
 	std::unique_ptr<bitmap_ind16> m_seabitmap[2];
 	struct
 	{
-		uint8_t offs;
-		uint8_t x;
-		uint8_t y;
+		uint8_t offs = 0;
+		uint8_t x = 0;
+		uint8_t y = 0;
 		bitmap_ind16 bitmap;
 	}m_obj[2];
 
-	uint8_t m_layer_en;
-	uint8_t m_in_select;
-	bool m_screen_flip;
-	uint8_t m_sea_bank;
+	uint8_t m_layer_en = 0;
+	uint8_t m_in_select = 0;
+	bool m_screen_flip = false;
+	uint8_t m_sea_bank = 0;
 
 	void init_seabitmap();
 	void obj_reg_w(uint8_t which,uint8_t reg, uint8_t data);
@@ -205,8 +205,8 @@ void marinedt_state::init_seabitmap()
 			if(blue_pen > 0x5f)
 				blue_pen = 0x5f;
 
-			m_seabitmap[0]->pix16(y, x) = blue_pen;
-			m_seabitmap[1]->pix16(y, x) = blue_pen+0x20;
+			m_seabitmap[0]->pix(y, x) = blue_pen;
+			m_seabitmap[1]->pix(y, x) = blue_pen+0x20;
 		}
 	}
 }
@@ -360,11 +360,11 @@ inline uint32_t marinedt_state::obj_to_obj_collision()
 			resx = m_obj[0].x + x;
 			resy = m_obj[0].y + y;
 
-			if((m_obj[0].bitmap.pix16(resy,resx) & 3) == 0)
+			if((m_obj[0].bitmap.pix(resy,resx) & 3) == 0)
 				continue;
 
 			// return value is never read most likely
-			if(m_obj[1].bitmap.pix16(resy,resx) != 0)
+			if(m_obj[1].bitmap.pix(resy,resx) != 0)
 				return ((resy / 8) * 32) | (((resx / 8) - 1) & 0x1f);
 		}
 	}
@@ -387,14 +387,14 @@ inline uint32_t marinedt_state::obj_to_layer_collision()
 			resx = m_obj[0].x + x;
 			resy = m_obj[0].y + y;
 
-			if((m_obj[0].bitmap.pix16(resy,resx) & 3) == 0)
+			if((m_obj[0].bitmap.pix(resy,resx) & 3) == 0)
 				continue;
 
 			if(!m_screen_flip)
 				resy -= 32;
 
 			// TODO: non screen flip path doesn't work properly
-			if(m_tilemap->pixmap().pix16(resy,resx) != 0)
+			if(m_tilemap->pixmap().pix(resy,resx) != 0)
 			{
 				if(m_screen_flip)
 					return ((resy / 8) * 32) | (((resx / 8) - 1) & 0x1f);

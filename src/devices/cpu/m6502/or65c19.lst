@@ -95,7 +95,7 @@ bas_amr
 	prefetch();
 
 brk_r_imp
-	if(irq_taken || nmi_state) {
+	if(irq_taken || nmi_pending) {
 		read_pc_noinc();
 	} else {
 		read_pc();
@@ -104,12 +104,12 @@ brk_r_imp
 	dec_SP();
 	write(SP, PC);
 	dec_SP();
-	write(SP, irq_taken || nmi_state ? P & ~F_B : P);
+	write(SP, irq_taken || nmi_pending ? P & ~F_B : P);
 	dec_SP();
-	if(irq_taken && nmi_state) {
+	if(irq_taken && nmi_pending) {
 		PC = read_arg(0xfffc);
 		PC = set_h(PC, read_arg(0xfffd));
-		nmi_state = false;
+		nmi_pending = false;
 		standard_irq_callback(NMI_LINE);
 	} else {
 		TMP = get_irq_vector();

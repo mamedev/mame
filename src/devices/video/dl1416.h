@@ -7,7 +7,7 @@
  * 4-Digit 16-Segment Alphanumeric Intelligent Display
  * with Memory/Decoder/Driver
  *
- * See video/dl1416.c for more info
+ * See video/dl1416.cpp for more info
  *
  ****************************************************************************/
 
@@ -36,8 +36,7 @@ public:
 	auto update() { return m_update_cb.bind(); }
 
 	// signal-level interface
-	DECLARE_WRITE_LINE_MEMBER(wr_w); // write strobe (rising edge)
-	DECLARE_WRITE_LINE_MEMBER(ce_w); // chip enable (active low)
+	virtual DECLARE_WRITE_LINE_MEMBER(wr_w); // write strobe (rising edge)
 	void addr_w(u8 state);
 	void data_w(u8 state);
 
@@ -59,23 +58,24 @@ protected:
 	void set_cursor_state(offs_t offset, bool state);
 	virtual u16 translate(u8 digit, bool cursor) const = 0;
 
+	// input line state
+	bool m_wr_in;
+	u8 m_addr_in;
+	u8 m_data_in;
+
 private:
 	devcb_write16 m_update_cb;
 
 	// internal state
 	u8 m_digit_ram[4]; // holds the digit code for each position
 	bool m_cursor_state[4]; // holds the cursor state for each position
-
-	// input line state
-	bool m_wr_in;
-	bool m_ce_in, m_ce_latch;
-	u8 m_addr_in, m_addr_latch;
-	u8 m_data_in;
 };
 
 class dl1416_device : public dl1414_device
 {
 public:
+	virtual DECLARE_WRITE_LINE_MEMBER(wr_w) override;
+	DECLARE_WRITE_LINE_MEMBER(ce_w); // chip enable (active low)
 	DECLARE_WRITE_LINE_MEMBER(cu_w); // cursor enable (active low)
 
 protected:
@@ -93,7 +93,9 @@ protected:
 
 private:
 	// input line state
+	bool m_ce_in, m_ce_latch;
 	bool m_cu_in;
+	u8 m_addr_latch;
 };
 
 #endif // MAME_VIDEO_DL1416_H

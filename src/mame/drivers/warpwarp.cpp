@@ -160,7 +160,7 @@ WRITE_LINE_MEMBER(warpwarp_state::vblank_irq)
 }
 
 /* B&W Games I/O */
-READ8_MEMBER(warpwarp_state::geebee_in_r)
+uint8_t warpwarp_state::geebee_in_r(offs_t offset)
 {
 	int res;
 
@@ -180,7 +180,7 @@ READ8_MEMBER(warpwarp_state::geebee_in_r)
 	return res;
 }
 
-WRITE8_MEMBER(warpwarp_state::geebee_out6_w)
+void warpwarp_state::geebee_out6_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 3)
 	{
@@ -231,19 +231,19 @@ WRITE_LINE_MEMBER(warpwarp_state::inv_w)
 /* Color Games I/O */
 
 /* Read Switch Inputs */
-READ8_MEMBER(warpwarp_state::warpwarp_sw_r)
+uint8_t warpwarp_state::warpwarp_sw_r(offs_t offset)
 {
 	return (m_in0->read() >> (offset & 7)) & 1;
 }
 
 /* Read Dipswitches */
-READ8_MEMBER(warpwarp_state::warpwarp_dsw1_r)
+uint8_t warpwarp_state::warpwarp_dsw1_r(offs_t offset)
 {
 	return (m_dsw1->read() >> (offset & 7)) & 1;
 }
 
 /* Read mux Controller Inputs */
-READ8_MEMBER(warpwarp_state::warpwarp_vol_r)
+uint8_t warpwarp_state::warpwarp_vol_r()
 {
 	int res;
 
@@ -259,7 +259,7 @@ READ8_MEMBER(warpwarp_state::warpwarp_vol_r)
 	return res;
 }
 
-WRITE8_MEMBER(warpwarp_state::warpwarp_out0_w)
+void warpwarp_state::warpwarp_out0_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 3)
 	{
@@ -685,27 +685,16 @@ INPUT_PORTS_END
 
 
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
 static GFXDECODE_START( gfx_1k )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 4 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, gfx_8x8x1, 0, 4 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_2k )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 2 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, gfx_8x8x1, 0, 2 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_color )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 256 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, gfx_8x8x1, 0, 256 )
 GFXDECODE_END
 
 

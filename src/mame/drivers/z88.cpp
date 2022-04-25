@@ -21,6 +21,8 @@
 #include "emu.h"
 #include "includes/z88.h"
 
+#include "softlist_dev.h"
+
 /* Assumption:
 
 all banks can access the same memory blocks in the same way.

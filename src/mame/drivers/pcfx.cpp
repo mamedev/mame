@@ -19,6 +19,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class pcfx_state : public driver_device
 {
 public:
@@ -28,6 +31,11 @@ public:
 		m_huc6261(*this, "huc6261") { }
 
 	void pcfx(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	enum
@@ -40,36 +48,32 @@ private:
 	void irq_write(offs_t offset, uint16_t data);
 	uint16_t pad_r(offs_t offset);
 	void pad_w(offs_t offset, uint16_t data);
-	uint8_t extio_r(offs_t offset);
-	void extio_w(offs_t offset, uint8_t data);
+	[[maybe_unused]] uint8_t extio_r(offs_t offset);
+	[[maybe_unused]] void extio_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( irq8_w );
-	DECLARE_WRITE_LINE_MEMBER( irq9_w );
-	DECLARE_WRITE_LINE_MEMBER( irq10_w );
-	DECLARE_WRITE_LINE_MEMBER( irq11_w );
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER( irq8_w );
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER( irq9_w );
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER( irq10_w );
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER( irq11_w );
 	DECLARE_WRITE_LINE_MEMBER( irq12_w );
 	DECLARE_WRITE_LINE_MEMBER( irq13_w );
 	DECLARE_WRITE_LINE_MEMBER( irq14_w );
-	DECLARE_WRITE_LINE_MEMBER( irq15_w );
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER( irq15_w );
 	TIMER_CALLBACK_MEMBER(pad_func);
 
 	void pcfx_io(address_map &map);
 	void pcfx_mem(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-	virtual void machine_reset() override;
-
 	// Interrupt controller (component unknown)
-	uint16_t m_irq_mask;
-	uint16_t m_irq_pending;
-	uint8_t m_irq_priority[8];
+	uint16_t m_irq_mask = 0;
+	uint16_t m_irq_pending = 0;
+	uint8_t m_irq_priority[8]{};
 
 	struct pcfx_pad_t
 	{
-		uint8_t ctrl[2];
-		uint8_t status[2];
-		uint32_t latch[2];
+		uint8_t ctrl[2]{};
+		uint8_t status[2]{};
+		uint32_t latch[2]{};
 	};
 
 	pcfx_pad_t m_pad;
@@ -137,12 +141,12 @@ uint16_t pcfx_state::pad_r(offs_t offset)
 	return res;
 }
 
-void pcfx_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pcfx_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_PAD_FUNC:
-		pad_func(ptr, param);
+		pad_func(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in pcfx_state::device_timer");
@@ -403,6 +407,16 @@ WRITE_LINE_MEMBER( pcfx_state::irq15_w )
 }
 
 
+void pcfx_state::machine_start()
+{
+	for (int i = 0; i < 2; i++)
+	{
+		m_pad.ctrl[i] = 0;
+		m_pad.status[i] = 0;
+		m_pad.latch[i] = 0;
+	};
+}
+
 void pcfx_state::machine_reset()
 {
 	m_irq_mask = 0xFF;
@@ -479,6 +493,8 @@ ROM_START( pcfxga )
 
 	ROM_REGION32_LE( 0x80000, "scsi_rom", ROMREGION_ERASEFF )
 ROM_END
+
+} // Anonymous namespace
 
 
 /***************************************************************************

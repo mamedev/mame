@@ -14,14 +14,14 @@ bit 2 = sound cpu reset line
 bit 1 = microcontroller reset line
 bit 0 = ? (unused?)
 */
-WRITE8_MEMBER(kikikai_state::main_f008_w)
+void kikikai_state::main_f008_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
 
 	m_mcu->set_input_line(INPUT_LINE_RESET, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE8_MEMBER(mexico86_state::main_f008_w)
+void mexico86_state::main_f008_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
 
@@ -29,7 +29,7 @@ WRITE8_MEMBER(mexico86_state::main_f008_w)
 	m_68705mcu->set_input_line(INPUT_LINE_RESET, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE8_MEMBER(kikikai_simulation_state::main_f008_w)
+void kikikai_simulation_state::main_f008_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
 
@@ -187,8 +187,7 @@ void kikikai_simulation_state::mcu_simulate(  )
 
 INTERRUPT_GEN_MEMBER(kikikai_state::kikikai_interrupt)
 {
-	device.execute().set_input_line_vector(0, m_mcu_sharedram[0]); // Z80
-	device.execute().set_input_line(0, HOLD_LINE);
+	device.execute().set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -197,8 +196,14 @@ INTERRUPT_GEN_MEMBER(kikikai_simulation_state::kikikai_interrupt)
 	if (m_kikikai_simulated_mcu_running)
 		mcu_simulate();
 
-	device.execute().set_input_line_vector(0, m_mcu_sharedram[0]); // Z80
-	device.execute().set_input_line(0, HOLD_LINE);
+	device.execute().set_input_line(0, ASSERT_LINE);
+}
+
+
+IRQ_CALLBACK_MEMBER(kikikai_state::mcram_vect_r)
+{
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	return m_mcu_sharedram[0];
 }
 
 #if 0
@@ -323,8 +328,7 @@ void mexico86_state::mexico86_68705_port_b_w(offs_t offset, u8 data, u8 mem_mask
 
 	if (BIT(mem_mask, 5) && BIT(data, 5) && !BIT(m_port_b_out, 5))
 	{
-		m_maincpu->set_input_line_vector(0, m_mcu_sharedram[0]); // Z80
-		m_maincpu->set_input_line(0, HOLD_LINE); // HOLD_LINE works better in Z80 interrupt mode 1.
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 		m_68705mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
 	}
 
@@ -344,54 +348,7 @@ Kiki KaiKai / Kick 'n Run MCU
 
 ***************************************************************************/
 
-READ8_MEMBER(kikikai_state::kikikai_mcu_ddr1_r)
-{
-	return m_ddr1;
-}
-
-WRITE8_MEMBER(kikikai_state::kikikai_mcu_ddr1_w)
-{
-	m_ddr1 = data;
-}
-
-READ8_MEMBER(kikikai_state::kikikai_mcu_ddr2_r)
-{
-	return m_ddr2;
-}
-
-WRITE8_MEMBER(kikikai_state::kikikai_mcu_ddr2_w)
-{
-	m_ddr2 = data;
-}
-
-READ8_MEMBER(kikikai_state::kikikai_mcu_ddr3_r)
-{
-	return m_ddr3;
-}
-
-WRITE8_MEMBER(kikikai_state::kikikai_mcu_ddr3_w)
-{
-	m_ddr3 = data;
-}
-
-READ8_MEMBER(kikikai_state::kikikai_mcu_ddr4_r)
-{
-	return m_ddr4;
-}
-
-WRITE8_MEMBER(kikikai_state::kikikai_mcu_ddr4_w)
-{
-	m_ddr4 = data;
-}
-
-READ8_MEMBER(kikikai_state::kikikai_mcu_port1_r)
-{
-	//logerror("%04x: 6801U4 port 1 read\n", m_mcu->pc());
-	m_port1_in = ioport("IN0")->read();
-	return (m_port1_out & m_ddr1) | (m_port1_in & ~m_ddr1);
-}
-
-WRITE8_MEMBER(kikikai_state::kikikai_mcu_port1_w)
+void kikikai_state::kikikai_mcu_port1_w(uint8_t data)
 {
 	//logerror("%04x: 6801U4 port 1 write %02x\n", m_mcu->pc(), data);
 
@@ -409,17 +366,10 @@ WRITE8_MEMBER(kikikai_state::kikikai_mcu_port1_w)
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x20);
 
 	// bit 7: ? (set briefly while MCU boots)
-
 	m_port1_out = data;
 }
 
-READ8_MEMBER(kikikai_state::kikikai_mcu_port2_r)
-{
-	//logerror("%04x: 6801U4 port 2 read\n", m_mcu->pc());
-	return (m_port2_out & m_ddr2) | (m_port2_in & ~m_ddr2);
-}
-
-WRITE8_MEMBER(kikikai_state::kikikai_mcu_port2_w)
+void kikikai_state::kikikai_mcu_port2_w(uint8_t data)
 {
 	//logerror("%04x: 6801U4 port 2 write %02x\n", m_mcu->pc(), data);
 	static const char *const portnames[] = { "IN1", "IN2" };
@@ -452,29 +402,21 @@ WRITE8_MEMBER(kikikai_state::kikikai_mcu_port2_w)
 	m_port2_out = data;
 }
 
-READ8_MEMBER(kikikai_state::kikikai_mcu_port3_r)
+uint8_t kikikai_state::kikikai_mcu_port3_r()
 {
 	//logerror("%04x: 6801U4 port 3 read\n", m_mcu->pc());
-	return (m_port3_out & m_ddr3) | (m_port3_in & ~m_ddr3);
+	return m_port3_in;
 }
 
-WRITE8_MEMBER(kikikai_state::kikikai_mcu_port3_w)
+void kikikai_state::kikikai_mcu_port3_w(uint8_t data)
 {
 	//logerror("%04x: 6801U4 port 3 write %02x\n", m_mcu->pc(), data);
 	m_port3_out = data;
 }
 
-READ8_MEMBER(kikikai_state::kikikai_mcu_port4_r)
-{
-	//logerror("%04x: 6801U4 port 4 read\n", m_mcu->pc());
-	return (m_port4_out & m_ddr4) | (m_port4_in & ~m_ddr4);
-}
-
-WRITE8_MEMBER(kikikai_state::kikikai_mcu_port4_w)
+void kikikai_state::kikikai_mcu_port4_w(uint8_t data)
 {
 	//logerror("%04x: 6801U4 port 4 write %02x\n", m_mcu->pc(), data);
-
 	// bits 0-7 of shared RAM address
-
 	m_port4_out = data;
 }

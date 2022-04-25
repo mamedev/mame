@@ -434,16 +434,19 @@ def CheckSelfAssign(line):
     rhs = ls[1].strip().rstrip(';')
     return lhs == rhs
 
-ins_list = LoadLst(sys.argv[1])
+m = sys.argv[1]
+ins_list = LoadLst(sys.argv[2])
 try:
-    f = open(sys.argv[2], "w")
+    f = open(sys.argv[3], "w")
 except Exception:
     err = sys.exc_info()[1]
-    sys.stderr.write("cannot write file %s [%s]\n" % (sys.argv[2], err))
+    sys.stderr.write("cannot write file %s [%s]\n" % (sys.argv[3], err))
     sys.exit(1)
 
-EmitDasm(f, ins_list)
-EmitCdec(f, ins_list)
-no = EmitCintrp(f, ins_list)
-EmitCintrpDecl(f, ins_list, no)
-EmitCintrpSwitch(f, ins_list, no)
+if m == "d":
+    EmitDasm(f, ins_list)
+else:
+    EmitCdec(f, ins_list)
+    no = EmitCintrp(f, ins_list)
+    EmitCintrpDecl(f, ins_list, no)
+    EmitCintrpSwitch(f, ins_list, no)

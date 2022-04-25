@@ -39,7 +39,7 @@ DAC               -26.6860Mhz
 
 #include "cpu/m68000/m68000.h"
 #include "machine/taitoio.h"
-#include "sound/2610intf.h"
+#include "sound/ymopn.h"
 #include "speaker.h"
 
 
@@ -88,7 +88,7 @@ private:
 	};
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	#endif
 };
 
@@ -132,7 +132,7 @@ void _2mindril_state::coins_w(u8 data)
     PORT_DIPSETTING(      0x0800, DEF_STR( On ) )
 */
 #ifdef UNUSED_FUNCTION
-void _2mindril_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void _2mindril_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -215,7 +215,7 @@ void _2mindril_state::drill_map(address_map &map)
 	map(0x460010, 0x46001f).w(FUNC(_2mindril_state::control_1_w));
 	map(0x500000, 0x501fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x502022, 0x502023).nopw(); //countinously switches between 0 and 2
-	map(0x600000, 0x600007).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write)).umask16(0x00ff);
+	map(0x600000, 0x600007).rw("ymsnd", FUNC(ym2610b_device::read), FUNC(ym2610b_device::write)).umask16(0x00ff);
 	map(0x60000c, 0x60000d).rw(FUNC(_2mindril_state::irq_r), FUNC(_2mindril_state::irq_w));
 	map(0x60000e, 0x60000f).ram(); // unknown purpose, zeroed at start-up and nothing else
 	map(0x700000, 0x70000f).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write)).umask16(0xff00);
@@ -391,7 +391,7 @@ ROM_START( 2mindril )
 	ROM_LOAD16_BYTE( "d58-38.ic11", 0x00000, 0x40000, CRC(c58e8e4f) SHA1(648db679c3bfb5de1cd6c1b1217773a2fe56f11b) ) // Ver 2.93A 1994/02/16 09:45:00
 	ROM_LOAD16_BYTE( "d58-37.ic9",  0x00001, 0x40000, CRC(19e5cc3c) SHA1(04ac0eef893c579fe90d91d7fd55c5741a2b7460) )
 
-	ROM_REGION( 0x200000, "ymsnd", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
 	ROM_LOAD( "d58-11.ic31", 0x000000, 0x200000,  CRC(dc26d58d) SHA1(cffb18667da18f5367b02af85a2f7674dd61ae97) )
 
 	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASE00 )
@@ -411,4 +411,5 @@ void _2mindril_state::init_drill()
 	tile_decode();
 }
 
-GAME( 1993, 2mindril, 0, drill, drill, _2mindril_state, init_drill, ROT0, "Taito America Corporation", "Two Minute Drill (Ver 2.93A 1994/02/16)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_MECHANICAL)
+//    YEAR  NAME      PARENT  MACHINE  INPUT  CLASS            INIT        ROT   COMPANY                      FULLNAME                                   FLAGS
+GAME( 1993, 2mindril, 0,      drill,   drill, _2mindril_state, init_drill, ROT0, "Taito America Corporation", "Two Minute Drill (Ver 2.93A 1994/02/16)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_MECHANICAL)

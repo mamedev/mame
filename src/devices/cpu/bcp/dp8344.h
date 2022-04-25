@@ -86,6 +86,8 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 private:
+	static const char *const s_protocol_names[8];
+
 	enum inst_state : u8 {
 		T1_DECODE, T1_START, T1_SKIP, T1_LJMP, T1_LCALL,
 		TX_READ, TX_WRITE,
@@ -123,7 +125,7 @@ private:
 	u16 transmit_fifo_pop();
 	void transmitter_idle();
 	void receiver_active();
-	void receive_fifo_push(u8 data);
+	void receive_fifo_push(u16 data);
 	u8 receive_fifo_pop(bool test);
 	void set_receiver_error(u8 code);
 	u8 get_error_code(bool test);
@@ -214,6 +216,9 @@ private:
 	u16 m_tfifo[3];
 	u8 m_rfifo_head;
 	u8 m_tfifo_head;
+
+	// misc. state
+	bool m_receiver_interrupt;
 };
 
 // ======================> dp8344a_device

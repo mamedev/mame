@@ -217,7 +217,6 @@ private:
 	bool m_fdc_drq; // FDC output pin
 
 	optional_device_array<floppy_connector, 4> m_floppy_connectors;
-	DECLARE_FLOPPY_FORMATS( epc_floppy_formats );
 
 	// UART
 	required_device<ins8250_device> m_uart;
@@ -770,11 +769,6 @@ static void epc_isa8_cards(device_slot_interface &device)
 	// device.option_add("epc_mb1080", ISA8_EPC_MB1080);
 }
 
-FLOPPY_FORMATS_MEMBER( epc_state::epc_floppy_formats )
-	FLOPPY_PC_FORMAT,
-	FLOPPY_IMD_FORMAT
-FLOPPY_FORMATS_END
-
 static void epc_sd_floppies(device_slot_interface &device)
 {
 	device.option_add("525sd", FLOPPY_525_SD);
@@ -933,8 +927,8 @@ void epc_state::epc(machine_config &config)
 	I8272A(config, m_fdc, XTAL(16'000'000) / 2, false); // TEW crystal marked X3 verified
 	m_fdc->intrq_wr_callback().set([this] (int state){ m_fdc_irq = state; check_fdc_irq(); });
 	m_fdc->drq_wr_callback().set([this] (int state){ m_fdc_drq = state; check_fdc_drq(); });
-	FLOPPY_CONNECTOR(config, m_floppy_connectors[0], epc_sd_floppies, "525sd", epc_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy_connectors[1], epc_sd_floppies, "525sd", epc_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy_connectors[0], epc_sd_floppies, "525sd", floppy_image_device::default_pc_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy_connectors[1], epc_sd_floppies, "525sd", floppy_image_device::default_pc_floppy_formats);
 	//SOFTWARE_LIST(config, "epc_flop_list").set_original("epc_flop");
 
 	// system board UART

@@ -227,6 +227,7 @@ ppc_device::ppc_device(const machine_config &mconfig, device_type type, const ch
 	, m_drcuml(nullptr)
 	, m_drcfe(nullptr)
 	, m_drcoptions(0)
+	, m_dasm(powerpc_disassembler())
 {
 	m_program_config.m_logaddr_width = 32;
 	m_program_config.m_page_shift = POWERPC_MIN_PAGE_SHIFT;
@@ -842,7 +843,6 @@ void ppc_device::device_start()
 
 	state_add(STATE_GENPC, "GENPC", m_core->pc).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_core->pc).noshow();
-	state_add(STATE_GENSP, "GENSP", m_core->r[31]).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).noshow().formatstr("%1s");
 
 	set_icountptr(m_core->icount);
@@ -1150,7 +1150,7 @@ void ppc_device::device_reset()
 		m_dec_zero_cycles = total_cycles();
 		if (m_tb_divisor)
 		{
-			decrementer_int_callback(nullptr, 0);
+			decrementer_int_callback(0);
 		}
 	}
 
@@ -1834,9 +1834,9 @@ void ppc_device::ppccom_execute_mtspr()
 			case SPR4XX_TCR:
 				m_core->spr[SPR4XX_TCR] = m_core->param1 | (oldval & PPC4XX_TCR_WRC_MASK);
 				if ((oldval ^ m_core->spr[SPR4XX_TCR]) & PPC4XX_TCR_FIE)
-					ppc4xx_fit_callback(nullptr, false);
+					ppc4xx_fit_callback(false);
 				if ((oldval ^ m_core->spr[SPR4XX_TCR]) & PPC4XX_TCR_PIE)
-					ppc4xx_pit_callback(nullptr, false);
+					ppc4xx_pit_callback(false);
 				return;
 
 			/* timer status register */
@@ -1849,7 +1849,7 @@ void ppc_device::ppccom_execute_mtspr()
 			case SPR4XX_PIT:
 				m_core->spr[SPR4XX_PIT] = m_core->param1;
 				m_pit_reload = m_core->param1;
-				ppc4xx_pit_callback(nullptr, false);
+				ppc4xx_pit_callback(false);
 				return;
 
 			/* timebase */
@@ -1919,7 +1919,7 @@ void ppc_device::ppccom_execute_mfdcr()
 	/* default handling */
 	if (m_dcr_read_func.isnull()) {
 		osd_printf_debug("DCR %03X read\n", m_core->param0);
-		if (m_core->param0 < ARRAY_LENGTH(m_dcr))
+		if (m_core->param0 < std::size(m_dcr))
 			m_core->param1 = m_dcr[m_core->param0];
 		else
 			m_core->param1 = 0;
@@ -2011,7 +2011,7 @@ void ppc_device::ppccom_execute_mtdcr()
 	/* default handling */
 	if (m_dcr_write_func.isnull()) {
 		osd_printf_debug("DCR %03X write = %08X\n", m_core->param0, m_core->param1);
-		if (m_core->param0 < ARRAY_LENGTH(m_dcr))
+		if (m_core->param0 < std::size(m_dcr))
 			m_dcr[m_core->param0] = m_core->param1;
 	} else {
 		m_dcr_write_func(m_core->param0,m_core->param1);
@@ -2662,7 +2662,7 @@ void ppc_device::ppc4xx_spu_rx_data(uint8_t data)
 	uint32_t new_rxin;
 
 	/* fail if we are going to overflow */
-	new_rxin = (m_spu.rxin + 1) % ARRAY_LENGTH(m_spu.rxbuffer);
+	new_rxin = (m_spu.rxin + 1) % std::size(m_spu.rxbuffer);
 	if (new_rxin == m_spu.rxout)
 		fatalerror("ppc4xx_spu_rx_data: buffer overrun!\n");
 
@@ -2741,7 +2741,7 @@ TIMER_CALLBACK_MEMBER( ppc_device::ppc4xx_spu_callback )
 
 			/* consume the byte and advance the out pointer */
 			rxbyte = m_spu.rxbuffer[m_spu.rxout];
-			m_spu.rxout = (m_spu.rxout + 1) % ARRAY_LENGTH(m_spu.rxbuffer);
+			m_spu.rxout = (m_spu.rxout + 1) % std::size(m_spu.rxbuffer);
 
 			/* if we're not full, copy data to the buffer and update the line status */
 			if (!(m_spu.regs[SPU4XX_LINE_STATUS] & 0x80))
@@ -2784,7 +2784,7 @@ uint8_t ppc4xx_device::ppc4xx_spu_r(offs_t offset)
 			break;
 
 		default:
-			if (offset < ARRAY_LENGTH(m_spu.regs))
+			if (offset < std::size(m_spu.regs))
 				result = m_spu.regs[offset];
 			break;
 	}
@@ -2848,7 +2848,7 @@ void ppc4xx_device::ppc4xx_spu_w(offs_t offset, uint8_t data)
 			break;
 
 		default:
-			if (offset < ARRAY_LENGTH(m_spu.regs))
+			if (offset < std::size(m_spu.regs))
 				m_spu.regs[offset] = data;
 			break;
 	}

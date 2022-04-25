@@ -35,7 +35,7 @@
 #include "machine/pit8253.h"
 #include "machine/i8257.h"
 #include "sound/spkrdev.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
@@ -209,7 +209,7 @@ private:
 	{
 		TIMER_ID_KEY_INTERRUPT
 	};
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	/* Status bits */
 	enum
@@ -281,7 +281,7 @@ void myb3k_state::kbd_set_data_and_interrupt(u8 data) {
 	timer_set(attotime::from_msec(1), TIMER_ID_KEY_INTERRUPT);
 }
 
-void myb3k_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void myb3k_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -305,7 +305,7 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 		{
 			for (int pxl = 0; pxl < 8; pxl++)
 			{
-				bitmap.pix32(y, ( x_pos * 8) + pxl) = rgb_t::black();
+				bitmap.pix(y, ( x_pos * 8) + pxl) = rgb_t::black();
 			}
 		}
 		else
@@ -332,7 +332,7 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 						//pind ^= ((cursor_x != -1 && x_pos == cursor_x && ra == 7) ? 7 : 0);
 
 						/* Create the grey scale */
-						bitmap.pix32(y, ( x_pos * 8) + pxl) = (*m_pal)[pind & 0x07];
+						bitmap.pix(y, ( x_pos * 8) + pxl) = (*m_pal)[pind & 0x07];
 					}
 				}
 				break;
@@ -372,7 +372,7 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 						pind ^= ((cursor_x != -1 && x_pos == cursor_x && ra == 7) ? 7 : 0);
 
 						/* Pick up the color */
-						bitmap.pix32(y, ( x_pos * 8) + pxl) = (*m_pal)[pind & 0x07];
+						bitmap.pix(y, ( x_pos * 8) + pxl) = (*m_pal)[pind & 0x07];
 					}
 				}
 				break;
@@ -394,11 +394,11 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 					{
 						if ((pdat & (0x80 >> pxl)) != 0)
 						{
-							bitmap.pix32(y, ( x_pos * 8) + pxl) = (*m_pal)[0x07];
+							bitmap.pix(y, ( x_pos * 8) + pxl) = (*m_pal)[0x07];
 						}
 						else
 						{
-							bitmap.pix32(y, ( x_pos * 8) + pxl) = rgb_t::black();
+							bitmap.pix(y, ( x_pos * 8) + pxl) = rgb_t::black();
 						}
 					}
 				}

@@ -1,10 +1,12 @@
-.. _universal-command-line:
+.. _mame-commandline-universal:
 
 Universal Commandline Options
 =============================
 
 This section contains configuration options that are applicable to *all* MAME
 sub-builds (both SDL and Windows native).
+
+.. contents:: :local:
 
 
 Commands and Verbs
@@ -16,6 +18,8 @@ distribution such as **romcmp** and **srcclean**.
 Verbs are actions to take upon something with the command (e.g.
 **mame -validate pacman** has *mame* as a command and *-validate* as a verb)
 
+
+.. _mame-commandline-patterns:
 
 Patterns
 --------
@@ -37,7 +41,7 @@ File Names and Directory Paths
 
 A number of options for specifying directories support multiple paths (for
 for example to search for ROMs in multiple locations).  MAME expects multiple
-paths to be separated with semicolons (``;``).
+paths to be separated with semicolons ( ``;`` ).
 
 MAME expands environment variable expressions in paths.  The syntax used depends
 on your operating system.  On Windows, ``%`` (percent) syntax is used.  For
@@ -47,45 +51,62 @@ Linux), Bourne shell syntax is used, and a leading ``~`` expands to the current
 user's home directory.  For example, ``~/.mame/${HOSTNAME}/cfg`` expands to
 a host-specific path inside the ``.mame`` directory in the current user's home
 directory.  Note that only simple variable substitutions are supported; more
-complex expressions supported by Bash, ksh or zsh are not recognised by MAME.
+complex expressions supported by Bash, ksh or zsh are not recognized by MAME.
 
 Relative paths are resolved relative to the current working directory.  If you
 start MAME by double-clicking it in Windows Explorer, the working directory is
 set to the folder containing the MAME executable.  If you start MAME by
 double-clicking it in the macOS Finder, it will open a Terminal window with the
-working directory is set to your home directory (usually ``/Users/<username>``)
+working directory is set to your home directory (usually ``/Users/<username>`` )
 and start MAME.
 
 If you want behaviour similar to what Windows Explorer provides on macOS, create
 a script file containing these lines in the directory containing the MAME
-executable (for example you could call it ``mame-here``)::
+executable (for example you could call it ``mame-here`` )::
 
     #!/bin/sh
     cd "`dirname "$0"`"
-    exec ./mame64
+    exec ./mame
 
 You should be able to use any text editor.  If you have a choice of file format
-or line ending style, chose UNIX.  I've assumed you're using a 64-bit release
-build of MAME, but if you aren't you just need to change ``mame64`` to the name
-of your MAME executable.  Once you've created the file, you need to mark is as
-executable.  You can do this by opening a Terminal window, typing **chmod a+x**
-followed by a space, dragging the file you created onto the window (this causes
-Terminal to insert the full escaped path to the file), and then ensuring the
-Terminal window is active and hitting **Return** (or **Enter**) on your
-keyboard.  You can close the Terminal window after doing this.  Now if you
-double-click the script in the Finder, it will open a Terminal window, set the
-working directory to the location of the script (i.e. the folder containing
-MAME), and then start MAME.
+or line ending style, choose UNIX. This assumes you're using a 64-bit release
+build of MAME, but if you aren't you just need to change ``mame`` to the name
+of your MAME executable (e.g. mamed, mamep, mamedp).  Once you've created the
+file, you need to mark it as executable.  You can do this by opening a Terminal
+window, typing **chmod a+x** followed by a space, dragging the file you created
+onto the window (this causes Terminal to insert the full escaped path to the
+file), and then ensuring the Terminal window is active and hitting **Return**
+(or **Enter**) on your keyboard.  You can close the Terminal window after doing
+this.  Now if you double-click the script in the Finder, it will open a
+Terminal window, set the working directory to the location of the script
+(i.e. the folder containing MAME), and then start MAME.
 
+
+.. _mame-commandline-coreverbs:
 
 Core Verbs
 ----------
+
+.. Tip:: Examples that have the output abbreviated for space reasons will show
+         "**...**" in the output where needed. For instance:
+         .. code-block:: bash
+
+                A
+                B
+                C
+                ...
+                Z
 
 .. _mame-commandline-help:
 
 **-help** / **-h** / **-?**
 
     Displays current MAME version and copyright notice.
+
+    Example:
+        .. code-block:: bash
+
+            mame -help
 
 .. _mame-commandline-validate:
 
@@ -100,7 +121,27 @@ Core Verbs
     is specified, it will be matched against systems only (not other devices),
     and no device type validation will be performed.
 
+    Example:
+        .. code-block:: bash
 
+            mame -validate
+            Driver ace100 (file apple2.cpp): 1 errors, 0 warnings
+            Errors:
+            Software List device 'flop525_orig': apple2_flop_orig.xml: Errors parsing software list:
+            apple2_flop_orig.xml(126.2): Unknown tag: year
+            apple2_flop_orig.xml(126.8): Unexpected content
+            apple2_flop_orig.xml(127.2): Unknown tag: publisher
+            apple2_flop_orig.xml(127.13): Unexpected content
+            apple2_flop_orig.xml(128.2): Unknown tag: info
+            apple2_flop_orig.xml(129.2): Unknown tag: sharedfeat
+            apple2_flop_orig.xml(132.2): Unknown tag: part
+            apple2_flop_orig.xml(133.3): Tag dataarea found outside of software context
+            apple2_flop_orig.xml(134.4): Tag rom found outside of part context
+            apple2_flop_orig.xml(137.3): mismatched tag
+
+
+
+.. _mame-commandline-configverbs:
 
 Configuration Verbs
 -------------------
@@ -113,16 +154,24 @@ Configuration Verbs
     verbs) described below can be permanently changed by editing this
     configuration file.
 
+    Example:
+        .. code-block:: bash
+
+            mame -createconfig
+
 .. _mame-commandline-showconfig:
 
 **-showconfig** / **-sc**
 
     Displays the current configuration settings.  If you route this to a file,
-    you can use it as an INI file.  For example, the command:
+    you can use it as an INI file.
 
-        **mame -showconfig > mame.ini**
+    Example:
+        .. code-block:: bash
 
-    is equivalent to **-createconfig**.
+            mame -showconfig > mame.ini
+
+        This example is equivalent to **-createconfig**.
 
 .. _mame-commandline-showusage:
 
@@ -133,6 +182,7 @@ Configuration Verbs
     a sufficient description.
 
 
+.. _mame-commandline-fronendverbs:
 
 Frontend Verbs
 --------------
@@ -145,19 +195,18 @@ command:
     **>** *filename*
 
 where *filename* is the name of the file to save the output in (e.g.
-``list.txt``).  Note that if this file already exists, it will be completely
+``list.txt`` ).  Note that if this file already exists, it will be completely
 overwritten.
 
-Example:
+    Example:
+        .. code-block:: bash
 
-|  **mame -listcrc puckman > list.txt**
-|
+            mame -listcrc puckman > list.txt
 
     This creates (or overwrites the existing file if already there) ``list.txt``
     and fills the file with the results of **-listcrc puckman**.  In other
     words, the list of each ROM used in Puckman and the CRC for that ROM are
     written into that file.
-
 
 .. _mame-commandline-listxml:
 
@@ -172,9 +221,56 @@ Example:
     front-ends and ROM managers), or processed with scripts query detailed
     information.
 
+    Example:
+        .. code-block:: bash
+
+            mame galaxian -listxml
+            <?xml version="1.0"?>
+            <!DOCTYPE mame [
+            <!ELEMENT mame (machine+)>
+	            <!ATTLIST mame build CDATA #IMPLIED>
+	            <!ATTLIST mame debug (yes|no) "no">
+	            <!ATTLIST mame mameconfig CDATA #REQUIRED>
+	            <!ELEMENT machine (description, year?, manufacturer?, biosset*, rom*, disk*, device_ref*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, port*, adjuster*, driver?, feature*, device*, slot*, softwarelist*, ramoption*)>
+		            <!ATTLIST machine name CDATA #REQUIRED>
+		            <!ATTLIST machine sourcefile CDATA #IMPLIED>
+            ...
+            <mame build="0.216 (mame0216-154-gabddfb0404c-dirty)" debug="no" mameconfig="10">
+            	<machine name="galaxian" sourcefile="galaxian.cpp">
+		            <description>Galaxian (Namco set 1)</description>
+		            <year>1979</year>
+		            <manufacturer>Namco</manufacturer>
+                    ...
+            	<machine name="z80" sourcefile="src/devices/cpu/z80/z80.cpp" isdevice="yes" runnable="no">
+		            <description>Zilog Z80</description>
+	        </machine>
+            </mame>
+
+.. Tip:: Output from this command is typically more useful if redirected to
+         an output file. For instance, doing
+         **mame -listxml galaxian > galax.xml** will make ``galax.xml`` or
+         overwrite any existing data in the file with the results of
+         **-listxml**; this will allow you to view it in a text editor or parse
+         it with external tools.
+
 .. _mame-commandline-listfull:
 
 **-listfull** / **-ll** [*<pattern>*...]
+
+    Example:
+        .. code-block:: bash
+
+            mame -listfull galaxian*
+            Name:             Description:
+            galaxian          "Galaxian (Namco set 1)"
+            galaxiana         "Galaxian (Namco set 2)"
+            galaxianbl        "Galaxian (bootleg, set 2)"
+            galaxianbl2       "Galaxian (bootleg, set 4)"
+            galaxiani         "Galaxian (Irem)"
+            galaxianm         "Galaxian (Midway set 1)"
+            galaxianmo        "Galaxian (Midway set 2)"
+            galaxiant         "Galaxian (Taito)"
+            galaxian_sound    "Galaxian Custom Sound"
 
     Displays a list of system driver names and descriptions.  By default all
     systems and devices are listed; however, you can limit this list by
@@ -190,6 +286,12 @@ Example:
     you can limit this list by specifying one or more *pattern* after the
     **-listsource** verb.
 
+    Example:
+        .. code-block:: bash
+
+            mame galaga -listsource
+            galaga           galaga.cpp
+
 .. _mame-commandline-listclones:
 
 **-listclones** / **-lc** [*<pattern>*]
@@ -199,12 +301,44 @@ Example:
     verb.  If a pattern is specified, MAME will list clones of systems that
     match the pattern, as well as clones that match the pattern themselves.
 
+    Example 1:
+        .. code-block:: bash
+
+            mame pacman -listclones
+            Name:            Clone of:
+            pacman           puckman
+
+    Example 2:
+        .. code-block:: bash
+
+            mame puckman -listclones
+            Name:            Clone of:
+            abscam           puckman
+            bucaner          puckman
+            crockman         puckman
+            crockmnf         puckman
+            ...
+            puckmod          puckman
+            titanpac         puckman
+
 .. _mame-commandline-listbrothers:
 
 **-listbrothers** / **-lb** [*<pattern>*]
 
     Displays a list of *brothers*, i.e. other systems that are defined in the
     same source file as a system that matches the specified *pattern*.
+
+    Example:
+        .. code-block:: bash
+
+            mame galaxian -listbrothers
+            Source file:         Name:            Parent:
+            galaxian.cpp         amidar
+            galaxian.cpp         amidar1          amidar
+            galaxian.cpp         amidarb          amidar
+            ...
+            galaxian.cpp         zigzagb
+            galaxian.cpp         zigzagb2         zigzagb
 
 .. _mame-commandline-listcrc:
 
@@ -215,6 +349,31 @@ Example:
     specified, ROMs referenced by all supported systems and devices will be
     included.
 
+    Example:
+        .. code-block:: bash
+
+            mame playch10 -listcrc
+            d52fa07a pch1-c__8t_e-2.8t                      playch10                PlayChoice-10 BIOS
+            503ee8b1 pck1-c.8t                              playch10                PlayChoice-10 BIOS
+            123ffa37 pch1-c_8te.8t                          playch10                PlayChoice-10 BIOS
+            0be8ceb4 pck1-c_fix.8t                          playch10                PlayChoice-10 BIOS
+            9acffb30 pch1-c__8k.8k                          playch10                PlayChoice-10 BIOS
+            c1232eee pch1-c__8m_e-1.8m                      playch10                PlayChoice-10 BIOS
+            30c15e23 pch1-c__8p_e-1.8p                      playch10                PlayChoice-10 BIOS
+            9acffb30 pch1-c__8k.8k                          playch10                PlayChoice-10 BIOS
+            c1232eee pch1-c__8m_e-1.8m                      playch10                PlayChoice-10 BIOS
+            30c15e23 pch1-c__8p_e-1.8p                      playch10                PlayChoice-10 BIOS
+            9acffb30 pch1-c__8k.8k                          playch10                PlayChoice-10 BIOS
+            83ebc7a3 pch1-c_8m.8m                           playch10                PlayChoice-10 BIOS
+            90e1b80c pch1-c_8p-8p                           playch10                PlayChoice-10 BIOS
+            9acffb30 pch1-c__8k.8k                          playch10                PlayChoice-10 BIOS
+            c1232eee pch1-c__8m_e-1.8m                      playch10                PlayChoice-10 BIOS
+            30c15e23 pch1-c__8p_e-1.8p                      playch10                PlayChoice-10 BIOS
+            e5414ca3 pch1-c-6f.82s129an.6f                  playch10                PlayChoice-10 BIOS
+            a2625c6e pch1-c-6e.82s129an.6e                  playch10                PlayChoice-10 BIOS
+            1213ebd4 pch1-c-6d.82s129an.6d                  playch10                PlayChoice-10 BIOS
+            48de65dc rp2c0x.pal                             playch10                PlayChoice-10 BIOS
+
 .. _mame-commandline-listroms:
 
 **-listroms** / **-lr** [*<pattern>*...]
@@ -222,6 +381,20 @@ Example:
     Displays a list of ROM images referenced by supported systems/devices that
     match the specified pattern(s). If no patterns are specified, the results
     will include *all* supported systems and devices.
+
+    Example:
+        .. code-block:: bash
+
+            mame neogeo -listroms
+            ROMs required for driver "neogeo".
+            Name                                   Size Checksum
+            sp-s2.sp1                            131072 CRC(9036d879) SHA1(4f5ed7105b7128794654ce82b51723e16e389543)
+            sp-s.sp1                             131072 CRC(c7f2fa45) SHA1(09576ff20b4d6b365e78e6a5698ea450262697cd)
+            sp-45.sp1                            524288 CRC(03cc9f6a) SHA1(cdf1f49e3ff2bac528c21ed28449cf35b7957dc1)
+            ...
+            sm1.sm1                              131072 CRC(94416d67) SHA1(42f9d7ddd6c0931fd64226a60dc73602b2819dcf)
+            000-lo.lo                            131072 CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a)
+            sfix.sfix                            131072 CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3)
 
 .. _mame-commandline-listsamples:
 
@@ -231,6 +404,19 @@ Example:
     device names. If no pattern is specified, the results will be *all* systems
     and devices.
 
+    Example:
+        .. code-block:: bash
+
+            mame armorap -listsamples
+            Samples required for driver "armorap".
+            loexp
+            jeepfire
+            hiexp
+            tankfire
+            tankeng
+            beep
+            chopper
+
 .. _mame-commandline-verifyroms:
 
 **-verifyroms** [<*pattern*>]
@@ -238,6 +424,13 @@ Example:
     Checks for invalid or missing ROM images. By default all drivers that have
     valid ZIP files or directories in the rompath are verified; however, you can
     limit this list by specifying a *pattern* after the **-verifyroms** command.
+
+    Example:
+        .. code-block:: bash
+
+            mame gradius -verifyroms
+            romset gradius [nemesis] is good
+            1 romsets found, 1 were OK.
 
 .. _mame-commandline-verifysamples:
 
@@ -247,6 +440,13 @@ Example:
     valid ZIP files or directories in the samplepath are verified; however, you
     can limit this list by specifying a *pattern* after the **-verifyroms**
     command.
+
+    Example:
+        .. code-block:: bash
+
+            mame armorap -verifysamples
+            sampleset armorap [armora] is good
+            1 samplesets found, 1 were OK.
 
 .. _mame-commandline-romident:
 
@@ -262,6 +462,13 @@ Example:
 		* 8: means some files were identified
 		* 9: means no files were identified
 
+    Example:
+        .. code-block:: bash
+
+            mame unknown.rom -romident
+            Identifying unknown.rom....
+            unknown.rom         = 456-a07.17l           gradius    Gradius (Japan, ROM version)
+
 .. _mame-commandline-listdevices:
 
 **-listdevices** / **-ld** [<*pattern*>]
@@ -273,6 +480,23 @@ Example:
     If slots are populated with devices, any additional slots those devices
     provide will be visible with **-listdevices** as well. For instance,
     installing a floppy controller into a PC will expose the disk drive slots.
+
+    Example:
+        .. code-block:: bash
+
+            mame apple2e -listdevices
+            Driver apple2e (Apple //e):
+               <root>                         Apple //e
+                 a2bus                        Apple II Bus
+                 a2common                     Apple II Common Components @ 14.31 MHz
+                 a2video                      Apple II video @ 14.31 MHz
+                 aux                          Apple IIe AUX Slot
+                   ext80                      Apple IIe Extended 80-Column Card
+                 auxbus                       Apple IIe AUX Bus
+                 ay3600                       AY-5-3600 Keyboard Encoder
+                 ...
+                 speaker                      Filtered 1-bit DAC
+                 tape                         Cassette
 
 .. _mame-commandline-listslots:
 
@@ -289,6 +513,28 @@ Example:
     The slot name (e.g. **ctrl1**) can be used from the command
     line (**-ctrl1** in this case)
 
+    Example:
+        .. code-block:: bash
+
+            mame apple2e -listslots
+            SYSTEM           SLOT NAME        SLOT OPTIONS     SLOT DEVICE NAME
+            ---------------- ---------------- ---------------- ----------------------------
+            apple2e          sl1              4play            4play Joystick Card (rev. B)
+                                              ...
+                                              aevm80           Applied Engineering Viewmaster 80
+                                              alfam2           ALF MC1 / Apple Music II
+                                              ...
+                                              zipdrive         Zip Technologies ZipDrive
+
+                             ...
+                             aux              ext80            Apple IIe Extended 80-Column Card
+                                              rw3              Applied Engineering RamWorks III
+                                              std80            Apple IIe Standard 80-Column Card
+
+                             gameio           compeyes         Digital Vision ComputerEyes
+                                              joy              Apple II analog joysticks
+                                              paddles          Apple II paddles
+
 .. _mame-commandline-listmedia:
 
 **-listmedia** / **-lm** [<*pattern*>]
@@ -297,13 +543,54 @@ Example:
     includes media types (cartridge, cassette, diskette and more) as well as
     common file extensions which are supported.
 
+    Example:
+        .. code-block:: bash
+
+            mame coco3 -listmedia
+            SYSTEM           MEDIA NAME       (brief)    IMAGE FILE EXTENSIONS SUPPORTED
+            ---------------- --------------------------- -------------------------------
+            coco3            cassette         (cass)     .wav  .cas
+                             printout         (prin)     .prn
+                             cartridge        (cart)     .ccc  .rom
+                             floppydisk1      (flop1)    .dmk  .jvc  .dsk  .vdk  .sdf  .os9  .d77  .d88  .1dd  .dfi  .hfe  .imd  .ipf  .mfi  .mfm  .td0  .cqm  .cqi
+                             floppydisk2      (flop2)    .dmk  .jvc  .dsk  .vdk  .sdf  .os9  .d77  .d88  .1dd  .dfi  .hfe  .imd  .ipf  .mfi  .mfm  .td0  .cqm  .cqi
+                             harddisk1        (hard1)    .vhd
+                             harddisk2        (hard2)    .vhd
+
 .. _mame-commandline-listsoftware:
 
 **-listsoftware** / **-lsoft** [<*pattern*>]
 
-    Posts to screen all software lists which can be used by the entered
-    *pattern* or system. Note that this is simply a copy/paste of the .XML file
-    which reside in the HASH folder which are allowed to be used.
+    Displays the contents of all software lists that can be used by the system
+    or systems represented by *pattern*.
+
+    Example:
+        .. code-block:: bash
+
+            mame coco3 -listsoftware
+            <?xml version="1.0"?>
+            <!DOCTYPE softwarelists [
+            <!ELEMENT softwarelists (softwarelist*)>
+	            <!ELEMENT softwarelist (software+)>
+		            <!ATTLIST softwarelist name CDATA #REQUIRED>
+		            <!ATTLIST softwarelist description CDATA #IMPLIED>
+		            <!ELEMENT software (description, year, publisher, info*, sharedfeat*, part*)>
+                    ...
+            <softwarelists>
+	            <softwarelist name="coco_cart" description="Tandy Radio Shack Color Computer cartridges">
+		            <software name="7cardstd">
+			            <description>7 Card Stud</description>
+			            <year>1983</year>
+			            <publisher>Tandy</publisher>
+			            <info name="developer" value="Intelligent Software"/>
+			            <info name="serial" value="26-3074"/>
+			            <part name="cart" interface="coco_cart">
+				            <dataarea name="rom" size="8192">
+					            <rom name="7 card stud (1983) (26-3074) (intelligent software).rom" size="8192" crc="f38d8c97" sha1="5cfcb699ce09840dbb52714c8d91b3d86d3a86c3"/>
+				            </dataarea>
+			            </part>
+		            </software>
+                    ...
 
 .. _mame-commandline-verifysoftware:
 
@@ -314,12 +601,49 @@ Example:
     verified; however, you can limit this list by specifying a specific driver
     name or *pattern* after the **-verifysoftware** command.
 
+    Example:
+        .. code-block:: bash
+
+            mame coco3 -verifysoftware
+            romset coco_cart:7cardstd is good
+            coco_cart:amazing: a mazing world of malcom mortar (1987)(26-3160)(zct systems).rom (16384 bytes) - NEEDS REDUMP
+            romset coco_cart:amazing is best available
+            coco_cart:amazing1: a mazing world of malcom mortar (1987)(26-3160)(zct systems)[a].rom (16384 bytes) - NEEDS REDUMP
+            romset coco_cart:amazing1 is best available
+            romset coco_cart:androne is good
+            ...
+
 .. _mame-commandline-getsoftlist:
 
 **-getsoftlist** / **-glist** [<*pattern*>]
 
-    Posts to screen a specific software list which matches with the system name
-    provided.
+    Displays the contents of a specific softlist with the filename represented
+    by *pattern*.
+
+    Example:
+        .. code-block:: bash
+
+            mame -getsoftlist apple2_flop_orig
+            <?xml version="1.0"?>
+            <!DOCTYPE softwarelists [
+            <!ELEMENT softwarelists (softwarelist*)>
+	            <!ELEMENT softwarelist (software+)>
+		            <!ATTLIST softwarelist name CDATA #REQUIRED>
+		            <!ATTLIST softwarelist description CDATA #IMPLIED>
+		            <!ELEMENT software (description, year, publisher, info*, sharedfeat*, part*)>
+			            <!ATTLIST software name CDATA #REQUIRED>
+			            <!ATTLIST software cloneof CDATA #IMPLIED>
+			            <!ATTLIST software supported (yes|partial|no) "yes">
+			            <!ELEMENT description (#PCDATA)>
+			            <!ELEMENT year (#PCDATA)>
+			            <!ELEMENT publisher (#PCDATA)>
+			            <!ELEMENT info EMPTY>
+				            <!ATTLIST info name CDATA #REQUIRED>
+				            <!ATTLIST info value CDATA #IMPLIED>
+			            <!ELEMENT sharedfeat EMPTY>
+				            <!ATTLIST sharedfeat name CDATA #REQUIRED>
+				            <!ATTLIST sharedfeat value CDATA #IMPLIED>
+                        ...
 
 .. _mame-commandline-verifysoftlist:
 
@@ -331,8 +655,26 @@ Example:
     by specifying a specific softwarelistname (without .XML) after the
     -verifysoftlist command.
 
+    Example:
+        .. code-block:: bash
 
-.. _osd-commandline-options:
+            mame -verifysoftlist apple2_flop_orig
+            romset apple2_flop_orig:agentusa is good
+            romset apple2_flop_orig:airheart is good
+            romset apple2_flop_orig:aplpanic is good
+            romset apple2_flop_orig:alambush is good
+            romset apple2_flop_orig:ankh is good
+            romset apple2_flop_orig:aplcdspd is good
+            romset apple2_flop_orig:agalxian is good
+            romset apple2_flop_orig:aquatron is good
+            romset apple2_flop_orig:archon is good
+            romset apple2_flop_orig:archon2 is good
+            romset apple2_flop_orig:ardyardv is good
+            romset apple2_flop_orig:autobahn is good
+            ...
+
+
+.. _mame-commandline-osdoptions:
 
 OSD-related Options
 -------------------
@@ -346,99 +688,291 @@ OSD-related Options
     **SCRLOCK** on other operating systems (including Windows and Linux).  Use
     **FN-Delete** on Macintosh computers with notebook/compact keyboards.
 
+    Example:
+        .. code-block:: bash
+
+            mame ibm5150 -uimodekey DEL
+
 .. _mame-commandline-uifontprovider:
 
-**-uifontprovider**
+**-uifontprovider** *<module>*
 
-    Chooses provider for UI font rendering.
+    Chooses provider for UI font rendering. The default setting is ``auto``.
 
-| On Windows, you can choose from: ``win``, ``dwrite``, ``none`` or ``auto``.
-| On macOS, you can choose from: ``osx``, ``none`` or ``auto``.
-| On other platforms, you can choose from: ``sdl``, ``none`` or ``auto``.
-|
-| Default setting is ``auto``.
-|
+.. list-table:: Supported UI font providers per-platform
+    :header-rows: 0
+    :stub-columns: 0
+
+    * - **Microsoft Windows**
+      - win
+      - dwrite
+      - none
+      - auto
+      -
+      - sdl [#UIFPSDLWindows]_.
+    * - **macOS**
+      -
+      -
+      - none
+      - auto
+      - osx
+      - sdl
+    * - **Linux**
+      -
+      -
+      - none
+      - auto
+      -
+      - sdl
+
+..  rubric:: Footnotes
+
+..  [#UIFPSDLWindows] SDL support on Windows requires that you compile MAME with
+                      the support in. By default SDL is not included in Windows
+                      builds of MAME.
+
+Example:
+    .. code-block:: bash
+
+        mame ajax -uifontprovider dwrite
 
 .. _mame-commandline-keyboardprovider:
 
-**-keyboardprovider**
+**-keyboardprovider** *<module>*
 
-    Chooses how MAME will get keyboard input.
+    Chooses how MAME will get keyboard input. The default is ``auto``.
 
-| On Windows, you can choose from: ``auto``, ``rawinput``, ``dinput``, ``win32``, or ``none``
-| On SDL, you can choose from: ``auto``, ``sdl``, ``none``
-|
-| The default is ``auto``.
-|
-| On Windows, ``auto`` will try ``rawinput`` with fallback to ``dinput``.
-| On SDL, ``auto`` will default to ``sdl``.
-|
+.. list-table:: Supported keyboard input providers per-platform
+    :header-rows: 0
+    :stub-columns: 0
+
+    * - **Microsoft Windows**
+      - auto [#KBIPAutoWindows]_.
+      - rawinput
+      - dinput
+      - win32
+      - none
+      - sdl [#KBIPSDLWindows]_.
+    * - **SDL (macOS and Linux)**
+      - auto [#KBIPAutoSDL]_.
+      -
+      -
+      -
+      - none
+      - sdl
+    * - **Linux**
+      - auto [#KBIPAutoSDL]_.
+      -
+      -
+      -
+      - none
+      - sdl
+
+..  rubric:: Footnotes
+
+..  [#KBIPAutoWindows] ``auto`` on Windows will try ``rawinput`` with
+                       fallback to ``dinput``.
+
+..  [#KBIPSDLWindows] SDL support on Windows requires that you compile MAME with
+                      the support in. By default SDL is not included in Windows
+                      builds of MAME.
+
+..  [#KBIPAutoSDL] ``auto`` on SDL will default to ``sdl``.
+
+.. Tip:: Note that user-mode keyboard emulation tools such as joy2key will
+         almost certainly require the use of **-keyboardprovider win32** on
+         Windows machines.
+
+Example:
+    .. code-block:: bash
+
+        mame c64 -keyboardprovider win32
 
 .. _mame-commandline-mouseprovider:
 
-**\-mouseprovider**
+**-mouseprovider** *<module>*
 
-    Chooses how MAME will get mouse input.
+    Chooses how MAME will get mouse input. The default is ``auto``.
 
-| On Windows, you can choose from: ``auto``, ``rawinput``, ``dinput``, ``win32``, or ``none``
-| On SDL, you can choose from: ``auto``, ``sdl``, ``none``
-|
-| The default is ``auto``.
-|
-| On Windows, ``auto`` will try ``rawinput`` with fallback to ``dinput``.
-| On SDL, ``auto`` will default to ``sdl``.
-|
+.. list-table:: Supported mouse input providers per-platform
+    :header-rows: 0
+    :stub-columns: 0
+
+    * - **Microsoft Windows**
+      - auto [#MIPAutoWindows]_.
+      - rawinput
+      - dinput
+      - win32
+      - none
+      - sdl [#MIPSDLWindows]_.
+    * - **SDL (macOS and Linux)**
+      - auto [#MIPAutoSDL]_.
+      -
+      -
+      -
+      - none
+      - sdl
+    * - **Linux**
+      - auto [#MIPAutoSDL]_.
+      -
+      -
+      -
+      - none
+      - sdl
+
+..  rubric:: Footnotes
+
+..  [#MIPAutoWindows] On Windows, ``auto`` will try ``rawinput`` with fallback
+                      to ``dinput``.
+
+..  [#MIPSDLWindows] SDL support on Windows requires that you compile MAME with
+                      the support in. By default SDL is not included in Windows
+                      builds of MAME.
+
+..  [#MIPAutoSDL] ``auto`` on SDL will default to ``sdl``.
+
+Example:
+    .. code-block:: bash
+
+        mame indy_4610 -mouseprovider win32
 
 .. _mame-commandline-lightgunprovider:
 
-**\-lightgunprovider**
+**-lightgunprovider** *<module>*
 
-    Chooses how MAME will get light gun input.
+    Chooses how MAME will get light gun input. The default is ``auto``.
 
-| On Windows, you can choose from: ``auto``, ``rawinput``, ``win32``, or ``none``
-| On SDL, you can choose from: ``auto``, ``x11`` or ``none``
-|
-| The default is ``auto``.
-|
-| On Windows, auto will try ``rawinput`` with fallback to ``win32``, or ``none`` if it doesn't find any.
-| On SDL/Linux, ``auto`` will default to ``x11``, or ``none`` if it doesn't find any.
-| On other SDL, ``auto`` will default to ``none``.
-|
+.. list-table:: Supported light gun input providers per-platform
+    :header-rows: 0
+    :stub-columns: 0
+
+    * - **Microsoft Windows**
+      - auto [#LGIPAutoWindows]_.
+      - rawinput
+      - win32
+      - none
+      -
+      -
+    * - **macOS**
+      - auto [#LGIPAutoSDL]_.
+      -
+      -
+      - none
+      -
+      -
+    * - **Linux**
+      - auto [#LGIPAutoLinux]_.
+      -
+      -
+      - none
+      -
+      - x11
+
+..  rubric:: Footnotes
+
+..  [#LGIPAutoWindows] On Windows, auto will try ``rawinput`` with fallback to
+                       ``win32``, or ``none`` if it doesn't find any.
+
+..  [#LGIPAutoSDL] On non-Linux SDL, ``auto`` will default to ``none``.
+
+..  [#LGIPAutoLinux] On SDL/Linux, ``auto`` will default to ``x11``, or ``none``
+                     if it doesn't find any.
+
+Example:
+    .. code-block:: bash
+
+        mame lethalen -lightgunprovider x11
 
 .. _mame-commandline-joystickprovider:
 
-**\-joystickprovider**
+**-joystickprovider** *<module>*
 
-    Chooses how MAME will get joystick input.
+    Chooses how MAME will get joystick input. The default is ``auto``.
 
-| On Windows, you can choose from: ``auto, ``winhybrid``, ``dinput``, ``xinput``, or ``none``
-| On SDL, you can choose from: ``auto``, ``sdl``, ``none``
-|
-| The default is ``auto``.
-|
-| On Windows, auto will default to ``dinput``.
-|
-| Note that Microsoft XBox 360 and XBox One controllers connected to Windows will work best with ``winhybrid`` or ``xinput``. The ``winhybrid`` option supports a mix of DirectInput and XInput controllers at the same time.
-| On SDL, auto will default to ``sdl``.
-|
+.. list-table:: Supported joystick input providers per-platform
+    :header-rows: 0
+    :stub-columns: 0
+
+    * - **Microsoft Windows**
+      - auto [#JIPAutoWindows]_.
+      - winhybrid
+      - dinput
+      - xinput
+      - none
+      - sdl
+    * - **SDL**
+      - auto [#JIPAutoSDL]_.
+      -
+      -
+      -
+      - none
+      - sdl
+
+..  rubric:: Footnotes
+
+..  [#JIPAutoWindows] On Windows, auto will default to ``dinput``.
+
+..  [#JIPAutoSDL] On SDL, auto will default to ``sdl``.
+
+.. Tip:: Note that Microsoft XBox 360 and XBox One controllers connected to
+         Windows will work best with ``winhybrid`` or ``xinput``. The
+         ``winhybrid`` option supports a mix of DirectInput and XInput
+         controllers at the same time.
+
+Example:
+    .. code-block:: bash
+
+        mame mk2 -joystickprovider winhybrid
+
+.. Tip:: On Windows, winhybrid is likely to give the best experience by
+         supporting both XInput and DirectInput controllers.
 
 
-OSD CLI Options
----------------
+.. _mame-commandline-cliverbs:
+
+OSD CLI Verbs
+-------------
 
 .. _mame-commandline-listmidi:
 
-**\-listmidi**
+**-listmidi**
 
-    Create a list of available MIDI I/O devices for use with emulation.
+    List available MIDI I/O devices for use with emulation.
+
+    Example:
+        .. code-block:: bash
+
+            mame -listmidi
+            MIDI input ports:
+
+            MIDI output ports:
+            Microsoft MIDI Mapper (default)
+            Microsoft GS Wavetable Synth
 
 .. _mame-commandline-listnetwork:
 
-**\-listnetwork**
+**-listnetwork**
 
-    Create a list of available Network Adapters for use with emulation.
+    List available network adapters for use with emulation.
+
+    Example 1:
+        .. code-block:: bash
+
+            mame -listnetwork
+            No network adapters were found
+
+    Example 2:
+        .. code-block:: bash
+
+            mame -listnetwork
+            Available network adapters:
+                Local Area Connection
+
+.. Tip:: On Windows, you'll need the TAP driver from OpenVPN for MAME to see
+         any network adapters.
 
 
+.. _mame-commandline-osdoutput:
 
 OSD Output Options
 ------------------
@@ -447,13 +981,26 @@ OSD Output Options
 
 **\-output**
 
-    Chooses how MAME will handle processing of output notifiers.
+    Chooses how MAME will handle processing of output notifiers. These are used
+    to connect external outputs such as the LED lights for the Player 1/2 start
+    buttons on certain arcade machines.
 
     You can choose from: ``auto``, ``none``, ``console`` or ``network``
 
     Note that network port is fixed at 8000.
 
+    Example:
+        .. code-block:: bash
 
+            mame asteroid -output console
+            led0 = 1
+            led0 = 0
+            ...
+            led0 = 1
+            led0 = 0
+
+
+.. _mame-commandline-configoptions:
 
 Configuration Options
 ---------------------
@@ -487,7 +1034,13 @@ Configuration Options
 
     The default is ON (**-readconfig**).
 
+    Example:
+        .. code-block:: bash
 
+            mame apple2ee -noreadconfig -sl6 diskii -sl7 cffa2 -hard1 TotalReplay.2mg
+
+
+.. _mame-commandline-pathoptions:
 
 Core Search Path Options
 ------------------------
@@ -500,15 +1053,25 @@ Core Search Path Options
 
     The default is ``.`` (that is, in the current working directory).
 
+    Example:
+        .. code-block:: bash
+
+            mame -homepath c:\mame\lua
+
 .. _mame-commandline-rompath:
 
-**-rompath** / **-rp** / **-biospath** / **-bp** *<path>*
+**-rompath** / **-rp** *<path>*
 
     Specifies one or more paths within which to find ROM or disk images.
     Multiple paths can be specified by separating them with semicolons.
 
     The default is ``roms`` (that is, a directory ``roms`` in the current
     working directory).
+
+    Example:
+        .. code-block:: bash
+
+            mame -rompath c:\mame\roms;c:\roms\another
 
 .. _mame-commandline-hashpath:
 
@@ -520,6 +1083,11 @@ Core Search Path Options
     The default is ``hash`` (that is, a directory ``hash`` in the current
     working directory).
 
+    Example:
+        .. code-block:: bash
+
+            mame -hashpath c:\mame\hash;c:\roms\softlists
+
 .. _mame-commandline-samplepath:
 
 **-samplepath** / **-sp** *<path>*
@@ -530,9 +1098,14 @@ Core Search Path Options
     The default is ``samples`` (that is, a directory ``samples`` in the current
     working directory).
 
+    Example:
+        .. code-block:: bash
+
+            mame -samplepath c:\mame\samples;c:\roms\samples
+
 .. _mame-commandline-artpath:
 
-**-artpath** *<path>* *<path>*
+**-artpath** *<path>*
 
     Specifies one or more paths within which to find external layout and artwork
     files.  Multiple paths can be specified by separating them with semicolons.
@@ -540,15 +1113,26 @@ Core Search Path Options
     The default is ``artwork`` (that is, a directory ``artwork`` in the current
     working directory).
 
+    Example:
+        .. code-block:: bash
+
+            mame -artpath c:\mame\artwork;c:\emu\shared-artwork
+
 .. _mame-commandline-ctrlrpath:
 
 **-ctrlrpath** *<path>*
 
-    Specifies one or more paths within which to find default input configuration
+    Specifies one or more paths within which to find controller configuration
     files.  Multiple paths can be specified by separating them with semicolons.
+    Used in conjunction with the ``-ctrlr`` option.
 
     The default is ``ctrlr`` (that is, a directory ``ctrlr`` in the current
     working directory).
+
+    Example:
+        .. code-block:: bash
+
+            mame -ctrlrpath c:\mame\ctrlr;c:\emu\controllers
 
 .. _mame-commandline-inipath:
 
@@ -574,6 +1158,11 @@ Core Search Path Options
     directory, followed by the current working directory, and finally the
     directory ``ini`` in the current working directory).
 
+    Example:
+        .. code-block:: bash
+
+            mame -inipath c:\users\thisuser\documents\mameini
+
 .. _mame-commandline-fontpath:
 
 **-fontpath** *<path>*
@@ -583,6 +1172,11 @@ Core Search Path Options
     separating them with semicolons.
 
     The default is ``.`` (that is, search in the current working directory).
+
+    Example:
+        .. code-block:: bash
+
+            mame -fontpath c:\mame\;c:\emu\artwork\mamefonts
 
 .. _mame-commandline-cheatpath:
 
@@ -594,6 +1188,11 @@ Core Search Path Options
     The default is ``cheat`` (that is, a folder called ``cheat`` located in the
     current working directory).
 
+    Example:
+        .. code-block:: bash
+
+            mame -cheatpath c:\mame\cheat;c:\emu\cheats
+
 .. _mame-commandline-crosshairpath:
 
 **-crosshairpath** *<path>*
@@ -604,6 +1203,11 @@ Core Search Path Options
     The default is ``crsshair`` (that is, a directory ``crsshair`` in the
     current working directory).
 
+    Example:
+        .. code-block:: bash
+
+            mame -crosshairpath c:\mame\crsshair;c:\emu\artwork\crosshairs
+
 .. _mame-commandline-pluginspath:
 
 **-pluginspath** *<path>*
@@ -612,6 +1216,11 @@ Core Search Path Options
 
     The default is ``plugins`` (that is, a directory ``plugins`` in the current
     working directory).
+
+    Example:
+        .. code-block:: bash
+
+            mame -pluginspath c:\mame\plugins;c:\emu\lua
 
 .. _mame-commandline-languagepath:
 
@@ -623,6 +1232,11 @@ Core Search Path Options
     The default is ``language`` (that is, a directory ``language`` in the
     current working directory).
 
+    Example:
+        .. code-block:: bash
+
+            mame -languagepath c:\mame\language;c:\emu\mame-languages
+
 .. _mame-commandline-swpath:
 
 **-swpath** *<path>*
@@ -632,6 +1246,13 @@ Core Search Path Options
     The default is ``sofware`` (that is, a directory ``software`` in the current
     working directory).
 
+    Example:
+        .. code-block:: bash
+
+            mame -swpath c:\mame\software;c:\emu\mydisks
+
+
+.. _mame-commandline-coreoutdir:
 
 Core Output Directory Options
 -----------------------------
@@ -650,6 +1271,11 @@ Core Output Directory Options
     directory). If this directory does not exist, it will be created
     automatically.
 
+    Example:
+        .. code-block:: bash
+
+            mame -cfg_directory c:\mame\cfg
+
 .. _mame-commandline-nvramdirectory:
 
 **-nvram_directory** *<path>*
@@ -663,6 +1289,11 @@ Core Output Directory Options
     working directory)).  If this directory does not exist, it will be created
     automatically.
 
+    Example:
+        .. code-block:: bash
+
+            mame -nvram_directory c:\mame\nvram
+
 .. _mame-commandline-inputdirectory:
 
 **-input_directory** *<path>*
@@ -674,6 +1305,11 @@ Core Output Directory Options
     The default is ``inp`` (that is, a directory ``inp`` in the current working
     directory).  If this directory does not exist, it will be created
     automatically.
+
+    Example:
+        .. code-block:: bash
+
+            mame -input_directory c:\mame\inp
 
 .. _mame-commandline-statedirectory:
 
@@ -687,6 +1323,11 @@ Core Output Directory Options
     directory).  If this directory does not exist, it will be created
     automatically.
 
+    Example:
+        .. code-block:: bash
+
+            mame -state_directory c:\mame\sta
+
 .. _mame-commandline-snapshotdirectory:
 
 **-snapshot_directory** *<path>*
@@ -697,6 +1338,11 @@ Core Output Directory Options
     The default is ``snap`` (that is, a directory ``snap`` in the current
     working directory). If this directory does not exist, it will be created
     automatically.
+
+    Example:
+        .. code-block:: bash
+
+            mame -snapshot_directory c:\mame\snap
 
 .. _mame-commandline-diffdirectory:
 
@@ -712,6 +1358,11 @@ Core Output Directory Options
     working directory).  If this directory does not exist, it will be created
     automatically.
 
+    Example:
+        .. code-block:: bash
+
+            mame -diff_directory c:\mame\diff
+
 .. _mame-commandline-commentdirectory:
 
 **-comment_directory** *<path>*
@@ -724,7 +1375,13 @@ Core Output Directory Options
     current working directory).  If this directory does not exist, it will be
     created automatically.
 
+    Example:
+        .. code-block:: bash
 
+            mame -comment_directory c:\mame\comments
+
+
+.. _mame-commandline-savestate:
 
 Core State/Playback Options
 ---------------------------
@@ -745,6 +1402,11 @@ Core State/Playback Options
     states can be loaded by executing the debugger **rewind** (or **rw**)
     command.
 
+    Example:
+        .. code-block:: bash
+
+            mame -norewind
+
 .. _mame-commandline-rewindcapacity:
 
 **-rewind_capacity** *<value>*
@@ -755,12 +1417,22 @@ Core State/Playback Options
     current savestate size disables rewind. Values below 0 are automatically
     clamped to 0.
 
+    Example:
+        .. code-block:: bash
+
+            mame -rewind_capacity 30
+
 .. _mame-commandline-state:
 
 **-state** *<slot>*
 
     Immediately after starting the specified system, will cause the save state
     in the specified <slot> to be loaded.
+
+    Example:
+        .. code-block:: bash
+
+            mame -state 1
 
 .. _mame-commandline-noautosave:
 
@@ -773,17 +1445,30 @@ Core State/Playback Options
 
     The default is OFF (**-noautosave**).
 
+    Example:
+        .. code-block:: bash
+
+            mame -autosave
+
 .. _mame-commandline-playback:
 
 **-playback** / **-pb** *<filename>*
 
     Specifies a file from which to play back a series of inputs.  This feature
     does not work reliably for all systems, but can be used to watch a
-    previously recorded game session from start to finish.  In order to make
-    things consistent, you should only record and playback with all
-    configuration (.cfg), NVRAM (.nv), and memory card files deleted.
+    previously recorded game session from start to finish.
 
     The default is ``NULL`` (no playback).
+
+    Example:
+        .. code-block:: bash
+
+            mame pacman -playback worldrecord
+
+.. Tip:: You may experience desync in playback if the configuration, NVRAM, and
+         memory card files don't match the original; this is why it is suggested
+         you should only record and playback with all configuration (.cfg),
+         NVRAM (.nv), and memory card files deleted.
 
 .. _mame-commandline-exitafterplayback:
 
@@ -795,29 +1480,30 @@ Core State/Playback Options
 
     The default is OFF (**-noexit_after_playback**).
 
+    Example:
+        .. code-block:: bash
+
+            mame pacman -playback worldrecord -exit_after_playback
+
 .. _mame-commandline-record:
 
 **-record** / **-rec** *<filename>*
 
     Specifies a file to record all input from a session.  This can be used to
     record a session for later playback.  This feature does not work reliably
-    for all systems, but can be used to watch a previously recorded session from
-    start to finish.  In order to make things consistent, you should only record
-    and playback with all configuration (.cfg), NVRAM (.nv), and memory card
-    files deleted.
+    for all systems, but can be used to record a session from start to finish.
 
     The default is ``NULL`` (no recording).
 
-.. _mame-commandline-recordtimecode:
+    Example:
+        .. code-block:: bash
 
-**-record_timecode**
+            mame pacman -record worldrecord
 
-    Tells MAME to create a timecode file. It contains a line with elapsed times
-    on each press of timecode shortcut key (default is **F12**).  This option
-    works only when recording mode is enabled (**-record** option).  The
-    timecode file is saved in the ``inp`` folder.
-
-    By default, no timecode file is saved.
+.. Tip:: You may experience desync in playback if the configuration, NVRAM, and
+         memory card files don't match the original; this is why it is suggested
+         you should only record and playback with all configuration (.cfg),
+         NVRAM (.nv), and memory card files deleted.
 
 .. _mame-commandline-mngwrite:
 
@@ -830,6 +1516,11 @@ Core State/Playback Options
     **-aviwrite** to record audio and video to a single file.
 
     The default is ``NULL`` (no recording).
+
+    Example:
+        .. code-block:: bash
+
+            mame pacman -mngwrite pacman-video
 
 .. _mame-commandline-aviwrite:
 
@@ -846,6 +1537,11 @@ Core State/Playback Options
 
     The default is ``NULL`` (no recording).
 
+    Example:
+        .. code-block:: bash
+
+            mame pacman -playback worldrecord -exit_after_playback -aviwrite worldrecord
+
 .. _mame-commandline-wavwrite:
 
 **-wavwrite** *<filename>*
@@ -854,6 +1550,11 @@ Core State/Playback Options
     producing an audio recording of the session.
 
     The default is ``NULL`` (no recording).
+
+    Example:
+        .. code-block:: bash
+
+            mame pacman -wavewrite pacsounds
 
 .. _mame-commandline-snapname:
 
@@ -877,16 +1578,26 @@ Core State/Playback Options
     floppy disks, you can also use the ``%d_[media]`` indicator. Replace [media]
     with the media switch you want to use.
 
-    A few examples:
+    Example 1:
+        .. code-block:: bash
 
-    If you use **mame robby -snapname foo/%g%i** snapshots will be saved as
-    ``snaps\\foo\\robby0000.png`` , ``snaps\\foo\\robby0001.png`` and so on.
+            mame robby -snapname foo\%g%i
 
-    If you use **mame nes -cart robby -snapname %g/%d_cart** snapshots will be
-    saved as ``snaps\\nes\\robby.png``.
+        Snapshots will be saved as ``snaps\foo\robby0000.png``, ``snaps\foo\robby0001.png`` and so on.
 
-    If you use **mame c64 -flop1 robby -snapname %g/%d_flop1/%i** snapshots will
-    be saved as ``snaps\\c64\\robby\\0000.png``.
+    Example 2:
+        .. code-block:: bash
+
+            mame nes -cart robby -snapname %g\%d_cart
+
+        Snapshots will be saved as ``snaps\nes\robby.png``.
+
+    Example 3:
+        .. code-block:: bash
+
+            mame c64 -flop1 robby -snapname %g\%d_flop1/%i
+
+        Snapshots will be saved as ``snaps\c64\robby\0000.png``.
 
 .. _mame-commandline-snapsize:
 
@@ -896,38 +1607,61 @@ Core State/Playback Options
     will create snapshots at the system's current resolution in raw pixels, and
     will create movies at the system's starting resolution in raw pixels.  If
     you specify this option, then MAME will create both snapshots and movies at
-    the size specified, and will bilinear filter the result.  Note that this
-    size does not automatically rotate if the system is vertically oriented.
+    the size specified, and will bilinear filter the result.
 
     The default is ``auto``.
+
+    Example:
+        .. code-block:: bash
+
+            mame pacman -snapsize 1920x1080
+
+.. Tip:: -snapsize does not automatically rotate if the system is vertically
+         oriented, so for vertical systems you'll want to swap the width and
+         height options.
 
 .. _mame-commandline-snapview:
 
 **-snapview** *<viewname>*
 
-    Specifies the view to use when rendering snapshots and movies.
+    Specifies the view to use when rendering snapshots and videos.  The
+    *<viewname>* does not need to be the full name of a view, MAME will choose
+    the first view with a name that has the *<viewname>* as a prefix.  For
+    example **-snapview "screen 0 pixel"** will match the
+    “\ *Screen 0 Pixel Aspect (10:7)*\ ” view.
 
-    By default, both use a special 'internal' view, which renders a separate
-    snapshot per screen or renders movies only of the first screen.  By
-    specifying this option, you can override this default behavior and select a
-    single view that will apply to all snapshots and movies.  Note that
-    <viewname> does not need to be a perfect match; rather, it will select the
-    first view whose name matches all the characters specified by <viewname>.
+    If the *<viewname>* is ``auto`` or an empty string, MAME will select a view
+    based on the number of emulated screens in the system, and the available
+    external and internal artwork.  MAME tries to select a view that shows all
+    emulated screens by default.
 
-    For example, **-snapview native** will match the "Native (15:14)" view even
-    though it is not a perfect match.  <viewname> can also be 'auto', which
-    selects the first view with all screens present.
+    If the *<viewname>* is ``native``, MAME uses special internal view to save a
+    separate snapshot for each visible emulated screen, or to record a video for
+    the first visible screen only.  The snapshot(s) or video will have the same
+    resolution as the emulated screen(s) with no artwork elements drawn or
+    effects applied.
 
-    The default value is ``internal``.
+    The default value is ``auto``.
+
+    Example:
+        .. code-block:: bash
+
+            mame wrecking -snapview cocktail
+
 
 .. _mame-commandline-nosnapbilinear:
 
 **-[no]snapbilinear**
 
     Specify if the snapshot or movie should have bilinear filtering applied.
-    Shutting this off can improve performance while recording video to a file.
+    Disabling this off can improve performance while recording video to a file.
 
     The default is ON (**-snapbilinear**).
+
+    Example:
+        .. code-block:: bash
+
+            mame pacman -nosnapbilinear
 
 .. _mame-commandline-statename:
 
@@ -947,16 +1681,27 @@ Core State/Playback Options
     floppy disks, you can also use the ``%d_[media]`` indicator. Replace
     ``[media]`` with the media switch you want to use.
 
-    A few examples:
+    Example 1:
+        .. code-block:: bash
 
-    If you use **mame robby -statename foo/%g** save states will be stored
-    inside ``sta\\foo\\robby\\``.
+            mame robby -statename foo\%g
+            All save states will be stored inside sta\foo\robby\
 
-    If you use **mame nes -cart robby -statename %g/%d_cart** save states will
-    be stored inside ``sta\\nes\\robby\\``.
+    Example 2:
+        .. code-block:: bash
 
-    If you use **mame c64 -flop1 robby -statename %g/%d_flop1** save states will
-    be stored inside 'sta\\c64\\robby\\'.
+            mame nes -cart robby -statename %g/%d_cart
+            All save states will be stored inside sta\nes\robby\
+
+    Example 3:
+        .. code-block:: bash
+
+            mame c64 -flop1 robby -statename %g/%d_flop1
+            All save states will be stored inside sta\c64\robby\
+
+.. Tip:: Note that even on Microsoft Windows, you should use ``/`` as your
+         path seperator for **-statename**
+
 
 .. _mame-commandline-noburnin:
 
@@ -976,7 +1721,13 @@ Core State/Playback Options
 
     The default is OFF (**-noburnin**).
 
+    Example:
+        .. code-block:: bash
 
+            mame neogeo -burnin
+
+
+.. _mame-commandline-perf:
 
 Core Performance Options
 ------------------------
@@ -991,6 +1742,11 @@ Core Performance Options
 
     This is off by default (**-noautoframeskip**).
 
+    Example:
+        .. code-block:: bash
+
+            mame gradius4 -autoframeskip
+
 .. _mame-commandline-frameskip:
 
 **-frameskip** / **-fs** *<level>*
@@ -1003,6 +1759,11 @@ Core Performance Options
 
     The default value is **-frameskip 0**, which skips no frames.
 
+    Example:
+        .. code-block:: bash
+
+            mame gradius4 -frameskip 2
+
 .. _mame-commandline-secondstorun:
 
 **-seconds_to_run** / **-str** *<seconds>*
@@ -1012,8 +1773,13 @@ Core Performance Options
     benchmarking and automated testing.  By combining this with a fixed set of
     other command line options, you can set up a consistent environment for
     benchmarking MAME's emulation performance.  In addition, upon exit, the
-    **-str** option will write a screenshot called ``final.png`` to the system's
-    snapshot directory.
+    **-str** option will write a screenshot to the system's snapshot directory
+    with the file name determined by the **-snapname** option.
+
+    Example:
+        .. code-block:: bash
+
+            mame pacman -seconds_to_run 60
 
 .. _mame-commandline-nothrottle:
 
@@ -1028,6 +1794,11 @@ Core Performance Options
 
    The default is to enable throttling (**-throttle**).
 
+    Example:
+        .. code-block:: bash
+
+            mame pacman -nothrottle
+
 .. _mame-commandline-nosleep:
 
 **-[no]sleep**
@@ -1039,6 +1810,11 @@ Core Performance Options
     programs are running.
 
     The default is on (**-sleep**).
+
+    Example:
+        .. code-block:: bash
+
+            mame gradius 4 -nosleep
 
 .. _mame-commandline-speed:
 
@@ -1054,6 +1830,11 @@ Core Performance Options
 
     The default is ``1.0`` (normal speed).
 
+    Example:
+        .. code-block:: bash
+
+            mame pacman -speed 1.25
+
 .. _mame-commandline-norefreshspeed:
 
 **-[no]refreshspeed** / **-[no]rs**
@@ -1067,6 +1848,11 @@ Core Performance Options
 
     The default is off (**-norefreshspeed**).
 
+    Example:
+        .. code-block:: bash
+
+            mame pacman -refreshspeed
+
 .. _mame-commandline-numprocessors:
 
 **-numprocessors** / **-np** **auto**\ \|\ *<value>*
@@ -1078,6 +1864,11 @@ Core Performance Options
 
     The default is ``auto``.
 
+    Example:
+        .. code-block:: bash
+
+            mame gradius4 -numprocessors 2
+
 .. _mame-commandline-bench:
 
 **-bench** *<n>*
@@ -1087,17 +1878,30 @@ Core Performance Options
 
     **-str** *<n>* **-video none -sound none -nothrottle**
 
+    Example:
+        .. code-block:: bash
+
+            mame gradius4 -bench 300
+
 .. _mame-commandline-lowlatency:
 
-**-lowlatency**
+**-[no]lowlatency**
 
     This tells MAME to draw a new frame before throttling to reduce input
     latency.  This is particularly effective with VRR (Variable Refresh Rate)
     displays.
 
-    This may cause frame pacing issues in the form of jitter with some 
+    This may cause frame pacing issues in the form of jitter with some
     systems (especially newer 3D-based systems or systems that run software
     akin to an operating system), so the default is off (**-nolowlatency**).
+
+    Example:
+        .. code-block:: bash
+
+            mame bgaregga -lowlatency
+
+
+.. _mame-commandline-rotation:
 
 Core Rotation Options
 ---------------------
@@ -1114,6 +1918,10 @@ Core Rotation Options
 
     The default is ON (**-rotate**).
 
+    Example:
+        .. code-block:: bash
+
+            mame pacman -norotate
 
 .. _mame-commandline-noror:
 
@@ -1129,6 +1937,16 @@ Core Rotation Options
     specified).
 
     The default for both of these options is OFF (**-noror -norol**).
+
+    Example 1:
+        .. code-block:: bash
+
+            mame pacman -ror
+
+    Example 2:
+        .. code-block:: bash
+
+            mame pacman -rol
 
 
 .. _mame-commandline-noautoror:
@@ -1146,6 +1964,20 @@ Core Rotation Options
     vertically in one of the directions you can handle.  If your screen only
     pivots counter-clockwise, use **-autoror**.
 
+    Example 1:
+        .. code-block:: bash
+
+            mame pacman -autoror
+
+    Example 2:
+        .. code-block:: bash
+
+            mame pacman -autorol
+
+.. Tip:: If you have a display that can be rotated, **-autorol** or
+         **-autoror** will allow you to get a larger display for both horizontal
+         and vertical systems.
+
 .. _mame-commandline-noflipx:
 
 **-[no]flipx**
@@ -1160,6 +1992,18 @@ Core Rotation Options
 
     The default for both of these options is OFF (**-noflipx -noflipy**).
 
+    Example 1:
+        .. code-block:: bash
+
+            mame -flipx pacman
+
+    Example 2:
+        .. code-block:: bash
+
+            mame -flipy suprmrio
+
+
+.. _mame-commandline-videooptions:
 
 Core Video Options
 ------------------
@@ -1203,17 +2047,34 @@ Core Video Options
       |	The default on all other systems is ``soft``.
       |
 
+    Example:
+        .. code-block:: bash
+
+            mame gradius3 -video bgfx
+
 .. _mame-commandline-numscreens:
 
 **-numscreens** *<count>*
 
-    Tells MAME how many output windows to create.  For most systems, a single
-    output window is all you need, but some systems originally used multipl
-    screens (*e.g. Darius and PlayChoice-10 arcade machines*).  Each screen
-    (up to 4) has its own independent settings for physical monitor, aspect
-    ratio, resolution, and view, which can be set using the options below.
+    Tells MAME how many output windows or screens to create.  For most systems,
+    a single output window is all you need, but some systems originally used
+    multiple screens (*e.g. Darius and PlayChoice-10 arcade machines*).  Some
+    systems with front panel controls and/or status lights also may let you put
+    these in different windows/screens. Each screen (up to 4) has its own
+    independent settings for physical monitor, aspect ratio, resolution, and
+    view, which can be set using the options below.
 
     The default is ``1``.
+
+    Example 1:
+        .. code-block:: bash
+
+            mame darius -numscreens 3
+
+    Example 2:
+        .. code-block:: bash
+
+            mame pc_cntra -numscreens 2
 
 .. _mame-commandline-window:
 
@@ -1222,6 +2083,11 @@ Core Video Options
     Run MAME in either a window or full screen.
 
     The default is OFF (**-nowindow**).
+
+    Example:
+        .. code-block:: bash
+
+            mame coco3 -window
 
 .. _mame-commandline-maximize:
 
@@ -1235,6 +2101,11 @@ Core Video Options
     **-window** option is used.
 
     The default is ON (**-maximize**).
+
+    Example:
+        .. code-block:: bash
+
+            mame apple2e -window -nomaximize
 
 .. _mame-commandline-keepaspect:
 
@@ -1265,6 +2136,11 @@ Core Video Options
     The MAME team strongly recommends leaving this option enabled.  Stretching
     systems beyond their original aspect ratio will mangle the appearance of the
     system in ways that no filtering or shaders can repair.
+
+    Example:
+        .. code-block:: bash
+
+            mame sf2ua -nokeepaspect
 
 .. _mame-commandline-waitvsync:
 
@@ -1300,6 +2176,11 @@ Core Video Options
 
     The default is OFF (**-nowaitvsync**).
 
+    Example:
+        .. code-block:: bash
+
+            mame gradius2 -waitvsync
+
 .. _mame-commandline-syncrefresh:
 
 **-[no]syncrefresh**
@@ -1317,6 +2198,11 @@ Core Video Options
 
 .. _mame-commandline-prescale:
 
+    Example:
+        .. code-block:: bash
+
+            mame mk -syncrefresh
+
 **-prescale** *<amount>*
 
     Controls the size of the screen images when they are passed off to the
@@ -1328,8 +2214,13 @@ Core Video Options
 
     The default is ``1``.
 
-    This is supported with all video output types (``bgfx``, ``d3d``, etc) on
-    Windows and is **ONLY** supported with OpenGL on other platforms.
+    This is supported with all video output types ( ``bgfx``, ``d3d``, etc) on
+    Windows and is supported with BGFX and OpenGL on other platforms.
+
+    Example:
+        .. code-block:: bash
+
+            mame pacman -video d3d -prescale 3
 
 .. _mame-commandline-filter:
 
@@ -1348,6 +2239,11 @@ Core Video Options
     Use ``bgfx_screen_chains`` in your INI file(s) to adjust filtering with the
     BGFX video system.
 
+    Example:
+        .. code-block:: bash
+
+            mame pacman -nofilter
+
 .. _mame-commandline-unevenstretch:
 
 **-[no]unevenstretch**
@@ -1357,6 +2253,13 @@ Core Video Options
 
     The default is ON. (**-unevenstretch**)
 
+    Example:
+        .. code-block:: bash
+
+            mame dkong -nounevenstretch
+
+
+.. _mame-commandline-fullscreen:
 
 Core Full Screen Options
 ------------------------
@@ -1370,21 +2273,25 @@ Core Full Screen Options
 
     On modern video cards, there is little reason to switch resolutions unless
     you are trying to achieve the "exact" pixel resolutions of the original
-    systems, which requires significant tweaking.  This option is also useful
+    systems, which requires significant tweaking.  This is also true
     on LCD displays, since they run with a fixed resolution and switching
     resolutions on them is just silly.  This option does not work with
-    **-video gdi**.
+    **-video gdi** and **-video bgfx**.
 
     The default is OFF (**-noswitchres**).
 
+    Example:
+        .. code-block:: bash
+
+            mame kof97 -video d3d -switchres -resolution 1280x1024
+
+
+.. _mame-commandline-windowoptions:
 
 Core Per-Window Options
 -----------------------
 
 .. _mame-commandline-screen:
-
-NOTE:  **Multiple Screens may fail to work correctly on some Mac machines as of
-right now.**
 
 **-screen** *<display>*
 
@@ -1412,6 +2319,22 @@ right now.**
     to the specific window. The **-screen** parameter applies to all windows.
     The window-specific options override values from the all window option.
 
+    Example 1:
+        .. code-block:: bash
+
+            mame pc_cntra -numscreens 2 -screen0 \\.\DISPLAY1 -screen1 \\.\DISPLAY2
+
+    Example 2:
+        .. code-block:: bash
+
+            mame darius -numscreens 3 -screen0 \\.\DISPLAY1 -screen1 \\.\DISPLAY3 -screen2 \\.\DISPLAY2
+
+.. Tip:: Using **-verbose** will tell you which displays you have on your
+         system, where they are connected, and what their current resolutions
+         are.
+
+.. Tip:: **Multiple Screens may fail to work correctly on some Mac machines as
+         of right now.**
 
 .. _mame-commandline-aspect:
 
@@ -1439,6 +2362,16 @@ right now.**
     The **-aspect0**, **-aspect1**, **-aspect2**, **-aspect3** parameters apply
     to the specific window.  The **-aspect** parameter applies to all windows.
     The window-specific options override values from the all window option.
+
+    Example 1:
+        .. code-block:: bash
+
+            mame contra -aspect 16:9
+
+    Example 2:
+        .. code-block:: bash
+
+            mame pc_cntra -numscreens 2 -aspect0 16:9 -aspect1 5:4
 
 
 .. _mame-commandline-resolution:
@@ -1473,6 +2406,10 @@ right now.**
     applies to all windows.  The window-specific options override values from
     the all window option.
 
+    Example:
+        .. code-block:: bash
+
+            mame pc_cntra -numscreens 2 -resolution0 1920x1080 -resolution1 1280x1024
 
 .. _mame-commandline-view:
 
@@ -1486,19 +2423,37 @@ right now.**
 
 **-view3** *<viewname>*
 
-    Specifies the initial view setting for each window.  The *<viewname>* does
-    not need to be a perfect match; rather, it will select the first view whose
-    name matches all the characters specified by *<viewname>*.  For example,
-    **-view native** will match the "*Native (15:14)*" view even though it is
-    not a perfect match.  The value ``auto`` is also supported, and requests
-    that MAME perform a default selection.
+    Specifies the initial view setting for each window/screen.  The *<viewname>*
+    does not need to be the full name of a view, MAME will choose the first view
+    with a name that has the *<viewname>* as a prefix.  For example
+    **-view "screen 0 pixel"** will match the
+    “\ *Screen 0 Pixel Aspect (10:7)*\ ” view.
+
+    If the *<viewname>* is ``auto`` or an empty string, MAME will select views
+    based on the number of emulated screens in the system, the number of
+    windows/screens MAME is using, and the available external and internal
+    artwork.  MAME tries to select views so that all emulated screens are
+    visible by default.
 
     The default value for these options is ``auto``.
 
     The **-view0**, **-view1**, **-view2**, **-view3** parameters apply to the
-    specific window.  The **-view** parameter applies to all windows. The
-    window-specific options override values from the all window option.
+    specific window.  The **-view** parameter applies to all windows.  The
+    window-specific options override values from the all windows option.
 
+    Note that view settings saved in the configuration file for the machine take
+    precedence over the initial view settings.  If you change the selected views
+    in the Video Options menu, this will be saved in the configuration file for
+    the machine and take precedence over any initial views specified in INI
+    files or on the command line.
+
+    Example:
+        .. code-block:: bash
+
+            mame contra -view native
+
+
+.. _mame-commandline-artwork:
 
 Core Artwork Options
 --------------------
@@ -1514,12 +2469,32 @@ Core Artwork Options
 
     The default is OFF **-noartwork_crop**.
 
+    Example:
+        .. code-block:: bash
+
+            mame pacman -artwork_crop
+
+.. Tip:: **-artwork_crop** is great for widescreen displays. You will get a
+         full-sized system display and the artwork will fill the empty space on
+         the sides as much as possible.
+
 .. _mame-commandline-fallbackartwork:
 
 **-fallback_artwork**
 
     Specifies fallback artwork if no external artwork or internal driver layout
-    is defined.
+    is defined. If external artwork for the system is present or a layout is
+    included in the driver for the system, then that will take precedence.
+
+    Example:
+        .. code-block:: bash
+
+            mame coco -fallback_artwork suprmrio
+
+.. Tip:: You can use **fallback_artwork <artwork name>** in
+         ``horizontal.ini`` and ``vertical.ini`` to specify different
+         fallback artwork choices for horizontal and vertical systems.
+
 
 .. _mame-commandline-overrideartwork:
 
@@ -1527,7 +2502,13 @@ Core Artwork Options
 
     Specifies override artwork for external artwork and internal driver layout.
 
+    Example:
+        .. code-block:: bash
 
+            mame galaga -override_artwork puckman
+
+
+.. _mame-commandline-screenoptions:
 
 Core Screen Options
 -------------------
@@ -1540,11 +2521,14 @@ Core Screen Options
     This option does not affect the artwork or other parts of the display.
     Using the MAME UI, you can individually set the brightness for each system
     screen; this option controls the initial value for all visible system
-    screens. The standard value is ``1.0``.  Selecting lower values
+    screens. The standard and default value is ``1.0``.  Selecting lower values
     (down to 0.1) will produce a darkened display, while selecting higher values
     (up to 2.0) will give a brighter display.
 
-    The default is ``1.0``.
+    Example:
+        .. code-block:: bash
+
+            mame pacman -brightness 0.5
 
 .. _mame-commandline-contrast:
 
@@ -1554,11 +2538,14 @@ Core Screen Options
     does not affect the artwork or other parts of the display.  Using the MAME
     UI, you can individually set the contrast for each system screen; this
     option controls the initial value for all visible system screens.  The
-    standard value is ``1.0``.  Selecting lower values (down to 0.1) will
-    produce a dimmer display, while selecting higher values (up to 2.0) will
-    give a more saturated display.
+    standard and default value is ``1.0``.  Selecting lower values (down to 0.1)
+    will produce a dimmer display, while selecting higher values (up to 2.0)
+    will give a more saturated display.
 
-    The default is ``1.0``.
+    Example:
+        .. code-block:: bash
+
+            mame pacman -contrast 0.5
 
 .. _mame-commandline-gamma:
 
@@ -1568,12 +2555,17 @@ Core Screen Options
     ramp, for the system screens.  This option does not affect the artwork or
     other parts of the display.  Using the MAME UI, you can individually set
     the gamma for each system screen; this option controls the initial value for
-    all visible system screens.  The standard value is ``1.0``, which gives a
-    linear ramp from black to white.  Selecting lower values (down to 0.1) will
-    increase the nonlinearity toward black, while selecting higher values
-    (up to 3.0) will push the nonlinearity toward white.
+    all visible system screens.  The standard and default value is ``1.0``,
+    which gives a linear ramp from black to white.  Selecting lower values
+    (down to 0.1) will increase the nonlinearity toward black, while
+    selecting higher values (up to 3.0) will push the nonlinearity toward white.
 
     The default is ``1.0``.
+
+    Example:
+        .. code-block:: bash
+
+            mame pacman -gamma 0.8
 
 .. _mame-commandline-pausebrightness:
 
@@ -1582,6 +2574,11 @@ Core Screen Options
     This controls the brightness level when MAME is paused.
 
     The default value is ``0.65``.
+
+    Example:
+        .. code-block:: bash
+
+            mame pacman -pause_brightness 0.33
 
 .. _mame-commandline-effect:
 
@@ -1601,7 +2598,13 @@ Core Screen Options
 
     The default is ``none``, meaning no effect.
 
+    Example:
+        .. code-block:: bash
 
+            mame pacman -effect scanlines
+
+
+.. _mame-commandline-vectoroptions:
 
 Core Vector Options
 -------------------
@@ -1610,19 +2613,62 @@ Core Vector Options
 
 **-beam_width_min** *<width>*
 
-    Sets the vector beam minimum width.
+    Sets the vector beam minimum width. The beam width varies between
+    the minimum and maximum beam widths as the intensity of the vector
+    drawn changes. To disable vector width changes based on intensity,
+    set the maximum equal to the minimum.
+
+    Example:
+        .. code-block:: bash
+
+            mame asteroid -beam_width_min 0.1
 
 .. _mame-commandline-beamwidthmax:
 
 **-beam_width_max** *<width>*
 
-    Sets the vector beam maximum width.
+    Sets the vector beam maximum width. The beam width varies between
+    the minimum and maximum beam widths as the intensity of the vector
+    drawn changes. To disable vector width changes based on intensity,
+    set the maximum equal to the minimum.
+
+    Example:
+        .. code-block:: bash
+
+            mame asteroid -beam_width_max 2
 
 .. _mame-commandline-beamintensityweight:
 
 **-beam_intensity_weight** *<weight>*
 
-    Sets the vector beam intensity weight.
+    Sets the vector beam intensity weight. This value determines how the
+    intensity of the vector drawn affects the width. A value of 0 creates
+    a linear mapping from intensity to width. Negative values mean that
+    lower intensities will increase the width toward maximum faster,
+    while positive values will increase the width toward maximum more
+    slowly.
+
+    Example:
+        .. code-block:: bash
+
+            mame asteroid -beam_intensity_weight 0.5
+
+.. _mame-commandline-beamdotsize:
+
+**-beam_dot_size** *<scale>*
+
+    Scale factor to apply to the size of single-point dots in vector games.
+    Normally these are rendered according to the computed beam width; however,
+    it is common for this to produce dots that are difficult to see. The
+    beam_dot_size option applies a scale factor on top of the beam width to
+    help them show up better.
+
+    The default is ``1``.
+
+    Example:
+        .. code-block:: bash
+
+            mame asteroid -beam_dot_size 2
 
 .. _mame-commandline-flicker:
 
@@ -1634,14 +2680,24 @@ Core Vector Options
 
     The default is ``0``.
 
+    Example:
+        .. code-block:: bash
 
-Core Video OpenGL Debugging Options
------------------------------------
+            mame asteroid -flicker 0.15
+
+
+.. _mame-commandline-opengloptions:
+
+Core Video OpenGL Feature Options
+---------------------------------
 
 These options are for compatibility in **-video opengl**.  If you report
-rendering artifacts you may be asked to try messing with them by the devs, but
-normally they should be left at their defaults which results in the best
+rendering artifacts you may be asked to try messing with them by the developers,
+but normally they should be left at their defaults which results in the best
 possible video performance.
+
+.. Tip:: Examples are not provided for these options as MAMEdev will provide
+         suitable test options in the case of needing them for debugging.
 
 .. _mame-commandline-glforcepow2texture:
 
@@ -1671,21 +2727,28 @@ possible video performance.
 
 **-[no]gl_pbo**
 
-    Enable OpenGL PBO (Pixel Buffer Objects), if available (default ``on``)
+    Enable OpenGL PBO (Pixel Buffer Objects), if available (default ``on`` )
 
     The default is ON. (**-gl_pbo**)
 
+
+.. _mame-commandline-openglglsl:
 
 Core Video OpenGL GLSL Options
 ------------------------------
 
 .. _mame-commandline-glglsl:
 
-**-gl_glsl**
+**-[no]gl_glsl**
 
     Enable OpenGL GLSL, if available.
 
-    The default is OFF.
+    The default is OFF (**-nogl_glsl**).
+
+    Example:
+        .. code-block:: bash
+
+            mame galaxian -gl_glsl
 
 .. _mame-commandline-glglslfilter:
 
@@ -1698,6 +2761,11 @@ Core Video OpenGL GLSL Options
 
     The default is 1. (**-gl_glsl_filter 1**)
 
+    Example:
+        .. code-block:: bash
+
+            mame galaxian -gl_glsl -gl_glsl_filter 0
+
 .. _mame-commandline-glslshadermame:
 
 **-glsl_shader_mame0**
@@ -1708,17 +2776,16 @@ Core Video OpenGL GLSL Options
 
 **-glsl_shader_mame9**
 
+    Set a custom OpenGL GLSL shader effect to the internal systcm screen in the
+    given slot. MAME does not include a vast selection of shaders by default;
+    more can be found online.
 
-    Custom OpenGL GLSL shader set MAME bitmap in the provided slot (0-9); one
-    can be applied to each slot.
+    Example:
+        .. code-block:: bash
 
-    [todo: better details on usage at some point.
-    See http://forums.bannister.org/ubbthreads.php?ubb=showflat&Number=100988#Post100988 ]
-
-
+            mame suprmrio -gl_glsl -glsl_shader_mame0 NTSC/NTSC_chain -glsl_shader_mame1 CRT-geom/CRT-geom
 
 .. _mame-commandline-glslshaderscreen:
-
 
 **-glsl_shader_screen0**
 
@@ -1729,21 +2796,17 @@ Core Video OpenGL GLSL Options
 **-glsl_shader_screen9**
 
 
-    Custom OpenGL GLSL shader screen bitmap in the provided slot (0-9).
+    Set a custom OpenGL GLSL shader effect to the whole scaled-up output screen
+    that will be rendered by your graphics card.MAME does not include a vast
+    selection of shaders by default; more can be found online.
 
-    [todo: better details on usage at some point.
-    See http://forums.bannister.org/ubbthreads.php?ubb=showflat&Number=100988#Post100988 ]
+    Example:
+        .. code-block:: bash
+
+            mame suprmrio -gl_glsl -glsl_shader_screen0 gaussx -glsl_shader_screen1 gaussy -glsl_shader_screen2 CRT-geom-halation
 
 
-.. _mame-commandline-glglslvidattr:
-
-**-gl_glsl_vid_attr**
-
-    Enable OpenGL GLSL handling of brightness and contrast.
-    Better RGB system performance.
-
-    Default is ``on``.
-
+.. _mame-commandline-soundoptions:
 
 Core Sound Options
 ------------------
@@ -1758,6 +2821,11 @@ Core Sound Options
 
     The default is ``48000``.
 
+    Example:
+        .. code-block:: bash
+
+            mame galaga -samplerate 44100
+
 .. _mame-commandline-nosamples:
 
 **-[no]samples**
@@ -1765,6 +2833,25 @@ Core Sound Options
     Use samples if available.
 
     The default is ON (**-samples**).
+
+    Example:
+        .. code-block:: bash
+
+            mame qbert -nosamples
+
+.. _mame-commandline-nocompressor:
+
+**-[no]compressor**
+
+    Enable audio compressor. It temporarily reduces the overall volume when
+    the audio output is overdriven.
+
+    The default is ON (**-compressor**).
+
+    Example:
+        .. code-block:: bash
+
+            mame popeye -nocompressor
 
 .. _mame-commandline-volume:
 
@@ -1776,19 +2863,17 @@ Core Sound Options
 
     The default is ``0``.
 
+    Example:
+        .. code-block:: bash
+
+            mame pacman -volume -30
+
 .. _mame-commandline-sound:
 
-**-sound** *<``dsound``|``coreaudio``|``sdl``|``xaudio2``|``portaudio``|``none``>*
+**-sound** *<dsound | coreaudio | sdl | xaudio2 | portaudio | none>*
 
     Specifies which sound subsystem to use. Selecting ``none`` disables sound
     output altogether (sound hardware is still emulated).
-
-| On Windows, ``dsound``, ``xaudio2``, ``portaudio`` and ``none`` are available.
-| On macOS, ``coreaudio``, ``sdl``, ``portaudio`` and ``none`` are available.
-| On other operating systems, ``sdl``, ``portaudio`` and ``none`` are available.  (Special build options allow ``sdl`` to be used on Windows, or ``portaudio`` to be disabled.)
-|
-| The default is ``dsound`` on Windows. On Mac, ``coreaudio`` is the default. On all other platforms, ``sdl`` is the default.
-|
 
     On Windows and Linux, *portaudio* is likely to give the lowest possible
     latency, while Mac users will find *coreaudio* provides the best results.
@@ -1797,6 +2882,45 @@ Core Sound Options
     by setting the *SDL_AUDIODRIVER* environment variable.  Available audio APIs
     depend on the operating system.  On Windows, it may be necessary to set
     ``SDL_AUDIODRIVER=directsound`` if no sound output is produced by default.
+
+    The default is ``dsound`` on Windows. On Mac, ``coreaudio`` is the default.
+    On all other platforms, ``sdl`` is the default.
+
+    Example:
+        .. code-block:: bash
+
+            mame pacman -sound portaudio
+
+.. list-table:: Supported sound subsystems per-platform
+    :header-rows: 0
+    :stub-columns: 0
+
+    * - **Microsoft Windows**
+      - dsound
+      - xaudio2
+      - portaudio
+      -
+      - sdl [#SoundWinSDL]_.
+      - none
+    * - **macOS**
+      -
+      -
+      - portaudio
+      - coreaudio
+      - sdl
+      - none
+    * - **Linux** and others
+      -
+      -
+      - portaudio
+      -
+      - sdl
+      - none
+
+
+..  rubric:: Footnotes
+
+..  [#SoundWinSDL] While SDL is not a supported option on official builds for Windows, you can compile MAME with SDL support on Windows.
 
 .. _mame-commandline-audiolatency:
 
@@ -1809,6 +2933,19 @@ Core Sound Options
 
     The default is ``1``.
 
+    | For PortAudio, see the section on :ref:`-pa_latency <mame-commandline-palatency>`.
+    | XAudio2 calculates audio_latency as 10ms steps.
+    | DSound calculates audio_latency as 10ms steps.
+    | CoreAudio calculates audio_latency as 25ms steps.
+    | SDL calculates audio_latency as Xms steps.
+
+    Example:
+        .. code-block:: bash
+
+            mame galaga -audio_latency 1
+
+
+.. _mame-commandline-inputoptions:
 
 Core Input Options
 ------------------
@@ -1827,15 +2964,27 @@ Core Input Options
 
     The default is ON (**-coin_lockout**).
 
+    Example:
+        .. code-block:: bash
+
+            mame suprmrio -coin_lockout
+
 .. _mame-commandline-ctrlr:
 
 **-ctrlr** *<controller>*
 
-    Enables support for special controllers. Configuration files are loaded from
-    the ctrlrpath.  They are in the same format as the .cfg files that are
-    saved, but only control configuration data is read from the file.
+    Specifies a controller configuration file, typically used to set more
+    suitable default input assignments for special controllers. Directories
+    specified using the ``ctrlrpath`` option are searched.  Controller
+    configuration files use a similar format to ``.cfg`` used to save system
+    settings. See :ref:`ctrlrcfg` for more details.
 
-    The default is ``NULL`` (no controller file).
+    The default is ``NULL`` (no controller configuration file).
+
+    Example:
+        .. code-block:: bash
+
+            mame dkong -ctrlr xarcade
 
 .. _mame-commandline-nomouse:
 
@@ -1846,6 +2995,11 @@ Core Input Options
     until you exit or pause the system.
 
     The default is OFF (**-nomouse**).
+
+    Example:
+        .. code-block:: bash
+
+            mame centiped -mouse
 
 .. _mame-commandline-nojoystick:
 
@@ -1858,6 +3012,11 @@ Core Input Options
 
     The default is OFF (**-nojoystick**).
 
+    Example:
+        .. code-block:: bash
+
+            mame mappy -joystick
+
 .. _mame-commandline-nolightgun:
 
 **-[no]lightgun** / **-[no]gun**
@@ -1867,6 +3026,11 @@ Core Input Options
     together may produce strange results.
 
     The default is OFF (**-nolightgun**).
+
+    Example:
+        .. code-block:: bash
+
+            mame lethalen -lightgun
 
 .. _mame-commandline-nomultikeyboard:
 
@@ -1881,6 +3045,11 @@ Core Input Options
 
     The default is OFF (**-nomultikeyboard**).
 
+    Example:
+        .. code-block:: bash
+
+            mame sf2ceua -multikey
+
 .. _mame-commandline-nomultimouse:
 
 **-[no]multimouse**
@@ -1892,6 +3061,11 @@ Core Input Options
     different mice independently.
 
     The default is OFF (**-nomultimouse**).
+
+    Example:
+        .. code-block:: bash
+
+            mame warlords -multimouse
 
 .. _mame-commandline-nosteadykey:
 
@@ -1906,6 +3080,11 @@ Core Input Options
 
     The default is OFF (**-nosteadykey**)
 
+    Example:
+        .. code-block:: bash
+
+            mame sf2ua -steadykey
+
 .. _mame-commandline-uiactive:
 
 **-[no]ui_active**
@@ -1913,6 +3092,11 @@ Core Input Options
     Enable user interface on top of emulated keyboard (if present).
 
     The default is OFF (**-noui_active**)
+
+    Example:
+        .. code-block:: bash
+
+            mame apple2e -ui_active
 
 .. _mame-commandline-nooffscreenreload:
 
@@ -1927,37 +3111,71 @@ Core Input Options
 
     The default is OFF (**-nooffscreen_reload**).
 
+    Example:
+        .. code-block:: bash
+
+            mame lethalen -offscreen_reload
+
 .. _mame-commandline-joystickmap:
 
 **-joystick_map** *<map>* / **-joymap** *<map>*
 
-    Controls how joystick values map to digital joystick controls. MAME accepts
-    all joystick input from the system as analog data.  For true analog
-    joysticks, this needs to be mapped down to the usual 4-way or 8-way digital
-    joystick values.  To do this, MAME divides the analog range into a 9x9 grid.
-    It then takes the joystick axis position (for X and Y axes only), maps it to
-    this grid, and then looks up a translation from a joystick map.  This
+    Controls how analog joystick values map to digital joystick controls.
+
+    Systems such as Pac-Man use a 4-way digital joystick and will exhibit
+    undesired behavior when a diagonal is triggered; in the case of Pac-Man,
+    movement will stop completely at intersections when diagonals are triggered
+    and the game will be considerably harder to play correctly.  Many other
+    arcade cabinets used 4-way or 8-way joysticks (as opposed to full analog
+    joysticks), so for true analog joysticks such as flight sticks and analog
+    thumb sticks, this then needs to be mapped down to the expected
+    4-way or 8-way digital joystick values.
+
+    To do this, MAME divides the analog range into a 9x9 grid that looks
+    like this:
+
+    **insert 9x9 grid picture here**
+
+    MAME then takes the joystick axis position (for X and Y axes only), maps it
+    to this grid, and then looks up a translation from a joystick map.  This
     parameter allows you to specify the map.
+
+    For instance, an 8-way joystick map traditionally looks like this:
+
+    **insert 8-way map picture here**
+
+    This mapping gives considerable leeway to the angles accepted for a given
+    direction, so that being approximately in the area of the direction you want
+    will give you the results you want.  Without that, if you were slightly off
+    center while holding the stick left, it would not recognize the action
+    correctly.
 
     The default is ``auto``, which means that a standard 8-way, 4-way, or 4-way
     diagonal map is selected automatically based on the input port configuration
     of the current system.
 
-    Maps are defined as a string of numbers and characters. Since the grid is
-    9x9, there are a total of 81 characters necessary to define a complete map.
-    Below is an example map for an 8-way joystick:
+    Generally you will want to set up the **-joystick_map** setting in the
+    per-system ``<system>.ini`` file as opposed to the main ``MAME.INI``
+    file so that the mapping only affects the systems you want it to.  See
+    :ref:`Multiple Configuration Files <advanced-multi-CFG>` for further
+    details on per-system configuration.
 
-		+-------------+---------------------------------------------------------+
-		| | 777888999 |                                                         |
-		| | 777888999 | | Note that the numeric digits correspond to the keys   |
-		| | 777888999 | | on a numeric keypad. So '7' maps to up+left, '4' maps |
-		| | 444555666 | | to left, '5' maps to neutral, etc. In addition to the |
-		| | 444555666 | | numeric values, you can specify the character 's',    |
-		| | 444555666 | | which means "sticky". In this case, the value of the  |
-		| | 111222333 | | map is the same as it was the last time a non-sticky  |
-		| | 111222333 | | value was read.                                       |
-		| | 111222333 |                                                         |
-		+-------------+---------------------------------------------------------+
+    Maps are defined as a string of numbers and characters. Since the grid is
+    9x9, there are a total of 81 characters necessary to define a complete
+    map.  Below is an example map for an 8-way joystick that matches the
+    picture shown above:
+
+		+-------------+--------------------------------------------------------+
+		| | 777888999 |                                                        |
+		| | 777888999 | | Note that the numeric digits correspond to the keys  |
+		| | 777888999 | | on a numeric keypad. So '7' maps to up+left, '4' maps|
+		| | 444555666 | | to left, '5' maps to neutral, etc. In addition to the|
+		| | 444555666 | | numeric values, you can specify the character 's',   |
+		| | 444555666 | | which means "sticky".  Sticky map positions will keep|
+		| | 111222333 | | the output the same as the last non-sticky input sent|
+		| | 111222333 | | to the system.                                       |
+		| | 111222333 |                                                        |
+		+-------------+--------------------------------------------------------+
 
     To specify the map for this parameter, you can specify a string of rows
     separated by a '.' (which indicates the end of a row), like so:
@@ -1993,6 +3211,47 @@ Core Input Options
     up/down mirrors of the first three rows, giving three final rows of
     111222333.
 
+    With 4-way games, sticky becomes important to avoid problems with
+    diagonals.  Typically you would choose a map that looks something like this:
+
+    **insert 9x9 4-way sticky grid picture here**
+
+    This means that if you press left, then roll the stick towards up (without
+    re-centering it) you'll pass through the sticky section in the corner.  As
+    you do, MAME will read that sticky corner as **left** as that's the last
+    non-sticky input it received.  As the roll gets into the upward space of
+    the map, this then switches to an up motion.
+
+    This map would look somewhat like:
+
+		+-------------+---------------------------------------------------------+
+		| | s8888888s |                                                         |
+		| | 4s88888s6 | | For this mapping, we have a wide range for the        |
+		| | 44s888s66 | | cardinal directions on 8, 4, 6, and 2.  We have sticky|
+		| | 444555666 | | on the meeting points between those cardinal          |
+		| | 444555666 | | directions where the appropriate direction isn't      |
+		| | 444555666 | | going to be completely obvious.                       |
+		| | 44s222s66 |                                                         |
+		| | 4s22222s6 |                                                         |
+		| | s2222222s |                                                         |
+		+-------------+---------------------------------------------------------+
+
+    To specify the map for this parameter, you can specify a string of rows
+    separated by a '.' (which indicates the end of a row), like so:
+
+    +-------------------------------------------------------------------------------------------------------+
+    | **-joymap s8888888s.4s88888s6.44s888s66.444555666.444555666.444555666.44s222s66.4s22222s6.s2222222s** |
+    +-------------------------------------------------------------------------------------------------------+
+
+    Like before, because of the symmetry between top and bottom and left and
+    right, we can shorten this down to:
+
+    +------------------------------+
+    | **-joymap s8.4s8.44s8.4445** |
+    +------------------------------+
+
+
+
 .. _mame-commandline-joystickdeadzone:
 
 **-joystick_deadzone** *<value>* / **-joy_deadzone** *<value>* / **-jdz** *<value>*
@@ -2003,6 +3262,11 @@ Core Input Options
   Where 0 is the center of the joystick and 1 is the outer limit.
 
   The default is ``0.3``.
+
+    Example:
+        .. code-block:: bash
+
+            mame sinistar -joystick_deadzone 0.45
 
 .. _mame-commandline-joysticksaturation:
 
@@ -2016,9 +3280,14 @@ Core Input Options
 
     The default is ``0.85``.
 
+    Example:
+        .. code-block:: bash
+
+            mame sinistar -joystick_saturation 1.0
+
 .. _mame-commandline-natural:
 
-**\-natural**
+**\-[no]natural**
 
     Allows user to specify whether or not to use a natural keyboard or not.
     This allows you to start your system in a 'native' mode, depending on your
@@ -2045,14 +3314,24 @@ Core Input Options
       * Dead key sequences are cumbersome to use at best.
       * It won't work at all if IME edit is involved. (e.g. for Chinese/Japanese/Korean)
 
+    Example:
+        .. code-block:: bash
+
+            mame coco2 -natural
+
 .. _mame-commandline-joystickcontradictory:
 
-**-joystick_contradictory**
+**-[no]joystick_contradictory**
 
     Enable contradictory direction digital joystick input at the same time such
     as **Left and Right** or **Up and Down** at the same time.
 
     The default is OFF (**-nojoystick_contradictory**)
+
+    Example:
+        .. code-block:: bash
+
+            mame pc_smb -joystick_contradictory
 
 .. _mame-commandline-coinimpulse:
 
@@ -2063,42 +3342,48 @@ Core Input Options
 
     Default is ``0``.
 
+    Example:
+        .. code-block:: bash
 
+            mame contra -coin_impulse 1
+
+
+.. _mame-commandline-inputenable:
 
 Core Input Automatic Enable Options
 -----------------------------------
 
 .. _mame-commandline-paddledevice:
 
-**-paddle_device** (``none``|``keyboard``|``mouse``|``lightgun``|``joystick``)
+**-paddle_device** ( ``none`` | ``keyboard`` | ``mouse`` | ``lightgun`` | ``joystick`` )
 
 .. _mame-commandline-adstickdevice:
 
-**-adstick_device** (``none``|``keyboard``|``mouse``|``lightgun``|``joystick``)
+**-adstick_device** ( ``none`` | ``keyboard`` | ``mouse`` | ``lightgun`` | ``joystick`` )
 
 .. _mame-commandline-pedaldevice:
 
-**-pedal_device** (``none``|``keyboard``|``mouse``|```lightgun``|``joystick``)
+**-pedal_device** ( ``none`` | ``keyboard`` | ``mouse`` | ```lightgun`` | ``joystick`` )
 
 .. _mame-commandline-dialdevice:
 
-**-dial_device** (``none``|``keyboard``|``mouse``|``lightgun``|``joystick``)
+**-dial_device** ( ``none`` | ``keyboard`` | ``mouse`` | ``lightgun`` | ``joystick`` )
 
 .. _mame-commandline-trackballdevice:
 
-**-trackball_device** (``none``|``keyboard``|``mouse``|``lightgun``|``joystick``)
+**-trackball_device** ( ``none`` | ``keyboard`` | ``mouse`` | ``lightgun`` | ``joystick`` )
 
 .. _mame-commandline-lightgundevice:
 
-**-lightgun_device** (``none``|``keyboard``|``mouse``|``lightgun``|``joystick``)
+**-lightgun_device** ( ``none`` | ``keyboard`` | ``mouse`` | ``lightgun`` | ``joystick`` )
 
 .. _mame-commandline-positionaldevice:
 
-**-positional_device** (``none``|``keyboard``|``mouse``|``lightgun``|``joystick``)
+**-positional_device** ( ``none`` | ``keyboard`` | ``mouse`` | ``lightgun`` | ``joystick`` )
 
 .. _mame-commandline-mousedevice:
 
-**-mouse_device** (``none``|``keyboard``|``mouse``|``lightgun``|``joystick``)
+**-mouse_device** ( ``none`` | ``keyboard`` | ``mouse`` | ``lightgun`` | ``joystick`` )
 
     Each of these options controls autoenabling the mouse, joystick, or lightgun
     depending on the presence of a particular class of analog control for a
@@ -2107,9 +3392,16 @@ Core Input Automatic Enable Options
     automatically enable mouse controls just as if you had explicitly specified
     **-mouse**.
 
-    Note that these controls override the values of **-[no]mouse**,
-    **-[no]joystick**, etc.
+    Example:
+        .. code-block:: bash
 
+            mame sbrkout -paddle_device mouse
+
+.. Tip:: Note that these controls override the values of **-[no]mouse**,
+         **-[no]joystick**, etc.
+
+
+.. _mame-commandline-debugging:
 
 Debugging Options
 -----------------
@@ -2119,11 +3411,17 @@ Debugging Options
 **-[no]verbose** / **-[no]v**
 
     Displays internal diagnostic information. This information is very useful
-    for debugging problems with your configuration.  IMPORTANT: when reporting
-    bugs, please run with **mame -verbose** and include the resulting
-    information.
+    for debugging problems with your configuration.
 
     The default is OFF (**-noverbose**).
+
+    Example:
+        .. code-block:: bash
+
+            mame polepos -verbose
+
+.. Tip:: IMPORTANT: When reporting bugs to MAMEdev, please run with **-verbose**
+         and include the resulting information.
 
 .. _mame-commandline-oslog:
 
@@ -2139,25 +3437,80 @@ Debugging Options
 
     The default is OFF (**-nooslog**).
 
+    Example:
+        .. code-block:: bash
+
+            mame mappy -oslog
+
 .. _mame-commandline-log:
 
 **-[no]log**
 
     Creates a file called error.log which contains all of the internal log
     messages generated by the MAME core and system drivers.  This can be used at
-    the same time as **-log** to output the log data to both targets as well.
+    the same time as **-oslog** to output the log data to both targets as well.
 
     The default is OFF (**-nolog**).
+
+    Example 1:
+        .. code-block:: bash
+
+            mame qbert -log
+
+    Example 2:
+        .. code-block:: bash
+
+            mame qbert -oslog -log
 
 .. _mame-commandline-debug:
 
 **-[no]debug**
 
-    Activates the integrated debugger.  By default, the debugger is entered by
-    pressing the tilde (**~**) key during emulation. It is also entered
-    immediately at startup.
+    Activates the integrated debugger.  By default, pressing the backtick/tilde
+    (**~**) key during emulation breaks into the debugger.  MAME also breaks
+    into the debugger after the initial soft reset on startup if the debugger is
+    active.  See :ref:`debugger` for information on using the debugger.
 
     The default is OFF (**-nodebug**).
+
+    Example:
+        .. code-block:: bash
+
+            mame indy_4610 -debug
+
+.. _mame-commandline-debugger:
+
+**-debugger** *<module>*
+
+    Chooses the module to use for debugging the target system when the
+    :ref:`debug <mame-commandline-debug>` option is on.  Available debugger
+    modules depend on the host platform and build options.
+
+    Supported debugger modules:
+
+    windows
+        Win32 GUI debugger (default on Windows).  Only supported on Windows.
+    qt
+        Qt GUI debugger (default on Linux).  Supported on Windows, Linux and
+        macOS, but only included on Linux by default.  Set ``USE_QTDEBUG=1``
+        when compiling MAME to include the Qt debugger on Windows or macOS.
+    osx
+        Cocoa GUI debugger (default on macOS).  Only supported on macOS.
+    imgui
+        ImgUi GUI debugger displayed in first MAME window.  Requires
+        :ref:`video <mame-commandline-video>` option to be set to **bgfx**.
+        Supported on all platforms with BGFX video output support.
+    gdbstub
+        Acts as a remote debugging server for the GNU debugger (GDB).  Only a
+        small subset of the CPUs emulated by MAME are supported.  Use the
+        :ref:`debugger_port <mame-commandline-debuggerport>` option to set the
+        listening port on the loopback interface.  Supported on all platforms
+        with TCP socket support.
+
+    Example:
+        .. code-block:: bash
+
+            mame ambush -debug -debugger qt
 
 .. _mame-commandline-debugscript:
 
@@ -2168,6 +3521,11 @@ Debugging Options
 
     The default is ``NULL`` (*no commands*).
 
+    Example:
+        .. code-block:: bash
+
+            mame galaga -debug -debugscript testscript.txt
+
 .. _mame-commandline-updateinpause:
 
 **-[no]update_in_pause**
@@ -2177,6 +3535,11 @@ Debugging Options
     emulation is paused, which can be useful for debugging.
 
     The default is OFF (**-noupdate_in_pause**).
+
+    Example:
+        .. code-block:: bash
+
+            mame indy_4610 -update_in_pause
 
 .. _mame-commandline-watchdog:
 
@@ -2191,6 +3554,26 @@ Debugging Options
 
     By default there is no watchdog.
 
+    Example:
+        .. code-block:: bash
+
+            mame ibm_5150 -watchdog 30
+
+.. _mame-commandline-debuggerport:
+
+**-debugger_port** *<port>*
+
+    Set the TCP port number to listen on for GDB connections when using the GDB
+    stub debugger module (see the :ref:`debugger <mame-commandline-debugger>`
+    option).
+
+    The default is ``23946``.
+
+    Example:
+        .. code-block:: bash
+
+            mame rfjet -debug -debugger gdbstub -debugger_port 2159
+
 .. _mame-commandline-debuggerfont:
 
 **-debugger_font** *<fontname>* / **-dfont** *<fontname>*
@@ -2200,6 +3583,11 @@ Debugging Options
     | The Windows default font is ``Lucida Console``.
     | The Mac (Cocoa) default font is system fixed-pitch font default (typically ``Monaco``).
     | The Qt default font is ``Courier New``.
+
+    Example:
+        .. code-block:: bash
+
+            mame marble -debug -debugger_font "Comic Sans MS"
 
 .. _mame-commandline-debuggerfontsize:
 
@@ -2211,6 +3599,13 @@ Debugging Options
     | The Qt default size is ``11`` points.
     | The Mac (Cocoa) default size is the system default size.
 
+    Example:
+        .. code-block:: bash
+
+            mame marble -debug -debugger_font "Comic Sans MS" -debugger_font_size 16
+
+
+.. _mame-commandline-commoptions:
 
 Core Communication Options
 --------------------------
@@ -2222,8 +3617,13 @@ Core Communication Options
     Local address to bind to. This can be a traditional ``xxx.xxx.xxx.xxx``
     address or a string containing a resolvable hostname.
 
-    The default is value is "``0.0.0.0``" (which binds to all local IPv4
+    The default is value is ``0.0.0.0`` (which binds to all local IPv4
     addresses).
+
+    Example:
+        .. code-block:: bash
+
+            mame arescue -comm_localhost 192.168.1.2
 
 .. _mame-commandline-commlocalport:
 
@@ -2232,7 +3632,12 @@ Core Communication Options
     Local port to bind to. This can be any traditional communications port as
     an unsigned 16-bit integer (0-65535).
 
-    The default value is "``15122``".
+    The default value is ``15122``.
+
+    Example:
+        .. code-block:: bash
+
+            mame arescue -comm_localhost 192.168.1.2 -comm_localport 30100
 
 .. _mame-commandline-commremotehost:
 
@@ -2244,6 +3649,11 @@ Core Communication Options
     The default is value is "``0.0.0.0``" (which binds to all local IPv4
     addresses).
 
+    Example:
+        .. code-block:: bash
+
+            mame arescue -comm_remotehost 192.168.1.2
+
 .. _mame-commandline-commremoteport:
 
 **-comm_remoteport** *<string>*
@@ -2253,6 +3663,11 @@ Core Communication Options
 
     The default value is "``15122``".
 
+    Example:
+        .. code-block:: bash
+
+            mame arescue -comm_remotehost 192.168.1.2 -comm_remoteport 30100
+
 .. _mame-commandline-commframesync:
 
 **-[no]comm_framesync**
@@ -2261,6 +3676,13 @@ Core Communication Options
 
     The default is OFF (**-nocomm_framesync**).
 
+    Example:
+        .. code-block:: bash
+
+            mame arescue -comm_remotehost 192.168.1.3 -comm_remoteport 30100 -comm_framesync
+
+
+.. _mame-commandline-miscoptions:
 
 Core Misc Options
 -----------------
@@ -2273,29 +3695,49 @@ Core Misc Options
 
     The default is ON (**-drc**).
 
+    Example:
+        .. code-block:: bash
+
+            mame ironfort -nodrc
+
 .. _mame-commandline-drcusec:
 
-**\-drc_use_c**
+**\-[no]drc_use_c**
 
     Force DRC to use the C code backend.
 
     The default is OFF (**-nodrc_use_c**).
 
+    Example:
+        .. code-block:: bash
+
+            mame ironfort -drc_use_c
+
 .. _mame-commandline-drcloguml:
 
-**\-drc_log_uml**
+**\-[no]drc_log_uml**
 
     Write DRC UML disassembly log.
 
     The default is OFF (**-nodrc_log_uml**).
 
+    Example:
+        .. code-block:: bash
+
+            mame ironfort -drc_log_uml
+
 .. _mame-commandline-drclognative:
 
-**\-drc_log_native**
+**\-[no]drc_log_native**
 
     Write DRC native disassembly log.
 
     The default is OFF (**-nodrc_log_native**).
+
+    Example:
+        .. code-block:: bash
+
+            mame ironfort -drc_log_native
 
 .. _mame-commandline-bios:
 
@@ -2306,6 +3748,11 @@ Core Misc Options
     BIOS names for a system.
 
     The default is ``default``.
+
+    Example:
+        .. code-block:: bash
+
+            mame mslug -bios unibios33
 
 .. _mame-commandline-cheat:
 
@@ -2320,6 +3767,11 @@ Core Misc Options
 
     The default is OFF (**-nocheat**).
 
+    Example:
+        .. code-block:: bash
+
+            mame dkong -cheat
+
 .. _mame-commandline-skipgameinfo:
 
 **-[no]skip_gameinfo**
@@ -2327,6 +3779,11 @@ Core Misc Options
     Forces MAME to skip displaying the system info screen.
 
     The default is OFF (**-noskip_gameinfo**).
+
+    Example:
+        .. code-block:: bash
+
+            mame samsho5 -skip_gameinfo
 
 .. _mame-commandline-uifont:
 
@@ -2339,6 +3796,11 @@ Core Misc Options
 
     The default is ``default`` (use the OSD-determined default font).
 
+    Example:
+        .. code-block:: bash
+
+            mame -uifont "Comic Sans MS"
+
 .. _mame-commandline-ui:
 
 **-ui** *<type>*
@@ -2347,24 +3809,39 @@ Core Misc Options
 
     The default is Cabinet (**-ui cabinet**).
 
+    Example:
+        .. code-block:: bash
+
+            mame -ui simple
+
 .. _mame-commandline-ramsize:
 
 **-ramsize** *[n]*
 
     Allows you to change the default RAM size (if supported by driver).
 
+    Example:
+        .. code-block:: bash
+
+            mame coco -ramsize 16K
+
 .. _mame-commandline-confirmquit:
 
-**\-confirm_quit**
+**\-[no]confirm_quit**
 
     Display a Confirm Quit dialog to screen on exit, requiring one extra step
     to exit MAME.
 
     The default is OFF (**-noconfirm_quit**).
 
+    Example:
+        .. code-block:: bash
+
+            mame pacman -confirm_quit
+
 .. _mame-commandline-uimouse:
 
-**\-ui_mouse**
+**\-[no]ui_mouse**
 
     Displays a mouse cursor when using the built-in UI for MAME.
 
@@ -2372,9 +3849,19 @@ Core Misc Options
 
 .. _mame-commandline-language:
 
+    Example:
+        .. code-block:: bash
+
+            mame -ui_mouse
+
 **-language** *<language>*
 
     Specify a localization language found in the ``languagepath`` tree.
+
+    Example:
+        .. code-block:: bash
+
+            mame -language Japanese
 
 .. _mame-commandline-nvramsave:
 
@@ -2387,7 +3874,13 @@ Core Misc Options
 
     The default is ON (**-nvram_save**).
 
+    Example:
+        .. code-block:: bash
 
+            mame galaga88 -nonvram_save
+
+
+.. _mame-commandline-scripting:
 
 Scripting Options
 -----------------
@@ -2402,7 +3895,10 @@ Scripting Options
 
     This works only with systems that support natural keyboard mode.
 
-      Example:  **-autoboot_command "load """$""",8,1\\n"**
+    Example:
+        .. code-block:: bash
+
+            mame c64 -autoboot_delay 5 -autoboot_command "load """$""",8,1\n"
 
 .. _mame-commandline-autobootdelay:
 
@@ -2410,11 +3906,21 @@ Scripting Options
 
     Timer delay (in seconds) to trigger command execution on autoboot.
 
+    Example:
+        .. code-block:: bash
+
+            mame c64 -autoboot_delay 5 -autoboot_command "load """$""",8,1\n"
+
 .. _mame-commandline-autobootscript:
 
 **-autoboot_script** / **-script** *[filename.lua]*
 
     File containing scripting to execute after machine boot.
+
+    Example:
+        .. code-block:: bash
+
+            mame ibm5150 -autoboot_script myscript.lua
 
 .. _mame-commandline-console:
 
@@ -2424,6 +3930,11 @@ Scripting Options
 
     The default of OFF (**-noconsole**).
 
+    Example:
+        .. code-block:: bash
+
+            mame ibm5150 -console
+
 .. _mame-commandline-plugins:
 
 **-plugins**
@@ -2432,11 +3943,21 @@ Scripting Options
 
     The default is ON (**-plugins**).
 
+    Example:
+        .. code-block:: bash
+
+            mame apple2e -plugins
+
 .. _mame-commandline-plugin:
 
 **-plugin** *[plugin shortname]*
 
     A list of Lua Plugins to enable, comma separated.
+
+    Example:
+        .. code-block:: bash
+
+            mame alcon -plugin cheat,discord,autofire
 
 .. _mame-commandline-noplugin:
 
@@ -2444,10 +3965,17 @@ Scripting Options
 
     A list of Lua Plugins to disable, comma separated.
 
+    Example:
+        .. code-block:: bash
 
+            mame alcon -noplugin cheat
+
+
+.. _mame-commandline-webserver:
 
 HTTP Server Options
 -------------------
+
 .. _mame-commandline-http:
 
 **-[no]http**
@@ -2456,18 +3984,126 @@ HTTP Server Options
 
     The default is OFF (**-nohttp**).
 
+    Example:
+        .. code-block:: bash
+
+            mame -http
+
 .. _mame-commandline-httpport:
 
-**-http_port** *[port]*
+**-http_port** *<port>*
 
     Choose HTTP server port.
 
     The default is ``8080``.
 
+    Example:
+        .. code-block:: bash
+
+            mame apple2 -http -http_port 6502
+
 .. _mame-commandline-httproot:
 
-**-http_root** *[rootfolder]*
+**-http_root** *<rootfolder>*
 
     Choose HTTP server document root.
 
     The default is ``web``.
+
+    Example:
+        .. code-block:: bash
+
+            mame apple2 -http -http_port 6502 -http_root c:\users\me\appleweb\root
+
+
+.. _mame-commandline-portaudio:
+
+PortAudio Options
+-----------------
+
+.. _mame-commandline-paapi:
+
+**-pa_api** *API*
+
+    Choose which API that PortAudio should use to talk to your sound hardware. You can use **-verbose** to see which APIs are available.
+
+    The default is ``none``.
+
+    Example 1:
+        .. code-block:: bash
+
+            mame -sound portaudio -verbose
+            Attempting load of mame.ini
+            ...
+            PortAudio: API MME has 20 devices
+            PortAudio: MME: " - Input"
+            PortAudio: MME: "Microphone (3- USB Camera-B4.09"
+            PortAudio: MME: "Line (AVerMedia Live Gamer HD 2"
+            PortAudio: MME: "Digital Audio Interface (AVerMe"
+            PortAudio: MME: "Headset Microphone (Razer Krake"
+            ...
+            PortAudio: MME: " - Output"
+            PortAudio: MME: "Headset Earphone (Razer Kraken "
+            PortAudio: MME: "Digital Audio (S/PDIF) (High De"
+            PortAudio: MME: "NX-EDG27 (NVIDIA High Definitio"
+            ...
+            PortAudio: API Windows DirectSound has 20 devices
+            PortAudio: Windows DirectSound: "Primary Sound Capture Driver"
+            PortAudio: Windows DirectSound: "Headset Microphone (Razer Kraken 7.1 V2)"
+            PortAudio: Windows DirectSound: "Primary Sound Driver" (default)
+            PortAudio: Windows DirectSound: "Headset Earphone (Razer Kraken 7.1 V2)"
+            PortAudio: Windows DirectSound: "Digital Audio (S/PDIF) (High Definition Audio Device)"
+            PortAudio: Windows DirectSound: "NX-EDG27 (NVIDIA High Definition Audio)"
+            ...
+            PortAudio: API Windows WASAPI has 18 devices
+            PortAudio: Windows WASAPI: "Headset Earphone (Razer Kraken 7.1 V2)"
+            PortAudio: Windows WASAPI: "Digital Audio (S/PDIF) (High Definition Audio Device)"
+            PortAudio: Windows WASAPI: "NX-EDG27 (NVIDIA High Definition Audio)"
+            PortAudio: Windows WASAPI: "Headset Microphone (Razer Kraken 7.1 V2)"
+            ...
+            PortAudio: API Windows WDM-KS has 22 devices
+            PortAudio: Windows WDM-KS: "Output (NVIDIA High Definition Audio)"
+            PortAudio: Windows WDM-KS: "SPDIF Out (HD Audio SPDIF out)"
+            PortAudio: Windows WDM-KS: "Headset Microphone (Razer Kraken 7.1 V2)"
+            PortAudio: Windows WDM-KS: "Headset Earphone (Razer Kraken 7.1 V2)"
+            PortAudio: Windows WDM-KS: "Microphone (VDVAD Wave)"
+            PortAudio: Windows WDM-KS: "Speakers (VDVAD Wave)"
+            ...
+            PortAudio: Sample rate is 48000 Hz, device output latency is 218.67 ms
+            PortAudio: Allowed additional buffering latency is 18.00 ms/864 frames
+
+    Example 2:
+        .. code-block:: bash
+
+            mame suprmrio -sound portaudio -pa_api "Windows WASAPI"
+
+.. _mame-commandline-padevice:
+
+**-pa_device** *device*
+
+    Choose which sound device to output through. This would typically be one of
+    the outputs on your sound card or a USB headset.
+
+    The default is ``none``.
+
+    Example:
+        .. code-block:: bash
+
+            mame suprmrio -sound portaudio -pa_api "Windows WASAPI" -pa_device "NX-EDG27 (NVIDIA High Definition Audio)"
+
+.. _mame-commandline-palatency:
+
+**-pa_latency** *latency*
+
+    Choose the buffer size for PortAudio output; this is specified in seconds.
+    Lower numbers have less latency but may increase stutter in the sound.
+    Decimal places are supported. Try starting from 0.20 and decrease or
+    increase until you find the best number your hardware and OS are capable of
+    handling.
+
+    The default is ``0``.
+
+    Example:
+        .. code-block:: bash
+
+            mame suprmrio -sound portaudio -pa_api "Windows WASAPI" -pa_device "NX-EDG27 (NVIDIA High Definition Audio)" -pa_latency 0.20

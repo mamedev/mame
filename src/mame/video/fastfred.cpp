@@ -332,9 +332,13 @@ VIDEO_START_MEMBER(fastfred_state,imago)
 	m_bg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_transparent_pen(0);
 
+	m_flipscreen_x = 0;
+	m_flipscreen_y = 0;
+
 	/* the game has a galaxian starfield */
 	galaxold_init_stars(256);
 	m_stars_on = 1;
+	m_stars_scrollpos = 0;
 
 	/* web colors */
 	m_palette->set_pen_color(256+64+0,rgb_t(0x50,0x00,0x00));
@@ -348,7 +352,6 @@ VIDEO_START_MEMBER(fastfred_state,imago)
 	save_item(NAME(m_stars_on));
 	save_item(NAME(m_stars_blink_state));
 	save_item(NAME(m_timer_adjusted));
-	save_item(NAME(m_stars_colors_start));
 	save_item(NAME(m_stars_scrollpos));
 
 	for (int i = 0; i < STAR_COUNT; i++)

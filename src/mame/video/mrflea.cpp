@@ -10,7 +10,7 @@ Mr. F. Lea
 #include "emu.h"
 #include "includes/mrflea.h"
 
-WRITE8_MEMBER(mrflea_state::mrflea_gfx_bank_w)
+void mrflea_state::mrflea_gfx_bank_w(uint8_t data)
 {
 	m_gfx_bank = data;
 
@@ -18,7 +18,7 @@ WRITE8_MEMBER(mrflea_state::mrflea_gfx_bank_w)
 		logerror("unknown gfx bank: 0x%02x\n", data);
 }
 
-WRITE8_MEMBER(mrflea_state::mrflea_videoram_w)
+void mrflea_state::mrflea_videoram_w(offs_t offset, uint8_t data)
 {
 	int bank = offset / 0x400;
 
@@ -29,7 +29,7 @@ WRITE8_MEMBER(mrflea_state::mrflea_videoram_w)
 	  the bank select.  The remaining bits are from a video register. */
 }
 
-WRITE8_MEMBER(mrflea_state::mrflea_spriteram_w)
+void mrflea_state::mrflea_spriteram_w(offs_t offset, uint8_t data)
 {
 	if (offset & 2)
 	{

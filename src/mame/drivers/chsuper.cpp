@@ -24,7 +24,6 @@
 #include "cpu/z180/z180.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/ramdac.h"
 #include "emupal.h"
 #include "screen.h"
@@ -66,9 +65,9 @@ protected:
 	virtual void video_start() override;
 
 
-	int m_tilexor;
-	uint8_t m_blacklamp;
-	uint8_t m_redlamp;
+	int m_tilexor = 0;
+	uint8_t m_blacklamp = 0;
+	uint8_t m_redlamp = 0;
 	std::unique_ptr<uint8_t[]> m_vram;
 
 	required_device<z180_device> m_maincpu;
@@ -216,7 +215,7 @@ void chsuper_state::chsuper_prg_map(address_map &map)
 {
 	map(0x00000, 0x0efff).rom();
 	map(0x00000, 0x01fff).w(FUNC(chsuper_state::chsuper_vram_w));
-	map(0x0f000, 0x0ffff).ram().region("maincpu", 0xf000);
+	map(0x0f000, 0x0ffff).ram();
 	map(0xfb000, 0xfbfff).ram().share("nvram");
 }
 
@@ -393,9 +392,6 @@ void chsuper_state::chsuper(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // 74HC273 latch + R2R network (unknown values)
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

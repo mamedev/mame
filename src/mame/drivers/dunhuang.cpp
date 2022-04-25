@@ -56,7 +56,7 @@ Notes:
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "video/ramdac.h"
 #include "emupal.h"
 #include "screen.h"
@@ -511,8 +511,8 @@ void dunhuang_state::dunhuang_io_map(address_map &map)
 
 	map(0x001b, 0x001b).w(FUNC(dunhuang_state::block_dest_w));
 
-	map(0x0081, 0x0081).w("ymsnd", FUNC(ym2413_device::register_port_w));
-	map(0x0089, 0x0089).w("ymsnd", FUNC(ym2413_device::data_port_w));
+	map(0x0081, 0x0081).w("ymsnd", FUNC(ym2413_device::address_w));
+	map(0x0089, 0x0089).w("ymsnd", FUNC(ym2413_device::data_w));
 
 	map(0x0082, 0x0082).w("oki", FUNC(okim6295_device::write));
 
@@ -856,7 +856,7 @@ ROM_START( dunhuang )
 	ROM_LOAD( "rom3.u4", 0x00000, 0x80000, CRC(1ff5d35e) SHA1(b808eb4f81be8fc77a58dadd661a9cc2b376a509) )
 	ROM_LOAD( "rom2.u5", 0x80000, 0x40000, CRC(384fa1d3) SHA1(f329db17aacacf1768ebd6ca2cc612503db93fac) )
 
-	ROM_REGION( 0xc0000, "gfx2", 0 )    // do not dispose
+	ROM_REGION( 0xc0000, "gfx2", 0 )
 	ROM_LOAD( "rom4.u3", 0x00000, 0x40000, CRC(7db45227) SHA1(2a12a2b8a1e58946ce3e7c770b3ca4803c3c3ccd) )
 	ROM_LOAD( "rom5.u2", 0x40000, 0x80000, CRC(d609880e) SHA1(3d69800e959e8f24ef950fea4312610c4407f6ba) )
 

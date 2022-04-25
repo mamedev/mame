@@ -39,15 +39,18 @@ I/O ports: These ranges are what is guessed
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
+#include "machine/terminal.h"
 #include "machine/upd765.h"
+#include "machine/z80ctc.h"
 #include "machine/z80daisy.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
-#include "machine/z80ctc.h"
-#include "machine/terminal.h"
 
+
+namespace {
 
 class ckz80_state : public driver_device
 {
@@ -57,6 +60,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_rom(*this, "maincpu")
 		, m_ram(*this, "mainram")
+		, m_bank1(*this, "bank1")
 		, m_terminal(*this, "terminal")
 		, m_fdc(*this, "fdc")
 	{ }
@@ -75,12 +79,12 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-	u8 m_term_data;
-	bool m_rom_in_map;
+	u8 m_term_data = 0U;
+	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
-	memory_passthrough_handler *m_rom_shadow_tap;
 	required_shared_ptr<u8> m_ram;
+	required_memory_bank    m_bank1;
 	required_device<generic_terminal_device> m_terminal;
 	required_device<upd765a_device> m_fdc;
 };
@@ -88,7 +92,7 @@ private:
 
 void ckz80_state::port40_w(u8 data)
 {
-	m_rom_in_map = !BIT(data, 1);
+	m_bank1->set_entry(BIT(~data, 1));
 }
 
 u8 ckz80_state::port80_r()
@@ -106,7 +110,7 @@ u8 ckz80_state::port81_r()
 void ckz80_state::mem_map(address_map &map)
 {
 	map(0x0000, 0xffff).ram().share("mainram");
-	map(0xe000, 0xffff).lr8(NAME([this] (offs_t offset) { if (m_rom_in_map) return m_rom[offset]; else return m_ram[offset+0xe000]; } ));
+	map(0xe000, 0xffff).bankr("bank1");
 }
 
 void ckz80_state::io_map(address_map &map)
@@ -153,30 +157,33 @@ WRITE_LINE_MEMBER( ckz80_state::ctc_z2_w )
 
 void ckz80_state::machine_start()
 {
+	m_bank1->configure_entry(0, m_ram+0xe000);
+	m_bank1->configure_entry(1, m_rom);
 	save_item(NAME(m_term_data));
-	save_item(NAME(m_rom_in_map));
 }
 
 void ckz80_state::machine_reset()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_rom(0x0000, 0x1fff, m_rom);   // do it here for F3
-	m_rom_shadow_tap = program.install_read_tap(0xe000, 0xffff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
-	{
-		if (!machine().side_effects_disabled())
-		{
-			// delete this tap
-			m_rom_shadow_tap->remove();
+	m_rom_shadow_tap.remove();
+	m_rom_shadow_tap = program.install_read_tap(
+			0xe000, 0xffff,
+			"rom_shadow_r",
+			[this] (offs_t offset, u8 &data, u8 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					// delete this tap
+					m_rom_shadow_tap.remove();
 
-			// reinstall ram over the rom shadow
-			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x1fff, m_ram);
-		}
+					// reinstall RAM over the ROM shadow
+					m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x1fff, m_ram);
+				}
+			},
+			&m_rom_shadow_tap);
 
-		// return the original data
-		return data;
-	});
-
-	m_rom_in_map = true;
+	m_bank1->set_entry(1);
 }
 
 static void ckz80_floppies(device_slot_interface &device)
@@ -200,7 +207,7 @@ void ckz80_state::ckz80(machine_config &config)
 	GENERIC_TERMINAL(config, m_terminal, 0);
 	m_terminal->set_keyboard_callback(FUNC(ckz80_state::kbd_put));
 	UPD765A(config, m_fdc, 8_MHz_XTAL, true, true);
-	FLOPPY_CONNECTOR(config, "fdc:0", ckz80_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", ckz80_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 
 	z80ctc_device& ctc(Z80CTC(config, "ctc", 16_MHz_XTAL / 4));
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -224,6 +231,8 @@ ROM_START( ckz80 )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "ckz80.rom", 0x0000, 0x2000, CRC(7081b7c6) SHA1(13f75b14ea73b252bdfa2384e6eead6e720e49e3))
 ROM_END
+
+} // anonymous namespace
 
 /* Driver */
 

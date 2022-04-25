@@ -2,17 +2,16 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles
 /***************************************************************************
 
-    emucore.c
+    emucore.cpp
 
     Simple core functions that are defined in emucore.h and which may
     need to be accessed by other MAME-related tools.
+
 ****************************************************************************/
 
 #include "emu.h"
 #include "emucore.h"
 #include "osdcore.h"
-
-const char *const endianness_names[2] = { "little", "big" };
 
 emu_fatalerror::emu_fatalerror(util::format_argument_pack<std::ostream> const &args)
 	: emu_fatalerror(0, args)

@@ -82,17 +82,17 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_DATAMUX, bus::ti99::internal, datamux_device, "ti99_datamux", "TI-99 Databus multiplexer")
+DEFINE_DEVICE_TYPE(TI99_DATAMUX, bus::ti99::internal::datamux_device, "ti99_datamux", "TI-99 Databus multiplexer")
 
-namespace bus { namespace ti99 { namespace internal {
+namespace bus::ti99::internal {
 
 /*
     Constructor
 */
 datamux_device::datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TI99_DATAMUX, tag, owner, clock),
-	m_video(*owner, TI_VDP_TAG),
-	m_sound(*owner, TI_SOUNDCHIP_TAG),
+	m_video(*owner, TI99_VDP_TAG),
+	m_sound(*owner, TI99_SOUNDCHIP_TAG),
 	m_ioport(*owner, TI99_IOPORT_TAG),
 	m_gromport(*owner, TI99_GROMPORT_TAG),
 	m_ram16b(*owner, TI99_EXPRAM_TAG),
@@ -101,6 +101,7 @@ datamux_device::datamux_device(const machine_config &mconfig, const char *tag, d
 	m_grom0(*owner, TI99_GROM0_TAG),
 	m_grom1(*owner, TI99_GROM1_TAG),
 	m_grom2(*owner, TI99_GROM2_TAG),
+	m_tms9901(*owner, TI99_TMS9901_TAG),
 	m_ready(*this),
 	m_addr_buf(0),
 	m_dbin(CLEAR_LINE),
@@ -312,14 +313,14 @@ void datamux_device::debugger_write(uint16_t addr, uint16_t data)
 			if ((addrb & 0xe000)==0x6000)
 			{
 				m_gromport->romgq_line(ASSERT_LINE);
-				m_gromport->write(addr+1, data & 0xff);
-				m_gromport->write(addr, (data>>8) & 0xff);
+				m_gromport->write(addrb+1, data & 0xff);
+				m_gromport->write(addrb, (data>>8) & 0xff);
 				m_gromport->romgq_line(m_romgq_state);  // reset to previous state
 			}
 
 			m_ioport->memen_in(ASSERT_LINE);
-			m_ioport->write(addr+1, data & 0xff);
-			m_ioport->write(addr,  (data>>8) & 0xff);
+			m_ioport->write(addrb+1, data & 0xff);
+			m_ioport->write(addrb,  (data>>8) & 0xff);
 			m_ioport->memen_in(m_memen_state);   // reset to previous state
 		}
 	}
@@ -435,6 +436,10 @@ void datamux_device::setaddress(offs_t offset, uint16_t busctrl)
 	m_dbin = ((busctrl & TMS99xx_BUS_DBIN)!=0);
 
 	LOGMASKED(LOG_ADDRESS, "Set address %04x\n", m_addr_buf);
+
+	// Trigger the TMS9901 clock when A10 is 1
+	if ((m_addr_buf & 0x0020) != 0)
+		m_tms9901->update_clock();
 
 	if ((m_addr_buf & 0xe000) == 0x0000)
 	{
@@ -632,5 +637,4 @@ ioport_constructor datamux_device::device_input_ports() const
 	return INPUT_PORTS_NAME(datamux);
 }
 
-} } } // end namespace bus::ti99::internal
-
+} // end namespace bus::ti99::internal

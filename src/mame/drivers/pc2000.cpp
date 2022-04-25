@@ -16,6 +16,11 @@
 
 Other known international versions:
 - Genio 2000 (Spanish version of Genius Leader 4000 Quadro)
+- Genius 4000 (French version of Genius Leader 4000 Quadro)
+- Genius 5000 (French version of Genius Leader 5000)
+- Genius 6000 (French version of Genius Leader 6000 SL)
+- Genius 6500 Duo (alternate French version of Genius Leader 6000 SL)
+- Genius Notebook (French version of Genius Leader 3000 S)
 - PreComputer Power Pad (English version of Genius Leader 4000 Quadro)
 - PreComputer Power Pad Plus (English version of Genius Leader 5000)
 - Talking Whiz-Kid Einstein (English version of Genius Leader Power Notebook)
@@ -36,7 +41,7 @@ Other known international versions:
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "gl3000s.lh"
@@ -272,7 +277,7 @@ int gl3000s_state::sed1520_screen_update(bitmap_ind16 &bitmap, const rectangle &
 				int py = 8 + y*8 + yi;
 
 				if (cliprect.contains(px, py))
-					bitmap.pix16(py, px) = (vram[addr % 0x140] >> yi) & 1;
+					bitmap.pix(py, px) = (vram[addr % 0x140] >> yi) & 1;
 			}
 
 			row_pos++;
@@ -283,7 +288,11 @@ int gl3000s_state::sed1520_screen_update(bitmap_ind16 &bitmap, const rectangle &
 
 SED1520_UPDATE_CB(gl3000s_state::screen_update_right)
 {
-	return sed1520_screen_update(bitmap, cliprect, vram, start_line, adc, 119);
+	if (lcd_on)
+		return sed1520_screen_update(bitmap, cliprect, dram, start_line, adc, 119);
+
+	bitmap.fill(0, cliprect);
+	return 0;
 }
 
 SED1520_UPDATE_CB(gl3000s_state::screen_update_left)
@@ -296,7 +305,10 @@ SED1520_UPDATE_CB(gl3000s_state::screen_update_left)
 	for (int y=0; y<2; y++)
 		for (int x=59; x<85; x++)
 		{
-			uint8_t data = vram[(y*0x50 + x) % 0x140];
+			uint8_t data = 0;
+			if (lcd_on)
+				data = dram[((y + (start_line >> 3)) * 80 + x) & 0x1ff];
+
 			int32_t dpos = (x - 74) / 2;
 			if (dpos < 0)
 			{
@@ -331,7 +343,7 @@ SED1520_UPDATE_CB(gl3000s_state::screen_update_left)
 				else if (x < 74 && yi < 7)
 				{
 					int cx = x - 59;
-					bitmap.pix16(yi, (y ? 0 : 89) + (16 - (cx + cx / 5))) = state;
+					bitmap.pix(yi, (y ? 0 : 89) + (16 - (cx + cx / 5))) = state;
 				}
 			}
 		}
@@ -343,7 +355,11 @@ SED1520_UPDATE_CB(gl3000s_state::screen_update_left)
 		m_points_out[1][i] = points[0][i];
 	}
 
-	return sed1520_screen_update(bitmap, cliprect, vram, start_line, adc, 58);
+	if (lcd_on)
+		return sed1520_screen_update(bitmap, cliprect, dram, start_line, adc, 58);
+
+	bitmap.fill(0, cliprect);
+	return 0;
 }
 
 
@@ -408,7 +424,7 @@ HD44780_PIXEL_UPDATE(pc1000_state::pc1000_pixel_update)
 	for (int i=0; i<20; i++)
 		if (pos == layout[i])
 		{
-			bitmap.pix16((line * 9) + y, (i * 6) + x) = state;
+			bitmap.pix((line * 9) + y, (i * 6) + x) = state;
 			break;
 		}
 }
@@ -957,7 +973,7 @@ HD44780_PIXEL_UPDATE(gl4004_state::gl4000_pixel_update)
 		};
 
 		uint8_t char_pos = gl4000_display_layout[line*40 + pos];
-		bitmap.pix16((char_pos / 20) * 9 + y, (char_pos % 20) * 6 + x) = state;
+		bitmap.pix((char_pos / 20) * 9 + y, (char_pos % 20) * 6 + x) = state;
 	}
 }
 

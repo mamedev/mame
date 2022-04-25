@@ -16,8 +16,8 @@ license:CC0
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
-		<overlay name="overlay" element="overlay_gremlin">
+		<element ref="overlay_gremlin" blend="multiply">
 			<bounds left="0" top="0" right="4" bottom="3" />
-		</overlay>
+		</element>
 	</view>
 </mamelayout>

@@ -14,7 +14,6 @@
  */
 
 #include "emu.h"
-#include "debugger.h"
 #include "clipper.h"
 #include "clipperd.h"
 
@@ -68,6 +67,7 @@ clipper_c300_device::clipper_c300_device(const machine_config &mconfig, const ch
 
 clipper_c400_device::clipper_c400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: clipper_device(mconfig, CLIPPER_C400, tag, owner, clock, ENDIANNESS_LITTLE, SSW_ID_C4R4)
+	, m_db_pc(0)
 	, m_cammu(*this, "^cammu")
 {
 }
@@ -81,6 +81,12 @@ clipper_device::clipper_device(const machine_config &mconfig, device_type type, 
 	, m_psw(endianness == ENDIANNESS_BIG ? PSW_BIG : 0)
 	, m_ssw(cpuid)
 	, m_r(m_rs)
+	, m_ru{0}
+	, m_rs{0}
+	, m_f{0}
+	, m_fp_pc(0)
+	, m_fp_dst(0)
+	, m_info{0}
 {
 }
 

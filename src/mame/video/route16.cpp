@@ -87,13 +87,13 @@ uint32_t route16_state::screen_update_route16(screen_device &screen, bitmap_rgb3
 			uint8_t final_color = (color1 | color2) & 0x07;
 
 			if (m_flipscreen)
-				bitmap.pix32(255 - y, 255 - x) = m_palette->pen_color(final_color);
+				bitmap.pix(255 - y, 255 - x) = m_palette->pen_color(final_color);
 			else
-				bitmap.pix32(y, x) = m_palette->pen_color(final_color);
+				bitmap.pix(y, x) = m_palette->pen_color(final_color);
 
-			x = x + 1;
-			data1 = data1 >> 1;
-			data2 = data2 >> 1;
+			x++;
+			data1 >>= 1;
+			data2 >>= 1;
 		}
 	}
 
@@ -134,13 +134,13 @@ uint32_t route16_state::screen_update_jongpute(screen_device &screen, bitmap_rgb
 			uint8_t final_color = (color1 | color2) & 0x07;
 
 			if (m_flipscreen)
-				bitmap.pix32(255 - y, 255 - x) = m_palette->pen_color(final_color);
+				bitmap.pix(255 - y, 255 - x) = m_palette->pen_color(final_color);
 			else
-				bitmap.pix32(y, x) = m_palette->pen_color(final_color);
+				bitmap.pix(y, x) = m_palette->pen_color(final_color);
 
-			x = x + 1;
-			data1 = data1 >> 1;
-			data2 = data2 >> 1;
+			x++;
+			data1 >>= 1;
+			data2 >>= 1;
 		}
 	}
 

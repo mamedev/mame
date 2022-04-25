@@ -132,7 +132,7 @@ void wpc_out_device::device_reset()
 	timer->adjust(attotime::from_hz(10), 0, attotime::from_hz(10));
 }
 
-void wpc_out_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void wpc_out_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	gi_update();
 	for(int i=0; i<gi_count; i++) {

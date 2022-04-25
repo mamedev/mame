@@ -14,7 +14,7 @@ TODO:
 Fidelity Chess Challenger 10 (CCX)
 -------------------
 3 versions are known to exist: A,B,C. Strangely, version C(UCC10) has an 8080
-instead of Z80 and no beeper, it's on CC1-based hardware.
+instead of Z80 and no beeper, it's on CC1-based hardware (see fidel_cc1.cpp).
 
 Z80A CPU @ 4MHz, NEC D8255C
 4KB ROM(NEC 2332A), 2*256 bytes RAM(4*NEC 2111AL-4)
@@ -27,12 +27,14 @@ advertisements, but box and manual still simply name it Checker Challenger.
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/bankdev.h"
 #include "machine/i8255.h"
 #include "machine/timer.h"
 #include "sound/beep.h"
 #include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -94,18 +96,13 @@ private:
 	u8 ppi_portc_r();
 	void ppi_portc_w(u8 data);
 
-	u8 m_inp_mux;
-	u8 m_led_select;
-	u8 m_7seg_data;
+	u8 m_inp_mux = 0;
+	u8 m_led_select = 0;
+	u8 m_7seg_data = 0;
 };
 
 void ccx_state::machine_start()
 {
-	// zerofill
-	m_inp_mux = 0;
-	m_led_select = 0;
-	m_7seg_data = 0;
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_select));

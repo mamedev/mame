@@ -10,8 +10,9 @@
 #define softfloat_h 1
 #include "softfloat/milieu.h"
 #include "softfloat/softfloat.h"
-extern flag floatx80_is_nan(floatx80 a);
 #endif
+
+extern flag floatx80_is_nan(floatx80 a);
 
 
 /* MMU constants */
@@ -134,9 +135,9 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	// device_execute_interface overrides
-	virtual u32 execute_min_cycles() const noexcept override { return 4; };
-	virtual u32 execute_max_cycles() const noexcept override { return 158; };
-	virtual u32 execute_input_lines() const noexcept override { return m_interrupt_mixer ? 8 : 3; }; // number of input lines
+	virtual u32 execute_min_cycles() const noexcept override { return 4; }
+	virtual u32 execute_max_cycles() const noexcept override { return 158; }
+	virtual u32 execute_input_lines() const noexcept override { return m_interrupt_mixer ? 8 : 3; } // number of input lines
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return m_interrupt_mixer ? inputnum == M68K_IRQ_7 : false; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
@@ -164,9 +165,10 @@ public:
 	template <typename... T> void set_tas_write_callback(T &&... args) { m_tas_write_callback.set(std::forward<T>(args)...); }
 	u16 get_fc();
 	void set_hmmu_enable(int enable);
-	int get_pmmu_enable() const {return m_pmmu_enabled;};
+	void set_emmu_enable(int enable);
+	int get_pmmu_enable() const {return m_pmmu_enabled;}
 	void set_fpu_enable(int enable);
-	void set_buserror_details(u32 fault_addr, u8 rw, u8 fc);
+	void set_buserror_details(u32 fault_addr, u8 rw, u8 fc, bool rerun = false);
 	void disable_interrupt_mixer() { m_interrupt_mixer = false; }
 	void set_cpu_space(int space_id) { m_cpu_space_id = space_id; }
 
@@ -219,6 +221,8 @@ protected:
 	int    m_has_hmmu;     /* Indicates if an Apple HMMU is available in place of the 68851 (020 only) */
 	int    m_pmmu_enabled; /* Indicates if the PMMU is enabled */
 	int    m_hmmu_enabled; /* Indicates if the HMMU is enabled */
+	int    m_emmu_enabled; /* Indicates if external MMU is enabled */
+	int    m_instruction_restart; /* Save DA regs for potential instruction restart */
 	int    m_fpu_just_reset; /* Indicates the FPU was just reset */
 
 	/* Clocks required for instructions / exceptions */
@@ -374,10 +378,66 @@ protected:
 
 #include "m68kcpu.h"
 #include "m68kops.h"
-#include "m68kfpu.hxx"
 #include "m68kmmu.h"
 
 	virtual void m68k_reset_peripherals() { }
+
+	static double fx80_to_double(floatx80 fx)
+	{
+		u64 d;
+		double *foo;
+
+		foo = (double *)&d;
+
+		d = floatx80_to_float64(fx);
+
+		return *foo;
+	}
+
+	static floatx80 double_to_fx80(double in)
+	{
+		u64 *d;
+
+		d = (u64 *)&in;
+
+		return float64_to_floatx80(*d);
+	}
+
+	// defined in m68kfpu.cpp
+	static const u32 pkmask2[18];
+	static const u32 pkmask3[18];
+	inline floatx80 load_extended_float80(u32 ea);
+	inline void store_extended_float80(u32 ea, floatx80 fpr);
+	inline floatx80 load_pack_float80(u32 ea);
+	inline void store_pack_float80(u32 ea, int k, floatx80 fpr);
+	inline void SET_CONDITION_CODES(floatx80 reg);
+	inline int TEST_CONDITION(int condition);
+	u8 READ_EA_8(int ea);
+	u16 READ_EA_16(int ea);
+	u32 READ_EA_32(int ea);
+	u64 READ_EA_64(int ea);
+	floatx80 READ_EA_FPE(int mode, int reg, uint32 di_mode_ea);
+	floatx80 READ_EA_PACK(int ea);
+	void WRITE_EA_8(int ea, u8 data);
+	void WRITE_EA_16(int ea, u16 data);
+	void WRITE_EA_32(int ea, u32 data);
+	void WRITE_EA_64(int ea, u64 data);
+	void WRITE_EA_FPE(int mode, int reg, floatx80 fpr, uint32 di_mode_ea);
+	void WRITE_EA_PACK(int ea, int k, floatx80 fpr);
+	void fpgen_rm_reg(u16 w2);
+	void fmove_reg_mem(u16 w2);
+	void fmove_fpcr(u16 w2);
+	void fmovem(u16 w2);
+	void fscc();
+	void fbcc16();
+	void fbcc32();
+	void m68040_fpu_op0();
+	int perform_fsave(u32 addr, int inc);
+	void do_frestore_null();
+	void m68040_do_fsave(u32 addr, int reg, int inc);
+	void m68040_do_frestore(u32 addr, int reg);
+	void m68040_fpu_op1();
+	void m68881_ftrap();
 };
 
 
@@ -391,8 +451,8 @@ public:
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual u32 execute_min_cycles() const noexcept override { return 4; };
-	virtual u32 execute_max_cycles() const noexcept override { return 158; };
+	virtual u32 execute_min_cycles() const noexcept override { return 4; }
+	virtual u32 execute_max_cycles() const noexcept override { return 158; }
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -415,8 +475,8 @@ public:
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual u32 execute_min_cycles() const noexcept override { return 4; };
-	virtual u32 execute_max_cycles() const noexcept override { return 158; };
+	virtual u32 execute_min_cycles() const noexcept override { return 4; }
+	virtual u32 execute_max_cycles() const noexcept override { return 158; }
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -430,8 +490,8 @@ public:
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual u32 execute_min_cycles() const noexcept override { return 4; };
-	virtual u32 execute_max_cycles() const noexcept override { return 158; };
+	virtual u32 execute_min_cycles() const noexcept override { return 4; }
+	virtual u32 execute_max_cycles() const noexcept override { return 158; }
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -445,8 +505,8 @@ public:
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual u32 execute_min_cycles() const noexcept override { return 4; };
-	virtual u32 execute_max_cycles() const noexcept override { return 158; };
+	virtual u32 execute_min_cycles() const noexcept override { return 4; }
+	virtual u32 execute_max_cycles() const noexcept override { return 158; }
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -460,8 +520,8 @@ public:
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual u32 execute_min_cycles() const noexcept override { return 2; };
-	virtual u32 execute_max_cycles() const noexcept override { return 158; };
+	virtual u32 execute_min_cycles() const noexcept override { return 2; }
+	virtual u32 execute_max_cycles() const noexcept override { return 158; }
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -475,8 +535,8 @@ public:
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual u32 execute_min_cycles() const noexcept override { return 2; };
-	virtual u32 execute_max_cycles() const noexcept override { return 158; };
+	virtual u32 execute_min_cycles() const noexcept override { return 2; }
+	virtual u32 execute_max_cycles() const noexcept override { return 158; }
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -490,8 +550,8 @@ public:
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual u32 execute_min_cycles() const noexcept override { return 2; };
-	virtual u32 execute_max_cycles() const noexcept override { return 158; };
+	virtual u32 execute_min_cycles() const noexcept override { return 2; }
+	virtual u32 execute_max_cycles() const noexcept override { return 158; }
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -505,8 +565,8 @@ public:
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual u32 execute_min_cycles() const noexcept override { return 2; };
-	virtual u32 execute_max_cycles() const noexcept override { return 158; };
+	virtual u32 execute_min_cycles() const noexcept override { return 2; }
+	virtual u32 execute_max_cycles() const noexcept override { return 158; }
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -520,8 +580,8 @@ public:
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual u32 execute_min_cycles() const noexcept override { return 2; };
-	virtual u32 execute_max_cycles() const noexcept override { return 158; };
+	virtual u32 execute_min_cycles() const noexcept override { return 2; }
+	virtual u32 execute_max_cycles() const noexcept override { return 158; }
 
 	virtual bool memory_translate(int space, int intention, offs_t &address) override;
 
@@ -537,8 +597,8 @@ public:
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual u32 execute_min_cycles() const noexcept override { return 2; };
-	virtual u32 execute_max_cycles() const noexcept override { return 158; };
+	virtual u32 execute_min_cycles() const noexcept override { return 2; }
+	virtual u32 execute_max_cycles() const noexcept override { return 158; }
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -552,8 +612,8 @@ public:
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual u32 execute_min_cycles() const noexcept override { return 2; };
-	virtual u32 execute_max_cycles() const noexcept override { return 158; };
+	virtual u32 execute_min_cycles() const noexcept override { return 2; }
+	virtual u32 execute_max_cycles() const noexcept override { return 158; }
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -567,8 +627,8 @@ public:
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual u32 execute_min_cycles() const noexcept override { return 2; };
-	virtual u32 execute_max_cycles() const noexcept override { return 158; };
+	virtual u32 execute_min_cycles() const noexcept override { return 2; }
+	virtual u32 execute_max_cycles() const noexcept override { return 158; }
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -582,8 +642,8 @@ public:
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual u32 execute_min_cycles() const noexcept override { return 2; };
-	virtual u32 execute_max_cycles() const noexcept override { return 158; };
+	virtual u32 execute_min_cycles() const noexcept override { return 2; }
+	virtual u32 execute_max_cycles() const noexcept override { return 158; }
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -597,8 +657,8 @@ public:
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual u32 execute_min_cycles() const noexcept override { return 2; };
-	virtual u32 execute_max_cycles() const noexcept override { return 158; };
+	virtual u32 execute_min_cycles() const noexcept override { return 2; }
+	virtual u32 execute_max_cycles() const noexcept override { return 158; }
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -609,8 +669,8 @@ class scc68070_base_device : public m68000_base_device
 protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual u32 execute_min_cycles() const noexcept override { return 4; };
-	virtual u32 execute_max_cycles() const noexcept override { return 158; };
+	virtual u32 execute_min_cycles() const noexcept override { return 4; }
+	virtual u32 execute_max_cycles() const noexcept override { return 158; }
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -630,8 +690,8 @@ public:
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual u32 execute_min_cycles() const noexcept override { return 2; };
-	virtual u32 execute_max_cycles() const noexcept override { return 158; };
+	virtual u32 execute_min_cycles() const noexcept override { return 2; }
+	virtual u32 execute_max_cycles() const noexcept override { return 158; }
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -651,8 +711,8 @@ public:
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual u32 execute_min_cycles() const noexcept override { return 2; };
-	virtual u32 execute_max_cycles() const noexcept override { return 158; };
+	virtual u32 execute_min_cycles() const noexcept override { return 2; }
+	virtual u32 execute_max_cycles() const noexcept override { return 158; }
 
 
 	// device-level overrides

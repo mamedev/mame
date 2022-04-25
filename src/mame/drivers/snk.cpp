@@ -225,7 +225,7 @@ A6004UP02-01
  |      2018  2018                           SKT64      |-|
  |-------------------------------------------------------|
 Notes:
-      CN5/6 - Auxilliary power input connectors
+      CN5/6 - Auxiliary power input connectors
       GV*   - OTP EPROMs
       6116  - 2k x8-bit SRAM
       2018  - Toshiba TMM2018 2k x8-bit SRAM
@@ -256,7 +256,7 @@ A6004UP01-01
  |                             16MHz                    |-|
  |-------------------------------------------------------|
 Notes:
-      CN4      - Auxilliary power input connectors
+      CN4      - Auxiliary power input connectors
       ^        - These parts not populated
       GV*      - OTP EPROMs
       A6003-1  - PAL
@@ -305,7 +305,7 @@ Notes:
       DIP1/2  - 8-position DIP switches
       4559    - NEC uPC4559 Dual Operational Amplifier
       YM3014  - Yamaha YM3014 DAC
-      CN5/7    - Auxilliary power input connectors
+      CN5/7    - Auxiliary power input connectors
       CN9-12  - 4-position connectors (extra control?)
       X       - Space for a DIP28 ROM, but not populated with anything
 
@@ -340,7 +340,7 @@ Notes:
       6116  - 2k x8-bit SRAM
       2018  - Toshiba TMM2018 2k x8-bit SRAM
       SNK8* - SNK SDIP64 custom chips
-      CN5/7 - Auxilliary power input connectors
+      CN5/7 - Auxiliary power input connectors
       JP*   - 2x 2-pin jumper to set ROM sizes 1M/512K for ROMs 2J-2T. Jumper is set to 512K
 
 
@@ -578,16 +578,19 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/snkwave.h"
 #include "sound/ay8910.h"
-#include "sound/3526intf.h"
-#include "sound/3812intf.h"
-#include "sound/8950intf.h"
+#include "sound/ymopl.h"
 #include "speaker.h"
 
+
+void snk_state::machine_start()
+{
+	m_countryc_trackball = 0;
+}
 
 /*********************************************************************/
 // Interrupt handlers common to all SNK triple Z80 games
 
-READ8_MEMBER(snk_state::snk_cpuA_nmi_trigger_r)
+uint8_t snk_state::snk_cpuA_nmi_trigger_r()
 {
 	if(!machine().side_effects_disabled())
 	{
@@ -596,12 +599,12 @@ READ8_MEMBER(snk_state::snk_cpuA_nmi_trigger_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(snk_state::snk_cpuA_nmi_ack_w)
+void snk_state::snk_cpuA_nmi_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-READ8_MEMBER(snk_state::snk_cpuB_nmi_trigger_r)
+uint8_t snk_state::snk_cpuB_nmi_trigger_r()
 {
 	if(!machine().side_effects_disabled())
 	{
@@ -610,7 +613,7 @@ READ8_MEMBER(snk_state::snk_cpuB_nmi_trigger_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(snk_state::snk_cpuB_nmi_ack_w)
+void snk_state::snk_cpuB_nmi_ack_w(uint8_t data)
 {
 	m_subcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
@@ -630,7 +633,7 @@ enum
 
 /*********************************************************************/
 
-READ8_MEMBER(snk_state::marvins_sound_nmi_ack_r)
+uint8_t snk_state::marvins_sound_nmi_ack_r()
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return 0xff;
@@ -659,25 +662,25 @@ TIMER_CALLBACK_MEMBER(snk_state::sgladiat_sndirq_update_callback)
 }
 
 
-WRITE8_MEMBER(snk_state::sgladiat_soundlatch_w)
+void snk_state::sgladiat_soundlatch_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sgladiat_sndirq_update_callback),this), CMDIRQ_BUSY_ASSERT);
 }
 
-READ8_MEMBER(snk_state::sgladiat_soundlatch_r)
+uint8_t snk_state::sgladiat_soundlatch_r()
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sgladiat_sndirq_update_callback),this), BUSY_CLEAR);
 	return m_soundlatch->read();
 }
 
-READ8_MEMBER(snk_state::sgladiat_sound_nmi_ack_r)
+uint8_t snk_state::sgladiat_sound_nmi_ack_r()
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sgladiat_sndirq_update_callback),this), CMDIRQ_CLEAR);
 	return 0xff;
 }
 
-READ8_MEMBER(snk_state::sgladiat_sound_irq_ack_r)
+uint8_t snk_state::sgladiat_sound_irq_ack_r()
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return 0xff;
@@ -757,7 +760,7 @@ WRITE_LINE_MEMBER(snk_state::ymirq_callback_2)
 }
 
 
-WRITE8_MEMBER(snk_state::snk_soundlatch_w)
+void snk_state::snk_soundlatch_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), CMDIRQ_BUSY_ASSERT);
@@ -769,12 +772,12 @@ READ_LINE_MEMBER(snk_state::sound_busy_r)
 }
 
 
-READ8_MEMBER(snk_state::snk_sound_status_r)
+uint8_t snk_state::snk_sound_status_r()
 {
 	return m_sound_status;
 }
 
-WRITE8_MEMBER(snk_state::snk_sound_status_w)
+void snk_state::snk_sound_status_w(uint8_t data)
 {
 	if (~data & 0x10)   // ack YM1 irq
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), YM1IRQ_CLEAR);
@@ -790,19 +793,19 @@ WRITE8_MEMBER(snk_state::snk_sound_status_w)
 }
 
 
-READ8_MEMBER(snk_state::tnk3_cmdirq_ack_r)
+uint8_t snk_state::tnk3_cmdirq_ack_r()
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), CMDIRQ_CLEAR);
 	return 0xff;
 }
 
-READ8_MEMBER(snk_state::tnk3_ymirq_ack_r)
+uint8_t snk_state::tnk3_ymirq_ack_r()
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), YM1IRQ_CLEAR);
 	return 0xff;
 }
 
-READ8_MEMBER(snk_state::tnk3_busy_clear_r)
+uint8_t snk_state::tnk3_busy_clear_r()
 {
 	// it's uncertain whether the latch should be cleared here or when it's read
 	m_soundlatch->clear_w();
@@ -829,17 +832,17 @@ A trojan could be used on the board to verify the exact behaviour.
 *****************************************************************************/
 
 
-WRITE8_MEMBER(snk_state::hardflags_scrollx_w)
+void snk_state::hardflags_scrollx_w(uint8_t data)
 {
 	m_hf_posx = (m_hf_posx & ~0xff) | data;
 }
 
-WRITE8_MEMBER(snk_state::hardflags_scrolly_w)
+void snk_state::hardflags_scrolly_w(uint8_t data)
 {
 	m_hf_posy = (m_hf_posy & ~0xff) | data;
 }
 
-WRITE8_MEMBER(snk_state::hardflags_scroll_msb_w)
+void snk_state::hardflags_scroll_msb_w(uint8_t data)
 {
 	m_hf_posx = (m_hf_posx & 0xff) | ((data & 0x80) << 1);
 	m_hf_posy = (m_hf_posy & 0xff) | ((data & 0x40) << 2);
@@ -875,13 +878,13 @@ int snk_state::hardflags_check8(int num)
 		(hardflags_check(num + 7) << 7);
 }
 
-READ8_MEMBER(snk_state::hardflags1_r){ return hardflags_check8(0*8); }
-READ8_MEMBER(snk_state::hardflags2_r){ return hardflags_check8(1*8); }
-READ8_MEMBER(snk_state::hardflags3_r){ return hardflags_check8(2*8); }
-READ8_MEMBER(snk_state::hardflags4_r){ return hardflags_check8(3*8); }
-READ8_MEMBER(snk_state::hardflags5_r){ return hardflags_check8(4*8); }
-READ8_MEMBER(snk_state::hardflags6_r){ return hardflags_check8(5*8); }
-READ8_MEMBER(snk_state::hardflags7_r)
+uint8_t snk_state::hardflags1_r(){ return hardflags_check8(0*8); }
+uint8_t snk_state::hardflags2_r(){ return hardflags_check8(1*8); }
+uint8_t snk_state::hardflags3_r(){ return hardflags_check8(2*8); }
+uint8_t snk_state::hardflags4_r(){ return hardflags_check8(3*8); }
+uint8_t snk_state::hardflags5_r(){ return hardflags_check8(4*8); }
+uint8_t snk_state::hardflags6_r(){ return hardflags_check8(5*8); }
+uint8_t snk_state::hardflags7_r()
 {
 	// apparently the startup tests use bits 0&1 while the game uses bits 4&5
 	return
@@ -909,27 +912,27 @@ A trojan could be used on the board to verify the exact behaviour.
 *****************************************************************************/
 
 
-WRITE8_MEMBER(snk_state::turbocheck16_1_w)
+void snk_state::turbocheck16_1_w(uint8_t data)
 {
 	m_tc16_posy = (m_tc16_posy & ~0xff) | data;
 }
 
-WRITE8_MEMBER(snk_state::turbocheck16_2_w)
+void snk_state::turbocheck16_2_w(uint8_t data)
 {
 	m_tc16_posx = (m_tc16_posx & ~0xff) | data;
 }
 
-WRITE8_MEMBER(snk_state::turbocheck32_1_w)
+void snk_state::turbocheck32_1_w(uint8_t data)
 {
 	m_tc32_posy = (m_tc32_posy & ~0xff) | data;
 }
 
-WRITE8_MEMBER(snk_state::turbocheck32_2_w)
+void snk_state::turbocheck32_2_w(uint8_t data)
 {
 	m_tc32_posx = (m_tc32_posx & ~0xff) | data;
 }
 
-WRITE8_MEMBER(snk_state::turbocheck_msb_w)
+void snk_state::turbocheck_msb_w(uint8_t data)
 {
 	m_tc16_posx = (m_tc16_posx & 0xff) | ((data & 0x80) << 1);
 	m_tc16_posy = (m_tc16_posy & 0xff) | ((data & 0x40) << 2);
@@ -967,18 +970,18 @@ int snk_state::turbofront_check8(int small, int num)
 		(turbofront_check(small, num + 7) << 7);
 }
 
-READ8_MEMBER(snk_state::turbocheck16_1_r){ return turbofront_check8(1, 0*8); }
-READ8_MEMBER(snk_state::turbocheck16_2_r){ return turbofront_check8(1, 1*8); }
-READ8_MEMBER(snk_state::turbocheck16_3_r){ return turbofront_check8(1, 2*8); }
-READ8_MEMBER(snk_state::turbocheck16_4_r){ return turbofront_check8(1, 3*8); }
-READ8_MEMBER(snk_state::turbocheck16_5_r){ return turbofront_check8(1, 4*8); }
-READ8_MEMBER(snk_state::turbocheck16_6_r){ return turbofront_check8(1, 5*8); }
-READ8_MEMBER(snk_state::turbocheck16_7_r){ return turbofront_check8(1, 6*8); }
-READ8_MEMBER(snk_state::turbocheck16_8_r){ return turbofront_check8(1, 7*8); }
-READ8_MEMBER(snk_state::turbocheck32_1_r){ return turbofront_check8(0, 0*8); }
-READ8_MEMBER(snk_state::turbocheck32_2_r){ return turbofront_check8(0, 1*8); }
-READ8_MEMBER(snk_state::turbocheck32_3_r){ return turbofront_check8(0, 2*8); }
-READ8_MEMBER(snk_state::turbocheck32_4_r){ return turbofront_check8(0, 3*8); }
+uint8_t snk_state::turbocheck16_1_r(){ return turbofront_check8(1, 0*8); }
+uint8_t snk_state::turbocheck16_2_r(){ return turbofront_check8(1, 1*8); }
+uint8_t snk_state::turbocheck16_3_r(){ return turbofront_check8(1, 2*8); }
+uint8_t snk_state::turbocheck16_4_r(){ return turbofront_check8(1, 3*8); }
+uint8_t snk_state::turbocheck16_5_r(){ return turbofront_check8(1, 4*8); }
+uint8_t snk_state::turbocheck16_6_r(){ return turbofront_check8(1, 5*8); }
+uint8_t snk_state::turbocheck16_7_r(){ return turbofront_check8(1, 6*8); }
+uint8_t snk_state::turbocheck16_8_r(){ return turbofront_check8(1, 7*8); }
+uint8_t snk_state::turbocheck32_1_r(){ return turbofront_check8(0, 0*8); }
+uint8_t snk_state::turbocheck32_2_r(){ return turbofront_check8(0, 1*8); }
+uint8_t snk_state::turbocheck32_3_r(){ return turbofront_check8(0, 2*8); }
+uint8_t snk_state::turbocheck32_4_r(){ return turbofront_check8(0, 3*8); }
 
 
 
@@ -1030,13 +1033,13 @@ CUSTOM_INPUT_MEMBER(snk_state::gwarb_rotary)
 /************************************************************************/
 
 
-WRITE8_MEMBER(snk_state::athena_coin_counter_w)
+void snk_state::athena_coin_counter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, ~data & 2);
 	machine().bookkeeping().coin_counter_w(1, ~data & 1);
 }
 
-WRITE8_MEMBER(snk_state::ikari_coin_counter_w)
+void snk_state::ikari_coin_counter_w(uint8_t data)
 {
 	if (~data & 0x80)
 	{
@@ -1051,13 +1054,13 @@ WRITE8_MEMBER(snk_state::ikari_coin_counter_w)
 	}
 }
 
-WRITE8_MEMBER(snk_state::tdfever_coin_counter_w)
+void snk_state::tdfever_coin_counter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	machine().bookkeeping().coin_counter_w(1, data & 2);
 }
 
-WRITE8_MEMBER(snk_state::countryc_trackball_w)
+void snk_state::countryc_trackball_w(uint8_t data)
 {
 	m_countryc_trackball = data & 1;
 }
@@ -1755,10 +1758,10 @@ void snk_state::YM3526_YM3526_sound_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram();
 	map(0xe000, 0xe000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xe800, 0xe800).rw("ym1", FUNC(ym3526_device::status_port_r), FUNC(ym3526_device::control_port_w));
-	map(0xec00, 0xec00).w("ym1", FUNC(ym3526_device::write_port_w));
-	map(0xf000, 0xf000).rw("ym2", FUNC(ym3526_device::status_port_r), FUNC(ym3526_device::control_port_w));
-	map(0xf400, 0xf400).w("ym2", FUNC(ym3526_device::write_port_w));
+	map(0xe800, 0xe800).rw("ym1", FUNC(ym3526_device::status_r), FUNC(ym3526_device::address_w));
+	map(0xec00, 0xec00).w("ym1", FUNC(ym3526_device::data_w));
+	map(0xf000, 0xf000).rw("ym2", FUNC(ym3526_device::status_r), FUNC(ym3526_device::address_w));
+	map(0xf400, 0xf400).w("ym2", FUNC(ym3526_device::data_w));
 	map(0xf800, 0xf800).rw(FUNC(snk_state::snk_sound_status_r), FUNC(snk_state::snk_sound_status_w));
 }
 
@@ -1767,8 +1770,8 @@ void snk_state::YM3812_sound_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram();
 	map(0xe000, 0xe000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xe800, 0xe800).rw("ym1", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
-	map(0xec00, 0xec00).w("ym1", FUNC(ym3812_device::write_port_w));
+	map(0xe800, 0xe800).rw("ym1", FUNC(ym3812_device::status_r), FUNC(ym3812_device::address_w));
+	map(0xec00, 0xec00).w("ym1", FUNC(ym3812_device::data_w));
 	map(0xf800, 0xf800).rw(FUNC(snk_state::snk_sound_status_r), FUNC(snk_state::snk_sound_status_w));
 }
 
@@ -1777,10 +1780,10 @@ void snk_state::YM3526_Y8950_sound_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram();
 	map(0xe000, 0xe000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xe800, 0xe800).rw("ym1", FUNC(ym3526_device::status_port_r), FUNC(ym3526_device::control_port_w));
-	map(0xec00, 0xec00).w("ym1", FUNC(ym3526_device::write_port_w));
-	map(0xf000, 0xf000).rw("ym2", FUNC(y8950_device::status_port_r), FUNC(y8950_device::control_port_w));
-	map(0xf400, 0xf400).w("ym2", FUNC(y8950_device::write_port_w));
+	map(0xe800, 0xe800).rw("ym1", FUNC(ym3526_device::status_r), FUNC(ym3526_device::address_w));
+	map(0xec00, 0xec00).w("ym1", FUNC(ym3526_device::data_w));
+	map(0xf000, 0xf000).rw("ym2", FUNC(y8950_device::status_r), FUNC(y8950_device::address_w));
+	map(0xf400, 0xf400).w("ym2", FUNC(y8950_device::data_w));
 	map(0xf800, 0xf800).rw(FUNC(snk_state::snk_sound_status_r), FUNC(snk_state::snk_sound_status_w));
 }
 
@@ -1789,10 +1792,10 @@ void snk_state::YM3812_Y8950_sound_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram();
 	map(0xe000, 0xe000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xe800, 0xe800).rw("ym1", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
-	map(0xec00, 0xec00).w("ym1", FUNC(ym3812_device::write_port_w));
-	map(0xf000, 0xf000).rw("ym2", FUNC(y8950_device::status_port_r), FUNC(y8950_device::control_port_w));
-	map(0xf400, 0xf400).w("ym2", FUNC(y8950_device::write_port_w));
+	map(0xe800, 0xe800).rw("ym1", FUNC(ym3812_device::status_r), FUNC(ym3812_device::address_w));
+	map(0xec00, 0xec00).w("ym1", FUNC(ym3812_device::data_w));
+	map(0xf000, 0xf000).rw("ym2", FUNC(y8950_device::status_r), FUNC(y8950_device::address_w));
+	map(0xf400, 0xf400).w("ym2", FUNC(y8950_device::data_w));
 	map(0xf800, 0xf800).rw(FUNC(snk_state::snk_sound_status_r), FUNC(snk_state::snk_sound_status_w));
 }
 
@@ -1801,8 +1804,8 @@ void snk_state::Y8950_sound_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram();
 	map(0xe000, 0xe000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xf000, 0xf000).rw("ym2", FUNC(y8950_device::status_port_r), FUNC(y8950_device::control_port_w));
-	map(0xf400, 0xf400).w("ym2", FUNC(y8950_device::write_port_w));
+	map(0xf000, 0xf000).rw("ym2", FUNC(y8950_device::status_r), FUNC(y8950_device::address_w));
+	map(0xf400, 0xf400).w("ym2", FUNC(y8950_device::data_w));
 	map(0xf800, 0xf800).rw(FUNC(snk_state::snk_sound_status_r), FUNC(snk_state::snk_sound_status_w));
 }
 
@@ -3822,17 +3825,6 @@ INPUT_PORTS_END
 
 /*********************************************************************/
 
-static const gfx_layout charlayout_4bpp =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ 4*1, 4*0, 4*3, 4*2, 4*5, 4*4, 4*7, 4*6 },
-	{ STEP8(0,4*8) },
-	32*8
-};
-
 static const gfx_layout tilelayout_4bpp =
 {
 	16,16,
@@ -3892,22 +3884,22 @@ static const gfx_layout bigspritelayout_4bpp =
 /*********************************************************************/
 
 static GFXDECODE_START( gfx_marvins )
-	GFXDECODE_ENTRY( "tx_tiles",   0, charlayout_4bpp,   0x180, 0x080>>4 )
-	GFXDECODE_ENTRY( "fg_tiles",   0, charlayout_4bpp,   0x080, 0x080>>4 )
-	GFXDECODE_ENTRY( "bg_tiles",   0, charlayout_4bpp,   0x100, 0x080>>4 )
-	GFXDECODE_ENTRY( "sp16_tiles", 0, spritelayout_3bpp, 0x000, 0x080>>3 )
+	GFXDECODE_ENTRY( "tx_tiles",   0, gfx_8x8x4_packed_lsb, 0x180, 0x080>>4 )
+	GFXDECODE_ENTRY( "fg_tiles",   0, gfx_8x8x4_packed_lsb, 0x080, 0x080>>4 )
+	GFXDECODE_ENTRY( "bg_tiles",   0, gfx_8x8x4_packed_lsb, 0x100, 0x080>>4 )
+	GFXDECODE_ENTRY( "sp16_tiles", 0, spritelayout_3bpp,    0x000, 0x080>>3 )
 	/* colors 0x200-0x3ff contain shadows */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_tnk3 )
-	GFXDECODE_ENTRY( "tx_tiles",   0, charlayout_4bpp,   0x180, 0x080>>4 )
-	GFXDECODE_ENTRY( "bg_tiles",   0, charlayout_4bpp,   0x080, 0x100>>4 )
-	GFXDECODE_ENTRY( "sp16_tiles", 0, spritelayout_3bpp, 0x000, 0x080>>3 )
+	GFXDECODE_ENTRY( "tx_tiles",   0, gfx_8x8x4_packed_lsb, 0x180, 0x080>>4 )
+	GFXDECODE_ENTRY( "bg_tiles",   0, gfx_8x8x4_packed_lsb, 0x080, 0x100>>4 )
+	GFXDECODE_ENTRY( "sp16_tiles", 0, spritelayout_3bpp,    0x000, 0x080>>3 )
 	/* colors 0x200-0x3ff contain shadows */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_ikari )
-	GFXDECODE_ENTRY( "tx_tiles",   0, charlayout_4bpp,      0x180, 0x080>>4 )
+	GFXDECODE_ENTRY( "tx_tiles",   0, gfx_8x8x4_packed_lsb, 0x180, 0x080>>4 )
 	GFXDECODE_ENTRY( "bg_tiles",   0, tilelayout_4bpp,      0x100, 0x080>>4 )
 	GFXDECODE_ENTRY( "sp16_tiles", 0, spritelayout_3bpp,    0x000, 0x080>>3 )
 	GFXDECODE_ENTRY( "sp32_tiles", 0, bigspritelayout_3bpp, 0x080, 0x080>>3 )
@@ -3915,14 +3907,14 @@ static GFXDECODE_START( gfx_ikari )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_gwar )
-	GFXDECODE_ENTRY( "tx_tiles",   0, charlayout_4bpp,      0x000, 0x100>>4 )
+	GFXDECODE_ENTRY( "tx_tiles",   0, gfx_8x8x4_packed_lsb, 0x000, 0x100>>4 )
 	GFXDECODE_ENTRY( "bg_tiles",   0, tilelayout_4bpp,      0x300, 0x100>>4 )
 	GFXDECODE_ENTRY( "sp16_tiles", 0, spritelayout_4bpp,    0x100, 0x100>>4 )
 	GFXDECODE_ENTRY( "sp32_tiles", 0, bigspritelayout_4bpp, 0x200, 0x100>>4 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_tdfever )
-	GFXDECODE_ENTRY( "tx_tiles",   0, charlayout_4bpp,      0x000, 0x100>>4 )
+	GFXDECODE_ENTRY( "tx_tiles",   0, gfx_8x8x4_packed_lsb, 0x000, 0x100>>4 )
 	GFXDECODE_ENTRY( "bg_tiles",   0, tilelayout_4bpp,      0x200, 0x100>>4 )
 	GFXDECODE_ENTRY( "sp32_tiles", 0, bigspritelayout_4bpp, 0x100, 0x100>>4 )
 	/* colors 0x300-0x3ff contain shadows */
@@ -4211,7 +4203,7 @@ void snk_state::victroad(machine_config &config)
 
 	/* sound hardware */
 	y8950_device &ym2(Y8950(config.replace(), "ym2", XTAL(8'000'000)/2)); /* verified on pcb */
-	ym2.irq().set(FUNC(snk_state::ymirq_callback_2));
+	ym2.irq_handler().set(FUNC(snk_state::ymirq_callback_2));
 	ym2.add_route(ALL_OUTPUTS, "mono", 2.0);
 }
 
@@ -4255,7 +4247,7 @@ void snk_state::bermudat(machine_config &config)
 	ym1.add_route(ALL_OUTPUTS, "mono", 2.0);
 
 	y8950_device &ym2(Y8950(config, "ym2", XTAL(8'000'000)/2)); /* verified on pcb */
-	ym2.irq().set(FUNC(snk_state::ymirq_callback_2));
+	ym2.irq_handler().set(FUNC(snk_state::ymirq_callback_2));
 	ym2.add_route(ALL_OUTPUTS, "mono", 2.0);
 }
 
@@ -4337,7 +4329,7 @@ void snk_state::tdfever(machine_config &config)
 	ym1.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	y8950_device &ym2(Y8950(config, "ym2", 4000000));
-	ym2.irq().set(FUNC(snk_state::ymirq_callback_2));
+	ym2.irq_handler().set(FUNC(snk_state::ymirq_callback_2));
 	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -6932,6 +6924,7 @@ ROM_END
 /***********************************************************************/
 
 
+// TODO: according to Kold at very least Athena is ROT180 not ROT0
 GAME( 1983, marvins,   0,        marvins,   marvins,   snk_state, empty_init, ROT270, "SNK",     "Marvin's Maze", 0 )
 GAME( 1984, vangrd2,   0,        vangrd2,   vangrd2,   snk_state, empty_init, ROT270, "SNK",     "Vanguard II", 0 )
 GAME( 1984, madcrash,  0,        vangrd2,   madcrash,  snk_state, empty_init, ROT0,   "SNK",     "Mad Crasher", 0 )

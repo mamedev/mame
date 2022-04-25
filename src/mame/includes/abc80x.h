@@ -86,8 +86,8 @@ public:
 		m_cassette(*this, CASSETTE_TAG),
 		m_ram(*this, RAM_TAG),
 		m_rom(*this, Z80_TAG),
-		m_video_ram(*this, "video_ram"),
-		m_char_ram(*this, "char_ram"),
+		m_video_ram(*this, "video_ram", 0x4000, ENDIANNESS_LITTLE),
+		m_char_ram(*this, "char_ram", 0x800, ENDIANNESS_LITTLE),
 		m_io_sb(*this, "SB"),
 		m_ctc_z0(0),
 		m_sio_txcb(0),
@@ -106,8 +106,8 @@ public:
 	optional_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
-	optional_shared_ptr<uint8_t> m_video_ram;
-	optional_shared_ptr<uint8_t> m_char_ram;
+	memory_share_creator<uint8_t> m_video_ram;
+	memory_share_creator<uint8_t> m_char_ram;
 	required_ioport m_io_sb;
 
 	virtual void machine_start() override;
@@ -134,23 +134,23 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	// memory state
-	int m_keydtr;               // keyboard DTR
-	bool m_fetch_charram;        // opcode fetched from character RAM region (0x7800-0x7fff)
+	int m_keydtr = 0;               // keyboard DTR
+	bool m_fetch_charram = false;        // opcode fetched from character RAM region (0x7800-0x7fff)
 
 	// serial state
-	uint8_t m_sb;
+	uint8_t m_sb = 0;
 	int m_ctc_z0;
 	int m_sio_txcb;
 	int m_sio_txdb;
 	int m_sio_rtsb;
 	int m_dfd_out;
-	int m_dfd_in;
+	int m_dfd_in = 0;
 	int m_tape_ctr;
 
 	// video state
-	size_t m_char_ram_size;
-	uint8_t m_hrs;                    // HR picture start scanline
-	uint8_t m_fgctl;                  // HR foreground control
+	size_t m_char_ram_size = 0;
+	uint8_t m_hrs = 0;                    // HR picture start scanline
+	uint8_t m_fgctl = 0;                  // HR foreground control
 
 	// timers
 	emu_timer *m_cassette_timer;
@@ -248,12 +248,12 @@ public:
 	MC6845_UPDATE_ROW( abc802_update_row );
 
 	// cpu state
-	int m_lrs;                  // low RAM select
+	int m_lrs = 0;                  // low RAM select
 
 	// video state
-	int m_flshclk_ctr;          // flash clock counter
-	int m_flshclk;              // flash clock
-	int m_80_40_mux;            // 40/80 column mode
+	int m_flshclk_ctr = 0;          // flash clock counter
+	int m_flshclk = 0;              // flash clock
+	int m_80_40_mux = 0;            // 40/80 column mode
 
 	void abc802(machine_config &config);
 	void abc802_video(machine_config &config);
@@ -276,7 +276,7 @@ public:
 		m_rad_prom(*this, "rad"),
 		m_hru2_prom(*this, "hru"),
 		m_char_rom(*this, MC6845_TAG),
-		m_attr_ram(*this, "attr_ram")
+		m_attr_ram(*this, "attr_ram", 0x800, ENDIANNESS_LITTLE)
 	{ }
 
 	required_device<mc6845_device> m_crtc;
@@ -285,7 +285,7 @@ public:
 	required_memory_region m_rad_prom;
 	required_memory_region m_hru2_prom;
 	required_memory_region m_char_rom;
-	optional_shared_ptr<uint8_t> m_attr_ram;
+	memory_share_creator<uint8_t> m_attr_ram;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -317,22 +317,22 @@ public:
 	MC6845_UPDATE_ROW( abc806_update_row );
 
 	// memory state
-	int m_eme;                  // extended memory enable
-	uint8_t m_map[16];            // memory page register
+	int m_eme = 0;                  // extended memory enable
+	uint8_t m_map[16]{};            // memory page register
 
 	// video state
-	int m_txoff;                // text display enable
-	int m_40;                   // 40/80 column mode
-	int m_flshclk_ctr;          // flash clock counter
-	int m_flshclk;              // flash clock
-	uint8_t m_attr_data;          // attribute data latch
-	uint8_t m_hrc[16];            // HR palette
-	uint8_t m_sync;               // line synchronization delay
-	uint8_t m_v50_addr;           // vertical sync PROM address
-	int m_hru2_a8;              // HRU II PROM address line 8
-	uint32_t m_vsync_shift;       // vertical sync shift register
-	int m_vsync;                // vertical sync
-	int m_d_vsync;              // delayed vertical sync
+	int m_txoff = 0;                // text display enable
+	int m_40 = 0;                   // 40/80 column mode
+	int m_flshclk_ctr = 0;          // flash clock counter
+	int m_flshclk = 0;              // flash clock
+	uint8_t m_attr_data = 0;          // attribute data latch
+	uint8_t m_hrc[16]{};            // HR palette
+	uint8_t m_sync = 0;               // line synchronization delay
+	uint8_t m_v50_addr = 0;           // vertical sync PROM address
+	int m_hru2_a8 = 0;              // HRU II PROM address line 8
+	uint32_t m_vsync_shift = 0;       // vertical sync shift register
+	int m_vsync = 0;                // vertical sync
+	int m_d_vsync = 0;              // delayed vertical sync
 
 	void abc806(machine_config &config);
 	void abc806_video(machine_config &config);

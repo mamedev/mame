@@ -62,17 +62,17 @@ MC6845_UPDATE_ROW( wangpc_lvc_device::crtc_update_row )
 	{
 		for (int column = 0; column < x_count; column++)
 		{
-			offs_t addr = scroll_y + (m_scroll & 0x3f) + ((ma / 80) * 0x480) + (((ra & 0x0f) << 7) | (column & 0x7f));
+			offs_t const addr = scroll_y + (m_scroll & 0x3f) + ((ma / 80) * 0x480) + (((ra & 0x0f) << 7) | (column & 0x7f));
 			uint16_t data = m_video_ram[addr & 0x7fff];
 
 			for (int bit = 0; bit < 8; bit++)
 			{
-				int x = (column * 8) + bit;
+				int const x = (column * 8) + bit;
 				int color = (BIT(data, 15) << 1) | BIT(data, 7);
 
 				if (column == cursor_x) color = 0x03;
 
-				bitmap.pix32(vbp + y, hbp + x) = de ? m_palette[color] : rgb_t::black();
+				bitmap.pix(vbp + y, hbp + x) = de ? m_palette[color] : rgb_t::black();
 
 				data <<= 1;
 			}
@@ -89,12 +89,12 @@ MC6845_UPDATE_ROW( wangpc_lvc_device::crtc_update_row )
 
 			for (int bit = 0; bit < 8; bit++)
 			{
-				int x = (column * 8) + bit;
+				int const x = (column * 8) + bit;
 				int color = (BIT(data, 31) << 3) | (BIT(data, 23) << 2) | (BIT(data, 15) << 1) | BIT(data, 7);
 
 				if (column == cursor_x) color = 0x03;
 
-				bitmap.pix32(vbp + y, hbp + x) = de ? m_palette[color] : rgb_t::black();
+				bitmap.pix(vbp + y, hbp + x) = de ? m_palette[color] : rgb_t::black();
 
 				data <<= 1;
 			}
@@ -164,7 +164,7 @@ wangpc_lvc_device::wangpc_lvc_device(const machine_config &mconfig, const char *
 	device_t(mconfig, WANGPC_LVC, tag, owner, clock),
 	device_wangpcbus_card_interface(mconfig, *this),
 	m_crtc(*this, MC6845_TAG),
-	m_video_ram(*this, "video_ram"),
+	m_video_ram(*this, "video_ram", RAM_SIZE, ENDIANNESS_LITTLE),
 	m_option(0), m_scroll(0),
 	m_irq(CLEAR_LINE)
 {
@@ -177,9 +177,6 @@ wangpc_lvc_device::wangpc_lvc_device(const machine_config &mconfig, const char *
 
 void wangpc_lvc_device::device_start()
 {
-	// allocate memory
-	m_video_ram.allocate(RAM_SIZE);
-
 	// state saving
 	save_item(NAME(m_option));
 	save_item(NAME(m_scroll));

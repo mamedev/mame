@@ -12,15 +12,31 @@
 #include "emu.h"
 #include "4play.h"
 
-/***************************************************************************
-    PARAMETERS
-***************************************************************************/
+
+namespace {
 
 //**************************************************************************
-//  GLOBAL VARIABLES
+//  TYPE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(A2BUS_4PLAY, a2bus_4play_device, "a24play", "4play Joystick Card (rev. B)")
+class a2bus_4play_device:
+	public device_t,
+	public device_a2bus_card_interface
+{
+public:
+	// construction/destruction
+	a2bus_4play_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	a2bus_4play_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+	virtual ioport_constructor device_input_ports() const override;
+
+	virtual uint8_t read_c0nx(uint8_t offset) override;
+
+	required_ioport m_p1, m_p2, m_p3, m_p4;
+};
 
 static INPUT_PORTS_START( a24play )
 	PORT_START("p1")
@@ -123,3 +139,12 @@ uint8_t a2bus_4play_device::read_c0nx(uint8_t offset)
 
 	return 0;
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_4PLAY, device_a2bus_card_interface, a2bus_4play_device, "a24play", "4play Joystick Card (rev. B)")

@@ -2,7 +2,6 @@
 // copyright-holders:Olivier Galibert
 
 #include "emu.h"
-#include "debugger.h"
 #include "mb86233.h"
 #include "mb86233d.h"
 
@@ -96,7 +95,7 @@ void mb86233_device::device_start()
 
 	state_add(STATE_GENPC,     "GENPC", m_pc);
 	state_add(STATE_GENPCBASE, "PC",    m_ppc).noshow();
-	state_add(STATE_GENSP,     "SP",    m_sp);
+	state_add(REG_SP,          "SP",    m_sp);
 	state_add(STATE_GENFLAGS,  "ST",    m_st);
 
 	state_add(REG_A,           "A",     m_a);
@@ -277,6 +276,16 @@ void mb86233_device::testdz()
 		m_st &= ~F_SGD;
 }
 
+void mb86233_device::stset_set_sz_int(u32 val)
+{
+	m_alu_stset = val ? (val & 0x80000000 ? F_SGD : 0) : F_ZRD;
+}
+
+void mb86233_device::stset_set_sz_fp(u32 val)
+{
+	m_alu_stset = (val & 0x7fffffff) ? (val & 0x80000000 ? F_SGD : 0) : F_ZRD;
+}
+
 void mb86233_device::alu_pre(u32 alu)
 {
 	switch(alu) {
@@ -286,7 +295,7 @@ void mb86233_device::alu_pre(u32 alu)
 		// andd
 		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
 		m_alu_r1 = m_d & m_a;
-		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		stset_set_sz_int(m_alu_r1);
 		break;
 	}
 
@@ -294,7 +303,7 @@ void mb86233_device::alu_pre(u32 alu)
 		// orad
 		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
 		m_alu_r1 = m_d | m_a;
-		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		stset_set_sz_int(m_alu_r1);
 		break;
 	}
 
@@ -302,7 +311,7 @@ void mb86233_device::alu_pre(u32 alu)
 		// eord
 		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
 		m_alu_r1 = m_d ^ m_a;
-		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		stset_set_sz_int(m_alu_r1);
 		break;
 	}
 
@@ -310,7 +319,7 @@ void mb86233_device::alu_pre(u32 alu)
 		// notd
 		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
 		m_alu_r1 = ~m_d;
-		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		stset_set_sz_int(m_alu_r1);
 		break;
 	}
 
@@ -318,7 +327,7 @@ void mb86233_device::alu_pre(u32 alu)
 		// fcpd
 		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
 		u32 r = f2u(u2f(m_d) - u2f(m_a));
-		m_alu_stset = r ? r & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		stset_set_sz_fp(r);
 		break;
 	}
 
@@ -326,7 +335,7 @@ void mb86233_device::alu_pre(u32 alu)
 		// fmad
 		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
 		m_alu_r1 = f2u(u2f(m_d) + u2f(m_a));
-		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		stset_set_sz_fp(m_alu_r1);
 		break;
 	}
 
@@ -334,7 +343,7 @@ void mb86233_device::alu_pre(u32 alu)
 		// fsbd
 		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
 		m_alu_r1 = f2u(u2f(m_d) - u2f(m_a));
-		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		stset_set_sz_fp(m_alu_r1);
 		break;
 	}
 
@@ -351,7 +360,7 @@ void mb86233_device::alu_pre(u32 alu)
 		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
 		m_alu_r1 = f2u(u2f(m_d) + u2f(m_p));
 		m_alu_r2 = f2u(u2f(m_a) * u2f(m_b));
-		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		stset_set_sz_fp(m_alu_r1);
 		break;
 	}
 
@@ -360,7 +369,7 @@ void mb86233_device::alu_pre(u32 alu)
 		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
 		m_alu_r1 = f2u(u2f(m_d) - u2f(m_p));
 		m_alu_r2 = f2u(u2f(m_a) * u2f(m_b));
-		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		stset_set_sz_fp(m_alu_r1);
 		break;
 	}
 
@@ -368,7 +377,7 @@ void mb86233_device::alu_pre(u32 alu)
 		// fabd
 		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
 		m_alu_r1 = m_d & 0x7fffffff;
-		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		stset_set_sz_fp(m_alu_r1);
 		break;
 	}
 
@@ -376,7 +385,7 @@ void mb86233_device::alu_pre(u32 alu)
 		// fsmd
 		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
 		m_alu_r1 = f2u(u2f(m_d) + u2f(m_p));
-		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		stset_set_sz_fp(m_alu_r1);
 		break;
 	}
 
@@ -385,7 +394,7 @@ void mb86233_device::alu_pre(u32 alu)
 		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
 		m_alu_r1 = m_p;
 		m_alu_r2 = f2u(u2f(m_a) * u2f(m_b));
-		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		stset_set_sz_fp(m_alu_r1);
 		break;
 	}
 
@@ -393,7 +402,7 @@ void mb86233_device::alu_pre(u32 alu)
 		// cxfd
 		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
 		m_alu_r1 = f2u(s32(m_d));
-		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		stset_set_sz_int(m_alu_r1);
 		break;
 	}
 
@@ -406,7 +415,7 @@ void mb86233_device::alu_pre(u32 alu)
 		case 2: m_alu_r1 = s32(floorf(u2f(m_d))); break;
 		case 3: m_alu_r1 = s32(u2f(m_d)); break;
 		}
-		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		stset_set_sz_int(m_alu_r1);
 		break;
 	}
 
@@ -414,7 +423,7 @@ void mb86233_device::alu_pre(u32 alu)
 		// fdvd
 		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
 		m_alu_r1 = f2u(u2f(m_d) / u2f(m_a));
-		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		stset_set_sz_fp(m_alu_r1);
 		break;
 	}
 
@@ -422,7 +431,7 @@ void mb86233_device::alu_pre(u32 alu)
 		// fned
 		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
 		m_alu_r1 = m_d ? m_d ^ 0x80000000 : 0;
-		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		stset_set_sz_fp(m_alu_r1);
 		break;
 	}
 
@@ -430,7 +439,7 @@ void mb86233_device::alu_pre(u32 alu)
 		// d = b + a
 		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
 		m_alu_r1 = f2u(u2f(m_b) + u2f(m_a));
-		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		stset_set_sz_fp(m_alu_r1);
 		break;
 	}
 
@@ -438,7 +447,7 @@ void mb86233_device::alu_pre(u32 alu)
 		// d = b - a
 		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
 		m_alu_r1 = f2u(u2f(m_b) - u2f(m_a));
-		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		stset_set_sz_fp(m_alu_r1);
 		break;
 	}
 
@@ -446,7 +455,7 @@ void mb86233_device::alu_pre(u32 alu)
 		// lsrd
 		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
 		m_alu_r1 = m_d >> m_sft;
-		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		stset_set_sz_int(m_alu_r1);
 		break;
 	}
 
@@ -454,7 +463,7 @@ void mb86233_device::alu_pre(u32 alu)
 		// lsld
 		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
 		m_alu_r1 = m_d << m_sft;
-		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		stset_set_sz_int(m_alu_r1);
 		break;
 	}
 
@@ -462,7 +471,7 @@ void mb86233_device::alu_pre(u32 alu)
 		// asrd
 		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
 		m_alu_r1 = s32(m_d) >> m_sft;
-		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		stset_set_sz_int(m_alu_r1);
 		break;
 	}
 
@@ -470,7 +479,7 @@ void mb86233_device::alu_pre(u32 alu)
 		// asld
 		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
 		m_alu_r1 = s32(m_d) << m_sft;
-		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		stset_set_sz_int(m_alu_r1);
 		break;
 	}
 
@@ -478,7 +487,7 @@ void mb86233_device::alu_pre(u32 alu)
 		// addd
 		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
 		m_alu_r1 = m_d + m_a;
-		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		stset_set_sz_int(m_alu_r1);
 		break;
 	}
 
@@ -486,7 +495,7 @@ void mb86233_device::alu_pre(u32 alu)
 		// subd
 		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
 		m_alu_r1 = m_d - m_a;
-		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		stset_set_sz_int(m_alu_r1);
 		break;
 	}
 

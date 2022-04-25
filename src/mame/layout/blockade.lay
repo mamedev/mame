@@ -20,16 +20,16 @@ license:CC0
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
-		<overlay name="overlay" element="overlay_green">
+		<element ref="overlay_green" blend="multiply">
 			<bounds left="0" top="0" right="4" bottom="3" />
-		</overlay>
+		</element>
 	</view>
 	<view name="Yellow Overlay">
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
-		<overlay name="overlay" element="overlay_yellow">
+		<element ref="overlay_yellow" blend="multiply">
 			<bounds left="0" top="0" right="4" bottom="3" />
-		</overlay>
+		</element>
 	</view>
 </mamelayout>

@@ -14,6 +14,7 @@
 
 #include "machine/eepromser.h"
 #include "machine/intelfsh.h"
+#include "sound/dac.h"
 #include "sound/namco.h"
 #include "emupal.h"
 
@@ -31,7 +32,8 @@ public:
 		m_mainbank(*this, "mainbank"),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_dac(*this, "dac")
 	{ }
 
 	void _20pacgal(machine_config &config);
@@ -52,12 +54,13 @@ protected:
 	optional_memory_bank m_mainbank;
 
 	/* machine state */
-	uint8_t m_game_selected;  /* 0 = Ms. Pac-Man, 1 = Galaga */
+	uint8_t m_game_selected = 0;  /* 0 = Ms. Pac-Man, 1 = Galaga */
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<palette_device> m_palette;
+	required_device<dac_8bit_r2r_device> m_dac;
 
 	/* memory */
 	std::unique_ptr<uint8_t[]> m_sprite_gfx_ram;
@@ -66,9 +69,9 @@ protected:
 	std::unique_ptr<uint8_t[]> m_ram_48000;
 
 	/* 25pacman and 20pacgal store the sprite palette at a different address, this is a hardware difference and confirmed NOT to be a register */
-	uint8_t m_sprite_pal_base;
+	uint8_t m_sprite_pal_base = 0;
 
-	uint8_t m_irq_mask;
+	uint8_t m_irq_mask = 0;
 	void irqack_w(uint8_t data);
 	void timer_pulse_w(uint8_t data);
 	void _20pacgal_coin_counter_w(uint8_t data);
@@ -79,7 +82,6 @@ protected:
 	void sprite_lookup_w(offs_t offset, uint8_t data);
 
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_20pacgal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);

@@ -35,14 +35,14 @@ public:
 
 	uint8_t fb_r(offs_t offset);
 	void fb_w(offs_t offset, uint8_t data);
-	DECLARE_READ32_MEMBER(s3d_sub_status_r);
-	DECLARE_WRITE32_MEMBER(s3d_sub_control_w);
-	DECLARE_READ32_MEMBER(s3d_func_ctrl_r);
+	uint32_t s3d_sub_status_r();
+	void s3d_sub_control_w(uint32_t data);
+	uint32_t s3d_func_ctrl_r();
 
-	DECLARE_READ32_MEMBER(s3d_register_r);
-	DECLARE_WRITE32_MEMBER(s3d_register_w);
+	uint32_t s3d_register_r(offs_t offset);
+	void s3d_register_w(offs_t offset, uint32_t data);
 
-	DECLARE_WRITE32_MEMBER(image_xfer)
+	void image_xfer(uint32_t data)
 	{
 //      if(s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x00000080)
 		{
@@ -184,7 +184,7 @@ protected:
 		} s3d;
 	} s3virge;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	void write_pixel32(uint32_t base, uint16_t x, uint16_t y, uint32_t val)
 	{
 		if(s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x00000002)

@@ -70,7 +70,6 @@ unknown cycle: CME, SSE, SSS
 
 #include "emu.h"
 #include "tms1k_base.h"
-#include "debugger.h"
 
 tms1k_base_device::tms1k_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
 	: cpu_device(mconfig, type, tag, owner, clock)
@@ -114,12 +113,6 @@ void tms1k_base_device::state_string_export(const device_state_entry &entry, std
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-
-enum
-{
-	TMS1XXX_PC=1, TMS1XXX_SR, TMS1XXX_PA, TMS1XXX_PB,
-	TMS1XXX_A, TMS1XXX_X, TMS1XXX_Y, TMS1XXX_STATUS
-};
 
 void tms1k_base_device::device_start()
 {
@@ -223,18 +216,19 @@ void tms1k_base_device::device_start()
 	save_item(NAME(m_subcycle));
 
 	// register state for debugger
-	state_add(TMS1XXX_PC,     "PC",     m_pc    ).formatstr("%02X");
-	state_add(TMS1XXX_SR,     "SR",     m_sr    ).formatstr("%01X");
-	state_add(TMS1XXX_PA,     "PA",     m_pa    ).formatstr("%01X");
-	state_add(TMS1XXX_PB,     "PB",     m_pb    ).formatstr("%01X");
-	state_add(TMS1XXX_A,      "A",      m_a     ).formatstr("%01X");
-	state_add(TMS1XXX_X,      "X",      m_x     ).formatstr("%01X");
-	state_add(TMS1XXX_Y,      "Y",      m_y     ).formatstr("%01X");
-	state_add(TMS1XXX_STATUS, "STATUS", m_status).formatstr("%01X");
-
 	state_add(STATE_GENPC, "GENPC", m_rom_address).formatstr("%03X").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_rom_address).formatstr("%03X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_sr).formatstr("%8s").noshow();
+
+	m_state_count = 0;
+	state_add(++m_state_count, "PC", m_pc).formatstr("%02X"); // 1
+	state_add(++m_state_count, "SR", m_sr).formatstr("%01X"); // 2
+	state_add(++m_state_count, "PA", m_pa).formatstr("%01X"); // 3
+	state_add(++m_state_count, "PB", m_pb).formatstr("%01X"); // 4
+	state_add(++m_state_count, "A", m_a).formatstr("%01X"); // 5
+	state_add(++m_state_count, "X", m_x).formatstr("%01X"); // 6
+	state_add(++m_state_count, "Y", m_y).formatstr("%01X"); // 7
+	state_add(++m_state_count, "STATUS", m_status).formatstr("%01X"); // 8
 
 	set_icountptr(m_icount);
 }

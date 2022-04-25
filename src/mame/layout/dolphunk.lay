@@ -26,20 +26,20 @@ license:CC0
 
 	<view name="Default Layout">
 		<!-- Black background -->
-		<bezel element="background">
+		<element ref="background">
 			<bounds left="97" top="65" right="308" bottom="156" />
-		</bezel>
-		<bezel name="digit0" element="r_digit">
+		</element>
+		<element name="digit0" ref="r_digit">
 			<bounds left="107" top="075" right="154" bottom="146" />
-		</bezel>
-		<bezel name="digit1" element="r_digit">
+		</element>
+		<element name="digit1" ref="r_digit">
 			<bounds left="155" top="075" right="202" bottom="146" />
-		</bezel>
-		<bezel name="digit2" element="g_digit">
+		</element>
+		<element name="digit2" ref="g_digit">
 			<bounds left="203" top="075" right="250" bottom="146" />
-		</bezel>
-		<bezel name="digit3" element="g_digit">
+		</element>
+		<element name="digit3" ref="g_digit">
 			<bounds left="251" top="075" right="298" bottom="146" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

@@ -9,9 +9,9 @@
 #include "emu.h"
 #include "singleconn.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_GROMPORT_SINGLE, bus::ti99::gromport, ti99_single_cart_conn_device, "ti99_scartconn", "TI-99 Standard cartridge connector")
+DEFINE_DEVICE_TYPE(TI99_GROMPORT_SINGLE, bus::ti99::gromport::ti99_single_cart_conn_device, "ti99_scartconn", "TI-99 Standard cartridge connector")
 
-namespace bus { namespace ti99 { namespace gromport {
+namespace bus::ti99::gromport {
 
 ti99_single_cart_conn_device::ti99_single_cart_conn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cartridge_connector_device(mconfig, TI99_GROMPORT_SINGLE, tag, owner, clock),
@@ -19,7 +19,7 @@ ti99_single_cart_conn_device::ti99_single_cart_conn_device(const machine_config 
 {
 }
 
-READ8Z_MEMBER(ti99_single_cart_conn_device::readz)
+void ti99_single_cart_conn_device::readz(offs_t offset, uint8_t *value)
 {
 	// Pass through
 	m_cartridge->readz(offset, value);
@@ -31,7 +31,7 @@ void ti99_single_cart_conn_device::write(offs_t offset, uint8_t data)
 	m_cartridge->write(offset, data);
 }
 
-READ8Z_MEMBER(ti99_single_cart_conn_device::crureadz)
+void ti99_single_cart_conn_device::crureadz(offs_t offset, uint8_t *value)
 {
 	// Pass through
 	m_cartridge->crureadz(offset, value);
@@ -88,5 +88,4 @@ void ti99_single_cart_conn_device::device_add_mconfig(machine_config &config)
 	TI99_CART(config, "cartridge", 0);
 }
 
-} } } // end namespace bus::ti99::gromport
-
+} // end namespace bus::ti99::gromport

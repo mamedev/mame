@@ -414,7 +414,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/ds1994.h"
-#include "sound/3812intf.h"
+#include "sound/ymopl.h"
 #include "video/mc6845.h"
 //#include "sound/dac.h"
 #include "emupal.h"
@@ -469,7 +469,7 @@ private:
 	optional_device<ds1994_device> m_tch;
 	output_finder<7> m_lamps;
 
-	uint8_t m_nmi_mask;
+	uint8_t m_nmi_mask = 0;
 
 	uint8_t epm_code_r();
 	uint8_t touchm_r();

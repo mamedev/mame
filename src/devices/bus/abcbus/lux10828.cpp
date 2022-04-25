@@ -106,6 +106,9 @@ Notes:
         0704: rr   a
         0706: call $073F
 
+        There is an alternate format function in the controller firmware that allows to set a secret byte which is stored in the sector header.
+        Copy protected software checks the secret byte read from the sector header and refuses to start if the disk has not been appropriately formatted.
+
 */
 
 #include "emu.h"
@@ -296,9 +299,11 @@ static void abc_floppies(device_slot_interface &device)
 	device.option_add("8dsdd", FLOPPY_8_DSDD);
 }
 
-FLOPPY_FORMATS_MEMBER( luxor_55_10828_device::floppy_formats )
-	FLOPPY_ABC800_FORMAT
-FLOPPY_FORMATS_END
+void luxor_55_10828_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ABC800_FORMAT);
+}
 
 WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_intrq_w )
 {
@@ -338,8 +343,8 @@ void luxor_55_10828_device::device_add_mconfig(machine_config &config)
 	m_fdc->intrq_wr_callback().set(FUNC(luxor_55_10828_device::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(luxor_55_10828_device::fdc_drq_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy0, abc_floppies, "525ssdd", luxor_55_10828_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, abc_floppies, "525ssdd", luxor_55_10828_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy0, abc_floppies, "525ssdd", luxor_55_10828_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, abc_floppies, "525ssdd", luxor_55_10828_device::floppy_formats).enable_sound(true);
 }
 
 
@@ -367,12 +372,12 @@ INPUT_PORTS_START( luxor_55_10828 )
 	PORT_DIPSETTING(    0x00, "44 (ABC 832/834/850)" )
 	PORT_DIPSETTING(    0x01, "45 (ABC 830)" )
 
-	PORT_START("S2,S3")
+	PORT_START("S2_S3")
 	PORT_DIPNAME( 0x01, 0x01, "Shift Clock" )
 	PORT_DIPSETTING(    0x00, "2 MHz" )
 	PORT_DIPSETTING(    0x01, "4 MHz" )
 
-	PORT_START("S4,S5")
+	PORT_START("S4_S5")
 	PORT_DIPNAME( 0x01, 0x01, "Write Precompensation" )
 	PORT_DIPSETTING(    0x00, "Always On" )
 	PORT_DIPSETTING(    0x01, "Programmable" )

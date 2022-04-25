@@ -338,7 +338,7 @@ void bfm_sc5_state::bfm_sc5(machine_config &config)
 {
 	MCF5206E(config, m_maincpu, 40000000); /* MCF5206eFT */
 	m_maincpu->set_addrmap(AS_PROGRAM, &bfm_sc5_state::sc5_map);
-	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0);
+	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0, m_maincpu);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -347,8 +347,8 @@ void bfm_sc5_state::bfm_sc5(machine_config &config)
 	m_duart->set_clocks(16000000/2/8, 16000000/2/16, 16000000/2/16, 16000000/2/8);
 	m_duart->irq_cb().set(FUNC(bfm_sc5_state::bfm_sc5_duart_irq_handler));
 	m_duart->a_tx_cb().set(FUNC(bfm_sc5_state::bfm_sc5_duart_txa));
-	m_duart->inport_cb().set(FUNC(bfm_sc5_state::bfm_sc5_duart_input_r));;
-	m_duart->outport_cb().set(FUNC(bfm_sc5_state::bfm_sc5_duart_output_w));;
+	m_duart->inport_cb().set(FUNC(bfm_sc5_state::bfm_sc5_duart_input_r));
+	m_duart->outport_cb().set(FUNC(bfm_sc5_state::bfm_sc5_duart_output_w));
 
 	BFM_BDA(config, m_vfd0, 60, 0);
 

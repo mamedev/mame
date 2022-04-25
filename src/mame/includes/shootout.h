@@ -43,18 +43,18 @@ private:
 	required_shared_ptr<uint8_t> m_textram;
 	required_shared_ptr<uint8_t> m_videoram;
 
-	tilemap_t *m_background;
-	tilemap_t *m_foreground;
+	tilemap_t *m_background = nullptr;
+	tilemap_t *m_foreground = nullptr;
 
-	int m_ccnt_old_val;
+	int m_ccnt_old_val = 0;
 
 	void bankswitch_w(uint8_t data);
-	DECLARE_READ8_MEMBER(sound_cpu_command_r);
-	DECLARE_WRITE8_MEMBER(sound_cpu_command_w);
+	uint8_t sound_cpu_command_r();
+	void sound_cpu_command_w(uint8_t data);
 	void flipscreen_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(coincounter_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(textram_w);
+	void coincounter_w(uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	void textram_w(offs_t offset, uint8_t data);
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;

@@ -110,7 +110,7 @@ uint32_t t6a04_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 				for (int b=7; b>=0; b--)
 				{
-					bitmap.pix16(x&0x3f, y*8+b) = data & 1;
+					bitmap.pix(x&0x3f, y*8+b) = data & 1;
 					data>>=1;
 				}
 			}

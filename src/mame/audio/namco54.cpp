@@ -52,10 +52,6 @@
 #include "emu.h"
 #include "namco54.h"
 
-TIMER_CALLBACK_MEMBER( namco_54xx_device::latch_callback )
-{
-	m_latched_cmd = param;
-}
 
 WRITE_LINE_MEMBER( namco_54xx_device::reset )
 {
@@ -90,23 +86,20 @@ void namco_54xx_device::R1_w(uint8_t data)
 }
 
 
-TIMER_CALLBACK_MEMBER( namco_54xx_device::irq_clear )
-{
-	m_cpu->set_input_line(0, CLEAR_LINE);
-}
-
 void namco_54xx_device::write(uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_54xx_device::latch_callback),this), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_54xx_device::write_sync),this), data);
+}
 
-	m_cpu->set_input_line(0, ASSERT_LINE);
+TIMER_CALLBACK_MEMBER( namco_54xx_device::write_sync )
+{
+	m_latched_cmd = param;
+}
 
-	// The execution time of one instruction is ~4us, so we must make sure to
-	// give the cpu time to poll the /IRQ input before we clear it.
-	// The input clock to the 06XX interface chip is 64H, that is
-	// 18432000/6/64 = 48kHz, so it makes sense for the irq line to be
-	// asserted for one clock cycle ~= 21us.
-	machine().scheduler().timer_set(attotime::from_usec(21), timer_expired_delegate(FUNC(namco_54xx_device::irq_clear),this), 0);
+
+WRITE_LINE_MEMBER( namco_54xx_device::chip_select )
+{
+	m_cpu->set_input_line(0, state);
 }
 
 
@@ -129,6 +122,7 @@ namco_54xx_device::namco_54xx_device(const machine_config &mconfig, const char *
 	m_latched_cmd(0)
 {
 }
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------

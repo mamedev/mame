@@ -16,7 +16,7 @@
 #include "machine/i8243.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "video/segaic16.h"
 #include "video/sega16sp.h"
 #include "screen.h"
@@ -88,10 +88,10 @@ private:
 	void tilemap_sound_w(uint8_t data);
 
 	// main CPU read/write handlers
-	DECLARE_READ16_MEMBER( standard_io_r );
-	DECLARE_WRITE16_MEMBER( standard_io_w );
-	DECLARE_READ16_MEMBER( misc_io_r );
-	DECLARE_WRITE16_MEMBER( misc_io_w );
+	uint16_t standard_io_r(offs_t offset);
+	void standard_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t misc_io_r(offs_t offset);
+	void misc_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// Z80 sound CPU read/write handlers
 	uint8_t sound_data_r();
@@ -138,18 +138,18 @@ private:
 	virtual void video_start() override;
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// I8751 simulations
 	void dumpmtmt_i8751_sim();
 
 	// custom I/O handlers
-	DECLARE_READ16_MEMBER( aceattaca_custom_io_r );
-	DECLARE_WRITE16_MEMBER( aceattaca_custom_io_w );
-	DECLARE_READ16_MEMBER( mjleague_custom_io_r );
-	DECLARE_READ16_MEMBER( passsht16a_custom_io_r );
-	DECLARE_READ16_MEMBER( sdi_custom_io_r );
-	DECLARE_READ16_MEMBER( sjryuko_custom_io_r );
+	uint16_t aceattaca_custom_io_r(offs_t offset);
+	void aceattaca_custom_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t mjleague_custom_io_r(offs_t offset);
+	uint16_t passsht16a_custom_io_r(offs_t offset);
+	uint16_t sdi_custom_io_r(offs_t offset);
+	uint16_t sjryuko_custom_io_r(offs_t offset);
 	void sjryuko_lamp_changed_w(uint8_t changed, uint8_t newval);
 
 	// devices
@@ -173,20 +173,20 @@ private:
 	optional_shared_ptr<uint8_t> m_sound_decrypted_opcodes;
 
 	// configuration
-	read16_delegate         m_custom_io_r;
-	write16_delegate        m_custom_io_w;
+	read16sm_delegate         m_custom_io_r;
+	write16s_delegate       m_custom_io_w;
 	i8751_sim_delegate      m_i8751_vblank_hook;
 	lamp_changed_delegate   m_lamp_changed_w;
 
 	// internal state
-	uint8_t                   m_video_control;
-	uint8_t                   m_mcu_control;
-	uint8_t                   m_n7751_command;
-	uint32_t                  m_n7751_rom_address;
-	uint8_t                   m_last_buttons1;
-	uint8_t                   m_last_buttons2;
-	uint8_t                   m_read_port;
-	uint8_t                   m_mj_input_num;
+	uint8_t                   m_video_control = 0;
+	uint8_t                   m_mcu_control = 0;
+	uint8_t                   m_n7751_command = 0;
+	uint32_t                  m_n7751_rom_address = 0;
+	uint8_t                   m_last_buttons1 = 0;
+	uint8_t                   m_last_buttons2 = 0;
+	uint8_t                   m_read_port = 0;
+	uint8_t                   m_mj_input_num = 0;
 	optional_ioport_array<6> m_mj_inputs;
 	output_finder<2> m_lamps;
 };

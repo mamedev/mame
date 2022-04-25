@@ -49,13 +49,13 @@ void poolshrk_state::init_poolshrk()
 }
 
 
-WRITE8_MEMBER(poolshrk_state::da_latch_w)
+void poolshrk_state::da_latch_w(uint8_t data)
 {
 	m_da_latch = data & 15;
 }
 
 
-WRITE8_MEMBER(poolshrk_state::led_w)
+void poolshrk_state::led_w(offs_t offset, uint8_t data)
 {
 	if (offset & 2)
 		m_leds[0] = BIT(offset, 0);
@@ -64,7 +64,7 @@ WRITE8_MEMBER(poolshrk_state::led_w)
 }
 
 
-WRITE8_MEMBER(poolshrk_state::watchdog_w)
+void poolshrk_state::watchdog_w(offs_t offset, uint8_t data)
 {
 	if ((offset & 3) == 3)
 	{
@@ -73,7 +73,7 @@ WRITE8_MEMBER(poolshrk_state::watchdog_w)
 }
 
 
-READ8_MEMBER(poolshrk_state::input_r)
+uint8_t poolshrk_state::input_r(offs_t offset)
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 	uint8_t val = ioport(portnames[offset & 3])->read();
@@ -93,7 +93,7 @@ READ8_MEMBER(poolshrk_state::input_r)
 }
 
 
-READ8_MEMBER(poolshrk_state::irq_reset_r)
+uint8_t poolshrk_state::irq_reset_r()
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 

@@ -27,7 +27,7 @@ actually bootlegs.
 
 TODO:
 - identify and decap the NB1414M4 chip, it could be either a MCU or a fancy blitter chip;
-- Fix Armed F and Tatakae Big Fighter text tilemap usage, they both doesn't use the NB1414M4
+- Fix Armed F and Tatakae Big Fighter text tilemap usage, they both don't use the NB1414M4
   (as shown by the per-game kludge)
 - kozure: time over doesn't kill the player, check (1) note for further details (kludged to work for now);
 - kozure: POST screen should have green as backdrop, this is actually drawn by the text layer but not seen
@@ -309,7 +309,7 @@ Notes:
       YM3014B - Yamaha YM3014B Serial Input Floating D/A Converter
       2018    - 2kx8 SRAM
       LM324   - Texas Instruments LM324 Quad Operational Amplifier with True Differential Inputs
-      MB3730  - Fujitsi MB3730 12W BTL Single Channel Amplifier
+      MB3730  - Fujitsu MB3730 12W BTL Single Channel Amplifier
 
 
 ***********************************************************************/
@@ -318,12 +318,10 @@ Notes:
 #include "includes/armedf.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/z80/z80.h"
 #include "cpu/mcs51/mcs51.h"
-#include "sound/3526intf.h"
-#include "sound/3812intf.h"
+#include "cpu/z80/z80.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
+#include "sound/ymopl.h"
 #include "speaker.h"
 
 #define LEGION_HACK 0
@@ -349,7 +347,7 @@ Notes:
 void armedf_state::terraf_io_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (data & 0x4000 && ((m_vreg & 0x4000) == 0)) //0 -> 1 transition
-		m_nb1414m4->exec((m_text_videoram[0] << 8) | (m_text_videoram[1] & 0xff),m_text_videoram.target(),m_fg_scrollx,m_fg_scrolly,m_tx_tilemap);
+		m_nb1414m4->exec((m_text_videoram[0] << 8)|m_text_videoram[1],m_text_videoram,m_fg_scrollx,m_fg_scrolly,m_tx_tilemap);
 
 	COMBINE_DATA(&m_vreg);
 
@@ -420,7 +418,7 @@ void armedf_state::common_map(address_map &map)
 {
 	map(0x000000, 0x05ffff).rom();
 	map(0x064000, 0x064fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::text_videoram_w)).umask16(0x00ff).share("text_videoram");
+	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::text_videoram_w)).umask16(0x00ff);
 	map(0x06a000, 0x06a9ff).ram();
 	map(0x06c000, 0x06cfff).ram().share("spr_pal_clut");
 	map(0x070000, 0x070fff).ram().w(FUNC(armedf_state::fg_videoram_w)).share("fg_videoram");
@@ -481,7 +479,7 @@ void armedf_state::cclimbr2_map(address_map &map)
 	map(0x060000, 0x060fff).ram().share("spriteram");
 	map(0x061000, 0x063fff).ram();
 	map(0x064000, 0x064fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::text_videoram_w)).umask16(0x00ff).share("text_videoram");
+	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::text_videoram_w)).umask16(0x00ff);
 	map(0x06a000, 0x06a9ff).ram();
 	map(0x06c000, 0x06cfff).ram().share("spr_pal_clut");
 	map(0x070000, 0x070fff).ram().w(FUNC(armedf_state::fg_videoram_w)).share("fg_videoram");
@@ -523,7 +521,7 @@ void armedf_state::legion_map(address_map &map)
 {
 	legion_common_map(map);
 
-	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::text_videoram_w)).umask16(0x00ff).share("text_videoram");
+	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::text_videoram_w)).umask16(0x00ff);
 	map(0x07c000, 0x07c001).w(FUNC(armedf_state::terraf_io_w));
 }
 
@@ -541,7 +539,7 @@ void armedf_state::legionjb_map(address_map &map)
 	legion_common_map(map);
 
 	map(0x040000, 0x04003f).w(FUNC(armedf_state::legionjb_fg_scroll_w)).umask16(0x00ff);
-	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::text_videoram_w)).umask16(0x00ff).share("text_videoram");
+	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::text_videoram_w)).umask16(0x00ff);
 	map(0x07c000, 0x07c001).w(FUNC(armedf_state::armedf_io_w));
 }
 
@@ -550,7 +548,7 @@ void armedf_state::legionjb2_map(address_map &map)
 	legion_common_map(map);
 
 	map(0x000000, 0x00003f).w(FUNC(armedf_state::legionjb_fg_scroll_w)).umask16(0x00ff);
-	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::text_videoram_w)).umask16(0x00ff).share("text_videoram");
+	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::text_videoram_w)).umask16(0x00ff);
 	map(0x07c000, 0x07c001).w(FUNC(armedf_state::armedf_io_w));
 	//also writes to 7c0010 / 70c020 / 70c030. These could possibly be the scroll registers on this bootleg and the writes to 000000 - 00003f could just be leftovers.
 }
@@ -562,7 +560,7 @@ void armedf_state::armedf_map(address_map &map)
 	map(0x061000, 0x065fff).ram();
 	map(0x066000, 0x066fff).ram().w(FUNC(armedf_state::bg_videoram_w)).share("bg_videoram");
 	map(0x067000, 0x067fff).ram().w(FUNC(armedf_state::fg_videoram_w)).share("fg_videoram");
-	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::text_videoram_w)).umask16(0x00ff).share("text_videoram");
+	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::text_videoram_w)).umask16(0x00ff);
 	map(0x06a000, 0x06afff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x06b000, 0x06bfff).ram().share("spr_pal_clut");
 	map(0x06c000, 0x06c7ff).ram();
@@ -611,7 +609,7 @@ void bigfghtr_state::bigfghtr_map(address_map &map)
 	map(0x084000, 0x085fff).ram(); //work ram
 	map(0x086000, 0x086fff).ram().w(FUNC(bigfghtr_state::bg_videoram_w)).share("bg_videoram");
 	map(0x087000, 0x087fff).ram().w(FUNC(bigfghtr_state::fg_videoram_w)).share("fg_videoram");
-	map(0x088000, 0x089fff).rw(FUNC(bigfghtr_state::text_videoram_r), FUNC(bigfghtr_state::text_videoram_w)).umask16(0x00ff).share("text_videoram");
+	map(0x088000, 0x089fff).rw(FUNC(bigfghtr_state::text_videoram_r), FUNC(bigfghtr_state::text_videoram_w)).umask16(0x00ff);
 	map(0x08a000, 0x08afff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08b000, 0x08bfff).ram().share("spr_pal_clut");
 	map(0x08c000, 0x08c001).portr("P1");
@@ -680,7 +678,8 @@ void armedf_state::terrafjb_fg_scroll_msb_w(u8 data)
 void armedf_state::terrafjb_extraz80_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x5fff).ram().w(FUNC(armedf_state::blitter_txram_w)).share("text_videoram");
+	map(0x4000, 0x4fff).ram().w(FUNC(armedf_state::blitter_txram_w)).share("text_videoram");
+	map(0x5000, 0x5fff).ram();
 	map(0x8000, 0x87ff).ram();
 }
 
@@ -1032,13 +1031,13 @@ static INPUT_PORTS_START( bigfghtr )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )        PORT_DIPLOCATION("DSW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )        PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPNAME( 0x20, 0x20, "Debug 2 (requires Debug On) (P2 Start skip stage, Invulnerability)" ) PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )    PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )        PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPNAME( 0x80, 0x80, "Debug (P1 Start to pause)" ) PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1120,9 +1119,6 @@ void armedf_state::sound_config(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // 10-pin SIP with 74HC374P latch
 	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // 10-pin SIP with 74HC374P latch
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void armedf_state::terraf(machine_config &config)
@@ -1167,9 +1163,6 @@ void armedf_state::terrafjb(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // unknown DAC
 	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void armedf_state::terrafb(machine_config &config)
@@ -1218,9 +1211,6 @@ void armedf_state::armedf(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
 	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void armedf_state::cclimbr2(machine_config &config)
@@ -1248,9 +1238,6 @@ void armedf_state::cclimbr2(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // unknown DAC
 	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void armedf_state::legion_common(machine_config &config)
@@ -1272,9 +1259,6 @@ void armedf_state::legion_common(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // 10-pin SIP with 74HC374P latch
 	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // 10-pin SIP with 74HC374P latch
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void armedf_state::legion(machine_config &config)
@@ -1360,10 +1344,39 @@ ROM_START( legion )
 	ROM_LOAD ( "lg7.bin", 0x0000, 0x4000, CRC(533e2b58) SHA1(a13ea4a530038760ffa87713903c59a932452717) )
 ROM_END
 
-ROM_START( legionj )
+ROM_START( legionj ) // this has the ROM checksum test circumvented like the bootlegs? Or maybe just a bug that was later fixed?
 	ROM_REGION( 0x60000, "maincpu", ROMREGION_ERASEFF ) /* 64K*8 for 68000 code */
 	ROM_LOAD16_BYTE( "legion.e1", 0x000001, 0x010000, CRC(977fa324) SHA1(04432ecb0cab61731e17bcf665ca66fe34b2d75c) )
 	ROM_LOAD16_BYTE( "legion.e5", 0x000000, 0x010000, CRC(49e8e1b7) SHA1(ed0b38aae3f46f689fe9d2c96c383d375716e77e) )
+	ROM_LOAD16_BYTE( "legion.1b", 0x020001, 0x010000, CRC(c306660a) SHA1(31c6b868ba07677b5110c577335873354bff596f) )
+	ROM_LOAD16_BYTE( "legion.1d", 0x020000, 0x010000, CRC(c2e45e1e) SHA1(95cc359145b1b03123262891feed358407ba105a) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 code (sound) */
+	ROM_LOAD( "legion.1h", 0x00000, 0x04000, CRC(2ca4f7f0) SHA1(7cf997af9dd74ced9d28c047069ccfb67d72e257) )
+	ROM_LOAD( "legion.1i", 0x04000, 0x08000, CRC(79f4a827) SHA1(25e4c1b5b8466627244b7226310e67e4261333b6) )
+
+	ROM_REGION( 0x08000, "text", 0 )
+	ROM_LOAD( "legion.1g", 0x00000, 0x08000, CRC(c50b0125) SHA1(83b5e9707152d97777fb65fa8820ba34ec2fac8d) )
+
+	ROM_REGION( 0x20000, "foreground", 0 )
+	ROM_LOAD( "legion.1e", 0x00000, 0x10000, CRC(a9d70faf) SHA1(8b8b60ae49c55e931d6838e863463f6b2bf7adb0) )
+	ROM_LOAD( "legion.1f", 0x18000, 0x08000, CRC(f018313b) SHA1(860bc9937202dc3a40c9fa7caad11c2c2aa19f5c) )
+
+	ROM_REGION( 0x20000, "background", 0 )
+	ROM_LOAD( "legion.1l", 0x00000, 0x10000, CRC(29b8adaa) SHA1(10338ebe7324960683de1f796dd311ed662e42b4) )
+
+	ROM_REGION( 0x20000, "sprite", 0 )
+	ROM_LOAD16_BYTE( "legion.1k", 0x000000, 0x010000, CRC(ff5a0db9) SHA1(9308deb363d3b7686cc69485ec14201dd68f9a97) )
+	ROM_LOAD16_BYTE( "legion.1j", 0x000001, 0x010000, CRC(bae220c8) SHA1(392ae0fb0351dcad7b0e8e0ed4a1dc6e07f493df) )
+
+	ROM_REGION( 0x4000, "nb1414m4", 0 )    /* data for mcu/blitter */
+	ROM_LOAD ( "lg7.bin", 0x0000, 0x4000, CRC(533e2b58) SHA1(a13ea4a530038760ffa87713903c59a932452717) )
+ROM_END
+
+ROM_START( legionj2 ) // this has the ROM checksum test working
+	ROM_REGION( 0x60000, "maincpu", ROMREGION_ERASEFF ) /* 64K*8 for 68000 code */
+	ROM_LOAD16_BYTE( "legion.e1", 0x000001, 0x010000, CRC(b890da35) SHA1(3c12b80aca7e4389c8e98f8891a9e620419d613f) )
+	ROM_LOAD16_BYTE( "legion.e5", 0x000000, 0x010000, CRC(d7efe310) SHA1(664e6f2b92670e9a32a56b4df3a7c99a99e4515d) )
 	ROM_LOAD16_BYTE( "legion.1b", 0x020001, 0x010000, CRC(c306660a) SHA1(31c6b868ba07677b5110c577335873354bff596f) )
 	ROM_LOAD16_BYTE( "legion.1d", 0x020000, 0x010000, CRC(c2e45e1e) SHA1(95cc359145b1b03123262891feed358407ba105a) )
 
@@ -1942,7 +1955,8 @@ void armedf_state::init_cclimbr2()
 
 /*     YEAR, NAME,     PARENT,   MACHINE,  INPUT,    STATE,          INIT,          MONITOR,COMPANY,                         FULLNAME, FLAGS */
 GAME( 1987, legion,    0,        legion,    legion,   armedf_state,   init_legion,   ROT270, "Nichibutsu",                    "Legion - Spinner-87 (World ver 2.03)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, legionj,   legion,   legion,    legion,   armedf_state,   init_legion,   ROT270, "Nichibutsu",                    "Chouji Meikyuu Legion (Japan ver 1.05)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, legionj,   legion,   legion,    legion,   armedf_state,   init_legion,   ROT270, "Nichibutsu",                    "Chouji Meikyuu Legion (Japan ver 1.05, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, legionj2,  legion,   legion,    legion,   armedf_state,   init_legion,   ROT270, "Nichibutsu",                    "Chouji Meikyuu Legion (Japan ver 1.05, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, legionjb,  legion,   legionjb,  legion,   armedf_state,   init_legionjb, ROT270, "bootleg",                       "Chouji Meikyuu Legion (Japan ver 1.05, bootleg set 1)", MACHINE_SUPPORTS_SAVE) /* blitter protection removed */
 GAME( 1987, legionjb2, legion,   legionjb2, legion,   armedf_state,   init_legionjb, ROT270, "bootleg",                       "Chouji Meikyuu Legion (Japan ver 1.05, bootleg set 2)", MACHINE_SUPPORTS_SAVE)
 

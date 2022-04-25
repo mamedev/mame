@@ -4,32 +4,31 @@ license:CC0
 -->
 <mamelayout version="2">
 
-	<!-- define elements -->
+<!-- define elements -->
 
 	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
 
 	<element name="led" defstate="0">
 		<disk state="0"><color red="0.0" green="0.0" blue="0.0" /></disk>
-		<disk state="1"><color red="1.0" green="0.5" blue="0.3" /></disk>
+		<disk state="1"><color red="0.5" green="1.0" blue="1.0" /></disk>
 	</element>
 
 
-	<!-- build screen -->
+<!-- build screen -->
 
 	<view name="Test Layout">
 		<bounds left="0" right="32" top="0" bottom="16" />
-		<bezel element="static_black">
+		<element ref="static_black">
 			<bounds left="0" right="32" top="0" bottom="16" />
-		</bezel>
+		</element>
 
 		<!-- max 16*32 matrix -->
-
 		<repeat count="16">
 			<param name="y" start="0" increment="1" />
 
 			<repeat count="32">
 				<param name="x" start="0" increment="1" />
-				<bezel name="~y~.~x~" element="led"><bounds x="~x~" y="~y~" width="0.5" height="0.5" /></bezel>
+				<element name="~y~.~x~" ref="led"><bounds x="~x~" y="~y~" width="0.5" height="0.5" /></element>
 			</repeat>
 		</repeat>
 

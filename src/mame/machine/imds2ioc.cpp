@@ -347,9 +347,8 @@ WRITE_LINE_MEMBER(imds2ioc_device::pio_lpt_select_w)
 
 I8275_DRAW_CHARACTER_MEMBER(imds2ioc_device::crtc_display_pixels)
 {
-	unsigned i;
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t chargen_byte = m_chargen[ (linecount & 7) | ((unsigned)charcode << 3) ];
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint8_t const chargen_byte = m_chargen[ (linecount & 7) | ((unsigned)charcode << 3) ];
 	uint16_t pixels;
 
 	if (lten) {
@@ -392,8 +391,8 @@ I8275_DRAW_CHARACTER_MEMBER(imds2ioc_device::crtc_display_pixels)
 		pixels = ~pixels;
 	}
 
-	for (i = 0; i < 14; i++) {
-		bitmap.pix32(y, x + i) = palette[ (pixels & (1U << (13 - i))) != 0 ];
+	for (unsigned i = 0; i < 14; i++) {
+		bitmap.pix(y, x + i) = palette[ (pixels & (1U << (13 - i))) != 0 ];
 	}
 }
 
@@ -625,7 +624,7 @@ void imds2ioc_device::device_add_mconfig(machine_config &config)
 
 	I8271(config, m_iocfdc, IOC_XTAL_Y1 / 2);
 	m_iocfdc->drq_wr_callback().set(m_iocdma, FUNC(i8257_device::dreq1_w));
-	FLOPPY_CONNECTOR(config, "iocfdc:0", imds2_floppies, "8sssd", floppy_image_device::default_floppy_formats, true);
+	FLOPPY_CONNECTOR(config, "iocfdc:0", imds2_floppies, "8sssd", floppy_image_device::default_mfm_floppy_formats, true);
 
 	I8041A(config, m_iocpio, IOC_XTAL_Y3);
 	m_iocpio->p1_in_cb().set(FUNC(imds2ioc_device::pio_port_p1_r));

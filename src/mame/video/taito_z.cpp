@@ -2,30 +2,39 @@
 // copyright-holders:David Graves
 #include "emu.h"
 #include "includes/taito_z.h"
-#include "screen.h"
+
 
 /**********************************************************/
 
-VIDEO_START_MEMBER(taitoz_state,taitoz)
+void contcirc_state::video_start()
 {
+	taitoz_z80_sound_state::video_start();
+
 	m_road_palbank = 3;
-	m_sci_spriteframe = 0;
 
 	save_item(NAME(m_road_palbank));
+}
+
+void sci_state::video_start()
+{
+	taitoz_z80_sound_state::video_start();
+
+	m_sci_spriteframe = 0;
+
 	save_item(NAME(m_sci_spriteframe));
 }
+
 
 /********************************************************
             SPRITE READ AND WRITE HANDLERS
 ********************************************************/
 
-
-u16 taitoz_state::sci_spriteframe_r()
+u16 sci_state::sci_spriteframe_r()
 {
-	return (m_sci_spriteframe << 8);
+	return m_sci_spriteframe << 8;
 }
 
-void taitoz_state::sci_spriteframe_w(u16 data)
+void sci_state::sci_spriteframe_w(u16 data)
 {
 	m_sci_spriteframe = (data >> 8) & 0xff;
 }
@@ -145,7 +154,7 @@ confirmed
 ********************************************************/
 
 
-void taitoz_state::contcirc_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs)
+void contcirc_state::contcirc_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs)
 {
 	int sprites_flipscreen = 0;
 	static const u32 primasks[2] = { 0xf0, 0xfc };
@@ -233,7 +242,7 @@ void taitoz_state::contcirc_draw_sprites_16x8(screen_device &screen, bitmap_ind1
 
 
 
-void taitoz_state::chasehq_draw_sprites_16x16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs)
+void taitoz_z80_sound_state::chasehq_draw_sprites_16x16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs)
 {
 	int sprites_flipscreen = 0;
 	static const u32 primasks[2] = { 0xf0, 0xfc };
@@ -499,7 +508,7 @@ void taitoz_state::bshark_draw_sprites_16x8(screen_device &screen, bitmap_ind16 
 
 
 
-void taitoz_state::sci_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs)
+void sci_state::sci_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs)
 {
 	int sprites_flipscreen = 0;
 	static const u32 primasks[2] = { 0xf0, 0xfc };
@@ -596,7 +605,7 @@ void taitoz_state::sci_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bi
 
 
 
-void taitoz_state::aquajack_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs)
+void taitoz_z80_sound_state::aquajack_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs)
 {
 	int sprites_flipscreen = 0;
 	static const u32 primasks[2] = { 0xf0, 0xfc };
@@ -683,7 +692,7 @@ void taitoz_state::aquajack_draw_sprites_16x8(screen_device &screen, bitmap_ind1
 
 
 
-void taitoz_state::spacegun_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs)
+void spacegun_state::spacegun_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs)
 {
 	int sprites_flipscreen = 0;
 	static const u32 primasks[2] = { 0xf0, 0xfc };
@@ -773,23 +782,46 @@ void taitoz_state::spacegun_draw_sprites_16x8(screen_device &screen, bitmap_ind1
                         SCREEN REFRESH
 **************************************************************/
 
-void taitoz_state::contcirc_out_w(u8 data)
+void contcirc_state::contcirc_out_w(u8 data)
 {
 	/* bit 0 = reset sub CPU */
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* bits 1-3 n.c. */
 
-	/* 3d glasses control */
+	/* 3d scope control */
 	/* bit 4 = SCPSW */
-	/* bit 5 = SCP */
+	/* bit 5 = _SCP */
+	if (~m_shutter_control & 2 && data & 0x20)
+		m_shutter_toggle = 0;
+	m_shutter_control = data >> 4 & 3;
 
 	/* bits 6 and 7 select the road palette bank */
 	m_road_palbank = (data & 0xc0) >> 6;
 }
 
+WRITE_LINE_MEMBER(contcirc_state::scope_vblank)
+{
+	if (state)
+	{
+		// it outputs 3d scope shutters at vblank
+		if (m_shutter_control & 1)
+		{
+			m_shutter_out[0] = m_shutter_toggle;
+			m_shutter_out[1] = m_shutter_toggle ^ 1;
+		}
+		else
+		{
+			m_shutter_out[0] = 0;
+			m_shutter_out[1] = 0;
+		}
 
-u32 taitoz_state::screen_update_contcirc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+		if (m_shutter_control & 2)
+			m_shutter_toggle ^= 1;
+	}
+}
+
+u32 contcirc_state::screen_update_contcirc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u8 layer[3];
 
@@ -815,7 +847,7 @@ u32 taitoz_state::screen_update_contcirc(screen_device &screen, bitmap_ind16 &bi
 
 /* Nightstr and ChaseHQ */
 
-u32 taitoz_state::screen_update_chasehq(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 taitoz_z80_sound_state::screen_update_chasehq(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u8 layer[3];
 
@@ -865,7 +897,7 @@ u32 taitoz_state::screen_update_bshark(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-u32 taitoz_state::screen_update_sci(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 sci_state::screen_update_sci(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u8 layer[3];
 
@@ -890,7 +922,7 @@ u32 taitoz_state::screen_update_sci(screen_device &screen, bitmap_ind16 &bitmap,
 }
 
 
-u32 taitoz_state::screen_update_aquajack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 taitoz_z80_sound_state::screen_update_aquajack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u8 layer[3];
 
@@ -915,7 +947,7 @@ u32 taitoz_state::screen_update_aquajack(screen_device &screen, bitmap_ind16 &bi
 }
 
 
-u32 taitoz_state::screen_update_spacegun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 spacegun_state::screen_update_spacegun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u8 layer[3];
 
@@ -940,7 +972,7 @@ u32 taitoz_state::screen_update_spacegun(screen_device &screen, bitmap_ind16 &bi
 }
 
 
-u32 taitoz_state::screen_update_dblaxle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 dblaxle_state::screen_update_dblaxle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u8 layer[5];
 	u16 priority;
@@ -975,7 +1007,7 @@ u32 taitoz_state::screen_update_dblaxle(screen_device &screen, bitmap_ind16 &bit
 }
 
 
-u32 taitoz_state::screen_update_racingb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 sci_state::screen_update_racingb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u8 layer[5];
 	u16 priority;

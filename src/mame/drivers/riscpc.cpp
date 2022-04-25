@@ -66,7 +66,7 @@ private:
 	void a7000_map(address_map &map);
 	void riscpc_map(address_map &map);
 
-	bool m_i2cmem_clock;
+	bool m_i2cmem_clock = false;
 	DECLARE_READ_LINE_MEMBER(iocr_od0_r);
 	DECLARE_READ_LINE_MEMBER(iocr_od1_r);
 	DECLARE_WRITE_LINE_MEMBER(iocr_od0_w);
@@ -163,22 +163,15 @@ void riscpc_state::base_config(machine_config &config)
 {
 	I2C_24C02(config, m_i2cmem);
 
-	pc_kbdc_device &kbd_con(PC_KBDC(config, "kbd_con", 0));
+	// TODO: verify type
+	pc_kbdc_device &kbd_con(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_101));
 	kbd_con.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_clk_w));
 	kbd_con.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_data_w));
 
-	// TODO: verify type
-	pc_kbdc_slot_device &kbd(PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_101));
-	kbd.set_pc_kbdc_slot(&kbd_con);
-
 	// auxiliary connector
-//  pc_kbdc_device &aux_con(PC_KBDC(config, "aux_con", 0));
+//  pc_kbdc_device &aux_con(PC_KBDC(config, "aux", ps2_mice, STR_HLE_PS2_MOUSE));
 //  aux_con.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::aux_clk_w));
 //  aux_con.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::aux_data_w));
-
-	// auxiliary port
-//  pc_kbdc_slot_device &aux(PC_KBDC_SLOT(config, "aux", ps2_mice, STR_HLE_PS2_MOUSE));
-//  aux.set_pc_kbdc_slot(&aux_con);
 
 	PS2_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL);
 	m_kbdc->hot_res().set(m_iomd, FUNC(arm_iomd_device::keyboard_reset));

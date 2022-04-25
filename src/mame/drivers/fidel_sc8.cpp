@@ -3,7 +3,7 @@
 // thanks-to:yoyo_chessboard
 /******************************************************************************
 
-Fidelity Sensory Chess Challenger "8"
+Fidelity Sensory Chess Challenger "8" (SCC)
 
 It is the first chesscomputer with sensors under the chessboard.
 
@@ -23,11 +23,12 @@ Hardware notes:
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -86,8 +87,6 @@ void scc_state::machine_start()
 /******************************************************************************
     I/O
 ******************************************************************************/
-
-// TTL
 
 void scc_state::control_w(offs_t offset, u8 data)
 {
@@ -179,7 +178,6 @@ void scc_state::scc(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 

@@ -82,7 +82,7 @@
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 #define A1_CPU_TAG  "maincpu"
 #define A1_PIA_TAG  "pia6821"
@@ -174,14 +174,11 @@ static const uint8_t apple1_keymap[] =
 // header is "LOAD:abcdDATA:" where abcd is the starting address
 SNAPSHOT_LOAD_MEMBER(apple1_state::snapshot_cb)
 {
-	uint64_t snapsize;
-	uint8_t *data;
-	uint16_t start, end;
 	static const char hd1[6] = "LOAD:";
 	static const char hd2[6] = "DATA:";
 
 	// get the snapshot's size
-	snapsize = image.length();
+	uint64_t snapsize = image.length();
 
 	if (snapsize < 12)
 	{
@@ -195,21 +192,21 @@ SNAPSHOT_LOAD_MEMBER(apple1_state::snapshot_cb)
 		return image_init_result::FAIL;
 	}
 
-	data = (uint8_t *)image.ptr();
-	if (!data)
+	auto data = std::make_unique<uint8_t []>(snapsize);
+	if (image.fread(data.get(), snapsize) != snapsize)
 	{
 		logerror("Internal error loading snapshot\n");
 		return image_init_result::FAIL;
 	}
 
-	if ((memcmp(hd1, data, 5)) || (memcmp(hd2, &data[7], 5)))
+	if ((memcmp(hd1, &data[0], 5)) || (memcmp(hd2, &data[7], 5)))
 	{
 		logerror("Snapshot is invalid\n");
 		return image_init_result::FAIL;
 	}
 
-	start = (data[5]<<8) | data[6];
-	end = (snapsize - 12) + start;
+	uint16_t start = (data[5]<<8) | data[6];
+	uint16_t end = (snapsize - 12) + start;
 
 	// check if this fits in RAM; load below 0xe000 must fit in RAMSIZE,
 	// load at 0xe000 must fit in 4K
@@ -324,24 +321,21 @@ void apple1_state::poll_keyboard()
 void apple1_state::plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code,
 	const uint8_t *textgfx_data, uint32_t textgfx_datalen)
 {
-	int x, y, i;
-	const uint8_t *chardata;
-	uint16_t color;
 	int fg = 1, bg = 0;
-	int charcode = (code & 0x1f) | (((code ^ 0x40) & 0x40) >> 1);
+	int const charcode = (code & 0x1f) | (((code ^ 0x40) & 0x40) >> 1);
 
 	/* look up the character data */
-	chardata = &textgfx_data[(charcode * 8)];
+	uint8_t const *const chardata = &textgfx_data[(charcode * 8)];
 
-	for (y = 0; y < 8; y++)
+	for (int y = 0; y < 8; y++)
 	{
-		for (x = 0; x < 7; x++)
+		for (int x = 0; x < 7; x++)
 		{
-			color = (chardata[y] & (1 << (6-x))) ? fg : bg;
+			uint16_t const color = (chardata[y] & (1 << (6-x))) ? fg : bg;
 
-			for (i = 0; i < xscale; i++)
+			for (int i = 0; i < xscale; i++)
 			{
-				bitmap.pix16(ypos + y, xpos + (x * xscale) + i) = color;
+				bitmap.pix(ypos + y, xpos + (x * xscale) + i) = color;
 			}
 		}
 	}

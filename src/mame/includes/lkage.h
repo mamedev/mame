@@ -47,18 +47,18 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 
 	/* video-related */
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_tx_tilemap;
-	uint8_t m_bg_tile_bank;
-	uint8_t m_fg_tile_bank;
-	uint8_t m_tx_tile_bank;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_tx_tilemap = nullptr;
+	uint8_t m_bg_tile_bank = 0U;
+	uint8_t m_fg_tile_bank = 0U;
+	uint8_t m_tx_tile_bank = 0U;
 
-	int m_sprite_dx;
+	int m_sprite_dx = 0;
 
 	/* lkageb fake mcu */
-	uint8_t m_mcu_val;
-	int m_mcu_ready;    /* cpu data/mcu ready status */
+	uint8_t m_mcu_val = 0U;
+	int m_mcu_ready = 0;    /* cpu data/mcu ready status */
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -69,16 +69,16 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<input_merger_device> m_soundnmi;
 
-	DECLARE_WRITE8_MEMBER(lkage_sh_nmi_disable_w);
-	DECLARE_WRITE8_MEMBER(lkage_sh_nmi_enable_w);
-	DECLARE_READ8_MEMBER(sound_status_r);
-	DECLARE_READ8_MEMBER(port_fetch_r);
-	DECLARE_READ8_MEMBER(mcu_status_r);
-	DECLARE_READ8_MEMBER(fake_mcu_r);
-	DECLARE_WRITE8_MEMBER(fake_mcu_w);
-	DECLARE_READ8_MEMBER(fake_status_r);
+	void lkage_sh_nmi_disable_w(uint8_t data);
+	void lkage_sh_nmi_enable_w(uint8_t data);
+	uint8_t sound_status_r();
+	uint8_t port_fetch_r(offs_t offset);
+	uint8_t mcu_status_r();
+	uint8_t fake_mcu_r();
+	void fake_mcu_w(uint8_t data);
+	uint8_t fake_status_r();
 
-	DECLARE_WRITE8_MEMBER(lkage_videoram_w);
+	void lkage_videoram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert, hap
+// copyright-holders:hap
 /****************************************************************************************
 
 2018-09-15
@@ -55,9 +55,9 @@ private:
 	void lamp1_w(uint8_t data);
 	void lamp2_w(uint8_t data);
 
-	int m_hopper_motor;
-	int m_hopper_coin;
-	emu_timer *m_hopper_timer;
+	int m_hopper_motor = 0;
+	int m_hopper_coin = 0;
+	emu_timer *m_hopper_timer = nullptr;
 	TIMER_CALLBACK_MEMBER(hopper_coinout);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -74,19 +74,18 @@ private:
 
 uint32_t video21_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,ma=0,x;
+	uint16_t sy=0,ma=0;
 
-	for (y = 0; y < 28; y++)
+	for (uint8_t y = 0; y < 28; y++)
 	{
-		for (ra = 0; ra < 8; ra++)
+		for (uint8_t ra = 0; ra < 8; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
-			for (x = 0; x < 32; x++)
+			for (uint16_t x = 0; x < 32; x++)
 			{
-				chr = m_p_videoram[x+ma] & 0x7f;
-				gfx = m_p_chargen[(chr<<3) | ra ];
+				uint8_t chr = m_p_videoram[x+ma] & 0x7f;
+				uint8_t gfx = m_p_chargen[(chr<<3) | ra ];
 
 				/* Display a scanline of a character */
 				*p++ = BIT(gfx, 7);

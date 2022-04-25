@@ -104,11 +104,11 @@ private:
 	required_shared_ptr<uint8_t> m_textram;
 	required_shared_ptr<uint8_t> m_spritebank;
 
-	tilemap_t *m_bgtilemap;
-	tilemap_t *m_infotilemap_2;
-	tilemap_t *m_txttilemap;
+	tilemap_t *m_bgtilemap = nullptr;
+	tilemap_t *m_infotilemap_2 = nullptr;
+	tilemap_t *m_txttilemap = nullptr;
 
-	int m_scrollx;
+	int m_scrollx = 0;
 	std::unique_ptr<bitmap_ind16> m_temprender;
 	std::unique_ptr<bitmap_ind16> m_tempbitmap_1;
 	rectangle m_tempbitmap_clip;
@@ -298,12 +298,12 @@ uint32_t panicr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 	for (int y=0;y<256;y++)
 	{
-		uint16_t* srcline = &m_temprender->pix16(y);
-		uint16_t* dstline = &bitmap.pix16(y);
+		uint16_t const *const srcline = &m_temprender->pix(y);
+		uint16_t *const dstline = &bitmap.pix(y);
 
 		for (int x=0;x<256;x++)
 		{
-			uint16_t dat = srcline[x];
+			uint16_t const dat = srcline[x];
 
 			dstline[x] = ((dat & 0x00f) | ((dat & 0x1e0)>>0)) + 0x200;
 
@@ -315,12 +315,12 @@ uint32_t panicr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 	for (int y=0;y<256;y++)
 	{
-		uint16_t* srcline = &m_temprender->pix16(y);
-		uint16_t* dstline = &bitmap.pix16(y);
+		uint16_t const *const srcline = &m_temprender->pix(y);
+		uint16_t *const dstline = &bitmap.pix(y);
 
 		for (int x=0;x<256;x++)
 		{
-			uint16_t dat = srcline[x];
+			uint16_t const dat = srcline[x];
 			if (dat & 0x10)
 				dstline[x] = ((dat & 0x00f) | ((dat & 0x1e0)>>0)) + 0x200;
 
@@ -367,7 +367,7 @@ uint8_t panicr_state::collision_r(offs_t offset)
 
 
 	uint8_t ret = 0;
-	uint16_t* srcline = &m_tempbitmap_1->pix16(actual_line);
+	uint16_t const *const srcline = &m_tempbitmap_1->pix(actual_line);
 
 
 	ret |= (srcline[(actual_column+0)&0xff]&3) << 6;

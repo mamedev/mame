@@ -58,7 +58,6 @@ ROM_END
 
 static DEVICE_INPUT_DEFAULTS_START(keyboard)
 	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_1200)
-	DEVICE_INPUT_DEFAULTS("RS232_STARTBITS", 0xff, RS232_STARTBITS_1)
 	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_8)
 	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_NONE)
 	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_2)
@@ -86,7 +85,7 @@ void cms_4080term_device::device_add_mconfig(machine_config &config)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(cms_4080term_device::update_scanline), "screen", 0, 10);
 
-	VIA6522(config, m_via, 1_MHz_XTAL);
+	MOS6522(config, m_via, 1_MHz_XTAL);
 	m_via->writepa_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	m_via->ca2_handler().set(m_centronics, FUNC(centronics_device::write_strobe));
 	m_via->irq_handler().set(FUNC(cms_4080term_device::bus_irq_w));

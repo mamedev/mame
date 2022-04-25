@@ -97,12 +97,14 @@ void adam_fdc_device::adam_fdc_mem(address_map &map)
 
 
 //-------------------------------------------------
-//  floppy_format_type floppy_formats
+//  floppy_formats
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( adam_fdc_device::floppy_formats )
-	FLOPPY_ADAM_FORMAT
-FLOPPY_FORMATS_END
+void adam_fdc_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ADAM_FORMAT);
+}
 
 static void adam_fdc_floppies(device_slot_interface &device)
 {
@@ -199,7 +201,7 @@ void adam_fdc_device::adamnet_reset_w(int state)
 //  data_r -
 //-------------------------------------------------
 
-READ8_MEMBER( adam_fdc_device::data_r )
+uint8_t adam_fdc_device::data_r(offs_t offset)
 {
 	uint8_t data = m_fdc->data_r();
 

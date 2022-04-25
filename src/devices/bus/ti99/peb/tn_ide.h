@@ -24,15 +24,15 @@
 #include "machine/74259.h"
 #include "machine/74543.h"
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 class nouspikel_ide_card_device : public device_t, public device_ti99_peribox_card_interface
 {
 public:
 	nouspikel_ide_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	DECLARE_READ8Z_MEMBER(readz) override;
+	void readz(offs_t offset, uint8_t *value) override;
 	void write(offs_t offset, uint8_t data) override;
-	DECLARE_READ8Z_MEMBER( crureadz ) override;
+	void crureadz(offs_t offset, uint8_t *value) override;
 	void cruwrite(offs_t offset, uint8_t data) override;
 	DECLARE_INPUT_CHANGED_MEMBER( mode_changed );
 
@@ -68,14 +68,19 @@ private:
 	// RTC type
 	int m_rtctype;
 
-	DECLARE_WRITE_LINE_MEMBER(clock_interrupt_callback);
+	// Genmod decoding. If not used, the AME line is pulled up, and the AMD line is pulled down
+	bool m_genmod;
+
+	template<int rtctype> DECLARE_WRITE_LINE_MEMBER(rtc_int_callback);
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt_callback);
 	DECLARE_WRITE_LINE_MEMBER(resetdr_callback);
 
 	void decode(offs_t offset, bool& mmap, bool& sramsel, bool& xramsel, bool& rtcsel, bool& cs1fx, bool& cs3fx);
+
+	int m_rtc_int;
 };
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb
 
 DECLARE_DEVICE_TYPE_NS(TI99_IDE, bus::ti99::peb, nouspikel_ide_card_device)
 

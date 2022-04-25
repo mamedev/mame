@@ -20,7 +20,6 @@
 // pinout reference
 
 /*
-
             ____   ____                         ____   ____
      R8  1 |*   \_/    | 28 R7           R0  1 |*   \_/    | 28 Vss
      R9  2 |           | 27 R6           R1  2 |           | 27 OSC2
@@ -249,7 +248,6 @@ protected:
 	u32 m_fixed;
 	u32 m_micro;
 	int m_subcycle;
-	int m_icount;
 	u8 m_o_index;
 
 	u8 m_o_pins;    // how many O pins
@@ -276,6 +274,9 @@ protected:
 	u32 m_k_mask;
 	u32 m_pc_mask;
 	u32 m_x_mask;
+
+	int m_icount;
+	int m_state_count;
 
 	// lookup tables
 	std::vector<u32> m_fixed_decode;

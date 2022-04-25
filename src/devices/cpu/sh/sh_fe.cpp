@@ -88,7 +88,7 @@ bool sh_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 		case 11:    // BSR
 			desc.regout[1] |= REGFLAG_PR;
-			// (intentional fallthrough - BSR is BRA with the addition of PR = the return address)
+			[[fallthrough]]; // BSR is BRA with the addition of PR = the return address
 		case 10:    // BRA
 			{
 				int32_t disp = ((int32_t)opcode << 20) >> 20;

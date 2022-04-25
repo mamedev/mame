@@ -80,7 +80,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( atn_w );
 	DECLARE_WRITE_LINE_MEMBER( byte_w );
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	required_device<via6522_device> m_via0;
 	required_device<via6522_device> m_via1;
@@ -264,13 +264,13 @@ private:
 	required_device<output_latch_device> m_cent_data_out;
 	required_memory_region m_mmu_rom;
 
-	DECLARE_READ8_MEMBER( pia_r );
-	DECLARE_WRITE8_MEMBER( pia_w );
+	uint8_t pia_r(offs_t offset);
+	void pia_w(offs_t offset, uint8_t data);
 	void pia_pa_w(uint8_t data);
 	uint8_t pia_pb_r();
 	void pia_pb_w(uint8_t data);
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read();
+	void write(uint8_t data);
 
 	void c1541pdc_mem(address_map &map);
 };

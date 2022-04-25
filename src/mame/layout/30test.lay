@@ -175,542 +175,542 @@ license:CC0
 
 	<view name="Internal Layout">
 		<bounds left="0" top="0" right="246" bottom="246" />
-		<bezel element="static_blue">
+		<element ref="static_blue">
 			<bounds left="0" right="246" top="0" bottom="246" />
-		</bezel>
+		</element>
 
 
 <!-- info box -->
 
-		<bezel element="static_red">
+		<element ref="static_red">
 			<bounds x="22" y="5" width="202" height="69" />
-		</bezel>
-		<bezel element="static_red">
+		</element>
+		<element ref="static_red">
 			<bounds x="18" y="9" width="210" height="61" />
-		</bezel>
+		</element>
 
-		<bezel element="disk_red">
+		<element ref="disk_red">
 			<bounds x="18" y="5" width="8" height="8" />
-		</bezel>
-		<bezel element="disk_red">
+		</element>
+		<element ref="disk_red">
 			<bounds x="18" y="66" width="8" height="8" />
-		</bezel>
-		<bezel element="disk_red">
+		</element>
+		<element ref="disk_red">
 			<bounds x="220" y="5" width="8" height="8" />
-		</bezel>
-		<bezel element="disk_red">
+		</element>
+		<element ref="disk_red">
 			<bounds x="220" y="66" width="8" height="8" />
-		</bezel>
+		</element>
 
-		<bezel element="static_yellow">
+		<element ref="static_yellow">
 			<bounds x="22" y="7" width="202" height="65" />
-		</bezel>
-		<bezel element="static_yellow">
+		</element>
+		<element ref="static_yellow">
 			<bounds x="20" y="9" width="206" height="61" />
-		</bezel>
+		</element>
 
-		<bezel element="disk_yellow">
+		<element ref="disk_yellow">
 			<bounds x="20" y="7" width="4" height="4" />
-		</bezel>
-		<bezel element="disk_yellow">
+		</element>
+		<element ref="disk_yellow">
 			<bounds x="222" y="7" width="4" height="4" />
-		</bezel>
-		<bezel element="disk_yellow">
+		</element>
+		<element ref="disk_yellow">
 			<bounds x="20" y="68" width="4" height="4" />
-		</bezel>
-		<bezel element="disk_yellow">
+		</element>
+		<element ref="disk_yellow">
 			<bounds x="222" y="68" width="4" height="4" />
-		</bezel>
+		</element>
 
 
 <!-- score -->
 
-		<bezel element="text_score">
+		<element ref="text_score">
 			<bounds x="25" y="7" width="37.4" height="7" />
-		</bezel>
+		</element>
 
-		<bezel element="static_blue">
+		<element ref="static_blue">
 			<bounds x="25" y="14.3" width="37.4" height="28.9" />
-		</bezel>
-		<bezel element="static_black">
+		</element>
+		<element ref="static_black">
 			<bounds x="25.7" y="15" width="36" height="27.5" />
-		</bezel>
+		</element>
 
-		<bezel name="digit70" element="digit">
+		<element name="digit70" ref="digit">
 			<bounds x="26.7" y="16" width="17" height="25.5" />
-		</bezel>
-		<bezel name="digit71" element="digit">
+		</element>
+		<element name="digit71" ref="digit">
 			<bounds x="43.7" y="16" width="17" height="25.5" />
-		</bezel>
+		</element>
 
 
 <!-- time -->
 
-		<bezel element="text_time">
+		<element ref="text_time">
 			<bounds x="22.3" y="43" width="43.4" height="7" />
-		</bezel>
+		</element>
 
-		<bezel element="static_blue">
+		<element ref="static_blue">
 			<bounds x="22.3" y="50.3" width="43.4" height="18.4" />
-		</bezel>
-		<bezel element="static_black">
+		</element>
+		<element ref="static_black">
 			<bounds x="23" y="51" width="42" height="17" />
-		</bezel>
+		</element>
 
-		<bezel name="digit60" element="digit">
+		<element name="digit60" ref="digit">
 			<bounds x="24" y="52" width="10" height="15" />
-		</bezel>
+		</element>
 
-		<bezel name="digit61" element="digit">
+		<element name="digit61" ref="digit">
 			<bounds x="34" y="52" width="10" height="15" />
-		</bezel>
+		</element>
 
-		<bezel name="digit62" element="digit">
+		<element name="digit62" ref="digit">
 			<bounds x="44" y="52" width="10" height="15" />
-		</bezel>
+		</element>
 
-		<bezel name="digit63" element="digit">
+		<element name="digit63" ref="digit">
 			<bounds x="54" y="52" width="10" height="15" />
-		</bezel>
+		</element>
 
 
 <!-- today's highscores -->
 
-		<bezel element="text_best">
+		<element ref="text_best">
 			<bounds x="73.3" y="7" width="23.4" height="7" />
-		</bezel>
+		</element>
 
-		<bezel element="text_1">
+		<element ref="text_1">
 			<bounds x="68" y="25.5" width="5" height="7" />
-		</bezel>
-		<bezel element="text_2">
+		</element>
+		<element ref="text_2">
 			<bounds x="68" y="43.5" width="5" height="7" />
-		</bezel>
-		<bezel element="text_3">
+		</element>
+		<element ref="text_3">
 			<bounds x="68" y="61.5" width="5" height="7" />
-		</bezel>
+		</element>
 
-		<bezel element="static_blue">
+		<element ref="static_blue">
 			<bounds x="73.3" y="14.3" width="23.4" height="54.4" />
-		</bezel>
+		</element>
 
-		<bezel element="static_black">
+		<element ref="static_black">
 			<bounds x="74" y="15" width="22" height="17" />
-		</bezel>
-		<bezel element="static_black">
+		</element>
+		<element ref="static_black">
 			<bounds x="74" y="33" width="22" height="17" />
-		</bezel>
-		<bezel element="static_black">
+		</element>
+		<element ref="static_black">
 			<bounds x="74" y="51" width="22" height="17" />
-		</bezel>
+		</element>
 
-		<bezel name="digit64" element="digit">
+		<element name="digit64" ref="digit">
 			<bounds x="75" y="16" width="10" height="15" />
-		</bezel>
-		<bezel name="digit65" element="digit">
+		</element>
+		<element name="digit65" ref="digit">
 			<bounds x="85" y="16" width="10" height="15" />
-		</bezel>
+		</element>
 
-		<bezel name="digit66" element="digit">
+		<element name="digit66" ref="digit">
 			<bounds x="75" y="34" width="10" height="15" />
-		</bezel>
-		<bezel name="digit67" element="digit">
+		</element>
+		<element name="digit67" ref="digit">
 			<bounds x="85" y="34" width="10" height="15" />
-		</bezel>
+		</element>
 
-		<bezel name="digit68" element="digit">
+		<element name="digit68" ref="digit">
 			<bounds x="75" y="52" width="10" height="15" />
-		</bezel>
-		<bezel name="digit69" element="digit">
+		</element>
+		<element name="digit69" ref="digit">
 			<bounds x="85" y="52" width="10" height="15" />
-		</bezel>
+		</element>
 
 
 <!-- ranking -->
 
-		<bezel element="disk_blue">
+		<element ref="disk_blue">
 			<bounds x="102.75" y="15.75" width="6.25" height="6.25" />
-		</bezel>
-		<bezel name="lamp0" element="disk_lamp">
+		</element>
+		<element name="lamp0" ref="disk_lamp">
 			<bounds x="103" y="16" width="5.75" height="5.75" />
-		</bezel>
+		</element>
 
-		<bezel element="disk_blue">
+		<element ref="disk_blue">
 			<bounds x="102.75" y="22.25" width="6.25" height="6.25" />
-		</bezel>
-		<bezel name="lamp1" element="disk_lamp">
+		</element>
+		<element name="lamp1" ref="disk_lamp">
 			<bounds x="103" y="22.5" width="5.75" height="5.75" />
-		</bezel>
+		</element>
 
-		<bezel element="disk_blue">
+		<element ref="disk_blue">
 			<bounds x="102.75" y="28.75" width="6.25" height="6.25" />
-		</bezel>
-		<bezel name="lamp2" element="disk_lamp">
+		</element>
+		<element name="lamp2" ref="disk_lamp">
 			<bounds x="103" y="29" width="5.75" height="5.75" />
-		</bezel>
+		</element>
 
-		<bezel element="disk_blue">
+		<element ref="disk_blue">
 			<bounds x="102.75" y="35.25" width="6.25" height="6.25" />
-		</bezel>
-		<bezel name="lamp3" element="disk_lamp">
+		</element>
+		<element name="lamp3" ref="disk_lamp">
 			<bounds x="103" y="35.5" width="5.75" height="5.75" />
-		</bezel>
+		</element>
 
-		<bezel element="disk_blue">
+		<element ref="disk_blue">
 			<bounds x="102.75" y="41.75" width="6.25" height="6.25" />
-		</bezel>
-		<bezel name="lamp4" element="disk_lamp">
+		</element>
+		<element name="lamp4" ref="disk_lamp">
 			<bounds x="103" y="42" width="5.75" height="5.75" />
-		</bezel>
+		</element>
 
-		<bezel element="disk_blue">
+		<element ref="disk_blue">
 			<bounds x="102.75" y="48.25" width="6.25" height="6.25" />
-		</bezel>
-		<bezel name="lamp5" element="disk_lamp">
+		</element>
+		<element name="lamp5" ref="disk_lamp">
 			<bounds x="103" y="48.5" width="5.75" height="5.75" />
-		</bezel>
+		</element>
 
-		<bezel element="disk_blue">
+		<element ref="disk_blue">
 			<bounds x="102.75" y="54.75" width="6.25" height="6.25" />
-		</bezel>
-		<bezel name="lamp6" element="disk_lamp">
+		</element>
+		<element name="lamp6" ref="disk_lamp">
 			<bounds x="103" y="55" width="5.75" height="5.75" />
-		</bezel>
+		</element>
 
-		<bezel element="text_rank1">
+		<element ref="text_rank1">
 			<bounds x="111" y="15.25" width="40" height="6.5" />
-		</bezel>
-		<bezel element="text_rank2">
+		</element>
+		<element ref="text_rank2">
 			<bounds x="111" y="21.75" width="40" height="6.5" />
-		</bezel>
-		<bezel element="text_rank3">
+		</element>
+		<element ref="text_rank3">
 			<bounds x="111" y="28.25" width="40" height="6.5" />
-		</bezel>
-		<bezel element="text_rank4">
+		</element>
+		<element ref="text_rank4">
 			<bounds x="111" y="34.75" width="40" height="6.5" />
-		</bezel>
-		<bezel element="text_rank5">
+		</element>
+		<element ref="text_rank5">
 			<bounds x="111" y="41.25" width="40" height="6.5" />
-		</bezel>
-		<bezel element="text_rank6">
+		</element>
+		<element ref="text_rank6">
 			<bounds x="111" y="47.75" width="40" height="6.5" />
-		</bezel>
+		</element>
 
-		<bezel element="text_gameover">
+		<element ref="text_gameover">
 			<bounds x="111" y="54.25" width="40" height="6.5" />
-		</bezel>
+		</element>
 
 
 <!-- the grid -->
 <!-- row 1 -->
 
-		<bezel element="led_box" inputtag="IN0" inputmask="0x01">
+		<element ref="led_box" inputtag="IN0" inputmask="0x01">
 			<bounds x="18" y="80" width="30" height="25" />
-		</bezel>
-		<bezel name="digit0" element="digit">
+		</element>
+		<element name="digit0" ref="digit">
 			<bounds x="23" y="85" width="10" height="15" />
-		</bezel>
-		<bezel name="digit1" element="digit">
+		</element>
+		<element name="digit1" ref="digit">
 			<bounds x="33" y="85" width="10" height="15" />
-		</bezel>
+		</element>
 
-		<bezel element="led_box" inputtag="IN0" inputmask="0x02">
+		<element ref="led_box" inputtag="IN0" inputmask="0x02">
 			<bounds x="54" y="80" width="30" height="25" />
-		</bezel>
-		<bezel name="digit2" element="digit">
+		</element>
+		<element name="digit2" ref="digit">
 			<bounds x="59" y="85" width="10" height="15" />
-		</bezel>
-		<bezel name="digit3" element="digit">
+		</element>
+		<element name="digit3" ref="digit">
 			<bounds x="69" y="85" width="10" height="15" />
-		</bezel>
+		</element>
 
-		<bezel element="led_box" inputtag="IN0" inputmask="0x04">
+		<element ref="led_box" inputtag="IN0" inputmask="0x04">
 			<bounds x="90" y="80" width="30" height="25" />
-		</bezel>
-		<bezel name="digit4" element="digit">
+		</element>
+		<element name="digit4" ref="digit">
 			<bounds x="95" y="85" width="10" height="15" />
-		</bezel>
-		<bezel name="digit5" element="digit">
+		</element>
+		<element name="digit5" ref="digit">
 			<bounds x="105" y="85" width="10" height="15" />
-		</bezel>
+		</element>
 
-		<bezel element="led_box" inputtag="IN0" inputmask="0x08">
+		<element ref="led_box" inputtag="IN0" inputmask="0x08">
 			<bounds x="126" y="80" width="30" height="25" />
-		</bezel>
-		<bezel name="digit6" element="digit">
+		</element>
+		<element name="digit6" ref="digit">
 			<bounds x="131" y="85" width="10" height="15" />
-		</bezel>
-		<bezel name="digit7" element="digit">
+		</element>
+		<element name="digit7" ref="digit">
 			<bounds x="141" y="85" width="10" height="15" />
-		</bezel>
+		</element>
 
-		<bezel element="led_box" inputtag="IN0" inputmask="0x10">
+		<element ref="led_box" inputtag="IN0" inputmask="0x10">
 			<bounds x="162" y="80" width="30" height="25" />
-		</bezel>
-		<bezel name="digit8" element="digit">
+		</element>
+		<element name="digit8" ref="digit">
 			<bounds x="167" y="85" width="10" height="15" />
-		</bezel>
-		<bezel name="digit9" element="digit">
+		</element>
+		<element name="digit9" ref="digit">
 			<bounds x="177" y="85" width="10" height="15" />
-		</bezel>
+		</element>
 
-		<bezel element="led_box" inputtag="IN0" inputmask="0x20">
+		<element ref="led_box" inputtag="IN0" inputmask="0x20">
 			<bounds x="198" y="80" width="30" height="25" />
-		</bezel>
-		<bezel name="digit10" element="digit">
+		</element>
+		<element name="digit10" ref="digit">
 			<bounds x="203" y="85" width="10" height="15" />
-		</bezel>
-		<bezel name="digit11" element="digit">
+		</element>
+		<element name="digit11" ref="digit">
 			<bounds x="213" y="85" width="10" height="15" />
-		</bezel>
+		</element>
 
 <!-- row 2 -->
 
-		<bezel element="led_box" inputtag="IN0" inputmask="0x40">
+		<element ref="led_box" inputtag="IN0" inputmask="0x40">
 			<bounds x="18" y="114" width="30" height="25" />
-		</bezel>
-		<bezel name="digit12" element="digit">
+		</element>
+		<element name="digit12" ref="digit">
 			<bounds x="23" y="119" width="10" height="15" />
-		</bezel>
-		<bezel name="digit13" element="digit">
+		</element>
+		<element name="digit13" ref="digit">
 			<bounds x="33" y="119" width="10" height="15" />
-		</bezel>
+		</element>
 
-		<bezel element="led_box" inputtag="IN0" inputmask="0x80">
+		<element ref="led_box" inputtag="IN0" inputmask="0x80">
 			<bounds x="54" y="114" width="30" height="25" />
-		</bezel>
-		<bezel name="digit14" element="digit">
+		</element>
+		<element name="digit14" ref="digit">
 			<bounds x="59" y="119" width="10" height="15" />
-		</bezel>
-		<bezel name="digit15" element="digit">
+		</element>
+		<element name="digit15" ref="digit">
 			<bounds x="69" y="119" width="10" height="15" />
-		</bezel>
+		</element>
 
-		<bezel element="led_box" inputtag="IN1" inputmask="0x01">
+		<element ref="led_box" inputtag="IN1" inputmask="0x01">
 			<bounds x="90" y="114" width="30" height="25" />
-		</bezel>
-		<bezel name="digit16" element="digit">
+		</element>
+		<element name="digit16" ref="digit">
 			<bounds x="95" y="119" width="10" height="15" />
-		</bezel>
-		<bezel name="digit17" element="digit">
+		</element>
+		<element name="digit17" ref="digit">
 			<bounds x="105" y="119" width="10" height="15" />
-		</bezel>
+		</element>
 
-		<bezel element="led_box" inputtag="IN1" inputmask="0x02">
+		<element ref="led_box" inputtag="IN1" inputmask="0x02">
 			<bounds x="126" y="114" width="30" height="25" />
-		</bezel>
-		<bezel name="digit18" element="digit">
+		</element>
+		<element name="digit18" ref="digit">
 			<bounds x="131" y="119" width="10" height="15" />
-		</bezel>
-		<bezel name="digit19" element="digit">
+		</element>
+		<element name="digit19" ref="digit">
 			<bounds x="141" y="119" width="10" height="15" />
-		</bezel>
+		</element>
 
-		<bezel element="led_box" inputtag="IN1" inputmask="0x04">
+		<element ref="led_box" inputtag="IN1" inputmask="0x04">
 			<bounds x="162" y="114" width="30" height="25" />
-		</bezel>
-		<bezel name="digit20" element="digit">
+		</element>
+		<element name="digit20" ref="digit">
 			<bounds x="167" y="119" width="10" height="15" />
-		</bezel>
-		<bezel name="digit21" element="digit">
+		</element>
+		<element name="digit21" ref="digit">
 			<bounds x="177" y="119" width="10" height="15" />
-		</bezel>
+		</element>
 
-		<bezel element="led_box" inputtag="IN1" inputmask="0x08">
+		<element ref="led_box" inputtag="IN1" inputmask="0x08">
 			<bounds x="198" y="114" width="30" height="25" />
-		</bezel>
-		<bezel name="digit22" element="digit">
+		</element>
+		<element name="digit22" ref="digit">
 			<bounds x="203" y="119" width="10" height="15" />
-		</bezel>
-		<bezel name="digit23" element="digit">
+		</element>
+		<element name="digit23" ref="digit">
 			<bounds x="213" y="119" width="10" height="15" />
-		</bezel>
+		</element>
 
 <!-- row 3 -->
 
-		<bezel element="led_box" inputtag="IN1" inputmask="0x10">
+		<element ref="led_box" inputtag="IN1" inputmask="0x10">
 			<bounds x="18" y="148" width="30" height="25" />
-		</bezel>
-		<bezel name="digit24" element="digit">
+		</element>
+		<element name="digit24" ref="digit">
 			<bounds x="23" y="153" width="10" height="15" />
-		</bezel>
-		<bezel name="digit25" element="digit">
+		</element>
+		<element name="digit25" ref="digit">
 			<bounds x="33" y="153" width="10" height="15" />
-		</bezel>
+		</element>
 
-		<bezel element="led_box" inputtag="IN1" inputmask="0x20">
+		<element ref="led_box" inputtag="IN1" inputmask="0x20">
 			<bounds x="54" y="148" width="30" height="25" />
-		</bezel>
-		<bezel name="digit26" element="digit">
+		</element>
+		<element name="digit26" ref="digit">
 			<bounds x="59" y="153" width="10" height="15" />
-		</bezel>
-		<bezel name="digit27" element="digit">
+		</element>
+		<element name="digit27" ref="digit">
 			<bounds x="69" y="153" width="10" height="15" />
-		</bezel>
+		</element>
 
-		<bezel element="led_box" inputtag="IN1" inputmask="0x40">
+		<element ref="led_box" inputtag="IN1" inputmask="0x40">
 			<bounds x="90" y="148" width="30" height="25" />
-		</bezel>
-		<bezel name="digit28" element="digit">
+		</element>
+		<element name="digit28" ref="digit">
 			<bounds x="95" y="153" width="10" height="15" />
-		</bezel>
-		<bezel name="digit29" element="digit">
+		</element>
+		<element name="digit29" ref="digit">
 			<bounds x="105" y="153" width="10" height="15" />
-		</bezel>
+		</element>
 
-		<bezel element="led_box" inputtag="IN1" inputmask="0x80">
+		<element ref="led_box" inputtag="IN1" inputmask="0x80">
 			<bounds x="126" y="148" width="30" height="25" />
-		</bezel>
-		<bezel name="digit30" element="digit">
+		</element>
+		<element name="digit30" ref="digit">
 			<bounds x="131" y="153" width="10" height="15" />
-		</bezel>
-		<bezel name="digit31" element="digit">
+		</element>
+		<element name="digit31" ref="digit">
 			<bounds x="141" y="153" width="10" height="15" />
-		</bezel>
+		</element>
 
-		<bezel element="led_box" inputtag="IN2" inputmask="0x01">
+		<element ref="led_box" inputtag="IN2" inputmask="0x01">
 			<bounds x="162" y="148" width="30" height="25" />
-		</bezel>
-		<bezel name="digit32" element="digit">
+		</element>
+		<element name="digit32" ref="digit">
 			<bounds x="167" y="153" width="10" height="15" />
-		</bezel>
-		<bezel name="digit33" element="digit">
+		</element>
+		<element name="digit33" ref="digit">
 			<bounds x="177" y="153" width="10" height="15" />
-		</bezel>
+		</element>
 
-		<bezel element="led_box" inputtag="IN2" inputmask="0x02">
+		<element ref="led_box" inputtag="IN2" inputmask="0x02">
 			<bounds x="198" y="148" width="30" height="25" />
-		</bezel>
-		<bezel name="digit34" element="digit">
+		</element>
+		<element name="digit34" ref="digit">
 			<bounds x="203" y="153" width="10" height="15" />
-		</bezel>
-		<bezel name="digit35" element="digit">
+		</element>
+		<element name="digit35" ref="digit">
 			<bounds x="213" y="153" width="10" height="15" />
-		</bezel>
+		</element>
 
 <!-- row 4 -->
 
-		<bezel element="led_box" inputtag="IN2" inputmask="0x04">
+		<element ref="led_box" inputtag="IN2" inputmask="0x04">
 			<bounds x="18" y="182" width="30" height="25" />
-		</bezel>
-		<bezel name="digit36" element="digit">
+		</element>
+		<element name="digit36" ref="digit">
 			<bounds x="23" y="187" width="10" height="15" />
-		</bezel>
-		<bezel name="digit37" element="digit">
+		</element>
+		<element name="digit37" ref="digit">
 			<bounds x="33" y="187" width="10" height="15" />
-		</bezel>
+		</element>
 
-		<bezel element="led_box" inputtag="IN2" inputmask="0x08">
+		<element ref="led_box" inputtag="IN2" inputmask="0x08">
 			<bounds x="54" y="182" width="30" height="25" />
-		</bezel>
-		<bezel name="digit38" element="digit">
+		</element>
+		<element name="digit38" ref="digit">
 			<bounds x="59" y="187" width="10" height="15" />
-		</bezel>
-		<bezel name="digit39" element="digit">
+		</element>
+		<element name="digit39" ref="digit">
 			<bounds x="69" y="187" width="10" height="15" />
-		</bezel>
+		</element>
 
-		<bezel element="led_box" inputtag="IN2" inputmask="0x10">
+		<element ref="led_box" inputtag="IN2" inputmask="0x10">
 			<bounds x="90" y="182" width="30" height="25" />
-		</bezel>
-		<bezel name="digit40" element="digit">
+		</element>
+		<element name="digit40" ref="digit">
 			<bounds x="95" y="187" width="10" height="15" />
-		</bezel>
-		<bezel name="digit41" element="digit">
+		</element>
+		<element name="digit41" ref="digit">
 			<bounds x="105" y="187" width="10" height="15" />
-		</bezel>
+		</element>
 
-		<bezel element="led_box" inputtag="IN2" inputmask="0x20">
+		<element ref="led_box" inputtag="IN2" inputmask="0x20">
 			<bounds x="126" y="182" width="30" height="25" />
-		</bezel>
-		<bezel name="digit42" element="digit">
+		</element>
+		<element name="digit42" ref="digit">
 			<bounds x="131" y="187" width="10" height="15" />
-		</bezel>
-		<bezel name="digit43" element="digit">
+		</element>
+		<element name="digit43" ref="digit">
 			<bounds x="141" y="187" width="10" height="15" />
-		</bezel>
+		</element>
 
-		<bezel element="led_box" inputtag="IN2" inputmask="0x40">
+		<element ref="led_box" inputtag="IN2" inputmask="0x40">
 			<bounds x="162" y="182" width="30" height="25" />
-		</bezel>
-		<bezel name="digit44" element="digit">
+		</element>
+		<element name="digit44" ref="digit">
 			<bounds x="167" y="187" width="10" height="15" />
-		</bezel>
-		<bezel name="digit45" element="digit">
+		</element>
+		<element name="digit45" ref="digit">
 			<bounds x="177" y="187" width="10" height="15" />
-		</bezel>
+		</element>
 
-		<bezel element="led_box" inputtag="IN2" inputmask="0x80">
+		<element ref="led_box" inputtag="IN2" inputmask="0x80">
 			<bounds x="198" y="182" width="30" height="25" />
-		</bezel>
-		<bezel name="digit46" element="digit">
+		</element>
+		<element name="digit46" ref="digit">
 			<bounds x="203" y="187" width="10" height="15" />
-		</bezel>
-		<bezel name="digit47" element="digit">
+		</element>
+		<element name="digit47" ref="digit">
 			<bounds x="213" y="187" width="10" height="15" />
-		</bezel>
+		</element>
 
 <!-- row 5 -->
 
-		<bezel element="led_box" inputtag="IN3" inputmask="0x01">
+		<element ref="led_box" inputtag="IN3" inputmask="0x01">
 			<bounds x="18" y="214" width="30" height="25" />
-		</bezel>
-		<bezel name="digit48" element="digit">
+		</element>
+		<element name="digit48" ref="digit">
 			<bounds x="23" y="219" width="10" height="15" />
-		</bezel>
-		<bezel name="digit49" element="digit">
+		</element>
+		<element name="digit49" ref="digit">
 			<bounds x="33" y="219" width="10" height="15" />
-		</bezel>
+		</element>
 
-		<bezel element="led_box" inputtag="IN3" inputmask="0x02">
+		<element ref="led_box" inputtag="IN3" inputmask="0x02">
 			<bounds x="54" y="214" width="30" height="25" />
-		</bezel>
-		<bezel name="digit50" element="digit">
+		</element>
+		<element name="digit50" ref="digit">
 			<bounds x="59" y="219" width="10" height="15" />
-		</bezel>
-		<bezel name="digit51" element="digit">
+		</element>
+		<element name="digit51" ref="digit">
 			<bounds x="69" y="219" width="10" height="15" />
-		</bezel>
+		</element>
 
-		<bezel element="led_box" inputtag="IN3" inputmask="0x04">
+		<element ref="led_box" inputtag="IN3" inputmask="0x04">
 			<bounds x="90" y="214" width="30" height="25" />
-		</bezel>
-		<bezel name="digit52" element="digit">
+		</element>
+		<element name="digit52" ref="digit">
 			<bounds x="95" y="219" width="10" height="15" />
-		</bezel>
-		<bezel name="digit53" element="digit">
+		</element>
+		<element name="digit53" ref="digit">
 			<bounds x="105" y="219" width="10" height="15" />
-		</bezel>
+		</element>
 
-		<bezel element="led_box" inputtag="IN3" inputmask="0x08">
+		<element ref="led_box" inputtag="IN3" inputmask="0x08">
 			<bounds x="126" y="214" width="30" height="25" />
-		</bezel>
-		<bezel name="digit54" element="digit">
+		</element>
+		<element name="digit54" ref="digit">
 			<bounds x="131" y="219" width="10" height="15" />
-		</bezel>
-		<bezel name="digit55" element="digit">
+		</element>
+		<element name="digit55" ref="digit">
 			<bounds x="141" y="219" width="10" height="15" />
-		</bezel>
+		</element>
 
-		<bezel element="led_box" inputtag="IN3" inputmask="0x10">
+		<element ref="led_box" inputtag="IN3" inputmask="0x10">
 			<bounds x="162" y="214" width="30" height="25" />
-		</bezel>
-		<bezel name="digit56" element="digit">
+		</element>
+		<element name="digit56" ref="digit">
 			<bounds x="167" y="219" width="10" height="15" />
-		</bezel>
-		<bezel name="digit57" element="digit">
+		</element>
+		<element name="digit57" ref="digit">
 			<bounds x="177" y="219" width="10" height="15" />
-		</bezel>
+		</element>
 
-		<bezel element="led_box" inputtag="IN3" inputmask="0x20">
+		<element ref="led_box" inputtag="IN3" inputmask="0x20">
 			<bounds x="198" y="214" width="30" height="25" />
-		</bezel>
-		<bezel name="digit58" element="digit">
+		</element>
+		<element name="digit58" ref="digit">
 			<bounds x="203" y="219" width="10" height="15" />
-		</bezel>
-		<bezel name="digit59" element="digit">
+		</element>
+		<element name="digit59" ref="digit">
 			<bounds x="213" y="219" width="10" height="15" />
-		</bezel>
+		</element>
 
 
 	</view>

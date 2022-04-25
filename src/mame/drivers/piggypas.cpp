@@ -53,9 +53,9 @@ private:
 	required_device<hd44780_device> m_hd44780;
 	required_device<ticket_dispenser_device> m_ticket;
 	output_finder<4> m_digits;
-	uint8_t   m_ctrl;
-	uint8_t   m_lcd_latch;
-	uint32_t  m_digit_latch;
+	uint8_t   m_ctrl = 0;
+	uint8_t   m_lcd_latch = 0;
+	uint32_t  m_digit_latch = 0;
 	void piggypas_io(address_map &map);
 	void piggypas_map(address_map &map);
 	void fidlstix_io(address_map &map);
@@ -184,7 +184,7 @@ void piggypas_state::machine_reset()
 HD44780_PIXEL_UPDATE(piggypas_state::piggypas_pixel_update)
 {
 	if (pos < 8)
-		bitmap.pix16(y, (line * 8 + pos) * 6 + x) = state;
+		bitmap.pix(y, (line * 8 + pos) * 6 + x) = state;
 }
 
 void piggypas_state::piggypas(machine_config &config)

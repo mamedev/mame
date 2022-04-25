@@ -12,6 +12,7 @@
 
 #include "exp.h"
 #include "machine/6522via.h"
+#include "machine/input_merger.h"
 #include "bus/electron/cart/slot.h"
 #include "bus/bbc/userport/userport.h"
 #include "bus/generic/slot.h"
@@ -45,6 +46,7 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom2_load) { return load_rom(image, m_rom[1]); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom3_load) { return load_rom(image, m_rom[2]); }
 
+	required_device<input_merger_device> m_irqs;
 	required_device<electron_expansion_slot_device> m_exp;
 	required_device<via6522_device> m_via;
 	required_device_array<generic_slot_device, 3> m_rom;

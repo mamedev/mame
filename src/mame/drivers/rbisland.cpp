@@ -326,13 +326,13 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "sound/2203intf.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-WRITE16_MEMBER(rbisland_state::jumping_sound_w)
+void rbisland_state::jumping_sound_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -406,7 +406,7 @@ void rbisland_state::bankswitch_w(uint8_t data)
 	membank("bank1")->set_entry(data & 3);
 }
 
-READ8_MEMBER(rbisland_state::jumping_latch_r)
+uint8_t rbisland_state::jumping_latch_r()
 {
 	return m_jumping_latch;
 }

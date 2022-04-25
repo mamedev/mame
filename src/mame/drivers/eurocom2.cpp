@@ -41,14 +41,15 @@
 #include "machine/wd_fdc.h"
 
 #include "emupal.h"
+#include "softlist_dev.h"
 #include "screen.h"
 
 
-#define VC_TOTAL_HORZ 678
-#define VC_DISP_HORZ  512
+static constexpr int VC_TOTAL_HORZ = 678;
+static constexpr int VC_DISP_HORZ = 512;
 
-#define VC_TOTAL_VERT 312
-#define VC_DISP_VERT  256
+static constexpr int VC_TOTAL_VERT = 312;
+static constexpr int VC_DISP_VERT = 256;
 
 
 //#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
@@ -56,12 +57,14 @@
 #define LOG_DEBUG     (1U <<  2)
 
 //#define VERBOSE (LOG_DEBUG)
-//#define LOG_OUTPUT_FUNC printf
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGKBD(...) LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
 #define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
 
+
+namespace {
 
 class eurocom2_state : public driver_device
 {
@@ -75,17 +78,17 @@ public:
 		, m_fdc(*this, "fdc")
 		, m_p_videoram(*this, "videoram")
 		, m_screen(*this, "screen")
-	{
-	}
+	{ }
 
 	void eurocom2(machine_config &config);
 	void microtrol(machine_config &config);
+
 protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint8_t fdc_aux_r(offs_t offset);
 	void fdc_aux_w(offs_t offset, uint8_t data);
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	void vico_w(offs_t offset, uint8_t data);
 
@@ -102,16 +105,16 @@ protected:
 	// driver_device overrides
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
-	emu_timer *m_sst;
+	emu_timer *m_sst = nullptr;
 
-	floppy_image_device *m_floppy;
-	bool m_sst_state, m_kbd_ready;
+	floppy_image_device *m_floppy = nullptr;
+	bool m_sst_state = false, m_kbd_ready = false;
 	bitmap_ind16 m_tmpbmp;
 
-	uint8_t m_vico[2];
-	uint8_t m_kbd_data;
+	uint8_t m_vico[2]{};
+	uint8_t m_kbd_data = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia1;
@@ -131,6 +134,9 @@ public:
 		, m_ptm(*this, "ptm")
 	{ }
 
+	void waveterm(machine_config &config);
+
+private:
 	uint8_t waveterm_kb_r();
 	void waveterm_kb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(waveterm_kbh_w);
@@ -143,11 +149,10 @@ public:
 	uint8_t waveterm_adc();
 	void waveterm_dac(uint8_t data); // declared but not defined, commented in memory map
 
-	void waveterm(machine_config &config);
 	void waveterm_map(address_map &map);
-protected:
-	bool m_driveh;
-	uint8_t m_drive;
+
+	bool m_driveh = false;
+	uint8_t m_drive = 0;
 
 	required_device<pia6821_device> m_pia3;
 	required_device<ptm6840_device> m_ptm;
@@ -240,7 +245,7 @@ WRITE_LINE_MEMBER(eurocom2_state::pia1_cb2_w)
 	// reset single-step timer
 }
 
-void eurocom2_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void eurocom2_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_sst_state = !m_sst_state;
 	m_pia1->ca2_w(m_sst_state);
@@ -296,25 +301,22 @@ void waveterm_state::pia3_pb_w(uint8_t data)
 
 uint8_t waveterm_state::waveterm_adc()
 {
-	return m_screen->frame_number() % 255; // XXX
+	return m_screen->frame_number() % 255; // FIXME
 }
 
 
 uint32_t eurocom2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y, offset, page;
-	uint16_t gfx, *p;
+	int const page = (m_vico[0] & 3) << 14;
 
-	page = (m_vico[0] & 3) << 14;
-
-	for (y = 0; y < VC_DISP_VERT; y++)
+	for (int y = 0; y < VC_DISP_VERT; y++)
 	{
-		offset = (VC_DISP_HORZ / 8) * ((m_vico[1] + y) % VC_DISP_VERT);
-		p = &m_tmpbmp.pix16(y);
+		int const offset = (VC_DISP_HORZ / 8) * ((m_vico[1] + y) % VC_DISP_VERT);
+		uint16_t *p = &m_tmpbmp.pix(y);
 
-		for (x = offset; x < offset + VC_DISP_HORZ / 8; x++)
+		for (int x = offset; x < offset + VC_DISP_HORZ / 8; x++)
 		{
-			gfx = m_p_videoram[page + x];
+			uint16_t const gfx = m_p_videoram[page + x];
 
 			for (int i = 7; i >= 0; i--)
 			{
@@ -418,12 +420,15 @@ void eurocom2_state::machine_start()
 {
 	m_sst = timer_alloc(0);
 	m_tmpbmp.allocate(VC_DISP_HORZ, VC_DISP_VERT);
+	m_kbd_data = 0;
 }
 
 
-FLOPPY_FORMATS_MEMBER( eurocom2_state::floppy_formats )
-	FLOPPY_PPG_FORMAT
-FLOPPY_FORMATS_END
+void eurocom2_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_PPG_FORMAT);
+}
 
 static void eurocom_floppies(device_slot_interface &device)
 {
@@ -532,6 +537,8 @@ ROM_START(microtrol)
 	ROM_LOAD("mon1.bin", 0x0000, 0x0800, CRC(4e82af0f) SHA1(a708f0c8a4d7ab216bc065e82a4ad42009cc3696)) // "microtrol Control V5.1"
 	ROM_LOAD("mon2.bin", 0x0800, 0x0800, CRC(577a2b4c) SHA1(e7097a96417fa249a62c967039f039e637079cb6))
 ROM_END
+
+} // Anonymous namespace
 
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     CLASS           INIT        COMPANY      FULLNAME                     FLAGS

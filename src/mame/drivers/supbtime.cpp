@@ -156,7 +156,7 @@ WRITE_LINE_MEMBER( supbtime_state::vblank_w )
 		m_maincpu->set_input_line(M68K_IRQ_6, ASSERT_LINE);
 }
 
-READ16_MEMBER( supbtime_state::vblank_ack_r )
+uint16_t supbtime_state::vblank_ack_r()
 {
 	m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
 	return 0xffff;

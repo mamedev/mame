@@ -50,7 +50,11 @@
  */
 
 #include "flex_dsk.h"
-#include "formats/imageutl.h"
+
+#include "imageutl.h"
+
+#include "ioprocs.h"
+
 
 flex_format::flex_format() : wd177x_format(formats)
 {
@@ -71,26 +75,31 @@ const char *flex_format::extensions() const
 	return "dsk";
 }
 
-int flex_format::identify(io_generic *io, uint32_t form_factor)
+int flex_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
-	int type = find_size(io, form_factor);
+	int type = find_size(io, form_factor, variants);
 
 	if (type != -1)
-		return 75;
+		return FIFID_SIZE;
 	return 0;
 }
 
-int flex_format::find_size(io_generic *io, uint32_t form_factor)
+int flex_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
-	uint64_t size = io_generic_size(io);
+	uint64_t size;
+	if (io.length(size))
+		return -1;
+
 	uint8_t boot0[256], boot1[256];
+	sysinfo_sector info;
+	size_t actual;
 
 	// Look at the boot sector.
 	// Density, sides, link??
-	io_generic_read(io, &boot0, 256 * 0, sizeof(boot0));
-	io_generic_read(io, &boot1, 256 * 1, sizeof(boot1));
+	io.read_at(256 * 0, &boot0, sizeof(boot0), actual);
+	io.read_at(256 * 1, &boot1, sizeof(boot1), actual);
 	// Look at the system information sector.
-	io_generic_read(io, &info, 256 * 2, sizeof(struct sysinfo_sector));
+	io.read_at(256 * 2, &info, sizeof(struct sysinfo_sector), actual);
 
 	LOG_FORMATS("FLEX floppy dsk: size %d bytes, %d total sectors, %d remaining bytes, expected form factor %x\n", (uint32_t)size, (uint32_t)size / 256, (uint32_t)size % 256, form_factor);
 
@@ -102,8 +111,8 @@ int flex_format::find_size(io_generic *io, uint32_t form_factor)
 	if (info.month < 1 || info.month > 12 || info.day < 1 || info.day > 31)
 		return -1;
 
-	boot0_sector_id = 1;
-	boot1_sector_id = 2;
+	uint8_t boot0_sector_id = 1;
+	//  uint8_t boot1_sector_id = 2;
 
 	// This floppy format uses a strategy of looking for 6800 boot code to
 	// set the numbering of the first two sectors. If this is shown to not
@@ -114,12 +123,13 @@ int flex_format::find_size(io_generic *io, uint32_t form_factor)
 		// Found a 6800 stack load and branch, looks like a 6800 boot sector.
 		boot0_sector_id = 0;
 
+		// boot1 is not actually used (yet?)
 		// Look for a link to the next sector, normal usage.
-		if (boot1[0] != 0 || boot1[1] != 3)
-		{
+		//      if (boot1[0] != 0 || boot1[1] != 3)
+		//      {
 			// If not then assume it is a boot sector.
-			boot1_sector_id = 1;
-		}
+		//          boot1_sector_id = 1;
+		//      }
 	}
 
 	for (int i=0; formats[i].form_factor; i++) {
@@ -173,7 +183,7 @@ int flex_format::find_size(io_generic *io, uint32_t form_factor)
 	return -1;
 }
 
-const wd177x_format::format &flex_format::get_track_format(const format &f, int head, int track)
+const wd177x_format::format &flex_format::get_track_format(const format &f, int head, int track) const
 {
 	int n = -1;
 
@@ -1265,4 +1275,4 @@ const flex_format::format flex_format::formats_head1_track0[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_FLEX_FORMAT = &floppy_image_format_creator<flex_format>;
+const flex_format FLOPPY_FLEX_FORMAT;

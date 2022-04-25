@@ -43,19 +43,7 @@ license:CC0
 		</disk>
 	</element>
 
-	<element name="background">
-		<rect>
-			<bounds left="0" top="0" right="1" bottom="1" />
-			<color red="0.0" green="0.0" blue="0.0" />
-		</rect>
-	</element>
-
 	<view name="Default Layout">
-		<!-- Background -->
-		<backdrop element="background">
-			<bounds left="0" top="0" right="150" bottom="20" />
-		</backdrop>
-
 		<!-- generated with mechanical data from the data sheet -->
 		<repeat count="8"> <!-- 8 digits -->
 			<param name="digitno" start="1" increment="1" />
@@ -66,9 +54,9 @@ license:CC0
 				<repeat count="5"> <!-- 5 columns in each digit -->
 					<param name="colno" start="1" increment="1" />
 					<param name="colx" start="~digitx~" increment="111" /> <!-- horizontal distance between LEDs -->
-					<bezel name="Dot_~digitno~~rowno~~colno~" element="Pixel" state="0">
+					<element name="Dot_~digitno~~rowno~~colno~" ref="Pixel" state="0">
 						<bounds x="~colx~" y="~rowy~" width="100" height="100" /> <!-- size of each LED -->
-					</bezel>
+					</element>
 				</repeat>
 			</repeat>
 		</repeat>

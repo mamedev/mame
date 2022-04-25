@@ -121,7 +121,6 @@ Table 3-2.  TMS32025/26 Memory Blocks
 #include "emu.h"
 #include "tms32025.h"
 #include "32025dsm.h"
-#include "debugger.h"
 
 
 #define CLK 4   /* 1 cycle equals 4 clock ticks */      /* PE/DI */
@@ -292,22 +291,22 @@ std::unique_ptr<util::disasm_interface> tms32025_device::create_disassembler()
 	return std::make_unique<tms32025_disassembler>();
 }
 
-READ16_MEMBER( tms32025_device::drr_r)
+uint16_t tms32025_device::drr_r()
 {
 	return m_drr;
 }
 
-WRITE16_MEMBER(tms32025_device::drr_w)
+void tms32025_device::drr_w(uint16_t data)
 {
 	m_drr = data;
 }
 
-READ16_MEMBER( tms32025_device::dxr_r)
+uint16_t tms32025_device::dxr_r()
 {
 	return m_dxr;
 }
 
-WRITE16_MEMBER(tms32025_device::dxr_w)
+void tms32025_device::dxr_w(uint16_t data)
 {
 	m_dxr = data;
 
@@ -319,42 +318,42 @@ WRITE16_MEMBER(tms32025_device::dxr_w)
 	}
 }
 
-READ16_MEMBER( tms32025_device::tim_r)
+uint16_t tms32025_device::tim_r()
 {
 	return m_tim;
 }
 
-WRITE16_MEMBER(tms32025_device::tim_w)
+void tms32025_device::tim_w(uint16_t data)
 {
 	m_tim = data;
 }
 
-READ16_MEMBER( tms32025_device::prd_r)
+uint16_t tms32025_device::prd_r()
 {
 	return m_prd;
 }
 
-WRITE16_MEMBER(tms32025_device::prd_w)
+void tms32025_device::prd_w(uint16_t data)
 {
 	m_prd = data;
 }
 
-READ16_MEMBER( tms32025_device::imr_r)
+uint16_t tms32025_device::imr_r()
 {
 	return m_imr;
 }
 
-WRITE16_MEMBER(tms32025_device::imr_w)
+void tms32025_device::imr_w(uint16_t data)
 {
 	m_imr = data;
 }
 
-READ16_MEMBER( tms32025_device::greg_r)
+uint16_t tms32025_device::greg_r()
 {
 	return m_greg;
 }
 
-WRITE16_MEMBER(tms32025_device::greg_w)
+void tms32025_device::greg_w(uint16_t data)
 {
 	m_greg = data;
 }
@@ -1754,8 +1753,6 @@ void tms32025_device::device_start()
 
 	state_add(STATE_GENPC, "GENPC", m_PC).formatstr("%04X").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_PREVPC).formatstr("%04X").noshow();
-	/* This is actually not a stack pointer, but the stack contents */
-	state_add(STATE_GENSP, "GENSP", m_STACK[7]).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS",  m_STR0).formatstr("%33s").noshow();
 
 	set_icountptr(m_icount);

@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    diexec.c
+    diexec.cpp
 
     Device execution interfaces.
 
@@ -164,7 +164,7 @@ void device_execute_interface::spin_until_time(const attotime &duration)
 	suspend_until_trigger(TRIGGER_SUSPENDTIME + timetrig, true);
 
 	// then set a timer for it
-	m_scheduler->timer_set(duration, timer_expired_delegate(FUNC(device_execute_interface::timed_trigger_callback),this), TRIGGER_SUSPENDTIME + timetrig, this);
+	m_scheduler->timer_set(duration, timer_expired_delegate(FUNC(device_execute_interface::timed_trigger_callback),this), TRIGGER_SUSPENDTIME + timetrig);
 	timetrig = (timetrig + 1) % 256;
 }
 
@@ -350,7 +350,7 @@ void device_execute_interface::interface_validity_check(validity_checker &valid)
 	// validate the interrupts
 	if (!m_vblank_interrupt.isnull())
 	{
-		screen_device_iterator iter(device().mconfig().root_device());
+		screen_device_enumerator iter(device().mconfig().root_device());
 		if (iter.first() == nullptr)
 			osd_printf_error("VBLANK interrupt specified, but the driver is screenless\n");
 		else if (m_vblank_interrupt_screen != nullptr && device().siblingdevice(m_vblank_interrupt_screen) == nullptr)
@@ -379,7 +379,7 @@ void device_execute_interface::interface_pre_start()
 	m_driver_irq.resolve();
 
 	// fill in the initial states
-	int const index = device_iterator(device().machine().root_device()).indexof(*this);
+	int const index = device_enumerator(device().machine().root_device()).indexof(*this);
 	m_suspend = SUSPEND_REASON_RESET;
 	m_profiler = profile_type(index + PROFILER_DEVICE_FIRST);
 	m_inttrigger = index + TRIGGER_INT;
@@ -416,7 +416,7 @@ void device_execute_interface::interface_post_start()
 	device().save_item(STRUCT_MEMBER(m_input, m_curstate));
 
 	// fill in the input states and IRQ callback information
-	for (int line = 0; line < ARRAY_LENGTH(m_input); line++)
+	for (int line = 0; line < std::size(m_input); line++)
 		m_input[line].start(*this, line);
 }
 
@@ -679,16 +679,16 @@ if (TEMPLOG) printf("setline(%s,%d,%d,%d)\n", m_execute->device().tag(), m_linen
 
 	// if we're full of events, flush the queue and log a message
 	int event_index = m_qindex++;
-	if (event_index >= ARRAY_LENGTH(m_queue))
+	if (event_index >= std::size(m_queue))
 	{
 		m_qindex--;
-		empty_event_queue(nullptr,0);
+		empty_event_queue(0);
 		event_index = m_qindex++;
 		m_execute->device().logerror("Exceeded pending input line event queue on device '%s'!\n", m_execute->device().tag());
 	}
 
 	// enqueue the event
-	if (event_index < ARRAY_LENGTH(m_queue))
+	if (event_index < std::size(m_queue))
 	{
 		if (vector == USE_STORED_VECTOR)
 			vector = m_stored_vector;
@@ -696,7 +696,7 @@ if (TEMPLOG) printf("setline(%s,%d,%d,%d)\n", m_execute->device().tag(), m_linen
 
 		// if this is the first one, set the timer
 		if (event_index == 0)
-			m_execute->scheduler().synchronize(timer_expired_delegate(FUNC(device_execute_interface::device_input::empty_event_queue),this), 0, this);
+			m_execute->scheduler().synchronize(timer_expired_delegate(FUNC(device_execute_interface::device_input::empty_event_queue),this));
 	}
 }
 

@@ -207,32 +207,28 @@ void nes_fjump2_device::pcb_reset()
 
 void nes_oekakids_device::nt_w(offs_t offset, uint8_t data)
 {
-	int page = ((offset & 0xc00) >> 10);
-
 #if 0
 	if (!(offset & 0x1000) && (offset & 0x3ff) < 0x3c0)
 	{
-		m_latch = (offset & 0x300) >> 8;
+		m_latch = BIT(offset, 8, 2);
 		chr4_0(m_reg | m_latch, CHRRAM);
 	}
 #endif
 
-	m_nt_access[page][offset & 0x3ff] = data;
+	device_nes_cart_interface::nt_w(offset, data);
 }
 
 uint8_t nes_oekakids_device::nt_r(offs_t offset)
 {
-	int page = ((offset & 0xc00) >> 10);
-
 #if 0
 	if (!(offset & 0x1000) && (offset & 0x3ff) < 0x3c0)
 	{
-		m_latch = (offset & 0x300) >> 8;
+		m_latch = BIT(offset, 8, 2);
 		chr4_0(m_reg | m_latch, CHRRAM);
 	}
 #endif
 
-	return m_nt_access[page][offset & 0x3ff];
+	return device_nes_cart_interface::nt_r(offset);
 }
 
 void nes_oekakids_device::update_chr()
@@ -247,7 +243,7 @@ void nes_oekakids_device::ppu_latch(offs_t offset)
 #if 0
 	if ((offset & 0x3000) == 0x2000)
 	{
-		m_latch = (offset & 0x300) >> 8;
+		m_latch = BIT(offset, 8, 2);
 		update_chr();
 	}
 #endif
@@ -285,7 +281,7 @@ void nes_oekakids_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_fcg_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_fcg_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{

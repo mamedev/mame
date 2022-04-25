@@ -24,7 +24,7 @@
 #include "includes/psion.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -170,7 +170,7 @@ void psion_state::io_rw(uint16_t offset)
 	}
 }
 
-WRITE8_MEMBER( psion_state::io_w )
+void psion_state::io_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x0ffc0)
 	{
@@ -182,7 +182,7 @@ WRITE8_MEMBER( psion_state::io_w )
 	}
 }
 
-READ8_MEMBER( psion_state::io_r )
+uint8_t psion_state::io_r(offs_t offset)
 {
 	switch (offset & 0xffc0)
 	{
@@ -203,19 +203,19 @@ INPUT_CHANGED_MEMBER(psion_state::psion_on)
 		m_maincpu->reset();
 }
 
-READ8_MEMBER( psion1_state::reset_kb_counter_r )
+uint8_t psion1_state::reset_kb_counter_r()
 {
 	m_kb_counter = 0;
 	return 0;
 }
 
-READ8_MEMBER( psion1_state::inc_kb_counter_r )
+uint8_t psion1_state::inc_kb_counter_r()
 {
 	m_kb_counter++;
 	return 0;
 }
 
-READ8_MEMBER( psion1_state::switchoff_r )
+uint8_t psion1_state::switchoff_r()
 {
 	if (!m_stby_pwr)
 	{
@@ -518,14 +518,14 @@ HD44780_PIXEL_UPDATE(psion_state::lz_pixel_update)
 		};
 
 		uint8_t char_pos = psion_display_layout[line*40 + pos];
-		bitmap.pix16((char_pos / 20) * 9 + y, (char_pos % 20) * 6 + x) = state;
+		bitmap.pix((char_pos / 20) * 9 + y, (char_pos % 20) * 6 + x) = state;
 	}
 }
 
 HD44780_PIXEL_UPDATE(psion1_state::psion1_pixel_update)
 {
 	if (pos < 8 && line < 2)
-		bitmap.pix16(y, (line * 8 + pos) * 6 + x) = state;
+		bitmap.pix(y, (line * 8 + pos) * 6 + x) = state;
 }
 
 void psion_state::psion_palette(palette_device &palette) const

@@ -109,9 +109,9 @@ public:
 	required_shared_ptr<uint8_t> m_sprites;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	tilemap_t  *m_fg_tilemap;
-	uint8_t    m_bg_bank;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	tilemap_t  *m_fg_tilemap = nullptr;
+	uint8_t    m_bg_bank = 0;
 	void fg_ram_w(offs_t offset, uint8_t data);
 	void bg_bank_w(uint8_t data);
 	void calorie_flipscreen_w(uint8_t data);
@@ -185,7 +185,6 @@ uint32_t calorie_state::screen_update_calorie(screen_device &screen, bitmap_ind1
 	{
 		m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	}
-
 
 	for (x = 0x400; x >= 0; x -= 4)
 	{
@@ -287,7 +286,7 @@ void calorie_state::calorie_map(address_map &map)
 void calorie_state::decrypted_opcodes_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
-	map(0x8000, 0xbfff).rom();
+	map(0x8000, 0xbfff).rom().region("maincpu", 0x8000);
 	map(0xc000, 0xcfff).ram().share("ram");
 }
 

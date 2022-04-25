@@ -179,6 +179,21 @@ void pgm_012_025_state::init_drgw2c()
 	mem16[0x1304f2 / 2] = 0x4e93;
 }
 
+void pgm_012_025_state::init_drgw2c101()
+{
+	u16 *mem16 = (u16 *)memregion("maincpu")->base();
+
+	drgw2_common_init();
+
+	const int region = 0x05;
+	m_igs025->m_kb_region = region;
+	m_igs025->m_kb_game_id = region | (region << 8) | (region << 16) | (region << 24);
+
+	mem16[0x1306e4 / 2] = 0x4e93;
+	mem16[0x13078a / 2] = 0x4e93;
+	mem16[0x13081a / 2] = 0x4e93;
+}
+
 void pgm_012_025_state::init_drgw2j()
 {
 	u16 *mem16 = (u16 *)memregion("maincpu")->base();

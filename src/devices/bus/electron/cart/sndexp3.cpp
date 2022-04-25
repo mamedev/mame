@@ -66,7 +66,7 @@ uint8_t electron_sndexp3_device::read(offs_t offset, int infc, int infd, int rom
 {
 	uint8_t data = 0xff;
 
-	if (oe && romqa)
+	if (oe2)
 	{
 		if (offset < 0x2000)
 		{
@@ -103,7 +103,7 @@ void electron_sndexp3_device::write(offs_t offset, uint8_t data, int infc, int i
 			break;
 		}
 	}
-	else if (oe && romqa)
+	else if (oe2)
 	{
 		if (offset >= 0x2000)
 		{

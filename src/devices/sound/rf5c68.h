@@ -45,7 +45,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// device_memory_interface configuration
 	virtual space_config_vector memory_space_config() const override;
@@ -75,6 +75,8 @@ private:
 	u16                                               m_wbank;
 	u8                                                m_enable;
 	int                                               m_output_bits;
+	std::vector<s32> m_mixleft;
+	std::vector<s32> m_mixright;
 
 	sample_end_cb_delegate m_sample_end_cb;
 };

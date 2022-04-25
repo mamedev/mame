@@ -33,7 +33,11 @@ protected:
 
 private:
 	// internal state
-	tilemap_t     *m_layer[2];
+	tilemap_t* m_tilemap_128 = nullptr;
+	tilemap_t* m_tilemap_256 = nullptr;
+
+	uint32_t m_palette_base = 0;
+	uint32_t m_tilemap_base = 0;
 
 	std::unique_ptr<uint32_t[]>       m_tile_ram;
 	std::unique_ptr<uint32_t[]>       m_char_ram;
@@ -41,9 +45,7 @@ private:
 
 	int            m_gfx_index;
 
-	TILE_GET_INFO_MEMBER(tile_info_layer0);
-	TILE_GET_INFO_MEMBER(tile_info_layer1);
-	void update_palette_color( uint32_t palette_base, int color );
+	TILE_GET_INFO_MEMBER(tile_info);
 };
 
 DECLARE_DEVICE_TYPE(K037122, k037122_device)

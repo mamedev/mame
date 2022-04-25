@@ -9,7 +9,7 @@ device_network_interface::device_network_interface(const machine_config &mconfig
 	m_promisc = false;
 	m_bandwidth = bandwidth;
 	set_mac("\0\0\0\0\0\0");
-	m_intf = 0;
+	m_intf = -1;
 	m_loopback_control = false;
 }
 
@@ -28,7 +28,7 @@ void device_network_interface::interface_post_start()
 	device().save_item(NAME(m_loopback_control));
 }
 
-int device_network_interface::send(u8 *buf, int len)
+int device_network_interface::send(u8 *buf, int len, int fcs)
 {
 	// TODO: enable this check when other devices implement delayed transmit
 	//if (m_send_timer->enabled())
@@ -49,8 +49,10 @@ int device_network_interface::send(u8 *buf, int len)
 	}
 	else if (m_dev)
 	{
-		// send the data
-		result = m_dev->send(buf, len);
+		// send the data (excluding fcs)
+		result = m_dev->send(buf, len - fcs);
+		if (result)
+			result += fcs;
 	}
 
 	// schedule transmit complete callback

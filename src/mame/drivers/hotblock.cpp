@@ -85,7 +85,7 @@ private:
 	required_device<i2cmem_device> m_i2cmem;
 
 	// Misc
-	int m_port0;
+	int m_port0 = 0;
 
 	// Memory
 	required_shared_ptr<uint8_t> m_vram;
@@ -159,7 +159,7 @@ uint32_t hotblock_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		int count = (y * 320) + cliprect.left();
 		for(int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
-			bitmap.pix16(y, x) = m_vram[count++];
+			bitmap.pix(y, x) = m_vram[count++];
 		}
 	}
 

@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "device.h"
-
 
 class r10788_device : public device_t
 {
@@ -45,7 +43,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	static const device_timer_id TIMER_DISPLAY = 0;

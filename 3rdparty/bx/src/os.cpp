@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -27,15 +27,13 @@
 	|| BX_PLATFORM_NX         \
 	|| BX_PLATFORM_OSX        \
 	|| BX_PLATFORM_PS4        \
-	|| BX_PLATFORM_RPI        \
-	|| BX_PLATFORM_STEAMLINK
+	|| BX_PLATFORM_RPI
 #	include <sched.h> // sched_yield
 #	if BX_PLATFORM_BSD       \
 	|| BX_PLATFORM_HAIKU     \
 	|| BX_PLATFORM_IOS       \
 	|| BX_PLATFORM_OSX       \
-	|| BX_PLATFORM_PS4       \
-	|| BX_PLATFORM_STEAMLINK
+	|| BX_PLATFORM_PS4
 #		include <pthread.h> // mach_port_t
 #	endif // BX_PLATFORM_*
 
@@ -47,8 +45,7 @@
 #	if BX_PLATFORM_ANDROID
 #		include <malloc.h> // mallinfo
 #	elif   BX_PLATFORM_LINUX     \
-		|| BX_PLATFORM_RPI       \
-		|| BX_PLATFORM_STEAMLINK
+		|| BX_PLATFORM_RPI
 #		include <stdio.h>  // fopen
 #		include <unistd.h> // syscall
 #		include <sys/syscall.h>
@@ -101,8 +98,7 @@ namespace bx
 #if BX_PLATFORM_WINDOWS
 		return ::GetCurrentThreadId();
 #elif  BX_PLATFORM_LINUX \
-	|| BX_PLATFORM_RPI   \
-	|| BX_PLATFORM_STEAMLINK
+	|| BX_PLATFORM_RPI
 		return (pid_t)::syscall(SYS_gettid);
 #elif  BX_PLATFORM_IOS \
 	|| BX_PLATFORM_OSX

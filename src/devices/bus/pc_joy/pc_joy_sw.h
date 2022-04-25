@@ -19,7 +19,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id tid, int param) override;
 
 private:
 	required_ioport m_btn1;

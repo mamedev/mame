@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
-#ifndef __DEBUG_QT_DEVICE_INFORMATION_WINDOW_H__
-#define __DEBUG_QT_DEVICE_INFORMATION_WINDOW_H__
+#ifndef MAME_DEBUGGER_QT_DEVICEINFORMATIONWINDOW_H
+#define MAME_DEBUGGER_QT_DEVICEINFORMATIONWINDOW_H
 
 #include "windowqt.h"
 
@@ -13,7 +13,7 @@ class DeviceInformationWindow : public WindowQt
 	Q_OBJECT
 
 public:
-	DeviceInformationWindow(running_machine* machine, device_t* device = nullptr, QWidget* parent=nullptr);
+	DeviceInformationWindow(running_machine &machine, device_t *device = nullptr, QWidget* parent=nullptr);
 	virtual ~DeviceInformationWindow();
 
 	void set_device(const char *tag);
@@ -43,11 +43,11 @@ public:
 
 	~DeviceInformationWindowQtConfig() {}
 
-	void buildFromQWidget(QWidget* widget);
-	void applyToQWidget(QWidget* widget);
+	void buildFromQWidget(QWidget *widget);
+	void applyToQWidget(QWidget *widget);
 	void addToXmlDataNode(util::xml::data_node &node) const;
 	void recoverFromXmlNode(util::xml::data_node const &node);
 };
 
 
-#endif
+#endif // MAME_DEBUGGER_QT_DEVICEINFORMATIONWINDOW_H

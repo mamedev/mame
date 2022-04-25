@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -120,6 +120,15 @@ namespace bx
 	{
 		const Ty mffff  = simd_isplat<Ty>(UINT32_MAX);
 		const Ty result = simd_xor(_a, mffff);
+
+		return result;
+	}
+
+	template<typename Ty>
+	BX_SIMD_INLINE Ty simd_cmpneq_ni(Ty _a, Ty _b)
+	{
+		const Ty tmp0   = simd_cmpeq(_a, _b);
+		const Ty result = simd_not(tmp0);
 
 		return result;
 	}

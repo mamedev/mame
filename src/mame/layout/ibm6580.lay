@@ -58,54 +58,54 @@ license:CC0
 			<bounds x="30" y="0" width="~scr0width~" height="~scr0height~" />
 		</screen>
 
-		<bezel name="led1" element="sysled">
+		<element name="led1" ref="sysled">
 			<bounds x="15" y="76" width="10" height="10" />
-		</bezel>
-		<bezel name="led2" element="sysled">
+		</element>
+		<element name="led2" ref="sysled">
 			<bounds x="15" y="96" width="10" height="10" />
-		</bezel>
-		<bezel name="led3" element="sysled">
+		</element>
+		<element name="led3" ref="sysled">
 			<bounds x="15" y="116" width="10" height="10" />
-		</bezel>
-		<bezel name="led4" element="sysled">
+		</element>
+		<element name="led4" ref="sysled">
 			<bounds x="15" y="136" width="10" height="10" />
-		</bezel>
-		<bezel name="led5" element="sysled">
+		</element>
+		<element name="led5" ref="sysled">
 			<bounds x="15" y="156" width="10" height="10" />
-		</bezel>
-		<bezel name="led6" element="sysled">
+		</element>
+		<element name="led6" ref="sysled">
 			<bounds x="15" y="176" width="10" height="10" />
-		</bezel>
-		<bezel name="led7" element="sysled">
+		</element>
+		<element name="led7" ref="sysled">
 			<bounds x="15" y="196" width="10" height="10" />
-		</bezel>
-		<bezel name="led8" element="sysled">
+		</element>
+		<element name="led8" ref="sysled">
 			<bounds x="15" y="216" width="10" height="10" />
-		</bezel>
+		</element>
 
-		<bezel name="label1" element="l1">
+		<element name="label1" ref="l1">
 			<bounds x="0" y="73" width="15" height="16" />
-		</bezel>
-		<bezel name="label2" element="l2">
+		</element>
+		<element name="label2" ref="l2">
 			<bounds x="0" y="93" width="15" height="16" />
-		</bezel>
-		<bezel name="label3" element="l3">
+		</element>
+		<element name="label3" ref="l3">
 			<bounds x="0" y="113" width="15" height="16" />
-		</bezel>
-		<bezel name="label4" element="l4">
+		</element>
+		<element name="label4" ref="l4">
 			<bounds x="0" y="133" width="15" height="16" />
-		</bezel>
-		<bezel name="label5" element="l5">
+		</element>
+		<element name="label5" ref="l5">
 			<bounds x="0" y="153" width="15" height="16" />
-		</bezel>
-		<bezel name="label6" element="l6">
+		</element>
+		<element name="label6" ref="l6">
 			<bounds x="0" y="173" width="15" height="16" />
-		</bezel>
-		<bezel name="label7" element="l7">
+		</element>
+		<element name="label7" ref="l7">
 			<bounds x="0" y="193" width="15" height="16" />
-		</bezel>
-		<bezel name="label8" element="l8">
+		</element>
+		<element name="label8" ref="l8">
 			<bounds x="0" y="213" width="15" height="16" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

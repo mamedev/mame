@@ -113,14 +113,14 @@
       must type a password. At this time, in the layout, under the
       roulette leds will appear the password we need (six numeric digits).
 
-  4.- Enter the required paswword using the credits in (IN1....IN6)
+  4.- Enter the required password using the credits in (IN1....IN6)
       and credits out (OUT1...OUT6) buttons following the key assignment
       indications located under the password field.
       Use the "E" button to finish once all numbers were typed.
       Use the "B" button clear last digit typed, in case of mistake.
 
   5.- Once finished that, the game will reboot and will be ready
-      to play. Also, password showed on layout will dissapear.
+      to play. Also, password showed on layout will disappear.
 
       In case that (by unknown reason) the game asks for
       "CONTROL ADMINISTRATIVO" again, follow the instructions starting
@@ -140,13 +140,13 @@
   roulettes like Lucky Ball, Lucky Roulette, Corona, Re900, etc...
 
   The most exciting part of this work was discover that this game runs
-  with an electromechanical roulette, not a tipical LED roulette. It
-  added an extra challenge to the work, wich implies a full develop
+  with an electromechanical roulette, not a typical LED roulette. It
+  added an extra challenge to the work, which implies a full develop
   of an electromechanical part simulation, objective that finally
   could be reached.
 
   Surprisingly, this game firmware includes a full communications
-  module, accesible via RS232 serial interface, that let the users
+  module, accessible via RS232 serial interface, that let the users
   some useful things like reconfigure hardware and game options or
   get different kinds of reports, like accounting, statistics and
   many other technical items. All this tasks are performed from a
@@ -216,7 +216,7 @@ public:
 	void rulechan_init();
 
 protected:
-	virtual void machine_start() override { m_lamps.resolve(); m_digits.resolve(); }
+	virtual void machine_start() override;
 
 private:
 	void port0_w(uint8_t data);
@@ -265,6 +265,27 @@ private:
 
 constexpr uint8_t rulechan_state::s_sndsrt[10];
 
+void rulechan_state::machine_start()
+{
+	m_lamps.resolve();
+	m_digits.resolve();
+
+	save_item(NAME(m_sline));
+	save_item(NAME(m_p30));
+	save_item(NAME(m_p31));
+	save_item(NAME(m_p32));
+	save_item(NAME(m_step));
+	save_item(NAME(m_updn2));
+	save_item(NAME(m_updn3));
+	save_item(NAME(m_updn4));
+	save_item(NAME(m_num));
+	save_item(NAME(m_spin));
+	save_item(NAME(m_tspin));
+	save_item(NAME(d_spin));
+	save_item(NAME(m_ballin));
+	save_item(NAME(m_led));
+	save_item(NAME(m_pass));
+}
 
 /* BCD to Seven Segment Decoder */
 

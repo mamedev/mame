@@ -8,9 +8,6 @@
   is available for pin-compatible Mitsubishi M50780SP/M50781SP.
   Other than more port pins, TMS1025 is assumed to be same as TMS1024.
 
-  TODO:
-  - x
-
 */
 
 #include "emu.h"

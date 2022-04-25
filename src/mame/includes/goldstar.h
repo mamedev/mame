@@ -28,6 +28,7 @@ public:
 		m_reel2_scroll(*this, "reel2_scroll"),
 		m_reel3_scroll(*this, "reel3_scroll"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
+		m_bgcolor(0),
 		m_maincpu(*this, "maincpu"),
 		m_ppi(*this, "ppi8255_%u", 0U),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -114,7 +115,7 @@ protected:
 	TILE_GET_INFO_MEMBER(get_goldstar_reel2_tile_info);
 	TILE_GET_INFO_MEMBER(get_goldstar_reel3_tile_info);
 
-	int m_dataoffset;
+	int m_dataoffset = 0;
 
 	required_shared_ptr<uint8_t> m_fg_vidram;
 	required_shared_ptr<uint8_t> m_fg_atrram;
@@ -132,17 +133,17 @@ protected:
 
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
-	tilemap_t *m_reel1_tilemap;
-	tilemap_t *m_reel2_tilemap;
-	tilemap_t *m_reel3_tilemap;
+	tilemap_t *m_reel1_tilemap = nullptr;
+	tilemap_t *m_reel2_tilemap = nullptr;
+	tilemap_t *m_reel3_tilemap = nullptr;
 
-	int m_bgcolor;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_cmaster_girl_num;
-	uint8_t m_cmaster_girl_pal;
-	uint8_t m_cm_enable_reg;
-	uint8_t m_cm_girl_scroll;
+	int m_bgcolor = 0;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_cmaster_girl_num = 0U;
+	uint8_t m_cmaster_girl_pal = 0U;
+	uint8_t m_cm_enable_reg = 0U;
+	uint8_t m_cm_girl_scroll = 0U;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device_array<i8255_device, 3> m_ppi;
@@ -202,10 +203,12 @@ public:
 	void amcoe1(machine_config &config);
 	void chryangl(machine_config &config);
 	void ss2001(machine_config &config);
+	void super7(machine_config &config);
 	void amcoe1_portmap(address_map &map);
 	void amcoe2_portmap(address_map &map);
 	void cm_portmap(address_map &map);
 	void cm97_portmap(address_map &map);
+	void super7_portmap(address_map &map);
 	void chryangl_decrypted_opcodes_map(address_map &map);
 	void ss2001_portmap(address_map &map);
 
@@ -233,10 +236,12 @@ public:
 
 	void init_lucky8a();
 	void init_lucky8f();
+	void init_lucky8l();
 	void init_magoddsc();
 	void init_flaming7();
 	void init_flam7_tw();
 	void init_luckylad();
+	void init_nd8lines();
 	void init_super972();
 	void init_wcat3();
 
@@ -255,6 +260,7 @@ public:
 	void lucky8f(machine_config &config);
 	void lucky8k(machine_config &config);
 	void luckylad(machine_config &config);
+	void nd8lines(machine_config &config);
 	void super972(machine_config &config);
 	void wcat3(machine_config &config);
 	void magodds(machine_config &config);
@@ -266,14 +272,17 @@ public:
 
 protected:
 	TILE_GET_INFO_MEMBER(get_magical_fg_tile_info);
+	virtual void machine_start() override { goldstar_state::machine_start(); m_tile_bank = 0; }
 
 private:
 	optional_device<ds2401_device> m_fl7w4_id;
 
-	uint8_t m_nmi_enable;
-	uint8_t m_vidreg;
+	uint8_t m_nmi_enable = 0U;
+	uint8_t m_vidreg = 0U;
 
-	int m_tile_bank;
+	uint8_t m_tile_bank = 0U;
+
+	void nd8lines_map(address_map &map);
 };
 
 
@@ -287,6 +296,7 @@ public:
 
 	void init_cb3();
 	void init_cb3e();
+	void init_cb3f();
 	void init_cherrys();
 	void init_chrygld();
 	void init_chry10();
@@ -307,6 +317,7 @@ protected:
 	void dump_to_file(uint8_t *rom);
 
 	uint8_t cb3_decrypt(uint8_t cipherText, uint16_t address);
+	uint8_t cb3f_decrypt(uint8_t cipherText, uint16_t address);
 	uint8_t chry10_decrypt(uint8_t cipherText);
 };
 
@@ -351,7 +362,7 @@ private:
 	required_shared_ptr<uint8_t> m_reel2_attrram;
 	required_shared_ptr<uint8_t> m_reel3_attrram;
 
-	uint8_t m_enable_reg;
+	uint8_t m_enable_reg = 0U;
 };
 
 
@@ -403,8 +414,8 @@ private:
 	required_shared_ptr<uint8_t> m_reel2_attrram;
 	required_shared_ptr<uint8_t> m_reel3_attrram;
 
-	uint8_t m_vblank_irq_enable;
-	uint8_t m_vidreg;
+	uint8_t m_vblank_irq_enable = 0U;
+	uint8_t m_vidreg = 0U;
 
 	optional_device<ticket_dispenser_device> m_ticket_dispenser;
 };

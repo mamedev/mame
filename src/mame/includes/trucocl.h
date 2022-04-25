@@ -33,22 +33,22 @@ protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
-	int m_cur_dac_address;
-	int m_cur_dac_address_index;
+	int m_cur_dac_address = 0;
+	int m_cur_dac_address_index = 0;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 
-	uint8_t m_irq_mask;
-	emu_timer *m_dac_irq_timer;
+	uint8_t m_irq_mask = 0;
+	emu_timer *m_dac_irq_timer = nullptr;
 
-	DECLARE_WRITE8_MEMBER(irq_enable_w);
-	DECLARE_WRITE8_MEMBER(trucocl_videoram_w);
-	DECLARE_WRITE8_MEMBER(trucocl_colorram_w);
-	DECLARE_WRITE8_MEMBER(audio_dac_w);
+	void irq_enable_w(uint8_t data);
+	void trucocl_videoram_w(offs_t offset, uint8_t data);
+	void trucocl_colorram_w(offs_t offset, uint8_t data);
+	void audio_dac_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void trucocl_palette(palette_device &palette) const;
 	uint32_t screen_update_trucocl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

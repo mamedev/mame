@@ -107,27 +107,27 @@ license:CC0
 		<screen index="0">
 			<bounds left="0" top="0" right="3" bottom="4" />
 		</screen>
-		<bezel name="lamp4" element="hold1">
+		<element name="lamp4" ref="hold1">
 			<bounds x="0" y="4.05" width="0.35" height="0.24" />
-		</bezel>
-		<bezel name="lamp5" element="hold2">
+		</element>
+		<element name="lamp5" ref="hold2">
 			<bounds x="0.4" y="4.05" width="0.35" height="0.24" />
-		</bezel>
-		<bezel name="lamp3" element="hold3">
+		</element>
+		<element name="lamp3" ref="hold3">
 			<bounds x="0.8" y="4.05" width="0.35" height="0.24" />
-		</bezel>
-		<bezel name="lamp2" element="hold4">
+		</element>
+		<element name="lamp2" ref="hold4">
 			<bounds x="1.2" y="4.05" width="0.35" height="0.24" />
-		</bezel>
-		<bezel name="lamp6" element="cancel">
+		</element>
+		<element name="lamp6" ref="cancel">
 			<bounds x="1.6" y="4.05" width="0.35" height="0.24" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp1" element="bet">
+		<element name="lamp1" ref="bet">
 			<bounds x="2.25" y="4.05" width="0.35" height="0.24" />
-		</bezel>
-		<bezel name="lamp0" element="start">
+		</element>
+		<element name="lamp0" ref="start">
 			<bounds x="2.65" y="4.05" width="0.35" height="0.24" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

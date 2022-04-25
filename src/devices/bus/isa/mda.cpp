@@ -183,14 +183,14 @@ void isa8_mda_device::device_start()
 	set_isa_device();
 	m_videoram.resize(0x1000);
 	m_isa->install_device(0x3b0, 0x3bf, read8sm_delegate(*this, FUNC(isa8_mda_device::io_read)), write8sm_delegate(*this, FUNC(isa8_mda_device::io_write)));
-	m_isa->install_bank(0xb0000, 0xb0fff, "bank_mda", &m_videoram[0]);
-	m_isa->install_bank(0xb1000, 0xb1fff, "bank_mda", &m_videoram[0]);
-	m_isa->install_bank(0xb2000, 0xb2fff, "bank_mda", &m_videoram[0]);
-	m_isa->install_bank(0xb3000, 0xb3fff, "bank_mda", &m_videoram[0]);
-	m_isa->install_bank(0xb4000, 0xb4fff, "bank_mda", &m_videoram[0]);
-	m_isa->install_bank(0xb5000, 0xb5fff, "bank_mda", &m_videoram[0]);
-	m_isa->install_bank(0xb6000, 0xb6fff, "bank_mda", &m_videoram[0]);
-	m_isa->install_bank(0xb7000, 0xb7fff, "bank_mda", &m_videoram[0]);
+	m_isa->install_bank(0xb0000, 0xb0fff, &m_videoram[0]);
+	m_isa->install_bank(0xb1000, 0xb1fff, &m_videoram[0]);
+	m_isa->install_bank(0xb2000, 0xb2fff, &m_videoram[0]);
+	m_isa->install_bank(0xb3000, 0xb3fff, &m_videoram[0]);
+	m_isa->install_bank(0xb4000, 0xb4fff, &m_videoram[0]);
+	m_isa->install_bank(0xb5000, 0xb5fff, &m_videoram[0]);
+	m_isa->install_bank(0xb6000, 0xb6fff, &m_videoram[0]);
+	m_isa->install_bank(0xb7000, 0xb7fff, &m_videoram[0]);
 
 	/* Initialise the mda palette */
 	for (int i = 0; i < 4; i++)
@@ -225,27 +225,26 @@ void isa8_mda_device::device_reset()
 ***************************************************************************/
 MC6845_UPDATE_ROW( isa8_mda_device::mda_text_inten_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t  *p = &bitmap.pix32(y);
-	uint16_t  chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
-	int i;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix(y);
+	uint16_t const chr_base = (ra & 0x08) ? 0x800 | (ra & 0x07) : ra;
 
-	if ( y == 0 ) LOGROW("%11.6f: %-24s\n", machine().time().as_double(), FUNCNAME);
-	for ( i = 0; i < x_count; i++ )
+	if (y == 0) LOGROW("%11.6f: %-24s\n", machine().time().as_double(), FUNCNAME);
+	for (int i = 0; i < x_count; i++)
 	{
-		uint16_t offset = ( ( ma + i ) << 1 ) & 0x0FFF;
-		uint8_t chr = m_videoram[ offset ];
-		uint8_t attr = m_videoram[ offset + 1 ];
-		uint8_t data = m_chr_gen[ chr_base + chr * 8 ];
-		uint8_t fg = ( attr & 0x08 ) ? 3 : 2;
+		uint16_t const offset = ((ma + i) << 1) & 0x0fff;
+		uint8_t const chr = m_videoram[offset];
+		uint8_t const attr = m_videoram[offset + 1];
+		uint8_t data = m_chr_gen[chr_base + chr * 8];
+		uint8_t fg = (attr & 0x08) ? 3 : 2;
 		uint8_t bg = 0;
 
-		if ( ( attr & ~0x88 ) == 0 )
+		if ((attr & ~0x88) == 0)
 		{
 			data = 0x00;
 		}
 
-		switch( attr )
+		switch (attr)
 		{
 		case 0x70:
 			bg = 2;
@@ -255,36 +254,36 @@ MC6845_UPDATE_ROW( isa8_mda_device::mda_text_inten_update_row )
 			bg = 2;
 			fg = 1;
 			break;
-		case 0xF0:
+		case 0xf0:
 			bg = 3;
 			fg = 0;
 			break;
-		case 0xF8:
+		case 0xf8:
 			bg = 3;
 			fg = 1;
 			break;
 		}
 
-		if ( ( i == cursor_x && ( m_framecnt & 0x08 ) ) || ( attr & 0x07 ) == 0x01 )
+		if ((i == cursor_x && (m_framecnt & 0x08)) || (attr & 0x07) == 0x01)
 		{
-			data = 0xFF;
+			data = 0xff;
 		}
 
-		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
-		if ( ( chr & 0xE0 ) == 0xC0 )
+		*p++ = palette[(data & 0x80) ? fg : bg];
+		*p++ = palette[(data & 0x40) ? fg : bg];
+		*p++ = palette[(data & 0x20) ? fg : bg];
+		*p++ = palette[(data & 0x10) ? fg : bg];
+		*p++ = palette[(data & 0x08) ? fg : bg];
+		*p++ = palette[(data & 0x04) ? fg : bg];
+		*p++ = palette[(data & 0x02) ? fg : bg];
+		*p++ = palette[(data & 0x01) ? fg : bg];
+		if ((chr & 0xe0) == 0xc0)
 		{
-			*p = palette[( data & 0x01 ) ? fg : bg]; p++;
+			*p++ = palette[(data & 0x01) ? fg : bg];
 		}
 		else
 		{
-			*p = palette[bg]; p++;
+			*p++ = palette[bg];
 		}
 	}
 }
@@ -298,75 +297,74 @@ MC6845_UPDATE_ROW( isa8_mda_device::mda_text_inten_update_row )
 
 MC6845_UPDATE_ROW( isa8_mda_device::mda_text_blink_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t  *p = &bitmap.pix32(y);
-	uint16_t  chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
-	int i;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix(y);
+	uint16_t const chr_base = (ra & 0x08) ? 0x800 | (ra & 0x07) : ra;
 
-	if ( y == 0 ) LOGROW("%11.6f: %-24s\n", machine().time().as_double(), FUNCNAME);
-	for ( i = 0; i < x_count; i++ )
+	if (y == 0) LOGROW("%11.6f: %-24s\n", machine().time().as_double(), FUNCNAME);
+	for (int i = 0; i < x_count; i++)
 	{
-		uint16_t offset = ( ( ma + i ) << 1 ) & 0x0FFF;
-		uint8_t chr = m_videoram[ offset ];
-		uint8_t attr = m_videoram[ offset + 1 ];
-		uint8_t data = m_chr_gen[ chr_base + chr * 8 ];
-		uint8_t fg = ( attr & 0x08 ) ? 3 : 2;
+		uint16_t const offset = ((ma + i) << 1) & 0x0fff;
+		uint8_t const chr = m_videoram[offset];
+		uint8_t const attr = m_videoram[offset + 1];
+		uint8_t data = m_chr_gen[chr_base + chr * 8];
+		uint8_t fg = (attr & 0x08) ? 3 : 2;
 		uint8_t bg = 0;
 
-		if ( ( attr & ~0x88 ) == 0 )
+		if ((attr & ~0x88) == 0)
 		{
 			data = 0x00;
 		}
 
-		switch( attr )
+		switch (attr)
 		{
 		case 0x70:
-		case 0xF0:
+		case 0xf0:
 			bg = 2;
 			fg = 0;
 			break;
 		case 0x78:
-		case 0xF8:
+		case 0xf8:
 			bg = 2;
 			fg = 1;
 			break;
 		}
 
-		if ( ( attr & 0x07 ) == 0x01 )
+		if ((attr & 0x07) == 0x01)
 		{
-			data = 0xFF;
+			data = 0xff;
 		}
 
-		if ( i == cursor_x )
+		if (i == cursor_x)
 		{
-			if ( m_framecnt & 0x08 )
+			if (m_framecnt & 0x08)
 			{
-				data = 0xFF;
+				data = 0xff;
 			}
 		}
 		else
 		{
-			if ( ( attr & 0x80 ) && ( m_framecnt & 0x10 ) )
+			if ((attr & 0x80) && (m_framecnt & 0x10))
 			{
 				data = 0x00;
 			}
 		}
 
-		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
-		if ( ( chr & 0xE0 ) == 0xC0 )
+		*p++ = palette[(data & 0x80) ? fg : bg];
+		*p++ = palette[(data & 0x40) ? fg : bg];
+		*p++ = palette[(data & 0x20) ? fg : bg];
+		*p++ = palette[(data & 0x10) ? fg : bg];
+		*p++ = palette[(data & 0x08) ? fg : bg];
+		*p++ = palette[(data & 0x04) ? fg : bg];
+		*p++ = palette[(data & 0x02) ? fg : bg];
+		*p++ = palette[(data & 0x01) ? fg : bg];
+		if ((chr & 0xe0) == 0xc0)
 		{
-			*p = palette[( data & 0x01 ) ? fg : bg]; p++;
+			*p++ = palette[(data & 0x01) ? fg : bg];
 		}
 		else
 		{
-			*p = palette[bg]; p++;
+			*p++ = palette[bg];
 		}
 	}
 }
@@ -603,7 +601,7 @@ void isa8_hercules_device::device_start()
 	m_videoram.resize(0x10000);
 	set_isa_device();
 	m_isa->install_device(0x3b0, 0x3bf, read8sm_delegate(*this, FUNC(isa8_hercules_device::io_read)), write8sm_delegate(*this, FUNC(isa8_hercules_device::io_write)));
-	m_isa->install_bank(0xb0000, 0xbffff, "bank_hercules", &m_videoram[0]);
+	m_isa->install_bank(0xb0000, 0xbffff, &m_videoram[0]);
 
 	/* Initialise the mda palette */
 	for(int i = 0; i < (sizeof(mda_palette) / 3); i++)
@@ -631,34 +629,36 @@ void isa8_hercules_device::device_reset()
 
 MC6845_UPDATE_ROW( isa8_hercules_device::hercules_gfx_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t  *p = &bitmap.pix32(y);
-	uint16_t  gfx_base = ( ( m_mode_control & 0x80 ) ? 0x8000 : 0x0000 ) | ( ( ra & 0x03 ) << 13 );
-	int i;
-	if ( y == 0 ) LOGROW("%11.6f: %-24s\n", machine().time().as_double(), FUNCNAME);
-	for ( i = 0; i < x_count; i++ )
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix(y);
+	uint16_t const gfx_base = ((m_mode_control & 0x80) ? 0x8000 : 0x0000) | ((ra & 0x03) << 13);
+
+	if (y == 0) LOGROW("%11.6f: %-24s\n", machine().time().as_double(), FUNCNAME);
+	for (int i = 0; i < x_count; i++)
 	{
-		uint8_t   data = m_videoram[ gfx_base + ( ( ma + i ) << 1 ) ];
+		uint8_t data;
 
-		*p = palette[( data & 0x80 ) ? 2 : 0]; p++;
-		*p = palette[( data & 0x40 ) ? 2 : 0]; p++;
-		*p = palette[( data & 0x20 ) ? 2 : 0]; p++;
-		*p = palette[( data & 0x10 ) ? 2 : 0]; p++;
-		*p = palette[( data & 0x08 ) ? 2 : 0]; p++;
-		*p = palette[( data & 0x04 ) ? 2 : 0]; p++;
-		*p = palette[( data & 0x02 ) ? 2 : 0]; p++;
-		*p = palette[( data & 0x01 ) ? 2 : 0]; p++;
+		data = m_videoram[gfx_base + ((ma + i) << 1)];
 
-		data = m_videoram[ gfx_base + ( ( ma + i ) << 1 ) + 1 ];
+		*p++ = palette[(data & 0x80) ? 2 : 0];
+		*p++ = palette[(data & 0x40) ? 2 : 0];
+		*p++ = palette[(data & 0x20) ? 2 : 0];
+		*p++ = palette[(data & 0x10) ? 2 : 0];
+		*p++ = palette[(data & 0x08) ? 2 : 0];
+		*p++ = palette[(data & 0x04) ? 2 : 0];
+		*p++ = palette[(data & 0x02) ? 2 : 0];
+		*p++ = palette[(data & 0x01) ? 2 : 0];
 
-		*p = palette[( data & 0x80 ) ? 2 : 0]; p++;
-		*p = palette[( data & 0x40 ) ? 2 : 0]; p++;
-		*p = palette[( data & 0x20 ) ? 2 : 0]; p++;
-		*p = palette[( data & 0x10 ) ? 2 : 0]; p++;
-		*p = palette[( data & 0x08 ) ? 2 : 0]; p++;
-		*p = palette[( data & 0x04 ) ? 2 : 0]; p++;
-		*p = palette[( data & 0x02 ) ? 2 : 0]; p++;
-		*p = palette[( data & 0x01 ) ? 2 : 0]; p++;
+		data = m_videoram[gfx_base + ((ma + i) << 1) + 1];
+
+		*p++ = palette[(data & 0x80) ? 2 : 0];
+		*p++ = palette[(data & 0x40) ? 2 : 0];
+		*p++ = palette[(data & 0x20) ? 2 : 0];
+		*p++ = palette[(data & 0x10) ? 2 : 0];
+		*p++ = palette[(data & 0x08) ? 2 : 0];
+		*p++ = palette[(data & 0x04) ? 2 : 0];
+		*p++ = palette[(data & 0x02) ? 2 : 0];
+		*p++ = palette[(data & 0x01) ? 2 : 0];
 	}
 }
 
@@ -797,8 +797,8 @@ void isa8_ec1840_0002_device::device_start()
 	isa8_mda_device::device_start();
 
 	m_soft_chr_gen = std::make_unique<uint8_t[]>(0x2000);
-	m_isa->install_bank(0xdc000, 0xddfff, "bank_chargen", m_soft_chr_gen.get());
-	m_isa->install_bank(0xde000, 0xdffff, "bank_chargen", m_soft_chr_gen.get());
+	m_isa->install_bank(0xdc000, 0xddfff, m_soft_chr_gen.get());
+	m_isa->install_bank(0xde000, 0xdffff, m_soft_chr_gen.get());
 }
 
 void isa8_ec1840_0002_device::device_reset()
@@ -816,27 +816,26 @@ void isa8_ec1840_0002_device::device_reset()
 
 MC6845_UPDATE_ROW( isa8_ec1840_0002_device::mda_lowres_text_inten_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t  *p = &bitmap.pix32(y);
-	uint16_t  chr_base = ra;
-	int i;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix(y);
+	uint16_t const chr_base = ra;
 
-	if ( y == 0 ) LOGROW("%11.6f: %-24s\n", machine().time().as_double(), FUNCNAME);
-	for ( i = 0; i < x_count; i++ )
+	if (y == 0) LOGROW("%11.6f: %-24s\n", machine().time().as_double(), FUNCNAME);
+	for (int i = 0; i < x_count; i++)
 	{
-		uint16_t offset = ( ( ma + i ) << 1 ) & 0x0FFF;
-		uint8_t chr = m_videoram[ offset ];
-		uint8_t attr = m_videoram[ offset + 1 ];
-		uint8_t data = m_chr_gen[ (chr_base + chr * 16) << 1 ];
-		uint8_t fg = ( attr & 0x08 ) ? 3 : 2;
+		uint16_t const offset = ((ma + i) << 1) & 0x0fff;
+		uint8_t const chr = m_videoram[offset];
+		uint8_t const attr = m_videoram[offset + 1];
+		uint8_t data = m_chr_gen[(chr_base + chr * 16) << 1];
+		uint8_t fg = (attr & 0x08) ? 3 : 2;
 		uint8_t bg = 0;
 
-		if ( ( attr & ~0x88 ) == 0 )
+		if ((attr & ~0x88) == 0)
 		{
 			data = 0x00;
 		}
 
-		switch( attr )
+		switch (attr)
 		{
 		case 0x70:
 			bg = 2;
@@ -846,29 +845,29 @@ MC6845_UPDATE_ROW( isa8_ec1840_0002_device::mda_lowres_text_inten_update_row )
 			bg = 2;
 			fg = 1;
 			break;
-		case 0xF0:
+		case 0xf0:
 			bg = 3;
 			fg = 0;
 			break;
-		case 0xF8:
+		case 0xf8:
 			bg = 3;
 			fg = 1;
 			break;
 		}
 
-		if ( ( i == cursor_x && ( m_framecnt & 0x08 ) ) || ( attr & 0x07 ) == 0x01 )
+		if ((i == cursor_x && (m_framecnt & 0x08)) || (attr & 0x07) == 0x01)
 		{
-			data = 0xFF;
+			data = 0xff;
 		}
 
-		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
+		*p++ = palette[(data & 0x80) ? fg : bg];
+		*p++ = palette[(data & 0x40) ? fg : bg];
+		*p++ = palette[(data & 0x20) ? fg : bg];
+		*p++ = palette[(data & 0x10) ? fg : bg];
+		*p++ = palette[(data & 0x08) ? fg : bg];
+		*p++ = palette[(data & 0x04) ? fg : bg];
+		*p++ = palette[(data & 0x02) ? fg : bg];
+		*p++ = palette[(data & 0x01) ? fg : bg];
 	}
 }
 
@@ -880,68 +879,67 @@ MC6845_UPDATE_ROW( isa8_ec1840_0002_device::mda_lowres_text_inten_update_row )
 
 MC6845_UPDATE_ROW( isa8_ec1840_0002_device::mda_lowres_text_blink_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t  *p = &bitmap.pix32(y);
-	uint16_t  chr_base = ra;
-	int i;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix(y);
+	uint16_t const chr_base = ra;
 
-	if ( y == 0 ) LOGROW("%11.6f: %-24s\n", machine().time().as_double(), FUNCNAME);
-	for ( i = 0; i < x_count; i++ )
+	if (y == 0) LOGROW("%11.6f: %-24s\n", machine().time().as_double(), FUNCNAME);
+	for (int i = 0; i < x_count; i++)
 	{
-		uint16_t offset = ( ( ma + i ) << 1 ) & 0x0FFF;
-		uint8_t chr = m_videoram[ offset ];
-		uint8_t attr = m_videoram[ offset + 1 ];
-		uint8_t data = m_chr_gen[ (chr_base + chr * 16) << 1 ];
-		uint8_t fg = ( attr & 0x08 ) ? 3 : 2;
+		uint16_t const offset = ((ma + i) << 1) & 0x0fff;
+		uint8_t const chr = m_videoram[offset];
+		uint8_t const attr = m_videoram[offset + 1];
+		uint8_t data = m_chr_gen[(chr_base + chr * 16) << 1];
+		uint8_t fg = (attr & 0x08) ? 3 : 2;
 		uint8_t bg = 0;
 
-		if ( ( attr & ~0x88 ) == 0 )
+		if ((attr & ~0x88) == 0)
 		{
 			data = 0x00;
 		}
 
-		switch( attr )
+		switch (attr)
 		{
 		case 0x70:
-		case 0xF0:
+		case 0xf0:
 			bg = 2;
 			fg = 0;
 			break;
 		case 0x78:
-		case 0xF8:
+		case 0xf8:
 			bg = 2;
 			fg = 1;
 			break;
 		}
 
-		if ( ( attr & 0x07 ) == 0x01 )
+		if ((attr & 0x07) == 0x01)
 		{
-			data = 0xFF;
+			data = 0xff;
 		}
 
-		if ( i == cursor_x )
+		if (i == cursor_x)
 		{
-			if ( m_framecnt & 0x08 )
+			if (m_framecnt & 0x08)
 			{
-				data = 0xFF;
+				data = 0xff;
 			}
 		}
 		else
 		{
-			if ( ( attr & 0x80 ) && ( m_framecnt & 0x10 ) )
+			if ((attr & 0x80) && (m_framecnt & 0x10))
 			{
 				data = 0x00;
 			}
 		}
 
-		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
+		*p++ = palette[(data & 0x80) ? fg : bg];
+		*p++ = palette[(data & 0x40) ? fg : bg];
+		*p++ = palette[(data & 0x20) ? fg : bg];
+		*p++ = palette[(data & 0x10) ? fg : bg];
+		*p++ = palette[(data & 0x08) ? fg : bg];
+		*p++ = palette[(data & 0x04) ? fg : bg];
+		*p++ = palette[(data & 0x02) ? fg : bg];
+		*p++ = palette[(data & 0x01) ? fg : bg];
 	}
 }
 

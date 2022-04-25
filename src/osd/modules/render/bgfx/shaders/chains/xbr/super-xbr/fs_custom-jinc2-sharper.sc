@@ -5,7 +5,7 @@ $input v_texcoord0, v_color0
 
 /*
    Hyllian's jinc windowed-jinc 2-lobe sharper with anti-ringing Shader
-   
+
    Copyright (C) 2011-2014 Hyllian/Jararaca - sergiogdb@gmail.com
 */
 
@@ -22,10 +22,10 @@ SAMPLER2D(s_p, 0);
 	 This is an approximation of Jinc(x)*Jinc(x*r1/r2) for x < 2.5,
 	 where r1 and r2 are the first two zeros of jinc function.
 	 For a jinc 2-lobe best approximation, use A=0.5 and B=0.825.
-	*/  
+	*/
 
 // A=0.5, B=0.825 is the best jinc approximation for x<2.5. if B=1.0, it's a lanczos filter.
-// Increase A to get more blur. Decrease it to get a sharper picture. 
+// Increase A to get more blur. Decrease it to get a sharper picture.
 // B = 0.825 to get rid of dithering. Increase B to get a fine sharpness, though dithering returns.
 
 #define halfpi  1.5707963267948966192313216916398

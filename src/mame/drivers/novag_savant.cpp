@@ -25,13 +25,13 @@ TODO:
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/f8/f8.h"
 #include "machine/f3853.h"
 #include "machine/sensorboard.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/hlcd0538.h"
 #include "video/pwm.h"
 
@@ -90,7 +90,7 @@ private:
 	void nvram_w(offs_t offset, u8 data);
 	u8 nvram_r(offs_t offset);
 	u8 stall_r(offs_t offset);
-	void stall_w(offs_t offset, u8 data);
+	void stall_w(offs_t offset, u8 data = 0);
 	u8 mcustatus_r();
 
 	void lcd1_output_w(u64 data);
@@ -103,22 +103,15 @@ private:
 	void lcd_w(u8 data);
 	u8 input_r();
 
-	bool m_wait_in;
-	u8 m_inp_mux;
-	u8 m_databus;
-	u8 m_control;
-	u64 m_lcd_data;
+	bool m_wait_in = false;
+	u8 m_inp_mux = 0;
+	u8 m_databus = 0;
+	u8 m_control = 0;
+	u64 m_lcd_data = 0;
 };
 
 void savant_state::machine_start()
 {
-	// zerofill
-	m_wait_in = false;
-	m_inp_mux = 0;
-	m_databus = 0;
-	m_control = 0;
-	m_lcd_data = 0;
-
 	// register for savestates
 	save_item(NAME(m_wait_in));
 	save_item(NAME(m_inp_mux));
@@ -157,8 +150,11 @@ void savant_state::stall_w(offs_t offset, u8 data)
 
 u8 savant_state::stall_r(offs_t offset)
 {
-	m_wait_in = true;
-	stall_w(offset, 0);
+	if (!machine().side_effects_disabled())
+	{
+		m_wait_in = true;
+		stall_w(offset);
+	}
 
 	// return value is databus (see control_w)
 	return 0;
@@ -231,7 +227,6 @@ void savant_state::control_w(u8 data)
 	m_lcd1->lcd_w(BIT(~data, 4));
 
 	// d5-d7: keypad mux
-
 	m_control = data;
 }
 
@@ -373,7 +368,9 @@ void savant_state::savant(machine_config &config)
 	config.set_perfect_quantum(m_mcu);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
+	m_board->set_delay(attotime::from_msec(200));
 	m_board->set_ui_enable(false); // no chesspieces
+	m_board->set_mod_enable(true);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -392,7 +389,6 @@ void savant_state::savant(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 

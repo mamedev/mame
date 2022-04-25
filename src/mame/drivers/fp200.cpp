@@ -43,14 +43,14 @@ public:
 private:
 	// devices
 	required_device<i8085a_cpu_device> m_maincpu;
-	uint8_t m_io_type;
-	uint8_t *m_chargen;
-	uint8_t m_keyb_mux;
+	uint8_t m_io_type = 0;
+	uint8_t *m_chargen = nullptr;
+	uint8_t m_keyb_mux = 0;
 
 	struct{
-		uint8_t x;
-		uint8_t y;
-		uint8_t status;
+		uint8_t x = 0;
+		uint8_t y = 0;
+		uint8_t status = 0;
 		std::unique_ptr<uint8_t[]> vram;
 		std::unique_ptr<uint8_t[]> attr;
 	}m_lcd;
@@ -135,20 +135,16 @@ uint32_t fp200_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 
 			if(m_lcd.attr[x/8+yoffs*20] == 0x60 || m_lcd.attr[x/8+yoffs*20] == 0x50)
 			{
-				uint8_t vram,pix;
-
-				vram = m_lcd.vram[x/8+yoffs*20];
-				pix = ((m_chargen[vram*8+(x & 7)]) >> (7-(yoffs & 7))) & 1;
-				bitmap.pix16(y,x) = pix;
+				uint8_t const vram = m_lcd.vram[x/8+yoffs*20];
+				uint8_t const pix = ((m_chargen[vram*8+(x & 7)]) >> (7-(yoffs & 7))) & 1;
+				bitmap.pix(y,x) = pix;
 			}
 			/*
 			else if(m_lcd.attr[x/8+yoffs*20] == 0x40)
 			{
-			    uint8_t vram,pix;
-
-			    vram = m_lcd.vram[x/8+yoffs*20];
-			    pix = (vram) >> (7-(yoffs & 7)) & 1;
-			    bitmap.pix16(y,x) = pix;
+			    uint8_t const vram = m_lcd.vram[x/8+yoffs*20];
+			    uint8_t const pix = (vram) >> (7-(yoffs & 7)) & 1;
+			    bitmap.pix(y,x) = pix;
 			}*/
 		}
 	}
@@ -166,19 +162,15 @@ uint32_t fp200_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 
 			if(m_lcd.attr[x/8+yoffs*20] == 0x60 || m_lcd.attr[x/8+yoffs*20] == 0x50)
 			{
-				uint8_t vram,pix;
-
-				vram = m_lcd.vram[x/8+yoffs*20];
-				pix = ((m_chargen[vram*8+(x & 7)]) >> (7-(yoffs & 7))) & 1;
-				bitmap.pix16(y,x) = pix;
+				uint8_t const vram = m_lcd.vram[x/8+yoffs*20];
+				uint8_t const pix = ((m_chargen[vram*8+(x & 7)]) >> (7-(yoffs & 7))) & 1;
+				bitmap.pix(y,x) = pix;
 			}
 			/*else if(m_lcd.attr[x/8+yoffs*20] == 0x40)
 			{
-			    uint8_t vram,pix;
-
-			    vram = m_lcd.vram[x/8+yoffs*20];
-			    pix = (vram) >> (7-(yoffs & 7)) & 1;
-			    bitmap.pix16(y,x) = pix;
+			    uint8_t const vram = m_lcd.vram[x/8+yoffs*20];
+			    uint8_t const pix = (vram) >> (7-(yoffs & 7)) & 1;
+			    bitmap.pix(y,x) = pix;
 			}*/
 		}
 	}

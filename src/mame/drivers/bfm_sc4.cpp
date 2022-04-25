@@ -8,10 +8,6 @@
 
     -----------------
 
-    This file contains the set lists only, for the actual hardware
-    emulation see bfm_sc4h.c
-
-
     note: default Jackpot keys should be set to whatever value the game
           mentions it should be using with none present, many games accept
           multiple keys.  A number of Mazooma games will attempt to use
@@ -219,14 +215,13 @@
 
     Configuration is SC4 motherboard + game card
 
-    The game card contains the program roms, sound rom and YMZ280B
+    The game card contains the program roms, sound rom and YMZ280B with a gal and optional RTC
+
+    The GAL is only dumped for highroller, not sure if other boards have a different part.
 
     Adder 4 video board adds an additional card with a MC68340PV25E (25.175Mhz)
 
     -------------------------------
-
-    This file contains the hardware emulation, for the supported sets
-    see bfm_sc4.c
 
     The hopper(s) are not currently emulated, many of the games can
     be operated in 'Door Open' mode granting you free credits.
@@ -910,8 +905,8 @@ void sc4_state::sc4_common(machine_config &config)
 	m_duart->set_clocks(XTAL(16'000'000)/2/8, XTAL(16'000'000)/2/16, XTAL(16'000'000)/2/16, XTAL(16'000'000)/2/8);
 	m_duart->irq_cb().set(FUNC(sc4_state::bfm_sc4_duart_irq_handler));
 	m_duart->a_tx_cb().set(FUNC(sc4_state::bfm_sc4_duart_txa));
-	m_duart->inport_cb().set(FUNC(sc4_state::bfm_sc4_duart_input_r));;
-	m_duart->outport_cb().set(FUNC(sc4_state::bfm_sc4_duart_output_w));;
+	m_duart->inport_cb().set(FUNC(sc4_state::bfm_sc4_duart_input_r));
+	m_duart->outport_cb().set(FUNC(sc4_state::bfm_sc4_duart_output_w));
 
 	BFM_BDA(config, m_vfd0, 60, 0);
 
@@ -1831,6 +1826,18 @@ ROM_START( sc4tst )
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
 ROM_END
 
+ROM_START( sc4hrolr ) // uses RTC on romcard
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "highroller13_hi.bin", 0x00000, 0x080000, CRC(b4138351) SHA1(330b45a4eb4c5bb5432508cc2c6806901ae59a95) )
+	ROM_LOAD16_BYTE( "highroller13_lo.bin", 0x00001, 0x080000, CRC(b479cd74) SHA1(c41b156ef2fd46e8658d036ee4d8c4056d0061d2) )
+
+	ROM_REGION( 0x100000, "ymz", 0 )
+	ROM_LOAD( "b3a_highroller.bin", 0x0000, 0x100000, CRC(38ce5435) SHA1(e159420e7929fa048f3b2393f761eeed2e1cf3b7) )
+
+	ROM_REGION( 0x100000, "gals", 0 )
+	ROM_LOAD( "75585129.ic1.bin", 0x0000, 0x000117, CRC(2454bb33) SHA1(610cde14caef3f2d02f0076b924e015077c3832b) ) /* protected gal16v8 on romcard */
+
+	ROM_END
 
 ROM_START( ad4skill )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -25153,7 +25160,8 @@ ROM_END
 
 /* Scorpion 4 */
 
-GAMEL( 200?, sc4tst, 0, sc4, sc4, sc4_state, init_sc4, ROT0, "BFM", "Scorpion 4 Test Rig (Bellfruit) (Scorpion ?)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4tst,  0, sc4, sc4, sc4_state, init_sc4, ROT0, "BFM", "Scorpion 4 Test Rig (Bellfruit) (Scorpion ?)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 2011, sc4hrolr,0, sc4, sc4, sc4_state, init_sc4, ROT0, "BFM", "High Roller (Bellfruit) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 void sc4_state::init_sc4pstat()
 {
@@ -29618,7 +29626,7 @@ INPUT_PORTS_START( sc4mondx ) // this structure is generated
 		// 0x0010 - "deflt" // standard input (expected here)
 INPUT_PORTS_END
 
-// So which Top Box roms should thse use? Why do some play without one?
+// So which Top Box roms should these use? Why do some play without one?
 
 // Waits for Top Box
 GAMEL( 200?, sc4mondxd, sc4mondx, sc4_3reel_200, sc4mondx, sc4_state, init_sc4mondx, ROT0, "Mazooma", "Monopoly Deluxe (PR2202, MPDX 1.1) (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4mondxe )// PR2202 MONOPOLY DELUXE         MONOPOLY  DELUXE  MAZ       MONOPOLY  TRIPLE

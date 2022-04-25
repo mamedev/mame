@@ -26,9 +26,9 @@ DEFINE_DEVICE_TYPE(UPD78053, upd78053_device, "upd78053", "NEC uPD78053")
 upd78k0_device::upd78k0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 iram_size, address_map_constructor mem_map, address_map_constructor sfr_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, mem_map)
-	, m_iram_config("internal high-speed RAM", ENDIANNESS_LITTLE, 16, iram_size > 0x200 ? 10 : iram_size > 0x100 ? 9 : 8, 0,
+	, m_iram_config("iram", ENDIANNESS_LITTLE, 16, iram_size > 0x200 ? 10 : iram_size > 0x100 ? 9 : 8, 0,
 					address_map_constructor(FUNC(upd78k0_device::iram_map), this))
-	, m_sfr_config("SFR", ENDIANNESS_LITTLE, 16, 8, 0, sfr_map)
+	, m_sfr_config("sfr", ENDIANNESS_LITTLE, 16, 8, 0, sfr_map)
 	, m_iram_size(iram_size)
 	, m_subclock(0)
 	, m_pc(0)

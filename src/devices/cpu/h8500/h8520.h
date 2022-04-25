@@ -24,6 +24,14 @@ public:
 	hd6435208_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
+class hd6475208_device : public h8520_device
+{
+public:
+	// device type constructor
+	hd6475208_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
 DECLARE_DEVICE_TYPE(HD6435208, hd6435208_device)
+DECLARE_DEVICE_TYPE(HD6475208, hd6475208_device)
 
 #endif // MAME_CPU_H8500_H8520_H

@@ -39,8 +39,8 @@ public:
 	void init_mz80k();
 
 private:
-	DECLARE_READ8_MEMBER(mz80k_strobe_r);
-	DECLARE_WRITE8_MEMBER(mz80k_strobe_w);
+	uint8_t mz80k_strobe_r();
+	void mz80k_strobe_w(uint8_t data);
 	uint8_t mz80k_8255_portb_r();
 	uint8_t mz80k_8255_portc_r();
 	void mz80k_8255_porta_w(uint8_t data);
@@ -54,12 +54,12 @@ private:
 
 	void mz80k_io(address_map &map);
 	void mz80k_mem(address_map &map);
-	bool m_mz80k_vertical;
-	bool m_mz80k_tempo_strobe;
-	uint8_t m_speaker_level;
-	bool m_prev_state;
-	uint8_t m_mz80k_cursor_cnt;
-	uint8_t m_mz80k_keyboard_line;
+	bool m_mz80k_vertical = false;
+	bool m_mz80k_tempo_strobe = false;
+	uint8_t m_speaker_level = 0;
+	bool m_prev_state = false;
+	uint8_t m_mz80k_cursor_cnt = 0;
+	uint8_t m_mz80k_keyboard_line = 0;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;

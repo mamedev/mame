@@ -128,7 +128,7 @@ void abc80_state::draw_scanline(bitmap_rgb32 &bitmap, int y)
 			color ^= (cursor & m_blink);
 			color &= blank;
 
-			bitmap.pix32(y, x) = m_palette->pen(color);
+			bitmap.pix(y, x) = m_palette->pen(color);
 
 			data <<= 1;
 		}
@@ -170,9 +170,6 @@ void abc80_state::video_start()
 
 	m_vsync_off_timer = timer_alloc(TIMER_ID_VSYNC_OFF);
 	m_vsync_off_timer->adjust(m_screen->time_until_pos(16, 0), 0, m_screen->frame_period());
-
-	// allocate memory
-	m_video_ram.allocate(0x400);
 }
 
 

@@ -55,7 +55,7 @@
 #include "bus/centronics/ctronics.h"
 #include "formats/flex_dsk.h"
 #include "formats/poly_dsk.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 
 class proteus_state : public driver_device
@@ -92,7 +92,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(motor_w);
 	uint8_t fdc_inv_r(offs_t offset);
 	void fdc_inv_w(offs_t offset, uint8_t data);
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	void enable_z80_w(uint8_t data);
 	void enable_6809_w(uint8_t data);
@@ -111,7 +111,7 @@ private:
 	required_device<fd1771_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
-	floppy_image_device *m_floppy;
+	floppy_image_device *m_floppy = nullptr;
 };
 
 
@@ -310,10 +310,12 @@ static INPUT_PORTS_START(proteus)
 INPUT_PORTS_END
 
 
-FLOPPY_FORMATS_MEMBER(proteus_state::floppy_formats)
-	FLOPPY_FLEX_FORMAT,
-	FLOPPY_POLY_CPM_FORMAT
-FLOPPY_FORMATS_END
+void proteus_state::floppy_formats(format_registration &fr)
+{
+	fr.add_fm_containers();
+	fr.add(FLOPPY_FLEX_FORMAT);
+	fr.add(FLOPPY_POLY_CPM_FORMAT);
+}
 
 static void proteus_floppies(device_slot_interface &device)
 {

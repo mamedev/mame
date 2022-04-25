@@ -31,12 +31,12 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( status0_r );
-	DECLARE_READ8_MEMBER( status1_r );
-	DECLARE_READ8_MEMBER( status_r );
+	uint8_t status0_r();
+	uint8_t status1_r();
+	uint8_t status_r(offs_t offset);
 
 	DECLARE_WRITE_LINE_MEMBER(c0_flag_w);
 	DECLARE_WRITE_LINE_MEMBER(c1_flag_w);
@@ -49,11 +49,11 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	int m_c0;
-	int m_c1;
-	int m_c2;
-	int m_mm0;
-	int m_mm1;
+	int m_c0 = 0;
+	int m_c1 = 0;
+	int m_c2 = 0;
+	int m_mm0 = 0;
+	int m_mm1 = 0;
 	void prof180x_io(address_map &map);
 	void prof180x_mem(address_map &map);
 };

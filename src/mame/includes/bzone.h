@@ -32,8 +32,8 @@ public:
 	{ }
 
 	DECLARE_READ_LINE_MEMBER(clock_r);
-	void init_bradley();
 	void bzone(machine_config &config);
+	void bradley(machine_config &config);
 
 protected:
 	void bzone_coin_counter_w(offs_t offset, uint8_t data);
@@ -46,6 +46,7 @@ protected:
 	void bzone_base(machine_config &config);
 	void bzone_audio(machine_config &config);
 	void bzone_map(address_map &map);
+	void bradley_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mathbox_device> m_mathbox;
@@ -54,7 +55,7 @@ protected:
 	output_finder<> m_startled;
 
 private:
-	uint8_t m_analog_data;
+	uint8_t m_analog_data = 0U;
 };
 
 
@@ -86,7 +87,7 @@ private:
 	required_device<er2055_device> m_earom;
 	required_device<redbaron_sound_device> m_redbaronsound;
 	required_ioport_array<2> m_fake_ports;
-	uint8_t m_rb_input_select;
+	uint8_t m_rb_input_select = 0U;
 };
 
 #endif // MAME_INCLUDES_BZONE_H

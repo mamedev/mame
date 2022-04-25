@@ -1,5 +1,8 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Couriersud
+
+#include "plib/pstonum.h"
+#include "plib/pstrutil.h"
 
 #include "nl_base.h"
 #include "nl_factory.h"
@@ -9,10 +12,7 @@
 #include <cstdint>
 #include <vector>
 
-namespace netlist
-{
-namespace devices
-{
+namespace netlist::devices {
 
 	template<std::size_t m_NI, std::size_t m_NO>
 	class NETLIB_NAME(truthtable_t) : public device_t
@@ -49,6 +49,8 @@ namespace devices
 		/* FIXME: the family should provide the names of the power-terminals! */
 		, m_power_pins(*this)
 		{
+			m_activate = activate_delegate(& NETLIB_NAME(truthtable_t) :: incdec_active, this);
+			set_hint_deactivate(true);
 			init(desc);
 		}
 
@@ -70,13 +72,12 @@ namespace devices
 #endif
 			}
 			for (auto &q : m_Q)
-				if (q.has_net() && q.net().has_connections())
+				if (q.has_net() && !exec().nlstate().core_terms(q.net()).empty())
 					active_outputs++;
 			set_active_outputs(active_outputs);
 		}
 
-		// update is only called during startup here ...
-		NETLIB_UPDATEI()
+		NETLIB_HANDLERI(inputs)
 		{
 #if USE_TT_ALTERNATIVE
 			m_state = 0;
@@ -98,19 +99,19 @@ namespace devices
 		}
 #endif
 
-		void inc_active() noexcept override
+		void incdec_active(bool a) noexcept
 		{
-			process<false>();
+			if (a)
+			{
+				process<false>();
+			}
+			else
+			{
+				for (std::size_t i = 0; i< m_NI; i++)
+					m_I[i].inactivate();
+				m_ign = (1<<m_NI)-1;
+			}
 		}
-
-		void dec_active() noexcept override
-		{
-			for (std::size_t i = 0; i< m_NI; i++)
-				m_I[i].inactivate();
-			m_ign = (1<<m_NI)-1;
-		}
-
-	private:
 
 		template<bool doOUT>
 		void process() noexcept
@@ -157,7 +158,7 @@ namespace devices
 
 			if (doOUT)
 				//for (std::size_t i = 0; i < m_NO; ++i)
-				//	m_Q[i].push((out >> i) & 1, tim[t[i]]);
+				//  m_Q[i].push((out >> i) & 1, tim[t[i]]);
 				this->push(out, t);
 			else
 			{
@@ -191,8 +192,8 @@ namespace devices
 		}
 
 
-		plib::uninitialised_array_t<logic_input_t, m_NI> m_I;
-		plib::uninitialised_array_t<logic_output_t, m_NO> m_Q;
+		plib::static_vector<logic_input_t, m_NI> m_I;
+		plib::static_vector<logic_output_t, m_NO> m_Q;
 
 #if USE_TT_ALTERNATIVE
 		state_var<type_t>   m_state;
@@ -371,23 +372,21 @@ namespace devices
 	template<std::size_t m_NI, std::size_t m_NO>
 	void NETLIB_NAME(truthtable_t)<m_NI, m_NO>::init(const std::vector<pstring> &desc)
 	{
-		set_hint_deactivate(true);
-
 		pstring header = desc[0];
 
-		std::vector<pstring> io(plib::psplit(header,"|"));
+		std::vector<pstring> io(plib::psplit(header,'|'));
 		// checks
 		nl_assert_always(io.size() == 2, "too many '|'");
-		std::vector<pstring> inout(plib::psplit(io[0], ","));
+		std::vector<pstring> inout(plib::psplit(io[0], ','));
 		nl_assert_always(inout.size() == m_num_bits, "bitcount wrong");
-		std::vector<pstring> outputs(plib::psplit(io[1], ","));
+		std::vector<pstring> outputs(plib::psplit(io[1], ','));
 		nl_assert_always(outputs.size() == m_NO, "output count wrong");
 
 #if !USE_TT_ALTERNATIVE
 		for (std::size_t i=0; i < m_NI; i++)
 		{
 			inout[i] = plib::trim(inout[i]);
-			m_I.emplace(i, *this, inout[i]);
+			m_I.emplace_back(*this, inout[i], nldelegate(&NETLIB_NAME(truthtable_t)<m_NI, m_NO> :: inputs, this));
 		}
 #else
 		for (std::size_t i=0; i < m_NI; i++)
@@ -410,7 +409,7 @@ namespace devices
 		for (std::size_t i=0; i < m_NO; i++)
 		{
 			outputs[i] = plib::trim(outputs[i]);
-			m_Q.emplace(i, *this, outputs[i]);
+			m_Q.emplace_back(*this, outputs[i]);
 			// Connect output "Q" to input "_Q" if this exists
 			// This enables timed state without having explicit state ....
 			pstring tmp = "_" + outputs[i];
@@ -440,7 +439,7 @@ namespace devices
 
 			if (!m_ttbl)
 			{
-				m_ttbl = pool.make_unique<typename nld_truthtable_t<m_NI, m_NO>::truthtable_t>();
+				m_ttbl = plib::make_unique<typename nld_truthtable_t<m_NI, m_NO>::truthtable_t>(pool);
 				truthtable_parser desc_s(m_NO, m_NI,
 						packed_int(m_ttbl->m_out_state.data(), sizeof(m_ttbl->m_out_state[0]) * 8),
 						m_ttbl->m_timing_index.data(), m_ttbl->m_timing_nt.data());
@@ -448,7 +447,7 @@ namespace devices
 				desc_s.parse(m_desc);
 			}
 
-			return pool.make_unique<tt_type>(anetlist, name, m_family_name, *m_ttbl, m_desc);
+			return plib::make_unique<tt_type>(pool, anetlist, name, m_family_name, *m_ttbl, m_desc);
 		}
 	private:
 		device_arena::unique_ptr<typename nld_truthtable_t<m_NI, m_NO>::truthtable_t> m_ttbl;
@@ -512,153 +511,152 @@ namespace devices
 		return ignore.expand_and(jm);
 	}
 
-// ----------------------------------------------------------------------------------------
-// parseline
-// ----------------------------------------------------------------------------------------
+	// ----------------------------------------------------------------------------------------
+	// parseline
+	// ----------------------------------------------------------------------------------------
 
-void truthtable_parser::parseline(unsigned cur, std::vector<pstring> list,
-		tt_bitset state, std::uint_least64_t val, std::vector<uint_least8_t> &timing_index)
-{
-	pstring elem = plib::trim(list[cur]);
-	std::uint_least64_t start = 0;
-	std::uint_least64_t end = 0;
+	void truthtable_parser::parseline(unsigned cur, std::vector<pstring> list,
+			tt_bitset state, std::uint_least64_t val, std::vector<uint_least8_t> &timing_index)
+	{
+		pstring elem = plib::trim(list[cur]);
+		std::uint_least64_t start = 0;
+		std::uint_least64_t end = 0;
 
-	if (elem == "0")
-	{
-		start = 0;
-		end = 0;
-	}
-	else if (elem == "1")
-	{
-		start = 1;
-		end = 1;
-	}
-	else if (elem == "X")
-	{
-		start = 0;
-		end = 1;
-	}
-	else
-		nl_assert_always(false, "unknown input value (not 0, 1, or X)");
-	for (std::uint_least64_t i = start; i <= end; i++)
-	{
-		tt_bitset nstate = state;
-		if (i==1)
-			nstate.set(cur);
-
-		if (cur < m_num_bits - 1)
+		if (elem == "0")
 		{
-			parseline(cur + 1, list, nstate, val, timing_index);
+			start = 0;
+			end = 0;
+		}
+		else if (elem == "1")
+		{
+			start = 1;
+			end = 1;
+		}
+		else if (elem == "X")
+		{
+			start = 0;
+			end = 1;
 		}
 		else
+			nl_assert_always(false, "unknown input value (not 0, 1, or X)");
+		for (std::uint_least64_t i = start; i <= end; i++)
 		{
-			// cutoff previous inputs and outputs for ignore
-			if (m_out_state[nstate] != m_out_state.mask() &&  m_out_state[nstate] != val)
-				throw nl_exception(plib::pfmt("Error in truthtable: State {1:04} already set, {2} != {3}\n")
-						.x(nstate.as_uint())(m_out_state[nstate])(val) );
-			m_out_state.set(nstate, val);
-			for (std::size_t j=0; j<m_NO; j++)
-				m_timing[nstate * m_NO + j] = timing_index[j];
-		}
-	}
-}
+			tt_bitset nstate = state;
+			if (i==1)
+				nstate.set(cur);
 
-void truthtable_parser::parse(const std::vector<pstring> &truthtable)
-{
-	unsigned line = 0;
-
-	pstring ttline(truthtable[line]);
-	line++;
-	ttline = truthtable[line];
-	line++;
-
-	for (unsigned j=0; j < m_size; j++)
-		m_out_state.set(j, tt_bitset::all_bits());
-
-	for (int j=0; j < 16; j++)
-		m_timing_nt[j] = netlist_time::zero();
-
-	while (!(ttline == ""))
-	{
-		std::vector<pstring> io(plib::psplit(ttline,"|"));
-		// checks
-		nl_assert_always(io.size() == 3, "io.count mismatch");
-		std::vector<pstring> inout(plib::psplit(io[0], ","));
-		nl_assert_always(inout.size() == m_num_bits, "number of bits not matching");
-		std::vector<pstring> out(plib::psplit(io[1], ","));
-		nl_assert_always(out.size() == m_NO, "output count not matching");
-		std::vector<pstring> times(plib::psplit(io[2], ","));
-		nl_assert_always(times.size() == m_NO, "timing count not matching");
-
-		tt_bitset val = 0;
-		std::vector<uint_least8_t> tindex;
-
-		//
-		// FIXME: evaluation of outputs should be done in parseline to
-		//        enable the use of inputs for output values, i.e. "I1" or "~I1"
-		//  in addition to "0" and "1".
-
-		for (unsigned j=0; j<m_NO; j++)
-		{
-			pstring outs = plib::trim(out[j]);
-			if (outs == "1")
-				val.set(j);
-			else
-				nl_assert_always(outs == "0", "Unknown value (not 0 or 1");
-			// FIXME: error handling
-			netlist_time t = netlist_time::from_nsec(plib::pstonum<std::int64_t>(plib::trim(times[j])));
-			uint_least8_t k=0;
-			while (m_timing_nt[k] != netlist_time::zero() && m_timing_nt[k] != t)
-				k++;
-			m_timing_nt[k] = t;
-			tindex.push_back(k); //[j] = k;
-		}
-
-		parseline(0, inout, 0 , val, tindex);
-		if (line < truthtable.size())
-			ttline = truthtable[line];
-		else
-			ttline = "";
-		line++;
-	}
-
-	// determine ignore mask by looping over all input combinations
-	std::vector<tt_bitset> ign(m_size);
-	for (tt_bitset &x : ign)
-		x.set();
-
-	for (std::uint_least64_t i=0; i < m_size; i++)
-	{
-		if (ign[i].all()) // not yet visited
-		{
-			tt_bitset tign = calculate_ignored_inputs(i);
-
-			ign[i] = tign;
-
-			// don't need to recalculate similar ones
-			tt_bitset bitsk;
-			bitsk.set(tign.count());
-
-			for (std::uint_least64_t k=0; k < bitsk; k++)
+			if (cur < m_num_bits - 1)
 			{
-				tt_bitset b = tign.expand_and(k);
-				ign[(i & tign.flip()) | b] = tign;
+				parseline(cur + 1, list, nstate, val, timing_index);
+			}
+			else
+			{
+				// cutoff previous inputs and outputs for ignore
+				if (m_out_state[nstate] != m_out_state.mask() &&  m_out_state[nstate] != val)
+					throw nl_exception(plib::pfmt("Error in truthtable: State {1:04} already set, {2} != {3}\n")
+							.x(nstate.as_uint())(m_out_state[nstate])(val) );
+				m_out_state.set(nstate, val);
+				for (std::size_t j=0; j<m_NO; j++)
+					m_timing[nstate * m_NO + j] = timing_index[j];
 			}
 		}
 	}
 
-	for (size_t i=0; i<m_size; i++)
+	void truthtable_parser::parse(const std::vector<pstring> &truthtable)
 	{
-		if (m_out_state[i] == m_out_state.mask())
-			throw nl_exception(plib::pfmt("truthtable: found element not set {1}\n").x(i) );
-		m_out_state.set(i, m_out_state[i] | (ign[i] << m_NO));
+		unsigned line = 0;
+
+		pstring ttline(truthtable[line]);
+		line++;
+		ttline = truthtable[line];
+		line++;
+
+		for (unsigned j=0; j < m_size; j++)
+			m_out_state.set(j, tt_bitset::all_bits());
+
+		for (int j=0; j < 16; j++)
+			m_timing_nt[j] = netlist_time::zero();
+
+		while (!ttline.empty())
+		{
+			std::vector<pstring> io(plib::psplit(ttline,'|'));
+			// checks
+			nl_assert_always(io.size() == 3, "io.count mismatch");
+			std::vector<pstring> inout(plib::psplit(io[0], ','));
+			nl_assert_always(inout.size() == m_num_bits, "number of bits not matching");
+			std::vector<pstring> out(plib::psplit(io[1], ','));
+			nl_assert_always(out.size() == m_NO, "output count not matching");
+			std::vector<pstring> times(plib::psplit(io[2], ','));
+			nl_assert_always(times.size() == m_NO, "timing count not matching");
+
+			tt_bitset val = 0;
+			std::vector<uint_least8_t> tindex;
+
+			//
+			// FIXME: evaluation of outputs should be done in parseline to
+			//        enable the use of inputs for output values, i.e. "I1" or "~I1"
+			//  in addition to "0" and "1".
+
+			for (unsigned j=0; j<m_NO; j++)
+			{
+				pstring outs = plib::trim(out[j]);
+				if (outs == "1")
+					val.set(j);
+				else
+					nl_assert_always(outs == "0", "Unknown value (not 0 or 1");
+				// FIXME: error handling
+				netlist_time t = netlist_time::from_nsec(plib::pstonum<std::int64_t>(plib::trim(times[j])));
+				uint_least8_t k=0;
+				while (m_timing_nt[k] != netlist_time::zero() && m_timing_nt[k] != t)
+					k++;
+				m_timing_nt[k] = t;
+				tindex.push_back(k); //[j] = k;
+			}
+
+			parseline(0, inout, 0 , val, tindex);
+			if (line < truthtable.size())
+				ttline = truthtable[line];
+			else
+				ttline = "";
+			line++;
+		}
+
+		// determine ignore mask by looping over all input combinations
+		std::vector<tt_bitset> ign(m_size);
+		for (tt_bitset &x : ign)
+			x.set();
+
+		for (std::uint_least64_t i=0; i < m_size; i++)
+		{
+			if (ign[i].all()) // not yet visited
+			{
+				tt_bitset tign = calculate_ignored_inputs(i);
+
+				ign[i] = tign;
+
+				// don't need to recalculate similar ones
+				tt_bitset bitsk;
+				bitsk.set(tign.count());
+
+				for (std::uint_least64_t k=0; k < bitsk; k++)
+				{
+					tt_bitset b = tign.expand_and(k);
+					ign[(i & tign.flip()) | b] = tign;
+				}
+			}
+		}
+
+		for (size_t i=0; i<m_size; i++)
+		{
+			if (m_out_state[i] == m_out_state.mask())
+				throw nl_exception(plib::pfmt("truthtable: found element not set {1}\n").x(i) );
+			m_out_state.set(i, m_out_state[i] | (ign[i] << m_NO));
+		}
 	}
-}
 
-} // namespace devices
+} // namespace netlist::devices
 
-namespace factory
-{
+namespace netlist::factory {
 
 	truthtable_base_element_t::truthtable_base_element_t(const pstring &name,
 		properties &&props)
@@ -670,12 +668,13 @@ namespace factory
 	#define ENTRYY(n, m, s)    case (n * 100 + m): \
 		{ using xtype = devices::netlist_factory_truthtable_t<n, m>; \
 			auto cs=s; \
-			ret = host_arena::make_unique<xtype>(desc.name, std::move(cs)); } \
+			ret = plib::make_unique<xtype, host_arena>(desc.name, std::move(cs)); } \
 			break
 
 	#define ENTRY(n, s) ENTRYY(n, 1, s); ENTRYY(n, 2, s); ENTRYY(n, 3, s); \
 						ENTRYY(n, 4, s); ENTRYY(n, 5, s); ENTRYY(n, 6, s); \
-						ENTRYY(n, 7, s); ENTRYY(n, 8, s)
+						ENTRYY(n, 7, s); ENTRYY(n, 8, s); ENTRYY(n, 9, s); \
+						ENTRYY(n, 10, s)
 
 	host_arena::unique_ptr<truthtable_base_element_t> truthtable_create(tt_desc &desc, properties &&props)
 	{
@@ -697,13 +696,12 @@ namespace factory
 			ENTRY(12, props);
 			default:
 				pstring msg = plib::pfmt("unable to create truthtable<{1},{2}>")(desc.ni)(desc.no);
-				nl_assert_always(false, msg.c_str());
+				nl_assert_always(false, putf8string(msg).c_str());
 		}
 		ret->m_desc = desc.desc;
-		ret->m_family_name = (desc.family != "" ? desc.family : pstring(config::DEFAULT_LOGIC_FAMILY()));
+		ret->m_family_name = (!desc.family.empty() ? desc.family : pstring(config::DEFAULT_LOGIC_FAMILY()));
 
 		return ret;
 	}
 
-} // namespace factory
-} // namespace netlist
+} // namespace netlist::factory

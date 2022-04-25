@@ -20,17 +20,19 @@
 #include <SDL2/SDL.h>
 #include <cctype>
 // ReSharper disable once CppUnusedIncludeDirective
-#include <cstddef>
-#include <mutex>
-#include <memory>
-#include <queue>
-#include <iterator>
 #include <algorithm>
+#include <cstddef>
+#include <iterator>
+#include <memory>
+#include <mutex>
+#include <optional>
+#include <queue>
 
 // MAME headers
 #include "emu.h"
 #include "uiinput.h"
 #include "strconv.h"
+#include "unicode.h"
 
 // MAMEOS headers
 #include "input_common.h"
@@ -44,6 +46,8 @@
 #undef DELETE
 #endif
 
+
+namespace {
 
 // FIXME: sdl does not properly report the window for certain OS.
 #define GET_FOCUS_WINDOW(ev) focus_window()
@@ -61,7 +65,7 @@ struct key_lookup_table
 #define KE5(A, B, C, D, E) KE(A) KE(B) KE(C) KE(D) KE(E)
 #define KE3(A, B, C) KE(A) KE(B) KE(C)
 
-static key_lookup_table sdl_lookup_table[] =
+key_lookup_table sdl_lookup_table[] =
 {
 	KE(UNKNOWN)
 
@@ -331,7 +335,7 @@ static key_lookup_table sdl_lookup_table[] =
 //  lookup_sdl_code
 //============================================================
 
-static int lookup_sdl_code(const char *scode)
+int lookup_sdl_code(const char *scode)
 {
 	int i = 0;
 
@@ -351,8 +355,8 @@ static int lookup_sdl_code(const char *scode)
 class sdl_device : public event_based_device<SDL_Event>
 {
 public:
-	sdl_device(running_machine &machine, const char *name, const char *id, input_device_class devclass, input_module &module)
-		: event_based_device(machine, name, id, devclass, module)
+	sdl_device(running_machine &machine, std::string &&name, std::string &&id, input_device_class devclass, input_module &module) :
+		event_based_device(machine, std::move(name), std::move(id), devclass, module)
 	{
 	}
 
@@ -370,19 +374,47 @@ protected:
 class sdl_keyboard_device : public sdl_device
 {
 public:
+	// state information for a keyboard
+	struct keyboard_state
+	{
+		int32_t   state[0x3ff];         // must be int32_t!
+		int8_t    oldkey[MAX_KEYS];
+		int8_t    currkey[MAX_KEYS];
+	};
+
 	keyboard_state keyboard;
 
-	sdl_keyboard_device(running_machine &machine, const char *name, const char *id, input_module &module)
-		: sdl_device(machine, name, id, DEVICE_CLASS_KEYBOARD, module),
+	sdl_keyboard_device(running_machine &machine, std::string &&name, std::string &&id, input_module &module) :
+		sdl_device(machine, std::move(name), std::move(id), DEVICE_CLASS_KEYBOARD, module),
 		keyboard({{0}})
 	{
+		#ifdef __APPLE__
+		m_capslock_hack = false;
+		machine.add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(&sdl_keyboard_device::frame_callback, this));
+		#endif
 	}
+
+	#ifdef __APPLE__
+	unsigned m_capslock_hack;
+	void frame_callback()
+	{
+		if (m_capslock_hack)
+			if (--m_capslock_hack == 0)
+				keyboard.state[SDL_SCANCODE_CAPSLOCK] = 0x00;
+	}
+	#endif
 
 	void process_event(SDL_Event &sdlevent) override
 	{
 		switch (sdlevent.type)
 		{
 		case SDL_KEYDOWN:
+
+			#ifdef __APPLE__
+			if (sdlevent.key.keysym.scancode == SDL_SCANCODE_CAPSLOCK)
+				m_capslock_hack = 2;
+			#endif
+
 			keyboard.state[sdlevent.key.keysym.scancode] = 0x80;
 			if (sdlevent.key.keysym.sym < 0x20)
 				machine().ui_input().push_char_event(osd_common_t::s_window_list.front()->target(), sdlevent.key.keysym.sym);
@@ -402,6 +434,11 @@ public:
 			break;
 
 		case SDL_KEYUP:
+			#ifdef __APPLE__
+			if (sdlevent.key.keysym.scancode == SDL_SCANCODE_CAPSLOCK)
+				break;
+			#endif
+
 			keyboard.state[sdlevent.key.keysym.scancode] = 0x00;
 			break;
 
@@ -436,6 +473,9 @@ public:
 	void reset() override
 	{
 		memset(&keyboard.state, 0, sizeof(keyboard.state));
+		#ifdef __APPLE__
+		m_capslock_hack = 0;
+		#endif
 	}
 };
 
@@ -452,10 +492,17 @@ private:
 	int last_y;
 
 public:
+	// state information for a mouse
+	struct mouse_state
+	{
+		int32_t lX, lY;
+		int32_t buttons[MAX_BUTTONS];
+	};
+
 	mouse_state mouse;
 
-	sdl_mouse_device(running_machine &machine, const char *name, const char *id, input_module &module)
-		: sdl_device(machine, name, id, DEVICE_CLASS_MOUSE, module),
+	sdl_mouse_device(running_machine &machine, std::string &&name, std::string &&id, input_module &module) :
+		sdl_device(machine, std::move(name), std::move(id), DEVICE_CLASS_MOUSE, module),
 		last_x(0),
 		last_y(0),
 		mouse({0})
@@ -571,40 +618,40 @@ public:
 //  sdl_joystick_device
 //============================================================
 
-// state information for a joystick
-struct sdl_joystick_state
-{
-	int32_t axes[MAX_AXES];
-	int32_t buttons[MAX_BUTTONS];
-	int32_t hatsU[MAX_HATS], hatsD[MAX_HATS], hatsL[MAX_HATS], hatsR[MAX_HATS];
-	int32_t balls[MAX_AXES];
-};
-
-struct sdl_api_state
-{
-	SDL_Joystick *device;
-	SDL_Haptic *hapdevice;
-	SDL_JoystickID joystick_id;
-};
-
 class sdl_joystick_device : public sdl_device
 {
 public:
+	// state information for a joystick
+	struct sdl_joystick_state
+	{
+		int32_t axes[MAX_AXES];
+		int32_t buttons[MAX_BUTTONS];
+		int32_t hatsU[MAX_HATS], hatsD[MAX_HATS], hatsL[MAX_HATS], hatsR[MAX_HATS];
+		int32_t balls[MAX_AXES];
+	};
+
+	struct sdl_api_state
+	{
+		SDL_Joystick *device = nullptr;
+		SDL_Haptic *hapdevice = nullptr;
+		SDL_JoystickID joystick_id;
+		std::optional<std::string> serial;
+	};
+
 	sdl_joystick_state    joystick;
 	sdl_api_state         sdl_state;
 
-	sdl_joystick_device(running_machine &machine, const char *name, const char *id, input_module &module)
-		: sdl_device(machine, name, id, DEVICE_CLASS_JOYSTICK, module),
-			joystick({{0}}),
-			sdl_state({ nullptr })
+	sdl_joystick_device(running_machine &machine, std::string &&name, std::string &&id, input_module &module) :
+		sdl_device(machine, std::move(name), std::move(id), DEVICE_CLASS_JOYSTICK, module),
+		joystick({{0}})
 	{
 	}
 
 	~sdl_joystick_device()
 	{
-		if (sdl_state.device != nullptr)
+		if (sdl_state.device)
 		{
-			if (sdl_state.hapdevice != nullptr)
+			if (sdl_state.hapdevice)
 			{
 				SDL_HapticClose(sdl_state.hapdevice);
 				sdl_state.hapdevice = nullptr;
@@ -634,44 +681,31 @@ public:
 			break;
 
 		case SDL_JOYHATMOTION:
-			if (sdlevent.jhat.value & SDL_HAT_UP)
-			{
-				joystick.hatsU[sdlevent.jhat.hat] = 0x80;
-			}
-			else
-			{
-				joystick.hatsU[sdlevent.jhat.hat] = 0;
-			}
-			if (sdlevent.jhat.value & SDL_HAT_DOWN)
-			{
-				joystick.hatsD[sdlevent.jhat.hat] = 0x80;
-			}
-			else
-			{
-				joystick.hatsD[sdlevent.jhat.hat] = 0;
-			}
-			if (sdlevent.jhat.value & SDL_HAT_LEFT)
-			{
-				joystick.hatsL[sdlevent.jhat.hat] = 0x80;
-			}
-			else
-			{
-				joystick.hatsL[sdlevent.jhat.hat] = 0;
-			}
-			if (sdlevent.jhat.value & SDL_HAT_RIGHT)
-			{
-				joystick.hatsR[sdlevent.jhat.hat] = 0x80;
-			}
-			else
-			{
-				joystick.hatsR[sdlevent.jhat.hat] = 0;
-			}
+			joystick.hatsU[sdlevent.jhat.hat] = (sdlevent.jhat.value & SDL_HAT_UP) ? 0x80 : 0;
+			joystick.hatsD[sdlevent.jhat.hat] = (sdlevent.jhat.value & SDL_HAT_DOWN) ? 0x80 : 0;
+			joystick.hatsL[sdlevent.jhat.hat] = (sdlevent.jhat.value & SDL_HAT_LEFT) ? 0x80 : 0;
+			joystick.hatsR[sdlevent.jhat.hat] = (sdlevent.jhat.value & SDL_HAT_RIGHT) ? 0x80 : 0;
 			break;
 
 		case SDL_JOYBUTTONDOWN:
 		case SDL_JOYBUTTONUP:
 			if (sdlevent.jbutton.button < MAX_BUTTONS)
 				joystick.buttons[sdlevent.jbutton.button] = (sdlevent.jbutton.state == SDL_PRESSED) ? 0x80 : 0;
+			break;
+
+		case SDL_JOYDEVICEREMOVED:
+			osd_printf_verbose("Joystick: %s [GUID %s] disconnected\n", name(), id());
+			reset();
+			if (sdl_state.device)
+			{
+				if (sdl_state.hapdevice)
+				{
+					SDL_HapticClose(sdl_state.hapdevice);
+					sdl_state.hapdevice = nullptr;
+				}
+				SDL_JoystickClose(sdl_state.device);
+				sdl_state.device = nullptr;
+			}
 			break;
 		}
 	}
@@ -680,8 +714,8 @@ public:
 class sdl_sixaxis_joystick_device : public sdl_joystick_device
 {
 public:
-	sdl_sixaxis_joystick_device(running_machine &machine, const char *name, const char *id, input_module &module)
-		: sdl_joystick_device(machine, name, id, module)
+	sdl_sixaxis_joystick_device(running_machine &machine, std::string &&name, std::string &&id, input_module &module) :
+		sdl_joystick_device(machine, std::move(name), std::move(id), module)
 	{
 	}
 
@@ -720,8 +754,7 @@ public:
 class sdl_input_module : public input_module_base, public sdl_event_subscriber
 {
 public:
-	sdl_input_module(const char *type)
-		: input_module_base(type, "sdl")
+	sdl_input_module(const char *type) : input_module_base(type, "sdl")
 	{
 	}
 
@@ -756,9 +789,10 @@ public:
 	void handle_event(SDL_Event &sdlevent) override
 	{
 		// By default dispatch event to every device
-		devicelist()->for_each_device([&sdlevent](auto device) {
-			downcast<sdl_device*>(device)->queue_events(&sdlevent, 1);
-		});
+		devicelist().for_each_device(
+				[&sdlevent](auto device) {
+					downcast<sdl_device*>(device)->queue_events(&sdlevent, 1);
+				});
 	}
 };
 
@@ -770,8 +804,9 @@ class sdl_keyboard_module : public sdl_input_module
 {
 	keyboard_trans_table * m_key_trans_table;
 public:
-	sdl_keyboard_module()
-		: sdl_input_module(OSD_KEYBOARDINPUT_PROVIDER), m_key_trans_table(nullptr)
+	sdl_keyboard_module() :
+		sdl_input_module(OSD_KEYBOARDINPUT_PROVIDER),
+		m_key_trans_table(nullptr)
 	{
 	}
 
@@ -779,15 +814,12 @@ public:
 	{
 		sdl_input_module::input_init(machine);
 
-		static int event_types[] = {
-			static_cast<int>(SDL_KEYDOWN),
-			static_cast<int>(SDL_KEYUP),
-			static_cast<int>(SDL_TEXTINPUT)
-		};
+		static int const event_types[] = {
+				int(SDL_KEYDOWN),
+				int(SDL_KEYUP),
+				int(SDL_TEXTINPUT) };
 
-		sdl_event_manager::instance().subscribe(event_types, ARRAY_LENGTH(event_types), this);
-
-		sdl_keyboard_device *devinfo;
+		sdl_event_manager::instance().subscribe(event_types, this);
 
 		// Read our keymap and store a pointer to our table
 		m_key_trans_table = sdlinput_read_keymap(machine);
@@ -797,7 +829,7 @@ public:
 		osd_printf_verbose("Keyboard: Start initialization\n");
 
 		// SDL only has 1 keyboard add it now
-		devinfo = devicelist()->create_device<sdl_keyboard_device>(machine, "System keyboard", "System keyboard", *this);
+		auto &devinfo = devicelist().create_device<sdl_keyboard_device>(machine, "System keyboard", "System keyboard", *this);
 
 		// populate it
 		for (int keynum = 0; local_table[keynum].mame_key != ITEM_ID_INVALID; keynum++)
@@ -808,31 +840,26 @@ public:
 			char defname[20];
 			snprintf(defname, sizeof(defname) - 1, "%s", local_table[keynum].ui_name);
 
-			devinfo->device()->add_item(defname, itemid, generic_button_get_state<std::int32_t>, &devinfo->keyboard.state[local_table[keynum].sdl_scancode]);
+			devinfo.device()->add_item(defname, itemid, generic_button_get_state<std::int32_t>, &devinfo.keyboard.state[local_table[keynum].sdl_scancode]);
 		}
 
-		osd_printf_verbose("Keyboard: Registered %s\n", devinfo->name());
+		osd_printf_verbose("Keyboard: Registered %s\n", devinfo.name());
 		osd_printf_verbose("Keyboard: End initialization\n");
 	}
 
 private:
-	static keyboard_trans_table* sdlinput_read_keymap(running_machine &machine)
+	keyboard_trans_table *sdlinput_read_keymap(running_machine &machine)
 	{
-		char *keymap_filename;
-		FILE *keymap_file;
-		int line = 1;
-		int  sdl2section = 0;
-
 		keyboard_trans_table &default_table = keyboard_trans_table::instance();
 
 		if (!machine.options().bool_value(SDLOPTION_KEYMAP))
 			return &default_table;
 
-		keymap_filename = (char *)downcast<sdl_options &>(machine.options()).keymap_file();
+		const char *const keymap_filename = downcast<sdl_options &>(machine.options()).keymap_file();
 		osd_printf_verbose("Keymap: Start reading keymap_file %s\n", keymap_filename);
 
-		keymap_file = fopen(keymap_filename, "r");
-		if (keymap_file == nullptr)
+		FILE *const keymap_file = fopen(keymap_filename, "r");
+		if (!keymap_file)
 		{
 			osd_printf_warning("Keymap: Unable to open keymap %s, using default\n", keymap_filename);
 			return &default_table;
@@ -846,8 +873,10 @@ private:
 			key_trans_entries[i] = default_table[i];
 
 		// Allocate the trans table to be associated with the machine so we don't have to free it
-		keyboard_trans_table *custom_table = auto_alloc(machine, keyboard_trans_table(std::move(key_trans_entries), default_table.size()));
+		m_custom_table = std::make_unique<keyboard_trans_table>(std::move(key_trans_entries), default_table.size());
 
+		int line = 1;
+		int sdl2section = 0;
 		while (!feof(keymap_file))
 		{
 			char buf[256];
@@ -878,14 +907,15 @@ private:
 
 					if (sk >= 0 && index >= 0)
 					{
-						key_trans_entry &entry = (*custom_table)[index];
+						key_trans_entry &entry = (*m_custom_table)[index];
 						entry.sdl_scancode = sk;
-						entry.ui_name = auto_alloc_array(machine, char, strlen(kns) + 1);
-						strcpy(entry.ui_name, kns);
+						entry.ui_name = const_cast<char *>(m_ui_names.emplace_back(kns).c_str());
 						osd_printf_verbose("Keymap: Mapped <%s> to <%s> with ui-text <%s>\n", sks, mks, kns);
 					}
 					else
+					{
 						osd_printf_error("Keymap: Error on line %d - %s key not found: %s\n", line, (sk<0) ? "sdl" : "mame", buf);
+					}
 				}
 			}
 			line++;
@@ -893,8 +923,11 @@ private:
 		fclose(keymap_file);
 		osd_printf_verbose("Keymap: Processed %d lines\n", line);
 
-		return custom_table;
+		return m_custom_table.get();
 	}
+
+	std::unique_ptr<keyboard_trans_table> m_custom_table;
+	std::list<std::string> m_ui_names;
 };
 
 //============================================================
@@ -904,8 +937,7 @@ private:
 class sdl_mouse_module : public sdl_input_module
 {
 public:
-	sdl_mouse_module()
-		: sdl_input_module(OSD_MOUSEINPUT_PROVIDER)
+	sdl_mouse_module() : sdl_input_module(OSD_MOUSEINPUT_PROVIDER)
 	{
 	}
 
@@ -913,54 +945,53 @@ public:
 	{
 		sdl_input_module::input_init(machine);
 
-		static int event_types[] = {
-			static_cast<int>(SDL_MOUSEMOTION),
-			static_cast<int>(SDL_MOUSEBUTTONDOWN),
-			static_cast<int>(SDL_MOUSEBUTTONUP),
-			static_cast<int>(SDL_MOUSEWHEEL)
-		};
+		static int const event_types[] = {
+				int(SDL_MOUSEMOTION),
+				int(SDL_MOUSEBUTTONDOWN),
+				int(SDL_MOUSEBUTTONUP),
+				int(SDL_MOUSEWHEEL) };
 
-		sdl_event_manager::instance().subscribe(event_types, ARRAY_LENGTH(event_types), this);
-
-		sdl_mouse_device *devinfo;
-		char defname[20];
-		int button;
+		sdl_event_manager::instance().subscribe(event_types, this);
 
 		osd_printf_verbose("Mouse: Start initialization\n");
 
 		// SDL currently only supports one mouse
-		devinfo = devicelist()->create_device<sdl_mouse_device>(machine, "System mouse", "System mouse", *this);
+		auto &devinfo = devicelist().create_device<sdl_mouse_device>(machine, "System mouse", "System mouse", *this);
 
 		// add the axes
-		devinfo->device()->add_item("X", ITEM_ID_XAXIS, generic_axis_get_state<std::int32_t>, &devinfo->mouse.lX);
-		devinfo->device()->add_item("Y", ITEM_ID_YAXIS, generic_axis_get_state<std::int32_t>, &devinfo->mouse.lY);
+		devinfo.device()->add_item("X", ITEM_ID_XAXIS, generic_axis_get_state<std::int32_t>, &devinfo.mouse.lX);
+		devinfo.device()->add_item("Y", ITEM_ID_YAXIS, generic_axis_get_state<std::int32_t>, &devinfo.mouse.lY);
 
-		for (button = 0; button < 4; button++)
+		for (int button = 0; button < 4; button++)
 		{
 			input_item_id itemid = (input_item_id)(ITEM_ID_BUTTON1 + button);
+			char defname[20];
 			snprintf(defname, sizeof(defname), "B%d", button + 1);
 
-			devinfo->device()->add_item(defname, itemid, generic_button_get_state<std::int32_t>, &devinfo->mouse.buttons[button]);
+			devinfo.device()->add_item(defname, itemid, generic_button_get_state<std::int32_t>, &devinfo.mouse.buttons[button]);
 		}
 
-		osd_printf_verbose("Mouse: Registered %s\n", devinfo->name());
+		osd_printf_verbose("Mouse: Registered %s\n", devinfo.name());
 		osd_printf_verbose("Mouse: End initialization\n");
 	}
 };
 
 
-static void devmap_register(device_map_t &devmap, int physical_idx, const std::string &name)
+void devmap_register(device_map_t &devmap, int physical_idx, const std::string &name)
 {
 	// Attempt to find the entry by name
-	auto entry = std::find_if(std::begin(devmap.map), std::end(devmap.map), [&name](auto &item)
-	{
-		return item.name == name && item.physical < 0;
-	});
+	auto entry = std::find_if(
+			std::begin(devmap.map),
+			std::end(devmap.map),
+			[&name] (auto const &item) { return (item.name == name) && (item.physical < 0); });
 
 	// If we didn't find it by name, find the first free slot
 	if (entry == std::end(devmap.map))
 	{
-		entry = std::find_if(std::begin(devmap.map), std::end(devmap.map), [](auto &item) { return item.name.empty(); });
+		entry = std::find_if(
+				std::begin(devmap.map),
+				std::end(devmap.map),
+				[] (auto const &item) { return item.name.empty(); });
 	}
 
 	if (entry != std::end(devmap.map))
@@ -984,8 +1015,11 @@ private:
 	bool           m_initialized_haptic;
 	bool           m_sixaxis_mode;
 public:
-	sdl_joystick_module()
-		: sdl_input_module(OSD_JOYSTICKINPUT_PROVIDER), m_initialized_joystick(false), m_initialized_haptic(false), m_sixaxis_mode(false)
+	sdl_joystick_module() :
+		sdl_input_module(OSD_JOYSTICKINPUT_PROVIDER),
+		m_initialized_joystick(false),
+		m_initialized_haptic(false),
+		m_sixaxis_mode(false)
 	{
 	}
 
@@ -1025,47 +1059,58 @@ public:
 
 		char tempname[512];
 
-		m_sixaxis_mode = downcast<const sdl_options*>(options())->sixaxis();
+		m_sixaxis_mode = downcast<const sdl_options *>(options())->sixaxis();
 
 		devmap_init(machine, &m_joy_map, SDLOPTION_JOYINDEX, 8, "Joystick mapping");
 
 		osd_printf_verbose("Joystick: Start initialization\n");
-		int physical_stick;
-		for (physical_stick = 0; physical_stick < SDL_NumJoysticks(); physical_stick++)
+		for (int physical_stick = 0; physical_stick < SDL_NumJoysticks(); physical_stick++)
 		{
-				std::string joy_name = remove_spaces(SDL_JoystickNameForIndex(physical_stick));
-				devmap_register(m_joy_map, physical_stick, joy_name);
+			std::string joy_name = remove_spaces(SDL_JoystickNameForIndex(physical_stick));
+			devmap_register(m_joy_map, physical_stick, joy_name);
 		}
 
 		for (int stick = 0; stick < MAX_DEVMAP_ENTRIES; stick++)
 		{
-			sdl_joystick_device *devinfo = create_joystick_device(machine, &m_joy_map, stick, DEVICE_CLASS_JOYSTICK);
+			sdl_joystick_device *const devinfo = create_joystick_device(machine, &m_joy_map, stick, DEVICE_CLASS_JOYSTICK);
 
-			if (devinfo == nullptr)
+			if (!devinfo)
 				continue;
 
-			physical_stick = m_joy_map.map[stick].physical;
-			SDL_Joystick *joy = SDL_JoystickOpen(physical_stick);
+			int const physical_stick = m_joy_map.map[stick].physical;
+			SDL_Joystick *const joy = SDL_JoystickOpen(physical_stick);
 			SDL_JoystickGUID guid = SDL_JoystickGetGUID(joy);
 			char guid_str[256];
 			guid_str[0] = '\0';
-			SDL_JoystickGetGUIDString(guid, guid_str, sizeof(guid_str)-1);
+			SDL_JoystickGetGUIDString(guid, guid_str, sizeof(guid_str) - 1);
 
 			devinfo->sdl_state.device = joy;
 			devinfo->sdl_state.joystick_id = SDL_JoystickInstanceID(joy);
 			devinfo->sdl_state.hapdevice = SDL_HapticOpenFromJoystick(joy);
-
-			osd_printf_verbose("Joystick: %s [GUID %s]\n", SDL_JoystickNameForIndex(physical_stick), guid_str);
-			osd_printf_verbose("Joystick:   ...  %d axes, %d buttons %d hats %d balls\n", SDL_JoystickNumAxes(joy), SDL_JoystickNumButtons(joy), SDL_JoystickNumHats(joy), SDL_JoystickNumBalls(joy));
-			osd_printf_verbose("Joystick:   ...  Physical id %d mapped to logical id %d\n", physical_stick, stick + 1);
-			if (devinfo->sdl_state.hapdevice != nullptr)
-			{
-				osd_printf_verbose("Joystick:   ...  Has haptic capability\n");
-			}
+#if SDL_VERSION_ATLEAST(2, 0, 14)
+			char const *const serial = SDL_JoystickGetSerial(joy);
+			if (serial)
+				devinfo->sdl_state.serial = serial;
 			else
-			{
+#endif // SDL_VERSION_ATLEAST(2, 0, 14)
+				devinfo->sdl_state.serial = std::nullopt;
+
+			osd_printf_verbose("Joystick: %s [GUID %s] Vendor ID %04X, Product ID %04X, Revision %04X\n",
+					SDL_JoystickNameForIndex(physical_stick),
+					guid_str,
+					SDL_JoystickGetVendor(joy),
+					SDL_JoystickGetProduct(joy),
+					SDL_JoystickGetProductVersion(joy));
+			osd_printf_verbose("Joystick:   ...  %d axes, %d buttons %d hats %d balls\n",
+					SDL_JoystickNumAxes(joy),
+					SDL_JoystickNumButtons(joy),
+					SDL_JoystickNumHats(joy),
+					SDL_JoystickNumBalls(joy));
+			osd_printf_verbose("Joystick:   ...  Physical id %d mapped to logical id %d\n", physical_stick, stick + 1);
+			if (devinfo->sdl_state.hapdevice)
+				osd_printf_verbose("Joystick:   ...  Has haptic capability\n");
+			else
 				osd_printf_verbose("Joystick:   ...  Does not have haptic capability\n");
-			}
 
 			// loop over all axes
 			for (int axis = 0; axis < SDL_JoystickNumAxes(joy); axis++)
@@ -1079,7 +1124,7 @@ public:
 				else
 					itemid = ITEM_ID_OTHER_AXIS_ABSOLUTE;
 
-				snprintf(tempname, sizeof(tempname), "A%d %s", axis, devinfo->name());
+				snprintf(tempname, sizeof(tempname), "A%d", axis + 1);
 				devinfo->device()->add_item(tempname, itemid, generic_axis_get_state<std::int32_t>, &devinfo->joystick.axes[axis]);
 			}
 
@@ -1099,7 +1144,7 @@ public:
 				else
 					itemid = ITEM_ID_OTHER_SWITCH;
 
-				snprintf(tempname, sizeof(tempname), "button %d", button);
+				snprintf(tempname, sizeof(tempname), "Button %d", button + 1);
 				devinfo->device()->add_item(tempname, itemid, generic_button_get_state<std::int32_t>, &devinfo->joystick.buttons[button]);
 			}
 
@@ -1108,16 +1153,16 @@ public:
 			{
 				input_item_id itemid;
 
-				snprintf(tempname, sizeof(tempname), "hat %d Up", hat);
+				snprintf(tempname, sizeof(tempname), "Hat %d Up", hat + 1);
 				itemid = (input_item_id)((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1UP + 4 * hat : ITEM_ID_OTHER_SWITCH);
 				devinfo->device()->add_item(tempname, itemid, generic_button_get_state<std::int32_t>, &devinfo->joystick.hatsU[hat]);
-				snprintf(tempname, sizeof(tempname), "hat %d Down", hat);
+				snprintf(tempname, sizeof(tempname), "Hat %d Down", hat + 1);
 				itemid = (input_item_id)((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1DOWN + 4 * hat : ITEM_ID_OTHER_SWITCH);
 				devinfo->device()->add_item(tempname, itemid, generic_button_get_state<std::int32_t>, &devinfo->joystick.hatsD[hat]);
-				snprintf(tempname, sizeof(tempname), "hat %d Left", hat);
+				snprintf(tempname, sizeof(tempname), "Hat %d Left", hat + 1);
 				itemid = (input_item_id)((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1LEFT + 4 * hat : ITEM_ID_OTHER_SWITCH);
 				devinfo->device()->add_item(tempname, itemid, generic_button_get_state<std::int32_t>, &devinfo->joystick.hatsL[hat]);
-				snprintf(tempname, sizeof(tempname), "hat %d Right", hat);
+				snprintf(tempname, sizeof(tempname), "Hat %d Right", hat + 1);
 				itemid = (input_item_id)((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1RIGHT + 4 * hat : ITEM_ID_OTHER_SWITCH);
 				devinfo->device()->add_item(tempname, itemid, generic_button_get_state<std::int32_t>, &devinfo->joystick.hatsR[hat]);
 			}
@@ -1132,75 +1177,126 @@ public:
 				else
 					itemid = ITEM_ID_OTHER_AXIS_RELATIVE;
 
-				snprintf(tempname, sizeof(tempname), "R%d %s", ball * 2, devinfo->name());
+				snprintf(tempname, sizeof(tempname), "R%d X", ball + 1);
 				devinfo->device()->add_item(tempname, (input_item_id)itemid, generic_axis_get_state<std::int32_t>, &devinfo->joystick.balls[ball * 2]);
-				snprintf(tempname, sizeof(tempname), "R%d %s", ball * 2 + 1, devinfo->name());
+				snprintf(tempname, sizeof(tempname), "R%d Y", ball + 1);
 				devinfo->device()->add_item(tempname, (input_item_id)(itemid + 1), generic_axis_get_state<std::int32_t>, &devinfo->joystick.balls[ball * 2 + 1]);
 			}
 		}
 
-		static int event_types[] = {
-			static_cast<int>(SDL_JOYAXISMOTION),
-			static_cast<int>(SDL_JOYBALLMOTION),
-			static_cast<int>(SDL_JOYHATMOTION),
-			static_cast<int>(SDL_JOYBUTTONDOWN),
-			static_cast<int>(SDL_JOYBUTTONUP)
-		};
+		static int const event_types[] = {
+				int(SDL_JOYAXISMOTION),
+				int(SDL_JOYBALLMOTION),
+				int(SDL_JOYHATMOTION),
+				int(SDL_JOYBUTTONDOWN),
+				int(SDL_JOYBUTTONUP),
+				int(SDL_JOYDEVICEADDED),
+				int(SDL_JOYDEVICEREMOVED) };
 
-		sdl_event_manager::instance().subscribe(event_types, ARRAY_LENGTH(event_types), this);
+		sdl_event_manager::instance().subscribe(event_types, this);
 
 		osd_printf_verbose("Joystick: End initialization\n");
 	}
 
 	virtual void handle_event(SDL_Event &sdlevent) override
 	{
-		// Figure out which joystick this event id destined for
-		auto target_device = std::find_if(devicelist()->begin(), devicelist()->end(), [&sdlevent](auto &device)
+		if (SDL_JOYDEVICEADDED == sdlevent.type)
 		{
-			std::unique_ptr<device_info> &ptr = device;
-			return downcast<sdl_joystick_device*>(ptr.get())->sdl_state.joystick_id == sdlevent.jdevice.which;
-		});
+			SDL_Joystick *const joy = SDL_JoystickOpen(sdlevent.jdevice.which);
+			if (joy)
+			{
+				SDL_JoystickGUID guid = SDL_JoystickGetGUID(joy);
+				char guid_str[256];
+				guid_str[0] = '\0';
+				SDL_JoystickGetGUIDString(guid, guid_str, sizeof(guid_str) - 1);
+				char const *serial = nullptr;
+#if SDL_VERSION_ATLEAST(2, 0, 14)
+				serial = SDL_JoystickGetSerial(joy);
+#endif
+				auto target_device = std::find_if(
+						devicelist().begin(),
+						devicelist().end(),
+						[&guid_str, &serial] (auto const &device)
+						{
+							auto &devinfo = downcast<sdl_joystick_device &>(*device);
+							return
+									!devinfo.sdl_state.device &&
+									(devinfo.id() == guid_str) &&
+									((serial && devinfo.sdl_state.serial && (*devinfo.sdl_state.serial == serial)) || (!serial && !devinfo.sdl_state.serial));
+						});
+				if (devicelist().end() != target_device)
+				{
+					auto &devinfo = downcast<sdl_joystick_device &>(**target_device);
+					devinfo.sdl_state.device = joy;
+					devinfo.sdl_state.joystick_id = SDL_JoystickInstanceID(joy);
+					devinfo.sdl_state.hapdevice = SDL_HapticOpenFromJoystick(joy);
+					osd_printf_verbose("Joystick: %s [GUID %s] reconnected\n", devinfo.name(), guid_str);
+				}
+				else
+				{
+					SDL_JoystickClose(joy);
+				}
+			}
+		}
+		else
+		{
+			// Figure out which joystick this event id destined for
+			sdl_joystick_device *const target_device = find_joystick(sdlevent.jdevice.which); // FIXME: this depends on SDL_JoystickID being the same size as Sint32
 
-		// If we find a matching joystick, dispatch the event to the joystick
-		if (target_device != devicelist()->end())
-		{
-			downcast<sdl_joystick_device*>((*target_device).get())->queue_events(&sdlevent, 1);
+			// If we find a matching joystick, dispatch the event to the joystick
+			if (target_device)
+				target_device->queue_events(&sdlevent, 1);
 		}
 	}
 
 private:
-	sdl_joystick_device* create_joystick_device(running_machine &machine, device_map_t *devmap, int index, input_device_class devclass)
+	sdl_joystick_device *find_joystick(SDL_JoystickID instance)
+	{
+		for (auto &ptr : devicelist())
+		{
+			sdl_joystick_device *const device = downcast<sdl_joystick_device *>(ptr.get());
+			if (device->sdl_state.device && (device->sdl_state.joystick_id == instance))
+				return device;
+		}
+		return nullptr;
+	}
+
+	sdl_joystick_device *create_joystick_device(running_machine &machine, device_map_t *devmap, int index, input_device_class devclass)
 	{
 		char tempname[20];
 		char guid_str[256];
 		SDL_JoystickGUID guid = SDL_JoystickGetDeviceGUID(m_joy_map.map[index].physical);
-		SDL_JoystickGetGUIDString(guid, guid_str, sizeof(guid_str)-1);
+		SDL_JoystickGetGUIDString(guid, guid_str, sizeof(guid_str) - 1);
 
 		if (devmap->map[index].name.empty())
 		{
 			// only map place holders if there were mappings specified
 			if (devmap->initialized)
 			{
-				snprintf(tempname, ARRAY_LENGTH(tempname), "NC%d", index);
+				snprintf(tempname, std::size(tempname), "NC%d", index);
 				m_sixaxis_mode
-					? devicelist()->create_device<sdl_sixaxis_joystick_device>(machine, tempname, guid_str, *this)
-					: devicelist()->create_device<sdl_joystick_device>(machine, tempname, guid_str, *this);
+						? devicelist().create_device<sdl_sixaxis_joystick_device>(machine, tempname, guid_str, *this)
+						: devicelist().create_device<sdl_joystick_device>(machine, tempname, guid_str, *this);
 			}
 
 			return nullptr;
 		}
 
 		return m_sixaxis_mode
-			? devicelist()->create_device<sdl_sixaxis_joystick_device>(machine, devmap->map[index].name.c_str(), guid_str, *this)
-			: devicelist()->create_device<sdl_joystick_device>(machine, devmap->map[index].name.c_str(), guid_str, *this);
+				? &devicelist().create_device<sdl_sixaxis_joystick_device>(machine, std::string(devmap->map[index].name), guid_str, *this)
+				: &devicelist().create_device<sdl_joystick_device>(machine, std::string(devmap->map[index].name), guid_str, *this);
 	}
 };
 
-#else
+} // anonymous namespace
+
+#else // defined(SDLMAME_SDL2)
+
 MODULE_NOT_SUPPORTED(sdl_keyboard_module, OSD_KEYBOARDINPUT_PROVIDER, "sdl")
 MODULE_NOT_SUPPORTED(sdl_mouse_module, OSD_MOUSEINPUT_PROVIDER, "sdl")
 MODULE_NOT_SUPPORTED(sdl_joystick_module, OSD_JOYSTICKINPUT_PROVIDER, "sdl")
-#endif
+
+#endif // defined(SDLMAME_SDL2)
 
 MODULE_DEFINITION(KEYBOARDINPUT_SDL, sdl_keyboard_module)
 MODULE_DEFINITION(MOUSEINPUT_SDL, sdl_mouse_module)

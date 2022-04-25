@@ -28,7 +28,7 @@ public:
 	eolith16_state(const machine_config &mconfig, device_type type, const char *tag)
 		: eolith_state(mconfig, type, tag)
 		, m_special_io(*this, "SPECIAL")
-		, m_vram(*this, "vram", 16)
+		, m_vram(*this, "vram", 0x20000, ENDIANNESS_BIG)
 		, m_vrambank(*this, "vrambank")
 	{
 	}
@@ -42,7 +42,7 @@ protected:
 
 private:
 	required_ioport m_special_io;
-	required_shared_ptr<uint8_t> m_vram;
+	memory_share_creator<uint8_t> m_vram;
 	required_memory_bank m_vrambank;
 
 	void eeprom_w(uint16_t data);
@@ -75,7 +75,7 @@ uint16_t eolith16_state::eolith16_custom_r()
 void eolith16_state::eolith16_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).ram();
-	map(0x50000000, 0x5000ffff).bankrw("vrambank").share("vram");
+	map(0x50000000, 0x5000ffff).bankrw("vrambank");
 	map(0x90000000, 0x9000002f).nopw(); //?
 	map(0xff000000, 0xff1fffff).rom().region("maindata", 0);
 	map(0xffe40001, 0xffe40001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -129,7 +129,7 @@ uint32_t eolith16_state::screen_update_eolith16(screen_device &screen, bitmap_in
 	{
 		for (int x = 0; x < 320; x++)
 		{
-			bitmap.pix16(y, x) = m_vram[(y * 320) + x] & 0xff;
+			bitmap.pix(y, x) = m_vram[(y * 320) + x] & 0xff;
 		}
 	}
 	return 0;

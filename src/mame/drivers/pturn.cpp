@@ -77,15 +77,19 @@ ROMS: All ROM labels say only "PROM" and a number.
 
 */
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
 
 class pturn_state : public driver_device
 {
@@ -115,17 +119,19 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
 
-	tilemap_t *m_fgmap;
-	tilemap_t *m_bgmap;
-	int m_bgbank;
-	int m_fgbank;
-	int m_bgpalette;
-	int m_fgpalette;
-	int m_bgcolor;
-	bool m_nmi_main;
-	bool m_nmi_sub;
+	tilemap_t *m_fgmap = nullptr;
+	tilemap_t *m_bgmap = nullptr;
+	int m_bgbank = 0;
+	int m_fgbank = 0;
+	int m_bgpalette = 0;
+	int m_fgpalette = 0;
+	int m_bgcolor = 0;
+	bool m_nmi_main = false;
+	bool m_nmi_sub = false;
 
 	void videoram_w(offs_t offset, uint8_t data);
+	[[maybe_unused]] uint8_t protection_r();
+	[[maybe_unused]] uint8_t protection2_r();
 	DECLARE_WRITE_LINE_MEMBER(nmi_main_enable_w);
 	void nmi_sub_enable_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
@@ -239,7 +245,6 @@ uint32_t pturn_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-#ifdef UNUSED_FUNCTION
 uint8_t pturn_state::protection_r()
 {
 	return 0x66;
@@ -249,7 +254,6 @@ uint8_t pturn_state::protection2_r()
 {
 	return 0xfe;
 }
-#endif
 
 void pturn_state::videoram_w(offs_t offset, uint8_t data)
 {
@@ -604,5 +608,7 @@ void pturn_state::init_pturn()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc0db, 0xc0db, read8_delegate(FUNC(pturn_state::protection2_r), this));
 	*/
 }
+
+} // anonymous namespace
 
 GAME( 1984, pturn,  0, pturn,  pturn, pturn_state, init_pturn, ROT90, "Jaleco", "Parallel Turn",  MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

@@ -41,7 +41,7 @@
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #define I8088_TAG       "8l"
@@ -304,7 +304,7 @@ MC6845_UPDATE_ROW( victor9k_state::crtc_update_row )
 				color = palette[pen];
 			}
 
-			bitmap.pix32(vbp + y, x++) = color;
+			bitmap.pix(vbp + y, x++) = color;
 		}
 
 		aa += 2;
@@ -731,19 +731,19 @@ void victor9k_state::victor9k(machine_config &config)
 	m_ssda->sm_dtr_callback().set(FUNC(victor9k_state::ssda_sm_dtr_w));
 	m_ssda->irq_callback().set(FUNC(victor9k_state::ssda_irq_w));
 
-	VIA6522(config, m_via1, XTAL(30'000'000)/30);
+	MOS6522(config, m_via1, XTAL(30'000'000)/30);
 	m_via1->readpa_handler().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
 	m_via1->writepa_handler().set(FUNC(victor9k_state::via1_pa_w));
 	m_via1->writepb_handler().set(FUNC(victor9k_state::via1_pb_w));
 	m_via1->cb2_handler().set(FUNC(victor9k_state::codec_vol_w));
 	m_via1->irq_handler().set(FUNC(victor9k_state::via1_irq_w));
 
-	VIA6522(config, m_via2, XTAL(30'000'000)/30);
+	MOS6522(config, m_via2, XTAL(30'000'000)/30);
 	m_via2->writepa_handler().set(FUNC(victor9k_state::via2_pa_w));
 	m_via2->writepb_handler().set(FUNC(victor9k_state::via2_pb_w));
 	m_via2->irq_handler().set(FUNC(victor9k_state::via2_irq_w));
 
-	VIA6522(config, m_via3, XTAL(30'000'000)/30);
+	MOS6522(config, m_via3, XTAL(30'000'000)/30);
 	m_via3->writepb_handler().set(FUNC(victor9k_state::via3_pb_w));
 	m_via3->irq_handler().set(FUNC(victor9k_state::via3_irq_w));
 

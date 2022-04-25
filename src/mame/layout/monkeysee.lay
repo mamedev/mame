@@ -47,21 +47,21 @@ license:CC0
 	<view name="Internal Layout">
 		<bounds left="0.6" right="15.4" top="3.1" bottom="8.4" />
 
-		<bezel element="static_yellow"><bounds x="0" y="2.5" width="16" height="6.5" /></bezel>
-		<bezel element="static_orange"><bounds x="1" y="3.5" width="14" height="4.5" /></bezel>
+		<element ref="static_yellow"><bounds x="0" y="2.5" width="16" height="6.5" /></element>
+		<element ref="static_orange"><bounds x="1" y="3.5" width="14" height="4.5" /></element>
 
-		<bezel element="text_l1"><bounds x="1.25" y="3.75" width="5" height="0.75" /></bezel>
-		<bezel element="text_l2"><bounds x="1.25" y="4.5" width="5" height="1" /></bezel>
-		<bezel element="text_r1"><bounds x="9.75" y="3.75" width="5" height="0.75" /></bezel>
-		<bezel element="text_r2"><bounds x="9.75" y="4.5" width="5" height="1" /></bezel>
+		<element ref="text_l1"><bounds x="1.25" y="3.75" width="5" height="0.75" /></element>
+		<element ref="text_l2"><bounds x="1.25" y="4.5" width="5" height="1" /></element>
+		<element ref="text_r1"><bounds x="9.75" y="3.75" width="5" height="0.75" /></element>
+		<element ref="text_r2"><bounds x="9.75" y="4.5" width="5" height="1" /></element>
 
-		<bezel element="text_title"><bounds x="3" y="5.5" width="10" height="1.75" /></bezel>
+		<element ref="text_title"><bounds x="3" y="5.5" width="10" height="1.75" /></element>
 
-		<bezel element="disk_yellow"><bounds x="1.75" y="5.75" width="1.5" height="1.5" /></bezel>
-		<bezel element="disk_yellow"><bounds x="12.75" y="5.75" width="1.5" height="1.5" /></bezel>
+		<element ref="disk_yellow"><bounds x="1.75" y="5.75" width="1.5" height="1.5" /></element>
+		<element ref="disk_yellow"><bounds x="12.75" y="5.75" width="1.5" height="1.5" /></element>
 
-		<bezel name="0.0" element="ledr"><bounds x="13" y="6" width="1" height="1" /></bezel>
-		<bezel name="0.1" element="ledg"><bounds x="2" y="6" width="1" height="1" /></bezel>
+		<element name="0.0" ref="ledr"><bounds x="13" y="6" width="1" height="1" /></element>
+		<element name="0.1" ref="ledg"><bounds x="2" y="6" width="1" height="1" /></element>
 
 	</view>
 </mamelayout>

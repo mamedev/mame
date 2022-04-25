@@ -1,25 +1,7 @@
-// AsmJit - Machine code generation for C++
+// This file is part of AsmJit project <https://asmjit.com>
 //
-//  * Official AsmJit Home Page: https://asmjit.com
-//  * Official Github Repository: https://github.com/asmjit/asmjit
-//
-// Copyright (c) 2008-2020 The AsmJit Authors
-//
-// This software is provided 'as-is', without any express or implied
-// warranty. In no event will the authors be held liable for any damages
-// arising from the use of this software.
-//
-// Permission is granted to anyone to use this software for any purpose,
-// including commercial applications, and to alter it and redistribute it
-// freely, subject to the following restrictions:
-//
-// 1. The origin of this software must not be misrepresented; you must not
-//    claim that you wrote the original software. If you use this software
-//    in a product, an acknowledgment in the product documentation would be
-//    appreciated but is not required.
-// 2. Altered source versions must be plainly marked as such, and must not be
-//    misrepresented as being the original software.
-// 3. This notice may not be removed or altered from any source distribution.
+// See asmjit.h or LICENSE.md for license and copyright information
+// SPDX-License-Identifier: Zlib
 
 #include "../core/api-build_p.h"
 #ifndef ASMJIT_NO_COMPILER
@@ -29,9 +11,8 @@
 
 ASMJIT_BEGIN_NAMESPACE
 
-// ============================================================================
-// [asmjit::RAStackAllocator - Slots]
-// ============================================================================
+// RAStackAllocator - Slots
+// ========================
 
 RAStackSlot* RAStackAllocator::newSlot(uint32_t baseRegId, uint32_t size, uint32_t alignment, uint32_t flags) noexcept {
   if (ASMJIT_UNLIKELY(_slots.willGrow(allocator(), 1) != kErrorOk))
@@ -43,11 +24,9 @@ RAStackSlot* RAStackAllocator::newSlot(uint32_t baseRegId, uint32_t size, uint32
 
   slot->_baseRegId = uint8_t(baseRegId);
   slot->_alignment = uint8_t(Support::max<uint32_t>(alignment, 1));
-  slot->_reserved[0] = 0;
-  slot->_reserved[1] = 0;
+  slot->_flags = uint16_t(flags);
   slot->_useCount = 0;
   slot->_size = size;
-  slot->_flags = flags;
 
   slot->_weight = 0;
   slot->_offset = 0;
@@ -57,9 +36,8 @@ RAStackSlot* RAStackAllocator::newSlot(uint32_t baseRegId, uint32_t size, uint32
   return slot;
 }
 
-// ============================================================================
-// [asmjit::RAStackAllocator - Utilities]
-// ============================================================================
+// RAStackAllocator - Utilities
+// ============================
 
 struct RAStackGap {
   inline RAStackGap() noexcept
@@ -84,15 +62,14 @@ Error RAStackAllocator::calculateStackFrame() noexcept {
 
   // STEP 1:
   //
-  // Update usage based on the size of the slot. We boost smaller slots in a way
-  // that 32-bit register has higher priority than a 128-bit register, however,
-  // if one 128-bit register is used 4 times more than some other 32-bit register
-  // it will overweight it.
+  // Update usage based on the size of the slot. We boost smaller slots in a way that 32-bit register has higher
+  // priority than a 128-bit register, however, if one 128-bit register is used 4 times more than some other 32-bit
+  // register it will overweight it.
   for (RAStackSlot* slot : _slots) {
     uint32_t alignment = slot->alignment();
     ASMJIT_ASSERT(alignment > 0);
 
-    uint32_t power = Support::ctz(alignment);
+    uint32_t power = Support::min<uint32_t>(Support::ctz(alignment), 6);
     uint64_t weight;
 
     if (slot->isRegHome())
@@ -100,8 +77,8 @@ Error RAStackAllocator::calculateStackFrame() noexcept {
     else
       weight = power;
 
-    // If overflown, which has less chance of winning a lottery, just use max
-    // possible weight. In such case it probably doesn't matter at all.
+    // If overflown, which has less chance of winning a lottery, just use max possible weight. In such case it
+    // probably doesn't matter at all.
     if (weight > 0xFFFFFFFFu)
       weight = 0xFFFFFFFFu;
 
@@ -118,17 +95,17 @@ Error RAStackAllocator::calculateStackFrame() noexcept {
 
   // STEP 3:
   //
-  // Calculate offset of each slot. We start from the slot that has the highest
-  // weight and advance to slots with lower weight. It could look that offsets
-  // start from the first slot in our list and then simply increase, but it's
-  // not always the case as we also try to fill all gaps introduced by the fact
-  // that slots are sorted by weight and not by size & alignment, so when we need
-  // to align some slot we distribute the gap caused by the alignment to `gaps`.
+  // Calculate offset of each slot. We start from the slot that has the highest weight and advance to slots with
+  // lower weight. It could look that offsets start from the first slot in our list and then simply increase, but
+  // it's not always the case as we also try to fill all gaps introduced by the fact that slots are sorted by
+  // weight and not by size & alignment, so when we need to align some slot we distribute the gap caused by the
+  // alignment to `gaps`.
   uint32_t offset = 0;
   ZoneVector<RAStackGap> gaps[kSizeCount - 1];
 
   for (RAStackSlot* slot : _slots) {
-    if (slot->isStackArg()) continue;
+    if (slot->isStackArg())
+      continue;
 
     uint32_t slotAlignment = slot->alignment();
     uint32_t alignedOffset = Support::alignUp(offset, slotAlignment);

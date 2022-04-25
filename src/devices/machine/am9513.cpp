@@ -232,7 +232,7 @@ void am9513_device::device_clock_changed()
 //  fires
 //-------------------------------------------------
 
-void am9513_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void am9513_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	assert(id >= TIMER_F1 && id <= TIMER_F5);
 
@@ -1304,7 +1304,7 @@ void am9513_device::command_write(u8 data)
 				m_write_prefetch = !BIT(data, 0);
 				break;
 			}
-			// else fall through
+			[[fallthrough]];
 		default:
 			logerror("Invalid command: %02X\n", data);
 			break;

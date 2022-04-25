@@ -97,14 +97,14 @@ void ra17xx_device::io_w(address_space &space, offs_t offset, uint8_t data)
 {
 	assert(offset < 16);
 
-	m_bl = m_cpu->address_bus_r(space, 0) & 63;
+	m_bl = m_cpu->address_bus_r(space) & 63;
 
 	if (offset & 1)
 	{
 		// SOS command
 		if (m_bl >= 16)
 		{
-			logerror("Attempt to write to nonexistent output %d\n");
+			logerror("Attempt to write to nonexistent output 0x%02X\n",m_bl);
 		}
 		else if (data & (1 << 3))
 		{

@@ -1,6 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Jarek Burczynski, Phil Stroffolino, Tomasz Slanina
 /**************************************************************************
+
 Change Lanes
 (C) Taito 1983
 
@@ -49,12 +50,11 @@ void changela_state::changela_68705_port_a_w(uint8_t data)
 void changela_state::changela_68705_port_c_w(uint8_t data)
 {
 	/* PC3 is connected to the CLOCK input of the LS374, so we latch the data on rising edge */
-	if (BIT(data, 3) && ~BIT(m_port_c_out, 3))
+	if (BIT(data, 3) && !BIT(m_port_c_out, 3))
 		m_mcu_out = m_port_a_out & (BIT(m_port_c_out, 2) ? 0xff : m_mcu_in);
 
 	/* PC2 is connected to the /OE input of the LS374 */
-	if (BIT(data, 2))
-		m_mcu->pa_w(BIT(data, 2) ? 0xff : m_mcu_in);
+	m_mcu->pa_w(BIT(data, 2) ? 0xff : m_mcu_in);
 
 	m_port_c_out = data;
 }
@@ -465,7 +465,7 @@ ROM_START( changela )
 	ROM_LOAD( "cl25a",  0x0000, 0x2000, CRC(38530a60) SHA1(0b0ef1abe11c5271fcd1671322b77165217553c3) )
 	ROM_LOAD( "cl24a",  0x2000, 0x2000, CRC(2fcf4a82) SHA1(c33355e2d4d3fab32c8d713a680ec0fceedab341) )
 	ROM_LOAD( "cl23",   0x4000, 0x2000, CRC(08385891) SHA1(d8d66664ec25db067d5a4a6c35ec0ac65b9e0c6a) )
-	ROM_LOAD( "cl22",   0x6000, 0x2000, CRC(796e0abd) SHA1(64dd9fc1f9bc44519a253ef0c02e181dd13904bf) )
+	ROM_LOAD( "cl22a",  0x6000, 0x2000, CRC(796e0abd) SHA1(64dd9fc1f9bc44519a253ef0c02e181dd13904bf) ) // confirmed dumped from a cl22a labeled ROM. Previously MAME had it as cl22. Wrongly labeled before or do they really have same contents?
 	ROM_LOAD( "cl27",   0xb000, 0x1000, CRC(3668afb8) SHA1(bcfb788baf806edcb129ea9f9dcb1d4260684773) )
 
 	ROM_REGION( 0x00800, "mcu", 0 ) /* 68705P3 */

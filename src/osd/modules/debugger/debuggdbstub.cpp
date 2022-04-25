@@ -13,6 +13,7 @@
 #include "debug/textbuf.h"
 #include "debug_module.h"
 #include "debugger.h"
+#include "fileio.h"
 #include "modules/lib/osdobj_common.h"
 #include "modules/osdmodule.h"
 
@@ -251,6 +252,34 @@ static const gdb_register_map gdb_register_map_m68020pmmu =
 };
 
 //-------------------------------------------------------------------------
+static const gdb_register_map gdb_register_map_m68000 =
+{
+	"m68k",
+	"org.gnu.gdb.m68k.core",
+	{
+		{ "D0", "d0", false, TYPE_INT },
+		{ "D1", "d1", false, TYPE_INT },
+		{ "D2", "d2", false, TYPE_INT },
+		{ "D3", "d3", false, TYPE_INT },
+		{ "D4", "d4", false, TYPE_INT },
+		{ "D5", "d5", false, TYPE_INT },
+		{ "D6", "d6", false, TYPE_INT },
+		{ "D7", "d7", false, TYPE_INT },
+		{ "A0", "a0", false, TYPE_INT },
+		{ "A1", "a1", false, TYPE_INT },
+		{ "A2", "a2", false, TYPE_INT },
+		{ "A3", "a3", false, TYPE_INT },
+		{ "A4", "a4", false, TYPE_INT },
+		{ "A5", "a5", false, TYPE_INT },
+		{ "A6", "fp", true,  TYPE_INT },
+		{ "A7", "sp", true,  TYPE_INT },
+		{ "SR", "ps", false, TYPE_INT }, // NOTE GDB named it ps, but it's actually sr
+		{ "PC", "pc", true,  TYPE_CODE_POINTER },
+		//NOTE m68-elf-gdb complains about fpcontrol register not present but 68000 doesn't have floating point so...
+	}
+};
+
+//-------------------------------------------------------------------------
 static const gdb_register_map gdb_register_map_z80 =
 {
 	"z80",
@@ -281,8 +310,94 @@ static const gdb_register_map gdb_register_map_m6502 =
 		{ "X",  "x",   false, TYPE_INT },
 		{ "Y",  "y",   false, TYPE_INT },
 		{ "P",  "p",   false, TYPE_INT },
-		{ "PC", "pc",  true,  TYPE_CODE_POINTER },
 		{ "SP", "sp",  true,  TYPE_DATA_POINTER },
+		{ "PC", "pc",  true,  TYPE_CODE_POINTER },
+	}
+};
+
+
+//-------------------------------------------------------------------------
+static const gdb_register_map gdb_register_map_m6809 =
+{
+	"m6809",
+	"mame.m6809",
+	{
+		{ "A",  "a",   false, TYPE_INT },
+		{ "B",  "b",   false, TYPE_INT },
+		{ "D",  "d",   false, TYPE_INT },
+		{ "X",  "x",   false, TYPE_INT },
+		{ "Y",  "y",   false, TYPE_INT },
+		{ "U",  "u",   true,  TYPE_DATA_POINTER },
+		{ "PC", "pc",  true,  TYPE_CODE_POINTER },
+		{ "S",  "s",   true,  TYPE_DATA_POINTER },
+		{ "CC", "cc",  false, TYPE_INT }, // TODO describe bitfield
+		{ "DP", "dp",  false, TYPE_INT },
+	}
+};
+
+
+//-------------------------------------------------------------------------
+static const gdb_register_map gdb_register_map_score7 =
+{
+	"score7",
+	"mame.score7",
+	{
+		{ "r0",      "r0",      true,  TYPE_DATA_POINTER },
+		{ "r1",      "r1",      false, TYPE_INT },
+		{ "r2",      "r2",      false, TYPE_INT },
+		{ "r3",      "r3",      false, TYPE_INT },
+		{ "r4",      "r4",      false, TYPE_INT },
+		{ "r5",      "r5",      false, TYPE_INT },
+		{ "r6",      "r6",      false, TYPE_INT },
+		{ "r7",      "r7",      false, TYPE_INT },
+		{ "r8",      "r8",      false, TYPE_INT },
+		{ "r9",      "r9",      false, TYPE_INT },
+		{ "r10",     "r10",     false, TYPE_INT },
+		{ "r11",     "r11",     false, TYPE_INT },
+		{ "r12",     "r12",     false, TYPE_INT },
+		{ "r13",     "r13",     false, TYPE_INT },
+		{ "r14",     "r14",     false, TYPE_INT },
+		{ "r15",     "r15",     false, TYPE_INT },
+		{ "r16",     "r16",     false, TYPE_INT },
+		{ "r17",     "r17",     false, TYPE_INT },
+		{ "r18",     "r18",     false, TYPE_INT },
+		{ "r19",     "r19",     false, TYPE_INT },
+		{ "r20",     "r20",     false, TYPE_INT },
+		{ "r21",     "r21",     false, TYPE_INT },
+		{ "r22",     "r22",     false, TYPE_INT },
+		{ "r23",     "r23",     false, TYPE_INT },
+		{ "r24",     "r24",     false, TYPE_INT },
+		{ "r25",     "r25",     false, TYPE_INT },
+		{ "r26",     "r26",     false, TYPE_INT },
+		{ "r27",     "r27",     false, TYPE_INT },
+		{ "r28",     "r28",     false, TYPE_INT },
+		{ "r29",     "r29",     false, TYPE_INT },
+		{ "r30",     "r30",     false, TYPE_INT },
+		{ "r31",     "r31",     false, TYPE_INT },
+		{ "cr0",     "PSR",     false, TYPE_INT },
+		{ "cr1",     "COND",    false, TYPE_INT },
+		{ "cr2",     "ECR",     false, TYPE_INT },
+		{ "cr3",     "EXCPVEC", false, TYPE_INT },
+		{ "cr4",     "CCR",     false, TYPE_INT },
+		{ "cr5",     "EPC",     false, TYPE_INT },
+		{ "cr6",     "EMA",     false, TYPE_INT },
+		{ "cr7",     "TLBLOCK", false, TYPE_INT },
+		{ "cr8",     "TLBPT",   false, TYPE_INT },
+		{ "cr9",     "PEADDR",  false, TYPE_INT },
+		{ "cr10",    "TLBRPT",  false, TYPE_INT },
+		{ "cr11",    "PEVN",    false, TYPE_INT },
+		{ "cr12",    "PECTX",   false, TYPE_INT },
+		{ "cr15",    "LIMPFN",  false, TYPE_INT },
+		{ "cr16",    "LDMPFN",  false, TYPE_INT },
+		{ "cr18",    "PREV",    false, TYPE_INT },
+		{ "cr29",    "DREG",    false, TYPE_INT },
+		{ "PC",      "PC",      true,  TYPE_CODE_POINTER }, // actually Debug exception program counter (DEPC)
+		{ "cr31",    "DSAVE",   false, TYPE_INT },
+		{ "sr0",     "COUNTER", false, TYPE_INT },
+		{ "sr1",     "LDCR",    false, TYPE_INT },
+		{ "sr2",     "STCR",    false, TYPE_INT },
+		{ "ceh",     "CEH",     false, TYPE_INT },
+		{ "cel",     "CEL",     false, TYPE_INT },
 	}
 };
 
@@ -293,8 +408,12 @@ static const std::map<std::string, const gdb_register_map &> gdb_register_maps =
 	{ "r4600",      gdb_register_map_r4600 },
 	{ "ppc601",     gdb_register_map_ppc601 },
 	{ "m68020pmmu", gdb_register_map_m68020pmmu },
+	{ "m68000",     gdb_register_map_m68000 },
 	{ "z80",        gdb_register_map_z80 },
 	{ "m6502",      gdb_register_map_m6502 },
+	{ "n2a03",      gdb_register_map_m6502 },
+	{ "m6809",      gdb_register_map_m6809 },
+	{ "score7",     gdb_register_map_score7 },
 };
 
 //-------------------------------------------------------------------------
@@ -303,6 +422,7 @@ class debug_gdbstub : public osd_module, public debug_module
 public:
 	debug_gdbstub()
 	: osd_module(OSD_DEBUG_PROVIDER, "gdbstub"), debug_module(),
+		m_readbuf_state(PACKET_START),
 		m_machine(nullptr),
 		m_maincpu(nullptr),
 		m_state(nullptr),
@@ -529,7 +649,8 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 		if ( it == gdb_register_maps.end() )
 			fatalerror("gdbstub: cpuname %s not found in gdb stub descriptions\n", cpuname);
 
-		m_state = &m_maincpu->state();
+		m_maincpu->interface(m_state);
+		assert(m_state != nullptr);
 		m_memory = &m_maincpu->memory();
 		m_address_space = &m_memory->space(AS_PROGRAM);
 		m_debugger_cpu = &m_machine->debugger().cpu();
@@ -588,8 +709,8 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 #endif
 
 		std::string socket_name = string_format("socket.localhost:%d", m_debugger_port);
-		osd_file::error filerr = m_socket.open(socket_name);
-		if ( filerr != osd_file::error::NONE )
+		std::error_condition const filerr = m_socket.open(socket_name);
+		if ( filerr )
 			fatalerror("gdbstub: failed to start listening on port %d\n", m_debugger_port);
 		osd_printf_info("gdbstub: listening on port %d\n", m_debugger_port);
 
@@ -656,7 +777,7 @@ void debug_gdbstub::send_reply(const char *str)
 		checksum += str[i];
 
 	std::string reply = string_format("$%s#%02x", str, checksum);
-	m_socket.puts(reply.c_str());
+	m_socket.puts(reply);
 }
 
 
@@ -889,7 +1010,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_q(const char *buf)
 		if ( !hex_decode(&data, buf, strlen(buf) / 2) )
 			return REPLY_ENN;
 		std::string command(data.begin(), data.end());
-		text_buffer *textbuf = m_debugger_console->get_console_textbuf();
+		text_buffer &textbuf = m_debugger_console->get_console_textbuf();
 		text_buffer_clear(textbuf);
 		m_debugger_console->execute_command(command, false);
 		uint32_t nlines = text_buffer_num_lines(textbuf);

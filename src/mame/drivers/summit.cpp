@@ -77,7 +77,7 @@ private:
 	TILE_GET_INFO_MEMBER(tile_info);
 	uint32_t screen_update_summit(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	tilemap_t *m_tilemap;
+	tilemap_t *m_tilemap = nullptr;
 };
 
 
@@ -170,7 +170,7 @@ static INPUT_PORTS_START( summit )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 
 	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_BET )  PORT_NAME("Start")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )  PORT_NAME("Start")
 	PORT_DIPNAME( 0x02, 0x02, "IN3-02" )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )

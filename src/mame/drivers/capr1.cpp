@@ -34,8 +34,8 @@ TODO:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/te7750.h"
-#include "sound/2203intf.h"
 #include "sound/okim6295.h"
+#include "sound/ymopn.h"
 #include "speaker.h"
 
 

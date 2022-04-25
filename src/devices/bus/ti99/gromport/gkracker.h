@@ -8,19 +8,18 @@
 #define MAME_BUS_TI99_GROMPORT_GKRACKER_H
 
 #pragma once
-#include "bus/ti99/ti99defs.h"
 #include "cartridges.h"
 
-namespace bus { namespace ti99 { namespace gromport {
+namespace bus::ti99::gromport {
 
 class ti99_gkracker_device : public cartridge_connector_device, public device_nvram_interface
 {
 public:
 	ti99_gkracker_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8Z_MEMBER(readz) override;
+	void readz(offs_t offset, uint8_t *value) override;
 	void write(offs_t offset, uint8_t data) override;
-	DECLARE_READ8Z_MEMBER(crureadz) override;
+	void crureadz(offs_t offset, uint8_t *value) override;
 	void cruwrite(offs_t offset, uint8_t data) override;
 	DECLARE_WRITE_LINE_MEMBER(romgq_line) override;
 
@@ -43,9 +42,9 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// device_nvram_interface
-	void nvram_default() override;
-	void nvram_read(emu_file &file) override;
-	void nvram_write(emu_file &file) override;
+	virtual void nvram_default() override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 
 private:
 	int     m_gk_switch[6];         // Used to cache the switch settings.
@@ -65,7 +64,7 @@ private:
 };
 
 
-} } } // end namespace bus::ti99::gromport
+} // end namespace bus::ti99::gromport
 
 DECLARE_DEVICE_TYPE_NS(TI99_GROMPORT_GK, bus::ti99::gromport, ti99_gkracker_device)
 

@@ -45,10 +45,11 @@ private:
 	uint8_t R2_r();
 	uint8_t R3_r();
 	void O_w(uint8_t data);
+	void P_w(uint8_t data);
 
-	TIMER_CALLBACK_MEMBER( chip_select_sync );
 	TIMER_CALLBACK_MEMBER( rw_sync );
 	TIMER_CALLBACK_MEMBER( write_sync );
+	TIMER_CALLBACK_MEMBER( O_w_sync );
 };
 
 DECLARE_DEVICE_TYPE(NAMCO_51XX, namco_51xx_device)

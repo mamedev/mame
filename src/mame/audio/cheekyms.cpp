@@ -55,7 +55,7 @@ void cheekyms_audio_device::device_add_mconfig(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "sound_nl:pest_dies",  "I_PEST_DIES.IN",  0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:coin_extra", "I_COIN_EXTRA.IN", 0);
 
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "VR1.2").set_mult_offset(30000.0 * 10.0, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "VR1.2").set_mult_offset(30000.0 * 10.0 / 32768.0, 0.0);
 }
 
 

@@ -55,9 +55,9 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	u8 m_digit_sel;
-	u8 m_cass_in;
-	u16 m_cass_data[4];
+	u8 m_digit_sel = 0U;
+	u8 m_cass_in = 0U;
+	u16 m_cass_data[4]{};
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;

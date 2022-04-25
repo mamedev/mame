@@ -92,17 +92,17 @@ device_memory_interface::space_config_vector namco_c139_device::memory_space_con
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ16_MEMBER(namco_c139_device::ram_r)
+uint16_t namco_c139_device::ram_r(offs_t offset)
 {
 	return m_ram[offset];
 }
 
-WRITE16_MEMBER(namco_c139_device::ram_w)
+void namco_c139_device::ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ram[offset]);
 }
 
-READ16_MEMBER(namco_c139_device::status_r)
+uint16_t namco_c139_device::status_r()
 {
 	/*
 	 x-- RX READY or irq pending?

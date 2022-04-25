@@ -28,7 +28,7 @@
 #include "emu.h"
 #include "includes/tek405x.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -927,6 +927,20 @@ void tek4051_state::machine_start()
 		program.unmap_readwrite(0x6000, 0x7fff);
 		break;
 	}
+
+	m_x_pia_irqa = 0;
+	m_x_pia_irqb = 0;
+	m_y_pia_irqa = 0;
+	m_y_pia_irqb = 0;
+	m_tape_pia_irqa = 0;
+	m_tape_pia_irqb = 0;
+	m_kb_pia_irqa = 0;
+	m_kb_pia_irqb = 0;
+	m_gpib_pia_irqa = 0;
+	m_gpib_pia_irqb = 0;
+	m_com_pia_irqa = 0;
+	m_com_pia_irqb = 0;
+	m_acia_irq = 0;
 
 	// register for state saving
 }

@@ -22,7 +22,7 @@ DEFINE_DEVICE_TYPE(FMT_ICMEM, fmt_icmem_device, "fmt_icmem", "FM Towns IC Memory
 
 fmt_icmem_device::fmt_icmem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, FMT_ICMEM, tag, owner, clock),
-		device_image_interface(mconfig, *this),
+		device_memcard_image_interface(mconfig, *this),
 		m_writeprotect(*this,"icmem"),
 		m_change(false),
 		m_attr_select(false),

@@ -48,6 +48,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class goldart_state : public driver_device
 {
 public:
@@ -81,7 +83,7 @@ private:
 	uint8_t m_ram[0x10000];
 	uint8_t m_ram2[0x10000];
 
-	uint8_t m_port1;
+	uint8_t m_port1 = 0;
 
 	uint8_t hostmem_r(offs_t offset);
 	void hostmem_w(offs_t offset, uint8_t data);
@@ -111,13 +113,13 @@ uint32_t goldart_state::screen_update_goldart(screen_device& screen, bitmap_ind1
 	{
 		for (int x = 0; x < 192; x++)
 		{
-			uint16_t* dstptr_bitmap  =  &bitmap.pix16(y);
-			uint8_t data = m_ram[count];
-			uint8_t data2 = m_ram2[count];
+			uint16_t *const dstptr_bitmap = &bitmap.pix(y);
+			uint8_t const data = m_ram[count];
+			uint8_t const data2 = m_ram2[count];
 
 			count++;
 
-			dstptr_bitmap[x*2] = ((data&0xf0)>>4)  | (data2 & 0xf0);;
+			dstptr_bitmap[x*2] = ((data&0xf0)>>4)  | (data2 & 0xf0);
 			dstptr_bitmap[(x*2)+1] = (data&0x0f) | ((data2 & 0x0f)<<4);
 		}
 	}
@@ -304,8 +306,13 @@ INPUT_PORTS_END
 
 void goldart_state::machine_start()
 {
+	save_item(NAME(m_port1));
 	save_item(NAME(m_ram));
 	save_item(NAME(m_ram2));
+
+	m_port1 = 0;
+	std::fill(std::begin(m_ram), std::end(m_ram), 0);
+	std::fill(std::begin(m_ram2), std::end(m_ram2), 0);
 }
 
 void goldart_state::machine_reset()
@@ -384,6 +391,8 @@ ROM_START( goldartp )
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "p-262.u6", 0x00000, 0x80000, CRC(4177e78b) SHA1(1099568b97a08c33a7da1bf46fc106f25af15e90) )
 ROM_END
+
+} // Anonymous namespace
 
 
 GAME( 1994, goldart,       0,        goldart,     goldart,      goldart_state, empty_init, ROT0, "Covielsa / Gaelco",   "Goldart (Spain)",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

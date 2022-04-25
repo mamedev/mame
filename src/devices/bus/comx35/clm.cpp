@@ -104,8 +104,8 @@ MC6845_UPDATE_ROW( comx_clm_device::crtc_update_row )
 {
 	for (int column = 0; column < x_count; column++)
 	{
-		uint8_t code = m_video_ram[((ma + column) & 0x7ff)];
-		uint16_t addr = (code << 3) | (ra & 0x07);
+		uint8_t const code = m_video_ram[((ma + column) & 0x7ff)];
+		uint16_t const addr = (code << 3) | (ra & 0x07);
 		uint8_t data = m_char_rom->base()[addr & 0x7ff];
 
 		if (BIT(ra, 3) && column == cursor_x)
@@ -115,9 +115,9 @@ MC6845_UPDATE_ROW( comx_clm_device::crtc_update_row )
 
 		for (int bit = 0; bit < 8; bit++)
 		{
-			int x = (column * 8) + bit;
+			int const x = (column * 8) + bit;
 
-			bitmap.pix32(vbp + y, hbp + x) = m_palette->pen(BIT(data, 7) && de);
+			bitmap.pix(vbp + y, hbp + x) = m_palette->pen(BIT(data, 7) && de);
 
 			data <<= 1;
 		}
@@ -173,7 +173,7 @@ comx_clm_device::comx_clm_device(const machine_config &mconfig, const char *tag,
 	m_palette(*this, "palette"),
 	m_rom(*this, "c000"),
 	m_char_rom(*this, MC6845_TAG),
-	m_video_ram(*this, "video_ram")
+	m_video_ram(*this, "video_ram", VIDEORAM_SIZE, ENDIANNESS_LITTLE)
 {
 }
 
@@ -184,9 +184,6 @@ comx_clm_device::comx_clm_device(const machine_config &mconfig, const char *tag,
 
 void comx_clm_device::device_start()
 {
-	// allocate memory
-	m_video_ram.allocate(VIDEORAM_SIZE);
-
 	// state saving
 	save_item(NAME(m_ds));
 }

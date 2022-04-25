@@ -70,7 +70,7 @@ void ohci_usb_controller::reset()
 {
 }
 
-READ32_MEMBER(ohci_usb_controller::read)
+uint32_t ohci_usb_controller::read(offs_t offset)
 {
 	uint32_t ret;
 
@@ -84,7 +84,7 @@ READ32_MEMBER(ohci_usb_controller::read)
 	return ret;
 }
 
-WRITE32_MEMBER(ohci_usb_controller::write)
+void ohci_usb_controller::write(offs_t offset, uint32_t data)
 {
 	uint32_t old = ohcist.hc_regs[offset];
 
@@ -220,7 +220,7 @@ WRITE32_MEMBER(ohci_usb_controller::write)
 	ohcist.hc_regs[offset] = data;
 }
 
-void ohci_usb_controller::timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ohci_usb_controller::timer(emu_timer &timer, device_timer_id id, int param)
 {
 	uint32_t hcca;
 	uint32_t plh;

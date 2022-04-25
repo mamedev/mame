@@ -669,7 +669,7 @@ void g65816_device::g65816i_check_maskable_interrupt()
 	{
 		g65816i_interrupt_hardware((FLAG_E) ? VECTOR_IRQ_E : VECTOR_IRQ_N);
 		CPU_STOPPED &= ~STOP_LEVEL_WAI;
-		LINE_IRQ=0;
+		LINE_IRQ=0; // FIXME: IRQ is level triggered, this makes it act as a HOLD_LINE
 	}
 }
 
@@ -684,13 +684,13 @@ unsigned g65816_device::EA_DX()    {return MAKE_UINT_16(REGISTER_D + g65816i_rea
 unsigned g65816_device::EA_DY()    {return MAKE_UINT_16(REGISTER_D + g65816i_read_8_immediate(EA_IMM8()) + REGISTER_Y);}
 unsigned g65816_device::EA_AX()    {unsigned tmp = EA_A(); if((tmp^(tmp+REGISTER_X))&0xff00) CLK(1); return tmp + REGISTER_X;}
 unsigned g65816_device::EA_ALX()   {return EA_AL() + REGISTER_X;}
-unsigned g65816_device::EA_AY()    {unsigned tmp = EA_A(); if((tmp^(tmp+REGISTER_X))&0xff00) CLK(1); return tmp + REGISTER_Y;}
+unsigned g65816_device::EA_AY()    {unsigned tmp = EA_A(); if((tmp^(tmp+REGISTER_Y))&0xff00) CLK(1); return tmp + REGISTER_Y;}
 unsigned g65816_device::EA_DI()    {return REGISTER_DB | g65816i_read_16_direct(EA_D());}
 unsigned g65816_device::EA_DLI()   {return g65816i_read_24_direct(EA_D());}
 unsigned g65816_device::EA_AI()    {return g65816i_read_16_normal(g65816i_read_16_immediate(EA_IMM16()));}
 unsigned g65816_device::EA_ALI()   {return g65816i_read_24_normal(EA_A());}
 unsigned g65816_device::EA_DXI()   {return REGISTER_DB | g65816i_read_16_direct(EA_DX());}
-unsigned g65816_device::EA_DIY()   {unsigned tmp = REGISTER_DB | g65816i_read_16_direct(EA_D()); if((tmp^(tmp+REGISTER_X))&0xff00) CLK(1); return tmp + REGISTER_Y;}
+unsigned g65816_device::EA_DIY()   {unsigned tmp = REGISTER_DB | g65816i_read_16_direct(EA_D()); if((tmp^(tmp+REGISTER_Y))&0xff00) CLK(1); return tmp + REGISTER_Y;}
 unsigned g65816_device::EA_DLIY()  {return g65816i_read_24_direct(EA_D()) + REGISTER_Y;}
 unsigned g65816_device::EA_AXI()   {return g65816i_read_16_normal(MAKE_UINT_16(g65816i_read_16_immediate(EA_IMM16()) + REGISTER_X));}
 unsigned g65816_device::EA_S()     {return MAKE_UINT_16(REGISTER_S + g65816i_read_8_immediate(EA_IMM8()));}
@@ -922,7 +922,6 @@ void g65816_device::device_start()
 
 	state_add( STATE_GENPC, "GENPC", m_debugger_temp).callimport().callexport().formatstr("%06X").noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_debugger_temp).callimport().callexport().formatstr("%06X").noshow();
-	state_add( STATE_GENSP, "GENSP", m_debugger_temp).callimport().callexport().formatstr("%06X").noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%8s").noshow();
 
 	set_icountptr(m_ICount);
@@ -935,9 +934,6 @@ void g65816_device::state_import(const device_state_entry &entry)
 		case STATE_GENPC:
 		case STATE_GENPCBASE:
 			g65816_set_pc(m_debugger_temp);
-			break;
-		case STATE_GENSP:
-			g65816_set_sp(m_debugger_temp);
 			break;
 		case G65816_PC:
 		case G65816_PB:
@@ -982,9 +978,6 @@ void g65816_device::state_export(const device_state_entry &entry)
 		case STATE_GENPCBASE:
 		case G65816_PC:
 			m_debugger_temp = g65816_get_pc();
-			break;
-		case STATE_GENSP:
-			m_debugger_temp = g65816_get_sp();
 			break;
 		case G65816_PB:
 			m_debugger_temp = m_pb>>16;

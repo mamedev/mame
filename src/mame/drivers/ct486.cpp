@@ -117,7 +117,7 @@ void ct486_state::ct486(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &ct486_state::ct486_io);
 	m_maincpu->set_irq_acknowledge_callback("cs4031", FUNC(cs4031_device::int_ack_r));
 
-	CS4031(config, m_cs4031, XTAL(25'000'000), "maincpu", "isa", "bios", "keybc");
+	CS4031(config, m_cs4031, XTAL(25'000'000), "maincpu", "isa", "bios", "keybc", RAM_TAG);
 	// cpu connections
 	m_cs4031->hold().set(FUNC(ct486_state::cs4031_hold));
 	m_cs4031->nmi().set_inputline("maincpu", INPUT_LINE_NMI);
@@ -137,13 +137,12 @@ void ct486_state::ct486(machine_config &config)
 	keybc.hot_res().set("cs4031", FUNC(cs4031_device::kbrst_w));
 	keybc.gate_a20().set("cs4031", FUNC(cs4031_device::gatea20_w));
 	keybc.kbd_irq().set("cs4031", FUNC(cs4031_device::irq01_w));
-	keybc.kbd_clk().set("pc_kbdc", FUNC(pc_kbdc_device::clock_write_from_mb));
-	keybc.kbd_data().set("pc_kbdc", FUNC(pc_kbdc_device::data_write_from_mb));
+	keybc.kbd_clk().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
+	keybc.kbd_data().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 
-	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "pc_kbdc", 0));
+	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
 	pc_kbdc.out_clock_cb().set(keybc, FUNC(at_kbc_device_base::kbd_clk_w));
 	pc_kbdc.out_data_cb().set(keybc, FUNC(at_kbc_device_base::kbd_data_w));
-	PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL).set_pc_kbdc_slot(&pc_kbdc);
 
 	ISA16(config, m_isabus, 0);
 	m_isabus->set_memspace(m_maincpu, AS_PROGRAM);
@@ -188,6 +187,7 @@ void ct486_state::ct486(machine_config &config)
 	SOFTWARE_LIST(config, "pc_disk_list").set_original("ibm5150");
 	SOFTWARE_LIST(config, "at_disk_list").set_original("ibm5170");
 	SOFTWARE_LIST(config, "at_cdrom_list").set_original("ibm5170_cdrom");
+	SOFTWARE_LIST(config, "at_hdd_list").set_original("ibm5170_hdd");
 	SOFTWARE_LIST(config, "midi_disk_list").set_compatible("midi_flop");
 }
 

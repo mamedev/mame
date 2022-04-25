@@ -3,91 +3,118 @@
 license:CC0
 -->
 <mamelayout version="2">
-	<element name="L0" defstate="1">
-		<rect>
-			<color red="0.70" green="0.70" blue="0.0" />
+	<element name="L0">
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.0" />
 		</rect>
-		<text string="DRAW/TAKE" state="1">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.0" />
+		</rect>
+		<text string="DRAW/TAKE">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.25" width="1" height="0.5" />
 		</text>
 	</element>
 
-	<element name="L1" defstate="1">
-		<rect>
-			<color red="0.70" green="0.70" blue="0.0" />
+	<element name="L1">
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.0" />
 		</rect>
-		<text string="CANCEL/DOUBLE" state="1">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.0" />
+		</rect>
+		<text string="CANCEL/DOUBLE">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.25" width="1" height="0.5" />
 		</text>
 	</element>
 
-	<element name="L2" defstate="1">
-		<rect>
-			<color red="0.70" green="0.0" blue=".0" />
+	<element name="L2">
+		<rect state="0">
+			<color red="0.25" green="0.0" blue="0.0" />
 		</rect>
-		<text string=" HOLD 1 " state="1">
+		<rect state="1">
+			<color red="1.00" green="0.0" blue="0.0" />
+		</rect>
+		<text string=" HOLD 1 ">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.25" width="1" height="0.5" />
 		</text>
 	</element>
 
-	<element name="L3" defstate="1">
-		<rect>
-			<color red="0.70" green="0.0" blue="0.0" />
+	<element name="L3">
+		<rect state="0">
+			<color red="0.25" green="0.0" blue="0.0" />
 		</rect>
-		<text string=" HOLD 2 " state="1">
+		<rect state="1">
+			<color red="1.00" green="0.0" blue="0.0" />
+		</rect>
+		<text string=" HOLD 2 ">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.25" width="1" height="0.5" />
 		</text>
 	</element>
 
-	<element name="L4" defstate="1">
-		<rect>
-			<color red="0.70" green="0.0" blue="0.0" />
+	<element name="L4">
+		<rect state="0">
+			<color red="0.25" green="0.0" blue="0.0" />
 		</rect>
-		<text string=" HOLD 3 " state="1">
+		<rect state="1">
+			<color red="1.00" green="0.0" blue="0.0" />
+		</rect>
+		<text string=" HOLD 3 ">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.25" width="1" height="0.5" />
 		</text>
 	</element>
 
-	<element name="L5" defstate="1">
-		<rect>
-			<color red="0.70" green="0.0" blue="0.0" />
+	<element name="L5">
+		<rect state="0">
+			<color red="0.25" green="0.0" blue="0.0" />
 		</rect>
-		<text string=" HOLD 4 " state="1">
+		<rect state="1">
+			<color red="1.00" green="0.0" blue="0.0" />
+		</rect>
+		<text string=" HOLD 4 ">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.25" width="1" height="0.5" />
 		</text>
 	</element>
 
-	<element name="L6" defstate="1">
-		<rect>
-			<color red="0.70" green="0.0" blue="0.0" />
+	<element name="L6">
+		<rect state="0">
+			<color red="0.25" green="0.0" blue="0.0" />
 		</rect>
-		<text string=" HOLD 5 " state="1">
+		<rect state="1">
+			<color red="1.00" green="0.0" blue="0.0" />
+		</rect>
+		<text string=" HOLD 5 ">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.25" width="1" height="0.5" />
 		</text>
 	</element>
 
-	<element name="L7" defstate="1">
-		<rect>
-			<color red="0.70" green="0.70" blue="0.0" />
+	<element name="L7">
+		<rect state="0">
+			<color red="0.25" green="0.25" blue="0.0" />
 		</rect>
-		<text string="  DEAL  " state="1">
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="0.0" />
+		</rect>
+		<text string="  DEAL  ">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.25" width="1" height="0.5" />
 		</text>
 	</element>
 
-	<element name="L8" defstate="1">
-		<disk>
-			<color red="0.70" green="0.0" blue="0.0" />
-		</disk>
-		<text string="BET" state="1">
+	<element name="L8">
+		<rect state="0">
+			<color red="0.25" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="1">
+			<color red="1.00" green="0.0" blue="0.0" />
+		</rect>
+		<text string="BET">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.25" width="1" height="0.5" />
 		</text>
@@ -111,13 +138,13 @@ license:CC0
 		</rect>
 	</element>
 
-	<element name="LX" defstate="1">
+	<element name="LX">
 		<rect>
 			<color red="0.00" green="0.0" blue="0.0" />
 		</rect>
 	</element>
 
-	<element name="Dig1" defstate="1">
+	<element name="Dig1">
 		<led7seg>
 			<color red="1" green="1" blue="1" />
 		</led7seg>
@@ -127,135 +154,58 @@ license:CC0
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
-		<bezel name="" element="LX">
+
+		<element ref="LX">
 			<bounds x="0.0" y="3.00" width="0.01" height="0.50" />
-		</bezel>
-		<bezel name="lamp3" element="L8">
+		</element>
+		<element name="lamp3" ref="L8" inputtag="IN1" inputmask="0x08">
 			<bounds x="0.022" y="3.16" width="0.315" height="0.315" />
-		</bezel>
-		<bezel name="lamp2" element="L0">
+		</element>
+		<element name="lamp2" ref="L0" inputtag="IN0" inputmask="0x10" >
 			<bounds x="0.382" y="3.16" width="0.449" height="0.315" />
-		</bezel>
-		<bezel name="lamp0" element="L1">
+		</element>
+		<element name="lamp0" ref="L1" inputtag="IN0" inputmask="0x20">
 			<bounds x="0.876" y="3.16" width="0.449" height="0.315" />
-		</bezel>
-		<bezel name="lamp1" element="L2">
+		</element>
+		<element name="lamp1" ref="L2" inputtag="IN0" inputmask="0x40">
 			<bounds x="1.371" y="3.16" width="0.315" height="0.315" />
-		</bezel>
-		<bezel name="lamp1" element="L3">
+		</element>
+		<element name="lamp1" ref="L3" inputtag="IN0" inputmask="0x80">
 			<bounds x="1.730" y="3.16" width="0.315" height="0.315" />
-		</bezel>
-		<bezel name="lamp1" element="L4">
+		</element>
+		<element name="lamp1" ref="L4" inputtag="IN1" inputmask="0x01">
 			<bounds x="2.090" y="3.16" width="0.315" height="0.315" />
-		</bezel>
-		<bezel name="lamp1" element="L5">
+		</element>
+		<element name="lamp1" ref="L5" inputtag="IN1" inputmask="0x02">
 			<bounds x="2.449" y="3.16" width="0.315" height="0.315" />
-		</bezel>
-		<bezel name="lamp1" element="L6">
+		</element>
+		<element name="lamp1" ref="L6" inputtag="IN1" inputmask="0x04">
 			<bounds x="2.809" y="3.16" width="0.315" height="0.315" />
-		</bezel>
-		<bezel name="lamp3" element="L7">
+		</element>
+		<element name="lamp3" ref="L7" inputtag="IN0" inputmask="0x08">
 			<bounds x="3.169" y="3.16" width="0.449" height="0.315" />
-		</bezel>
+		</element>
 
-		<backdrop name="TOP_1" element="L9">
+		<element name="TOP_1" ref="L9">
 			<bounds x="1.75" y="3.01" width="0.5" height="0.04" />
-		</backdrop>
-		<backdrop name="TOP_2" element="L10">
+		</element>
+		<element name="TOP_2" ref="L10">
 			<bounds x="1.75" y="3.06" width="0.5" height="0.04" />
-		</backdrop>
-		<backdrop name="TOP_3" element="L11">
+		</element>
+		<element name="TOP_3" ref="L11">
 			<bounds x="1.75" y="3.11" width="0.5" height="0.04" />
-		</backdrop>
+		</element>
 
-
-
-		<bezel name="digit0" element="Dig1">
-			<bounds x="3.933" y="3.16" width="0.045" height="0.065625" />
-		</bezel>
-		<bezel name="digit1" element="Dig1">
-			<bounds x="3.888" y="3.16" width="0.045" height="0.065625" />
-		</bezel>
-		<bezel name="digit2" element="Dig1">
-			<bounds x="3.843" y="3.16" width="0.045" height="0.065625" />
-		</bezel>
-		<bezel name="digit3" element="Dig1">
-			<bounds x="3.798" y="3.16" width="0.045" height="0.065625" />
-		</bezel>
-		<bezel name="digit4" element="Dig1">
-			<bounds x="3.753" y="3.16" width="0.045" height="0.065625" />
-		</bezel>
-		<bezel name="digit5" element="Dig1">
-			<bounds x="3.708" y="3.16" width="0.045" height="0.065625" />
-		</bezel>
-		<bezel name="digit6" element="Dig1">
-			<bounds x="3.663" y="3.16" width="0.045" height="0.065625" />
-		</bezel>
-
-		<bezel name="digit7" element="Dig1">
-			<bounds x="3.933" y="3.239" width="0.045" height="0.065625" />
-		</bezel>
-		<bezel name="digit8" element="Dig1">
-			<bounds x="3.888" y="3.239" width="0.045" height="0.065625" />
-		</bezel>
-		<bezel name="digit9" element="Dig1">
-			<bounds x="3.843" y="3.239" width="0.045" height="0.065625" />
-		</bezel>
-		<bezel name="digit10" element="Dig1">
-			<bounds x="3.798" y="3.239" width="0.045" height="0.065625" />
-		</bezel>
-		<bezel name="digit11" element="Dig1">
-			<bounds x="3.753" y="3.239" width="0.045" height="0.065625" />
-		</bezel>
-		<bezel name="digit12" element="Dig1">
-			<bounds x="3.708" y="3.239" width="0.045" height="0.065625" />
-		</bezel>
-		<bezel name="digit13" element="Dig1">
-			<bounds x="3.663" y="3.239" width="0.045" height="0.065625" />
-		</bezel>
-
-		<bezel name="digit14" element="Dig1">
-			<bounds x="3.933" y="3.318" width="0.045" height="0.065625" />
-		</bezel>
-		<bezel name="digit15" element="Dig1">
-			<bounds x="3.888" y="3.318" width="0.045" height="0.065625" />
-		</bezel>
-		<bezel name="digit16" element="Dig1">
-			<bounds x="3.843" y="3.318" width="0.045" height="0.065625" />
-		</bezel>
-		<bezel name="digit17" element="Dig1">
-			<bounds x="3.798" y="3.318" width="0.045" height="0.065625" />
-		</bezel>
-		<bezel name="digit18" element="Dig1">
-			<bounds x="3.753" y="3.318" width="0.045" height="0.065625" />
-		</bezel>
-		<bezel name="digit19" element="Dig1">
-			<bounds x="3.708" y="3.318" width="0.045" height="0.065625" />
-		</bezel>
-		<bezel name="digit20" element="Dig1">
-			<bounds x="3.663" y="3.318" width="0.045" height="0.065625" />
-		</bezel>
-
-		<bezel name="digit21" element="Dig1">
-			<bounds x="3.933" y="3.396" width="0.045" height="0.065625" />
-		</bezel>
-		<bezel name="digit22" element="Dig1">
-			<bounds x="3.888" y="3.396" width="0.045" height="0.065625" />
-		</bezel>
-		<bezel name="digit23" element="Dig1">
-			<bounds x="3.843" y="3.396" width="0.045" height="0.065625" />
-		</bezel>
-		<bezel name="digit24" element="Dig1">
-			<bounds x="3.798" y="3.396" width="0.045" height="0.065625" />
-		</bezel>
-		<bezel name="digit25" element="Dig1">
-			<bounds x="3.753" y="3.396" width="0.045" height="0.065625" />
-		</bezel>
-		<bezel name="digit26" element="Dig1">
-			<bounds x="3.708" y="3.396" width="0.045" height="0.065625" />
-		</bezel>
-		<bezel name="digit27" element="Dig1">
-			<bounds x="3.663" y="3.396" width="0.045" height="0.065625" />
-		</bezel>
+		<repeat count="4">
+			<param name="s" start="0" increment="7" />
+			<param name="y" start="3.16" increment="0.079" />
+			<repeat count="7">
+				<param name="n" start="~s~" increment="1" />
+				<param name="x" start="3.933" increment="-0.045" />
+				<element name="digit~n~" ref="Dig1">
+					<bounds x="~x~" y="~y~" width="0.045" height="0.065625" />
+				</element>
+			</repeat>
+		</repeat>
 	</view>
 </mamelayout>

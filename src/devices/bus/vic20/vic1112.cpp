@@ -99,12 +99,12 @@ WRITE_LINE_MEMBER( vic1112_device::via1_irq_w )
 
 void vic1112_device::device_add_mconfig(machine_config &config)
 {
-	VIA6522(config, m_via0, DERIVED_CLOCK(1, 1));
+	MOS6522(config, m_via0, DERIVED_CLOCK(1, 1));
 	m_via0->readpb_handler().set(FUNC(vic1112_device::via0_pb_r));
 	m_via0->writepb_handler().set(FUNC(vic1112_device::via0_pb_w));
 	m_via0->irq_handler().set(FUNC(vic1112_device::via0_irq_w));
 
-	VIA6522(config, m_via1, DERIVED_CLOCK(1, 1));
+	MOS6522(config, m_via1, DERIVED_CLOCK(1, 1));
 	m_via1->readpb_handler().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
 	m_via1->writepa_handler().set(IEEE488_TAG, FUNC(ieee488_device::host_dio_w));
 	m_via1->ca2_handler().set(IEEE488_TAG, FUNC(ieee488_device::host_atn_w));

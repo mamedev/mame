@@ -65,8 +65,8 @@ void bbc_ramdisc_device::device_add_mconfig(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	BBC_1MHZBUS_SLOT(config, m_1mhzbus, DERIVED_CLOCK(1, 1), bbc_1mhzbus_devices, nullptr);
-	m_1mhzbus->irq_handler().set(m_1mhzbus, FUNC(bbc_1mhzbus_slot_device::irq_w));
-	m_1mhzbus->nmi_handler().set(m_1mhzbus, FUNC(bbc_1mhzbus_slot_device::nmi_w));
+	m_1mhzbus->irq_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_1mhzbus_slot_device::irq_w));
+	m_1mhzbus->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_1mhzbus_slot_device::nmi_w));
 }
 
 //-------------------------------------------------

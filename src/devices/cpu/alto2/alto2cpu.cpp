@@ -138,8 +138,6 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_ucode_ram_base(ALTO2_UCODE_PAGE_SIZE),
 	m_ucode_size(3*ALTO2_UCODE_PAGE_SIZE),
 	m_sreg_banks(1),
-	m_ucode_crom(nullptr),
-	m_const_data(nullptr),
 	m_icount(0),
 	m_task(0),
 	m_next_task(0),
@@ -802,24 +800,23 @@ void alto2_cpu_device::device_start()
 
 	// Decode 2 pages of micro code PROMs to CROM
 	// If m_cram_config == 1 or 3, only the first page will be used
-	m_ucode_crom = prom_load(machine(), pl_ucode, memregion("ucode_proms")->base(), 2, 8);
+	m_ucode_crom = prom_load<uint32_t>(machine(), pl_ucode, memregion("ucode_proms")->base(), 2, 8);
 
 	// allocate micro code CRAM for max 3 pages
-	m_ucode_cram = std::make_unique<uint8_t[]>(sizeof(uint32_t) * 3 * ALTO2_UCODE_PAGE_SIZE);
+	m_ucode_cram = std::make_unique<uint32_t []>(3 * ALTO2_UCODE_PAGE_SIZE);
 	// fill with the micro code inverted bits value
-	for (offs_t offset = 0; offset < 3 * ALTO2_UCODE_PAGE_SIZE; offset++)
-		*reinterpret_cast<uint32_t *>(m_ucode_cram.get() + offset * 4) = ALTO2_UCODE_INVERTED;
+	std::fill_n(m_ucode_cram.get(), 3 * ALTO2_UCODE_PAGE_SIZE, ALTO2_UCODE_INVERTED);
 
 	// decode constant PROMs to m_const_data
-	m_const_data = prom_load(machine(), pl_const, memregion("const_proms")->base(), 1, 4);
+	m_const_data = prom_load<uint16_t>(machine(), pl_const, memregion("const_proms")->base(), 1, 4);
 
-	m_ctl2k_u3 = prom_load(machine(), &pl_2kctl_u3, memregion("2kctl_u3")->base());
-	m_ctl2k_u38 = prom_load(machine(), &pl_2kctl_u38, memregion("2kctl_u38")->base());
-	m_ctl2k_u76 = prom_load(machine(), &pl_2kctl_u76, memregion("2kctl_u76")->base());
-	m_alu_a10 = prom_load(machine(), &pl_alu_a10, memregion("alu_a10")->base());
-	m_cram3k_a37 = prom_load(machine(), &pl_3kcram_a37, memregion("3kcram_a37")->base());
-	m_madr_a90 = prom_load(machine(), &pl_madr_a90, memregion("madr_a90")->base());
-	m_madr_a91 = prom_load(machine(), &pl_madr_a91, memregion("madr_a91")->base());
+	m_ctl2k_u3 = prom_load<uint8_t>(machine(), &pl_2kctl_u3, memregion("2kctl_u3")->base());
+	m_ctl2k_u38 = prom_load<uint8_t>(machine(), &pl_2kctl_u38, memregion("2kctl_u38")->base());
+	m_ctl2k_u76 = prom_load<uint8_t>(machine(), &pl_2kctl_u76, memregion("2kctl_u76")->base());
+	m_alu_a10 = prom_load<uint8_t>(machine(), &pl_alu_a10, memregion("alu_a10")->base());
+	m_cram3k_a37 = prom_load<uint8_t>(machine(), &pl_3kcram_a37, memregion("3kcram_a37")->base());
+	m_madr_a90 = prom_load<uint8_t>(machine(), &pl_madr_a90, memregion("madr_a90")->base());
+	m_madr_a91 = prom_load<uint8_t>(machine(), &pl_madr_a91, memregion("madr_a91")->base());
 
 #if DEBUG_ALU_A10_PROM
 	// dump ALU a10 PROM after loading
@@ -1006,31 +1003,31 @@ void alto2_cpu_device::state_string_export(const device_state_entry &entry, std:
 }
 
 //! read microcode CROM or CRAM
-READ32_MEMBER ( alto2_cpu_device::crom_cram_r )
+uint32_t alto2_cpu_device::crom_cram_r(offs_t offset)
 {
 	if (offset < m_ucode_ram_base)
-		return *reinterpret_cast<uint32_t *>(m_ucode_crom + offset * 4);
-	return *reinterpret_cast<uint32_t *>(m_ucode_cram.get() + (offset - m_ucode_ram_base) * 4);
+		return m_ucode_crom[offset];
+	else
+		return m_ucode_cram[offset - m_ucode_ram_base];
 }
 
 //! write microcode CROM or CRAM (CROM of course can't be written)
-WRITE32_MEMBER( alto2_cpu_device::crom_cram_w )
+void alto2_cpu_device::crom_cram_w(offs_t offset, uint32_t data)
 {
-	if (offset < m_ucode_ram_base)
-		return;
-	*reinterpret_cast<uint32_t *>(m_ucode_cram.get() + (offset - m_ucode_ram_base) * 4) = data;
+	if (offset >= m_ucode_ram_base)
+		m_ucode_cram[offset - m_ucode_ram_base] = data;
 }
 
 //! read constants PROM
-READ16_MEMBER ( alto2_cpu_device::const_r )
+uint16_t alto2_cpu_device::const_r(offs_t offset)
 {
-	return *reinterpret_cast<uint16_t *>(m_const_data + offset * 2);
+	return m_const_data[offset];
 }
 
 //! direct read access to the microcode CROM or CRAM
-#define RD_UCODE(addr) (addr < m_ucode_ram_base ? \
-	*reinterpret_cast<uint32_t *>(m_ucode_crom + addr * 4) : \
-	*reinterpret_cast<uint32_t *>(m_ucode_cram.get() + (addr - m_ucode_ram_base) * 4))
+#define RD_UCODE(addr) (((addr) < m_ucode_ram_base) ? \
+	m_ucode_crom[addr] : \
+	m_ucode_cram[(addr) - m_ucode_ram_base])
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -1257,42 +1254,42 @@ void alto2_cpu_device::watch_write(uint32_t addr, uint32_t data)
 }
 #endif
 
-/** @brief fatal exit on unitialized dynamic phase BUS source */
+/** @brief fatal exit on uninitialized dynamic phase BUS source */
 void alto2_cpu_device::bs_early_bad()
 {
 	throw emu_fatalerror(9,"fatal: bad early bus source pointer for task %s, mpc:%05o bs:%s\n",
 			task_name(m_task), m_mpc, bs_name(bs()));
 }
 
-/** @brief fatal exit on unitialized latching phase BUS source */
+/** @brief fatal exit on uninitialized latching phase BUS source */
 void alto2_cpu_device::bs_late_bad()
 {
 	throw emu_fatalerror(9,"fatal: bad late bus source pointer for task %s, mpc:%05o bs: %s\n",
 			task_name(m_task), m_mpc, bs_name(bs()));
 }
 
-/** @brief fatal exit on unitialized dynamic phase F1 function */
+/** @brief fatal exit on uninitialized dynamic phase F1 function */
 void alto2_cpu_device::f1_early_bad()
 {
 	throw emu_fatalerror(9,"fatal: bad early f1 function pointer for task %s, mpc:%05o f1: %s\n",
 			task_name(m_task), m_mpc, f1_name(f1()));
 }
 
-/** @brief fatal exit on unitialized latching phase F1 function */
+/** @brief fatal exit on uninitialized latching phase F1 function */
 void alto2_cpu_device::f1_late_bad()
 {
 	throw emu_fatalerror(9,"fatal: bad late f1 function pointer for task %s, mpc:%05o f1: %s\n",
 			task_name(m_task), m_mpc, f1_name(f1()));
 }
 
-/** @brief fatal exit on unitialized dynamic phase F2 function */
+/** @brief fatal exit on uninitialized dynamic phase F2 function */
 void alto2_cpu_device::f2_early_bad()
 {
 	throw emu_fatalerror(9,"fatal: bad early f2 function pointer for task %s, mpc:%05o f2: %s\n",
 			task_name(m_task), m_mpc, f2_name(f2()));
 }
 
-/** @brief fatal exit on unitialized latching phase F2 function */
+/** @brief fatal exit on uninitialized latching phase F2 function */
 void alto2_cpu_device::f2_late_bad()
 {
 	throw emu_fatalerror(9,"fatal: bad late f2 function pointer for task %s, mpc:%05o f2: %s\n",
@@ -1364,7 +1361,7 @@ static const char* memory_range_name(offs_t offset)
 /**
  * @brief read the open bus for unused MMIO range
  */
-READ16_MEMBER( alto2_cpu_device::noop_r )
+uint16_t alto2_cpu_device::noop_r(offs_t offset)
 {
 	LOG((this,LOG_CPU,0,"    MMIO rd %s\n", memory_range_name(offset)));
 	return 0177777;
@@ -1373,7 +1370,7 @@ READ16_MEMBER( alto2_cpu_device::noop_r )
 /**
  * @brief write nowhere for unused MMIO range
  */
-WRITE16_MEMBER( alto2_cpu_device::noop_w )
+void alto2_cpu_device::noop_w(offs_t offset, uint16_t data)
 {
 	LOG((this,LOG_CPU,0,"    MMIO wr %s\n", memory_range_name(offset)));
 }
@@ -1383,7 +1380,7 @@ WRITE16_MEMBER( alto2_cpu_device::noop_w )
  *
  * The bank registers are stored in a 16x4-bit RAM 74S189.
  */
-READ16_MEMBER( alto2_cpu_device::bank_reg_r )
+uint16_t alto2_cpu_device::bank_reg_r(offs_t offset)
 {
 	int task = offset & 017;
 	int bank = m_bank_reg[task] | 0177760;
@@ -1395,7 +1392,7 @@ READ16_MEMBER( alto2_cpu_device::bank_reg_r )
  *
  * The bank registers are stored in a 16x4-bit RAM 74S189.
  */
-WRITE16_MEMBER( alto2_cpu_device::bank_reg_w )
+void alto2_cpu_device::bank_reg_w(offs_t offset, uint16_t data)
 {
 	int task = offset & 017;
 	m_bank_reg[task] = data & 017;
@@ -2289,7 +2286,7 @@ void alto2_cpu_device::execute_run()
 			 * the bitclk sequence by leaving m_bitclk_time at -1.
 			 */
 			m_bitclk_time -= ucycle;
-			disk_bitclk(nullptr, m_bitclk_index);
+			disk_bitclk(m_bitclk_index);
 		}
 
 		m_mpc = m_next;             // next instruction's micro program counter
@@ -2338,7 +2335,7 @@ void alto2_cpu_device::execute_run()
 		// The constant memory is gated to the bus by F1 == f1_const, F2 == f2_const, or BS >= 4
 		if (!do_bs || bs() >= bs_task_4) {
 			const uint32_t addr = 8 * m_rsel + bs();
-			const uint16_t data = m_const_data[2*addr] | (m_const_data[2*addr+1] << 8);
+			const uint16_t data = m_const_data[addr];
 			m_bus &= data;
 			LOG((this,LOG_CPU,2,"    %#o; BUS &= %#o CONST[%03o]\n", m_bus, data, addr));
 		}

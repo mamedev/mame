@@ -267,7 +267,7 @@ inline void gba_lcd_device::update_mask(uint8_t* mask, int y)
 
 void gba_lcd_device::draw_scanline(int y)
 {
-	uint16_t *scanline = &m_bitmap.pix16(y);
+	uint16_t *const scanline = &m_bitmap.pix(y);
 
 	if (is_set(dispcnt::forced_blank))
 	{
@@ -1577,7 +1577,7 @@ uint32_t gba_lcd_device::video_r(offs_t offset, uint32_t mem_mask)
 		break;
 	}
 
-	if (offset >= ARRAY_LENGTH(reg_names) / 2)
+	if (offset >= std::size(reg_names) / 2)
 		throw emu_fatalerror("gba_lcd_device::video_r: Not enough register names in gba_lcd_device");
 
 	if (ACCESSING_BITS_0_15)
@@ -1593,7 +1593,7 @@ void gba_lcd_device::video_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_regs[offset]);
 
-	if (offset >= ARRAY_LENGTH(reg_names) / 2)
+	if (offset >= std::size(reg_names) / 2)
 		throw emu_fatalerror("gba_lcd_device::video_w: Not enough register names in gba_lcd_device");
 
 	if (ACCESSING_BITS_0_15)

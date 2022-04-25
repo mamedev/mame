@@ -182,7 +182,7 @@ SCN2674_DRAW_CHARACTER_MEMBER(pcd_video_device::display_pixels)
 			data = ~data;
 		for(int i = 0; i < 16; i++)
 		{
-			bitmap.pix32(y, x++) = palette().pen(BIT(data, 15) ? 1 : 0);
+			bitmap.pix(y, x++) = palette().pen(BIT(data, 15) ? 1 : 0);
 			data <<= 1;
 		}
 	}
@@ -209,8 +209,8 @@ SCN2674_DRAW_CHARACTER_MEMBER(pcd_video_device::display_pixels)
 		for(int i = 0; i < 8; i++)
 		{
 			rgb_t pix = palette().pen(BIT(data, 7) ? fgnd : bgnd);
-			bitmap.pix32(y, x++) = pix;
-			bitmap.pix32(y, x++) = pix;
+			bitmap.pix(y, x++) = pix;
+			bitmap.pix(y, x++) = pix;
 			data <<= 1;
 		}
 	}
@@ -229,7 +229,7 @@ SCN2672_DRAW_CHARACTER_MEMBER(pcx_video_device::display_pixels)
 	for (int i = 0; i < 8; i++)
 	{
 		rgb_t pix = palette().pen(BIT(data, 7) ? 1 : 0);
-		bitmap.pix32(y, x++) = pix;
+		bitmap.pix(y, x++) = pix;
 		data <<= 1;
 	}
 }

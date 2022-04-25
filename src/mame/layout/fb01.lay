@@ -95,90 +95,90 @@ license:CC0
     </element>
 -->
 
-	<view name="View">
+	<view name="Front Panel">
 		<screen index="0">
 			<bounds x="30" y="32" width="108" height="8" />
 		</screen>
 
-		<bezel name="system_setup_1" element="system">
+		<element name="system_setup_1" ref="system">
 			<bounds left="200" right="249" top="0" bottom="15" />
-		</bezel>
-		<bezel name="system_setup_2" element="setup">
+		</element>
+		<element name="system_setup_2" ref="setup">
 			<bounds left="200" right="249" top="16" bottom="31" />
-		</bezel>
-		<bezel element="button" inputtag="PANEL" inputmask="0x01">
+		</element>
+		<element ref="button" inputtag="PANEL" inputmask="0x01">
 			<bounds x="203" y="34" width="45" height="28" />
-		</bezel>
+		</element>
 
-		<bezel name="inst_select_1" element="inst">
+		<element name="inst_select_1" ref="inst">
 			<bounds left="250" right="299" top="0" bottom="15" />
-		</bezel>
-		<bezel name="inst_select_2" element="select">
+		</element>
+		<element name="inst_select_2" ref="select">
 			<bounds left="250" right="299" top="16" bottom="31" />
-		</bezel>
-		<bezel element="button" inputtag="PANEL" inputmask="0x02">
+		</element>
+		<element ref="button" inputtag="PANEL" inputmask="0x02">
 			<bounds x="253" y="34" width="45" height="28" />
-		</bezel>
+		</element>
 
-		<bezel name="data_entry_no_1" element="data_entry">
+		<element name="data_entry_no_1" ref="data_entry">
 			<bounds left="300" right="349" top="0" bottom="15" />
-		</bezel>
-		<bezel name="data_entry_no_2" element="no">
+		</element>
+		<element name="data_entry_no_2" ref="no">
 			<bounds left="300" right="349" top="16" bottom="31" />
-		</bezel>
-		<bezel element="button" inputtag="PANEL" inputmask="0x40">
+		</element>
+		<element ref="button" inputtag="PANEL" inputmask="0x40">
 			<bounds x="303" y="34" width="45" height="28" />
-		</bezel>
+		</element>
 
-		<bezel nmae="data_entry_yes_1" element="data_entry">
+		<element nmae="data_entry_yes_1" ref="data_entry">
 			<bounds left="350" right="399" top="0" bottom="15" />
-		</bezel>
-		<bezel name="data_entry_yes_2" element="yes">
+		</element>
+		<element name="data_entry_yes_2" ref="yes">
 			<bounds left="350" right="399" top="16" bottom="31" />
-		</bezel>
-		<bezel element="button" inputtag="PANEL" inputmask="0x80">
+		</element>
+		<element ref="button" inputtag="PANEL" inputmask="0x80">
 			<bounds x="353" y="34" width="45" height="28" />
-		</bezel>
+		</element>
 
 
-		<bezel name="inst_assign_1" element="inst">
+		<element name="inst_assign_1" ref="inst">
 			<bounds left="200" right="249" top="64" bottom="79" />
-		</bezel>
-		<bezel name="inst_assign_2" element="assign">
+		</element>
+		<element name="inst_assign_2" ref="assign">
 			<bounds left="200" right="249" top="80" bottom="95" />
-		</bezel>
-		<bezel element="button" inputtag="PANEL" inputmask="0x04">
+		</element>
+		<element ref="button" inputtag="PANEL" inputmask="0x04">
 			<bounds x="203" y="98" width="45" height="28" />
-		</bezel>
+		</element>
 
-		<bezel name="inst_function_1" element="inst">
+		<element name="inst_function_1" ref="inst">
 			<bounds left="250" right="299" top="64" bottom="79" />
-		</bezel>
-		<bezel name="inst_function_2" element="function">
+		</element>
+		<element name="inst_function_2" ref="function">
 			<bounds left="250" right="299" top="80" bottom="95" />
-		</bezel>
-		<bezel element="button" inputtag="PANEL" inputmask="0x08">
+		</element>
+		<element ref="button" inputtag="PANEL" inputmask="0x08">
 			<bounds x="253" y="98" width="45" height="28" />
-		</bezel>
+		</element>
 
-		<bezel name="voice_function_1" element="voice">
+		<element name="voice_function_1" ref="voice">
 			<bounds left="300" right="349" top="64" bottom="79" />
-		</bezel>
-		<bezel name="voice_function_2" element="function">
+		</element>
+		<element name="voice_function_2" ref="function">
 			<bounds left="300" right="349" top="80" bottom="95" />
-		</bezel>
-		<bezel element="button" inputtag="PANEL" inputmask="0x10">
+		</element>
+		<element ref="button" inputtag="PANEL" inputmask="0x10">
 			<bounds x="303" y="98" width="45" height="28" />
-		</bezel>
+		</element>
 
-		<bezel name="voice_select_1" element="voice">
+		<element name="voice_select_1" ref="voice">
 			<bounds left="350" right="399" top="64" bottom="79" />
-		</bezel>
-		<bezel name="voice_select_2" element="select">
+		</element>
+		<element name="voice_select_2" ref="select">
 			<bounds left="350" right="399" top="80" bottom="95" />
-		</bezel>
-		<bezel element="button" inputtag="PANEL" inputmask="0x20">
+		</element>
+		<element ref="button" inputtag="PANEL" inputmask="0x20">
 			<bounds x="353" y="98" width="45" height="28" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

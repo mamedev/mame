@@ -134,7 +134,7 @@ void device_psx_controller_interface::interface_post_stop()
 	m_ack_timer = nullptr;
 }
 
-void device_psx_controller_interface::ack_timer(void *ptr, int param)
+void device_psx_controller_interface::ack_timer(int32_t param)
 {
 	m_ack = param;
 	m_owner->ack();

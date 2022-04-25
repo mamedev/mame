@@ -185,7 +185,7 @@ u8 tc0040ioc_device::portreg_r()
 
 void tc0040ioc_device::portreg_w(u8 data)
 {
-	if (m_port < ARRAY_LENGTH(m_regs))
+	if (m_port < std::size(m_regs))
 		m_regs[m_port] = data;
 	switch (m_port)
 	{

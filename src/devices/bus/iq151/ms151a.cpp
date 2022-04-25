@@ -10,6 +10,7 @@
 #include "ms151a.h"
 
 #include "emuopts.h"
+#include "fileio.h"
 #include "png.h"
 
 // paper is A4 (210x297mm)
@@ -164,5 +165,5 @@ void iq151_ms151a_device::plotter_update(uint8_t offset, uint8_t data)
 
 	// if pen is down draws a point
 	if (m_pen)
-		m_paper->pix16(((PAPER_HEIGHT-PAPER_MAX_Y)/2) + m_posy, ((PAPER_WIDTH-PAPER_MAX_X)/2) + m_posx) = 1;
+		m_paper->pix(((PAPER_HEIGHT-PAPER_MAX_Y)/2) + m_posy, ((PAPER_WIDTH-PAPER_MAX_X)/2) + m_posx) = 1;
 }

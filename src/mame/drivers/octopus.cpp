@@ -133,7 +133,7 @@ It's a very rare computer. It has 2 processors, Z80 and 8088, so it can run both
 #include "bus/centronics/printer.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -145,7 +145,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
 		m_crtc(*this, "crtc"),
-		m_vram(*this, "vram"),
+		m_vram(*this, "vram", 0x10000, ENDIANNESS_LITTLE),
 		m_fontram(*this, "fram"),
 		m_dma1(*this, "dma1"),
 		m_dma2(*this, "dma2"),
@@ -233,12 +233,12 @@ private:
 	void octopus_sub_mem(address_map &map);
 	void octopus_vram(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<scn2674_device> m_crtc;
-	required_shared_ptr<uint8_t> m_vram;
+	memory_share_creator<uint8_t> m_vram;
 	required_shared_ptr<uint8_t> m_fontram;
 	required_device<am9517a_device> m_dma1;
 	required_device<am9517a_device> m_dma2;
@@ -288,8 +288,8 @@ private:
 
 void octopus_state::octopus_mem(address_map &map)
 {
-	map(0x00000, 0xcffff).bankrw("main_ram_bank");
-	map(0xd0000, 0xdffff).ram().share("vram");
+	map(0x00000, 0xcffff).rw(m_ram, FUNC(ram_device::read), FUNC(ram_device::write));
+	//map(0xd0000, 0xdffff).ram().share("vram");
 	map(0xe0000, 0xe3fff).noprw();
 	map(0xe4000, 0xe5fff).ram().share("fram");
 	map(0xe6000, 0xe7fff).rom().region("chargen", 0);
@@ -369,7 +369,7 @@ static INPUT_PORTS_START( octopus )
 	PORT_DIPSETTING( 0x80, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
-void octopus_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void octopus_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{
@@ -760,7 +760,7 @@ void octopus_state::machine_start()
 	m_vidctrl = 0xff;
 
 	// install RAM
-	m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x0000,m_ram->size()-1,"main_ram_bank");
+	m_maincpu->space(AS_PROGRAM).install_ram(0x0000,m_ram->size()-1,m_ram->pointer());
 	m_maincpu->space(AS_PROGRAM).nop_readwrite(m_ram->size(),0xcffff);
 }
 
@@ -773,13 +773,11 @@ void octopus_state::machine_reset()
 	m_current_drive = 0;
 	m_rtc_address = true;
 	m_rtc_data = false;
-	membank("main_ram_bank")->set_base(m_ram->pointer());
 	m_kb_uart->write_dsr(1);  // DSR is used to determine if a keyboard is connected?  If DSR is high, then the CHAR_OUT BIOS function will not output to the screen.
 }
 
 void octopus_state::video_start()
 {
-	m_vram.allocate(0x10000);
 }
 
 uint8_t octopus_state::video_latch_r(offs_t offset)
@@ -863,7 +861,7 @@ SCN2674_DRAW_CHARACTER_MEMBER(octopus_state::display_pixels)
 				data = 0xff;
 		}
 		for (int z=0;z<8;z++)
-			bitmap.pix32(y,x + z) = BIT(data,z) ? fg : bg;
+			bitmap.pix(y,x + z) = BIT(data,z) ? fg : bg;
 	}
 }
 
@@ -977,8 +975,8 @@ void octopus_state::octopus(machine_config &config)
 	FD1793(config, m_fdc, 16_MHz_XTAL / 8);
 	m_fdc->intrq_wr_callback().set(m_pic1, FUNC(pic8259_device::ir5_w));
 	m_fdc->drq_wr_callback().set(m_dma2, FUNC(am9517a_device::dreq1_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", octopus_floppies, "525dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", octopus_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", octopus_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", octopus_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 	SOFTWARE_LIST(config, "fd_list").set_original("octopus");
 
 	PIT8253(config, m_pit, 0);
@@ -1026,7 +1024,7 @@ void octopus_state::octopus(machine_config &config)
 	m_crtc->set_addrmap(0, &octopus_state::octopus_vram);
 	m_crtc->set_screen("screen");
 
-	ADDRESS_MAP_BANK(config, "z80_bank").set_map(&octopus_state::octopus_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x10000);
+	ADDRESS_MAP_BANK(config, m_z80_bankdev).set_map(&octopus_state::octopus_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x10000);
 
 	RAM(config, "ram").set_default_size("256K").set_extra_options("128K,512K,768K");
 }

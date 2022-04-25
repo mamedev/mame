@@ -1,0 +1,654 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+
+PAK and NET roms for the Microbee non-disk models. These extensions are supported: MBP, MBN, ROM.
+
+Compatibility flags:
+1 = mbee
+2 = mbeeic, mbeepc, mbeepc85
+TT = Teleterm
+
+If no flag is specified, it's assumed it works on all of them.
+
+NET roms:
+There's only one slot (-rom1). It can be activated by NET from Basic.
+mbee only handles 4k roms. The others can work with 4k or 8k roms.
+
+PAK roms:
+On mbee, there's only one slot (-rom2), activated by EDASM command.
+The others have -rom2 to -rom7, activated by PAK0 thru PAK5.
+Most roms can be mounted in any slot, although sometimes one is recommended in the usage.
+
+-->
+<softwarelist name="mbee_cart" description="Microbee NET/PAK roms">
+
+	<software name="edasm">
+		<description>EDASM</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="1,2" />
+		<part name="cart" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="edasm.mbp" size="0x2000" crc="1af1b3a9" sha1="d035a997c2dbbb3918b3395a3a5a1076aa203ee5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="forth10">
+		<description>FORTH v1.0</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
+		<sharedfeat name="compatibility" value="1,2" />
+		<part name="cart" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="forth.mbp" size="0x2000" crc="c0795c2b" sha1="8faa0a46fbbdb8a1019d706a40cd4431a5063f8c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="forth11">
+		<description>FORTH v1.1</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
+		<sharedfeat name="compatibility" value="1,2" />
+		<part name="cart" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="forth11.mbp" size="0x2000" crc="f0fc2358" sha1="b7303b94abe647d5a6ffb2fba5d205412f970c16" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ozlogo">
+		<description>OZLOGO</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
+		<sharedfeat name="compatibility" value="1,2" />
+		<part name="cart" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="ozlogo.mbp" size="0x2000" crc="47c3ef69" sha1="8274d27c323ca4a6cc9e7d24946ae9c0531c3112" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chess">
+		<description>Sargon Chess</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
+		<sharedfeat name="compatibility" value="1,2" />
+		<part name="cart" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="chess.mbp" size="0x2000" crc="fe9ee9d0" sha1="a316559414e68c0101af5f00755db551e7c5788e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="help1">
+		<description>HELP (set 1)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0 [-rom3 recommended = PAK1]"/>
+		<sharedfeat name="compatibility" value="1,2" />
+		<part name="cart" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="help1.mbp" size="0x2000" crc="d34fae54" sha1="5ed30636f48e9d208ce2da367ba4425782a5bce3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="help2">
+		<description>HELP (set 2)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0 [-rom3 recommended = PAK1]"/>
+		<sharedfeat name="compatibility" value="1,2" />
+		<part name="cart" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="help2.mbp" size="0x2000" crc="a4f1fa90" sha1="1456abc6ed0501a3b15a99b4302750843293ae5f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdisas">
+		<description>Mydas Dissassembler</description>
+		<year>1984</year>
+		<publisher>Mytek</publisher>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
+		<sharedfeat name="compatibility" value="1,2" />
+		<part name="cart" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="mdisas.mbp" size="0x2000" crc="a14c1747" sha1="0ef2e27ecac659c4050b1e43dd183a0809263014" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdisas">
+		<description>Super Disassembler 3.0</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
+		<sharedfeat name="compatibility" value="1,2" />
+		<part name="cart" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="sdisas.mbp" size="0x2000" crc="613f2212" sha1="967f7516354911a1278a8d5e09ac2d2c74c76594" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mwordp">
+		<description>Mytek Word Processor</description>
+		<year>198?</year>
+		<publisher>Mytek</publisher>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
+		<sharedfeat name="compatibility" value="2" />
+		<part name="cart" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="mwordp.mbp" size="0x2000" crc="1bbec49f" sha1="12e0f78ec5550076c5f63bc8aaf28930c6c3ad09" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msinv">
+		<description>Microspace Invaders</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
+		<sharedfeat name="compatibility" value="1,2" />
+		<part name="cart" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="invaders.mbp" size="0x2000" crc="ad84132d" sha1="d4eeecc548ed61f29a9ab157b003b9a8ce0713eb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="survivor">
+		<description>Survivor</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
+		<sharedfeat name="compatibility" value="1,2" />
+		<part name="cart" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="survivor.mbp" size="0x2000" crc="75d6d01e" sha1="81f8163774eccd5e000a206f08cb842c6b0d8c88" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="typtut">
+		<description>Typing Tutor</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
+		<sharedfeat name="compatibility" value="1,2" />
+		<part name="cart" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="typtut.mbp" size="0x2000" crc="3e1c790c" sha1="9b4b1822fb64d9cd12a7347af23916bc36be5314" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wbee10">
+		<description>Wordbee 1.0</description>
+		<year>1982</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0 [-rom2 recommended]"/>
+		<sharedfeat name="compatibility" value="1,2" />
+		<part name="cart" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="wbee10.mbp" size="0x2000" crc="2ed7e739" sha1="fec174caa6f9534c3ef93feb491b31a5642f9d2b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wbee12">
+		<description>Wordbee 1.2</description>
+		<year>1982</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0 [-rom2 recommended]"/>
+		<sharedfeat name="compatibility" value="1,2" />
+		<part name="cart" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="wbee12.mbp" size="0x2000" crc="0fc21cb5" sha1="33b3995988fc51ddef1568e160dfe699867adbd5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wbee12s">
+		<description>Wordbee 1.2 (Swedish)</description>
+		<year>1982</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0 [-rom2 recommended]"/>
+		<sharedfeat name="compatibility" value="1,2" />
+		<part name="cart" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="wbee12s.mbp" size="0x2000" crc="2ae22525" sha1="893f2fc1511f4b2c55741365faaf00a478491383" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wbee13">
+		<description>Wordbee 1.3</description>
+		<year>1982</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0 [-rom2 recommended]"/>
+		<sharedfeat name="compatibility" value="1,2" />
+		<part name="cart" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="wbee13.mbp" size="0x2000" crc="85f0e581" sha1="fea7bf261ce268097c6db662300dce091887b807" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wbee13r3">
+		<description>Wordbee 1.3 Rel 3</description>
+		<year>1982</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0 [-rom2 recommended]"/>
+		<sharedfeat name="compatibility" value="1,2" />
+		<part name="cart" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="wbee13r3.mbp" size="0x2000" crc="d7c58b7b" sha1="5af1b8d21a0f21534ed1833ae919dbbc6ca973e2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wbee20s">
+		<description>Wordbee 2.0 (Swedish)</description>
+		<year>1982</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0 [-rom2 recommended]"/>
+		<sharedfeat name="compatibility" value="1,2" />
+		<part name="cart" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="wbee20s.mbp" size="0x2000" crc="6a0fe57f" sha1="a101b588b1872e19382b9e9ea50fabb0fd060aa6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tt_test109">
+		<description>Teleterm Test Rom 1.09</description>
+		<year>1986</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="[-rom5 recommended]"/>
+		<sharedfeat name="compatibility" value="TT" />
+		<part name="cart" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="tt_test109.mbp" size="0x2000" crc="6088689d" sha1="77a8ea8c695668d30765fdc2756880088b11b3cb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tt_wm108">
+		<description>Teleterm Telcom 1.08</description><!-- version shows on boot screen -->
+		<year>1986</year>
+		<publisher>Microworld</publisher>
+		<sharedfeat name="compatibility" value="TT" />
+		<part name="cart" interface="mbee_net">
+			<dataarea name="rom" size="0x2000">
+				<rom name="tt_wm108.mbn" size="0x2000" crc="0926b5a6" sha1="bfa6d268b145771f162dd28f2d1790e97c88c19b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dinmicro">
+		<description>Dinamicro 1.1 (Swedish)</description>
+		<year>198?</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="NET"/>
+		<sharedfeat name="compatibility" value="2,3" />
+		<part name="cart" interface="mbee_net">
+			<dataarea name="rom" size="0x1000">
+				<rom name="dinmicro.mbn" size="0x1000" crc="8e26ee34" sha1="a7cf1226a76e5ef0db29369dd1930f15cc9a27b8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="telcom10">
+		<description>Telcom 1.0</description>
+		<year>198?</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="NET"/>
+		<sharedfeat name="compatibility" value="2,3" />
+		<part name="cart" interface="mbee_net">
+			<dataarea name="rom" size="0x1000">
+				<rom name="telcom10.mbn" size="0x1000" crc="d1617e4f" sha1="c73dc4dcf4c69419842fa4b52aa92e86924a2e2b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="telcom11">
+		<description>Telcom 1.1</description>
+		<year>198?</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="NET"/>
+		<sharedfeat name="compatibility" value="2,3" />
+		<part name="cart" interface="mbee_net">
+			<dataarea name="rom" size="0x1000">
+				<rom name="telcom11.mbn" size="0x1000" crc="15516499" sha1="2d4953f994b66c5d3b1d457b8c92d9a0a69eb8b8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="telcom12">
+		<description>Telcom 1.2</description>
+		<year>198?</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="NET"/>
+		<sharedfeat name="compatibility" value="2,3" />
+		<part name="cart" interface="mbee_net">
+			<dataarea name="rom" size="0x1000">
+				<rom name="telcom12.mbn" size="0x1000" crc="0231bda3" sha1="be7b32499034f985cc8f7865f2bc2b78c485585c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="telcom30">
+		<description>Telcom 3.0</description>
+		<year>198?</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="NET"/>
+		<sharedfeat name="compatibility" value="2,3" />
+		<part name="cart" interface="mbee_net">
+			<dataarea name="rom" size="0x2000">
+				<rom name="telcom30.mbn" size="0x2000" crc="9aee48e2" sha1="e0598e732b44a08e3f7e77ec63a879ac1434b5ec" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="telcom31">
+		<description>Telcom 3.1</description>
+		<year>198?</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="NET"/>
+		<sharedfeat name="compatibility" value="2,3" />
+		<part name="cart" interface="mbee_net">
+			<dataarea name="rom" size="0x2000">
+				<rom name="telcom31.mbn" size="0x2000" crc="5a904a29" sha1="3120fb65ccefeb180ab80d8d35440c70dc8452c8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="telcom32">
+		<description>Telcom 3.2</description>
+		<year>198?</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="NET"/>
+		<sharedfeat name="compatibility" value="2,3" />
+		<part name="cart" interface="mbee_net">
+			<dataarea name="rom" size="0x2000">
+				<rom name="telcom32.mbn" size="0x2000" crc="e9f0b82b" sha1="e1f2004a401878468f7f359fd30b0b948ae0eb48" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="telcom321">
+		<description>Telcom 3.21</description>
+		<year>198?</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="NET"/>
+		<sharedfeat name="compatibility" value="2,3" />
+		<part name="cart" interface="mbee_net">
+			<dataarea name="rom" size="0x2000">
+				<rom name="telcom321.mbn" size="0x2000" crc="b07eefaa" sha1="5dab90b2c232673282d215845c9947cc5bdd50c8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="telcom321a">
+		<description>Telcom 3.21 (Standard)</description>
+		<year>198?</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="NET"/>
+		<sharedfeat name="compatibility" value="2,3" />
+		<part name="cart" interface="mbee_net">
+			<dataarea name="rom" size="0x2000">
+				<rom name="telcom321a.mbn" size="0x2000" crc="36852a11" sha1="c45b8d03629e86231c6b256a7435abd87d8872a4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="telcom321p">
+		<description>Telcom 3.21 (Premium)</description>
+		<year>198?</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="NET"/>
+		<sharedfeat name="compatibility" value="2,3" />
+		<part name="cart" interface="mbee_net">
+			<dataarea name="rom" size="0x2000">
+				<rom name="telcom321p.mbn" size="0x2000" crc="3d2e8190" sha1="b4d330e149c4ddaa4a399f90b3ce8a854ddcd271" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="telcom321s">
+		<description>Telcom 3.21 (Swedish)</description>
+		<year>198?</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="NET"/>
+		<sharedfeat name="compatibility" value="2,3" />
+		<part name="cart" interface="mbee_net">
+			<dataarea name="rom" size="0x2000">
+				<rom name="telcom321s.mbn" size="0x2000" crc="00f8fde1" sha1="eb881bbab90c85fd6e29540decd25e884c67f738" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="terminal1">
+		<description>Terminal (set 1)</description>
+		<year>198?</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="NET"/>
+		<sharedfeat name="compatibility" value="2,3" />
+		<part name="cart" interface="mbee_net">
+			<dataarea name="rom" size="0x1000">
+				<rom name="terminal1.mbn" size="0x1000" crc="cc9ac94d" sha1="6804b5ff54d16f8e06180751d8681c44f351e0bb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="terminal2">
+		<description>Terminal (set 2)</description>
+		<year>198?</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="NET"/>
+		<sharedfeat name="compatibility" value="2,3" />
+		<part name="cart" interface="mbee_net">
+			<dataarea name="rom" size="0x1000">
+				<rom name="terminal2.mbn" size="0x1000" crc="186437a1" sha1="e847b99dd9c8c95c8266280efe27984d41fa96e2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="viatel20">
+		<description>Viatel 2.0</description>
+		<year>198?</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
+		<sharedfeat name="compatibility" value="2,3" />
+		<part name="cart" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="viatel20.mbp" size="0x1000" crc="92c42a2e" sha1="6c91de99ac1aea3b818ad7a06ddb988d43fbe0db" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="viatel22">
+		<description>Viatel 2.2</description>
+		<year>198?</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
+		<sharedfeat name="compatibility" value="2,3" />
+		<part name="cart" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="viatel22.mbp" size="0x2000" crc="c323aff6" sha1="604c6898da4b6bb01914ae190c89ba346ce374b0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="viatel23">
+		<description>Viatel 2.3</description>
+		<year>198?</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
+		<sharedfeat name="compatibility" value="2,3" />
+		<part name="cart" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="viatel23.mbp" size="0x2000" crc="2da2411f" sha1="d3cfa978165feef0a96e28197f6a762aa6604799" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vtex11s">
+		<description>Videotex 1.1 (Swedish)</description>
+		<year>198?</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
+		<sharedfeat name="compatibility" value="2,3" />
+		<part name="cart" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="vtex11s.mbp" size="0x2000" crc="67592b3f" sha1="7f1d23ded34781ccda5f36b4a4fa118a8c0e44ec" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vtex234">
+		<description>Videotex 2.34</description>
+		<year>198?</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
+		<sharedfeat name="compatibility" value="2,3" />
+		<part name="cart" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="vtex234.mbp" size="0x2000" crc="62244ac7" sha1="5994d51a2a1cd4e65d1bd718b98ef9f173babdb7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vtex235">
+		<description>Videotex 2.35</description>
+		<year>198?</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
+		<sharedfeat name="compatibility" value="2,3" />
+		<part name="cart" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="vtex235.mbp" size="0x2000" crc="8c30ecb2" sha1="cf068462d7def885bdb5d3a265851b88c727c0d7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shell">
+		<description>Shell (pc85)</description>
+		<year>198?</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0 [recommend -rom7 = PAK5]"/>
+		<sharedfeat name="compatibility" value="2,3" />
+		<part name="cart" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="shell.mbp" size="0x2000" crc="5a2c7cd6" sha1="8edc086710cb558f2146d660eddc8a18ba6a141c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shellb">
+		<description>Shell (pc85b)</description>
+		<year>198?</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0 [recommend -rom7 = PAK5]"/>
+		<sharedfeat name="compatibility" value="2,3" />
+		<part name="cart" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="shell-b.mbp" size="0x2000" crc="17bf2d58" sha1="ae22a5fc5783f37066ba5555497e40945272ca3d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shellp">
+		<description>Shell (ppc85)</description>
+		<year>198?</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0 [recommend -rom7 = PAK5]"/>
+		<sharedfeat name="compatibility" value="2,3" />
+		<part name="cart" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="ppcshell.mbp" size="0x2000" crc="1e793555" sha1="ddeaa081ec4408e80e3fb192865d87daa035c701" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shells">
+		<description>Shell (pc85s)</description>
+		<year>198?</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0 [recommend -rom7 = PAK5]"/>
+		<sharedfeat name="compatibility" value="2,3" />
+		<part name="cart" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="shell-s.mbp" size="0x2000" crc="bdf1768f" sha1="4385351d07288cf94947ac63131eeed98572caa1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="graphics">
+		<description>Graphics / Database</description>
+		<year>198?</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0 [recommend -rom5 = PAK3]. Database access is PAKn+8"/>
+		<sharedfeat name="compatibility" value="2,3" />
+		<part name="cart" interface="mbee_pak">
+			<dataarea name="rom" size="0x4000">
+				<rom name="busy-p.mbp" size="0x4000" crc="9e9d327c" sha1="aebf60ed153004380b9f271f2212376910a6cef9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="graph">
+		<description>Graphics (Swedish)</description>
+		<year>198?</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0 [recommend -rom5 = PAK3]"/>
+		<sharedfeat name="compatibility" value="2,3" />
+		<part name="cart" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="bg-s.mbp" size="0x2000" crc="5aa4813e" sha1="a8638e9046bfb9d5a98c878322295ce408bd879d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbase">
+		<description>Database (Swedish)</description>
+		<year>198?</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0 [recommend -rom3 = PAK1]"/>
+		<sharedfeat name="compatibility" value="2,3" />
+		<part name="cart" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="db-s.mbp" size="0x2000" crc="e2094771" sha1="62d7fb66c91d2bd24523bc84e4f005cf2c4480bb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pascal">
+		<description>Pascal</description>
+		<year>198?</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
+		<sharedfeat name="compatibility" value="1,2,3" />
+		<part name="cart1" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="pascal.mbp" size="0x2000" crc="d67c1ce4" sha1="6140fca6cc3e8315f2eb38a7341268fe2d123b71" />
+			</dataarea>
+		</part>
+		<part name="cart2" interface="mbee_net">
+			<dataarea name="rom" size="0x1000">
+				<rom name="pascal.mbn" size="0x1000" crc="b4830252" sha1="98593db159242f8c98f5321253c03ab588b106ba" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

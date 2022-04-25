@@ -27,8 +27,8 @@ public:
 	// construction/destruction
 	x68k_neptune_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER(x68k_neptune_port_r);
-	DECLARE_WRITE16_MEMBER(x68k_neptune_port_w);
+	uint16_t x68k_neptune_port_r(offs_t offset, uint16_t mem_mask = ~0);
+	void x68k_neptune_port_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 protected:
 	// device-level overrides

@@ -647,7 +647,6 @@ VIDEO_START_MEMBER(dynax_state,neruton)
 void dynax_state::hanamai_copylayer(bitmap_ind16 &bitmap, const rectangle &cliprect, int i )
 {
 	int color;
-	int scrollx, scrolly;
 
 	switch (i)
 	{
@@ -660,8 +659,8 @@ void dynax_state::hanamai_copylayer(bitmap_ind16 &bitmap, const rectangle &clipr
 
 	color += (m_blit_palbank & 0x0f) * 16;
 
-	scrollx = m_blit_scroll_x;
-	scrolly = m_blit_scroll_y;
+	int scrollx = m_blit_scroll_x;
+	int scrolly = m_blit_scroll_y;
 
 	if (i == 1 && (m_layer_layout == LAYOUT_HANAMAI  || m_layer_layout == LAYOUT_HNORIDUR))
 	{
@@ -670,16 +669,16 @@ void dynax_state::hanamai_copylayer(bitmap_ind16 &bitmap, const rectangle &clipr
 	}
 
 	{
-		int dy, length, pen;
-		uint8_t *src1 = m_pixmap[i][1].get();
-		uint8_t *src2 = m_pixmap[i][0].get();
+		uint8_t const *src1 = m_pixmap[i][1].get();
+		uint8_t const *src2 = m_pixmap[i][0].get();
 
-		int palbase = 16 * color;
+		int const palbase = 16 * color;
 
-		for (dy = 0; dy < 256; dy++)
+		for (int dy = 0; dy < 256; dy++)
 		{
+			int length, pen;
 			uint16_t *dst;
-			uint16_t *dstbase = &bitmap.pix16((dy - scrolly) & 0xff);
+			uint16_t *const dstbase = &bitmap.pix((dy - scrolly) & 0xff);
 
 			length = scrollx;
 			dst = dstbase + 2 * (256 - length);
@@ -736,17 +735,17 @@ void dynax_state::jantouki_copylayer( bitmap_ind16 &bitmap, const rectangle &cli
 	}
 
 	{
-		int dy, length, pen;
-		uint8_t *src1 = m_pixmap[i][1].get();
-		uint8_t *src2 = m_pixmap[i][0].get();
+		uint8_t const *src1 = m_pixmap[i][1].get();
+		uint8_t const *src2 = m_pixmap[i][0].get();
 
-		int palbase = 16 * color;
+		int const palbase = 16 * color;
 
-		for (dy = 0; dy < 256; dy++)
+		for (int dy = 0; dy < 256; dy++)
 		{
-			int sy = ((dy - scrolly) & 0xff) + y;
+			int length, pen;
+			int const sy = ((dy - scrolly) & 0xff) + y;
 			uint16_t *dst;
-			uint16_t *dstbase = &bitmap.pix16(sy);
+			uint16_t *const dstbase = &bitmap.pix(sy);
 
 			if ((sy < cliprect.top()) || (sy > cliprect.bottom()))
 			{
@@ -784,7 +783,6 @@ void dynax_state::jantouki_copylayer( bitmap_ind16 &bitmap, const rectangle &cli
 void dynax_state::mjdialq2_copylayer( bitmap_ind16 &bitmap, const rectangle &cliprect, int i )
 {
 	int color;
-	int scrollx, scrolly;
 
 	switch (i)
 	{
@@ -795,19 +793,19 @@ void dynax_state::mjdialq2_copylayer( bitmap_ind16 &bitmap, const rectangle &cli
 
 	color += (m_blit_palbank & 1) * 16;
 
-	scrollx = m_blit_scroll_x;
-	scrolly = m_blit_scroll_y;
+	int const scrollx = m_blit_scroll_x;
+	int const scrolly = m_blit_scroll_y;
 
 	{
-		int dy, length, pen;
-		uint8_t *src = m_pixmap[i][0].get();
+		uint8_t const *src = m_pixmap[i][0].get();
 
-		int palbase = 16 * color;
+		int const palbase = 16 * color;
 
-		for (dy = 0; dy < 256; dy++)
+		for (int dy = 0; dy < 256; dy++)
 		{
+			int length, pen;
 			uint16_t *dst;
-			uint16_t *dstbase = &bitmap.pix16((dy - scrolly) & 0xff);
+			uint16_t *const dstbase = &bitmap.pix((dy - scrolly) & 0xff);
 
 			length = scrollx;
 			dst = dstbase + 256 - length;
@@ -948,6 +946,7 @@ uint32_t dynax_state::screen_update_hanamai(screen_device &screen, bitmap_ind16 
 	switch (m_hanamai_priority)
 	{
 		default:    popmessage("unknown priority %02x", m_hanamai_priority);
+		[[fallthrough]]; // FIXME: really?
 		case 0x10:  lay[0] = 0; lay[1] = 1; lay[2] = 2; lay[3] = 3; break;
 		case 0x11:  lay[0] = 0; lay[1] = 3; lay[2] = 2; lay[3] = 1; break;
 		case 0x12:  lay[0] = 0; lay[1] = 1; lay[2] = 3; lay[3] = 2; break;
@@ -1017,7 +1016,7 @@ uint32_t dynax_state::screen_update_sprtmtch(screen_device &screen, bitmap_ind16
 	return 0;
 }
 
-uint32_t dynax_state::screen_update_jantouki_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dynax_state::screen_update_jantouki_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = m_layer_enable;
 
@@ -1035,7 +1034,7 @@ uint32_t dynax_state::screen_update_jantouki_top(screen_device &screen, bitmap_i
 	return 0;
 }
 
-uint32_t dynax_state::screen_update_jantouki_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dynax_state::screen_update_jantouki_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = m_layer_enable;
 

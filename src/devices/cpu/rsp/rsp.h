@@ -14,9 +14,6 @@
 
 #pragma once
 
-#include "cpu/drcfe.h"
-#include "cpu/drcuml.h"
-
 /***************************************************************************
     REGISTER ENUMERATION
 ***************************************************************************/
@@ -81,14 +78,9 @@ enum
 #define RSP_STATUS_SIGNAL6       0x2000
 #define RSP_STATUS_SIGNAL7       0x4000
 
-#define RSPDRC_STRICT_VERIFY    0x0001          /* verify all instructions */
-
-
 class rsp_device : public cpu_device
 {
-	class frontend;
 	class cop2;
-	class cop2_drc;
 
 public:
 	// construction/destruction
@@ -101,24 +93,6 @@ public:
 	auto sp_reg_r() { return m_sp_reg_r_func.bind(); }
 	auto sp_reg_w() { return m_sp_reg_w_func.bind(); }
 	auto status_set() { return m_sp_set_status_func.bind(); }
-
-	void rspdrc_flush_drc_cache();
-	void rspdrc_set_options(uint32_t options);
-	void rsp_add_dmem(uint32_t *base);
-	void rsp_add_imem(uint32_t *base);
-
-	void ccfunc_read8();
-	void ccfunc_read16();
-	void ccfunc_read32();
-	void ccfunc_write8();
-	void ccfunc_write16();
-	void ccfunc_write32();
-	void ccfunc_get_cop0_reg();
-	void ccfunc_set_cop0_reg();
-	void ccfunc_sp_set_status_cb();
-	void ccfunc_unimplemented();
-
-	uint8_t* get_dmem() { return m_dmem8; }
 
 protected:
 	// device-level overrides
@@ -146,95 +120,56 @@ protected:
 
 	void unimplemented_opcode(uint32_t op);
 
-	/* internal compiler state */
-	struct compiler_state
-	{
-		compiler_state &operator=(compiler_state &) = delete;
-
-		uint32_t              cycles;                   /* accumulated cycles */
-		uint8_t               checkints;                /* need to check interrupts before next instruction */
-		uint8_t               checksoftints;            /* need to check software interrupts before next instruction */
-		uml::code_label     labelnum;                 /* index for local labels */
-	};
-
 private:
-	address_space_config m_program_config;
+	address_space_config m_imem_config;
+	address_space_config m_dmem_config;
 
-	/* fast RAM info */
-	struct fast_ram_info
-	{
-		offs_t              start;                      /* start of the RAM block */
-		offs_t              end;                        /* end of the RAM block */
-		bool                readonly;                   /* true if read-only */
-		void *              base;                       /* base in memory where the RAM lives */
-	};
+	uint16_t m_pc;
+	uint32_t m_r[35];
+	int m_icount;
+	int m_ideduct;
+	bool m_scalar_busy;
+	bool m_vector_busy;
+	bool m_paired_busy;
 
-	/* core state */
-	drc_cache           m_cache;                      /* pointer to the DRC code cache */
-	std::unique_ptr<drcuml_state>  m_drcuml;                     /* DRC UML generator state */
-	std::unique_ptr<frontend>      m_drcfe;                      /* pointer to the DRC front-end state */
-	uint32_t              m_drcoptions;                 /* configurable DRC options */
-
-	/* internal stuff */
-	uint8_t               m_cache_dirty;                /* true if we need to flush the cache */
-
-	/* parameters for subroutines */
-	uint64_t              m_numcycles;                  /* return value from gettotalcycles */
-	const char *        m_format;                     /* format string for print_debug */
-	uint32_t              m_arg2;                       /* print_debug argument 3 */
-	uint32_t              m_arg3;                       /* print_debug argument 4 */
-
-	/* register mappings */
-	uml::parameter   m_regmap[34];                 /* parameter to register mappings for all 32 integer registers */
-
-	/* subroutines */
-	uml::code_handle *   m_entry;                      /* entry point */
-	uml::code_handle *   m_nocode;                     /* nocode exception handler */
-	uml::code_handle *   m_out_of_cycles;              /* out of cycles exception handler */
-	uml::code_handle *   m_read8;                      /* read byte */
-	uml::code_handle *   m_write8;                     /* write byte */
-	uml::code_handle *   m_read16;                     /* read half */
-	uml::code_handle *   m_write16;                    /* write half */
-	uml::code_handle *   m_read32;                     /* read word */
-	uml::code_handle *   m_write32;                    /* write word */
-
-	struct internal_rsp_state
-	{
-		uint32_t pc;
-		uint32_t r[35];
-		uint32_t arg0;
-		uint32_t arg1;
-		uint32_t jmpdest;
-		int icount;
-	};
-
-	internal_rsp_state *m_rsp_state;
+	void update_scalar_op_deduction();
+	void update_vector_op_deduction();
 
 	FILE *m_exec_output;
 
 	uint32_t m_sr;
 	uint32_t m_step_count;
 
-	uint32_t m_ppc;
-	uint32_t m_nextpc;
+	uint16_t m_ppc;
+	uint16_t m_nextpc;
 
 protected:
-	memory_access<32, 2, 0, ENDIANNESS_BIG>::cache m_pcache;
-	memory_access<32, 2, 0, ENDIANNESS_BIG>::specific m_program;
+	memory_access<12, 2, 0, ENDIANNESS_BIG>::cache m_icache;
+	memory_access<12, 2, 0, ENDIANNESS_BIG>::specific m_imem;
+	memory_access<12, 2, 0, ENDIANNESS_BIG>::cache m_dcache;
+	memory_access<12, 2, 0, ENDIANNESS_BIG>::specific m_dmem;
 
 private:
-	std::unique_ptr<cop2>    m_cop2;
+	union VECTOR_REG
+	{
+		uint64_t d[2];
+		uint32_t l[4];
+		uint16_t w[8];
+		int16_t  s[8];
+		uint8_t  b[16];
+	};
 
-	uint32_t *m_dmem32;
-	uint16_t *m_dmem16;
-	uint8_t *m_dmem8;
-
-	uint32_t *m_imem32;
-	uint16_t *m_imem16;
-	uint8_t *m_imem8;
+	union ACCUMULATOR_REG
+	{
+		uint64_t q;
+		uint32_t l[2];
+		uint16_t w[4];
+	};
 
 	uint32_t m_debugger_temp;
-	bool m_isdrc;
+	uint16_t m_pc_temp;
+	uint16_t m_ppc_temp;
+	uint16_t m_nextpc_temp;
 
 	devcb_read32 m_dp_reg_r_func;
 	devcb_write32 m_dp_reg_w_func;
@@ -242,42 +177,40 @@ private:
 	devcb_write32 m_sp_reg_w_func;
 	devcb_write32 m_sp_set_status_func;
 
-	uint8_t READ8(uint32_t address);
-	uint16_t READ16(uint32_t address);
-	uint32_t READ32(uint32_t address);
-	void WRITE8(uint32_t address, uint8_t data);
-	void WRITE16(uint32_t address, uint16_t data);
-	void WRITE32(uint32_t address, uint32_t data);
+	uint8_t read_dmem_byte(uint32_t address);
+	uint16_t read_dmem_word(uint32_t address);
+	uint32_t read_dmem_dword(uint32_t address);
+	void write_dmem_byte(uint32_t address, uint8_t data);
+	void write_dmem_word(uint32_t address, uint16_t data);
+	void write_dmem_dword(uint32_t address, uint32_t data);
 	uint32_t get_cop0_reg(int reg);
 	void set_cop0_reg(int reg, uint32_t data);
-	void load_fast_iregs(drcuml_block &block);
-	void save_fast_iregs(drcuml_block &block);
-	uint8_t DM_READ8(uint32_t address);
-	uint16_t DM_READ16(uint32_t address);
-	uint32_t DM_READ32(uint32_t address);
-	void DM_WRITE8(uint32_t address, uint8_t data);
-	void DM_WRITE16(uint32_t address, uint16_t data);
-	void DM_WRITE32(uint32_t address, uint32_t data);
 	void rspcom_init();
-	void execute_run_drc();
-	void code_flush_cache();
-	void code_compile_block(offs_t pc);
-	void static_generate_entry_point();
-	void static_generate_nocode_handler();
-	void static_generate_out_of_cycles();
-	void static_generate_memory_accessor(int size, int iswrite, const char *name, uml::code_handle *&handleptr);
-	void generate_update_cycles(drcuml_block &block, compiler_state &compiler, uml::parameter param, bool allow_exception);
-	void generate_checksum_block(drcuml_block &block, compiler_state &compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
-	void generate_sequence_instruction(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
-	void generate_delay_slot_and_branch(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint8_t linkreg);
-	void generate_branch(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
-	bool generate_opcode(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
-	bool generate_special(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
-	bool generate_regimm(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
-	bool generate_cop0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
-	void log_add_disasm_comment(drcuml_block &block, uint32_t pc, uint32_t op);
-};
 
+	// COP2 (vectors)
+	uint16_t SATURATE_ACCUM(int accum, int slice, uint16_t negative, uint16_t positive);
+
+	uint16_t          m_vres[8];
+	VECTOR_REG        m_v[32];
+	ACCUMULATOR_REG   m_accum[8];
+	uint8_t           m_vcarry;
+	uint8_t           m_vcompare;
+	uint8_t           m_vclip1;
+	uint8_t           m_vzero;
+	uint8_t           m_vclip2;
+
+	int32_t           m_reciprocal_res;
+	uint32_t          m_reciprocal_high;
+	int32_t           m_dp_allowed;
+
+	void              handle_cop2(uint32_t op);
+	void              handle_lwc2(uint32_t op);
+	void              handle_swc2(uint32_t op);
+	void              handle_vector_ops(uint32_t op);
+
+	uint32_t          m_div_in;
+	uint32_t          m_div_out;
+};
 
 DECLARE_DEVICE_TYPE(RSP, rsp_device)
 

@@ -6,16 +6,21 @@
 
     Dragon DOS disk images
 
-	I am not happy with the sector allocation algorithm
+    I am not happy with the sector allocation algorithm
 
 ****************************************************************************/
 
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
 #include "imgtool.h"
-#include "formats/coco_dsk.h"
+#include "filter.h"
 #include "iflopimg.h"
+
+#include "formats/coco_dsk.h"
+#include "corestr.h"
+#include "opresolv.h"
+
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 #ifdef _MSC_VER
 #pragma pack(push,1)
@@ -68,7 +73,7 @@ struct dgndos_direnum
 #define HEADER_EXTENTS_COUNT 4
 #define CONT_EXTENTS_COUNT 7
 
-#define DGNDOS_DELETED_BIT	0x80       // deleted entry
+#define DGNDOS_DELETED_BIT  0x80       // deleted entry
 #define DGNDOS_CONTINUED_BIT 0x20      // byte at offset 0x18 give next entry number
 #define DGNDOS_END_BIT 0x08            // end of directory
 #define DGNDOS_PROTECT_BIT 0x02        // ignored
@@ -149,13 +154,13 @@ static imgtoolerr_t dgndos_get_geometry(uint8_t *entire_track, int *bitmap_count
 
 	if( (~tod & 0xff) != entire_track[0xfe])
 	{
-// 		fprintf( stderr, "tracks_on_disk check failed: %u == %u\n", (~tod & 0xff), entire_track[0xfe] );
+//      fprintf( stderr, "tracks_on_disk check failed: %u == %u\n", (~tod & 0xff), entire_track[0xfe] );
 		return IMGTOOLERR_CORRUPTIMAGE;
 	}
 
 	if( (~spt & 0xff) != entire_track[0xff])
 	{
-// 		fprintf( stderr, "sectors_per_track check failed: %u == %u\n", (~spt & 0xff), entire_track[0xff] );
+//      fprintf( stderr, "sectors_per_track check failed: %u == %u\n", (~spt & 0xff), entire_track[0xff] );
 		return IMGTOOLERR_CORRUPTIMAGE;
 	}
 
@@ -169,7 +174,7 @@ static imgtoolerr_t dgndos_get_geometry(uint8_t *entire_track, int *bitmap_count
 	}
 	else
 	{
-// 		fprintf( stderr, "sides check failed\n" );
+//      fprintf( stderr, "sides check failed\n" );
 		return IMGTOOLERR_CORRUPTIMAGE;
 	}
 
@@ -518,8 +523,8 @@ static imgtoolerr_t dgndos_diskimage_nextenum(imgtool::directory &enumeration, i
 	}
 	else
 	{
- 		err = dgndos_get_file_size(entire_track20, dgnent, filesize);
- 		if (err) return err;
+		err = dgndos_get_file_size(entire_track20, dgnent, filesize);
+		if (err) return err;
 
 		if (filesize == ((size_t) -1))
 		{
@@ -539,8 +544,8 @@ static imgtoolerr_t dgndos_diskimage_nextenum(imgtool::directory &enumeration, i
 		err = dgndos_count_dirents(entire_track20, dgnent, &dir_ent_count);
 		if (err) return err;
 
-		snprintf(ent.filename, ARRAY_LENGTH(ent.filename), "%s", fname.c_str());
-		snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "%c (%03d)",
+		snprintf(ent.filename, std::size(ent.filename), "%s", fname.c_str());
+		snprintf(ent.attr, std::size(ent.attr), "%c (%03d)",
 			(char) (dgnent.flag_byte & DGNDOS_PROTECT_BIT ? 'P' : '.'),
 			dir_ent_count);
 	}
@@ -906,7 +911,7 @@ static imgtoolerr_t dgndos_diskimage_writefile(imgtool::partition &partition, co
 			int de_count = 0;
 			int de_dont_delete = position;
 			int lsn, count;
-			int	save_next_de;
+			int save_next_de;
 
 			save_next_de = ent.dngdos_last_or_next;
 			ent.dngdos_last_or_next = last_sector_size;

@@ -208,7 +208,7 @@ void hd66421_device::reg_dat_w(uint8_t data)
 
 void hd66421_device::plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color)
 {
-	bitmap.pix16(y, x) = (uint16_t)color;
+	bitmap.pix(y, x) = (uint16_t)color;
 }
 
 uint32_t hd66421_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

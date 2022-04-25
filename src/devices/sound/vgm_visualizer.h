@@ -91,10 +91,10 @@ protected:
 	virtual void device_reset() override;
 
 	// device_sound_interface-level overrides
-	void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
-	void update_waveform(stream_sample_t **outputs);
-	void update_fft(stream_sample_t **outputs);
+	void update_waveform();
+	void update_fft();
 
 	void init_palette(palette_device &palette) const;
 

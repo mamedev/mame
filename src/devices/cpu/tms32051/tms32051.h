@@ -59,8 +59,8 @@ public:
 	// construction/destruction
 	tms32051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER( cpuregs_r );
-	DECLARE_WRITE16_MEMBER( cpuregs_w );
+	uint16_t cpuregs_r(offs_t offset);
+	void cpuregs_w(offs_t offset, uint16_t data);
 
 	void tms32051_internal_data(address_map &map);
 	void tms32051_internal_pgm(address_map &map);

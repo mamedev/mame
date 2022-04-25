@@ -26,13 +26,13 @@ license:CC0
 
 	 SP-01  (unknown)
 	*SP-02  'Super Cartridge' SP-2
-	*SP-03  'Super Cartridge' SP-3
+	*SP-03  'Super Cartridge' SP-3 TV Pop
 	*SP-04  'Super Cartridge' SP-4
-	 SP-05
+	*SP-05  'Super Cartridge' SP-5 TV POP Junior with Chibi Marukochan & Anpanman
 	 SP-06  (seen)
 	 SP-07  (seen)
 
-	(more? what's the SP highest number?)
+	(more? what's the SP highest number? correct titles for each of these etc.)
 
 	-->
 
@@ -41,7 +41,7 @@ license:CC0
 		<year>2004</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24lc04"/>
+			<feature name="slot" value="rom_24c08_epitch"/> <!-- FIXME: actually 24c04 -->
 			<dataarea name="rom" size="0x200000">
 				<rom name="sp02.u1" size="0x200000" crc="c8a84ded" sha1="02ffa04cdc7732fd3ab75505c5cc68bda130c7ee"/>
 			</dataarea>
@@ -49,11 +49,11 @@ license:CC0
 	</software>
 
 	<software name="sp03">
-		<description>SP-03 Super Cartridge (Japan)</description>
+		<description>SP-03 Super Cartridge - TV Pop (Japan)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24lc04"/>
+			<feature name="slot" value="rom_24c08_epitch"/> <!-- FIXME: actually 24c04 -->
 			<dataarea name="rom" size="0x200000">
 				<rom name="sp03.u1" size="0x200000" crc="cd7dbbaf" sha1="cc62c10f8f83015e4c472bc41e9a1fd7ac497655"/>
 			</dataarea>
@@ -65,9 +65,21 @@ license:CC0
 		<year>2004</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24lc04"/>
+			<feature name="slot" value="rom_24c08_epitch"/> <!-- FIXME: actually 24c04 -->
 			<dataarea name="rom" size="0x200000">
 				<rom name="sp04.u1" size="0x200000" crc="77818ddb" sha1="708980b1ae30864bd3395ef663de1c57ecbc113c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sp05">
+		<description>SP-05 Super Cartridge - TV POP Junior with Chibi Marukochan &amp; Anpanman (Japan)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24c08_epitch"/> <!-- FIXME: actually 24c04 -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="sp05.u1" size="0x200000" crc="f5ae63b2" sha1="d471ee862aa2ab790defb57873a10862531fd76b"/>
 			</dataarea>
 		</part>
 	</software>

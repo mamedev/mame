@@ -58,7 +58,7 @@ private:
 	emu_timer *m_sportspad_timer;
 	static const device_timer_id TIMER_SPORTSPAD = 0;
 
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 

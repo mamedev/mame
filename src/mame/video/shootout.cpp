@@ -64,13 +64,13 @@ TILE_GET_INFO_MEMBER(shootout_state::get_fg_tile_info)
 			0);
 }
 
-WRITE8_MEMBER(shootout_state::videoram_w)
+void shootout_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_background->mark_tile_dirty(offset&0x3ff );
 }
 
-WRITE8_MEMBER(shootout_state::textram_w)
+void shootout_state::textram_w(offs_t offset, uint8_t data)
 {
 	m_textram[offset] = data;
 	m_foreground->mark_tile_dirty(offset&0x3ff );

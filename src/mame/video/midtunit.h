@@ -37,18 +37,18 @@ public:
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
 
-	DECLARE_READ16_MEMBER(midtunit_vram_r);
-	DECLARE_WRITE16_MEMBER(midtunit_vram_w);
-	DECLARE_READ16_MEMBER(midtunit_gfxrom_r);
-	DECLARE_WRITE16_MEMBER(midtunit_vram_data_w);
-	DECLARE_WRITE16_MEMBER(midtunit_vram_color_w);
-	DECLARE_READ16_MEMBER(midtunit_vram_data_r);
-	DECLARE_READ16_MEMBER(midtunit_vram_color_r);
+	uint16_t midtunit_vram_r(offs_t offset);
+	void midtunit_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t midtunit_gfxrom_r(offs_t offset);
+	void midtunit_vram_data_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void midtunit_vram_color_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t midtunit_vram_data_r(offs_t offset);
+	uint16_t midtunit_vram_color_r(offs_t offset);
 
-	DECLARE_READ16_MEMBER(midtunit_dma_r);
-	DECLARE_WRITE16_MEMBER(midtunit_dma_w);
+	uint16_t midtunit_dma_r(offs_t offset);
+	void midtunit_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE16_MEMBER(midtunit_control_w);
+	void midtunit_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void set_gfx_rom_large(bool gfx_rom_large) { m_gfx_rom_large = gfx_rom_large; }
 
@@ -64,7 +64,7 @@ protected:
 	midtunit_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	static const device_timer_id TIMER_DMA = 0;
 
@@ -79,7 +79,7 @@ protected:
 	static constexpr uint32_t YPOSMASK = 0x1ff;
 
 	template <int BitsPerPixel, bool XFlip, bool Skip, bool Scale, op_type_t Zero, op_type_t NonZero> void dma_draw();
-	void dma_draw_none() {};
+	void dma_draw_none() {}
 
 	typedef void (midtunit_video_device::*draw_func)();
 	draw_func m_dma_draw_skip_scale[8*32];
@@ -173,9 +173,9 @@ protected:
 	bitmap_argb32 m_log_bitmap;
 
 	void debug_init();
-	void debug_commands(int ref, const std::vector<std::string> &params);
-	void debug_help_command(int ref, const std::vector<std::string> &params);
-	void debug_png_dma_command(int ref, const std::vector<std::string> &params);
+	void debug_commands(const std::vector<std::string> &params);
+	void debug_help_command(const std::vector<std::string> &params);
+	void debug_png_dma_command(const std::vector<std::string> &params);
 	void log_bitmap(int command, int bpp, bool skip);
 };
 
@@ -193,10 +193,10 @@ public:
 	}
 	midwunit_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	DECLARE_READ16_MEMBER(midwunit_gfxrom_r);
+	uint16_t midwunit_gfxrom_r(offs_t offset);
 
-	DECLARE_WRITE16_MEMBER(midwunit_control_w);
-	DECLARE_READ16_MEMBER(midwunit_control_r);
+	void midwunit_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t midwunit_control_r();
 
 protected:
 	midwunit_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
@@ -222,8 +222,8 @@ public:
 
 	midxunit_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	DECLARE_WRITE16_MEMBER(midxunit_paletteram_w);
-	DECLARE_READ16_MEMBER(midxunit_paletteram_r);
+	void midxunit_paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t midxunit_paletteram_r(offs_t offset);
 
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
 

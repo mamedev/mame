@@ -359,6 +359,28 @@ public:
 };
 
 
+// ======================> sega8_korean_188_device
+
+class sega8_korean_188_device : public sega8_rom_device
+{
+public:
+	// construction/destruction
+	sega8_korean_188_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	// reading and writing
+	virtual u8 read_cart(offs_t offset) override;
+	virtual void write_cart(offs_t offset, u8 data) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	u8 m_rom_bank_base;
+};
+
+
 // ======================> sega8_korean_nb_device
 
 class sega8_korean_nb_device : public sega8_rom_device
@@ -450,6 +472,33 @@ private:
 	uint8_t m_block;
 };
 
+class sega8_x_terminator_device : public sega8_rom_device
+{
+public:
+	sega8_x_terminator_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual ioport_constructor device_input_ports() const override;
+
+	// reading and writing
+	virtual uint8_t read_cart(offs_t offset) override;
+	virtual void write_cart(offs_t offset, uint8_t data) override;
+	virtual void write_mapper(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_io(offs_t offset) override;
+	virtual void write_io(offs_t offset, uint8_t data) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	required_device<sega8_cart_slot_device> m_subslot;
+	required_ioport m_switch;
+	required_ioport m_reset;
+	bool m_active;
+};
 
 // device type definition
 DECLARE_DEVICE_TYPE(SEGA8_ROM_STD,          sega8_rom_device)
@@ -468,9 +517,11 @@ DECLARE_DEVICE_TYPE(SEGA8_ROM_NEMESIS,      sega8_nemesis_device)
 DECLARE_DEVICE_TYPE(SEGA8_ROM_JANGGUN,      sega8_janggun_device)
 DECLARE_DEVICE_TYPE(SEGA8_ROM_HICOM,        sega8_hicom_device)
 DECLARE_DEVICE_TYPE(SEGA8_ROM_KOREAN,       sega8_korean_device)
+DECLARE_DEVICE_TYPE(SEGA8_ROM_KOREAN_188,   sega8_korean_188_device)
 DECLARE_DEVICE_TYPE(SEGA8_ROM_KOREAN_NB,    sega8_korean_nb_device)
 DECLARE_DEVICE_TYPE(SEGA8_ROM_SEOJIN,       sega8_seojin_device)
 DECLARE_DEVICE_TYPE(SEGA8_ROM_MULTICART,    sega8_multicart_device)
 DECLARE_DEVICE_TYPE(SEGA8_ROM_MEGACART,     sega8_megacart_device)
+DECLARE_DEVICE_TYPE(SEGA8_ROM_X_TERMINATOR, sega8_x_terminator_device)
 
 #endif // MAME_BUS_SEGA8_ROM_H

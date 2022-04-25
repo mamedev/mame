@@ -60,7 +60,7 @@ void spg_renderer_device::device_reset()
 	m_video_regs_1e = 0x0000;
 
 	m_video_regs_2a = 0x0000;
-	
+
 	m_video_regs_30 = 0x0000;
 	m_video_regs_3c = 0x0020;
 
@@ -140,8 +140,8 @@ void spg_renderer_device::draw_tilestrip(bool read_from_csspace, uint32_t screen
 				{
 
 					m_linebuf[realdrawpos] = (mix_channel((uint8_t)(m_linebuf[realdrawpos] >> 10) & 0x1f,  (rgb >> 10) & 0x1f, blendlevel) << 10) |
-						                     (mix_channel((uint8_t)(m_linebuf[realdrawpos] >> 5)  & 0x1f,  (rgb >> 5)  & 0x1f, blendlevel) << 5) |
-						                     (mix_channel((uint8_t)(m_linebuf[realdrawpos] >> 0)  & 0x1f,  (rgb >> 0)  & 0x1f, blendlevel) << 0);
+											 (mix_channel((uint8_t)(m_linebuf[realdrawpos] >> 5)  & 0x1f,  (rgb >> 5)  & 0x1f, blendlevel) << 5) |
+											 (mix_channel((uint8_t)(m_linebuf[realdrawpos] >> 0)  & 0x1f,  (rgb >> 0)  & 0x1f, blendlevel) << 0);
 				}
 				else
 				{
@@ -158,7 +158,7 @@ void spg_renderer_device::draw_linemap(bool has_extended_tilemaps, const rectang
 	if (has_extended_tilemaps)
 	{
 		uint32_t ctrl = tilemapregs[1];
-		
+
 		if (0)
 		{
 			if (ctrl & 0x0010)
@@ -350,7 +350,7 @@ void spg_renderer_device::update_vcmp_table()
 			{
 				m_ycmp_table[i] = currentline;
 			}
-			
+
 			counter += current_inc_value;
 
 			while (counter >= (0x20<<4))
@@ -415,8 +415,9 @@ void spg_renderer_device::draw_page(bool read_from_csspace, bool has_extended_ti
 
 	if (ctrl & 0x0040) // 'vertical compression feature' (later models only?)
 	{
-		if (m_video_regs_1e != 0x0000)
-			popmessage("vertical compression mode with non-0 step amount %04x offset %04x step %04x\n", m_video_regs_1c, m_video_regs_1d, m_video_regs_1e);
+		// used by senspeed
+		//if (m_video_regs_1e != 0x0000)
+		//  popmessage("vertical compression mode with non-0 step amount %04x offset %04x step %04x\n", m_video_regs_1c, m_video_regs_1d, m_video_regs_1e);
 
 		logical_scanline = m_ycmp_table[scanline];
 		if (logical_scanline == 0xffffffff)
@@ -427,7 +428,7 @@ void spg_renderer_device::draw_page(bool read_from_csspace, bool has_extended_ti
 	uint32_t y_mask;
 	uint32_t screenwidth;
 
-	 
+
 	if (read_from_csspace && (attr & 0x8000)) // is this only available in high res mode, or always?
 	{
 		// just a guess based on this being set on the higher resolution tilemaps we've seen, could be 100% incorrect register
@@ -466,7 +467,11 @@ void spg_renderer_device::draw_page(bool read_from_csspace, bool has_extended_ti
 	const uint32_t bits_per_row = nc_bpp * tile_w / 16;
 	//const uint32_t words_per_tile = bits_per_row * tile_h;
 	const bool row_scroll = (ctrl & 0x0010);
-	uint8_t blendlevel = (m_video_regs_2a & 3) << 3;
+
+	// Max blend level (3) should result in 100% opacity, per docs
+	// Min blend level (0) should result in 25% opacity, per docs
+	static const uint8_t s_blend_levels[4] = { 0x08, 0x10, 0x18, 0x20 };
+	uint8_t blendlevel = s_blend_levels[m_video_regs_2a & 3];
 
 	uint32_t words_per_tile;
 
@@ -596,7 +601,7 @@ void spg_renderer_device::draw_page(bool read_from_csspace, bool has_extended_ti
 	}
 }
 
-void spg_renderer_device::draw_sprite(bool read_from_csspace, bool has_extended_sprites, bool alt_extrasprite_hack, uint32_t palbank, bool highres, const rectangle& cliprect, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, uint32_t base_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram)
+void spg_renderer_device::draw_sprite(bool read_from_csspace, int extended_sprites_mode, bool alt_extrasprite_hack, uint32_t palbank, bool highres, const rectangle& cliprect, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, uint32_t base_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram)
 {
 	uint32_t tilegfxdata_addr = spritegfxdata_addr;
 	uint32_t tile = spriteram[base_addr + 0];
@@ -616,7 +621,7 @@ void spg_renderer_device::draw_sprite(bool read_from_csspace, bool has_extended_
 
 
 	uint32_t screenwidth = 320;
-//	uint32_t screenheight = 240;
+//  uint32_t screenheight = 240;
 	uint32_t screenheight = 256;
 	uint32_t xmask = 0x1ff;
 	uint32_t ymask = 0x1ff;
@@ -624,7 +629,7 @@ void spg_renderer_device::draw_sprite(bool read_from_csspace, bool has_extended_
 	if (highres)
 	{
 		screenwidth = 640;
-//		screenheight = 480;
+//      screenheight = 480;
 		screenheight = 512;
 		xmask = 0x3ff;
 		ymask = 0x3ff;
@@ -636,7 +641,7 @@ void spg_renderer_device::draw_sprite(bool read_from_csspace, bool has_extended_
 	if (!(m_video_regs_42 & 0x0002))
 	{
 		x = ((screenwidth/2) + x) - tile_w / 2;
-//		y = ((screenheight/2) - y) - (tile_h / 2) + 8;
+//      y = ((screenheight/2) - y) - (tile_h / 2) + 8;
 		y = ((screenheight/2) - y) - (tile_h / 2);
 	}
 
@@ -652,12 +657,16 @@ void spg_renderer_device::draw_sprite(bool read_from_csspace, bool has_extended_
 	const uint8_t bpp = attr & 0x0003;
 	const uint32_t nc_bpp = ((bpp)+1) << 1;
 	const uint32_t bits_per_row = nc_bpp * tile_w / 16;
-	uint8_t blendlevel = (m_video_regs_2a & 3) << 3;
+
+	// Max blend level (3) should result in 100% opacity on the sprite, per docs
+	// Min blend level (0) should result in 25% opacity on the sprite, per docs
+	static const uint8_t s_blend_levels[4] = { 0x08, 0x10, 0x18, 0x20 };
+	uint8_t blendlevel = s_blend_levels[m_video_regs_2a & 3];
 
 	uint32_t words_per_tile;
-	
+
 	// good for gormiti, smartfp, wrlshunt, paccon, jak_totm, jak_s500, jak_gtg
-	if (has_extended_sprites && ((m_video_regs_42 & 0x0010) == 0x10))
+	if (extended_sprites_mode && ((m_video_regs_42 & 0x0010) == 0x10))
 	{
 		// paccon and smartfp use this mode
 		words_per_tile = 8;
@@ -681,10 +690,11 @@ void spg_renderer_device::draw_sprite(bool read_from_csspace, bool has_extended_
 
 
 	bool flip_y = (attr & 0x0008);
-	
+
 	// various games don't want the flip bits in the usual place, wrlshunt for example, there's probably a bit to control this
 	// and likewise these bits probably now have a different meaning, so this shouldn't be trusted
-	if (has_extended_sprites)
+	// beijuehh does NOT want this either (see characters in 'empire fighter')
+	if (extended_sprites_mode)
 	{
 		if (highres || alt_extrasprite_hack)
 		{
@@ -692,13 +702,16 @@ void spg_renderer_device::draw_sprite(bool read_from_csspace, bool has_extended_
 			flip_y = 0;
 		}
 	}
-	
+
 	uint32_t palette_offset = (attr & 0x0f00) >> 4;
-	
-	if (has_extended_sprites)
+
+	if (extended_sprites_mode)
 	{
-		// guess, tkmag220 / myac220 don't set this bit and expect all sprite palettes to be from the same bank as background palettes
-		if (palbank & 1)
+		// TODO: tkmag220 / myac220 don't set this bit and expect all sprite palettes to be from the same bank as background palettes
+		// beijuehh (extended_sprites_mode == 2) appears to disagree with that logic, it has this set, but expects palettes and sprites
+		// from the first bank but also needs the attr & 0x8000 check below for the 'pause' graphics so isn't ignoring the 'extended'
+		// capabilities entirely.
+		if ((palbank & 1) && (extended_sprites_mode != 2))
 			palette_offset |= 0x100;
 
 		// many other gpl16250 sets have this bit set when they want the upper 256 colours on a per-sprite basis, seems like an extended feature
@@ -742,7 +755,7 @@ void spg_renderer_device::draw_sprite(bool read_from_csspace, bool has_extended_
 	}
 }
 
-void spg_renderer_device::draw_sprites(bool read_from_csspace, bool has_extended_sprites, bool alt_extrasprite_hack, uint32_t palbank, bool highres, const rectangle &cliprect, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram, int sprlimit)
+void spg_renderer_device::draw_sprites(bool read_from_csspace, int extended_sprites_mode, bool alt_extrasprite_hack, uint32_t palbank, bool highres, const rectangle &cliprect, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, address_space &spc, uint16_t* paletteram, uint16_t* spriteram, int sprlimit)
 {
 	if (!(m_video_regs_42 & 0x0001))
 	{
@@ -759,7 +772,7 @@ void spg_renderer_device::draw_sprites(bool read_from_csspace, bool has_extended
 
 	for (uint32_t n = 0; n < sprlimit; n++)
 	{
-		draw_sprite(read_from_csspace, has_extended_sprites, alt_extrasprite_hack, palbank, highres, cliprect, scanline, priority, spritegfxdata_addr, 4 * n, spc, paletteram, spriteram);
+		draw_sprite(read_from_csspace, extended_sprites_mode, alt_extrasprite_hack, palbank, highres, cliprect, scanline, priority, spritegfxdata_addr, 4 * n, spc, paletteram, spriteram);
 	}
 }
 
@@ -830,7 +843,7 @@ void spg_renderer_device::update_palette_lookup()
 
 void spg_renderer_device::apply_saturation_and_fade(bitmap_rgb32& bitmap, const rectangle& cliprect, int scanline)
 {
-	uint32_t* src = &bitmap.pix32(scanline, cliprect.min_x);
+	uint32_t* src = &bitmap.pix(scanline, cliprect.min_x);
 
 	for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 	{

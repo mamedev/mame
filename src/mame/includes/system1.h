@@ -59,6 +59,7 @@ public:
 	void sys2(machine_config &config);
 	void sys2_315_5177(machine_config &config);
 	void nob(machine_config &config);
+	void blockgal(machine_config &config);
 	void sys1ppisx_315_5041(machine_config &config);
 	void sys1piox_315_5132(machine_config &config);
 	void sys1piox_315_5162(machine_config &config);
@@ -92,7 +93,6 @@ public:
 	void sys1piox_315_5155(machine_config &config);
 	void sys2rowxb(machine_config &config);
 
-	void init_bank00();
 	void init_bank0c();
 	void init_bank44();
 
@@ -121,39 +121,39 @@ private:
 	// video related
 	std::unique_ptr<u8[]> m_videoram;
 	void (system1_state::*m_videomode_custom)(u8 data, u8 prevdata);
-	u8 m_videomode_prev;
+	u8 m_videomode_prev = 0;
 	std::unique_ptr<u8[]> m_mix_collide;
-	u8 m_mix_collide_summary;
+	u8 m_mix_collide_summary = 0;
 	std::unique_ptr<u8[]> m_sprite_collide;
-	u8 m_sprite_collide_summary;
+	u8 m_sprite_collide_summary = 0;
 	bitmap_ind16 m_sprite_bitmap;
-	u8 m_video_mode;
-	u8 m_videoram_bank;
-	tilemap_t *m_tilemap_page[8];
-	u8 m_tilemap_pages;
+	u8 m_video_mode = 0;
+	u8 m_videoram_bank = 0;
+	tilemap_t *m_tilemap_page[8]{};
+	u8 m_tilemap_pages = 0;
 
 	// protection, miscs
-	u8 m_mute_xor;
-	u8 m_dakkochn_mux_data;
-	u8 m_mcu_control;
-	u8 m_nob_maincpu_latch;
-	u8 m_nob_mcu_latch;
-	u8 m_nob_mcu_status;
-	int m_nobb_inport23_step;
+	u8 m_mute_xor = 0;
+	u8 m_dakkochn_mux_data = 0;
+	u8 m_mcu_control = 0;
+	u8 m_nob_maincpu_latch = 0;
+	u8 m_nob_mcu_latch = 0;
+	u8 m_nob_mcu_status = 0;
+	int m_nobb_inport23_step = 0;
 
 	// video handlers
 	void common_videomode_w(u8 data);
 	void videomode_w(u8 data);
 	void videoram_bank_w(u8 data);
-	DECLARE_READ8_MEMBER(mixer_collision_r);
-	DECLARE_WRITE8_MEMBER(mixer_collision_w);
-	DECLARE_WRITE8_MEMBER(mixer_collision_reset_w);
-	DECLARE_READ8_MEMBER(sprite_collision_r);
-	DECLARE_WRITE8_MEMBER(sprite_collision_w);
-	DECLARE_WRITE8_MEMBER(sprite_collision_reset_w);
-	DECLARE_READ8_MEMBER(videoram_r);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(paletteram_w);
+	u8 mixer_collision_r(offs_t offset);
+	void mixer_collision_w(offs_t offset, u8 data);
+	void mixer_collision_reset_w(u8 data);
+	u8 sprite_collision_r(offs_t offset);
+	void sprite_collision_w(offs_t offset, u8 data);
+	void sprite_collision_reset_w(u8 data);
+	u8 videoram_r(offs_t offset);
+	void videoram_w(offs_t offset, u8 data);
+	void paletteram_w(offs_t offset, u8 data);
 
 	// sound handlers
 	u8 sound_data_r();
@@ -162,21 +162,21 @@ private:
 
 	// misc handlers
 	void mcu_control_w(u8 data);
-	DECLARE_READ8_MEMBER(mcu_io_r);
-	DECLARE_WRITE8_MEMBER(mcu_io_w);
+	u8 mcu_io_r(offs_t offset);
+	void mcu_io_w(offs_t offset, u8 data);
 	u8 nob_mcu_latch_r();
 	void nob_mcu_latch_w(u8 data);
 	void nob_mcu_status_w(u8 data);
 	void nob_mcu_control_p2_w(u8 data);
-	DECLARE_READ8_MEMBER(nob_maincpu_latch_r);
-	DECLARE_WRITE8_MEMBER(nob_maincpu_latch_w);
-	DECLARE_READ8_MEMBER(nob_mcu_status_r);
-	DECLARE_READ8_MEMBER(nobb_inport1c_r);
-	DECLARE_READ8_MEMBER(nobb_inport22_r);
-	DECLARE_READ8_MEMBER(nobb_inport23_r);
-	DECLARE_WRITE8_MEMBER(nobb_outport24_w);
-	DECLARE_READ8_MEMBER(nob_start_r);
-	DECLARE_READ8_MEMBER(shtngmst_gunx_r);
+	u8 nob_maincpu_latch_r();
+	void nob_maincpu_latch_w(u8 data);
+	u8 nob_mcu_status_r();
+	u8 nobb_inport1c_r();
+	u8 nobb_inport22_r();
+	u8 nobb_inport23_r();
+	void nobb_outport24_w(u8 data);
+	u8 nob_start_r();
+	u8 shtngmst_gunx_r();
 
 	// video functions
 	TILE_GET_INFO_MEMBER(tile_get_info);
@@ -238,6 +238,7 @@ private:
 	void nobo_map(address_map &map);
 	void sound_map(address_map &map);
 	void system1_map(address_map &map);
+	void blockgal_pio_io_map(address_map &map);
 	void system1_pio_io_map(address_map &map);
 	void system1_ppi_io_map(address_map &map);
 };

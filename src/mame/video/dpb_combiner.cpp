@@ -141,7 +141,7 @@ void dpb7000_combiner_card_device::device_add_mconfig(machine_config &config)
 	//m_screen->set_screen_update(FUNC(dpb7000_combiner_card_device::screen_update));
 }
 
-void dpb7000_combiner_card_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void dpb7000_combiner_card_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == FSCK_TIMER)
 	{
@@ -206,7 +206,7 @@ void dpb7000_combiner_card_device::fsck_tick()
 {
     for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
     {
-        uint32_t *dest = &bitmap.pix32(y, cliprect.min_x);
+        uint32_t *dest = &bitmap.pix(y, cliprect.min_x);
         for (int x = cliprect.min_x; x <= cliprect.max_x && x < 256; x++)
         {
             *dest++ = 0xff000000 | (m_lum_out << 16) | (m_lum_out << 8) | m_lum_out;

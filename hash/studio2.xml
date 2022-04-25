@@ -3,46 +3,90 @@
 <!--
 license:CC0
 
-RCA Studio II games list
+Software list for the RCA Studio II and clones
+Software documentation and redumping by Guru
+==============================================
 
-ID      Title                   Series                  Dumped
-_________________________________________________________________
-        Bowling                 built-in                yes
-        Doodles                 built-in                yes
-        Freeway                 built-in                yes
-        Math                    built-in                yes
-        Patterns                built-in                yes
-18V400  Space War               TV Arcade I             yes
-18V401  Fun with Numbers        TV Arcade II            yes
-18V402  Tennis/Squash           TV Arcade III           yes
-18V403  Baseball                TV Arcade IV            yes
-18V404  Speedway/Tag            TV Arcade               yes
-18V405  Gunfighter/Moonship Battle   TV Arcade          yes
-18V500  Math and Social Studies TV School House I       yes
-18V501  Math Fun                TV School House II      yes
-18V600  Blackjack               TV Casino I             yes
-18V601  Bingo                   TV Casino II            no
-18V700  Biorhythm               TV Mystic               yes
+Maker  System                   Built-in Games in BIOS
+=====  =====================    ===============================================
+RCA    Studio II                Addition, Bowling, Doodle, Freeway, Patterns
+Conic  Hanimex MPT-02           none (came with pack-in cart 'Grand Pack')
+Conic  Soundic Victory MPT-02   Bowling, Blackjack I & II, Doodle, Patterns  \
+Conic  Academy Apollo 80        Bowling, Blackjack I & II, Doodle, Patterns   |
+Conic  M-1200                   Bowling, Blackjack I & II, Doodle, Patterns   |
+Conic  Sheen M-1200             Bowling, Blackjack I & II, Doodle, Patterns   | Same BIOS for all these systems
+Conic  Trevi M-1200             Bowling, Blackjack I & II, Doodle, Patterns   |
+Conic  Mustang 9016             Bowling, Blackjack I & II, Doodle, Patterns  /
 
 
-MPT-02 games list
+Carts for RCA Studio II and clones
+==================================
+Note: All carts are compatible with all RCA Studio clones listed above.
+      All RCA carts use CDP1831 512B ROMs. Later MPT-02 clones use CDP1833 1KB ROMs.
 
-ID      Title                   Series                  Dumped
-_________________________________________________________________
-MG-200  Grand Pack                                      yes
-MG-201  Bingo                                           yes
-MG-202  Concentration Match                             yes
-MG-203  Star Wars                                       yes
-MG-204  Math Fun                School House II         yes
-MG-205  Pinball                                         yes
-MG-206  Biorhythm                                       yes
-MG-207  Tennis/Squash                                   no
-MG-208  Fun with Numbers                                no
-MG-209  Computer Quiz           School House I          no
-MG-210  Baseball                                        no
-MG-211  Speedway/Tag                                    yes
-MG-212  Spacewar Intercept                              no
-MG-213  Gun Fight/Moon Ship                             yes
+                              RCA                                    Mustang
+                              Studio   Series for           MPT-02   9016                            ROM
+  Title                       II ID    RCA Studio II only   ID       ID        Dump  ROM#            Type    Qty  Note
+  =====================================================================================================================
+  Space War                   18V400   TV Arcade I          MG-212   ?         yes   ?               CDP1831 x1   *3
+  Fun with Numbers            18V401   TV Arcade II         MG-208   ?         yes   85717           CDP1831 x1
+  Tennis/Squash               18V402   TV Arcade III        MG-207   ?         yes   ?               CDP1831 x1
+  Baseball                    18V403   TV Arcade IV         MG-210   ?         yes   ?    , ?        CDP1831 x2   *5
+  Speedway/Tag                18V404   TV Arcade            MG-211   9016F     yes   ?               CDP1831 x1
+  Gunfighter/Moonship Battle  18V405   TV Arcade            MG-213   ?         yes   86195, 86196    CDP1831 x2   *5
+  Computer Quiz               18V500   TV School House I    MG-209   ?         yes   85718           CDP1831 x1
+  Math Fun                    18V501   TV School House II   MG-204   9016B     yes   86344, 86345    CDP1831 x2   *1
+  Blackjack                   18V600   TV Casino I          in BIOS  in BIOS   yes   ?    , ?        CDP1831 x2   *5
+  Bingo                       18V601   TV Casino II         MG-201   ?         yes   ?    , ?        CDP1831 x2   *5
+  Biorhythm                   18V700   TV Mystic            MG-206   9016C     yes   86624, 86625    CDP1831 x2   *5
+  Grand Pack                  -                             MG-200   in BIOS   yes   86677b, 87201   CDP1833 x2   *2 *4
+  Concentration Match         -                             MG-202   9016E     yes   87484           CDP1833 x1
+  Star Wars                   -                             MG-203   9016D     yes   87331           CDP1833 x1
+  Pinball                     -                             MG-205   9016G     yes   87330           CDP1833 x1
+
+? - Info not documented, but needed.
+
+*1 - The later MPT-02 release MG-204 'School House II Math Fun' matches the RCA 'Math Fun' release but with one single 1KB ROM with
+     ROM number 87476. There are also several other later carts that use 1KB ROMs.
+*2 - Pack-in cart only with Hanimex MPT-02 due to not having any built-in games. Cart includes Bowling, Doodle, Blackjack I & II & Patterns.
+*3 - Named 'Spacewar Intercept' for MPT-02 release.
+*4 - The ROM numbers match the Victory MPT-02 and Mustang 9016 BIOS.
+*5 - Later MPT-02 release has a single 1KB ROM and a different ROM number.
+
+Due to language differences in Germany, the Mustang 9016 carts have German game names. The actual software and game is exactly the same as
+the RCA Studio II carts.
+
+9016A   ?                                            unknown, but definitely one of the dumped games
+9016B   Mathematische Spielcassette                  matches MPT-02 Math Fun
+9016C   Biorhythmus                                  matches MPT-02 Biorhythm
+9016D   Cassette Krieg der Sterne                    matches MPT-02 Star Wars
+9016E   Cassette Konzentrationsspiele (Memory)       matches MPT-02 Concentration Match
+9016F   Sandbahnrennen                               matches MPT-02 Speedway/Tag
+9016G   Cassette Flipper                             matches MPT-02 Pinball
+
+Notes for Mustang 9016 carts:
+1. It is expected that the other games were released with Mustang 9016 carts. However only the above mentioned carts are known to exist (so far).
+2. Cart 9016A is one of the existing games and is technically dumped regardless of what game it is.
+
+Notes about the carts on all systems:
+1. After deciding to not release the RCA Studio III, RCA sold everything to Conic who made a few more games and several clone systems, all
+   nearly identical and fully compatible with each other. The deal included all the RCA games that were made up to that point, including Bingo.
+2. Several carts were dumped from each of the clones and they all match the equivalent games on the Studio II, Victory MPT-02 and Mustang 9016 clones.
+   This makes sense since all the ROMS are a special type, either CDP1831 or CDP1833, only made by RCA. So RCA continued to manufacture and
+   sell ROMs to the clone makers even after RCA themselves stopped making the Studio II console and carts.
+3. Some ROMs have (C)1980 or (C)1979 or (C)1978 but they are identical to ROMs dumped from different carts with different years marked on them from
+   Studio II, MPT-02 & Mustang 9016 consoles. This proves the ROMs are the same on all Studio II compatible consoles regardless of the type of
+   cart (RCA or clone). After February 1978 RCA were not producing games for the Studio II but they continued to manufacture ROMs for the licensed
+   clones and updated the year marking on the ROMs, but the contents of the ROMs were identical to previous releases.
+4. Because all the ROMs match between different clone carts with at least one version of each game dumped, it can be said with 100% accuracy that
+   the other games previously listed as 'undumped' are actually dumped.
+5. Lastly, there are no undumped or unreleased games on Studio II compatible consoles. All games have been dumped because all ROMs were made by
+   RCA and are identical across carts from all the Studio II-compatible models.
+
+Undumped carts
+==============
+RCA Studio II Factory Test Cart: http://videogamekraken.com/rca-studio-ii-prototype-cartridges
+
 -->
 <softwarelist name="studio2" description="RCA Studio II / Victory MPT-02 cartridges">
 
@@ -54,7 +98,6 @@ MG-213  Gun Fight/Moon Ship                             yes
 		<publisher>RCA</publisher>
 		<info name="serial" value="18V400" />
 		<info name="usage" value="Press 'Clear' and then '1' on Keypad A" />
-
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x200">
 				<rom name="spacewar.bin" size="0x200" crc="021551f2" sha1="4878ae6d313743d7e3bd45e05c6e5e0582d9febb"/>
@@ -68,10 +111,9 @@ MG-213  Gun Fight/Moon Ship                             yes
 		<publisher>RCA</publisher>
 		<info name="serial" value="18V401" />
 		<info name="usage" value="Press 'Clear' and then '1' on Keypad A" />
-
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x200">
-				<rom name="fun-with-numbers.bin" size="0x200" crc="26ebe344" sha1="ede8731283d49666ddb63c1a52d6d270973d6dc8"/>
+				<rom name="85717.u1" size="0x200" crc="26ebe344" sha1="ede8731283d49666ddb63c1a52d6d270973d6dc8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -82,7 +124,6 @@ MG-213  Gun Fight/Moon Ship                             yes
 		<publisher>RCA</publisher>
 		<info name="serial" value="18V402" />
 		<info name="usage" value="Press 'Clear', '1' on Keypad A, '4' on Keypad B and then '7' on Keypad A" />
-
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x200">
 				<rom name="tennis-squash.bin" size="0x200" crc="a21590c8" sha1="c573e8cd7d1aa423d26e64a4da781a5989e4ed1d"/>
@@ -96,10 +137,10 @@ MG-213  Gun Fight/Moon Ship                             yes
 		<publisher>RCA</publisher>
 		<info name="serial" value="18V403" />
 		<info name="usage" value="Press 'Clear' and then '0' on Keypad A" />
-
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x400">
-				<rom name="baseball.bin" size="0x400" crc="d7fdedaa" sha1="fa1e3089d05503b7b1d5e98552318d5836c1798a"/>
+				<rom name="baseball.u1" size="0x200" crc="1731bd3e" sha1="1baec96cd086db46fcd6f4638989d44b4ad3080e"/>
+				<rom name="baseball.u2" size="0x200" crc="dab57a30" sha1="3910d7a83bf2d11d6a5e2748a5f67a399a45108a" offset="0x200" />
 			</dataarea>
 		</part>
 	</software>
@@ -109,11 +150,11 @@ MG-213  Gun Fight/Moon Ship                             yes
 		<year>1977</year>
 		<publisher>RCA</publisher>
 		<info name="serial" value="18V404" />
-		<info name="usage" value="Press 'Clear' and then '1' on Keypad A" />
-
+		<info name="usage" value="Press 'Clear' and then '1' for Speedway or '2' for Tag on Keypad A" />
+		<info name="usage" value="Note both games are only for 2 players" />
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x200">
-				<rom name="speedway tag.bin" size="0x200" crc="a80379e2" sha1="5bc93a1a7ea05411f607ed56241da88b1f8468c5"/>
+				<rom name="speedway_tag.bin" size="0x200" crc="a80379e2" sha1="5bc93a1a7ea05411f607ed56241da88b1f8468c5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -124,24 +165,23 @@ MG-213  Gun Fight/Moon Ship                             yes
 		<publisher>RCA</publisher>
 		<info name="serial" value="18V405" />
 		<info name="usage" value="Press 'Clear' and then '1' on Keypad A" />
-
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x400">
-				<rom name="gunfighter-moonship battle.bin" size="0x400" crc="989d2c67" sha1="82f37ec5b7599e9169873da6c269c0c092395458"/>
+				<rom name="86195.u1" size="0x200" crc="15a4ba12" sha1="009fadd3ba8bbcfc51b065849be991a05d16e4de"/>
+				<rom name="86196.u2" size="0x200" crc="a62d38b2" sha1="4685ed315301fac3d792be233f3a3b6f4ecb6021" offset="0x200" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="compquiz">
-		<description>TV School House: Computer Quiz</description>
+		<description>TV School House I: Computer Quiz</description>
 		<year>1977</year>
 		<publisher>RCA</publisher>
 		<info name="serial" value="18V500" />
 		<info name="usage" value="Press 'Clear' and then '1' on Keypad A twice" />
-
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x200">
-				<rom name="computer quiz.bin" size="0x200" crc="cf08aa66" sha1="1d709a7f6b0a3d67d184ae0d94b1cb198f9c8a6a"/>
+				<rom name="85718.u1" size="0x200" crc="cf08aa66" sha1="1d709a7f6b0a3d67d184ae0d94b1cb198f9c8a6a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -152,10 +192,10 @@ MG-213  Gun Fight/Moon Ship                             yes
 		<publisher>RCA</publisher>
 		<info name="serial" value="18V501" />
 		<info name="usage" value="Press 'Clear' and then '1' on Keypad A three times" />
-
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x400">
-				<rom name="math fun.bin" size="0x400" crc="9ab5af96" sha1="12a013e483af253d75845adf0d9e86672b161f94"/>
+				<rom name="86344.u1" size="0x200" crc="143b053b" sha1="96673348df7fe37dd179047ac3e3891c7ea0cdc8"/>
+				<rom name="86345.u2" size="0x200" crc="a4f6a46f" sha1="c11e381a004d0817e97373f32fca3971d70c680a" offset="0x200" />
 			</dataarea>
 		</part>
 	</software>
@@ -166,10 +206,24 @@ MG-213  Gun Fight/Moon Ship                             yes
 		<publisher>RCA</publisher>
 		<info name="serial" value="18V600" />
 		<info name="usage" value="Press 'Clear' and then '1' on Keypad A" />
-
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x400">
-				<rom name="blackjack.bin" size="0x400" crc="b30af7a9" sha1="e328791d6aa8292d1b68abe03c7ebfefa9282ced"/>
+				<rom name="blackjack.u1" size="0x200" crc="04536fc0" sha1="7e6e5319f68f87dfdb0a5087308ff9aa261277f5"/>
+				<rom name="blackjack.u2" size="0x200" crc="6110893f" sha1="238f541457fd647240ccffcaedebfdc6b1f8d7dd" offset="0x200" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bingo">
+		<description>TV Casino II: Bingo</description>
+		<year>1977</year>
+		<publisher>RCA</publisher>
+		<info name="serial" value="18V601" />
+		<info name="usage" value="Press 'Clear' and then '2' on Keypad A" />
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom_400" size="0x400">
+				<rom name="bingo.u1" size="0x200" crc="48a7fb02" sha1="8e86d01f10d4a9c21ea50949c6c959c4f082d934"/>
+				<rom name="bingo.u2" size="0x200" crc="b2aa7578" sha1="5c3eb80066420002bc3dcc7ca4ab6efad7ed4ae5" offset="0x200" />
 			</dataarea>
 		</part>
 	</software>
@@ -179,11 +233,11 @@ MG-213  Gun Fight/Moon Ship                             yes
 		<year>1977</year>
 		<publisher>RCA</publisher>
 		<info name="serial" value="18V700" />
-		<info name="usage" value="Press 'Clear' and then '0' on Keypad A" />
-
+		<info name="usage" value="Press 'Clear' and then '0' on Keypad A and then using Keypad B '0' through '9' enter birth date (MDY, xx xx xxxx) and then start date (MDY, xx xx xxxx)" />
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x400">
-				<rom name="biorhythm.bin" size="0x400" crc="6dcbc525" sha1="9fdab1be5d83aa0ccacf7e9ae2837b2b9e10be1c"/>
+				<rom name="86624.u1" size="0x200" crc="535877b7" sha1="868ccb4c1a1c9a129732d5a7f05db696e2044f60"/>
+				<rom name="86625.u2" size="0x200" crc="ed40d6ff" sha1="ba3e5d570932454ee6272b88b5ce375e32ce7016" offset="0x200" />
 			</dataarea>
 		</part>
 	</software>
@@ -193,82 +247,173 @@ MG-213  Gun Fight/Moon Ship                             yes
 		<year>1977</year>
 		<publisher>RCA</publisher>
 		<info name="usage" value="Press 'Clear'" />
-
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x400">
-				<rom name="demo.bin" size="0x400" crc="96f9a105" sha1="0375fd680ac7332f05acb35973b8d0756916b93d"/>
+				<rom name="demo.u1" size="0x200" crc="b1bb37ed" sha1="821080efec555c36642193238799f7f332573566"/>
+				<rom name="demo.u2" size="0x200" crc="fd363ae0" sha1="6e0c75a0e5f412ebfeffbc80d89d43169672eb57" offset="0x200" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Victory MPT-02 -->
 
-	<software name="grandpak">
-		<description>Grand Pack</description>
+	<!-- Victory MPT-02 and clones (4 extra carts) plus clones with larger 1KB ROM -->
+
+	<software name="grandpak"> <!-- Pack-in cart on Hanimex MPT-02 due to not having any built-in games -->
+		<description>Grand Pack (MPT-02)</description>
 		<year>1978</year>
 		<publisher>Hanimex</publisher>
 		<info name="serial" value="MG-200" />
 		<info name="usage" value="Press 'Clear' then choose a game by pressing 1-5 on Keypad A" />
-
 		<part name="cart" interface="studio2_cart">
-			<dataarea name="rom_400" size="0x400">
-				<rom name="86677b" size="0x400" crc="82a2d29e" sha1="37e02089d611db10bad070d89c8801de41521189"/>
+			<dataarea name="rom_400" size="0x400"> <!-- These match the MPT-02 BIOS built-in games -->
+				<rom name="86677b.u1" size="0x400" crc="82a2d29e" sha1="37e02089d611db10bad070d89c8801de41521189"/>
 			</dataarea>
-
 			<dataarea name="rom_c00" size="0x400">
-				<rom name="87201" size="0x400" crc="8006a1e3" sha1="b67612d98231485fce55d604915abd19b6d64eac"/>
+				<rom name="87201.u2" size="0x400" crc="8006a1e3" sha1="b67612d98231485fce55d604915abd19b6d64eac"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="bingo">
-		<description>Bingo</description>
+	<software name="bingoa" cloneof="bingo">
+		<description>Bingo (MPT-02)</description>
 		<year>1978</year>
 		<publisher>Hanimex</publisher>
 		<info name="serial" value="MG-201" />
-
+		<info name="usage" value="Press 'Clear' and then '2' on Keypad A" />
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x400">
+				<!-- same as bingo, but on a single 1KB ROM instead of 2x 512B ROMs -->
 				<rom name="mg-201-bingo.rom" size="0x400" crc="39ddc4ab" sha1="5e16b9572fda5d8b203df9318b8f1e250bea7432"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="conmatch">
-		<description>Concentration Match</description>
+		<description>Concentration Match (MPT-02)</description>
 		<year>1978</year>
 		<publisher>Hanimex</publisher>
 		<info name="serial" value="MG-202" />
-
+		<info name="usage" value="Press 'Clear' and then select pattern time '9' (longest time) on Keypad A then match pattern with '0' through '9' on Keypads A and B" />
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x400">
-				<rom name="mg-202-concentration-match.rom" size="0x400" crc="28e21408" sha1="df2b2c7b5ec4c2d33321934ffff29cb41c2b6f68"/>
+				<rom name="87484.u1" size="0x400" crc="28e21408" sha1="df2b2c7b5ec4c2d33321934ffff29cb41c2b6f68"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="starwars">
-		<description>Star Wars</description>
+		<description>Star Wars (MPT-02)</description>
 		<year>1978</year>
 		<publisher>Hanimex</publisher>
 		<info name="serial" value="MG-203" />
-
+		<info name="usage" value="Press 'Clear' and then select game '1' (1 player) or '2' (2 player) or '3' (Advanced player) on Keypad A" />
+		<info name="usage" value="Select speed '1' (slow) or '2' (medium) or '3' (fast) on Keypad A" />
+		<info name="usage" value="Runner Keypad controls are '2' (up'), '8' (down), '4' (left), '6' (right)" />
+		<info name="usage" value="Chaser Keypad controls are '2' (down'), '8' (up), '4' (right), '6' (left)" />
+		<info name="usage" value="Spaceship and viewfinder of A is red, B is yellow" />
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x400">
-				<rom name="mg-203-star-wars.rom" size="0x400" crc="92b55eb4" sha1="63ec52fdf1a5e04ced74560809de550c527ecd38"/>
+				<rom name="87331.u1" size="0x400" crc="92b55eb4" sha1="63ec52fdf1a5e04ced74560809de550c527ecd38"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathfuna" cloneof="mathfun">
+		<description>School House II Math Fun (MPT-02)</description>
+		<year>1977</year>
+		<publisher>Hanimex</publisher>
+		<info name="serial" value="MG-204" />
+		<info name="usage" value="Press 'Clear' and then '1' on Keypad A three times" />
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom_400" size="0x400">
+				<!-- same as mathfun, but on a single 1KB ROM instead of 2x 512B ROMs -->
+				<rom name="87476.u1" size="0x400" crc="9ab5af96" sha1="12a013e483af253d75845adf0d9e86672b161f94"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="pinball">
-		<description>Pinball</description>
+		<description>Pinball (MPT-02)</description>
 		<year>1978</year>
 		<publisher>Hanimex</publisher>
 		<info name="serial" value="MG-205" />
-
+		<info name="usage" value="Press 'Clear' and then '1' on Keypad A" />
+		<info name="usage" value="On Keypad B press '1' to launch ball and '4' and '6' for flippers" />
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x400">
-				<rom name="mg-205-pinball.rom" size="0x400" crc="9f7f692e" sha1="6afd1252d72df39482699c1ee76fa28669c7db80"/>
+				<rom name="87330.u1" size="0x400" crc="9f7f692e" sha1="6afd1252d72df39482699c1ee76fa28669c7db80"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="biorhytha" cloneof="biorhyth">
+		<description>Biorhythm (MPT-02)</description>
+		<year>1978</year>
+		<publisher>Hanimex</publisher>
+		<info name="serial" value="MG-206" />
+		<info name="usage" value="Press 'Clear' and then '0' on Keypad A" />
+		<info name="usage" value="Using Keypad B '0' through '9' enter birth date (MDY, xx xx xxxx) and then start date (MDY, xx xx xxxx)" />
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom_400" size="0x400">
+				<!-- same as biorhyth, but on a single 1KB ROM instead of 2x 512B ROMs -->
+				<rom name="biorhythm.bin" size="0x400" crc="6dcbc525" sha1="9fdab1be5d83aa0ccacf7e9ae2837b2b9e10be1c"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- placeholder for MG-207 if found and dumped (with possible 1K ROM)
+    <software name="tennisa"> cloneof="tennis">
+        <description>Tennis/Squash (MPT-02)</description>
+        <year>1978</year>
+        <publisher>Hanimex</publisher>
+        <info name="serial" value="MG-207" />
+        <info name="usage" value="Press 'Clear', '1' on Keypad A, '4' on Keypad B and then '7' on Keypad A" />
+        <part name="cart" interface="studio2_cart">
+            <dataarea name="rom_400" size="0x400">
+                <rom name="xxxxx.u1" size="0x400" crc="" sha1=""/>
+            </dataarea>
+        </part>
+    </software>
+-->
+<!-- placeholder for MG-208 if found and dumped (with possible 1K ROM)
+    <software name="funwnuma"> cloneof="funwnum">
+        <description>Fun with Numbers (MPT-02)</description>
+        <year>1978</year>
+        <publisher>Hanimex</publisher>
+        <info name="serial" value="MG-208" />
+        <info name="usage" value="Press 'Clear' and then '1' on Keypad A" />
+        <part name="cart" interface="studio2_cart">
+            <dataarea name="rom_400" size="0x400">
+                <rom name="xxxxx.u1" size="0x400" crc="" sha1=""/>
+            </dataarea>
+        </part>
+    </software>
+-->
+<!-- placeholder for MG-209 if found and dumped (with possible 1K ROM)
+    <software name="compquiza"> cloneof="compquiz">
+        <description>School House I Computer Quiz (MPT-02)</description>
+        <year>1978</year>
+        <publisher>Hanimex</publisher>
+        <info name="serial" value="MG-209" />
+        <info name="usage" value="Press 'Clear' and then '1' on Keypad A twice" />
+        <part name="cart" interface="studio2_cart">
+            <dataarea name="rom_400" size="0x400">
+                <rom name="xxxxx.u1" size="0x400" crc="" sha1=""/>
+            </dataarea>
+        </part>
+    </software>
+-->
+
+	<software name="baseballa" cloneof="baseball">
+		<description>Baseball (MPT-02)</description>
+		<year>1978</year>
+		<publisher>Hanimex</publisher>
+		<info name="serial" value="MG-210" />
+		<info name="usage" value="Press 'Clear' and then '0' on Keypad A" />
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom_400" size="0x400">
+				<!-- same as baseball, but on a single 1KB ROM instead of 2x 512B ROMs -->
+				<rom name="baseball.bin" size="0x400" crc="d7fdedaa" sha1="fa1e3089d05503b7b1d5e98552318d5836c1798a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -278,7 +423,8 @@ MG-213  Gun Fight/Moon Ship                             yes
 		<year>1978</year>
 		<publisher>Hanimex</publisher>
 		<info name="serial" value="MG-211" />
-
+		<info name="usage" value="Press 'Clear' and then '1' for Speedway or '2' for Tag on Keypad A" />
+		<info name="usage" value="Note both games are only for 2 players" />
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x400">
 				<!-- same as speedway, but on a 1KB ROM instead of 512B -->
@@ -287,4 +433,235 @@ MG-213  Gun Fight/Moon Ship                             yes
 		</part>
 	</software>
 
+<!-- placeholder for MG-212 if found and dumped (with possible 1K ROM)
+    <software name="spacewara"> cloneof="spacewar">
+        <description>Spacewar Intercept (MPT-02)</description>
+        <year>1978</year>
+        <publisher>Hanimex</publisher>
+        <info name="serial" value="MG-212" />
+        <info name="usage" value="Press 'Clear' and then '1' on Keypad A" />
+        <part name="cart" interface="studio2_cart">
+            <dataarea name="rom_400" size="0x400">
+                <rom name="xxxxx.u1" size="0x400" crc="" sha1=""/>
+            </dataarea>
+        </part>
+    </software>
+-->
+
+	<software name="gunfighta" cloneof="gunfight">
+		<description>Gunfighter / Moonship Battle (MPT-02)</description>
+		<year>1978</year>
+		<publisher>Hanimex</publisher>
+		<info name="serial" value="MG-213" />
+		<info name="usage" value="Press 'Clear' and then on Keypad A press '1' for Gunfighter 1-player, '2' for Gunfighter 2-players or '3' for Moonship Battle 2 players" />
+		<info name="usage" value="Gunfighter controls are '2' (up), '8' (down), '5' (shoot)" />
+		<info name="usage" value="Moonship controls are '2' (up), '4' (left), '6' (right), '8' (down), '5' (fire)" />
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom_400" size="0x400">
+				<rom name="gunfighter-moonship battle.bin" size="0x400" crc="989d2c67" sha1="82f37ec5b7599e9169873da6c269c0c092395458"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+	<!-- Homebrew Games -->
+
+	<software name="asteroids">
+		<description>Asteroids (homebrew)</description>
+		<year>2013</year>
+		<publisher>Paul Robson</publisher>
+		<info name="usage" value="Press 'Clear' then on any Keypad '5' (start/continue), '2' (thrust), '4' (left), '6' (right), '0' (fire)" />
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom_400" size="0x400">
+				<rom name="asteroids.u1" size="0x400" crc="e2b984f0" sha1="a19c8e1dae87714b64126ba0fdaa992363cb9e32"/>
+			</dataarea>
+			<dataarea name="rom_c00" size="0x400">
+				<rom name="asteroids.u2" size="0x400" crc="f360668f" sha1="7feb6ffe25e7953f42cda93963a14ab50162a146"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="berzerk">
+		<description>Berzerk (homebrew)</description>
+		<year>2013</year>
+		<publisher>Paul Robson</publisher>
+		<info name="usage" value="Press 'Clear' and then on Keypad A '5' (start) and all remaining keys '1..9' except 5 (move), Keypad B '0' (fire)" />
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom_400" size="0x400">
+				<rom name="berzerk.u1" size="0x400" crc="32e1af2f" sha1="b97cb52961844fd5b9718a68691badc6b0b1e57a"/>
+			</dataarea>
+			<dataarea name="rom_c00" size="0x400">
+				<rom name="berzerk.u2" size="0x400" crc="4c5a7eeb" sha1="869eae42d5a011cc0c91608e49269bf480d41eb4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="climber"> <!-- similar to Crazy Climber -->
+		<description>Climber (homebrew)</description>
+		<year>2013</year>
+		<publisher>Lee Romanow</publisher>
+		<info name="usage" value="Press 'Clear' and then on Keypad A '3' (difficulty 3 easy to 6 hardest), '4' (left), '6' (right), '2' (up)" />
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom_400" size="0x400">
+				<rom name="climber.u1" size="0x400" crc="aa64eb89" sha1="7c5b38adf0600f84de2b2df8f12643700f9ca8cc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="combat"> <!-- based on the Atari 2600 version -->
+		<description>Combat (homebrew)</description>
+		<year>2000</year>
+		<publisher>Paul Robson</publisher>
+		<info name="usage" value="Press 'Clear'. Levels work like A2600 games. Enter game number using Keypad A '81'. Keypad B '0' (start)" />
+		<info name="usage" value="Controls are '4' (left), '6' (right), '2' (forward), '8' (back), '0' (fire)" />
+		<info name="usage" value="Level Info. Start at 0 then" />
+		<info name="usage" value="add 128 for the plane game (otherwise tank game)" />
+		<info name="usage" value="add 64 for long range missiles (otherwise short range)" />
+		<info name="usage" value="add 32 for slow missiles (otherwise fast missiles)" />
+		<info name="usage" value="add 16 for a border around the screen" />
+		<info name="usage" value="add 8 for the tank defences" />
+		<info name="usage" value="add 4 for both the defences and the in-game barriers" />
+		<info name="usage" value="add 2 for balloons" />
+		<info name="usage" value="add 1 for mines" />
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom_400" size="0x400">
+				<rom name="combat.u1" size="0x400" crc="f7d1f301" sha1="85400a9d9b8ed5bdc4893756429ef0c8f90d7358"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fifteen"> <!-- sliding puzzle game -->
+		<description>Fifteen (homebrew)</description>
+		<year>2017</year>
+		<publisher>Lee Romanow</publisher>
+		<info name="usage" value="Press 'Clear' and then any key. Controls are '2', '4', '6', '8' (movement), '5' (slide)" />
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom_400" size="0x400">
+				<rom name="fifteen.u1" size="0x400" crc="14143610" sha1="f42f37a19ed0c397be32e19344d776fa09b30150"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fourspts"> <!-- four pong-type games -->
+		<description>Four Sports (homebrew)</description>
+		<year>2000</year>
+		<publisher>Paul Robson</publisher>
+		<info name="usage" value="Press 'Clear'. Enter game type using Keypad A '1' (hockey), '2' (doubles tennis), '3' (pong), '4' (squash)" />
+		<info name="usage" value="Then '8' (easy) or '9' (hard)" />
+		<info name="usage" value="Controls on Keypad A and B are '2' (up), '8' (down), '0' (serve)" />
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom_400" size="0x400">
+				<rom name="fourspts.u1" size="0x400" crc="f40cd42f" sha1="e5d8de160baa6b324d98ff9e1a407aa289fca29a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="invaders">
+		<description>Invaders (homebrew)</description>
+		<year>2000</year>
+		<publisher>Paul Robson</publisher>
+		<info name="usage" value="Press 'Clear'. Controls on Keypad A are '4' (left), '6' (right), '0' (restart). Keypad B '0' (fire)" />
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom_400" size="0x400">
+				<rom name="invaders.u1" size="0x400" crc="090db76e" sha1="811fa649eff9c3c56aa531826a2a2f680ee4d8d0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="invasion">
+		<description>The Invasion (homebrew)</description>
+		<year>2019</year>
+		<publisher>Lee Romanow</publisher>
+		<info name="usage" value="Press 'Clear'. On Keypad A choose game (1-6) '1' (easiest) to '6' (hardest). Controls are '4' (left), '6' (right), '5' (fire)" />
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom_400" size="0x400">
+				<rom name="invasion.u1" size="0x400" crc="90cccb05" sha1="535743edc7e652f97c885d80735562fc764a7f3d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kaboom"> <!-- based on the Atari 2600 game -->
+		<description>Kaboom (homebrew)</description>
+		<year>2013</year>
+		<publisher>Paul Robson</publisher>
+		<info name="usage" value="Press 'Clear'. Controls on Keypad A are '4' (left), '6' (right), '0' (start)" />
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom_400" size="0x400">
+				<rom name="kaboom.u1" size="0x400" crc="09efcdb8" sha1="5305bd3eb2b856e1d583f146217b79e374149ea5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outbreak"> <!-- breakout clone -->
+		<description>Outbreak (homebrew)</description>
+		<year>2013</year>
+		<publisher>Lee Romanow</publisher>
+		<info name="usage" value="Press 'Clear'. On Keypad A choose difficulty (0-3) '0' (easiest) to '3' (hardest). Controls are '4' (left), '6' (right)" />
+		<info name="usage" value="Pressing left or right at the same time on Keypad B '4' (left), '6' (right) doubles the paddle speed" />
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom_400" size="0x400">
+				<rom name="invasion.u1" size="0x400" crc="f0b582d5" sha1="0763da26ceaa5a8a40d7de123e444864c983d582"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacman">
+		<description>Pacman (homebrew)</description>
+		<year>2013</year>
+		<publisher>Paul Robson</publisher>
+		<info name="usage" value="Press 'Clear' then on Keypad A '0' (start), '2' (up), '4' (left), '6' (right), '8' (down)" />
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom_400" size="0x400">
+				<rom name="pacman.u1" size="0x400" crc="93c402dd" sha1="3e1f329c91d3cbda0d153c9b110ce84daebb83e9"/>
+			</dataarea>
+			<dataarea name="rom_c00" size="0x400">
+				<rom name="pacman.u2" size="0x400" crc="daae27ab" sha1="096cd5bab1c173818de5f823b03e660019db872e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rocket">
+		<description>Rocket (homebrew)</description>
+		<year>2010</year>
+		<publisher>Lee Romanow</publisher>
+		<info name="usage" value="Press 'Clear' then on Keypad A '1' (start), '5' (fire)" />
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom_400" size="0x200">
+				<rom name="rocket.u1" size="0x200" crc="d2192f34" sha1="d2f33a5fe5d2cd4f0ce778c368bd228b7658a6f1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scramble">
+		<description>Scramble (homebrew)</description>
+		<year>2013</year>
+		<publisher>Paul Robson</publisher>
+		<info name="usage" value="Press 'Clear'. On Keypad A choose difficulty (2,4,6) '2' (easy), '4' (medium), '6' (hard)" />
+		<info name="usage" value="Controls on Keypad A or Keypad B are '2' (up), '4' (brake), '8' (down), '0' (missile), '0' and '4' together (bomb)" />
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom_400" size="0x400">
+				<rom name="scramble.u1" size="0x400" crc="56f077a0" sha1="bc3600d7849e38a326a2fb3f4ea26f6259343853"/>
+			</dataarea>
+			<dataarea name="rom_c00" size="0x400">
+				<rom name="scramble.u2" size="0x400" crc="4b26376b" sha1="dcc496bb5a3f4dc687ac9566f1cb9f24d1b9f0ba"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tvar2012">
+		<description>TV Arcade 2012 (homebrew)</description>
+		<year>2012</year>
+		<publisher>Lee Romanow</publisher>
+		<info name="usage" value="Press 'Clear'. On Keypad A choose game (1...6) '1' (craps), '2' (lander), '3' (repeat), '4' (space), '5' (nim 1 - last stone loses), '6' (nim 6 - last stone wins)" />
+		<info name="usage" value="craps - any key 1-9 (bet)" />
+		<info name="usage" value="lander - any key 1-9 (burn fuel). display shows height, speed, fuel. burn fuel to land at 0 height with 5 or less speed" />
+		<info name="usage" value="repeat - any key 1-9 (follow on-screen and repeat the numbers)" />
+		<info name="usage" value="space - '4' (left), '6' (right)" />
+		<info name="usage" value="nim (2 players only) - Keypad A and Keypad B any key 1-3 (remove stones)" />
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom_400" size="0x400">
+				<rom name="tvar2012.u1" size="0x400" crc="dcfb2488" sha1="9feebd75ac277574ea3d674473c265299a82ca16"/>
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

@@ -37,7 +37,7 @@
 
 #include "opcode.h"
 
-#include "debugger.h"
+#include "debug/debugcpu.h"
 
 #include "dsp56def.h"
 
@@ -60,7 +60,7 @@
 #include "dsp56mem.h"
 
 
-DEFINE_DEVICE_TYPE_NS(DSP56156, DSP_56156, dsp56156_device, "dsp56156", "Motorola DSP56156")
+DEFINE_DEVICE_TYPE(DSP56156, DSP_56156::dsp56156_device, "dsp56156", "Motorola DSP56156")
 
 
 namespace DSP_56156 {
@@ -345,7 +345,6 @@ void dsp56156_device::device_start()
 
 	state_add(STATE_GENPC, "GENPC", m_core.PCU.pc).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_core.ppc).noshow();
-	state_add(STATE_GENSP, "GENSP", m_core.PCU.sp).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_core.PCU.sr).formatstr("%14s").noshow();
 
 	set_icountptr(m_core.icount);

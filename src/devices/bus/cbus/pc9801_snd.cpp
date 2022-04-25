@@ -3,21 +3,19 @@
 /***************************************************************************
 
     NEC PC-9801
-    common functions for CBUS sound boards -26, -86, -118
+    common functions for C-bus sound boards -26, -86, -118
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "pc9801_snd.h"
 
-//DEFINE_DEVICE_TYPE(PC9801_SND, pc9801_snd_device, "pc9801_snd", "PC9801 CBUS Sound")
-
 pc9801_snd_device::pc9801_snd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 {
 }
 
-uint8_t pc9801_snd_device::opn_porta_r()
+u8 pc9801_snd_device::opn_porta_r()
 {
 	if(m_joy_sel & 0x80)
 		return ioport(m_joy_sel & 0x40 ? "PA2" : "PA1")->read();
@@ -25,7 +23,7 @@ uint8_t pc9801_snd_device::opn_porta_r()
 	return 0xff;
 }
 
-void pc9801_snd_device::opn_portb_w(uint8_t data) { m_joy_sel = data; }
+void pc9801_snd_device::opn_portb_w(u8 data) { m_joy_sel = data; }
 
 INPUT_PORTS_START(pc9801_joy_port)
 	PORT_START("PA1")

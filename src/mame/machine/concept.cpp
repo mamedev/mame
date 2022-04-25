@@ -66,7 +66,7 @@ uint32_t concept_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	/* resolution is 720*560 */
 	for (int y = 0; y < 560; y++)
 	{
-		uint16_t *line = &bitmap.pix16(560-1-y);
+		uint16_t *const line = &bitmap.pix(560-1-y);
 		for (int x = 0; x < 720; x++)
 			line[720-1-x] = (m_videoram[(x+48+y*768)>>4] & (0x8000 >> ((x+48+y*768) & 0xf))) ? 1 : 0;
 	}

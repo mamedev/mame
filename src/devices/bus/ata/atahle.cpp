@@ -150,7 +150,7 @@ void ata_hle_device::soft_reset()
 	start_busy(DIAGNOSTIC_TIME, PARAM_DIAGNOSTIC);
 }
 
-void ata_hle_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ata_hle_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{

@@ -30,7 +30,7 @@ private:
 
 	// bit 2 enables gradient and starfield
 	// bit 3 seems to be used to flip for cocktail
-	uint8_t m_palette_bank;
+	uint8_t m_palette_bank = 0;
 };
 
 // device type definition

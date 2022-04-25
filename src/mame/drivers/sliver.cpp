@@ -11,7 +11,6 @@ hardware JPEG decompression chips.
 
 TODO:
 - verify OKI rom banking  (bank num inverted or not)
-- DIPS
 - fix transparency problems in some stages
 
 
@@ -79,6 +78,8 @@ Notes:
 #include "jpeglib.h"
 
 
+namespace {
+
 #define FIFO_SIZE 1024
 #define IO_SIZE     0x100
 #define COMMAND_SIZE 8
@@ -98,17 +99,22 @@ public:
 
 	void sliver(machine_config &config);
 
-private:
-	uint16_t m_io_offset;
-	uint16_t m_io_reg[IO_SIZE];
-	uint16_t m_fifo[FIFO_SIZE];
-	uint16_t m_fptr;
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+	virtual void device_post_load() override;
 
-	uint16_t m_jpeg1;
-	uint16_t m_jpeg2;
-	int m_jpeg_x;
-	int m_jpeg_y;
-	int m_tmp_counter;
+private:
+	uint16_t m_io_offset = 0;
+	uint16_t m_io_reg[IO_SIZE]{};
+	uint16_t m_fifo[FIFO_SIZE]{};
+	uint16_t m_fptr = 0;
+
+	uint16_t m_jpeg1 = 0;
+	uint16_t m_jpeg2 = 0;
+	int m_jpeg_x = 0;
+	int m_jpeg_y = 0;
+	int m_tmp_counter = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8051_device> m_audiocpu;
@@ -132,16 +138,11 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(obj_irq_cb);
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
-
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void plot_pixel_rgb(int x, int y, uint32_t r, uint32_t g, uint32_t b);
 	void plot_pixel_pal(int x, int y, int addr);
 	void blit_gfx();
 	void render_jpeg();
-
-	void postload();
 
 	void oki_map(address_map &map);
 	void ramdac_map(address_map &map);
@@ -169,21 +170,19 @@ void sliver_state::plot_pixel_rgb(int x, int y, uint32_t r, uint32_t g, uint32_t
 	if (y < 0 || x < 0 || x > 383 || y > 255)
 		return;
 
-	m_bitmap_bg.pix32(y, x) = r | (g<<8) | (b<<16);
+	m_bitmap_bg.pix(y, x) = r | (g<<8) | (b<<16);
 }
 
 void sliver_state::plot_pixel_pal(int x, int y, int addr)
 {
-	uint32_t r,g,b;
-
 	if (y < 0 || x < 0 || x > 383 || y > 255)
 		return;
 
-	b=(m_colorram[addr] << 2) | (m_colorram[addr] & 0x3);
-	g=(m_colorram[addr+0x100] << 2) | (m_colorram[addr+0x100] & 3);
-	r=(m_colorram[addr+0x200] << 2) | (m_colorram[addr+0x200] & 3);
+	uint32_t b=(m_colorram[addr] << 2) | (m_colorram[addr] & 0x3);
+	uint32_t g=(m_colorram[addr+0x100] << 2) | (m_colorram[addr+0x100] & 3);
+	uint32_t r=(m_colorram[addr+0x200] << 2) | (m_colorram[addr+0x200] & 3);
 
-	m_bitmap_fg.pix32(y, x) = r | (g<<8) | (b<<16);
+	m_bitmap_fg.pix(y, x) = r | (g<<8) | (b<<16);
 }
 
 void sliver_state::fifo_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -419,10 +418,13 @@ void sliver_state::video_start()
 	save_item(NAME(m_jpeg_x));
 	save_item(NAME(m_jpeg_y));
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(sliver_state::postload), this));
+	m_jpeg1 = 0;
+	m_jpeg2 = 0;
+	m_jpeg_x = 0;
+	m_jpeg_y = 0;
 }
 
-void sliver_state::postload()
+void sliver_state::device_post_load()
 {
 	render_jpeg();
 }
@@ -599,6 +601,8 @@ ROM_START( slivera )
 	ROM_LOAD( "ka-11.bin", 0x080000, 0x80000, CRC(47c05898) SHA1(51f7bb4ccaa5440a31aae9c02ed255243a3c8e22) ) // sldh
 	// no rom 12 on PCB, played through the game and doesn't seem to be required for this gfx set, all girls present.
 ROM_END
+
+} // Anonymous namespace
 
 
 GAME( 1996, sliver,  0,        sliver, sliver, sliver_state, empty_init, ROT0, "Hollow Corp", "Sliver (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

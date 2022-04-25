@@ -110,8 +110,8 @@ protected:
 
 private:
 	// internal state
-	tilemap_t   *m_tilemap[K056832_PAGE_COUNT];
-	bitmap_ind16  *m_pixmap[K056832_PAGE_COUNT];
+	tilemap_t   *m_tilemap[K056832_PAGE_COUNT]{};
+	bitmap_ind16  *m_pixmap[K056832_PAGE_COUNT]{};
 
 	std::vector<uint16_t> m_videoram;
 
@@ -133,7 +133,7 @@ private:
 	// ROM readback involves reading 2 halves of a word
 	// from the same location in a row.  Reading the
 	// RAM window resets this state so you get the first half.
-	int       m_rom_half;
+	int       m_rom_half = 0;
 
 	// locally cached values
 	int       m_layer_assoc_with_page[K056832_PAGE_COUNT];
@@ -186,11 +186,11 @@ private:
 	void change_rombank();
 	int rom_read_b(int offset, int blksize, int blksize2, int zerosec);
 
-	template<class _BitmapClass>
-	int update_linemap(screen_device &screen, _BitmapClass &bitmap, int page, int flags);
+	template<class BitmapClass>
+	int update_linemap(screen_device &screen, BitmapClass &bitmap, int page, int flags);
 
-	template<class _BitmapClass>
-	void tilemap_draw_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int layer, uint32_t flags, uint32_t priority);
+	template<class BitmapClass>
+	void tilemap_draw_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int layer, uint32_t flags, uint32_t priority);
 
 	void create_gfx();
 	void create_tilemaps();

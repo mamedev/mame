@@ -29,7 +29,7 @@ public:
 		m_palette(*this, "palette"),
 		m_dials(*this, "DIAL.%u", 0),
 		m_videoram(*this, "videoram"),
-		m_spriteram(*this, "spriteram"),
+		m_spriteram(*this, "spriteram", 0x100, ENDIANNESS_LITTLE),
 		m_colorram(*this, "colorram"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
@@ -64,30 +64,30 @@ private:
 	optional_ioport_array<2> m_dials;
 
 	required_shared_ptr<uint8_t> m_videoram;
-	optional_shared_ptr<uint8_t> m_spriteram;
+	memory_share_creator<uint8_t> m_spriteram;
 	optional_shared_ptr<uint8_t> m_colorram;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
-	uint8_t m_int_enabled;
-	uint8_t m_coin_status[3];
+	uint8_t m_int_enabled = 0;
+	uint8_t m_coin_status[3]{};
 
-	uint8_t m_razmataz_dial_pos[2];
-	uint16_t m_razmataz_counter;
+	uint8_t m_razmataz_dial_pos[2]{};
+	uint16_t m_razmataz_counter = 0;
 
-	uint8_t m_sound_state[3];
-	uint8_t m_bg_enable;
-	uint8_t m_bg_color;
-	uint16_t m_bg_position;
-	uint8_t m_fg_color;
-	bool m_flip_screen;
+	uint8_t m_sound_state[3]{};
+	uint8_t m_bg_enable = 0;
+	uint8_t m_bg_color = 0;
+	uint16_t m_bg_position = 0;
+	uint8_t m_fg_color = 0;
+	bool m_flip_screen = false;
 
-	uint8_t m_congo_fg_bank;
-	uint8_t m_congo_color_bank;
-	uint8_t m_congo_custom[4];
+	uint8_t m_congo_fg_bank = 0;
+	uint8_t m_congo_color_bank = 0;
+	uint8_t m_congo_custom[4]{};
 
 	const uint8_t *m_color_codes;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
 	DECLARE_WRITE_LINE_MEMBER(int_enable_w);
 	uint8_t razmataz_counter_r();
 	void zaxxon_control_w(offs_t offset, uint8_t data);
@@ -117,6 +117,7 @@ private:
 	uint32_t screen_update_zaxxon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_futspy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_razmataz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ixion(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_congo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_int);
 	void zaxxon_sound_a_w(uint8_t data);

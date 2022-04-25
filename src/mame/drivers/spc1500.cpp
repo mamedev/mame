@@ -13,11 +13,11 @@ Samsung SPC-1500 driver by Miso Kim
   2016-01-05 detection of color palette initialization
   2016-01-06 80x16 mode graphic mode support
   2016-01-10 double character support
-  2016-01-12 PCG adressing improved
+  2016-01-12 PCG addressing improved
   2016-01-13 Cassette tape motor improved
 
 TODO:
-  - Verify PCG ram read for Korean character (english character is fine)
+  - Verify PCG ram read for Korean character (English character is fine)
   - Support floppy disk drive with SD-1500A controller card
 
 ****************************************************************************/
@@ -44,7 +44,7 @@ TODO:
   - English font: 8KB (sizes 8x8 and 8x16 size of each character in ROM)
   - Hangul fonts: 24KB (head 8KB, middle 8KB, last 8KB)
 
- Periperials
+ Peripherals
   - Built-in cassette deck
   - 1 composite video output to connect a monitor
   - 1 TTL output for RGB monitor connection
@@ -66,9 +66,9 @@ TODO:
 
  3) SPC-1500V
   This product can not confirm the release date because of PCB level modification.
-  It equiped SPC-1500V VLSI chip embedded products and removed a lot of TTLs and the memory expansion card.
+  It equipped SPC-1500V VLSI chip embedded products and removed a lot of TTLs and the memory expansion card.
   - IOCS ROM Version: 1.6
-  - Two internal 50-pin expension slots
+  - Two internal 50-pin expansion slots
 
  Firmware
 
@@ -90,11 +90,11 @@ TODO:
 
   Hangul ROM
    8KB each is divided by a consonant and consonant and neutral.
-   - Initial (Choseong)  SS151-1223: 8 types of intial character (actual 6 types)
+   - Initial (Choseong)  SS151-1223: 8 types of initial character (actual 6 types)
    - Middle (Jungseong) SS152-1224: 2 types of middle character
    - Final  (Jongseong) SS153-1225: 2 types of final character
 
-  Periperials - Monitor
+  Peripherals - Monitor
    - , high-resolution monitor SM, color monitor model was to distinguish it from CD.
 
   1) MD-1255H (Low resolution monitors MD)
@@ -128,7 +128,7 @@ TODO:
    - 5.25 "floppy drive for 2D composed of external disk drives diskettes
   2) SD-1500B
    - Dual external disk drives
-   - The two models are idential except the number of FDD. They need the expension controller card named by SFC-1500.
+   - The two models are identical except the number of FDD. They need the expansion controller card named by SFC-1500.
    - IBM PC XT compatible FDD can be quipped. SFD-5x0 model is a genuine FDD from Samsung Electronics.
 
   HDD (Hard Disk Drive)
@@ -149,9 +149,9 @@ TODO:
 
   1) SP-510S
    - Bitmap image output method Hangul support
-   - Recommanded 80 columns dot-matrix printer
+   - Recommended 80 columns dot-matrix printer
   2) SP-570H
-   - Recommanded 132 columns dot-matrix printer
+   - Recommended 132 columns dot-matrix printer
   3) SP-510L
   4) SP-510T
   5) SP-570B
@@ -207,7 +207,7 @@ TODO:
    - Release price: 49,900won ($58)
 
   Super Pack
-   - External ROM cartrige from Static Soft (C)
+   - External ROM cartridge from Static Soft (C)
    - 1 cartridge slot and 3 expansion slots (up to five expansion slots available)
    - It is available to use the MSX ROM packs without any modification with the static soft VDP card
    - Release price: 60,000won ($71)
@@ -215,7 +215,7 @@ TODO:
   ST-KEY2
    - For synthesizer external keyboard
 
-  * Compatiblity with X1 series of Sharp Electronics
+  * Compatibility with X1 series of Sharp Electronics
    - Almost the key components is the same as X1 models of Sharp Electronics and except for the keyboard input.
    - To port the X1 software to SPC-1500, Text attribute, keyboard input and DMA related code should be modified
 
@@ -234,10 +234,13 @@ TODO:
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/spc1000_cas.h"
+
+
+namespace {
 
 #define VDP_CLOCK  XTAL(42'954'545)
 
@@ -259,10 +262,14 @@ public:
 		, m_pio(*this, "ppi8255")
 		, m_sound(*this, "ay8910")
 		, m_palette(*this, "palette")
-		, m_timer(nullptr)
 	{ }
 
 	void spc1500(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 
 private:
 	uint8_t psga_r();
@@ -285,7 +292,6 @@ private:
 	void double_w(offs_t offset, uint8_t data);
 	uint8_t io_r(offs_t offset);
 	void spc_palette(palette_device &palette) const;
-	DECLARE_VIDEO_START(spc);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_RECONFIGURE(crtc_reconfig);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer);
@@ -293,23 +299,21 @@ private:
 	void spc1500_double_io(address_map &map);
 	void spc1500_mem(address_map &map);
 
-	uint8_t *m_p_ram;
-	uint8_t m_ipl;
-	uint8_t m_palet[3];
-	uint8_t m_paltbl[8];
-	uint8_t m_pcg_char, m_pcg_attr, m_char_change;
-	uint16_t m_pcg_offset[3];
-	int m_char_count;
+	uint8_t *m_p_ram = nullptr;
+	uint8_t m_ipl = 0;
+	uint8_t m_palet[3]{};
+	uint8_t m_paltbl[8]{};
+	uint8_t m_pcg_char = 0, m_pcg_attr = 0, m_char_change = 0;
+	uint16_t m_pcg_offset[3]{};
+	int m_char_count = 0;
 	attotime m_time;
-	bool m_romsel;
-	bool m_double_mode;
-	bool m_p5bit;
-	bool m_motor;
-	bool m_motor_toggle;
-	uint8_t m_crtc_vreg[0x100];
-	bool m_centronics_busy;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	bool m_romsel = false;
+	bool m_double_mode = false;
+	bool m_p5bit = false;
+	bool m_motor = false;
+	bool m_motor_toggle = false;
+	uint8_t m_crtc_vreg[0x100]{};
+	bool m_centronics_busy = false;
 	required_device<z80_device> m_maincpu;
 	required_device<mc6845_device> m_vdg;
 	required_device<cassette_image_device> m_cass;
@@ -323,9 +327,9 @@ private:
 	required_device<i8255_device> m_pio;
 	required_device<ay8910_device> m_sound;
 	required_device<palette_device> m_palette;
-	uint8_t *m_font;
-	uint8_t m_priority;
-	emu_timer *m_timer;
+	uint8_t *m_font = nullptr;
+	uint8_t m_priority = 0;
+	emu_timer *m_timer = nullptr;
 	void get_pcg_addr();
 };
 
@@ -511,9 +515,6 @@ void spc1500_state::spc_palette(palette_device &palette) const
 	palette.set_pen_color(7,rgb_t(0xff,0xff,0xff));
 }
 
-VIDEO_START_MEMBER(spc1500_state, spc)
-{
-}
 
 MC6845_RECONFIGURE(spc1500_state::crtc_reconfig)
 {
@@ -523,36 +524,29 @@ MC6845_RECONFIGURE(spc1500_state::crtc_reconfig)
 
 MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 {
-	uint8_t han2;
-	uint8_t *pf;
+	uint8_t const *pf;
 	uint16_t hfnt;
-	int i;
-	int j;
-	int h1, h2, h3;
-	uint32_t  *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix(y);
 
 	unsigned char cho[] ={1,1,1,1,1,1,1,1,0,0,1,1,1,3,5,5,0,0,5,3,3,5,5,5,0,0,3,3,5,1};
 	unsigned char jong[]={0,0,0,1,1,1,1,1,0,0,1,1,1,2,2,2,0,0,2,2,2,2,2,2,0,0,2,2,1,1};
-	bool inv = false;
 	char hs = (m_crtc_vreg[0x9] < 15 ? 3 : 4);
 	int n = y & (m_crtc_vreg[0x9]);
 	bool ln400 = (hs == 4 && m_crtc_vreg[0x4] > 20);
-	uint8_t *vram = &m_p_videoram[0] + (m_crtc_vreg[12] << 8) + m_crtc_vreg[13];
-	for (i = 0; i < x_count; i++)
+	uint8_t const *const vram = &m_p_videoram[0] + (m_crtc_vreg[12] << 8) + m_crtc_vreg[13];
+	for (int i = 0; i < x_count; i++)
 	{
-		uint8_t *pp = &vram[0x2000+((y>>hs)*x_count+(((y)&7)<<11))+i+(((hs==4)&&(y&8))?0x400:0)];
-		uint8_t *pv = &vram[(y>>hs)*x_count + i];
+		uint8_t const *const pp = &vram[0x2000+((y>>hs)*x_count+(((y)&7)<<11))+i+(((hs==4)&&(y&8))?0x400:0)];
+		uint8_t const *const pv = &vram[(y>>hs)*x_count + i];
 		uint8_t ascii = *(pv+0x1000);
 		uint8_t attr = *pv;
-		inv = (attr & 0x8 ? true : false);
+		bool inv = (attr & 0x8 ? true : false);
 		uint8_t color = attr & 0x7;
 		uint8_t pixelb = *(pp+0);
 		uint8_t pixelr = *(pp+0x4000);
 		uint8_t pixelg = *(pp+0x8000);
 		bool nopalet = ((m_palet[0] | m_palet[1] | m_palet[2])==0 || ln400);
 		uint8_t pen = (nopalet ? color : m_paltbl[color]);
-		uint8_t pixelpen = 0;
-		uint8_t pixel = 0;
 		if (hs == 4 && (ascii & 0x80))
 		{
 			uint16_t wpixelb = (pixelb << 8) + (*(pp+1));
@@ -560,10 +554,10 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 			uint16_t wpixelg = (pixelg << 8) + (*(pp+0x8001));
 			if (ascii != 0xfa)
 			{
-				han2 = *(pv+0x1001);
-				h1 = (ascii>>2)&0x1f;
-				h2 = ((ascii<<3)|(han2>>5))&0x1f;
-				h3 = (han2)&0x1f;
+				uint8_t han2 = *(pv+0x1001);
+				int h1 = (ascii>>2)&0x1f;
+				int h2 = ((ascii<<3)|(han2>>5))&0x1f;
+				int h3 = (han2)&0x1f;
 				pf = &m_font[0x2000+(h1 * 32) + (cho[h2] + (h3 != 0) -1) * 16 * 2 * 32 + n];
 				hfnt = (*pf << 8) | (*(pf+16));
 				pf = &m_font[0x4000+(h2 * 32) + (h3 == 0 ? 0 : 1) * 16 * 2 * 32 + n];
@@ -578,26 +572,26 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 				hfnt = (*pf << 8) | (*(pf+16));
 			}
 			hfnt = (inv ? 0xffff - hfnt : hfnt);
-			for (j = 0x8000; j > 0; j>>=1)
+			for (int j = 0x8000; j > 0; j>>=1)
 			{
-				pixel = ((wpixelg&j ? 4:0 )|(wpixelr&j? 2:0)|(wpixelb&j ? 1:0));
-				pixelpen = (nopalet ? pixel : m_paltbl[pixel]);
+				uint8_t pixel = ((wpixelg&j ? 4:0 )|(wpixelr&j? 2:0)|(wpixelb&j ? 1:0));
+				uint8_t pixelpen = (nopalet ? pixel : m_paltbl[pixel]);
 				*p++ = m_palette->pen(((hfnt & j) || (m_priority & (1<<pixel))) ? pixelpen : pen);
 			}
 			i++;
 		}
 		else if (attr & 0x20)
 		{
-			uint8_t *pa = &m_pcgram[(ascii*(m_crtc_vreg[0x9]+1))+n];
+			uint8_t const *pa = &m_pcgram[(ascii*(m_crtc_vreg[0x9]+1))+n];
 			uint8_t b = *pa;
 			uint8_t r = *(pa+0x800);
 			uint8_t g = *(pa+0x1000);
-			for (j = 0x80; j > 0; j>>=1)
+			for (int j = 0x80; j > 0; j>>=1)
 			{
-				pixel = ((g & j)?4:0)|((r & j)?2:0)|((b & j)?1:0);
+				uint8_t pixel = ((g & j)?4:0)|((r & j)?2:0)|((b & j)?1:0);
 				pen = (pixel == 7 ? color : pixel);
 				pixel = (pixelg&j ? 4 : 0)|(pixelr&j ? 2:0)|(pixelb&j ? 1:0 );
-				pixelpen = (nopalet ? pixel : m_paltbl[pixel]);
+				uint8_t pixelpen = (nopalet ? pixel : m_paltbl[pixel]);
 				*p++ = m_palette->pen((m_priority & (1<<pixel)) ? pixelpen : pen);
 			}
 		}
@@ -609,10 +603,10 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 				fnt = 0xff;
 			}
 			fnt = (inv ? 0xff - fnt : fnt);
-			for (j = 0x80; j > 0; j>>=1)
+			for (int j = 0x80; j > 0; j>>=1)
 			{
-				pixel = ((pixelg&j) ? 4 : 0)|(pixelr&j ? 2:0)|(pixelb&j ? 1:0 );
-				pixelpen = (nopalet ? pixel : m_paltbl[pixel]);
+				uint8_t pixel = ((pixelg&j) ? 4 : 0)|(pixelr&j ? 2:0)|(pixelb&j ? 1:0 );
+				uint8_t pixelpen = (nopalet ? pixel : m_paltbl[pixel]);
 				if (ascii == 0 && attr == 0 && !inv)
 					*p++ = m_palette->pen(pixelpen);
 				else
@@ -713,7 +707,7 @@ static INPUT_PORTS_START( spc1500 )
 
 	PORT_START("LINE.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("= +") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('+')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C') PORT_CHAR(0x03)
@@ -723,7 +717,7 @@ static INPUT_PORTS_START( spc1500 )
 
 	PORT_START("LINE.2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Caps") PORT_CODE(KEYCODE_CAPSLOCK)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z') PORT_CHAR(0x1a)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("] }") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}') PORT_CHAR(0x1d)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V') PORT_CHAR(0x16)
@@ -732,8 +726,8 @@ static INPUT_PORTS_START( spc1500 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2 @") PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('@')
 
 	PORT_START("LINE.3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_INSERT) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_UP)  PORT_CODE(KEYCODE_UP)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_INSERT) PORT_CHAR(8) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_UP)  PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC) PORT_CHAR(0x1b)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("` ~") PORT_CODE(KEYCODE_TILDE) PORT_CHAR('`') PORT_CHAR('~')
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B') PORT_CHAR(0x02)
@@ -743,7 +737,7 @@ static INPUT_PORTS_START( spc1500 )
 
 	PORT_START("LINE.4")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Del Ins") PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD)) PORT_CHAR(8)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB) PORT_CHAR('\t')
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Home") PORT_CODE(KEYCODE_HOME)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N') PORT_CHAR(0x0e)
@@ -847,7 +841,7 @@ void spc1500_state::machine_reset()
 	m_char_count = 0;
 }
 
-uint8_t spc1500_state::mc6845_videoram_r(offs_t offset)
+[[maybe_unused]] uint8_t spc1500_state::mc6845_videoram_r(offs_t offset)
 {
 	return m_p_videoram[offset];
 }
@@ -860,7 +854,7 @@ uint8_t spc1500_state::psga_r()
 	return data;
 }
 
-uint8_t spc1500_state::porta_r()
+[[maybe_unused]] uint8_t spc1500_state::porta_r()
 {
 	uint8_t data = 0x3f;
 	data |= (m_cass->input() > 0.0038) ? 0x80 : 0;
@@ -895,8 +889,6 @@ void spc1500_state::spc1500(machine_config &config)
 	m_vdg->set_char_width(8);
 	m_vdg->set_update_row_callback(FUNC(spc1500_state::crtc_update_row));
 	m_vdg->set_reconfigure_callback(FUNC(spc1500_state::crtc_reconfig));
-
-	MCFG_VIDEO_START_OVERRIDE(spc1500_state, spc)
 
 	I8255(config, m_pio);
 	m_pio->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::write));
@@ -945,6 +937,8 @@ ROM_START( spc1500 )
 	ROM_LOAD( "ss152fnt.bin", 0x4000, 0x2000, CRC(f4a5a590) SHA1(c9a02756107083bf602ae7c90cfe29b8b964e0df) )
 	ROM_LOAD( "ss153fnt.bin", 0x6000, 0x2000, CRC(8677d5fa) SHA1(34bfacc855c3846744cd586c150c72e5cbe948b0) )
 ROM_END
+
+} // Anonymous namespace
 
 
 /* Driver */

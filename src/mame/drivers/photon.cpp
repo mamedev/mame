@@ -23,6 +23,7 @@
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
 #include "sound/spkrdev.h"
+#include "machine/ram.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -33,14 +34,15 @@ public:
 	photon_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pk8000_base_state(mconfig, type, tag)
 		, m_speaker(*this, "speaker")
-		, m_banks(*this, "bank%u", 1U)
+		, m_banks(*this, "bank%u", 0U)
+		, m_ram(*this, RAM_TAG)
 	{ }
 
 	void photon(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override;
 
 private:
 	uint8_t _80_portb_r();
@@ -57,13 +59,14 @@ private:
 
 	required_device<speaker_sound_device> m_speaker;
 	required_memory_bank_array<8> m_banks;
+	required_device<ram_device> m_ram;
 };
 
 
 void photon_state::set_bank(uint8_t data)
 {
 	uint8_t *const rom = memregion("maincpu")->base();
-	uint8_t *const ram = memregion("maincpu")->base();
+	u8 *ram = m_ram->pointer();
 	uint8_t const block1 = data & 3;
 	uint8_t const block2 = (data >> 2) & 3;
 	uint8_t const block3 = (data >> 4) & 3;
@@ -71,7 +74,7 @@ void photon_state::set_bank(uint8_t data)
 
 	switch(block1) {
 	case 0:
-		m_banks[0]->set_base(rom + 0x10000);
+		m_banks[0]->set_base(rom);
 		m_banks[4]->set_base(ram);
 		break;
 	case 1: break;
@@ -84,7 +87,7 @@ void photon_state::set_bank(uint8_t data)
 
 	switch(block2) {
 	case 0:
-		m_banks[1]->set_base(rom + 0x14000);
+		m_banks[1]->set_base(rom + 0x4000);
 		m_banks[5]->set_base(ram + 0x4000);
 		break;
 	case 1: break;
@@ -97,7 +100,7 @@ void photon_state::set_bank(uint8_t data)
 
 	switch(block3) {
 	case 0:
-		m_banks[2]->set_base(rom + 0x18000);
+		m_banks[2]->set_base(rom + 0x8000);
 		m_banks[6]->set_base(ram + 0x8000);
 		break;
 	case 1: break;
@@ -110,7 +113,7 @@ void photon_state::set_bank(uint8_t data)
 
 	switch(block4) {
 	case 0:
-		m_banks[3]->set_base(rom + 0x1c000);
+		m_banks[3]->set_base(rom + 0xc000);
 		m_banks[7]->set_base(ram + 0xc000);
 		break;
 	case 1: break;
@@ -135,10 +138,10 @@ void photon_state::_80_portc_w(uint8_t data)
 void photon_state::pk8000_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x3fff).bankr("bank1").bankw("bank5");
-	map(0x4000, 0x7fff).bankr("bank2").bankw("bank6");
-	map(0x8000, 0xbfff).bankr("bank3").bankw("bank7");
-	map(0xc000, 0xffff).bankr("bank4").bankw("bank8");
+	map(0x0000, 0x3fff).bankr("bank0").bankw("bank4");
+	map(0x4000, 0x7fff).bankr("bank1").bankw("bank5");
+	map(0x8000, 0xbfff).bankr("bank2").bankw("bank6");
+	map(0xc000, 0xffff).bankr("bank3").bankw("bank7");
 }
 
 void photon_state::pk8000_io(address_map &map)
@@ -184,15 +187,11 @@ IRQ_CALLBACK_MEMBER(photon_state::irq_callback)
 
 void photon_state::machine_reset()
 {
-	pk8000_base_state::machine_reset();
-
 	set_bank(0);
 }
 
-void photon_state::video_start()
+void photon_state::machine_start()
 {
-	pk8000_base_state::video_start();
-
 	save_item(NAME(m_text_start));
 	save_item(NAME(m_chargen_start));
 	save_item(NAME(m_video_start));
@@ -205,7 +204,7 @@ void photon_state::video_start()
 
 uint32_t photon_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	return video_update(screen, bitmap, cliprect, memregion("maincpu")->base());
+	return video_update(screen, bitmap, cliprect, m_ram->pointer());
 }
 
 void photon_state::photon(machine_config &config)
@@ -234,9 +233,12 @@ void photon_state::photon(machine_config &config)
 	ppi1.out_pc_callback().set(FUNC(photon_state::_80_portc_w));
 
 	i8255_device &ppi2(I8255(config, "ppi8255_2"));
-	ppi2.in_pa_callback().set(FUNC(pk8000_base_state::_84_porta_r));
-	ppi2.out_pa_callback().set(FUNC(pk8000_base_state::_84_porta_w));
-	ppi2.out_pc_callback().set(FUNC(pk8000_base_state::_84_portc_w));
+	ppi2.in_pa_callback().set(FUNC(photon_state::_84_porta_r));
+	ppi2.out_pa_callback().set(FUNC(photon_state::_84_porta_w));
+	ppi2.out_pc_callback().set(FUNC(photon_state::_84_portc_w));
+
+	/* internal ram */
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
@@ -256,8 +258,8 @@ void photon_state::photon(machine_config &config)
     3800...3FFFh - ROM8 (D48)
 */
 ROM_START( phtetris )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "foton_tetris.bin", 0x10000, 0x4000, BAD_DUMP CRC(a8af10bb) SHA1(5e2ea9a5d38399cbe156638eea73a3d25c442f77) )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "foton_tetris.bin", 0x0000, 0x4000, BAD_DUMP CRC(a8af10bb) SHA1(5e2ea9a5d38399cbe156638eea73a3d25c442f77) )
 ROM_END
 
 /*
@@ -269,8 +271,8 @@ ROM_END
     1000...17FFh - ROM3 (D43)
 */
 ROM_START( phpython )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "foton_piton.bin", 0x10000, 0x1800, BAD_DUMP CRC(4eac925a) SHA1(26f9a18c7aed31b7daacdc003bafb60a5e6d6300) )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "foton_piton.bin", 0x0000, 0x1800, BAD_DUMP CRC(4eac925a) SHA1(26f9a18c7aed31b7daacdc003bafb60a5e6d6300) )
 ROM_END
 
 
@@ -278,10 +280,10 @@ ROM_END
     Dump was made using custom adaptor, hence it is marked as bad dump.
 */
 ROM_START( phklad )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "klad.bin", 0x10000, 0x4000, BAD_DUMP CRC(49cc7d65) SHA1(d966cfc1d973a533df8044a71fad37f7177da554) )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "klad.bin", 0x0000, 0x4000, BAD_DUMP CRC(49cc7d65) SHA1(d966cfc1d973a533df8044a71fad37f7177da554) )
 ROM_END
 
-GAME( 19??,  phtetris, 0,      photon, photon, photon_state, empty_init, ROT0, "<unknown>", "Tetris (Photon System)",           0 )
-GAME( 1989?, phpython,  0,     photon, photon, photon_state, empty_init, ROT0, "<unknown>", "Python (Photon System)",           0 )
-GAME( 19??,  phklad,   0,      photon, photon, photon_state, empty_init, ROT0, "<unknown>", "Klad / Labyrinth (Photon System)", 0 )
+GAME( 19??,  phtetris, 0,      photon, photon, photon_state, empty_init, ROT0, "<unknown>", "Tetris (Photon System)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1989?, phpython,  0,     photon, photon, photon_state, empty_init, ROT0, "<unknown>", "Python (Photon System)",           MACHINE_SUPPORTS_SAVE )
+GAME( 19??,  phklad,   0,      photon, photon, photon_state, empty_init, ROT0, "<unknown>", "Klad / Labyrinth (Photon System)", MACHINE_SUPPORTS_SAVE )

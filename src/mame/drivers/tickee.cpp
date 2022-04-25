@@ -68,11 +68,11 @@ private:
 	required_shared_ptr<uint16_t> m_vram;
 	optional_shared_ptr<uint16_t> m_control;
 
-	emu_timer *m_setup_gun_timer;
-	int m_beamxadd;
-	int m_beamyadd;
-	int m_palette_bank;
-	uint8_t m_gunx[2];
+	emu_timer *m_setup_gun_timer = nullptr;
+	int m_beamxadd = 0;
+	int m_beamyadd = 0;
+	int m_palette_bank = 0;
+	uint8_t m_gunx[2]{};
 	void get_crosshair_xy(int player, int &x, int &y);
 
 	void rapidfir_transparent_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -102,7 +102,7 @@ private:
 	void rapidfir_map(address_map &map);
 	void tickee_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 
@@ -133,18 +133,18 @@ inline void tickee_state::get_crosshair_xy(int player, int &x, int &y)
  *
  *************************************/
 
-void tickee_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void tickee_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_TRIGGER_GUN_INTERRUPT:
-		trigger_gun_interrupt(ptr, param);
+		trigger_gun_interrupt(param);
 		break;
 	case TIMER_CLEAR_GUN_INTERRUPT:
-		clear_gun_interrupt(ptr, param);
+		clear_gun_interrupt(param);
 		break;
 	case TIMER_SETUP_GUN_INTERRUPTS:
-		setup_gun_interrupts(ptr, param);
+		setup_gun_interrupts(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in tickee_state::device_timer");
@@ -220,21 +220,20 @@ VIDEO_START_MEMBER(tickee_state,tickee)
 
 TMS340X0_SCANLINE_RGB32_CB_MEMBER(tickee_state::scanline_update)
 {
-	uint16_t *src = &m_vram[(params->rowaddr << 8) & 0x3ff00];
-	uint32_t *dest = &bitmap.pix32(scanline);
-	const pen_t *pens = m_tlc34076->pens();
+	uint16_t const *const src = &m_vram[(params->rowaddr << 8) & 0x3ff00];
+	uint32_t *const dest = &bitmap.pix(scanline);
+	pen_t const *const pens = m_tlc34076->pens();
 	int coladdr = params->coladdr << 1;
-	int x;
 
 	/* blank palette: fill with pen 255 */
 	if (m_control[2])
 	{
-		for (x = params->heblnk; x < params->hsblnk; x++)
+		for (int x = params->heblnk; x < params->hsblnk; x++)
 			dest[x] = pens[0xff];
 	}
 	else
 		/* copy the non-blanked portions of this scanline */
-		for (x = params->heblnk; x < params->hsblnk; x += 2)
+		for (int x = params->heblnk; x < params->hsblnk; x += 2)
 		{
 			uint16_t pixels = src[coladdr++ & 0xff];
 			dest[x + 0] = pens[pixels & 0xff];
@@ -245,16 +244,15 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(tickee_state::scanline_update)
 
 TMS340X0_SCANLINE_RGB32_CB_MEMBER(tickee_state::rapidfir_scanline_update)
 {
-	uint16_t *src = &m_vram[(params->rowaddr << 8) & 0x3ff00];
-	uint32_t *dest = &bitmap.pix32(scanline);
+	uint16_t const *const src = &m_vram[(params->rowaddr << 8) & 0x3ff00];
+	uint32_t *const dest = &bitmap.pix(scanline);
 	const pen_t *pens = m_tlc34076->pens();
 	int coladdr = params->coladdr << 1;
-	int x;
 
 	if (m_palette_bank)
 	{
 		/* blank palette: fill with pen 255 */
-		for (x = params->heblnk; x < params->hsblnk; x += 2)
+		for (int x = params->heblnk; x < params->hsblnk; x += 2)
 		{
 			dest[x + 0] = pens[0xff];
 			dest[x + 1] = pens[0xff];
@@ -263,7 +261,7 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(tickee_state::rapidfir_scanline_update)
 	else
 	{
 		/* copy the non-blanked portions of this scanline */
-		for (x = params->heblnk; x < params->hsblnk; x += 2)
+		for (int x = params->heblnk; x < params->hsblnk; x += 2)
 		{
 			uint16_t pixels = src[coladdr++ & 0xff];
 			dest[x + 0] = pens[pixels & 0xff];

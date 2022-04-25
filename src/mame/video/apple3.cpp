@@ -138,26 +138,21 @@ void apple3_state::video_start()
 
 void apple3_state::text40(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y, col, row, lc;
-	offs_t offset;
-	uint8_t ch;
-	const uint8_t *char_data;
-	pen_t fg, bg, temp;
-	uint16_t *dest;
-	uint8_t *ram = m_ram->pointer();
-	uint32_t ram_size = m_ram->size();
-	int smooth = m_va | (m_vb << 1) | (m_vc << 2);
-	int beginrow = (cliprect.top() - (cliprect.top() % 8)) / 8;
-	int endrow = (cliprect.bottom() - (cliprect.bottom() % 8) + 7) / 8;
+	uint8_t const *const ram = m_ram->pointer();
+	uint32_t const ram_size = m_ram->size();
+	int const smooth = m_va | (m_vb << 1) | (m_vc << 2);
+	int const beginrow = (cliprect.top() - (cliprect.top() % 8)) / 8;
+	int const endrow = (cliprect.bottom() - (cliprect.bottom() % 8) + 7) / 8;
 
-	for (y = beginrow; y <= endrow; y++)
+	for (int y = beginrow; y <= endrow; y++)
 	{
-		for (x = 0; x < 40; x++)
+		for (int x = 0; x < 40; x++)
 		{
-			offset = ram_size - 0x8000 + text_map[y] + x + (m_flags & VAR_VM2 ? 0x0400 : 0x0000);
-			ch = ram[offset];
+			offs_t offset = ram_size - 0x8000 + text_map[y] + x + (m_flags & VAR_VM2 ? 0x0400 : 0x0000);
+			uint8_t const ch = ram[offset];
 
 			// no color text in emulation mode
+			pen_t fg, bg;
 			if ((m_flags & VAR_VM0) && (m_via_1_a & 0x40))
 			{
 				/* color text */
@@ -175,17 +170,17 @@ void apple3_state::text40(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			/* inverse? */
 			if (!(ch & 0x80))
 			{
-				temp = fg;
-				fg = bg;
-				bg = temp;
+				using std::swap;
+				swap(fg, bg);
 			}
 
-			char_data = &m_char_mem[(ch & 0x7F) * 8];
+			uint8_t const *const char_data = &m_char_mem[(ch & 0x7F) * 8];
 
-			for (row = 0; row < 8; row++)
+			for (int row = 0; row < 8; row++)
 			{
-				for (col = 0; col < 7; col++)
+				for (int col = 0; col < 7; col++)
 				{
+					int lc;
 					if (m_smoothscr)
 					{
 						// get the offset into the group of 8 lines
@@ -196,7 +191,7 @@ void apple3_state::text40(bitmap_ind16 &bitmap, const rectangle &cliprect)
 						lc = col;
 					}
 
-					dest = &bitmap.pix16(y * 8 + row, x * 14 + lc * 2);
+					uint16_t *const dest = &bitmap.pix(y * 8 + row, x * 14 + lc * 2);
 					dest[0] = (char_data[row] & (1 << col)) ? fg : bg;
 					dest[1] = (char_data[row] & (1 << col)) ? fg : bg;
 				}
@@ -209,23 +204,20 @@ void apple3_state::text40(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 void apple3_state::text80(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y, col, row, lc;
-	offs_t offset;
-	uint8_t ch;
-	const uint8_t *char_data;
-	pen_t fg, bg;
-	uint16_t *dest;
-	uint8_t *ram = m_ram->pointer();
-	uint32_t ram_size = m_ram->size();
-	int smooth = m_va | (m_vb << 1) | (m_vc << 2);
-	int beginrow = (cliprect.top() - (cliprect.top() % 8)) / 8;
-	int endrow = (cliprect.bottom() - (cliprect.bottom() % 8) + 7) / 8;
+	uint8_t const *const ram = m_ram->pointer();
+	uint32_t const ram_size = m_ram->size();
+	int const smooth = m_va | (m_vb << 1) | (m_vc << 2);
+	int const beginrow = (cliprect.top() - (cliprect.top() % 8)) / 8;
+	int const endrow = (cliprect.bottom() - (cliprect.bottom() % 8) + 7) / 8;
 
-	for (y = beginrow; y <= endrow; y++)
+	for (int y = beginrow; y <= endrow; y++)
 	{
-		for (x = 0; x < 40; x++)
+		for (int x = 0; x < 40; x++)
 		{
-			offset = ram_size - 0x8000 + text_map[y] + x;
+			offs_t const offset = ram_size - 0x8000 + text_map[y] + x;
+			uint8_t ch;
+			uint8_t const *char_data;
+			pen_t fg, bg;
 
 			/* first character */
 			ch = ram[offset + 0x0000];
@@ -233,10 +225,11 @@ void apple3_state::text80(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			fg = (ch & 0x80) ? GREEN : BLACK;
 			bg = (ch & 0x80) ? BLACK : GREEN;
 
-			for (row = 0; row < 8; row++)
+			for (int row = 0; row < 8; row++)
 			{
-				for (col = 0; col < 7; col++)
+				for (int col = 0; col < 7; col++)
 				{
+					int lc;
 					if (m_smoothscr)
 					{
 						// get the offset into the group of 8 lines
@@ -247,7 +240,7 @@ void apple3_state::text80(bitmap_ind16 &bitmap, const rectangle &cliprect)
 						lc = col;
 					}
 
-					dest = &bitmap.pix16(y * 8 + row, x * 14 + lc + 0);
+					uint16_t *const dest = &bitmap.pix(y * 8 + row, x * 14 + lc + 0);
 					*dest = (char_data[row] & (1 << col)) ? fg : bg;
 				}
 			}
@@ -258,11 +251,11 @@ void apple3_state::text80(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			fg = (ch & 0x80) ? GREEN : BLACK;
 			bg = (ch & 0x80) ? BLACK : GREEN;
 
-			for (row = 0; row < 8; row++)
+			for (int row = 0; row < 8; row++)
 			{
-				for (col = 0; col < 7; col++)
+				for (int col = 0; col < 7; col++)
 				{
-					dest = &bitmap.pix16(y * 8 + row, x * 14 + col + 7);
+					uint16_t *const dest = &bitmap.pix(y * 8 + row, x * 14 + col + 7);
 					*dest = (char_data[row] & (1 << col)) ? fg : bg;
 				}
 			}
@@ -275,37 +268,34 @@ void apple3_state::text80(bitmap_ind16 &bitmap, const rectangle &cliprect)
 void apple3_state::graphics_hgr(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* hi-res mode: 280x192x2 */
-	int y, i, x, ly, lyb;
-	const uint8_t *pix_info;
-	uint16_t *ptr;
-	uint8_t b;
-	uint8_t *ram = m_ram->pointer();
-	int smooth = m_va | (m_vb << 1) | (m_vc << 2);
+	uint8_t const *const ram = m_ram->pointer();
+	int const smooth = m_va | (m_vb << 1) | (m_vc << 2);
 
-	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		ly = y;
+		int ly = y;
 		if (m_smoothscr)
 		{
 			// get our base Y position
 			ly = y & ~7;
 			// get the offset into the group of 8 lines
-			lyb = ((y % 8) + smooth) & 7;
+			int const lyb = ((y % 8) + smooth) & 7;
 			// add to the base
 			ly += lyb;
 		}
 
+		uint8_t const *pix_info;
 		if (m_flags & VAR_VM2)
 			pix_info = &ram[m_hgr_map[ly]];
 		else
 			pix_info = &ram[m_hgr_map[ly] - 0x2000];
-		ptr = &bitmap.pix16(y);
+		uint16_t *ptr = &bitmap.pix(y);
 
-		for (i = 0; i < 40; i++)
+		for (int i = 0; i < 40; i++)
 		{
-			b = *(pix_info++);
+			uint8_t b = *(pix_info++);
 
-			for (x = 0; x < 7; x++)
+			for (int x = 0; x < 7; x++)
 			{
 				ptr[0] = ptr[1] = (b & 0x01) ? WHITE : BLACK;
 				ptr += 2;
@@ -318,28 +308,24 @@ void apple3_state::graphics_hgr(bitmap_ind16 &bitmap, const rectangle &cliprect)
 void apple3_state::graphics_chgr(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* color hi-res mode: 280x192x16 */
-	int y, i, x, ly, lyb;
-	const uint8_t *pix_info;
-	const uint8_t *col_info;
-	uint16_t *ptr;
-	uint8_t b;
-	uint16_t fgcolor, bgcolor;
-	uint8_t *ram = m_ram->pointer();
-	int smooth = m_va | (m_vb << 1) | (m_vc << 2);
+	uint8_t const *const ram = m_ram->pointer();
+	int const smooth = m_va | (m_vb << 1) | (m_vc << 2);
 
-	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		ly = y;
+		int ly = y;
 		if (m_smoothscr)
 		{
 			// get our base Y position
 			ly = y & ~7;
 			// get the offset into the group of 8 lines
-			lyb = ((y % 8) + smooth) & 7;
+			int const lyb = ((y % 8) + smooth) & 7;
 			// add to the base
 			ly += lyb;
 		}
 
+		uint8_t const *pix_info;
+		uint8_t const *col_info;
 		if (m_flags & VAR_VM2)
 		{
 			pix_info = &ram[m_hgr_map[ly] + 0x2000];
@@ -350,16 +336,16 @@ void apple3_state::graphics_chgr(bitmap_ind16 &bitmap, const rectangle &cliprect
 			pix_info = &ram[m_hgr_map[ly] - 0x2000];
 			col_info = &ram[m_hgr_map[ly]];
 		}
-		ptr = &bitmap.pix16(y);
+		uint16_t *ptr = &bitmap.pix(y);
 
-		for (i = 0; i < 40; i++)
+		for (int i = 0; i < 40; i++)
 		{
-			bgcolor = ((*col_info >> 0) & 0x0F) + 16;
-			fgcolor = ((*col_info >> 4) & 0x0F) + 16;
+			uint16_t const bgcolor = ((*col_info >> 0) & 0x0F) + 16;
+			uint16_t const fgcolor = ((*col_info >> 4) & 0x0F) + 16;
 
-			b = *pix_info;
+			uint8_t b = *pix_info;
 
-			for (x = 0; x < 7; x++)
+			for (int x = 0; x < 7; x++)
 			{
 				ptr[0] = ptr[1] = (b & 1) ? fgcolor : bgcolor;
 				ptr += 2;
@@ -376,27 +362,24 @@ void apple3_state::graphics_chgr(bitmap_ind16 &bitmap, const rectangle &cliprect
 void apple3_state::graphics_shgr(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* super hi-res mode: 560x192x2 */
-	int y, i, x, ly, lyb;
-	const uint8_t *pix_info1;
-	const uint8_t *pix_info2;
-	uint16_t *ptr;
-	uint8_t b1, b2;
-	uint8_t *ram = m_ram->pointer();
-	int smooth = m_va | (m_vb << 1) | (m_vc << 2);
+	uint8_t const *const ram = m_ram->pointer();
+	int const smooth = m_va | (m_vb << 1) | (m_vc << 2);
 
-	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		ly = y;
+		int ly = y;
 		if (m_smoothscr)
 		{
 			// get our base Y position
 			ly = y & ~7;
 			// get the offset into the group of 8 lines
-			lyb = ((y % 8) + smooth) & 7;
+			int const lyb = ((y % 8) + smooth) & 7;
 			// add to the base
 			ly += lyb;
 		}
 
+		uint8_t const *pix_info1;
+		uint8_t const *pix_info2;
 		if (m_flags & VAR_VM2)
 		{
 			pix_info1 = &ram[m_hgr_map[ly] + 0x2000];
@@ -407,20 +390,20 @@ void apple3_state::graphics_shgr(bitmap_ind16 &bitmap, const rectangle &cliprect
 			pix_info1 = &ram[m_hgr_map[ly] - 0x2000];
 			pix_info2 = &ram[m_hgr_map[ly]];
 		}
-		ptr = &bitmap.pix16(y);
+		uint16_t *ptr = &bitmap.pix(y);
 
-		for (i = 0; i < 40; i++)
+		for (int i = 0; i < 40; i++)
 		{
-			b1 = *(pix_info1++);
-			b2 = *(pix_info2++);
+			uint8_t b1 = *(pix_info1++);
+			uint8_t b2 = *(pix_info2++);
 
-			for (x = 0; x < 7; x++)
+			for (int x = 0; x < 7; x++)
 			{
 				*(ptr++) = (b1 & 0x01) ? WHITE : BLACK;
 				b1 >>= 1;
 			}
 
-			for (x = 0; x < 7; x++)
+			for (int x = 0; x < 7; x++)
 			{
 				*(ptr++) = (b2 & 0x01) ? WHITE : BLACK;
 				b2 >>= 1;
@@ -433,28 +416,26 @@ void apple3_state::graphics_shgr(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 void apple3_state::graphics_chires(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t *pen;
-	uint8_t p1, p2, p3, p4;
-	int y, i, ly, lyb;
-	uint8_t *ram = m_ram->pointer();
-	int smooth = m_va | (m_vb << 1) | (m_vc << 2);
+	uint8_t const *const ram = m_ram->pointer();
+	int const smooth = m_va | (m_vb << 1) | (m_vc << 2);
 
-	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		ly = y;
+		int ly = y;
 		if (m_smoothscr)
 		{
 			// get our base Y position
 			ly = y & ~7;
 			// get the offset into the group of 8 lines
-			lyb = ((y % 8) + smooth) & 7;
+			int const lyb = ((y % 8) + smooth) & 7;
 			// add to the base
 			ly += lyb;
 		}
 
-		pen = &bitmap.pix16(y);
-		for (i = 0; i < 20; i++)
+		uint16_t *pen = &bitmap.pix(y);
+		for (int i = 0; i < 20; i++)
 		{
+			uint8_t p1, p2, p3, p4;
 			if (m_flags & VAR_VM2)
 			{
 				p1 = ram[m_hgr_map[ly] + 0x2000 + (i * 2) + 0];

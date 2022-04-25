@@ -87,24 +87,24 @@ private:
 
 	void internal_io_map(address_map &map);
 
-	DECLARE_READ8_MEMBER (dram_config_r) { return m_dram_config; }
-	DECLARE_WRITE8_MEMBER(dram_config_w) { m_dram_config = data; remap_cb(); }
-	DECLARE_READ8_MEMBER (bios_config_r) { return m_bios_config; }
-	DECLARE_WRITE8_MEMBER(bios_config_w) { m_bios_config = data; remap_cb(); }
-	DECLARE_READ32_MEMBER(mailbox_r)     { return m_mailbox; }
-	DECLARE_WRITE32_MEMBER(mailbox_w)    { COMBINE_DATA(&m_mailbox); }
-	DECLARE_READ8_MEMBER (isa_decoder_r) { return m_isa_decoder; }
-	DECLARE_WRITE8_MEMBER(isa_decoder_w) { m_isa_decoder = data; remap_cb(); }
-	DECLARE_READ16_MEMBER(shadow_config_r) { return m_shadctrl; }
-	DECLARE_WRITE16_MEMBER(shadow_config_w) { COMBINE_DATA(&m_shadctrl); logerror("SiS496: %04x to shadow control\n", m_shadctrl); remap_cb(); }
-	DECLARE_READ8_MEMBER (smram_ctrl_r) { return m_smramctrl; }
-	DECLARE_WRITE8_MEMBER(smram_ctrl_w) { m_smramctrl = data; remap_cb(); }
+	uint8_t dram_config_r() { return m_dram_config; }
+	void dram_config_w(uint8_t data) { m_dram_config = data; remap_cb(); }
+	uint8_t bios_config_r() { return m_bios_config; }
+	void bios_config_w(uint8_t data) { m_bios_config = data; remap_cb(); }
+	uint32_t mailbox_r()     { return m_mailbox; }
+	void mailbox_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0)    { COMBINE_DATA(&m_mailbox); }
+	uint8_t isa_decoder_r() { return m_isa_decoder; }
+	void isa_decoder_w(uint8_t data) { m_isa_decoder = data; remap_cb(); }
+	uint16_t shadow_config_r() { return m_shadctrl; }
+	void shadow_config_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { COMBINE_DATA(&m_shadctrl); logerror("SiS496: %04x to shadow control\n", m_shadctrl); remap_cb(); }
+	uint8_t smram_ctrl_r() { return m_smramctrl; }
+	void smram_ctrl_w(uint8_t data) { m_smramctrl = data; remap_cb(); }
 
 	// southbridge
-	DECLARE_READ8_MEMBER(at_page8_r);
-	DECLARE_WRITE8_MEMBER(at_page8_w);
-	DECLARE_READ8_MEMBER(at_portb_r);
-	DECLARE_WRITE8_MEMBER(at_portb_w);
+	uint8_t at_page8_r(offs_t offset);
+	void at_page8_w(offs_t offset, uint8_t data);
+	uint8_t at_portb_r();
+	void at_portb_w(uint8_t data);
 	uint8_t get_slave_ack(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(at_pit8254_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(at_pit8254_out1_changed);
@@ -133,15 +133,11 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(pc_dack5_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack6_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack7_w);
-	DECLARE_READ8_MEMBER(ide_read_cs1_r);
-	DECLARE_WRITE8_MEMBER(ide_write_cs1_w);
-	DECLARE_READ8_MEMBER(ide2_read_cs1_r);
-	DECLARE_WRITE8_MEMBER(ide2_write_cs1_w);
-	DECLARE_READ8_MEMBER(at_dma8237_2_r);
-	DECLARE_WRITE8_MEMBER(at_dma8237_2_w);
-	DECLARE_READ8_MEMBER(at_keybc_r);
-	DECLARE_WRITE8_MEMBER(at_keybc_w);
-	DECLARE_WRITE8_MEMBER(write_rtc);
+	uint8_t at_dma8237_2_r(offs_t offset);
+	void at_dma8237_2_w(offs_t offset, uint8_t data);
+	uint8_t at_keybc_r(offs_t offset);
+	void at_keybc_w(offs_t offset, uint8_t data);
+	void write_rtc(offs_t offset, uint8_t data);
 	uint8_t pc_dma_read_byte(offs_t offset);
 	void pc_dma_write_byte(offs_t offset, uint8_t data);
 	uint8_t pc_dma_read_word(offs_t offset);

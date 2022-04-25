@@ -122,11 +122,14 @@ const atari_motion_objects_config eprom_state::s_mob_config =
 	0                   /* resulting value to indicate "special" */
 };
 
-VIDEO_START_MEMBER(eprom_state,eprom)
+void eprom_state::video_start()
 {
 	/* save states */
 	save_item(NAME(m_screen_intensity));
 	save_item(NAME(m_video_disable));
+
+	m_screen_intensity = 0;
+	m_video_disable = 0;
 }
 
 
@@ -163,14 +166,6 @@ const atari_motion_objects_config eprom_state::s_guts_mob_config =
 	{{ 0 }},            /* mask for the special value */
 	0                   /* resulting value to indicate "special" */
 };
-
-VIDEO_START_MEMBER(eprom_state,guts)
-{
-	/* save states */
-	save_item(NAME(m_screen_intensity));
-	save_item(NAME(m_video_disable));
-}
-
 
 
 /*************************************
@@ -221,8 +216,8 @@ uint32_t eprom_state::screen_update_eprom(screen_device &screen, bitmap_ind16 &b
 	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->top(); y <= rect->bottom(); y++)
 		{
-			uint16_t *mo = &mobitmap.pix16(y);
-			uint16_t *pf = &bitmap.pix16(y);
+			uint16_t const *const mo = &mobitmap.pix(y);
+			uint16_t *const pf = &bitmap.pix(y);
 			for (int x = rect->left(); x <= rect->right(); x++)
 				if (mo[x] != 0xffff)
 				{
@@ -266,15 +261,15 @@ uint32_t eprom_state::screen_update_eprom(screen_device &screen, bitmap_ind16 &b
 					 *
 					 *      --- CRA8-1 are the low 8 bits of the color RAM index; set as expected
 					 */
-					int mopriority = (mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT) & 7;
-					int pfpriority = (pf[x] >> 4) & 3;
-					int forcemc0 = 0, shade = 1, pfm = 1, m7 = 0;
+					int const mopriority = (mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT) & 7;
+					int const pfpriority = (pf[x] >> 4) & 3;
 
 					/* upper bit of MO priority signals special rendering and doesn't draw anything */
 					if (mopriority & 4)
 						continue;
 
 					/* compute the FORCEMC signal */
+					int forcemc0 = 0;
 					if (!(pf[x] & 8))
 					{
 						if (((pfpriority == 3) && !(mopriority & 1)) ||
@@ -284,12 +279,14 @@ uint32_t eprom_state::screen_update_eprom(screen_device &screen, bitmap_ind16 &b
 					}
 
 					/* compute the SHADE signal */
+					int shade = 1;
 					if (((mo[x] & 0x0f) != 1) ||
 						((mo[x] & 0xf0) == 0) ||
 						forcemc0)
 						shade = 0;
 
 					/* compute the PF/M signal */
+					int pfm = 1;
 					if ((mopriority == 3) ||
 						(pf[x] & 8) ||
 						(!(pfpriority & 1) && (mopriority & 2)) ||
@@ -299,6 +296,7 @@ uint32_t eprom_state::screen_update_eprom(screen_device &screen, bitmap_ind16 &b
 						pfm = 0;
 
 					/* compute the M7 signal */
+					int m7 = 0;
 					if ((mo[x] & 0x0f) == 1)
 						m7 = 1;
 
@@ -327,12 +325,12 @@ uint32_t eprom_state::screen_update_eprom(screen_device &screen, bitmap_ind16 &b
 	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->top(); y <= rect->bottom(); y++)
 		{
-			uint16_t *mo = &mobitmap.pix16(y);
-			uint16_t *pf = &bitmap.pix16(y);
+			uint16_t const *const mo = &mobitmap.pix(y);
+			uint16_t *const pf = &bitmap.pix(y);
 			for (int x = rect->left(); x <= rect->right(); x++)
 				if (mo[x] != 0xffff)
 				{
-					int mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
+					int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
 
 					/* upper bit of MO priority might mean palette kludges */
 					if (mopriority & 4)
@@ -368,13 +366,13 @@ uint32_t eprom_state::screen_update_guts(screen_device &screen, bitmap_ind16 &bi
 	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->top(); y <= rect->bottom(); y++)
 		{
-			uint16_t *mo = &mobitmap.pix16(y);
-			uint16_t *pf = &bitmap.pix16(y);
+			uint16_t const *const mo = &mobitmap.pix(y);
+			uint16_t *const pf = &bitmap.pix(y);
 			for (int x = rect->left(); x <= rect->right(); x++)
 				if (mo[x] != 0xffff)
 				{
-					int mopriority = (mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT) & 7;
-					int pfpriority = (pf[x] >> 5) & 3;
+					int const mopriority = (mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT) & 7;
+					int const pfpriority = (pf[x] >> 5) & 3;
 
 					/* upper bit of MO priority signals special rendering and doesn't draw anything */
 					if (mopriority & 4)
@@ -393,12 +391,12 @@ uint32_t eprom_state::screen_update_guts(screen_device &screen, bitmap_ind16 &bi
 	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->top(); y <= rect->bottom(); y++)
 		{
-			uint16_t *mo = &mobitmap.pix16(y);
-			uint16_t *pf = &bitmap.pix16(y);
+			uint16_t const *const mo = &mobitmap.pix(y);
+			uint16_t *const pf = &bitmap.pix(y);
 			for (int x = rect->left(); x <= rect->right(); x++)
 				if (mo[x] != 0xffff)
 				{
-					int mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
+					int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
 
 					/* upper bit of MO priority might mean palette kludges */
 					if (mopriority & 4)

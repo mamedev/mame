@@ -428,6 +428,13 @@ protected:
 };
 
 
+class z86e02_device : public z8_device
+{
+public:
+	z86e02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
 // Zilog Z8601
 DECLARE_DEVICE_TYPE(Z8601, z8601_device)
 
@@ -445,5 +452,8 @@ DECLARE_DEVICE_TYPE(Z8681, z8681_device)
 
 // Zilog Z8682 ROMless (boot to 0812H)
 DECLARE_DEVICE_TYPE(Z8682, z8682_device)
+
+// Zilog Z86E02
+DECLARE_DEVICE_TYPE(Z86E02, z86e02_device)
 
 #endif // MAME_CPU_Z8_Z8_H

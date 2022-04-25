@@ -22,6 +22,7 @@ DEFINE_DEVICE_TYPE(SAA1043, saa1043_device, "saa1043", "Philips SAA1043")
 saa1043_device::saa1043_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SAA1043, tag, owner, clock)
 	, m_outputs(*this)
+	, m_type(PAL)
 {
 	std::fill(std::begin(m_outputs_hooked), std::end(m_outputs_hooked), false);
 }
@@ -61,7 +62,7 @@ void saa1043_device::device_reset()
 	m_outputs[V2](ASSERT_LINE);
 }
 
-void saa1043_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void saa1043_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

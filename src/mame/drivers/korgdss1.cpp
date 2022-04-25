@@ -16,7 +16,7 @@
 #include "machine/gen_latch.h"
 #include "machine/i8155.h"
 #include "machine/i8255.h"
-#include "machine/ncr5380n.h"
+#include "machine/ncr5380.h"
 #include "machine/nscsi_bus.h"
 #include "machine/pit8253.h"
 #include "machine/upd765.h"
@@ -72,7 +72,6 @@ private:
 
 	void bank_switch_w(u8 data);
 	void panel_led_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(fdc_reset_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_tc_w);
 	DECLARE_WRITE_LINE_MEMBER(sed9420c_trgin_w);
 	u8 fdc_r(offs_t offset);
@@ -141,7 +140,7 @@ void korg_dss1_state::machine_reset()
 HD44780_PIXEL_UPDATE(korg_dss1_state::lcd_pixel_update)
 {
 	if (x < 5 && y < 8 && line < 2 && pos < 20)
-		bitmap.pix16(line * 8 + y, pos * 6 + x) = state;
+		bitmap.pix(line * 8 + y, pos * 6 + x) = state;
 }
 
 
@@ -154,12 +153,6 @@ void korg_dss1_state::panel_led_w(u8 data)
 {
 	// TODO
 	// TODO
-}
-
-WRITE_LINE_MEMBER(korg_dss1_state::fdc_reset_w)
-{
-	if (!state)
-		m_fdc->soft_reset();
 }
 
 WRITE_LINE_MEMBER(korg_dss1_state::fdc_tc_w)
@@ -444,7 +437,7 @@ void korg_dss1_state::klm780(machine_config &config)
 	m_io1->out_pc_callback().set(m_lcdc, FUNC(hd44780_device::e_w)).bit(0);
 	m_io1->out_pc_callback().append(m_lcdc, FUNC(hd44780_device::rw_w)).bit(1);
 	m_io1->out_pc_callback().append(m_lcdc, FUNC(hd44780_device::rs_w)).bit(2);
-	m_io1->out_pc_callback().append(FUNC(korg_dss1_state::fdc_reset_w)).bit(3);
+	m_io1->out_pc_callback().append(m_fdc, FUNC(upd765a_device::reset_w)).bit(3).invert();
 	m_io1->out_pc_callback().append(FUNC(korg_dss1_state::fdc_tc_w)).bit(4);
 	m_io1->out_pc_callback().append(FUNC(korg_dss1_state::sed9420c_trgin_w)).bit(5);
 
@@ -453,8 +446,8 @@ void korg_dss1_state::klm780(machine_config &config)
 
 	UPD765A(config, m_fdc, 16_MHz_XTAL / 4, true, true); // uPD765AC; clocked through SED9420C
 	m_fdc->intrq_wr_callback().set_inputline(m_cpu1, I8085_INTR_LINE);
-	FLOPPY_CONNECTOR(config, "fdc:0", dss1_floppies, "35dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", dss1_floppies, nullptr, floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", dss1_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", dss1_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	GENERIC_LATCH_8(config, m_latch[0]);
 	m_latch[0]->data_pending_callback().set_inputline(m_cpu1, I8085_RST65_LINE).invert();
@@ -520,7 +513,7 @@ void korg_dssmsrk_state::dssmsrk(machine_config &config)
 	m_msrkcpu->out_iow_cb<1>().set(m_scsic, FUNC(ncr53c80_device::dma_w));
 	m_msrkcpu->out_eop_cb().set(m_fdc, FUNC(upd765a_device::tc_line_w));
 	//m_msrkcpu->out_eop_cb().append(m_scsic, FUNC(ncr53c80_device::eop_w));
-	m_msrkcpu->out_handler<1>().set(m_msrkcpu, FUNC(v40_device::tclk_w));
+	m_msrkcpu->tout1_cb().set(m_msrkcpu, FUNC(v40_device::tclk_w));
 
 	klm780(config);
 	config.device_remove("cpu1");

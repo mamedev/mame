@@ -111,7 +111,7 @@ void galaxold_state::stratgyx_palette(palette_device &palette)
 	}
 }
 
-void galaxold_state::rockclim_palette(palette_device &palette) const
+void galaxold_state::s2650_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 
@@ -372,12 +372,15 @@ void galaxold_state::video_start_common()
 	m_background_red = 0;
 	m_background_green = 0;
 
+	m_stars_on = 0;
 	m_draw_stars = &galaxold_state::noop_draw_stars;
 
 	m_flipscreen_x = 0;
 	m_flipscreen_y = 0;
 
 	m_spriteram2_present = 0;
+
+	std::fill(std::begin(m_gfxbank), std::end(m_gfxbank), 0);
 
 	state_save_register();
 }
@@ -531,16 +534,13 @@ VIDEO_START_MEMBER(galaxold_state,pisces)
 #ifdef UNUSED_FUNCTION
 void galaxold_state::theend_draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y)
 {
-	int i;
-
-
 	/* same as Galaxian, but all bullets are yellow */
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		x--;
 
 		if (cliprect.contains(x, y))
-			bitmap.pix16(y, x) = BULLETS_COLOR_BASE;
+			bitmap.pix(y, x) = BULLETS_COLOR_BASE;
 	}
 }
 
@@ -568,29 +568,8 @@ VIDEO_START_MEMBER(galaxold_state,mooncrst)
 	m_modify_spritecode = &galaxold_state::mooncrst_modify_spritecode;
 }
 
-void galaxold_state::rockclim_draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_rockclim_tilemap->draw(screen, bitmap, cliprect, 0,0);
-}
 
-void galaxold_state::rockclim_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs)
-{
-	if (m_gfxbank[2])    *code|=0x40;
-}
 
-VIDEO_START_MEMBER(galaxold_state,rockclim)
-{
-	VIDEO_START_CALL_MEMBER(galaxold);
-	m_rockclim_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(galaxold_state::rockclim_get_tile_info)), TILEMAP_SCAN_ROWS,8,8,64,32);
-
-	m_draw_background = &galaxold_state::rockclim_draw_background;
-	m_modify_charcode = &galaxold_state::mooncrst_modify_charcode;
-	m_modify_spritecode = &galaxold_state::rockclim_modify_spritecode;
-
-	m_rockclim_v = m_rockclim_h = 0;
-	save_item(NAME(m_rockclim_v));
-	save_item(NAME(m_rockclim_h));
-}
 
 TILE_GET_INFO_MEMBER(galaxold_state::drivfrcg_get_tile_info)
 {
@@ -699,22 +678,6 @@ VIDEO_START_MEMBER(galaxold_state,harem)
 	m_modify_spritecode = &galaxold_state::harem_modify_spritecode;
 }
 
-VIDEO_START_MEMBER(galaxold_state,ozon1)
-{
-	VIDEO_START_CALL_MEMBER(galaxold_plain);
-
-	m_bg_tilemap->set_scrolldx(0, 384-256);
-}
-
-VIDEO_START_MEMBER(galaxold_state,bongo)
-{
-	VIDEO_START_CALL_MEMBER(galaxold_plain);
-
-	m_bg_tilemap->set_scrolldx(0, 384-256);
-
-	m_modify_spritecode = &galaxold_state::batman2_modify_spritecode;
-}
-
 TILE_GET_INFO_MEMBER(galaxold_state::dambustr_get_tile_info2)
 {
 	uint8_t x = tile_index & 0x1f;
@@ -744,6 +707,7 @@ VIDEO_START_MEMBER(galaxold_state,dambustr)
 	m_dambustr_bg_color_2 = 0;
 	m_dambustr_bg_priority = 0;
 	m_dambustr_char_bank = 0;
+	m_stars_scrollpos = 0;
 
 	m_draw_background = &galaxold_state::dambustr_draw_background;
 
@@ -892,31 +856,6 @@ void galaxold_state::galaxold_gfxbank_w(offs_t offset, uint8_t data)
 	}
 }
 
-void galaxold_state::rockclim_videoram_w(offs_t offset, uint8_t data)
-{
-	m_rockclim_videoram[offset] = data;
-	m_rockclim_tilemap->mark_tile_dirty(offset);
-}
-
-void galaxold_state::rockclim_scroll_w(offs_t offset, uint8_t data)
-{
-	switch(offset&3)
-	{
-		case 0: m_rockclim_h=(m_rockclim_h&0xff00)|data;m_rockclim_tilemap ->set_scrollx(0, m_rockclim_h );break;
-		case 1: m_rockclim_h=(m_rockclim_h&0xff)|(data<<8);m_rockclim_tilemap ->set_scrollx(0, m_rockclim_h );break;
-		case 2: m_rockclim_v=(m_rockclim_v&0xff00)|data;m_rockclim_tilemap ->set_scrolly(0, m_rockclim_v );break;
-		case 3: m_rockclim_v=(m_rockclim_v&0xff)|(data<<8);m_rockclim_tilemap ->set_scrolly(0, m_rockclim_v );break;
-	}
-
-}
-
-
-uint8_t galaxold_state::rockclim_videoram_r(offs_t offset)
-{
-	return m_rockclim_videoram[offset];
-}
-
-
 void galaxold_state::dambustr_bg_split_line_w(uint8_t data)
 {
 	m_dambustr_bg_split_line = data;
@@ -1040,22 +979,16 @@ void galaxold_state::drivfrcg_modify_color(uint8_t *color)
 
 void galaxold_state::galaxold_draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y)
 {
-	int i;
-
-
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		x--;
 
 		if (cliprect.contains(x, y))
 		{
-			int color;
-
-
 			/* yellow missile, white shells (this is the terminology on the schematics) */
-			color = ((offs == 7*4) ? BULLETS_COLOR_BASE : BULLETS_COLOR_BASE + 1);
+			int const color = ((offs == 7*4) ? BULLETS_COLOR_BASE : BULLETS_COLOR_BASE + 1);
 
-			bitmap.pix16(y, x) = color;
+			bitmap.pix(y, x) = color;
 		}
 	}
 }
@@ -1068,7 +1001,7 @@ void galaxold_state::scrambold_draw_bullets(bitmap_ind16 &bitmap, const rectangl
 
 	if (cliprect.contains(x, y))
 		/* yellow bullets */
-		bitmap.pix16(y, x) = BULLETS_COLOR_BASE;
+		bitmap.pix(y, x) = BULLETS_COLOR_BASE;
 }
 
 void galaxold_state::darkplnt_draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y)
@@ -1078,32 +1011,32 @@ void galaxold_state::darkplnt_draw_bullets(bitmap_ind16 &bitmap, const rectangle
 	x = x - 6;
 
 	if (cliprect.contains(x, y))
-		bitmap.pix16(y, x) = 32 + m_darkplnt_bullet_color;
+		bitmap.pix(y, x) = 32 + m_darkplnt_bullet_color;
 }
 
 void galaxold_state::dambustr_draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y)
 {
-	int i, color;
-
 	if (flip_screen_x())  x++;
 
 	x = x - 6;
 
 	/* bullets are 2 pixels wide */
-	for (i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
+		int color;
 		if (offs < 4*4)
 		{
 			color = BULLETS_COLOR_BASE;
 			y--;
 		}
-		else {
+		else
+		{
 			color = BULLETS_COLOR_BASE + 1;
 			x--;
 		}
 
 		if (cliprect.contains(x, y))
-			bitmap.pix16(y, x) = color;
+			bitmap.pix(y, x) = color;
 	}
 }
 
@@ -1368,7 +1301,7 @@ void galaxold_state::plot_star(bitmap_ind16 &bitmap, int x, int y, int color, co
 		y = 255 - y;
 
 	if (cliprect.contains(x, y))
-		bitmap.pix16(y, x) = m_stars_colors_start + color;
+		bitmap.pix(y, x) = m_stars_colors_start + color;
 }
 
 void galaxold_state::noop_draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -1581,11 +1514,6 @@ TILE_GET_INFO_MEMBER(galaxold_state::get_tile_info)
 	tileinfo.set(0, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(galaxold_state::rockclim_get_tile_info)
-{
-	uint16_t code = m_rockclim_videoram[tile_index];
-	tileinfo.set(2, code, 0, 0);
-}
 
 void galaxold_state::draw_bullets_common(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -1745,22 +1673,4 @@ uint32_t galaxold_state::screen_update_dambustr(screen_device &screen, bitmap_in
 	};
 
 	return 0;
-}
-
-void galaxold_state::bagmanmc_modify_charcode(uint16_t *code, uint8_t x)
-{
-	*code |= (m_gfxbank[0] << 9);
-}
-
-void galaxold_state::bagmanmc_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs)
-{
-	*code |= (m_gfxbank[0] << 7) | 0x40;
-}
-
-VIDEO_START_MEMBER(galaxold_state,bagmanmc)
-{
-	VIDEO_START_CALL_MEMBER(galaxold);
-
-	m_modify_charcode = &galaxold_state::bagmanmc_modify_charcode;
-	m_modify_spritecode = &galaxold_state::bagmanmc_modify_spritecode;
 }

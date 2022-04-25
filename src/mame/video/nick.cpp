@@ -185,14 +185,14 @@ void nick_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void nick_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nick_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	int scanline = screen().vpos();
 
 	if (scanline < ENTERPRISE_SCREEN_HEIGHT)
 	{
 		/* set write address for line */
-		m_dest = &m_bitmap.pix32(scanline);
+		m_dest = &m_bitmap.pix(scanline);
 		m_dest_pos = 0;
 		m_dest_max_pos = m_bitmap.width();
 
@@ -354,7 +354,6 @@ void nick_device::initialize_palette()
 	}
 }
 
-// MESS specific
 /* 8-bit pixel write! */
 void nick_device::write_pixel(int ci)
 {

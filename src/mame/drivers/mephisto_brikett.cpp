@@ -35,7 +35,7 @@ Mephisto Junior: (listed differences)
 - no module slot, I/O chip, or external port
 
 Mephisto program module:
-- PCB label: DF 4003-B
+- PCB label: DF 4003-B or DH 4005 20100
 - 6*CDP1833CE (1KB ROM)
 
 Mephisto II/ESB II program module:
@@ -66,16 +66,22 @@ There are no other known external port peripherals.
 The Brikett was also used in the 1983 Mephisto Excalibur, but the hardware
 is completely different, based on a 68000.
 
+BTANB:
+- bad bug in mephistoj opening library: e4 e6 / d4 d5 / Nd2 c5 / exd5 Qd1xd5,
+  in other words: computer makes an illegal move with the WHITE queen
+
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/cosmac/cosmac.h"
 #include "machine/cdp1852.h"
 #include "machine/sensorboard.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
+#include "video/mmdisplay1.h"
 #include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -96,6 +102,7 @@ public:
 		m_extport(*this, "extport"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
+		m_led_pwm(*this, "led_pwm"),
 		m_dac(*this, "dac"),
 		m_speaker_off(*this, "speaker_off"),
 		m_inputs(*this, "IN.%u", 0)
@@ -120,7 +127,8 @@ private:
 	required_device<cdp1802_device> m_maincpu;
 	optional_device<cdp1852_device> m_extport;
 	optional_device<sensorboard_device> m_board;
-	required_device<pwm_display_device> m_display;
+	required_device<mephisto_display1_device> m_display;
+	optional_device<pwm_display_device> m_led_pwm;
 	required_device<dac_bit_interface> m_dac;
 	required_device<timer_device> m_speaker_off;
 	optional_ioport_array<4+2> m_inputs;
@@ -139,8 +147,6 @@ private:
 	// I/O handlers
 	INTERRUPT_GEN_MEMBER(interrupt);
 	DECLARE_READ_LINE_MEMBER(clear_r);
-	DECLARE_WRITE_LINE_MEMBER(q_w);
-	void lcd_w(u8 data);
 	u8 input_r(offs_t offset);
 	u8 sound_r();
 
@@ -149,34 +155,16 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_off) { m_dac->write(0); }
 
-	bool m_reset;
-	u8 m_lcd_mask;
-	u8 m_digit_idx;
-	u8 m_digit_data[4];
-
-	u8 m_esb_led;
-	u8 m_esb_row;
-	u8 m_esb_select;
+	bool m_reset = false;
+	u8 m_esb_led = 0;
+	u8 m_esb_row = 0;
+	u8 m_esb_select = 0;
 };
 
 void brikett_state::machine_start()
 {
-	// zerofill
-	m_reset = false;
-	m_lcd_mask = 0;
-	m_digit_idx = 0;
-	memset(m_digit_data, 0, sizeof(m_digit_data));
-
-	m_esb_led = 0;
-	m_esb_row = 0;
-	m_esb_select = 0;
-
 	// register for savestates
 	save_item(NAME(m_reset));
-	save_item(NAME(m_lcd_mask));
-	save_item(NAME(m_digit_idx));
-	save_item(NAME(m_digit_data));
-
 	save_item(NAME(m_esb_led));
 	save_item(NAME(m_esb_row));
 	save_item(NAME(m_esb_select));
@@ -185,8 +173,6 @@ void brikett_state::machine_start()
 void brikett_state::machine_reset()
 {
 	m_reset = true;
-	m_digit_idx = 0;
-
 	set_cpu_freq();
 }
 
@@ -223,28 +209,6 @@ READ_LINE_MEMBER(brikett_state::clear_r)
 	return ret;
 }
 
-WRITE_LINE_MEMBER(brikett_state::q_w)
-{
-	// Q: LCD digit data mask
-	// also assume LCD update on rising edge
-	if (state && !m_lcd_mask)
-	{
-		for (int i = 0; i < 4; i++)
-			m_display->write_row(i, m_digit_data[i]);
-		m_display->update();
-	}
-
-	m_lcd_mask = state ? 0xff : 0;
-}
-
-void brikett_state::lcd_w(u8 data)
-{
-	// d0-d7: write/shift LCD digit (4*CD4015)
-	// note: last digit "dp" is the colon in the middle
-	m_digit_data[m_digit_idx] = data ^ m_lcd_mask;
-	m_digit_idx = (m_digit_idx + 1) & 3;
-}
-
 u8 brikett_state::sound_r()
 {
 	// port 1 read enables the speaker
@@ -275,7 +239,7 @@ void brikett_state::esb_w(u8 data)
 	if (!m_inputs[5].read_safe(0))
 	{
 		// chessboard disabled
-		m_display->matrix_partial(4, 8, 0, 0);
+		m_led_pwm->clear();
 		return;
 	}
 
@@ -297,7 +261,7 @@ void brikett_state::esb_w(u8 data)
 		m_esb_row = data;
 
 	// update chessboard leds
-	m_display->matrix_partial(4, 8, ~m_esb_row, m_esb_led);
+	m_led_pwm->matrix(~m_esb_row, m_esb_led);
 }
 
 READ_LINE_MEMBER(brikett_state::esb_r)
@@ -319,7 +283,7 @@ void brikett_state::mephisto_map(address_map &map)
 {
 	map(0x0000, 0x17ff).rom();
 	map(0xf400, 0xf7ff).ram();
-	map(0xfb00, 0xfb00).mirror(0x00ff).w(FUNC(brikett_state::lcd_w));
+	map(0xfb00, 0xfb00).mirror(0x00ff).w(m_display, FUNC(mephisto_display1_device::data_w));
 	map(0xfff0, 0xffff).r(FUNC(brikett_state::input_r));
 }
 
@@ -460,20 +424,18 @@ void brikett_state::mephistoj(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &brikett_state::mephistoj_map);
 	m_maincpu->set_addrmap(AS_IO, &brikett_state::mephistoj_io);
 	m_maincpu->clear_cb().set(FUNC(brikett_state::clear_r));
-	m_maincpu->q_cb().set(FUNC(brikett_state::q_w)).invert();
+	m_maincpu->q_cb().set(m_display, FUNC(mephisto_display1_device::strobe_w)).invert();
 
 	const attotime irq_period = attotime::from_hz(4.194304_MHz_XTAL / 0x10000); // through SAJ300T
 	m_maincpu->set_periodic_int(FUNC(brikett_state::interrupt), irq_period);
 
 	/* video hardware */
-	PWM_DISPLAY(config, m_display).set_size(4, 8);
-	m_display->set_segmask(0xf, 0x7f);
+	MEPHISTO_DISPLAY_MODULE1(config, m_display); // internal
 	config.set_default_layout(layout_mephisto_junior);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	TIMER(config, m_speaker_off).configure_generic(FUNC(brikett_state::speaker_off));
 }
@@ -521,7 +483,7 @@ void brikett_state::mephisto2e(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(250));
 
-	m_display->set_size(4+8, 8);
+	PWM_DISPLAY(config, m_led_pwm).set_size(8, 8);
 	config.set_default_layout(layout_mephisto_esb2);
 }
 
@@ -532,7 +494,7 @@ void brikett_state::mephisto3(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_clock(6.144_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &brikett_state::mephisto3_map);
-	m_maincpu->q_cb().set(FUNC(brikett_state::q_w));
+	m_maincpu->q_cb().set(m_display, FUNC(mephisto_display1_device::strobe_w));
 
 	config.set_default_layout(layout_mephisto_3);
 }
@@ -543,14 +505,14 @@ void brikett_state::mephisto3(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
-ROM_START( mephisto )
+ROM_START( mephisto ) // ROM serials 911xx have same contents, some modules have both 898xx and 911xx chips
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("89810", 0x0000, 0x0400, CRC(6816be9e) SHA1(f5f1d5084925fe239f5b2ecf4724751e0dc4fc51) ) // CDP1833CE
-	ROM_LOAD("89811", 0x0400, 0x0400, CRC(15febc73) SHA1(10353a7f021993f2cf7d509a928425617e1786fb) ) // "
-	ROM_LOAD("89812", 0x0800, 0x0400, CRC(5e45eb65) SHA1(9d46e5f405bd48705d1e29826917522595fc9768) ) // "
-	ROM_LOAD("89813", 0x0c00, 0x0400, CRC(62da3d89) SHA1(a7f9ada7037e0bd61420358c147b2f57ee47ebcb) ) // "
-	ROM_LOAD("89814", 0x1000, 0x0400, CRC(8e212d9c) SHA1(5df221ce8ca4fbb74f34f31738db4c2efee7fb01) ) // "
-	ROM_LOAD("89815", 0x1400, 0x0400, CRC(072e0b01) SHA1(5b1074932b3f21ab01392250061c093de4af3624) ) // "
+	ROM_LOAD("89810", 0x0000, 0x0400, CRC(6816be9e) SHA1(f5f1d5084925fe239f5b2ecf4724751e0dc4fc51) ) // CDP1833CE, also seen with label 91143
+	ROM_LOAD("89811", 0x0400, 0x0400, CRC(15febc73) SHA1(10353a7f021993f2cf7d509a928425617e1786fb) ) // " or 91144
+	ROM_LOAD("89812", 0x0800, 0x0400, CRC(5e45eb65) SHA1(9d46e5f405bd48705d1e29826917522595fc9768) ) // " or 91145
+	ROM_LOAD("89813", 0x0c00, 0x0400, CRC(62da3d89) SHA1(a7f9ada7037e0bd61420358c147b2f57ee47ebcb) ) // " or 91146
+	ROM_LOAD("89814", 0x1000, 0x0400, CRC(8e212d9c) SHA1(5df221ce8ca4fbb74f34f31738db4c2efee7fb01) ) // " or 91163
+	ROM_LOAD("89815", 0x1400, 0x0400, CRC(072e0b01) SHA1(5b1074932b3f21ab01392250061c093de4af3624) ) // " or 91147
 ROM_END
 
 ROM_START( mephisto1x )
@@ -591,11 +553,23 @@ ROM_END
 
 ROM_START( mephisto3 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101", 0x0000, 0x4000, CRC(923de04f) SHA1(ca7cb3e29aeb3432a815c9d58bb0ed45e7302581) ) // HN4827128G-45
+	ROM_LOAD("101", 0x0000, 0x4000, CRC(923de04f) SHA1(ca7cb3e29aeb3432a815c9d58bb0ed45e7302581) ) // HN4827128G-45 or D27128-4
 	ROM_LOAD("201", 0x4000, 0x4000, CRC(0c3cb8fa) SHA1(31449422142c19fc71474a057fc5d6af8a86be7d) ) // "
 ROM_END
 
+ROM_START( mephisto3a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("107", 0x0000, 0x4000, CRC(52c072b8) SHA1(938dfaa18d751f06f42be16dedb7d32d010023b2) ) // HN4827128G-25
+	ROM_LOAD("207", 0x4000, 0x4000, CRC(9b45c350) SHA1(96a11f740c657a915a9ce3fa417a59f4e064a10b) ) // "
+ROM_END
+
 ROM_START( mephisto3b )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("109", 0x0000, 0x4000, CRC(02f9e37d) SHA1(1911d45c0c8db030d129c4d2b25572678835112a) ) // D27128-4
+	ROM_LOAD("209", 0x4000, 0x4000, CRC(0f217caf) SHA1(5aa77157af51a73e0654c344636ea2887bc45d42) ) // "
+ROM_END
+
+ROM_START( mephisto3c )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("g81", 0x0000, 0x8000, CRC(7b49475d) SHA1(30193153f0c259294b47e95d3e33834e40a94821) ) // HN613256P
 ROM_END
@@ -618,5 +592,7 @@ CONS( 1981, mephisto2,  0,         0, mephisto2,  mephisto,   brikett_state, emp
 CONS( 1981, mephisto2a, mephisto2, 0, mephisto2,  mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto II (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1981, mephisto2e, mephisto2, 0, mephisto2e, mephisto2e, brikett_state, empty_init, "Hegener + Glaser", "Mephisto ESB II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1983, mephisto3,  0,         0, mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (ver. A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1983, mephisto3b, mephisto3, 0, mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (ver. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1983, mephisto3,  0,         0, mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1983, mephisto3a, mephisto3, 0, mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1983, mephisto3b, mephisto3, 0, mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1983, mephisto3c, mephisto3, 0, mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

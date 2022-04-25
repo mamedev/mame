@@ -76,7 +76,6 @@ private:
 	uint16_t mem_r(address_space &space, offs_t offset);
 	void mem_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_bsy);
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_cd);
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_io);
@@ -102,14 +101,14 @@ private:
 	required_device<output_latch_device> m_scsi_data_out;
 	required_device<input_buffer_device> m_scsi_data_in;
 	required_device<ram_device> m_ram;
-	uint8_t m_stat, m_led;
-	int m_msg, m_bsy, m_io, m_cd, m_req, m_rst;
-	uint16_t m_dskctl;
+	uint8_t m_stat = 0, m_led = 0;
+	int m_msg = 0, m_bsy = 0, m_io = 0, m_cd = 0, m_req = 0, m_rst = 0;
+	uint16_t m_dskctl = 0;
 	struct {
-		uint16_t ctl;
-		uint16_t regs[1024];
-		int type;
-		bool sc;
+		uint16_t ctl = 0;
+		uint16_t regs[1024]{};
+		int type = 0;
+		bool sc = 0;
 	} m_mmu;
 
 	void check_scsi_irq();
@@ -239,7 +238,7 @@ uint16_t pcd_state::mmu_r(offs_t offset)
 	//logerror("%s: mmu read %04x %04x\n", machine().describe_context(), (offset << 1) + 0x8000, data);
 	if(!offset)
 		return m_mmu.ctl;
-	else if((offset >= 0x200) && (offset < 0x300) && !(offset & 3))
+	else if((offset >= 0x200) && (offset < 0x400) && !(offset & 3))
 		return (data << 4) | (data >> 12) | (m_mmu.sc && (offset == 0x200) ? 0xc0 : 0);
 	else if(offset == 0x400)
 	{
@@ -254,7 +253,7 @@ void pcd_state::mmu_w(offs_t offset, uint16_t data)
 	//logerror("%s: mmu write %04x %04x\n", machine().describe_context(), (offset << 1) + 0x8000, data);
 	if(!offset)
 		m_mmu.ctl = data;
-	else if((offset >= 0x200) && (offset < 0x300) && !(offset & 3))
+	else if((offset >= 0x200) && (offset < 0x400) && !(offset & 3))
 		m_mmu.regs[((m_mmu.ctl & 0x1f) << 5) | ((offset >> 2) & 0x1f)] = (data >> 4) | (data << 12);
 	else if(offset == 0x400)
 	{
@@ -376,7 +375,7 @@ void pcd_state::mem_w(address_space &space, offs_t offset, uint16_t data, uint16
 			reg = m_mmu.regs[((offset >> 10) & 0xff) | ((m_mmu.ctl & 0x18) << 5)];
 		else
 			reg = m_mmu.regs[((offset >> 10) & 0x7f) | ((m_mmu.ctl & 0x1c) << 5)];
-		if(!reg && !machine().side_effects_disabled())
+		if(!(reg & 1) && !machine().side_effects_disabled())
 		{
 			offset <<= 1;
 			logerror("%s: Null mmu entry %06x\n", machine().describe_context(), offset);
@@ -398,7 +397,7 @@ uint16_t pcd_state::mem_r(address_space &space, offs_t offset)
 			reg = m_mmu.regs[((offset >> 10) & 0xff) | ((m_mmu.ctl & 0x18) << 5)];
 		else
 			reg = m_mmu.regs[((offset >> 10) & 0x7f) | ((m_mmu.ctl & 0x1c) << 5)];
-		if(!reg && !machine().side_effects_disabled())
+		if(!(reg & 2) && !machine().side_effects_disabled())
 		{
 			offset <<= 1;
 			logerror("%s: Null mmu entry %06x\n", machine().describe_context(), offset);
@@ -460,10 +459,6 @@ static void pcd_floppies(device_slot_interface &device)
 	device.option_add("55g", TEAC_FD_55G); // 77 tracks
 }
 
-FLOPPY_FORMATS_MEMBER( pcd_state::floppy_formats )
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
-
 static INPUT_PORTS_START(pcx)
 	PORT_START("mmu")
 	PORT_CONFNAME(0x03, 0x00, "MMU Type")
@@ -502,8 +497,8 @@ void pcd_state::pcd(machine_config &config)
 	m_fdc->enmf_rd_callback().set_constant(0);
 
 	// floppy drives
-	FLOPPY_CONNECTOR(config, "fdc:0", pcd_floppies, "55f", pcd_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", pcd_floppies, "55f", pcd_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", pcd_floppies, "55f", floppy_image_device::default_pc_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", pcd_floppies, "55f", floppy_image_device::default_pc_floppy_formats);
 
 	// usart
 	SCN2661B(config, m_usart[0], 4.9152_MHz_XTAL);

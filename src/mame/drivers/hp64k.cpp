@@ -481,11 +481,9 @@ WRITE_LINE_MEMBER(hp64k_state::hp64k_crtc_vrtc_w)
 
 I8275_DRAW_CHARACTER_MEMBER(hp64k_state::crtc_display_pixels)
 {
-		const rgb_t *palette = m_palette->palette()->entry_list_raw();
+		rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 		uint8_t chargen_byte = m_chargen[ linecount  | ((unsigned)charcode << 4) ];
-		bool lvid , livid;
 		uint16_t pixels_lvid , pixels_livid;
-		unsigned i;
 
 		if (vsp) {
 				pixels_lvid = pixels_livid = ~0;
@@ -504,19 +502,19 @@ I8275_DRAW_CHARACTER_MEMBER(hp64k_state::crtc_display_pixels)
 				pixels_livid = ~0;
 		}
 
-		for (i = 0; i < 9; i++) {
-				lvid = (pixels_lvid & (1U << (8 - i))) != 0;
-				livid = (pixels_livid & (1U << (8 - i))) != 0;
+		for (unsigned i = 0; i < 9; i++) {
+				bool const lvid = (pixels_lvid & (1U << (8 - i))) != 0;
+				bool const livid = (pixels_livid & (1U << (8 - i))) != 0;
 
 				if (!lvid) {
 						// Normal brightness
-						bitmap.pix32(y , x + i) = palette[ 2 ];
+						bitmap.pix(y , x + i) = palette[ 2 ];
 				} else if (livid) {
 						// Black
-						bitmap.pix32(y , x + i) = palette[ 0 ];
+						bitmap.pix(y , x + i) = palette[ 0 ];
 				} else {
 						// Half brightness
-						bitmap.pix32(y , x + i) = palette[ 1 ];
+						bitmap.pix(y , x + i) = palette[ 1 ];
 				}
 		}
 
@@ -1382,7 +1380,7 @@ void hp64k_state::hp64k(machine_config &config)
 	m_cpu->set_relative_mode(true);
 	m_cpu->set_addrmap(AS_PROGRAM, &hp64k_state::cpu_mem_map);
 	m_cpu->set_addrmap(AS_IO, &hp64k_state::cpu_io_map);
-	m_cpu->int_cb().set(FUNC(hp64k_state::int_cb));
+	m_cpu->set_int_cb(FUNC(hp64k_state::int_cb));
 
 	// Actual keyboard refresh rate should be between 1 and 2 kHz
 	TIMER(config, "kb_timer").configure_periodic(FUNC(hp64k_state::hp64k_kb_scan), attotime::from_hz(100));
@@ -1410,8 +1408,8 @@ void hp64k_state::hp64k(machine_config &config)
 	m_fdc->set_force_ready(true); // should be able to get rid of this when fdc issue is fixed
 	m_fdc->intrq_wr_callback().set(FUNC(hp64k_state::hp64k_flp_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(hp64k_state::hp64k_flp_drq_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", hp64k_floppies, "525dd", floppy_image_device::default_floppy_formats, true);
-	FLOPPY_CONNECTOR(config, "fdc:1", hp64k_floppies, "525dd", floppy_image_device::default_floppy_formats, true);
+	FLOPPY_CONNECTOR(config, "fdc:0", hp64k_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats, true);
+	FLOPPY_CONNECTOR(config, "fdc:1", hp64k_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats, true);
 
 	TTL74123(config, m_ss0, 0);
 	m_ss0->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);

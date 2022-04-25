@@ -10,29 +10,29 @@
 #include "includes/renegade.h"
 
 
-WRITE8_MEMBER(renegade_state::bg_videoram_w)
+void renegade_state::bg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(renegade_state::fg_videoram_w)
+void renegade_state::fg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(renegade_state::flipscreen_w)
+void renegade_state::flipscreen_w(uint8_t data)
 {
 	flip_screen_set(~data & 0x01);
 }
 
-WRITE8_MEMBER(renegade_state::scroll_lsb_w)
+void renegade_state::scroll_lsb_w(uint8_t data)
 {
 	m_scrollx = (m_scrollx & 0xff00) | data;
 }
 
-WRITE8_MEMBER(renegade_state::scroll_msb_w)
+void renegade_state::scroll_msb_w(uint8_t data)
 {
 	m_scrollx = (m_scrollx & 0xff) | (data << 8);
 }
@@ -64,6 +64,8 @@ void renegade_state::video_start()
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scrolldx(256, 0);
+	m_fg_tilemap->set_scrolldy(10, 10);
+	m_bg_tilemap->set_scrolldy(10, 10);
 
 	save_item(NAME(m_scrollx));
 }
@@ -75,8 +77,8 @@ void renegade_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 	while (source < finish)
 	{
-		// 224 matches reference (stage 1 boss in kuniokun is aligned with the train door)
-		int sy = 224 - source[0];
+		// reference: stage 1 boss in kuniokun is aligned with the train door
+		int sy = 234 - source[0];
 
 		//if (sy >= 0)
 		{
@@ -96,7 +98,7 @@ void renegade_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			if (flip_screen())
 			{
 				sx = 240 - sx;
-				sy = 224 - sy;
+				sy = 260 - sy;
 				xflip = !xflip;
 			}
 

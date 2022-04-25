@@ -3,9 +3,9 @@
 // thanks-to:Sean Riddle, Kevin Horton
 /***************************************************************************
 
-  GI PIC 16xx-driven dedicated handhelds or other simple devices.
+GI PIC 16xx-driven dedicated handhelds or other simple devices.
 
-  known chips:
+known chips:
 
   serial  device  etc.
 -----------------------------------------------------------
@@ -16,12 +16,13 @@
  @036     1655A   1979, Ideal Maniac
  @043     1655A   1979, Caprice Pro-Action Baseball
  @049     1655A   1980, Kingsford Match Me(?)/Mini Match Me
- @051     1655A   1979, Tandy Electronic Basketball
+ @051     1655A   1979, Kmart Dr. Dunk/Tandy Electronic Basketball
  @053     1655A   1979, Atari Touch Me
  @0??     1655A   1979, Tiger Half Court Computer Basketball/Sears Electronic Basketball (custom label)
  @061     1655A   1980, Lakeside Le Boom
  @078     1655A   1980, Ideal Flash
  *081     1655A   1981, Ramtex Space Invaders/Block Buster
+ *085     1655A   1980, VTech Soccer 2/Grandstand Match of the Day Soccer
  @094     1655A   1980, GAF Melody Madness
  @110     1650A   1979, Tiger/Tandy Rocket Pinball
  *123     1655A?  1980, Kingsford Match Me/Mini Match Me
@@ -37,25 +38,34 @@
 
   (* means undumped unless noted, @ denotes it's in this driver)
 
+ROM source notes when dumped from another publisher, but confident it's the same:
+- drdunk: Tandy Electronic Basketball
+- flash: Radio Shack Sound Effects Chassis
+- hccbaskb: Sears Electronic Basketball
+- us2pfball: Tandy 2-Player Football
+- uspbball: Tandy 2-Player Baseball
 
-  TODO:
-  - tweak MCU frequency for games when video/audio recording surfaces(YouTube etc.)
-  - us2pfball player led is brighter, but I can't get a stable picture
-  - ttfball: discrete sound part, for volume gating?
-  - what's the relation between hccbaskb and tbaskb? Is one the bootleg of the
-    other? Or are they both made by the same subcontractor? I presume Toytronic.
-  - uspbball and pabball internal artwork
+TODO:
+- tweak MCU frequency for games when video/audio recording surfaces(YouTube etc.)
+- ttfball: discrete sound part, for volume gating?
+- what's the relation between drdunk and hccbaskb? Probably made by the same
+  Hong Kong subcontractor? I presume Toytronic.
+- uspbball and pabball internal artwork
 
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "video/pwm.h"
 #include "machine/clock.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
+
 #include "speaker.h"
 
+// internal artwork
+#include "drdunk.lh"
 #include "flash.lh" // clickable
 #include "hccbaskb.lh"
 #include "leboom.lh" // clickable
@@ -63,7 +73,6 @@
 #include "melodym.lh" // clickable
 #include "matchme.lh" // clickable
 #include "rockpin.lh"
-#include "tbaskb.lh"
 #include "touchme.lh" // clickable
 #include "ttfball.lh"
 #include "us2pfball.lh"
@@ -82,6 +91,12 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
+	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	// devices
 	required_device<pic16c5x_device> m_maincpu;
 	optional_device<pwm_display_device> m_display;
@@ -89,19 +104,14 @@ public:
 	optional_ioport_array<6> m_inputs; // max 6
 
 	// misc common
-	u8 m_a;                         // MCU port A write data
-	u8 m_b;                         // " B
-	u8 m_c;                         // " C
-	u8 m_d;                         // " D
-	u16 m_inp_mux;                  // multiplexed inputs mask
+	u8 m_a = 0;                     // MCU port A write data
+	u8 m_b = 0;                     // " B
+	u8 m_c = 0;                     // " C
+	u8 m_d = 0;                     // " D
+	u16 m_inp_mux = ~0;             // multiplexed inputs mask
 
 	u16 read_inputs(int columns, u16 colmask = ~0);
 	u8 read_rotated_inputs(int columns, u8 rowmask = ~0);
-	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button);
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 };
 
 
@@ -109,13 +119,6 @@ protected:
 
 void hh_pic16_state::machine_start()
 {
-	// zerofill
-	m_a = 0;
-	m_b = 0;
-	m_c = 0;
-	m_d = 0;
-	m_inp_mux = ~0;
-
 	// register for savestates
 	save_item(NAME(m_a));
 	save_item(NAME(m_b));
@@ -202,12 +205,14 @@ public:
 		hh_pic16_state(mconfig, type, tag)
 	{ }
 
+	void touchme(machine_config &config);
+
+private:
 	void update_display();
 	void update_speaker();
 	u8 read_a();
 	void write_b(u8 data);
 	void write_c(u8 data);
-	void touchme(machine_config &config);
 };
 
 // handlers
@@ -277,7 +282,7 @@ INPUT_PORTS_END
 
 void touchme_state::touchme(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	PIC1655(config, m_maincpu, 300000); // approximation - RC osc. R=100K, C=47pF
 	m_maincpu->read_a().set(FUNC(touchme_state::read_a));
 	m_maincpu->write_b().set(FUNC(touchme_state::write_b));
@@ -287,15 +292,15 @@ void touchme_state::touchme(machine_config &config)
 	// PIC CLKOUT, tied to RTCC
 	CLOCK(config, "clock", 300000/4).signal_handler().set_inputline("maincpu", PIC16C5x_RTCC);
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(7, 7);
 	m_display->set_segmask(3, 0x7f);
 	config.set_default_layout(layout_touchme);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	static const s16 speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
+	static const double speaker_levels[] = { 0.0, 1.0, -1.0, 0.0 };
 	m_speaker->set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -326,10 +331,12 @@ public:
 		hh_pic16_state(mconfig, type, tag)
 	{ }
 
+	void pabball(machine_config &config);
+
+private:
 	void update_display();
 	void write_b(u8 data);
 	void write_c(u8 data);
-	void pabball(machine_config &config);
 };
 
 // handlers
@@ -382,24 +389,24 @@ static INPUT_PORTS_START( pabball )
 	PORT_CONFSETTING(    0x20, "2" )
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_pic16_state, reset_button, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_pic16_state, reset_button, 0) PORT_NAME("P1 Reset")
 INPUT_PORTS_END
 
 void pabball_state::pabball(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	PIC1655(config, m_maincpu, 1200000); // approximation - RC osc. R=18K, C=27pF
 	m_maincpu->read_a().set_ioport("IN.0");
 	m_maincpu->write_b().set(FUNC(pabball_state::write_b));
 	m_maincpu->read_c().set_ioport("IN.1");
 	m_maincpu->write_c().set(FUNC(pabball_state::write_c));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
 	m_display->set_segmask(0x200, 0xff);
 	config.set_default_layout(layout_hh_pic16_test);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -433,10 +440,12 @@ public:
 		hh_pic16_state(mconfig, type, tag)
 	{ }
 
+	void melodym(machine_config &config);
+
+private:
 	void write_b(u8 data);
 	u8 read_c();
 	void write_c(u8 data);
-	void melodym(machine_config &config);
 };
 
 // handlers
@@ -509,19 +518,19 @@ INPUT_PORTS_END
 
 void melodym_state::melodym(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	PIC1655(config, m_maincpu, 1000000); // approximation
 	m_maincpu->read_a().set_ioport("IN.5");
 	m_maincpu->write_b().set(FUNC(melodym_state::write_b));
 	m_maincpu->read_c().set(FUNC(melodym_state::read_c));
 	m_maincpu->write_c().set(FUNC(melodym_state::write_c));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 1);
 	m_display->set_bri_levels(0.9);
 	config.set_default_layout(layout_melodym);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -559,11 +568,13 @@ public:
 		hh_pic16_state(mconfig, type, tag)
 	{ }
 
+	void maniac(machine_config &config);
+
+private:
 	void update_display();
 	void update_speaker();
 	void write_b(u8 data);
 	void write_c(u8 data);
-	void maniac(machine_config &config);
 };
 
 // handlers
@@ -572,7 +583,6 @@ void maniac_state::update_display()
 {
 	m_display->write_row(0, ~m_b & 0x7f);
 	m_display->write_row(1, ~m_c & 0x7f);
-	m_display->update();
 }
 
 void maniac_state::update_speaker()
@@ -612,21 +622,21 @@ INPUT_PORTS_END
 
 void maniac_state::maniac(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	PIC1655(config, m_maincpu, 1000000); // approximation - RC osc. R=~13.4K, C=470pF
 	m_maincpu->read_a().set_ioport("IN.0");
 	m_maincpu->write_b().set(FUNC(maniac_state::write_b));
 	m_maincpu->write_c().set(FUNC(maniac_state::write_c));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(2, 7);
 	m_display->set_segmask(3, 0x7f);
 	config.set_default_layout(layout_maniac);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	static const s16 speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
+	static const double speaker_levels[] = { 0.0, 1.0, -1.0, 0.0 };
 	m_speaker->set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -673,6 +683,12 @@ public:
 		hh_pic16_state(mconfig, type, tag)
 	{ }
 
+	void flash(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
 	void update_display();
 	void write_b(u8 data);
 	u8 read_c();
@@ -680,19 +696,12 @@ public:
 
 	void speaker_decay_reset();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
-	double m_speaker_volume;
-	void flash(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
+	double m_speaker_volume = 0.0;
 };
 
 void flash_state::machine_start()
 {
 	hh_pic16_state::machine_start();
-
-	// zerofill/init
-	m_speaker_volume = 0;
 	save_item(NAME(m_speaker_volume));
 }
 
@@ -767,19 +776,19 @@ INPUT_PORTS_END
 
 void flash_state::flash(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	PIC1655(config, m_maincpu, 1050000); // approximation
 	m_maincpu->read_a().set_ioport("IN.0");
 	m_maincpu->write_b().set(FUNC(flash_state::write_b));
 	m_maincpu->read_c().set(FUNC(flash_state::read_c));
 	m_maincpu->write_c().set(FUNC(flash_state::write_c));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(2, 7+4);
 	m_display->set_segmask(3, 0x7f);
 	config.set_default_layout(layout_flash);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 	TIMER(config, "speaker_decay").configure_periodic(FUNC(flash_state::speaker_decay_sim), attotime::from_msec(25));
@@ -803,10 +812,11 @@ ROM_END
   * 8 lamps, 1-bit sound
 
   Known releases:
-  - USA(1): Match Me/Mini Match Me(latter is the handheld version, same game)
+  - USA(1): Match Me/Mini Match Me, published by Kingsford
   - USA(2): Me Too, published by Talbot
   - Hong Kong: Gotcha!/Encore/Follow Me, published by Toytronic
 
+  Match Me is the tabletop version, Mini Match Me is the handheld.
   The original is probably by Toytronic, Kingsford's version being licensed from them.
 
   Known revisions:
@@ -822,16 +832,18 @@ public:
 		hh_pic16_state(mconfig, type, tag)
 	{ }
 
-	void write_b(u8 data);
-	void write_c(u8 data);
-	u8 read_c();
-
-	void set_clock();
-	DECLARE_INPUT_CHANGED_MEMBER(speed_switch) { set_clock(); }
 	void matchme(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(speed_switch) { set_clock(); }
 
 protected:
 	virtual void machine_reset() override;
+
+private:
+	void set_clock();
+	void write_b(u8 data);
+	void write_c(u8 data);
+	u8 read_c();
 };
 
 void matchme_state::machine_reset()
@@ -923,18 +935,18 @@ INPUT_PORTS_END
 
 void matchme_state::matchme(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	PIC1655(config, m_maincpu, 1200000); // see set_clock
 	m_maincpu->read_a().set_ioport("IN.3");
 	m_maincpu->write_b().set(FUNC(matchme_state::write_b));
 	m_maincpu->read_c().set(FUNC(matchme_state::read_c));
 	m_maincpu->write_c().set(FUNC(matchme_state::write_c));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 8);
 	config.set_default_layout(layout_matchme);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -944,6 +956,130 @@ void matchme_state::matchme(machine_config &config)
 ROM_START( matchme )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "pic_1655a-049", 0x0000, 0x0400, CRC(fa3f4805) SHA1(57cbac18baa201927e99cd69cc2ffda4d2e642bb) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Kmart Dr. Dunk (manufactured in Hong Kong)
+  * PIC 1655A-51
+  * 2 7seg LEDs + 21 other LEDs, 1-bit sound
+
+  It is a clone of Mattel Basketball, but at lower speed.
+  The ROM is nearly identical to hccbaskb, the housing/overlay is similar to
+  U.S. Games/Tandy Trick Shot Basketball.
+
+  known releases:
+  - USA(1): Dr. Dunk, published by Kmart
+  - USA(2): Electronic Basketball (model 60-2146), published by Tandy
+
+***************************************************************************/
+
+class drdunk_state : public hh_pic16_state
+{
+public:
+	drdunk_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_pic16_state(mconfig, type, tag)
+	{ }
+
+	void drdunk(machine_config &config);
+
+private:
+	void update_display();
+	u8 read_a();
+	void write_b(u8 data);
+	void write_c(u8 data);
+};
+
+// handlers
+
+void drdunk_state::update_display()
+{
+	m_display->matrix(m_b, m_c);
+}
+
+u8 drdunk_state::read_a()
+{
+	// A2: skill switch, A3: multiplexed inputs
+	return m_inputs[5]->read() | read_inputs(5, 8) | 3;
+}
+
+void drdunk_state::write_b(u8 data)
+{
+	// B0: RTCC pin
+	m_maincpu->set_input_line(PIC16C5x_RTCC, data & 1);
+
+	// B0-B4: input mux
+	m_inp_mux = ~data & 0x1f;
+
+	// B0-B3: led select
+	// B4,B5: digit select
+	m_b = data;
+	update_display();
+}
+
+void drdunk_state::write_c(u8 data)
+{
+	// C7: speaker out
+	m_speaker->level_w(data >> 7 & 1);
+
+	// C0-C6: led data
+	m_c = ~data;
+	update_display();
+}
+
+// config
+
+static INPUT_PORTS_START( drdunk )
+	PORT_START("IN.0") // B0 port A3
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_16WAY
+
+	PORT_START("IN.1") // B1 port A3
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_16WAY
+
+	PORT_START("IN.2") // B2 port A3
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY
+
+	PORT_START("IN.3") // B3 port A3
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+
+	PORT_START("IN.4") // B4 port A3
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
+
+	PORT_START("IN.5") // port A2
+	PORT_CONFNAME( 0x04, 0x04, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x04, "1" )
+	PORT_CONFSETTING(    0x00, "2" )
+INPUT_PORTS_END
+
+void drdunk_state::drdunk(machine_config &config)
+{
+	// basic machine hardware
+	PIC1655(config, m_maincpu, 800000); // approximation - RC osc. R=18K, C=47pF
+	m_maincpu->read_a().set(FUNC(drdunk_state::read_a));
+	m_maincpu->write_b().set(FUNC(drdunk_state::write_b));
+	m_maincpu->read_c().set_constant(0xff);
+	m_maincpu->write_c().set(FUNC(drdunk_state::write_c));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(6, 7);
+	m_display->set_segmask(0x30, 0x7f);
+	m_display->set_bri_levels(0.01, 0.2); // player led is brighter
+	config.set_default_layout(layout_drdunk);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( drdunk )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "pic_1655a-051", 0x0000, 0x0400, CRC(92534b40) SHA1(7055e32846c913e68f7d35f279cd537f6325f4f2) )
 ROM_END
 
 
@@ -980,25 +1116,24 @@ public:
 		hh_pic16_state(mconfig, type, tag)
 	{ }
 
+	void leboom(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
 	u8 read_a();
 	void write_b(u8 data);
 	void write_c(u8 data);
 
 	void speaker_decay_reset();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
-	double m_speaker_volume;
-	void leboom(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
+	double m_speaker_volume = 0.0;
 };
 
 void leboom_state::machine_start()
 {
 	hh_pic16_state::machine_start();
-
-	// zerofill/init
-	m_speaker_volume = 0;
 	save_item(NAME(m_speaker_volume));
 }
 
@@ -1086,18 +1221,18 @@ INPUT_PORTS_END
 
 void leboom_state::leboom(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	PIC1655(config, m_maincpu, 1000000); // approximation
 	m_maincpu->read_a().set(FUNC(leboom_state::read_a));
 	m_maincpu->write_b().set(FUNC(leboom_state::write_b));
 	m_maincpu->read_c().set_constant(0xff);
 	m_maincpu->write_c().set(FUNC(leboom_state::write_c));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 1);
 	config.set_default_layout(layout_leboom);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 	TIMER(config, "speaker_decay").configure_periodic(FUNC(leboom_state::speaker_decay_sim), attotime::from_msec(25));
@@ -1116,129 +1251,12 @@ ROM_END
 
 /***************************************************************************
 
-  Tandy Electronic Basketball (model 60-2146)
-  * PIC 1655A-51
-  * 2 7seg LEDs + 21 other LEDs, 1-bit sound
-
-  The ROM is nearly identical to hccbaskb, the shell/overlay is the same as
-  U.S. Games/Tandy Trick Shot Basketball.
-
-***************************************************************************/
-
-class tbaskb_state : public hh_pic16_state
-{
-public:
-	tbaskb_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_pic16_state(mconfig, type, tag)
-	{ }
-
-	void update_display();
-	u8 read_a();
-	void write_b(u8 data);
-	void write_c(u8 data);
-	void tbaskb(machine_config &config);
-};
-
-// handlers
-
-void tbaskb_state::update_display()
-{
-	m_display->matrix(m_b, m_c);
-}
-
-u8 tbaskb_state::read_a()
-{
-	// A2: skill switch, A3: multiplexed inputs
-	return m_inputs[5]->read() | read_inputs(5, 8) | 3;
-}
-
-void tbaskb_state::write_b(u8 data)
-{
-	// B0: RTCC pin
-	m_maincpu->set_input_line(PIC16C5x_RTCC, data & 1);
-
-	// B0-B4: input mux
-	m_inp_mux = ~data & 0x1f;
-
-	// B0-B3: led select
-	// B4,B5: digit select
-	m_b = data;
-	update_display();
-}
-
-void tbaskb_state::write_c(u8 data)
-{
-	// C7: speaker out
-	m_speaker->level_w(data >> 7 & 1);
-
-	// C0-C6: led data
-	m_c = ~data;
-	update_display();
-}
-
-// config
-
-static INPUT_PORTS_START( tbaskb )
-	PORT_START("IN.0") // B0 port A3
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_16WAY
-
-	PORT_START("IN.1") // B1 port A3
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_16WAY
-
-	PORT_START("IN.2") // B2 port A3
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY
-
-	PORT_START("IN.3") // B3 port A3
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_16WAY
-
-	PORT_START("IN.4") // B4 port A3
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
-
-	PORT_START("IN.5") // port A2
-	PORT_CONFNAME( 0x04, 0x04, DEF_STR( Difficulty ) )
-	PORT_CONFSETTING(    0x04, "1" )
-	PORT_CONFSETTING(    0x00, "2" )
-INPUT_PORTS_END
-
-void tbaskb_state::tbaskb(machine_config &config)
-{
-	/* basic machine hardware */
-	PIC1655(config, m_maincpu, 950000); // approximation - RC osc. R=18K, C=47pF
-	m_maincpu->read_a().set(FUNC(tbaskb_state::read_a));
-	m_maincpu->write_b().set(FUNC(tbaskb_state::write_b));
-	m_maincpu->read_c().set_constant(0xff);
-	m_maincpu->write_c().set(FUNC(tbaskb_state::write_c));
-
-	/* video hardware */
-	PWM_DISPLAY(config, m_display).set_size(6, 7);
-	m_display->set_segmask(0x30, 0x7f);
-	m_display->set_bri_levels(0.01, 0.2); // player led is brighter
-	config.set_default_layout(layout_tbaskb);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
-}
-
-// roms
-
-ROM_START( tbaskb )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "pic_1655a-051", 0x0000, 0x0400, CRC(92534b40) SHA1(7055e32846c913e68f7d35f279cd537f6325f4f2) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
   Tiger Electronics Rocket Pinball (model 7-460)
   * PIC 1650A-110, 69-11397
   * 3 7seg LEDs + 44 other LEDs, 1-bit sound
 
   known releases:
-  - Hong Kong(1): Rocket Pinball
+  - Hong Kong(1): Rocket Pinball, published by Tiger
   - Hong Kong(2): Spaceship Pinball, published by Toytronic
   - USA(1): Rocket Pinball (model 60-2140), published by Tandy
   - USA(2): Cosmic Pinball (model 49-65456), published by Sears
@@ -1252,12 +1270,14 @@ public:
 		hh_pic16_state(mconfig, type, tag)
 	{ }
 
+	void rockpin(machine_config &config);
+
+private:
 	void update_display();
 	void write_a(u8 data);
 	void write_b(u8 data);
 	void write_c(u8 data);
 	void write_d(u8 data);
-	void rockpin(machine_config &config);
 };
 
 // handlers
@@ -1265,7 +1285,7 @@ public:
 void rockpin_state::update_display()
 {
 	// 3 7seg leds from ports A and B
-	m_display->matrix_partial(0, 3, m_a, m_b, false);
+	m_display->matrix_partial(0, 3, m_a, m_b);
 
 	// 44 leds from ports C and D
 	m_display->matrix_partial(3, 6, m_d, m_c);
@@ -1314,7 +1334,7 @@ INPUT_PORTS_END
 
 void rockpin_state::rockpin(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	PIC1650(config, m_maincpu, 450000); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->read_a().set_ioport("IN.0");
 	m_maincpu->write_a().set(FUNC(rockpin_state::write_a));
@@ -1328,15 +1348,15 @@ void rockpin_state::rockpin(machine_config &config)
 	// PIC CLKOUT, tied to RTCC
 	CLOCK(config, "clock", 450000/4).signal_handler().set_inputline(m_maincpu, PIC16C5x_RTCC);
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(3+6, 8);
 	m_display->set_segmask(7, 0x7f);
 	config.set_default_layout(layout_rockpin);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	static const s16 speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
+	static const double speaker_levels[] = { 0.0, 1.0, -1.0, 0.0 };
 	m_speaker->set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -1359,7 +1379,7 @@ ROM_END
   * 2 7seg LEDs + 26 other LEDs, 1-bit sound
 
   known releases:
-  - Hong Kong: Half Court Computer Basketball
+  - Hong Kong: Half Court Computer Basketball, published by Tiger
   - USA: Electronic Basketball (model 49-65453), published by Sears
 
 ***************************************************************************/
@@ -1371,11 +1391,13 @@ public:
 		hh_pic16_state(mconfig, type, tag)
 	{ }
 
+	void hccbaskb(machine_config &config);
+
+private:
 	void update_display();
 	u8 read_a();
 	void write_b(u8 data);
 	void write_c(u8 data);
-	void hccbaskb(machine_config &config);
 };
 
 // handlers
@@ -1441,20 +1463,20 @@ INPUT_PORTS_END
 
 void hccbaskb_state::hccbaskb(machine_config &config)
 {
-	/* basic machine hardware */
-	PIC1655(config, m_maincpu, 950000); // approximation - RC osc. R=15K, C=47pF
+	// basic machine hardware
+	PIC1655(config, m_maincpu, 800000); // approximation - RC osc. R=15K, C=47pF
 	m_maincpu->read_a().set(FUNC(hccbaskb_state::read_a));
 	m_maincpu->write_b().set(FUNC(hccbaskb_state::write_b));
 	m_maincpu->read_c().set_constant(0xff);
 	m_maincpu->write_c().set(FUNC(hccbaskb_state::write_c));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(7, 7);
 	m_display->set_segmask(0x60, 0x7f);
 	m_display->set_bri_levels(0.01, 0.2); // player led is brighter
 	config.set_default_layout(layout_hccbaskb);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -1495,11 +1517,13 @@ public:
 		hh_pic16_state(mconfig, type, tag)
 	{ }
 
+	void ttfball(machine_config &config);
+
+private:
 	void update_display();
 	u8 read_a();
 	void write_b(u8 data);
 	void write_c(u8 data);
-	void ttfball(machine_config &config);
 };
 
 // handlers
@@ -1575,10 +1599,10 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ttfballa )
 	PORT_START("IN.0") // B0 port A3
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Kick")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Kick")
 
 	PORT_START("IN.1") // B1 port A3
-	PORT_BIT( 0x08, 0x08, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x00) // left/right
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Forward")
 
 	PORT_START("IN.2") // B3 port A3
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_16WAY
@@ -1595,28 +1619,24 @@ static INPUT_PORTS_START( ttfballa )
 	PORT_CONFNAME( 0x04, 0x04, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x04, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
-
-	PORT_START("FAKE") // fake port for left/right combination
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("P1 Left/Right")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("P1 Left/Right")
 INPUT_PORTS_END
 
 void ttfball_state::ttfball(machine_config &config)
 {
-	/* basic machine hardware */
-	PIC1655(config, m_maincpu, 800000); // approximation - RC osc. R=27K(set 1) or 33K(set 2), C=68pF
+	// basic machine hardware
+	PIC1655(config, m_maincpu, 600000); // approximation - RC osc. R=27K(set 1) or 33K(set 2), C=68pF
 	m_maincpu->read_a().set(FUNC(ttfball_state::read_a));
 	m_maincpu->write_b().set(FUNC(ttfball_state::write_b));
 	m_maincpu->read_c().set_constant(0xff);
 	m_maincpu->write_c().set(FUNC(ttfball_state::write_c));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 11);
 	m_display->set_segmask(0x7f, 0xff);
 	m_display->set_bri_levels(0.003, 0.03); // player led is brighter
 	config.set_default_layout(layout_ttfball);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -1644,7 +1664,7 @@ ROM_END
   * 3 7seg LEDs + 36 other LEDs, 1-bit sound
 
   known releases:
-  - USA(1): Programmable Baseball
+  - USA(1): Programmable Baseball, published by U.S. Games
   - USA(2): Electronic 2-Player Baseball (model 60-2157), published by Tandy
 
 ***************************************************************************/
@@ -1656,12 +1676,14 @@ public:
 		hh_pic16_state(mconfig, type, tag)
 	{ }
 
+	void uspbball(machine_config &config);
+
+private:
 	void update_display();
 	void write_a(u8 data);
 	void write_b(u8 data);
 	void write_c(u8 data);
 	void write_d(u8 data);
-	void uspbball(machine_config &config);
 };
 
 // handlers
@@ -1720,7 +1742,7 @@ INPUT_PORTS_END
 
 void uspbball_state::uspbball(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	PIC1650(config, m_maincpu, 900000); // approximation - RC osc. R=22K, C=47pF
 	m_maincpu->read_a().set_ioport("IN.0");
 	m_maincpu->write_a().set(FUNC(uspbball_state::write_a));
@@ -1734,12 +1756,12 @@ void uspbball_state::uspbball(machine_config &config)
 	// PIC CLKOUT, tied to RTCC
 	CLOCK(config, "clock", 900000/4).signal_handler().set_inputline("maincpu", PIC16C5x_RTCC);
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(6, 16);
 	m_display->set_segmask(7, 0x7f);
 	config.set_default_layout(layout_hh_pic16_test);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -1762,7 +1784,7 @@ ROM_END
   * 8 7seg LEDs + 2 other LEDs, 1-bit sound
 
   known releases:
-  - USA(1): Electronic 2-Player Football
+  - USA(1): Electronic 2-Player Football, published by U.S. Games
   - USA(2): Electronic 2-Player Football (model 60-2156), published by Tandy
 
 ***************************************************************************/
@@ -1774,13 +1796,15 @@ public:
 		hh_pic16_state(mconfig, type, tag)
 	{ }
 
+	void us2pfball(machine_config &config);
+
+private:
 	void update_display();
 	u8 read_a();
 	void write_a(u8 data);
 	void write_b(u8 data);
 	void write_c(u8 data);
 	void write_d(u8 data);
-	void us2pfball(machine_config &config);
 };
 
 // handlers
@@ -1862,7 +1886,7 @@ INPUT_PORTS_END
 
 void us2pfball_state::us2pfball(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	PIC1650(config, m_maincpu, 800000); // approximation - RC osc. R=39K, C=75pF
 	m_maincpu->read_a().set(FUNC(us2pfball_state::read_a));
 	m_maincpu->write_a().set(FUNC(us2pfball_state::write_a));
@@ -1876,12 +1900,13 @@ void us2pfball_state::us2pfball(machine_config &config)
 	// PIC CLKOUT, tied to RTCC
 	CLOCK(config, "clock", 800000/4).signal_handler().set_inputline("maincpu", PIC16C5x_RTCC);
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 7);
 	m_display->set_segmask(0xff, 0x7f);
+	m_display->set_bri_levels(0.01, 0.17); // player led is brighter
 	config.set_default_layout(layout_us2pfball);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -1915,9 +1940,9 @@ CONS( 1980, flash,     0,       0, flash,     flash,     flash_state,     empty_
 
 CONS( 1980, matchme,   0,       0, matchme,   matchme,   matchme_state,   empty_init, "Kingsford", "Match Me", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1980, leboom,    0,       0, leboom,    leboom,    leboom_state,    empty_init, "Lakeside", "Le Boom", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, drdunk,    0,       0, drdunk,    drdunk,    drdunk_state,    empty_init, "Kmart", "Dr. Dunk", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1979, tbaskb,    0,       0, tbaskb,    tbaskb,    tbaskb_state,    empty_init, "Tandy Corporation", "Electronic Basketball (Tandy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, leboom,    0,       0, leboom,    leboom,    leboom_state,    empty_init, "Lakeside", "Le Boom", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1979, rockpin,   0,       0, rockpin,   rockpin,   rockpin_state,   empty_init, "Tiger Electronics", "Rocket Pinball", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, hccbaskb,  0,       0, hccbaskb,  hccbaskb,  hccbaskb_state,  empty_init, "Tiger Electronics", "Half Court Computer Basketball", MACHINE_SUPPORTS_SAVE )

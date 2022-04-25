@@ -6,9 +6,9 @@
 
 ----------------------------------------------------------------------------
 
-The Alpha-8201/830x isn't a real CPU. It is a Hitachi HD44801 4-bit MCU,
-programmed to interpret an external program using a custom instruction set.
-Alpha-8301 has an expanded instruction set, backwards compatible with Alpha-8201.
+The Alpha-8x0x isn't a real CPU. It is a Hitachi HD44801 4-bit MCU, programmed
+to interpret an external program using a custom instruction set. Alpha-8302
+has an expanded instruction set, backwards compatible with Alpha-8201.
 
 
 Game                      Year   MCU
@@ -185,7 +185,7 @@ opcode       mnemonic     function      flags
 1111--xx mirror for the above
 
 Notes:
-[1] bug: the Z flag is not updated correctly after a LD A,Rn instruction. Fixed in 8302 (possibly 8301).
+[1] bug: the Z flag is not updated correctly after a LD A,Rn instruction. Fixed in 8302.
 
 
 8302 CONFIRMED OPCODES:

@@ -2,8 +2,6 @@
 // copyright-holders:Wilbert Pol, Kevin Thacker
 /******************************************************************************
 
-        nc.cpp
-
         NC100/NC150/NC200 Notepad computer
 
         system driver
@@ -83,15 +81,11 @@
         Self Test:
 
         - requires memory save and real time clock save to be working!
-        (i.e. for MESS nc100 driver, nc100.nv can be created)
+        (i.e. for MAME nc100 driver, nc100.nv can be created)
         - turn off nc (use NMI button)
         - reset+FUNCTION+SYMBOL must be pressed together.
 
         Note: NC200 Self test does not test disc hardware :(
-
-
-
-        Kevin Thacker [MESS driver]
 
  ******************************************************************************/
 
@@ -289,13 +283,6 @@ TIMER_CALLBACK_MEMBER(nc_state::nc_keyboard_timer_callback)
 		m_keyboard_timer->reset();
 }
 
-
-static const char *const nc_bankhandler_r[]={
-"bank1", "bank2", "bank3", "bank4"};
-
-static const char *const nc_bankhandler_w[]={
-"bank5", "bank6", "bank7", "bank8"};
-
 void nc_state::nc_refresh_memory_bank_config(int bank)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -304,13 +291,13 @@ void nc_state::nc_refresh_memory_bank_config(int bank)
 	int mem_bank;
 	char bank1[20];
 	char bank5[20];
-	snprintf(bank1,ARRAY_LENGTH(bank1),"bank%d",bank+1);
-	snprintf(bank5,ARRAY_LENGTH(bank5),"bank%d",bank+5);
+	snprintf(bank1,std::size(bank1),"bank%d",bank+1);
+	snprintf(bank5,std::size(bank5),"bank%d",bank+5);
 
 	mem_type = (m_memory_config[bank]>>6) & 0x03;
 	mem_bank = m_memory_config[bank] & 0x03f;
 
-	space.install_read_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, nc_bankhandler_r[bank]);
+	space.install_read_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, m_bankhandler_r[bank]);
 
 	switch (mem_type)
 	{
@@ -337,7 +324,7 @@ void nc_state::nc_refresh_memory_bank_config(int bank)
 			membank(bank1)->set_base(ptr);
 			membank(bank5)->set_base(ptr);
 
-			space.install_write_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, nc_bankhandler_w[bank]);
+			space.install_write_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, m_bankhandler_w[bank]);
 			LOG("BANK %d: RAM\n",bank);
 		}
 		break;
@@ -358,7 +345,7 @@ void nc_state::nc_refresh_memory_bank_config(int bank)
 				{
 					/* yes */
 					membank(bank5)->set_base(ptr);
-					space.install_write_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, nc_bankhandler_w[bank]);
+					space.install_write_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, m_bankhandler_w[bank]);
 				}
 				else
 				{
@@ -474,12 +461,12 @@ void nc_state::nc_map(address_map &map)
 }
 
 
-READ8_MEMBER(nc_state::nc_memory_management_r)
+uint8_t nc_state::nc_memory_management_r(offs_t offset)
 {
 	return m_memory_config[offset];
 }
 
-WRITE8_MEMBER(nc_state::nc_memory_management_w)
+void nc_state::nc_memory_management_w(offs_t offset, uint8_t data)
 {
 	LOG("Memory management W: %02x %02x\n",offset,data);
 		m_memory_config[offset] = data;
@@ -487,7 +474,7 @@ WRITE8_MEMBER(nc_state::nc_memory_management_w)
 		nc_refresh_memory_config();
 }
 
-WRITE8_MEMBER(nc_state::nc_irq_mask_w)
+void nc_state::nc_irq_mask_w(uint8_t data)
 {
 	LOG("irq mask w: %02x\n", data);
 	LOGDEBUG("irq mask nc200 w: %02x\n",data & ((1<<4) | (1<<5) | (1<<6) | (1<<7)));
@@ -498,7 +485,7 @@ WRITE8_MEMBER(nc_state::nc_irq_mask_w)
 	nc_update_interrupts();
 }
 
-WRITE8_MEMBER(nc_state::nc_irq_status_w)
+void nc_state::nc_irq_status_w(uint8_t data)
 {
 	LOG("irq status w: %02x\n", data);
 	data = data ^ 0x0ff;
@@ -521,7 +508,7 @@ WRITE8_MEMBER(nc_state::nc_irq_status_w)
 		nc_update_interrupts();
 }
 
-WRITE8_MEMBER(nc200_state::nc200_irq_status_w)
+void nc200_state::nc200_irq_status_w(uint8_t data)
 {
 	LOG("irq status w: %02x\n", data);
 	data = data ^ 0x0ff;
@@ -536,16 +523,16 @@ WRITE8_MEMBER(nc200_state::nc200_irq_status_w)
 		nc_update_interrupts();
 	}
 
-	nc_irq_status_w(space, offset, data, mem_mask);
+	nc_irq_status_w(data);
 }
 
-READ8_MEMBER(nc_state::nc_irq_status_r)
+uint8_t nc_state::nc_irq_status_r()
 {
 		return ~((m_irq_status & (~m_irq_latch_mask)) | m_irq_latch);
 }
 
 
-READ8_MEMBER(nc_state::nc_key_data_in_r)
+uint8_t nc_state::nc_key_data_in_r(offs_t offset)
 {
 	static const char *const keynames[] = {
 		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4",
@@ -569,28 +556,16 @@ READ8_MEMBER(nc_state::nc_key_data_in_r)
 
 void nc_state::nc_sound_update(int channel)
 {
-	int on;
-	int frequency;
-	int period;
-	beep_device *beeper_device = nullptr;
+	channel &= 1;
+	beep_device *beeper_device = channel ? m_beeper2 : m_beeper1;
 
-	switch(channel)
-	{
-		case 0:
-			beeper_device = m_beeper1;
-			break;
-		case 1:
-			beeper_device = m_beeper2;
-			break;
-	}
-
-	period = m_sound_channel_periods[channel];
+	int period = m_sound_channel_periods[channel];
 
 	/* if top bit is 0, sound is on */
-	on = ((period & (1<<15))==0);
+	int on = ((period & (1<<15))==0);
 
 	/* calculate frequency from period */
-	frequency = (int)(1000000.0f/((float)((period & 0x07fff)<<1) * 1.6276f));
+	int frequency = (int)(1000000.0f/((float)((period & 0x07fff)<<1) * 1.6276f));
 
 	/* set state */
 	beeper_device->set_state(on);
@@ -598,7 +573,7 @@ void nc_state::nc_sound_update(int channel)
 	beeper_device->set_clock(frequency);
 }
 
-WRITE8_MEMBER(nc_state::nc_sound_w)
+void nc_state::nc_sound_w(offs_t offset, uint8_t data)
 {
 	LOG("sound w: %04x %02x\n", offset, data);
 
@@ -665,7 +640,7 @@ WRITE_LINE_MEMBER(nc_state::write_uart_clock)
 	m_uart->write_rxc(state);
 }
 
-WRITE8_MEMBER(nc_state::nc_uart_control_w)
+void nc_state::nc_uart_control_w(uint8_t data)
 {
 	/* same for nc100 and nc200 */
 	m_centronics->write_strobe(BIT(data, 6));
@@ -696,7 +671,7 @@ WRITE8_MEMBER(nc_state::nc_uart_control_w)
 
 
 
-WRITE8_MEMBER(nc_state::nc100_display_memory_start_w)
+void nc_state::nc100_display_memory_start_w(uint8_t data)
 {
 	/* bit 7: A15 */
 	/* bit 6: A14 */
@@ -709,9 +684,9 @@ WRITE8_MEMBER(nc_state::nc100_display_memory_start_w)
 }
 
 
-WRITE8_MEMBER(nc100_state::nc100_uart_control_w)
+void nc100_state::nc100_uart_control_w(uint8_t data)
 {
-	nc_uart_control_w(space, offset,data);
+	nc_uart_control_w(data);
 
 //  /* is this correct?? */
 //  if (data & (1<<3))
@@ -795,7 +770,7 @@ void nc100_state::machine_reset()
 }
 
 
-WRITE8_MEMBER(nc100_state::nc100_poweroff_control_w)
+void nc100_state::nc100_poweroff_control_w(uint8_t data)
 {
 	/* bits 7-1: not used */
 	/* bit 0: 1 = no effect, 0 = power off */
@@ -805,7 +780,7 @@ WRITE8_MEMBER(nc100_state::nc100_poweroff_control_w)
 
 
 /* nc100 version of card/battery status */
-READ8_MEMBER(nc100_state::nc100_card_battery_status_r)
+uint8_t nc100_state::nc100_card_battery_status_r()
 {
 	int nc_card_battery_status = 0x0fc;
 
@@ -833,7 +808,7 @@ READ8_MEMBER(nc100_state::nc100_card_battery_status_r)
 	return nc_card_battery_status;
 }
 
-WRITE8_MEMBER(nc100_state::nc100_memory_card_wait_state_w)
+void nc100_state::nc100_memory_card_wait_state_w(uint8_t data)
 {
 	LOG("nc100 memory card wait state: %02x\n",data);
 }
@@ -873,9 +848,10 @@ Small note about natural keyboard support (both for nc100 and nc200): currently,
 - "Menu" is mapped to 'F4'
 */
 
+// 2020-09-21: not possible to select a menu item with natural keyboard. However, you can switch over to it after you enter an app.
 static INPUT_PORTS_START(nc100)
 	PORT_START("LINE0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift (Left)") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_MAMEKEY(LSHIFT))
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift (Left)") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_MAMEKEY(LSHIFT),UCHAR_SHIFT_1)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift (Right)") PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_MAMEKEY(RSHIFT))
 	PORT_BIT(0x04, 0x00, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cursor Left (Red)") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
@@ -886,7 +862,7 @@ static INPUT_PORTS_START(nc100)
 
 	PORT_START("LINE1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Function (Yellow)") PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL)) // 5th row, 1st key on left (where 'fn' is on mac keyboards)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control") PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control") PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL),UCHAR_SHIFT_2)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Stop") PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(F2))
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)       PORT_CHAR(' ')
 	PORT_BIT(0x10, 0x00, IPT_UNUSED)
@@ -931,8 +907,8 @@ static INPUT_PORTS_START(nc100)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)           PORT_CHAR('v') PORT_CHAR('V')
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)           PORT_CHAR('t') PORT_CHAR('T')
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)           PORT_CHAR('y') PORT_CHAR('Y')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)           PORT_CHAR('c') PORT_CHAR('C')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)           PORT_CHAR('g') PORT_CHAR('G')
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)           PORT_CHAR('g') PORT_CHAR('G')
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)           PORT_CHAR('c') PORT_CHAR('C')
 
 	PORT_START("LINE6")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)           PORT_CHAR('6') PORT_CHAR('^')
@@ -967,7 +943,7 @@ static INPUT_PORTS_START(nc100)
 	PORT_START("LINE9")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)           PORT_CHAR('0') PORT_CHAR(')')
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)           PORT_CHAR('9') PORT_CHAR('(')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Del<") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR('8')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Del<") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)           PORT_CHAR('p') PORT_CHAR('P')
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)       PORT_CHAR(';') PORT_CHAR(':')
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)           PORT_CHAR('l') PORT_CHAR('L')
@@ -991,11 +967,11 @@ INPUT_PORTS_END
 #if 0
 void nc_state::nc150_init_machine()
 {
-		m_membank_internal_ram_mask = 7;
+	m_membank_internal_ram_mask = 7;
 
-		m_membank_card_ram_mask = 0x03f;
+	m_membank_card_ram_mask = 0x03f;
 
-		nc_state::machine_reset();
+	nc_state::machine_reset();
 }
 #endif
 
@@ -1004,18 +980,16 @@ void nc_state::nc150_init_machine()
 /**********************************************************************************************************/
 /* NC200 hardware */
 
-#ifdef UNUSED_FUNCTION
-WRITE8_MEMBER(nc200_state::nc200_display_memory_start_w)
+void nc200_state::nc200_display_memory_start_w(uint8_t data)
 {
 	/* bit 7: A15 */
 	/* bit 6: A14 */
 	/* bit 5: A13 */
 	/* bit 4-0: not used */
-	m_display_memory_start = (data & 0x0e0)<<(12-4);
+	m_display_memory_start = (data & 0x0e0) << (12 - 4);
 
 	LOG("disp memory w: %04x\n", m_display_memory_start);
 }
-#endif
 
 
 WRITE_LINE_MEMBER(nc200_state::write_nc200_centronics_ack)
@@ -1091,15 +1065,13 @@ WRITE_LINE_MEMBER(nc200_state::nc200_fdc_interrupt)
 	nc_update_interrupts();
 }
 
-#ifdef UNUSED_FUNCTION
-void nc_state::nc200_floppy_drive_index_callback(int drive_id)
+void nc200_state::nc200_floppy_drive_index_callback(int drive_id)
 {
 	LOGDEBUG("nc200 index pulse\n");
 //  m_irq_status |= (1<<4);
 
 //  nc_update_interrupts(Machine);
 }
-#endif
 
 void nc200_state::machine_reset()
 {
@@ -1151,7 +1123,7 @@ NC200:
 
 
 /* nc200 version of card/battery status */
-READ8_MEMBER(nc200_state::nc200_card_battery_status_r)
+uint8_t nc200_state::nc200_card_battery_status_r()
 {
 	int nc_card_battery_status = 0x0ff;
 
@@ -1184,7 +1156,7 @@ READ8_MEMBER(nc200_state::nc200_card_battery_status_r)
   bit 0: Parallel interface BUSY
  */
 
-READ8_MEMBER(nc200_state::nc200_printer_status_r)
+uint8_t nc200_state::nc200_printer_status_r()
 {
 	uint8_t result = 0;
 
@@ -1194,11 +1166,11 @@ READ8_MEMBER(nc200_state::nc200_printer_status_r)
 }
 
 
-WRITE8_MEMBER(nc200_state::nc200_uart_control_w)
+void nc200_state::nc200_uart_control_w(uint8_t data)
 {
 	/* int reset_fdc = (m_uart_control^data) & (1<<5); */
 
-	nc_uart_control_w(space, offset,data);
+	nc_uart_control_w(data);
 
 	if (data & (1<<3))
 	{
@@ -1224,7 +1196,7 @@ WRITE8_MEMBER(nc200_state::nc200_uart_control_w)
 /* bit 1: disk motor??  */
 /* bit 0: UPD765 Terminal Count input */
 
-WRITE8_MEMBER(nc200_state::nc200_memory_card_wait_state_w)
+void nc200_state::nc200_memory_card_wait_state_w(uint8_t data)
 {
 	LOGDEBUG("nc200 memory card wait state: PC: %04x %02x\n", m_maincpu->pc(), data);
 #if 0
@@ -1237,7 +1209,7 @@ WRITE8_MEMBER(nc200_state::nc200_memory_card_wait_state_w)
 /* bit 2: backlight: 1=off, 0=on */
 /* bit 1 cleared to zero in disk code */
 /* bit 0 seems to be the same as nc100 */
-WRITE8_MEMBER(nc200_state::nc200_poweroff_control_w)
+void nc200_state::nc200_poweroff_control_w(uint8_t data)
 {
 	LOGDEBUG("nc200 power off: PC: %04x %02x\n", m_maincpu->pc(), data);
 
@@ -1446,12 +1418,6 @@ void nc100_state::nc100(machine_config &config)
 	rtc.out_alarm_callback().set(FUNC(nc100_state::nc100_tc8521_alarm_callback));
 }
 
-static const floppy_format_type ibmpc_floppy_formats[] = {
-	FLOPPY_PC_FORMAT,
-	FLOPPY_MFI_FORMAT,
-	nullptr
-};
-
 static void ibmpc_floppies(device_slot_interface &device)
 {
 	device.option_add("525dd", FLOPPY_525_DD);
@@ -1482,8 +1448,8 @@ void nc200_state::nc200(machine_config &config)
 
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set(FUNC(nc200_state::nc200_fdc_interrupt));
-	FLOPPY_CONNECTOR(config, "upd765:0", ibmpc_floppies, "525dd", ibmpc_floppy_formats);
-	FLOPPY_CONNECTOR(config, "upd765:1", ibmpc_floppies, "525dd", ibmpc_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:0", ibmpc_floppies, "525dd", floppy_image_device::default_pc_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", ibmpc_floppies, "525dd", floppy_image_device::default_pc_floppy_formats);
 
 	MC146818(config, "mc", 4.194304_MHz_XTAL);
 
@@ -1535,4 +1501,4 @@ ROM_END
 COMP( 1992, nc100, 0,      0,      nc100,   nc100, nc100_state, init_nc, "Amstrad plc",          "NC100",           0 )
 COMP( 1992, dw225, nc100,  0,      nc100,   nc100, nc100_state, init_nc, "NTS Computer Systems", "DreamWriter 225", 0 )
 COMP( 1992, nc150, nc100,  0,      nc100,   nc100, nc100_state, init_nc, "Amstrad plc",          "NC150",           0 )
-COMP( 1993, nc200, 0,      0,      nc200,   nc200, nc200_state, init_nc, "Amstrad plc",          "NC200",           MACHINE_NOT_WORKING ) // boot hangs while checking the MC146818 UIP (update in progress) bit
+COMP( 1993, nc200, 0,      0,      nc200,   nc200, nc200_state, init_nc, "Amstrad plc",          "NC200",           0 )

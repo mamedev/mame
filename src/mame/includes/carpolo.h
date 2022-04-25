@@ -17,6 +17,9 @@
 #include "machine/7474.h"
 #include "machine/74148.h"
 #include "machine/74153.h"
+#include "machine/netlist.h"
+#include "netlist/nl_setup.h"
+#include "audio/nl_carpolo.h"
 #include "emupal.h"
 
 class carpolo_state : public driver_device
@@ -47,6 +50,7 @@ public:
 		, m_dial(*this, "DIAL%u", 0U)
 		, m_in(*this, "IN%u", 0U)
 		, m_pedals(*this, "PEDALS")
+		, m_player_crash(*this, "sound_nl:player_crash%u", 1U)
 	{ }
 
 	void init_carpolo();
@@ -58,17 +62,17 @@ protected:
 	virtual void video_start() override;
 
 private:
-	uint8_t m_ball_screen_collision_cause;
-	uint8_t m_car_ball_collision_x;
-	uint8_t m_car_ball_collision_y;
-	uint8_t m_car_car_collision_cause;
-	uint8_t m_car_goal_collision_cause;
-	uint8_t m_car_ball_collision_cause;
-	uint8_t m_car_border_collision_cause;
-	uint8_t m_priority_0_extension;
-	uint8_t m_last_wheel_value[4];
-	int m_ls153_za;
-	int m_ls153_zb;
+	uint8_t m_ball_screen_collision_cause = 0U;
+	uint8_t m_car_ball_collision_x = 0U;
+	uint8_t m_car_ball_collision_y = 0U;
+	uint8_t m_car_car_collision_cause = 0U;
+	uint8_t m_car_goal_collision_cause = 0U;
+	uint8_t m_car_ball_collision_cause = 0U;
+	uint8_t m_car_border_collision_cause = 0U;
+	uint8_t m_priority_0_extension = 0U;
+	uint8_t m_last_wheel_value[4]{};
+	int m_ls153_za = 0;
+	int m_ls153_zb = 0;
 	required_device<m6502_device> m_maincpu;
 	required_device<ttl74148_device> m_ttl74148_3s;
 	required_device<ttl153_device> m_ttl74153_1k;
@@ -151,6 +155,8 @@ private:
 										int x2, int y2, int code2, int flipy2,
 										int *col_x, int *col_y);
 	void main_map(address_map &map);
+
+	required_device_array<netlist_mame_logic_input_device, 4> m_player_crash;
 };
 
 #endif // MAME_INCLUDES_CARPOLO_H

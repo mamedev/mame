@@ -118,11 +118,11 @@
 #define VERBOSE ( LOG_CONFIG | LOG_WARN )
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_RS232,     bus::ti99::peb, ti_rs232_pio_device,      "ti99_rs232",           "TI-99 RS232/PIO interface")
-DEFINE_DEVICE_TYPE_NS(TI99_RS232_DEV, bus::ti99::peb, ti_rs232_attached_device, "ti99_rs232_atttached", "TI-99 Serial attached device")
-DEFINE_DEVICE_TYPE_NS(TI99_PIO_DEV,   bus::ti99::peb, ti_pio_attached_device,   "ti99_pio_attached",    "TI-99 Parallel attached device")
+DEFINE_DEVICE_TYPE(TI99_RS232,     bus::ti99::peb::ti_rs232_pio_device,      "ti99_rs232",           "TI-99 RS232/PIO interface")
+DEFINE_DEVICE_TYPE(TI99_RS232_DEV, bus::ti99::peb::ti_rs232_attached_device, "ti99_rs232_atttached", "TI-99 Serial attached device")
+DEFINE_DEVICE_TYPE(TI99_PIO_DEV,   bus::ti99::peb::ti_pio_attached_device,   "ti99_pio_attached",    "TI-99 Parallel attached device")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 #define SENILA_0_BIT 0x80
 #define SENILA_1_BIT 0x40
@@ -238,7 +238,7 @@ void ti_pio_attached_device::call_unload()
 /*
     CRU read
 */
-READ8Z_MEMBER(ti_rs232_pio_device::crureadz)
+void ti_rs232_pio_device::crureadz(offs_t offset, uint8_t *value)
 {
 	if ((offset & 0xff00)==m_cru_base)
 	{
@@ -374,7 +374,7 @@ WRITE_LINE_MEMBER(ti_rs232_pio_device::led_w)
 /*
     Memory read
 */
-READ8Z_MEMBER( ti_rs232_pio_device::readz )
+void ti_rs232_pio_device::readz(offs_t offset, uint8_t *value)
 {
 	if (m_senila==ASSERT_LINE)
 	{
@@ -1130,4 +1130,4 @@ ioport_constructor ti_rs232_pio_device::device_input_ports() const
 	return INPUT_PORTS_NAME(ti_rs232);
 }
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb

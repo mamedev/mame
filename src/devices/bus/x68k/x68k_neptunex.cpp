@@ -47,14 +47,14 @@ void x68k_neptune_device::device_start()
 	mac[0] = 0; mac[1] = 0;  // avoid gcc warning
 	memcpy(m_prom, mac, 6);
 	m_dp8390->set_mac(mac);
-	m_slot->space().install_readwrite_handler(0xece000,0xece3ff, read16_delegate(*this, FUNC(x68k_neptune_device::x68k_neptune_port_r)), write16_delegate(*this, FUNC(x68k_neptune_device::x68k_neptune_port_w)), 0xffffffff);
+	m_slot->space().install_readwrite_handler(0xece000,0xece3ff, read16s_delegate(*this, FUNC(x68k_neptune_device::x68k_neptune_port_r)), write16s_delegate(*this, FUNC(x68k_neptune_device::x68k_neptune_port_w)), 0xffffffff);
 }
 
 void x68k_neptune_device::device_reset() {
 	memcpy(m_prom, m_dp8390->get_mac(), 6);
 }
 
-READ16_MEMBER(x68k_neptune_device::x68k_neptune_port_r)
+uint16_t x68k_neptune_device::x68k_neptune_port_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data;
 
@@ -81,7 +81,7 @@ READ16_MEMBER(x68k_neptune_device::x68k_neptune_port_r)
 	return 0;
 }
 
-WRITE16_MEMBER(x68k_neptune_device::x68k_neptune_port_w)
+void x68k_neptune_device::x68k_neptune_port_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(offset >= 0x100+32 || offset < 0x100)
 		return;

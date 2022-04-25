@@ -7,7 +7,6 @@ license:CC0
 <!-- define elements -->
 
 	<element name="black"><rect><color red="0" green="0" blue="0" /></rect></element>
-	<element name="blackd"><disk><color red="0" green="0" blue="0" /></disk></element>
 	<element name="white"><rect><color red="0.9" green="0.9" blue="0.92" /></rect></element>
 	<element name="gray2"><rect><color red="0.12" green="0.12" blue="0.12" /></rect></element>
 	<element name="yellow"><rect><color red="0.9" green="0.9" blue="0.15" /></rect></element>
@@ -74,7 +73,7 @@ license:CC0
 	</element>
 
 	<element name="nothing" defstate="0">
-		<text string=" "/>
+		<rect><color alpha="0" /></rect>
 	</element>
 
 	<element name="hlb" defstate="0">
@@ -113,8 +112,12 @@ license:CC0
 	</element>
 
 	<element name="ledg" defstate="0">
-		<disk state="0"><color red="0.2" green="0.4" blue="0.17" /></disk>
-		<disk state="1"><color red="0.5" green="1.0" blue="0.4" /></disk>
+		<disk>
+			<bounds left="-0.5" top="-0.5" right="2.5" bottom="2.5" />
+			<color red="0" green="0" blue="0" />
+		</disk>
+		<disk state="0"><bounds width="2" height="2" /><color red="0.2" green="0.4" blue="0.17" /></disk>
+		<disk state="1"><bounds width="2" height="2" /><color red="0.5" green="1.0" blue="0.4" /></disk>
 	</element>
 
 	<element name="ledr" defstate="0">
@@ -253,213 +256,12 @@ license:CC0
 		</disk>
 	</element>
 
-	<element name="ani_white" defstate="0">
-		<text string=" "><bounds x="0" y="0" width="1" height="100" /></text>
-		<rect state="1"><bounds x="0" y="0" width="1" height="1" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="2"><bounds x="0" y="0" width="1" height="2" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="3"><bounds x="0" y="0" width="1" height="3" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="4"><bounds x="0" y="0" width="1" height="4" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="5"><bounds x="0" y="0" width="1" height="5" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="6"><bounds x="0" y="0" width="1" height="6" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="7"><bounds x="0" y="0" width="1" height="7" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="8"><bounds x="0" y="0" width="1" height="8" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="9"><bounds x="0" y="0" width="1" height="9" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="10"><bounds x="0" y="0" width="1" height="10" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="11"><bounds x="0" y="0" width="1" height="11" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="12"><bounds x="0" y="0" width="1" height="12" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="13"><bounds x="0" y="0" width="1" height="13" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="14"><bounds x="0" y="0" width="1" height="14" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="15"><bounds x="0" y="0" width="1" height="15" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="16"><bounds x="0" y="0" width="1" height="16" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="17"><bounds x="0" y="0" width="1" height="17" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="18"><bounds x="0" y="0" width="1" height="18" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="19"><bounds x="0" y="0" width="1" height="19" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="20"><bounds x="0" y="0" width="1" height="20" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="21"><bounds x="0" y="0" width="1" height="21" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="22"><bounds x="0" y="0" width="1" height="22" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="23"><bounds x="0" y="0" width="1" height="23" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="24"><bounds x="0" y="0" width="1" height="24" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="25"><bounds x="0" y="0" width="1" height="25" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="26"><bounds x="0" y="0" width="1" height="26" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="27"><bounds x="0" y="0" width="1" height="27" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="28"><bounds x="0" y="0" width="1" height="28" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="29"><bounds x="0" y="0" width="1" height="29" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="30"><bounds x="0" y="0" width="1" height="30" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="31"><bounds x="0" y="0" width="1" height="31" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="32"><bounds x="0" y="0" width="1" height="32" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="33"><bounds x="0" y="0" width="1" height="33" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="34"><bounds x="0" y="0" width="1" height="34" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="35"><bounds x="0" y="0" width="1" height="35" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="36"><bounds x="0" y="0" width="1" height="36" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="37"><bounds x="0" y="0" width="1" height="37" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="38"><bounds x="0" y="0" width="1" height="38" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="39"><bounds x="0" y="0" width="1" height="39" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="40"><bounds x="0" y="0" width="1" height="40" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="41"><bounds x="0" y="0" width="1" height="41" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="42"><bounds x="0" y="0" width="1" height="42" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="43"><bounds x="0" y="0" width="1" height="43" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="44"><bounds x="0" y="0" width="1" height="44" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="45"><bounds x="0" y="0" width="1" height="45" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="46"><bounds x="0" y="0" width="1" height="46" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="47"><bounds x="0" y="0" width="1" height="47" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="48"><bounds x="0" y="0" width="1" height="48" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="49"><bounds x="0" y="0" width="1" height="49" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="50"><bounds x="0" y="0" width="1" height="50" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="51"><bounds x="0" y="0" width="1" height="51" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="52"><bounds x="0" y="0" width="1" height="52" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="53"><bounds x="0" y="0" width="1" height="53" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="54"><bounds x="0" y="0" width="1" height="54" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="55"><bounds x="0" y="0" width="1" height="55" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="56"><bounds x="0" y="0" width="1" height="56" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="57"><bounds x="0" y="0" width="1" height="57" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="58"><bounds x="0" y="0" width="1" height="58" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="59"><bounds x="0" y="0" width="1" height="59" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="60"><bounds x="0" y="0" width="1" height="60" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="61"><bounds x="0" y="0" width="1" height="61" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="62"><bounds x="0" y="0" width="1" height="62" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="63"><bounds x="0" y="0" width="1" height="63" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="64"><bounds x="0" y="0" width="1" height="64" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="65"><bounds x="0" y="0" width="1" height="65" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="66"><bounds x="0" y="0" width="1" height="66" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="67"><bounds x="0" y="0" width="1" height="67" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="68"><bounds x="0" y="0" width="1" height="68" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="69"><bounds x="0" y="0" width="1" height="69" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="70"><bounds x="0" y="0" width="1" height="70" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="71"><bounds x="0" y="0" width="1" height="71" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="72"><bounds x="0" y="0" width="1" height="72" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="73"><bounds x="0" y="0" width="1" height="73" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="74"><bounds x="0" y="0" width="1" height="74" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="75"><bounds x="0" y="0" width="1" height="75" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="76"><bounds x="0" y="0" width="1" height="76" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="77"><bounds x="0" y="0" width="1" height="77" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="78"><bounds x="0" y="0" width="1" height="78" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="79"><bounds x="0" y="0" width="1" height="79" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="80"><bounds x="0" y="0" width="1" height="80" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="81"><bounds x="0" y="0" width="1" height="81" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="82"><bounds x="0" y="0" width="1" height="82" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="83"><bounds x="0" y="0" width="1" height="83" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="84"><bounds x="0" y="0" width="1" height="84" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="85"><bounds x="0" y="0" width="1" height="85" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="86"><bounds x="0" y="0" width="1" height="86" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="87"><bounds x="0" y="0" width="1" height="87" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="88"><bounds x="0" y="0" width="1" height="88" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="89"><bounds x="0" y="0" width="1" height="89" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="90"><bounds x="0" y="0" width="1" height="90" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="91"><bounds x="0" y="0" width="1" height="91" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="92"><bounds x="0" y="0" width="1" height="92" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="93"><bounds x="0" y="0" width="1" height="93" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="94"><bounds x="0" y="0" width="1" height="94" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="95"><bounds x="0" y="0" width="1" height="95" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="96"><bounds x="0" y="0" width="1" height="96" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="97"><bounds x="0" y="0" width="1" height="97" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="98"><bounds x="0" y="0" width="1" height="98" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="99"><bounds x="0" y="0" width="1" height="99" /><color red="1" green="1" blue="1" /></rect>
-		<rect state="100"><bounds x="0" y="0" width="1" height="100" /><color red="1" green="1" blue="1" /></rect>
+	<element name="crate" defstate="0">
+		<rect><color red="0.75" green="0.1" blue="0.15" /></rect>
 	</element>
 
-	<element name="ani_crate" defstate="0">
-		<text string=" "><bounds x="0" y="0" width="1" height="110" /></text>
-		<rect state="0"><bounds x="0" y="0" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="1"><bounds x="0" y="1" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="2"><bounds x="0" y="2" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="3"><bounds x="0" y="3" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="4"><bounds x="0" y="4" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="5"><bounds x="0" y="5" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="6"><bounds x="0" y="6" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="7"><bounds x="0" y="7" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="8"><bounds x="0" y="8" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="9"><bounds x="0" y="9" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="10"><bounds x="0" y="10" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="11"><bounds x="0" y="11" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="12"><bounds x="0" y="12" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="13"><bounds x="0" y="13" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="14"><bounds x="0" y="14" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="15"><bounds x="0" y="15" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="16"><bounds x="0" y="16" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="17"><bounds x="0" y="17" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="18"><bounds x="0" y="18" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="19"><bounds x="0" y="19" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="20"><bounds x="0" y="20" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="21"><bounds x="0" y="21" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="22"><bounds x="0" y="22" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="23"><bounds x="0" y="23" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="24"><bounds x="0" y="24" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="25"><bounds x="0" y="25" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="26"><bounds x="0" y="26" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="27"><bounds x="0" y="27" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="28"><bounds x="0" y="28" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="29"><bounds x="0" y="29" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="30"><bounds x="0" y="30" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="31"><bounds x="0" y="31" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="32"><bounds x="0" y="32" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="33"><bounds x="0" y="33" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="34"><bounds x="0" y="34" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="35"><bounds x="0" y="35" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="36"><bounds x="0" y="36" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="37"><bounds x="0" y="37" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="38"><bounds x="0" y="38" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="39"><bounds x="0" y="39" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="40"><bounds x="0" y="40" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="41"><bounds x="0" y="41" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="42"><bounds x="0" y="42" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="43"><bounds x="0" y="43" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="44"><bounds x="0" y="44" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="45"><bounds x="0" y="45" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="46"><bounds x="0" y="46" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="47"><bounds x="0" y="47" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="48"><bounds x="0" y="48" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="49"><bounds x="0" y="49" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="50"><bounds x="0" y="50" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="51"><bounds x="0" y="51" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="52"><bounds x="0" y="52" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="53"><bounds x="0" y="53" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="54"><bounds x="0" y="54" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="55"><bounds x="0" y="55" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="56"><bounds x="0" y="56" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="57"><bounds x="0" y="57" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="58"><bounds x="0" y="58" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="59"><bounds x="0" y="59" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="60"><bounds x="0" y="60" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="61"><bounds x="0" y="61" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="62"><bounds x="0" y="62" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="63"><bounds x="0" y="63" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="64"><bounds x="0" y="64" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="65"><bounds x="0" y="65" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="66"><bounds x="0" y="66" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="67"><bounds x="0" y="67" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="68"><bounds x="0" y="68" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="69"><bounds x="0" y="69" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="70"><bounds x="0" y="70" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="71"><bounds x="0" y="71" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="72"><bounds x="0" y="72" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="73"><bounds x="0" y="73" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="74"><bounds x="0" y="74" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="75"><bounds x="0" y="75" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="76"><bounds x="0" y="76" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="77"><bounds x="0" y="77" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="78"><bounds x="0" y="78" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="79"><bounds x="0" y="79" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="80"><bounds x="0" y="80" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="81"><bounds x="0" y="81" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="82"><bounds x="0" y="82" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="83"><bounds x="0" y="83" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="84"><bounds x="0" y="84" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="85"><bounds x="0" y="85" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="86"><bounds x="0" y="86" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="87"><bounds x="0" y="87" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="88"><bounds x="0" y="88" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="89"><bounds x="0" y="89" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="90"><bounds x="0" y="90" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="91"><bounds x="0" y="91" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="92"><bounds x="0" y="92" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="93"><bounds x="0" y="93" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="94"><bounds x="0" y="94" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="95"><bounds x="0" y="95" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="96"><bounds x="0" y="96" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="97"><bounds x="0" y="97" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="98"><bounds x="0" y="98" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="99"><bounds x="0" y="99" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
-		<rect state="100"><bounds x="0" y="100" width="1" height="10" /><color red="0.75" green="0.1" blue="0.15" /></rect>
+	<element name="door" defstate="0">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
 	</element>
 
 
@@ -525,37 +327,48 @@ license:CC0
 		<element ref="blue"><bounds x="7" y="5" width="48" height="3" /></element>
 		<element ref="black"><bounds x="7" y="5" width="48" height="1.5" /></element>
 
-		<!-- unable to move the cosmogangs with artwork, have to do it like this with 'fishing lines' -->
 		<repeat count="5">
 			<param name="x" start="12.6" increment="9" />
 			<param name="i" start="0" increment="1" />
 
-			<element ref="gray2"><bounds x="~x~" y="17" width="0.8" height="38.5" /></element>
-			<element name="cg_count~i~" ref="ani_white"><bounds x="~x~" y="17" width="0.8" height="35" /><color alpha="0.5" /></element>
+			<element ref="gray2"><bounds x="~x~" y="15.5" width="0.8" height="40" /></element>
+		</repeat>
+
+		<repeat count="5">
+			<param name="x" start="10" increment="9" />
+			<param name="i" start="0" increment="1" />
+			<param name="mask" start="0x01" lshift="1" />
+
+			<element name="cg_sol~i~" ref="cosmo">
+				<animate name="cg_count~i~" />
+				<bounds state="0" x="~x~" y="10" width="6" height="7" />
+				<bounds state="255" x="~x~" y="48.5" width="6" height="7" />
+			</element>
+
+			<element ref="nothing" inputtag="FAKE1" inputmask="~mask~">
+				<animate name="cg_count~i~" />
+				<bounds state="0" x="~x~" y="10" width="6" height="7" />
+				<bounds state="255" x="~x~" y="48.5" width="6" height="7" />
+			</element>
 		</repeat>
 
 		<repeat count="5">
 			<param name="x" start="11.2" increment="9" />
 			<param name="i" start="0" increment="1" />
 
-			<element name="en_count~i~" ref="ani_crate"><bounds x="~x~" y="17" width="3.6" height="38.5" /></element>
+			<element ref="crate">
+				<animate name="en_count~i~" />
+				<bounds state="0" x="~x~" y="13.5" width="3.6" height="3.5" />
+				<bounds state="255" x="~x~" y="52" width="3.6" height="3.5" />
+			</element>
 		</repeat>
 
-		<repeat count="5">
-			<param name="x" start="10" increment="9" />
-			<param name="i" start="0" increment="1" />
-
-			<element name="cg_sol~i~" ref="cosmo"><bounds x="~x~" y="10" width="6" height="7" /></element>
-		</repeat>
-
-		<repeat count="5">
-			<param name="x" start="10" increment="9" />
-			<param name="mask" start="0x01" lshift="1" />
-
-			<element ref="nothing" blend="add" inputtag="FAKE1" inputmask="~mask~"><bounds x="~x~" y="10" width="6" height="45.5" /></element>
-		</repeat>
-
-		<element name="door_count" ref="ani_white"><bounds x="8.5" y="8" width="45" height="9" /><color alpha="0.3" /></element>
+		<element ref="door">
+			<animate name="door_count" />
+			<bounds state="0" x="8.5" y="8" width="45" height="0" />
+			<bounds state="255" x="8.5" y="8" width="45" height="9" />
+			<color alpha="0.6" />
+		</element>
 	</group>
 
 
@@ -613,13 +426,11 @@ license:CC0
 		<element name="misc_lamp10" ref="led2p"><bounds x="4.5" y="0.5" width="2" height="2" /></element>
 
 		<element ref="text_start1"><bounds x="9" y="0.55" width="5" height="1.9" /></element>
-		<element ref="blackd"><bounds x="14.5" y="0" width="3" height="3" /></element>
-		<element name="misc_lamp0" ref="ledg"><bounds x="15" y="0.5" width="2" height="2" /></element>
+		<element name="misc_lamp0" ref="ledg"><bounds x="14.5" y="0" width="3" height="3" /></element>
 		<element ref="hlb" inputtag="IN1" inputmask="0x10"><bounds x="14.5" y="0" width="3" height="3" /><color alpha="0.2" /></element>
 
 		<element ref="text_start2"><bounds x="18.5" y="0.55" width="5" height="1.9" /></element>
-		<element ref="blackd"><bounds x="24.0" y="0" width="3" height="3" /></element>
-		<element name="misc_lamp1" ref="ledg"><bounds x="24.5" y="0.5" width="2" height="2" /></element>
+		<element name="misc_lamp1" ref="ledg"><bounds x="24" y="0" width="3" height="3" /></element>
 		<element ref="hlb" inputtag="IN1" inputmask="0x08"><bounds x="24.0" y="0" width="3" height="3" /><color alpha="0.2" /></element>
 	</group>
 

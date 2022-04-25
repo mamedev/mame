@@ -133,7 +133,7 @@ public:
 	void uapce(machine_config &config);
 
 private:
-	uint8_t m_jamma_if_control_latch;
+	uint8_t m_jamma_if_control_latch = 0;
 	void jamma_if_control_latch_w(uint8_t data);
 	uint8_t jamma_if_control_latch_r();
 	uint8_t jamma_if_read_dsw(offs_t offset);
@@ -163,7 +163,7 @@ void uapce_state::jamma_if_control_latch_w(uint8_t data)
 
 /*  D7 : Controls relay which connects the PCE R-AUDIO output to the common audio path.
     (1= Relay closed, 0= Relay open) */
-	machine().sound().system_enable( (data >> 7) & 1 );
+	machine().sound().system_mute(!BIT(data, 7));
 
 /* D6 : Output to JAMMA connector KEY pin. Connected to /RESET on the PCE backplane connector.
     (1= /RESET not asserted, 0= /RESET asserted) */

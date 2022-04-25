@@ -97,6 +97,11 @@ Instruction* MemPass::GetPtr(uint32_t ptrId, uint32_t* varId) {
   Instruction* ptrInst = get_def_use_mgr()->GetDef(*varId);
   Instruction* varInst;
 
+  if (ptrInst->opcode() == SpvOpConstantNull) {
+    *varId = 0;
+    return ptrInst;
+  }
+
   if (ptrInst->opcode() != SpvOpVariable &&
       ptrInst->opcode() != SpvOpFunctionParameter) {
     varInst = ptrInst->GetBaseAddress();
@@ -220,6 +225,11 @@ MemPass::MemPass() {}
 
 bool MemPass::HasOnlySupportedRefs(uint32_t varId) {
   return get_def_use_mgr()->WhileEachUser(varId, [this](Instruction* user) {
+    auto dbg_op = user->GetCommonDebugOpcode();
+    if (dbg_op == CommonDebugInfoDebugDeclare ||
+        dbg_op == CommonDebugInfoDebugValue) {
+      return true;
+    }
     SpvOp op = user->opcode();
     if (op != SpvOpStore && op != SpvOpLoad && op != SpvOpName &&
         !IsNonTypeDecorate(op)) {

@@ -10,38 +10,47 @@
 
 #include "emu.h"
 #include "mame.h"
-#include "emuopts.h"
-#include "mameopts.h"
-#include "pluginopts.h"
-#include "osdepend.h"
-#include "validity.h"
-#include "clifront.h"
-#include "luaengine.h"
-#include <ctime>
-#include "ui/ui.h"
+
+#include "ui/inifile.h"
 #include "ui/selgame.h"
 #include "ui/simpleselgame.h"
+#include "ui/ui.h"
+
 #include "cheat.h"
-#include "ui/inifile.h"
+#include "clifront.h"
+#include "emuopts.h"
+#include "fileio.h"
+#include "luaengine.h"
+#include "mameopts.h"
+#include "pluginopts.h"
+#include "rendlay.h"
+#include "validity.h"
+
+#include "corestr.h"
 #include "xmlfile.h"
+
+#include "osdepend.h"
+
+#include <ctime>
+
 
 //**************************************************************************
 //  MACHINE MANAGER
 //**************************************************************************
 
-mame_machine_manager* mame_machine_manager::m_manager = nullptr;
+mame_machine_manager *mame_machine_manager::s_manager = nullptr;
 
 mame_machine_manager* mame_machine_manager::instance(emu_options &options, osd_interface &osd)
 {
-	if (!m_manager)
-		m_manager = global_alloc(mame_machine_manager(options, osd));
+	if (!s_manager)
+		s_manager = new mame_machine_manager(options, osd);
 
-	return m_manager;
+	return s_manager;
 }
 
 mame_machine_manager* mame_machine_manager::instance()
 {
-	return m_manager;
+	return s_manager;
 }
 
 //-------------------------------------------------
@@ -51,7 +60,7 @@ mame_machine_manager* mame_machine_manager::instance()
 mame_machine_manager::mame_machine_manager(emu_options &options,osd_interface &osd) :
 	machine_manager(options, osd),
 	m_plugins(std::make_unique<plugin_options>()),
-	m_lua(global_alloc(lua_engine)),
+	m_lua(std::make_unique<lua_engine>()),
 	m_new_driver_pending(nullptr),
 	m_firstrun(true),
 	m_autoboot_timer(nullptr)
@@ -65,8 +74,8 @@ mame_machine_manager::mame_machine_manager(emu_options &options,osd_interface &o
 
 mame_machine_manager::~mame_machine_manager()
 {
-	global_free(m_lua);
-	m_manager = nullptr;
+	m_lua.reset();
+	s_manager = nullptr;
 }
 
 
@@ -144,7 +153,7 @@ void mame_machine_manager::start_luaengine()
 			// parse the file
 			// attempt to open the output file
 			emu_file file(options().ini_path(), OPEN_FLAG_READ);
-			if (file.open("plugin.ini") == osd_file::error::NONE)
+			if (!file.open("plugin.ini"))
 			{
 				try
 				{
@@ -160,18 +169,18 @@ void mame_machine_manager::start_luaengine()
 		// process includes
 		for (const std::string &incl : split(options().plugin(), ','))
 		{
-			plugin *p = m_plugins->find(incl);
+			plugin_options::plugin *p = m_plugins->find(incl);
 			if (!p)
-				fatalerror("Fatal error: Could not load plugin: %s\n", incl.c_str());
+				fatalerror("Fatal error: Could not load plugin: %s\n", incl);
 			p->m_start = true;
 		}
 
 		// process excludes
 		for (const std::string &excl : split(options().no_plugin(), ','))
 		{
-			plugin *p = m_plugins->find(excl);
+			plugin_options::plugin *p = m_plugins->find(excl);
 			if (!p)
-				fatalerror("Fatal error: Unknown plugin: %s\n", excl.c_str());
+				fatalerror("Fatal error: Unknown plugin: %s\n", excl);
 			p->m_start = false;
 		}
 	}
@@ -179,7 +188,7 @@ void mame_machine_manager::start_luaengine()
 	// we have a special way to open the console plugin
 	if (options().console())
 	{
-		plugin *p = m_plugins->find(OPTION_CONSOLE);
+		plugin_options::plugin *p = m_plugins->find(OPTION_CONSOLE);
 		if (!p)
 			fatalerror("Fatal error: Console plugin not found.\n");
 
@@ -190,12 +199,33 @@ void mame_machine_manager::start_luaengine()
 
 	{
 		emu_file file(options().plugins_path(), OPEN_FLAG_READ);
-		osd_file::error filerr = file.open("boot.lua");
-		if (filerr == osd_file::error::NONE)
+		std::error_condition const filerr = file.open("boot.lua");
+		if (!filerr)
 		{
 			std::string exppath;
-			osd_subst_env(exppath, std::string(file.fullpath()));
-			m_lua->load_script(exppath.c_str());
+			osd_subst_env(exppath, file.fullpath());
+			auto &l(*lua());
+			auto load_result = l.load_script(exppath);
+			if (!load_result.valid())
+			{
+				sol::error err = load_result;
+				sol::load_status status = load_result.status();
+				fatalerror("Error plugin bootstrap script %s: %s error\n%s\n",
+						exppath,
+						sol::to_string(status),
+						err.what());
+			}
+			sol::protected_function func = load_result;
+			sol::protected_function_result call_result = l.invoke(func);
+			if (!call_result.valid())
+			{
+				sol::error err = call_result;
+				sol::call_status status = call_result.status();
+				fatalerror("Error running plugin bootstrap script %s: %s error\n%s\n",
+						options().autoboot_script(),
+						sol::to_string(status),
+						err.what());
+			}
 		}
 	}
 }
@@ -244,7 +274,7 @@ int mame_machine_manager::execute()
 		bool is_empty = (system == &GAME_NAME(___empty));
 		if (!is_empty)
 		{
-			validity_checker valid(m_options);
+			validity_checker valid(m_options, true);
 			valid.set_verbose(false);
 			valid.check_shared_source(*system);
 		}
@@ -286,21 +316,35 @@ int mame_machine_manager::execute()
 
 TIMER_CALLBACK_MEMBER(mame_machine_manager::autoboot_callback)
 {
-	if (strlen(options().autoboot_script())!=0) {
-		mame_machine_manager::instance()->lua()->load_script(options().autoboot_script());
+	if (*options().autoboot_script())
+	{
+		assert(m_autoboot_script);
+		sol::protected_function func = *m_autoboot_script;
+		sol::protected_function_result result = lua()->invoke(func);
+		if (!result.valid())
+		{
+			sol::error err = result;
+			sol::call_status status = result.status();
+			fatalerror("Error running autoboot script %s: %s error\n%s\n",
+					options().autoboot_script(),
+					sol::to_string(status),
+					err.what());
+		}
 	}
-	else if (strlen(options().autoboot_command())!=0) {
-		std::string cmd = std::string(options().autoboot_command());
+	else if (*options().autoboot_command())
+	{
+		std::string cmd(options().autoboot_command());
 		strreplace(cmd, "'", "\\'");
 		std::string val = std::string("emu.keypost('").append(cmd).append("')");
-		mame_machine_manager::instance()->lua()->load_string(val.c_str());
+		auto &l(*lua());
+		l.invoke(l.load_string(val));
 	}
 }
 
 void mame_machine_manager::reset()
 {
 	// setup autoboot if needed
-	m_autoboot_timer->adjust(attotime(options().autoboot_delay(),0),0);
+	m_autoboot_timer->adjust(attotime(options().autoboot_delay(), 0), 0);
 }
 
 ui_manager* mame_machine_manager::create_ui(running_machine& machine)
@@ -328,7 +372,7 @@ void mame_machine_manager::before_load_settings(running_machine& machine)
 	m_lua->on_machine_before_load_settings();
 }
 
-void mame_machine_manager::create_custom(running_machine& machine)
+void mame_machine_manager::create_custom(running_machine &machine)
 {
 	// start the inifile manager
 	m_inifile = std::make_unique<inifile_manager>(m_ui->options());
@@ -338,6 +382,25 @@ void mame_machine_manager::create_custom(running_machine& machine)
 
 	// start favorite manager
 	m_favorite = std::make_unique<favorite_manager>(m_ui->options());
+
+	// attempt to load the autoboot script if configured
+	m_autoboot_script.reset();
+	if (*options().autoboot_script())
+	{
+		auto result = lua()->load_script(options().autoboot_script());
+		if (!result.valid())
+		{
+			sol::error err = result;
+			sol::load_status status = result.status();
+			fatalerror("Error loading autoboot script %s: %s error\n%s\n",
+					options().autoboot_script(),
+					sol::to_string(status),
+					err.what());
+		}
+		m_autoboot_script.reset(new sol::load_result(std::move(result)));
+		sol::protected_function func = *m_autoboot_script;
+		sol::set_environment(lua()->make_environment(), func);
+	}
 }
 
 void mame_machine_manager::load_cheatfiles(running_machine& machine)
@@ -357,7 +420,7 @@ std::vector<std::reference_wrapper<const std::string>> mame_machine_manager::mis
 	assert(m_machine);
 
 	// make sure that any required image has a mounted file
-	for (device_image_interface &image : image_interface_iterator(m_machine->root_device()))
+	for (device_image_interface &image : image_interface_enumerator(m_machine->root_device()))
 	{
 		if (image.must_be_loaded())
 		{
@@ -418,14 +481,20 @@ void emulator_info::sound_hook()
 	return mame_machine_manager::instance()->lua()->on_sound_update();
 }
 
-void emulator_info::layout_file_cb(util::xml::data_node const &layout)
+void emulator_info::layout_script_cb(layout_file &file, const char *script)
 {
-	util::xml::data_node const *const mamelayout = layout.get_child("mamelayout");
-	if (mamelayout)
+	// TODO: come up with a better way to pass multiple arguments to plugin
+	//mame_machine_manager::instance()->lua()->call_plugin_set("layout", std::make_tuple(&file, script->get_value()));
+	auto &lua(mame_machine_manager::instance()->lua()->sol());
+	sol::object obj = lua.registry()["cb_layout"];
+	if (obj.is<sol::protected_function>())
 	{
-		util::xml::data_node const *const script = mamelayout->get_child("script");
-		if (script)
-			mame_machine_manager::instance()->lua()->call_plugin_set("layout", script->get_value());
+		auto res = obj.as<sol::protected_function>()(sol::make_reference(lua, &file), sol::make_reference(lua, script));
+		if (!res.valid())
+		{
+			sol::error err = res;
+			osd_printf_error("[LUA ERROR] in call_plugin: %s\n", err.what());
+		}
 	}
 }
 

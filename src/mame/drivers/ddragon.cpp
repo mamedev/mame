@@ -60,7 +60,8 @@ Dip locations verified with manual for ddragon & ddragon2
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
+#include "sound/ymopn.h"
 
 #include "speaker.h"
 
@@ -125,11 +126,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(ddragon_state::ddragon_scanline)
 
 /*************************************
  *
- *  System setup and intialization
+ *  System setup and initialization
  *
  *************************************/
 
-MACHINE_START_MEMBER(ddragon_state,ddragon)
+void ddragon_state::machine_start()
 {
 	/* configure banks */
 	if (m_mainbank)
@@ -146,7 +147,7 @@ MACHINE_START_MEMBER(ddragon_state,ddragon)
 }
 
 
-MACHINE_RESET_MEMBER(ddragon_state,ddragon)
+void ddragon_state::machine_reset()
 {
 	m_scrollx_hi = 0;
 	m_scrolly_hi = 0;
@@ -470,7 +471,7 @@ void ddragon_state::ddragon_base_map(address_map &map)
 	map(0x1000, 0x11ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x1200, 0x13ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x1800, 0x1fff).ram().w(FUNC(ddragon_state::ddragon_fgvideoram_w)).share("fgvideoram");
-	map(0x2000, 0x21ff).rw(FUNC(ddragon_state::ddragon_comram_r), FUNC(ddragon_state::ddragon_comram_w)).share("comram").mirror(0x0600);
+	map(0x2000, 0x21ff).rw(FUNC(ddragon_state::ddragon_comram_r), FUNC(ddragon_state::ddragon_comram_w)).mirror(0x0600);
 	map(0x2800, 0x2fff).ram().share("spriteram");
 	map(0x3000, 0x37ff).ram().w(FUNC(ddragon_state::ddragon_bgvideoram_w)).share("bgvideoram");
 	map(0x3800, 0x3800).portr("P1");
@@ -516,7 +517,7 @@ void ddragon_state::dd2_map(address_map &map)
 {
 	map(0x0000, 0x17ff).ram();
 	map(0x1800, 0x1fff).ram().w(FUNC(ddragon_state::ddragon_fgvideoram_w)).share("fgvideoram");
-	map(0x2000, 0x21ff).rw(FUNC(ddragon_state::ddragon_comram_r), FUNC(ddragon_state::ddragon_comram_w)).share("comram").mirror(0x0600);
+	map(0x2000, 0x21ff).rw(FUNC(ddragon_state::ddragon_comram_r), FUNC(ddragon_state::ddragon_comram_w)).mirror(0x0600);
 	map(0x2800, 0x2fff).ram().share("spriteram");
 	map(0x3000, 0x37ff).ram().w(FUNC(ddragon_state::ddragon_bgvideoram_w)).share("bgvideoram");
 	map(0x3800, 0x3800).portr("P1");
@@ -559,6 +560,11 @@ void ddragon_state::sub_6309_map(address_map &map)
 	map(0xc000, 0xffff).rom();
 }
 
+void ddragon_state::sub_6809_map(address_map &map) // TODO: everything
+{
+	map(0x8000, 0xffff).rom().region("sub", 0);
+}
+
 void ddragon_state::ddragonba_sub_map(address_map &map)
 {
 	map(0x0100, 0x0fff).ram();
@@ -588,6 +594,12 @@ void ddragon_state::sound_map(address_map &map)
 	map(0x1800, 0x1800).r(FUNC(ddragon_state::dd_adpcm_status_r));
 	map(0x2800, 0x2801).rw("fmsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x3800, 0x3807).w(FUNC(ddragon_state::dd_adpcm_w));
+	map(0x8000, 0xffff).rom();
+}
+
+void ddragon_state::ddragon6809_sound_map(address_map &map) // TODO: everything
+{
+	// 2x YM2203, 2xMSM5205
 	map(0x8000, 0xffff).rom();
 }
 
@@ -698,10 +710,10 @@ static INPUT_PORTS_START( ddragon2 )
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
 	PORT_DIPNAME( 0x30, 0x10, "Timer" ) PORT_DIPLOCATION("SW2:5,6")
-	PORT_DIPSETTING(    0x00, "60" )
-	PORT_DIPSETTING(    0x10, "65" )
-	PORT_DIPSETTING(    0x30, "70" )
-	PORT_DIPSETTING(    0x20, "80" )
+	PORT_DIPSETTING(    0x00, "Very Fast" )
+	PORT_DIPSETTING(    0x10, "Fast" )
+	PORT_DIPSETTING(    0x30, "Normal" )
+	PORT_DIPSETTING(    0x20, "Slow" )
 	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "2" )
@@ -957,9 +969,6 @@ void ddragon_state::ddragon(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(60000)); /* heavy interleaving to sync up sprite<->main CPUs */
 
-	MCFG_MACHINE_START_OVERRIDE(ddragon_state,ddragon)
-	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,ddragon)
-
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ddragon);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 512);
@@ -968,8 +977,6 @@ void ddragon_state::ddragon(machine_config &config)
 	m_screen->set_raw(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240);
 	m_screen->set_screen_update(FUNC(ddragon_state::screen_update_ddragon));
 	m_screen->set_palette(m_palette);
-
-	MCFG_VIDEO_START_OVERRIDE(ddragon_state,ddragon)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1013,23 +1020,31 @@ void ddragon_state::ddragonba(machine_config &config)
 }
 
 
+/*
+3x EF68B09EP (main)
+2x YM2203C (sound)
+2x OKI M5202 (sound)
+2x Y3014B (sound)
+2x LM324N (sound)
+1x TDA2003 (sound)
+1x oscillator 20.000 near sound section
+1x oscillator 24.575 (24.000 on another PCB) near main and sub CPU
+1x orange resonator CSB445E (CSB500E on another PCB)
+*/
 void ddragon_state::ddragon6809(machine_config &config)
 {
 	/* basic machine hardware */
-	MC6809E(config, m_maincpu, MAIN_CLOCK / 8);     /* 1.5 MHz */
+	MC6809E(config, m_maincpu, 24_MHz_XTAL / 16); // divisor not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddragon_state::ddragon_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(ddragon_state::ddragon_scanline), "screen", 0, 1);
 
-	MC6809E(config, m_subcpu, MAIN_CLOCK / 8);      /* 1.5 Mhz */
-	m_subcpu->set_addrmap(AS_PROGRAM, &ddragon_state::sub_6309_map); // wrong
+	MC6809E(config, m_subcpu, 24_MHz_XTAL / 16); // divisor not verified
+	m_subcpu->set_addrmap(AS_PROGRAM, &ddragon_state::sub_6809_map);
 
-	MC6809E(config, m_soundcpu, MAIN_CLOCK / 8);    /* 1.5 MHz */
-	m_soundcpu->set_addrmap(AS_PROGRAM, &ddragon_state::sound_map);
+	MC6809E(config, m_soundcpu, 20_MHz_XTAL / 12); // divisor not verified
+	m_soundcpu->set_addrmap(AS_PROGRAM, &ddragon_state::ddragon6809_sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(60000)); /* heavy interleaving to sync up sprite<->main CPUs */
-
-	MCFG_MACHINE_START_OVERRIDE(ddragon_state,ddragon)
-	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,ddragon)
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ddragon);
@@ -1040,25 +1055,24 @@ void ddragon_state::ddragon6809(machine_config &config)
 	m_screen->set_screen_update(FUNC(ddragon_state::screen_update_ddragon));
 	m_screen->set_palette(m_palette);
 
-	MCFG_VIDEO_START_OVERRIDE(ddragon_state,ddragon)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, M6809_IRQ_LINE);
 
-	ym2151_device &fmsnd(YM2151(config, "fmsnd", SOUND_CLOCK));
-	fmsnd.irq_handler().set_inputline(m_soundcpu, M6809_FIRQ_LINE);
-	fmsnd.add_route(0, "mono", 0.60);
-	fmsnd.add_route(1, "mono", 0.60);
+	ym2203_device &ym1(YM2203(config, "ym1", 20_MHz_XTAL / 6)); // divisor not verified
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.60);
 
-	MSM5205(config, m_adpcm[0], MAIN_CLOCK/32);
+	ym2203_device &ym2(YM2203(config, "ym2", 20_MHz_XTAL / 6)); // divisor not verified
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.60);
+
+	MSM5205(config, m_adpcm[0], 500_kHz_XTAL);
 	m_adpcm[0]->vck_legacy_callback().set(FUNC(ddragon_state::dd_adpcm_int_1));   /* interrupt function */
 	m_adpcm[0]->set_prescaler_selector(msm5205_device::S48_4B);  /* 8kHz */
 	m_adpcm[0]->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MSM5205(config, m_adpcm[1], MAIN_CLOCK/32);
+	MSM5205(config, m_adpcm[1], 500_kHz_XTAL);
 	m_adpcm[1]->vck_legacy_callback().set(FUNC(ddragon_state::dd_adpcm_int_2));   /* interrupt function */
 	m_adpcm[1]->set_prescaler_selector(msm5205_device::S48_4B);  /* 8kHz */
 	m_adpcm[1]->add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -1079,9 +1093,6 @@ void ddragon_state::ddragon2(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(60000)); /* heavy interleaving to sync up sprite<->main CPUs */
 
-	MCFG_MACHINE_START_OVERRIDE(ddragon_state,ddragon)
-	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,ddragon)
-
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ddragon);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 512);
@@ -1090,8 +1101,6 @@ void ddragon_state::ddragon2(machine_config &config)
 	m_screen->set_raw(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240);
 	m_screen->set_screen_update(FUNC(ddragon_state::screen_update_ddragon));
 	m_screen->set_palette(m_palette);
-
-	MCFG_VIDEO_START_OVERRIDE(ddragon_state,ddragon)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1539,16 +1548,16 @@ ROM_END
  */
 ROM_START( ddragon6809 )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + bankswitched memory */
-	ROM_LOAD( "6809_16.bin",   0x08000, 0x08000, CRC(f4c72690) SHA1(c70d032355acf3f7f6586b6e57a94f80e099bf1a) )
-	ROM_LOAD( "6809_17.bin",   0x10000, 0x08000, CRC(6489d637) SHA1(fd17fd870e9386a3e3bdd56c8d731c73d8c70b88) ) /* banked at 0x4000-0x8000 */
+	ROM_LOAD( "6809_20.bin",   0x08000, 0x08000, CRC(67e3b4f1) SHA1(4945d76b0694299f2f4739ebfba98da6d96fe4cb) )
+	ROM_LOAD( "6809_19.bin",   0x10000, 0x08000, CRC(090e2baf) SHA1(29b775c59c7a4d30a33e3d10e736cd1a83baf3bb) ) /* banked at 0x4000-0x8000 */
 	ROM_LOAD( "6809_18.bin",   0x18000, 0x08000, CRC(154d50c4) SHA1(4ffdd29406b6c6b552344f820f83715b1c7727d1) ) /* banked at 0x4000-0x8000 */
-	ROM_LOAD( "6809_19.bin",   0x20000, 0x08000, CRC(090e2baf) SHA1(29b775c59c7a4d30a33e3d10e736cd1a83baf3bb) ) /* banked at 0x4000-0x8000 */
+	ROM_LOAD( "6809_17.bin",   0x20000, 0x08000, CRC(6489d637) SHA1(fd17fd870e9386a3e3bdd56c8d731c73d8c70b88) ) /* banked at 0x4000-0x8000 */
 
-	ROM_REGION( 0x10000, "sub", 0 ) /* sprite cpu */
-	ROM_LOAD( "6809_20.bin",   0x8000, 0x8000, CRC(67e3b4f1) SHA1(4945d76b0694299f2f4739ebfba98da6d96fe4cb) )
+	ROM_REGION( 0x8000, "sub", 0 ) /* sprite cpu */
+	ROM_LOAD( "21.bin",      0x00000, 0x08000, CRC(4437fc51) SHA1(fffcf2bec50d0b79861904b4abc607206b7794e6) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
-	ROM_LOAD( "21.bin",      0x08000, 0x08000, CRC(4437fc51) SHA1(fffcf2bec50d0b79861904b4abc607206b7794e6) )
+	ROM_LOAD( "6809_16.bin",   0x08000, 0x08000, CRC(f4c72690) SHA1(c70d032355acf3f7f6586b6e57a94f80e099bf1a) )
 
 	/* all the gfx roms are scrambled on this set */
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_ERASEFF )
@@ -1625,8 +1634,8 @@ ROM_START( ddragon6809a )
 	ROM_LOAD( "18.7h",   0x18000, 0x08000, CRC(154d50c4) SHA1(4ffdd29406b6c6b552344f820f83715b1c7727d1) ) /* banked at 0x4000-0x8000 */
 	ROM_LOAD( "17.7j",   0x20000, 0x08000, CRC(4052f37a) SHA1(9444a30ce32a2d35c601324d79c0ba602be4f288) ) /* banked at 0x4000-0x8000 */
 
-	ROM_REGION( 0x10000, "sub", 0 ) /* sprite cpu */
-	ROM_LOAD( "21.7d",   0x08000, 0x8000, CRC(4437fc51) SHA1(fffcf2bec50d0b79861904b4abc607206b7794e6) )
+	ROM_REGION( 0x8000, "sub", 0 ) /* sprite cpu */
+	ROM_LOAD( "21.7d",   0x00000, 0x8000, CRC(4437fc51) SHA1(fffcf2bec50d0b79861904b4abc607206b7794e6) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
 	ROM_LOAD( "16.7n",   0x08000, 0x08000, CRC(f4c72690) SHA1(c70d032355acf3f7f6586b6e57a94f80e099bf1a) )
@@ -1639,7 +1648,7 @@ ROM_START( ddragon6809a )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "1.1t",         0x00000, 0x10000, CRC(5e810a6d) SHA1(5eba3e982b271bc284ca333429cd0b3759c9c8d1) )
-	ROM_LOAD( "1.1r",         0x10000, 0x10000, CRC(7300b785) SHA1(6d3b72bd7208e2bd790517a753c9d5192c88d20f) )
+	ROM_LOAD( "2.1r",         0x10000, 0x10000, CRC(7300b785) SHA1(6d3b72bd7208e2bd790517a753c9d5192c88d20f) )
 	ROM_LOAD( "3.1q",         0x20000, 0x10000, CRC(19405de8) SHA1(ac1aa40478b92af5ccdde89812be78b7c9f7d20d) )
 	ROM_LOAD( "4.1p",         0x30000, 0x10000, CRC(4b10defd) SHA1(fb43eba7c8a7f77f0fdd6253d51b40b0e64598f5) )
 	ROM_LOAD( "5.1n",         0x40000, 0x10000, CRC(5b1bb493) SHA1(dd947d7d381af5952acece4b2cefc9fc4847ec68) )

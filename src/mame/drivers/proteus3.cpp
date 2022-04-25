@@ -61,6 +61,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class proteus3_state : public driver_device
 {
 public:
@@ -77,6 +79,10 @@ public:
 	{ }
 
 	void proteus3(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(ca2_w);
@@ -106,13 +112,11 @@ private:
 
 	void mem_map(address_map &map);
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	u8 m_video_data;
-	u8 m_flashcnt;
-	u16 m_curs_pos;
-	u8 m_cass_data[4];
-	bool m_cassbit, m_cassold, m_cassinbit;
+	u8 m_video_data = 0U;
+	u8 m_flashcnt = 0U;
+	u16 m_curs_pos = 0U;
+	u8 m_cass_data[4]{};
+	bool m_cassbit = false, m_cassold = false, m_cassinbit = false;
 	std::unique_ptr<u8[]> m_vram;
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
@@ -300,26 +304,24 @@ WRITE_LINE_MEMBER( proteus3_state::ca2_w )
 
 u32 proteus3_state::screen_update_proteus3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 y,ra,chr,gfx;
-	u16 sy=0,ma=0,x;
+	u16 sy=0,ma=0;
 	m_flashcnt++;
 
-	for(y = 0; y < 16; y++ )
+	for (u8 y = 0; y < 16; y++ )
 	{
-		for (ra = 0; ra < 12; ra++)
+		for (u8 ra = 0; ra < 12; ra++)
 		{
-			u16 *p = &bitmap.pix16(sy++);
+			u16 *p = &bitmap.pix(sy++);
 
-			for (x = ma; x < ma + 64; x++)
+			for (u16 x = ma; x < ma + 64; x++)
 			{
-				gfx = 0;
+				u8 gfx = 0;
 				if (ra < 8)
 				{
-					chr = m_vram[x]; // get char in videoram
+					u8 chr = m_vram[x]; // get char in videoram
 					gfx = m_p_chargen[(chr<<3) | ra]; // get dot pattern in chargen
 				}
-				else
-				if ((ra == 9) && (m_curs_pos == x) && BIT(m_flashcnt, 4))
+				else if ((ra == 9) && (m_curs_pos == x) && BIT(m_flashcnt, 4))
 					gfx = 0xff;
 
 				/* Display a scanline of a character */
@@ -387,6 +389,8 @@ void proteus3_state::machine_start()
 	save_item(NAME(m_cassbit));
 	save_item(NAME(m_cassold));
 	save_item(NAME(m_cassinbit));
+
+	m_flashcnt = 0;
 }
 
 /******************************************************************************
@@ -493,6 +497,8 @@ ROM_START(proteus3)
 	// Proteus III - pbug F800-FFFF, expects RAM at F000-F7FF
 	ROM_LOAD( "proteus3_pbug.bin", 0x0000, 0x0800, CRC(1118694d) SHA1(2dfc08d405e8f2936f5b0bd1c4007995151abbba) )
 ROM_END
+
+} // Anonymous namespace
 
 
 /******************************************************************************

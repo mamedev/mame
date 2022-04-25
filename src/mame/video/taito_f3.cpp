@@ -502,6 +502,7 @@ void taito_f3_state::video_start()
 		m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
 		m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<2>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
 		m_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<3>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+		m_tilemap[4] = m_tilemap[5] = m_tilemap[6] = m_tilemap[7] = nullptr;
 
 		m_pf_data[0] = m_pf_ram + (0x0000 / 2);
 		m_pf_data[1] = m_pf_ram + (0x2000 / 2);
@@ -728,7 +729,7 @@ u16 taito_f3_state::lineram_r(offs_t offset)
 
 void taito_f3_state::lineram_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	#ifdef UNUSED_FUNCTION
+#if 0
 	/* DariusGX has an interesting bug at the start of Round D - the clearing of lineram
 	(0xa000->0x0xa7ff) overflows into priority RAM (0xb000) and creates garbage priority
 	values.  I'm not sure what the real machine would do with these values, and this
@@ -749,7 +750,7 @@ void taito_f3_state::lineram_w(offs_t offset, u16 data, u16 mem_mask)
 			return;
 		}
 	}
-	#endif
+#endif
 
 	COMBINE_DATA(&m_line_ram[offset]);
 }
@@ -1354,7 +1355,7 @@ inline void taito_f3_state::draw_scanlines(
 		yadvp = -yadvp;
 	}
 
-	u8 *dstp0 = &m_pri_alp_bitmap.pix8(ty, x);
+	u8 *dstp0 = &m_pri_alp_bitmap.pix(ty, x);
 
 	m_pdest_2a = m_alpha_level_2ad ? 0x10 : 0;
 	m_pdest_2b = m_alpha_level_2bd ? 0x20 : 0;
@@ -1366,7 +1367,7 @@ inline void taito_f3_state::draw_scanlines(
 	m_tr_3b =(m_alpha_level_3bs == 0 && m_alpha_level_3bd == 255) ? -1 : 1;
 
 	{
-		u32 *dsti0 = &bitmap.pix32(ty, x);
+		u32 *dsti0 = &bitmap.pix(ty, x);
 		while (1)
 		{
 			int cx = 0;
@@ -1382,10 +1383,10 @@ inline void taito_f3_state::draw_scanlines(
 
 			switch (skip_layer_num)
 			{
-				case 0: GET_PIXMAP_POINTER(0)
-				case 1: GET_PIXMAP_POINTER(1)
-				case 2: GET_PIXMAP_POINTER(2)
-				case 3: GET_PIXMAP_POINTER(3)
+				case 0: GET_PIXMAP_POINTER(0) [[fallthrough]];
+				case 1: GET_PIXMAP_POINTER(1) [[fallthrough]];
+				case 2: GET_PIXMAP_POINTER(2) [[fallthrough]];
+				case 3: GET_PIXMAP_POINTER(3) [[fallthrough]];
 				case 4: GET_PIXMAP_POINTER(4)
 			}
 
@@ -1397,11 +1398,11 @@ inline void taito_f3_state::draw_scanlines(
 					u8 sprite_pri;
 					switch (skip_layer_num)
 					{
-						case 0: UPDATE_PIXMAP_SP(0) UPDATE_PIXMAP_LP(0)
-						case 1: UPDATE_PIXMAP_SP(1) UPDATE_PIXMAP_LP(1)
-						case 2: UPDATE_PIXMAP_SP(2) UPDATE_PIXMAP_LP(2)
-						case 3: UPDATE_PIXMAP_SP(3) UPDATE_PIXMAP_LP(3)
-						case 4: UPDATE_PIXMAP_SP(4) UPDATE_PIXMAP_LP(4)
+						case 0: UPDATE_PIXMAP_SP(0) UPDATE_PIXMAP_LP(0) [[fallthrough]];
+						case 1: UPDATE_PIXMAP_SP(1) UPDATE_PIXMAP_LP(1) [[fallthrough]];
+						case 2: UPDATE_PIXMAP_SP(2) UPDATE_PIXMAP_LP(2) [[fallthrough]];
+						case 3: UPDATE_PIXMAP_SP(3) UPDATE_PIXMAP_LP(3) [[fallthrough]];
+						case 4: UPDATE_PIXMAP_SP(4) UPDATE_PIXMAP_LP(4) [[fallthrough]];
 						case 5: UPDATE_PIXMAP_SP(5)
 								if (!bgcolor) { if (!(m_pval & 0xf0)) { *dsti = 0; break; } }
 								else dpix_bg(bgcolor);
@@ -1416,10 +1417,10 @@ inline void taito_f3_state::draw_scanlines(
 
 				switch (skip_layer_num)
 				{
-					case 0: CULC_PIXMAP_POINTER(0)
-					case 1: CULC_PIXMAP_POINTER(1)
-					case 2: CULC_PIXMAP_POINTER(2)
-					case 3: CULC_PIXMAP_POINTER(3)
+					case 0: CULC_PIXMAP_POINTER(0) [[fallthrough]];
+					case 1: CULC_PIXMAP_POINTER(1) [[fallthrough]];
+					case 2: CULC_PIXMAP_POINTER(2) [[fallthrough]];
+					case 3: CULC_PIXMAP_POINTER(3) [[fallthrough]];
 					case 4: CULC_PIXMAP_POINTER(4)
 				}
 			}
@@ -1684,9 +1685,9 @@ void taito_f3_state::get_spritealphaclip_info()
 		line_t->spri[y] = spri;
 		line_t->sprite_alpha[y] = sprite_alpha;
 		line_t->clip0_l[y] = ((clip0_low & 0xff) | ((clip0_high & 0x1000) >> 4)) - 47;
-		line_t->clip0_r[y] = (((clip0_low & 0xff00) >> 8) | ((clip0_high & 0x2000) >> 5)) - 47;
+		line_t->clip0_r[y] = (((clip0_low & 0xff00) >> 8) | ((clip0_high & 0x2000) >> 5)) - 48;
 		line_t->clip1_l[y] = ((clip1_low & 0xff) | ((clip0_high & 0x4000) >> 6)) - 47;
-		line_t->clip1_r[y] = (((clip1_low & 0xff00) >> 8) | ((clip0_high & 0x8000) >> 7)) - 47;
+		line_t->clip1_r[y] = (((clip1_low & 0xff00) >> 8) | ((clip0_high & 0x8000) >> 7)) - 48;
 		if (line_t->clip0_l[y] < 0) line_t->clip0_l[y] = 0;
 		if (line_t->clip0_r[y] < 0) line_t->clip0_r[y] = 0;
 		if (line_t->clip1_l[y] < 0) line_t->clip1_l[y] = 0;
@@ -1909,11 +1910,11 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 
 			/* set pixmap index */
 			line_t->x_count[y]=x_index_fx & 0xffff; // Fractional part
-			line_t->src_s[y] = src_s = &srcbitmap.pix16(y_index);
+			line_t->src_s[y] = src_s = &srcbitmap.pix(y_index);
 			line_t->src_e[y] = &src_s[m_width_mask + 1];
 			line_t->src[y] = &src_s[x_index_fx >> 16];
 
-			line_t->tsrc_s[y]=tsrc_s = &flagsbitmap.pix8(y_index);
+			line_t->tsrc_s[y]=tsrc_s = &flagsbitmap.pix(y_index);
 			line_t->tsrc[y] = &tsrc_s[x_index_fx >> 16];
 		}
 
@@ -2022,16 +2023,16 @@ void taito_f3_state::get_vram_info(tilemap_t *vram_tilemap, tilemap_t *pixel_til
 			/* set pixmap index */
 			line_t->x_count[y] = 0xffff;
 			if (usePixelLayer)
-				line_t->src_s[y] = src_s = &srcbitmap_pixel.pix16(sy & 0xff);
+				line_t->src_s[y] = src_s = &srcbitmap_pixel.pix(sy & 0xff);
 			else
-				line_t->src_s[y] = src_s = &srcbitmap_vram.pix16(sy & 0x1ff);
+				line_t->src_s[y] = src_s = &srcbitmap_vram.pix(sy & 0x1ff);
 			line_t->src_e[y] = &src_s[vram_width_mask + 1];
 			line_t->src[y] = &src_s[sx];
 
 			if (usePixelLayer)
-				line_t->tsrc_s[y]=tsrc_s = &flagsbitmap_pixel.pix8(sy & 0xff);
+				line_t->tsrc_s[y]=tsrc_s = &flagsbitmap_pixel.pix(sy & 0xff);
 			else
-				line_t->tsrc_s[y]=tsrc_s = &flagsbitmap_vram.pix8(sy & 0x1ff);
+				line_t->tsrc_s[y]=tsrc_s = &flagsbitmap_vram.pix(sy & 0x1ff);
 			line_t->tsrc[y] = &tsrc_s[sx];
 		}
 
@@ -2537,8 +2538,8 @@ inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &
 					int y = ey - sy;
 					const int x = (ex - sx - 1) | (m_tile_opaque_sp[code % gfx->elements()] << 4);
 					const u8 *source0 = code_base + y_index * 16 + x_index_base;
-					u32 *dest0 = &dest_bmp.pix32(sy, sx);
-					u8 *pri0 = &m_pri_alp_bitmap.pix8(sy, sx);
+					u32 *dest0 = &dest_bmp.pix(sy, sx);
+					u8 *pri0 = &m_pri_alp_bitmap.pix(sy, sx);
 					const int yadv = dest_bmp.rowpixels();
 					const int yadvp = m_pri_alp_bitmap.rowpixels();
 					dy = dy * 16;
@@ -2552,38 +2553,38 @@ inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp, const rectangle &
 						{
 							int c;
 							u8 p;
-							case 31: PSET_O NEXT_P
-							case 30: PSET_O NEXT_P
-							case 29: PSET_O NEXT_P
-							case 28: PSET_O NEXT_P
-							case 27: PSET_O NEXT_P
-							case 26: PSET_O NEXT_P
-							case 25: PSET_O NEXT_P
-							case 24: PSET_O NEXT_P
-							case 23: PSET_O NEXT_P
-							case 22: PSET_O NEXT_P
-							case 21: PSET_O NEXT_P
-							case 20: PSET_O NEXT_P
-							case 19: PSET_O NEXT_P
-							case 18: PSET_O NEXT_P
-							case 17: PSET_O NEXT_P
+							case 31: PSET_O NEXT_P [[fallthrough]];
+							case 30: PSET_O NEXT_P [[fallthrough]];
+							case 29: PSET_O NEXT_P [[fallthrough]];
+							case 28: PSET_O NEXT_P [[fallthrough]];
+							case 27: PSET_O NEXT_P [[fallthrough]];
+							case 26: PSET_O NEXT_P [[fallthrough]];
+							case 25: PSET_O NEXT_P [[fallthrough]];
+							case 24: PSET_O NEXT_P [[fallthrough]];
+							case 23: PSET_O NEXT_P [[fallthrough]];
+							case 22: PSET_O NEXT_P [[fallthrough]];
+							case 21: PSET_O NEXT_P [[fallthrough]];
+							case 20: PSET_O NEXT_P [[fallthrough]];
+							case 19: PSET_O NEXT_P [[fallthrough]];
+							case 18: PSET_O NEXT_P [[fallthrough]];
+							case 17: PSET_O NEXT_P [[fallthrough]];
 							case 16: PSET_O break;
 
-							case 15: PSET_T NEXT_P
-							case 14: PSET_T NEXT_P
-							case 13: PSET_T NEXT_P
-							case 12: PSET_T NEXT_P
-							case 11: PSET_T NEXT_P
-							case 10: PSET_T NEXT_P
-							case  9: PSET_T NEXT_P
-							case  8: PSET_T NEXT_P
-							case  7: PSET_T NEXT_P
-							case  6: PSET_T NEXT_P
-							case  5: PSET_T NEXT_P
-							case  4: PSET_T NEXT_P
-							case  3: PSET_T NEXT_P
-							case  2: PSET_T NEXT_P
-							case  1: PSET_T NEXT_P
+							case 15: PSET_T NEXT_P [[fallthrough]];
+							case 14: PSET_T NEXT_P [[fallthrough]];
+							case 13: PSET_T NEXT_P [[fallthrough]];
+							case 12: PSET_T NEXT_P [[fallthrough]];
+							case 11: PSET_T NEXT_P [[fallthrough]];
+							case 10: PSET_T NEXT_P [[fallthrough]];
+							case  9: PSET_T NEXT_P [[fallthrough]];
+							case  8: PSET_T NEXT_P [[fallthrough]];
+							case  7: PSET_T NEXT_P [[fallthrough]];
+							case  6: PSET_T NEXT_P [[fallthrough]];
+							case  5: PSET_T NEXT_P [[fallthrough]];
+							case  4: PSET_T NEXT_P [[fallthrough]];
+							case  3: PSET_T NEXT_P [[fallthrough]];
+							case  2: PSET_T NEXT_P [[fallthrough]];
+							case  1: PSET_T NEXT_P [[fallthrough]];
 							case  0: PSET_T
 						}
 
@@ -2686,8 +2687,8 @@ inline void taito_f3_state::f3_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectang
 					for (int y = sy; y < ey; y++)
 					{
 						const u8 *source = code_base + (y_index >> 16) * 16;
-						u32 *dest = &dest_bmp.pix32(y);
-						u8 *pri = &m_pri_alp_bitmap.pix8(y);
+						u32 *dest = &dest_bmp.pix(y);
+						u8 *pri = &m_pri_alp_bitmap.pix(y);
 
 						int x_index = x_index_base;
 						for (int x = sx; x < ex; x++)

@@ -114,7 +114,7 @@ NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerCo
 				keyEquivalent:@"b"];
 	[newMenu addItemWithTitle:@"Devices Window"
 					   action:@selector(debugNewDevicesWindow:)
-				keyEquivalent:@"D"];
+				keyEquivalent:@""];
 
 	[menu addItem:[NSMenuItem separatorItem]];
 
@@ -493,7 +493,7 @@ NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerCo
 
 - (void)saveConfigurationToNode:(util::xml::data_node *)node {
 	[super saveConfigurationToNode:node];
-	node->add_child("expression", util::xml::normalize_string([[self expression] UTF8String]));
+	node->add_child("expression", [[self expression] UTF8String]);
 }
 
 

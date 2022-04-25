@@ -13,6 +13,7 @@
 #include "pce_rom.h"
 
 
+
 //-------------------------------------------------
 //  pce_rom_device - constructor
 //-------------------------------------------------
@@ -111,14 +112,16 @@ void pce_tennokoe_device::nvram_default()
 	memcpy(m_bram + 0x1800, m_rom + 0x8800, 0x800);
 }
 
-void pce_tennokoe_device::nvram_read(emu_file &file)
+bool pce_tennokoe_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_bram, m_bram_size);
+	size_t actual_size;
+	return !file.read(m_bram, m_bram_size, actual_size) && actual_size == m_bram_size;
 }
 
-void pce_tennokoe_device::nvram_write(emu_file &file)
+bool pce_tennokoe_device::nvram_write(util::write_stream &file)
 {
-	file.write(m_bram, m_bram_size);
+	size_t actual_size;
+	return !file.write(m_bram, m_bram_size, actual_size) && actual_size == m_bram_size;
 }
 
 /*-------------------------------------------------
@@ -214,6 +217,7 @@ void pce_tennokoe_device::write_cart(offs_t offset, uint8_t data)
 			// TODO: lock/unlock mechanism is a complete guess, needs real HW study
 			// (writes to ports $c0000, $d0000, $f0000)
 			m_bram_locked = (data == 0);
+			[[fallthrough]];
 		default:
 			logerror("tennokoe: ROM writing at %06x %02x\n",offset,data);
 			break;

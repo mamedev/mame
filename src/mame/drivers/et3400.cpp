@@ -33,6 +33,7 @@ ETA-3400 Memory I/O Accessory
 
 #include "et3400.lh"
 
+namespace {
 
 class et3400_state : public driver_device
 {
@@ -212,7 +213,6 @@ INPUT_PORTS_END
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
@@ -262,7 +262,7 @@ ROM_START( et3400 )
 	ROM_LOAD_OPTIONAL("prom.u108", 0x1400, 0x0020, CRC(273025c3) SHA1(136c1cdce2a4a796c1c46e8ea4f798cdee4b549b) ) // not used
 ROM_END
 
-/* Driver */
+} // Anonymous namespace
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY          FULLNAME                                         FLAGS */
-COMP( 1976, et3400, 0,      0,      et3400,  et3400, et3400_state, empty_init, "Heath Company", "Heathkit Model ET-3400 Microprocessor Trainer", 0 )
+COMP( 1976, et3400, 0,      0,      et3400,  et3400, et3400_state, empty_init, "Heath Company", "Heathkit Model ET-3400 Microprocessor Trainer", MACHINE_SUPPORTS_SAVE )

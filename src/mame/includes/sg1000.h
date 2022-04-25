@@ -116,12 +116,12 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	int m_centronics_busy;
+	int m_centronics_busy = 0;
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
 	uint8_t ppi_pa_r();
 	void ppi_pc_w(uint8_t data);
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 	void sf7000_io_map(address_map &map);
 	void sf7000_map(address_map &map);
 };

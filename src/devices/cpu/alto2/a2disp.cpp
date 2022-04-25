@@ -258,7 +258,7 @@ void alto2_cpu_device::update_framebuf_word(uint16_t* framebuf, int x, int y, ui
 	if (word == framebuf[x])
 		return;
 	framebuf[x] = word;
-	draw_scanline8(*m_dsp.bitmap, x * 16, y, 16, m_dsp.patterns + 16 * word, nullptr);
+	draw_scanline8(*m_dsp.bitmap, x * 16, y, 16, &m_dsp.patterns[16 * word], nullptr);
 }
 
 /**
@@ -517,16 +517,16 @@ void alto2_cpu_device::init_disp()
 	save_item(NAME(m_dsp.xpreg));
 	save_item(NAME(m_dsp.csr));
 
-	m_disp_a38 = prom_load(machine(), &pl_displ_a38, memregion("displ_a38")->base());
-	m_disp_a63 = prom_load(machine(), &pl_displ_a63, memregion("displ_a63")->base());
-	m_disp_a66 = prom_load(machine(), &pl_displ_a66, memregion("displ_a66")->base());
+	m_disp_a38 = prom_load<uint8_t>(machine(), &pl_displ_a38, memregion("displ_a38")->base());
+	m_disp_a63 = prom_load<uint8_t>(machine(), &pl_displ_a63, memregion("displ_a63")->base());
+	m_disp_a66 = prom_load<uint8_t>(machine(), &pl_displ_a66, memregion("displ_a66")->base());
 
 	m_dsp.hlc = A2_DISP_HLC_START;
 
 	m_dsp.framebuf = std::make_unique<uint16_t[]>(A2_DISP_TOTAL_HEIGHT * A2_DISP_SCANLINE_WORDS);
-	m_dsp.patterns = auto_alloc_array(machine(), uint8_t, 65536 * 16);
+	m_dsp.patterns = std::make_unique<uint8_t[]>(65536 * 16);
 	for (int y = 0; y < 65536; y++) {
-		uint8_t* dst = m_dsp.patterns + y * 16;
+		uint8_t* dst = &m_dsp.patterns[y * 16];
 		for (int x = 0; x < 16; x++)
 			*dst++ = (~y >> (15 - x)) & 1;
 	}

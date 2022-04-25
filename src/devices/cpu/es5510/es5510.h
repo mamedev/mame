@@ -187,7 +187,8 @@ private:
 	int32_t  gpr_latch;     // 24 bits, holding up to 20 address bits, left justified
 	uint64_t instr_latch;   // 48 bits, right justified
 	uint8_t  ram_sel;       // effectively a boolean
-	uint8_t  host_control;  //
+	uint8_t  host_control;  // ESP state / host control register
+	uint8_t  host_serial;   // serial I/O format and control
 
 	// currently executing instruction(s)
 	alu_t alu;

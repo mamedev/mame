@@ -8,7 +8,6 @@
 #include "stereo_fx.h"
 
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -134,11 +133,6 @@ void stereo_fx_device::device_add_mconfig(machine_config &config)
 
 	DAC_8BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
 	DAC_8BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 
 	PC_JOY(config, m_joy);
 }
@@ -214,7 +208,7 @@ void stereo_fx_device::device_start()
 	ym3812_device &ym3812 = *subdevice<ym3812_device>("ym3812");
 	set_isa_device();
 
-	m_isa->install_device(0x0200, 0x0207, read8_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_r)), write8_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_w)));
+	m_isa->install_device(0x0200, 0x0207, read8smo_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_r)), write8smo_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_w)));
 	m_isa->install_device(0x0226, 0x0227, read8smo_delegate(*this, FUNC(stereo_fx_device::invalid_r)), write8smo_delegate(*this, FUNC(stereo_fx_device::dsp_reset_w)));
 	m_isa->install_device(0x022a, 0x022b, read8smo_delegate(*this, FUNC(stereo_fx_device::dsp_data_r)), write8smo_delegate(*this, FUNC(stereo_fx_device::invalid_w)));
 	m_isa->install_device(0x022c, 0x022d, read8smo_delegate(*this, FUNC(stereo_fx_device::dsp_wbuf_status_r)), write8smo_delegate(*this, FUNC(stereo_fx_device::dsp_cmd_w)));
@@ -238,7 +232,7 @@ void stereo_fx_device::device_reset()
 	m_t0 = CLEAR_LINE;
 }
 
-void stereo_fx_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void stereo_fx_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
 {
 	m_t0 = !m_t0;
 	m_cpu->set_input_line(MCS51_T0_LINE, m_t0);

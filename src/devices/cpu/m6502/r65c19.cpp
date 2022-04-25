@@ -34,7 +34,7 @@ r65c19_device::r65c19_device(const machine_config &mconfig, const char *tag, dev
 c39_device::c39_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal_map)
 	: r65c19_device(mconfig, type, tag, owner, clock, internal_map)
 	, m_exp_config("expansion", ENDIANNESS_LITTLE, 8, 21, 0)
-	, m_es4_config("ES4", ENDIANNESS_LITTLE, 8, 9, 0)
+	, m_es4_config("es4", ENDIANNESS_LITTLE, 8, 9, 0)
 {
 }
 

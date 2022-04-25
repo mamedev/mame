@@ -378,7 +378,7 @@ private:
 
 	void swyft_mem(address_map &map);
 
-	//virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	//virtual void device_timer(emu_timer &timer, device_timer_id id, int param);
 };
 
 
@@ -599,19 +599,16 @@ void swyft_state::video_start()
 
 uint32_t swyft_state::screen_update_swyft(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t code;
-	int y, x, b;
-
 	int addr = 0;
-	for (y = 0; y < 242; y++)
+	for (int y = 0; y < 242; y++)
 	{
 		int horpos = 0;
-		for (x = 0; x < 40; x++)
+		for (int x = 0; x < 40; x++)
 		{
-			code = m_p_swyft_videoram[addr++];
-			for (b = 7; b >= 0; b--)
+			uint16_t code = m_p_swyft_videoram[addr++];
+			for (int b = 7; b >= 0; b--)
 			{
-				bitmap.pix16(y, horpos++) = (code >> b) & 0x01;
+				bitmap.pix(y, horpos++) = (code >> b) & 0x01;
 			}
 		}
 	}
@@ -771,7 +768,7 @@ void swyft_state::swyft(machine_config &config)
 	clock_device &acia_clock(CLOCK(config, "acia_clock", (XTAL(15'897'600)/2)/5)); // out e clock from 68008, ~ 10in clocks per out clock
 	acia_clock.signal_handler().set(FUNC(swyft_state::write_acia_clock));
 
-	via6522_device &via0(VIA6522(config, "via6522_0", (XTAL(15'897'600)/2)/5)); // out e clock from 68008
+	via6522_device &via0(MOS6522(config, "via6522_0", (XTAL(15'897'600)/2)/5)); // out e clock from 68008
 	via0.readpa_handler().set(FUNC(swyft_state::via0_pa_r));
 	via0.readpb_handler().set(FUNC(swyft_state::via0_pb_r));
 	via0.writepa_handler().set(FUNC(swyft_state::via0_pa_w));
@@ -781,7 +778,7 @@ void swyft_state::swyft(machine_config &config)
 	via0.cb2_handler().set(FUNC(swyft_state::via0_cb2_w));
 	via0.irq_handler().set("viairq", FUNC(input_merger_device::in_w<0>));
 
-	via6522_device &via1(VIA6522(config, "via6522_1", (XTAL(15'897'600)/2)/5)); // out e clock from 68008
+	via6522_device &via1(MOS6522(config, "via6522_1", (XTAL(15'897'600)/2)/5)); // out e clock from 68008
 	via1.readpa_handler().set(FUNC(swyft_state::via1_pa_r));
 	via1.readpb_handler().set(FUNC(swyft_state::via1_pb_r));
 	via1.writepa_handler().set(FUNC(swyft_state::via1_pa_w));

@@ -8,8 +8,6 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/xdf_dsk.h"
 
 xdf_format::xdf_format() : upd765_format(formats)
@@ -44,4 +42,4 @@ const xdf_format::format xdf_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_XDF_FORMAT = &floppy_image_format_creator<xdf_format>;
+const xdf_format FLOPPY_XDF_FORMAT;

@@ -80,13 +80,13 @@ void pingpong_state::pingpong_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(pingpong_state::pingpong_videoram_w)
+void pingpong_state::pingpong_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(pingpong_state::pingpong_colorram_w)
+void pingpong_state::pingpong_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);

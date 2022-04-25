@@ -792,12 +792,10 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 
 /**
  * @brief timer callback to take away the SECLATE pulse (monoflop)
- * @param ptr some unused pointer
  * @param arg contains the seclate value
  */
-void alto2_cpu_device::disk_seclate(void* ptr, int32_t arg)
+void alto2_cpu_device::disk_seclate(int32_t arg)
 {
-	(void)ptr;
 	LOG((this,LOG_DISK,2,"   SECLATE -> %d\n", arg));
 	m_dsk.seclate = arg;
 	m_dsk.seclate_timer->enable(false);
@@ -805,12 +803,10 @@ void alto2_cpu_device::disk_seclate(void* ptr, int32_t arg)
 
 /**
  * @brief timer callback to take away the OK TO RUN pulse (reset)
- * @param ptr some unused pointer
  * @param arg contains the ok_to_run value
  */
-void alto2_cpu_device::disk_ok_to_run(void* ptr, int32_t arg)
+void alto2_cpu_device::disk_ok_to_run(int32_t arg)
 {
-	(void)ptr;
 	LOG((this,LOG_DISK,2,"   OK TO RUN -> %d\n", arg));
 	m_dsk.ok_to_run = arg;
 	m_dsk.ok_to_run_timer->enable(false);
@@ -833,12 +829,10 @@ void alto2_cpu_device::disk_ok_to_run(void* ptr, int32_t arg)
  * flag 0 (SKINC, active low). If the seek would go beyond the last cylinder,
  * the drive deasserts seek_incomplete, but does not assert the addx_acknowledge.
  *
- * @param ptr some unused pointer
  * @param arg contains the drive, cylinder, and restore flag
  */
-void alto2_cpu_device::disk_strobon(void* ptr, int32_t arg)
+void alto2_cpu_device::disk_strobon(int32_t arg)
 {
-	(void)ptr;
 	int unit = arg % 2;
 	int restore = (arg / 2) % 2;
 	int cylinder = arg / 4;
@@ -904,7 +898,7 @@ void alto2_cpu_device::disk_strobon(void* ptr, int32_t arg)
 }
 
 /** @brief timer callback to change the READY monoflop 31a */
-void alto2_cpu_device::disk_ready_mf31a(void* ptr, int32_t arg)
+void alto2_cpu_device::disk_ready_mf31a(int32_t arg)
 {
 	diablo_hd_device* dhd = m_drive[m_dsk.drive];
 	m_dsk.ready_mf31a = arg & dhd->get_ready_0();
@@ -1005,7 +999,7 @@ void alto2_cpu_device::f1_late_strobe()
 		LOG((this,LOG_DISK,1,"   STROBE (SENDADR:1)\n"));
 		/* Set the STROBON flag and start the STROBON monoflop */
 		m_dsk.strobe = 1;
-		disk_strobon(nullptr,
+		disk_strobon(
 			4 * GET_KADDR_CYLINDER(m_dsk.kaddr) +
 			2 * GET_KADDR_RESTORE(m_dsk.kaddr) +
 			m_dsk.drive);
@@ -1570,12 +1564,10 @@ void alto2_cpu_device::f2_late_strobon()
 /**
  * @brief update the disk controller with a new bitclk
  *
- * @param id timer id
  * @param arg bit number
  */
-void alto2_cpu_device::disk_bitclk(void* ptr, int32_t arg)
+void alto2_cpu_device::disk_bitclk(int32_t arg)
 {
-	(void)ptr;
 	diablo_hd_device* dhd = m_drive[m_dsk.drive];
 	int clk = arg & 1;
 	int bit;

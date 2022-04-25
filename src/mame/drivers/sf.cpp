@@ -17,7 +17,7 @@
 #include "machine/gen_latch.h"
 #include "screen.h"
 #include "sound/msm5205.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
 #include "tilemap.h"
 

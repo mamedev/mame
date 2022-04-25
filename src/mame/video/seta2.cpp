@@ -75,14 +75,14 @@
     The low bits of the pens from a "shadowing" tile (regardless of color code)
     substitute the top bits of the color index (0-7fff) in the frame buffer.
 
-	Note:
+    Note:
 
-	Based on raster effect usage in Guardians it would appear this list is
-	transformed into an alt format by the hardware.  It is unknown if this
-	alt format is visible to the CPU for reading, or only writing the updated
-	scroll positions.  We could do with attempting a RAM capture to see what
-	this format really looks like if it is CPU visible as the current
-	implementation of this copy / reformat operation is pure guesswork
+    Based on raster effect usage in Guardians it would appear this list is
+    transformed into an alt format by the hardware.  It is unknown if this
+    alt format is visible to the CPU for reading, or only writing the updated
+    scroll positions.  We could do with attempting a RAM capture to see what
+    this format really looks like if it is CPU visible as the current
+    implementation of this copy / reformat operation is pure guesswork
 
 ***************************************************************************/
 
@@ -149,7 +149,12 @@
 
 ***************************************************************************/
 
-WRITE16_MEMBER(seta2_state::vregs_w)
+uint16_t seta2_state::vregs_r(offs_t offset)
+{
+	return m_vregs[offset];
+}
+
+void seta2_state::vregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* 02/04 = horizontal display start/end
 	           mj4simai = 0065/01E5 (0180 visible area)
@@ -272,12 +277,12 @@ WRITE16_MEMBER(seta2_state::vregs_w)
 	}
 }
 
-READ16_MEMBER(seta2_state::spriteram_r)
+uint16_t seta2_state::spriteram_r(offs_t offset)
 {
 	return m_spriteram[offset];
 }
 
-WRITE16_MEMBER(seta2_state::spriteram_w)
+void seta2_state::spriteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_spriteram[offset]);
 }
@@ -318,10 +323,10 @@ inline void seta2_state::drawgfx_line(bitmap_ind16& bitmap, const rectangle& cli
 	if (!use_shadow)
 		shadow = 0;
 
-	uint16_t* dest = &bitmap.pix16(screenline);
+	uint16_t *const dest = &bitmap.pix(screenline);
 
 	int minx = cliprect.min_x << 16;
-	int maxx = cliprect.max_x << 16;
+	int maxx = (cliprect.max_x + 1) << 16;
 
 	if (xzoom < 0x10000) // shrink
 	{
@@ -337,7 +342,7 @@ inline void seta2_state::drawgfx_line(bitmap_ind16& bitmap, const rectangle& cli
 			uint8_t pen = (source[column++] & gfx_mask) >> gfx_shift;
 
 
-			if (sx >= minx && sx <= maxx)
+			if (sx >= minx && sx < maxx)
 			{
 				int realsx = sx >> 16;
 
@@ -379,7 +384,7 @@ inline void seta2_state::drawgfx_line(bitmap_ind16& bitmap, const rectangle& cli
 		{
 			uint8_t pen = (source[column] & gfx_mask) >> gfx_shift;
 
-			if (sx >= minx && sx <= maxx)
+			if (sx >= minx && sx < maxx)
 			{
 				int realsx = sx >> 16;
 
@@ -473,7 +478,7 @@ int seta2_state::calculate_global_xoffset(int nozoom_fixedpalette_fixedposition)
 	/*
 	int global_xoffset = (m_vregs[0x12/2] & 0x7ff); // and 0x10/2 for low bits
 	if (global_xoffset & 0x400)
-		global_xoffset -= 0x800;
+	    global_xoffset -= 0x800;
 
 	// funcube3 sets a global xoffset of -1 causing a single pixel shift, does something else compensate for it?
 	// note, it also writes a different address for the sprite buffering (related?) but doesn't also have the global zoom set to negative like Star Audition which also writes there.
@@ -484,7 +489,7 @@ int seta2_state::calculate_global_xoffset(int nozoom_fixedpalette_fixedposition)
 	// TODO: properly render negative zoom sprites
 	if (global_xzoom & 0x400)
 	{
-		global_xoffset -= 0x14f;
+	    global_xoffset -= 0x14f;
 	}
 	*/
 
@@ -501,7 +506,7 @@ int seta2_state::calculate_global_yoffset(int nozoom_fixedpalette_fixedposition)
 	// Sprites list
 	//int global_yoffset = (m_vregs[0x1a / 2] & 0x7ff); // and 0x18/2 for low bits
 	//if (global_yoffset & 0x400)
-	//	global_yoffset -= 0x800;
+	//  global_yoffset -= 0x800;
 
 	//global_yoffset += 1; // +2 for myangel / myangel2?
 	int global_yoffset = 0;
@@ -599,19 +604,19 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 
 					int height = use_global_size ? global_sizey : local_sizey;
 					height = ((height & 0xfc00) >> 10) + 1;
-					
+
 					int firstline = (sy + yoffs) & 0x3ff;
-					
+
 					if (firstline & 0x200)
 						firstline -= 0x400;
-					
+
 					int endline = firstline + height * 0x10 - 1;
 
 					// if the sprite doesn't cover this scanline, bail now
-					
+
 					if (endline & 0x200)
 						endline -= 0x400;
-					
+
 					if (endline >= firstline)
 					{
 						if (firstline > usedscanline)    continue;
@@ -691,7 +696,7 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 
 					if (realscanline == 128)
 					{
-					//	printf("%04x %02x %d %d\n", sprite_debug_count, num, yoffs, sy);
+					//  printf("%04x %02x %d %d\n", sprite_debug_count, num, yoffs, sy);
 					}
 
 					int sizey = use_global_size ? global_sizey : s2[1] & 0xfc00;
@@ -760,7 +765,7 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 						realsx = realsx * usedxzoom;
 						drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[realcode]), color << 4, flipx, flipy, realsx, usedxzoom, use_shadow, realscanline, line, opaque);
 					}
-					
+
 				}
 			}
 		}
@@ -786,9 +791,6 @@ TIMER_CALLBACK_MEMBER(seta2_state::raster_timer_done)
 
 void seta2_state::draw_sprites(bitmap_ind16& bitmap, const rectangle& cliprect)
 {
-	if (!m_vregs.found())
-		return; // ablastb (bootleg) doesn't have obvious video registers, so just abandon, probably needs a different driver
-
 	//printf("yoffset: %04x%04x yzoom: %04x%04x | xoffset: %04x%04x xzoom: %04x%04x  \n", m_vregs[0x1a/2],  m_vregs[0x18/2],  m_vregs[0x1e/2],  m_vregs[0x1c/2]   ,   m_vregs[0x12/2],  m_vregs[0x10/2],  m_vregs[0x16/2],  m_vregs[0x14/2]);
 
 	uint32_t yoffset = (m_vregs[0x1a / 2] << 16) | m_vregs[0x18 / 2];
@@ -852,7 +854,7 @@ void seta2_state::draw_sprites(bitmap_ind16& bitmap, const rectangle& cliprect)
 			yy &= 0x07ffffff;
 			yy >>= 16;
 
-		//	printf("line %04x yline requested %04x\n", y, yy);
+		//  printf("line %04x yline requested %04x\n", y, yy);
 
 			if (yy & 0x400)
 				yy -= 0x800;
@@ -897,15 +899,8 @@ uint32_t seta2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	// Black or pen 0?
 	bitmap.fill(m_palette->pen(0), cliprect);
 
-	if (m_vregs.found())
-	{
-		if ( (m_vregs[0x30/2] & 1) == 0 )   // 1 = BLANK SCREEN
-			draw_sprites(bitmap, cliprect);
-	}
-	else // ablastb doesn't seem to have the same vregs
-	{
+	if ( (m_vregs[0x30/2] & 1) == 0 )   // 1 = BLANK SCREEN
 		draw_sprites(bitmap, cliprect);
-	}
 
 	return 0;
 }
@@ -927,7 +922,7 @@ void staraudi_state::draw_rgbram(bitmap_ind16 &bitmap)
 		{
 			int offs = x * 2/2 + y * 0x400/2;
 			uint32_t data = ((m_rgbram[offs + 0x40000/2] & 0xff) << 16) | m_rgbram[offs];
-			bitmap.pix16(y, x) = (data & 0x7fff);
+			bitmap.pix(y, x) = (data & 0x7fff);
 		}
 	}
 }

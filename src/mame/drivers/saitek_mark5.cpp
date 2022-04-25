@@ -50,7 +50,6 @@ TODO:
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/hlcd0538.h"
 #include "video/pwm.h"
 
@@ -127,7 +126,7 @@ private:
 	u8 m_lcd_rowsel = 0;
 	u8 m_cb_mux = 0;
 
-	emu_timer *m_irqtimer;
+	emu_timer *m_irqtimer = nullptr;
 	TIMER_CALLBACK_MEMBER(interrupt);
 	void write_lcd(int state);
 };
@@ -175,7 +174,7 @@ void mark5_state::pwm_output_w(offs_t offset, u8 data)
 template<int N>
 void mark5_state::lcd_output_w(u64 data)
 {
-	if (N == 0)
+	if constexpr (N == 0)
 	{
 		// HLCD0538 R pins
 		m_lcd_rowsel = data & 0xff;
@@ -436,7 +435,7 @@ void mark5_state::mark5(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
-	screen.set_size(942, 1080);
+	screen.set_size(942/1.5, 1080/1.5);
 	screen.set_visarea_full();
 
 	config.set_default_layout(layout_saitek_mark5);
@@ -444,7 +443,6 @@ void mark5_state::mark5(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 void mark5_state::mark6(machine_config &config)

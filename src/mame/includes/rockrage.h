@@ -49,13 +49,13 @@ private:
 	required_memory_bank m_rombank;
 
 	/* video-related */
-	int        m_vreg;
+	int        m_vreg = 0;
 
-	DECLARE_WRITE8_MEMBER(rockrage_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(rockrage_sh_irqtrigger_w);
-	DECLARE_WRITE8_MEMBER(rockrage_vreg_w);
-	DECLARE_READ8_MEMBER(rockrage_VLM5030_busy_r);
-	DECLARE_WRITE8_MEMBER(rockrage_speech_w);
+	void rockrage_bankswitch_w(uint8_t data);
+	void rockrage_sh_irqtrigger_w(uint8_t data);
+	void rockrage_vreg_w(uint8_t data);
+	uint8_t rockrage_VLM5030_busy_r();
+	void rockrage_speech_w(uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void rockrage_palette(palette_device &palette) const;

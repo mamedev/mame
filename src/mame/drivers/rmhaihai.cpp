@@ -21,6 +21,7 @@ TODO:
   protection (in rmhaisei the failure is more explicit, in rmhaijin it's
   deviously delayed to a later part of the game).
   In themj the checks are patched out, maybe it's a bootleg?
+  ETA: it uses IOX, which is shared with speedatk.cpp and srmp2.cpp as well.
 
 - some unknown reads and writes.
 
@@ -81,9 +82,9 @@ protected:
 
 	required_ioport_array<2> m_key;
 
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_keyboard_cmd;
-	uint8_t m_gfxbank;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_keyboard_cmd = 0;
+	uint8_t m_gfxbank = 0;
 };
 
 

@@ -70,7 +70,7 @@ uint32_t unkpoker_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	{
 		for (uint8_t ra = 0; ra < 8; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
 			for (uint16_t x = 0; x < 32; x++)
 			{
@@ -114,7 +114,7 @@ static INPUT_PORTS_START( unkpoker )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) // does something
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_BET ) PORT_NAME("Ante")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Ante")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -138,20 +138,8 @@ static INPUT_PORTS_START( unkpoker )
 INPUT_PORTS_END
 
 
-static const gfx_layout tiles8x8_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
-
 static GFXDECODE_START( gfx_unkpoker )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x1, 0, 1 )
 GFXDECODE_END
 
 

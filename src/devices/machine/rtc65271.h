@@ -36,8 +36,8 @@ protected:
 	virtual void device_start() override;
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
-	virtual void nvram_read(emu_file &file) override;
-	virtual void nvram_write(emu_file &file) override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 
 private:
 	void field_interrupts();
@@ -63,6 +63,8 @@ private:
 
 	/* callback called when interrupt pin state changes (may be nullptr) */
 	devcb_write_line    m_interrupt_cb;
+
+	optional_region_ptr<u8> m_default_data;
 };
 
 // device type definition

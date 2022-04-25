@@ -240,16 +240,16 @@ The sprites are mapped into RAM locations $F000-$FFFF using only the first
 4 bytes from each 32-byte slice. Intervening addresses appear to be
 conventional RAM. See the memory map for sprite data format.
 
- ****************************************************************************
+******************************************************************************
 
 TODO:
 - handle transparency in text layer properly (how?)
 - second bank of sf02 is this used? (probably NOT)
-- stfight/empcity YM2203s should be clocked at 1.5MHz but this results in
-  the sound and music being 1/3 of the pitch they should be. The game never
-  writes the YM2203s' divider registers yet other games (e.g. Lock-On)
-  suggest the default values are correct.
-  cshootert however, sounds too high-pitched at 1.5MHz*3.
+- empcity/stfight never writes the YM2203s' divider registers but it expects
+  0x2f, there's a workaround for it in the driver init
+- if empcity turns out to really be a bootleg, maybe it doesn't have an MCU,
+  and instead does the ADPCM with the audiocpu? (see the driver notes above
+  mentioning an unused NMI handler)
 - Each version of empcity/stfight has a different protection code stored in the
   MCU (at $1D2) so each 68705 will need to be dumped.
   We currently use hacked versions of the empcityu MCU for each different set.
@@ -258,8 +258,8 @@ TODO:
   08 Japan
   09 Benelux
   0d Italy
+  0e France
   0f Germany
-  The France version doesn't care for the protection code.
 
 *****************************************************************************/
 
@@ -267,8 +267,7 @@ TODO:
 #include "includes/stfight.h"
 
 #include "cpu/z80/z80.h"
-
-#include "sound/2203intf.h"
+#include "sound/ymopn.h"
 
 #include "speaker.h"
 
@@ -324,8 +323,8 @@ void stfight_state::cshooter_cpu1_map(address_map &map)
 void stfight_state::cpu2_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xc000, 0xc001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0xc800, 0xc801).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xc000, 0xc001).rw(m_ym[0], FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xc800, 0xc801).rw(m_ym[1], FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xd000, 0xd000).nopr();
 	map(0xd800, 0xd800).nopw();
 	map(0xe800, 0xe800).nopw();
@@ -458,7 +457,6 @@ INPUT_PORTS_END
 
 
 
-
 void stfight_state::stfight_base(machine_config &config)
 {
 	/* basic machine hardware */
@@ -483,22 +481,21 @@ void stfight_state::stfight_base(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	// YM2203_PITCH_HACK - These should be clocked at 1.5Mhz (see TODO list)
-	ym2203_device &ym1(YM2203(config, "ym1", 12_MHz_XTAL / 8 * 3));
-	ym1.add_route(0, "mono", 0.15);
-	ym1.add_route(1, "mono", 0.15);
-	ym1.add_route(2, "mono", 0.15);
-	ym1.add_route(3, "mono", 0.10);
+	YM2203(config, m_ym[0], 12_MHz_XTAL / 8);
+	m_ym[0]->add_route(0, "mono", 0.15);
+	m_ym[0]->add_route(1, "mono", 0.15);
+	m_ym[0]->add_route(2, "mono", 0.15);
+	m_ym[0]->add_route(3, "mono", 0.10);
 
-	ym2203_device &ym2(YM2203(config, "ym2", 12_MHz_XTAL / 8 * 3));
-	ym2.add_route(0, "mono", 0.15);
-	ym2.add_route(1, "mono", 0.15);
-	ym2.add_route(2, "mono", 0.15);
-	ym2.add_route(3, "mono", 0.10);
+	YM2203(config, m_ym[1], 12_MHz_XTAL / 8);
+	m_ym[1]->add_route(0, "mono", 0.15);
+	m_ym[1]->add_route(1, "mono", 0.15);
+	m_ym[1]->add_route(2, "mono", 0.15);
+	m_ym[1]->add_route(3, "mono", 0.10);
 
 	MSM5205(config, m_msm, 384_kHz_XTAL);
 	m_msm->vck_callback().set(FUNC(stfight_state::stfight_adpcm_int)); // Interrupt function
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  // 8KHz, 4-bit
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B); // 8KHz, 4-bit
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
@@ -906,7 +903,6 @@ ROM_START( empcityi ) // very similar to above set
 	ROM_LOAD( "5j",   0x00000, 0x8000, CRC(1b8d0c07) SHA1(c163ccd2b7ed6c84facc075eb1564ca399f3ba17) )
 ROM_END
 
-// This set doesn't seem to check for the protection code in the MCU
 ROM_START( empcityfr )
 	ROM_REGION( 2*0x18000, "maincpu", 0 )   /* 96k for code + 96k for decrypted opcodes */
 	ROM_LOAD( "pr.4t",     0x00000, 0x8000, CRC(aa1f84ac) SHA1(b484b85270091511860f5b4041099c5335ff1204) )
@@ -916,7 +912,7 @@ ROM_START( empcityfr )
 	ROM_LOAD( "092-5c",   0x0000,  0x8000, CRC(6a8cb7a6) SHA1(dc123cc48d3623752b78e7c23dd8d2f5adf84f92) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )
-	ROM_LOAD( "empcityu_68705.3j",  0x0000,  0x0800, BAD_DUMP CRC(182f7616) SHA1(38b4f23a559ae13f8ca1b974407a2a40fc52879f) )
+	ROM_LOAD( "empcityfr_68705.3j",  0x0000,  0x0800, BAD_DUMP CRC(d66ac61f) SHA1(5f44d69886d4db46f2e4c07ebdf01e337ee4fd35) )
 
 	ROM_REGION( 0x02000, "stfight_vid:tx_gfx", 0 )    /* character data */
 	ROM_LOAD( "17.2n",   0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )
@@ -1132,7 +1128,7 @@ ROM_END
 
 
 // Note: Marked MACHINE_IMPERFECT_SOUND due to YM2203 clock issue
-GAME( 1986, empcity,   0,       stfight,  stfight,  stfight_state, init_empcity,  ROT0,   "Seibu Kaihatsu",                           "Empire City: 1931 (bootleg?)",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, empcity,   0,       stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu",                           "Empire City: 1931 (bootleg?)",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, empcityu,  empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Taito / Romstar license)", "Empire City: 1931 (US)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // different title logo
 GAME( 1986, empcityj,  empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Taito license)",           "Empire City: 1931 (Japan)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, empcityi,  empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Eurobed license)",         "Empire City: 1931 (Italy)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
@@ -1142,4 +1138,4 @@ GAME( 1986, stfighta,  empcity, stfight,  stfight,  stfight_state, init_stfight,
 GAME( 1986, stfightgb, empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany - Benelux)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 // Cross Shooter uses the same base board, but different video board
-GAME( 1987, cshootert, airraid, cshooter, cshooter, stfight_state, init_cshooter, ROT270, "Seibu Kaihatsu (Taito license)",           "Cross Shooter (2 PCB Stack)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, cshootert, airraid, cshooter, cshooter, stfight_state, empty_init,    ROT270, "Seibu Kaihatsu (Taito license)",           "Cross Shooter (2 PCB Stack)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

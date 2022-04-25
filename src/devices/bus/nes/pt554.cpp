@@ -8,9 +8,6 @@
 
  Here we emulate the following Bandai PT-554 PCB (a CNROM PCB + LPC / PARCOR speech synthesis chip)
 
- TODO:
- - emulate the mat controller
-
  ***********************************************************************************************************/
 
 
@@ -32,10 +29,10 @@
 //  constructor
 //-------------------------------------------------
 
-DEFINE_DEVICE_TYPE(NES_BANDAI_PT554, nes_bandai_pt554_device, "nes_bandai_pt554", "NES Cart Bandai BT-554 PCB")
+DEFINE_DEVICE_TYPE(NES_BANDAI_PT554, nes_bandai_pt554_device, "nes_bandai_pt554", "NES Cart Bandai PT-554 PCB")
 
 
-nes_bandai_pt554_device::nes_bandai_pt554_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_bandai_pt554_device::nes_bandai_pt554_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_cnrom_device(mconfig, NES_BANDAI_PT554, tag, owner, clock)
 	, m_samples(*this, "samples")
 {
@@ -55,31 +52,30 @@ nes_bandai_pt554_device::nes_bandai_pt554_device(const machine_config &mconfig, 
  with an Mitsubishi M50805 LPC / PARCOR speech synthesis chip
  with internal tables stored in ROM which have not yet been dumped.
 
- iNES: mapper 3?
+ iNES: mapper 3
 
  -------------------------------------------------*/
 
-void nes_bandai_pt554_device::write_m(offs_t offset, uint8_t data)
+void nes_bandai_pt554_device::write_m(offs_t offset, u8 data)
 {
 	LOG_MMC(("Bandai PT-554 Sound write, data: %02x\n", data));
 
+	// the actual chip starts speech synthesis when SYNC is held low >18µs
 	if (!BIT(data, 6))
 		m_samples->start(data & 0x07, data & 0x07);
-	else
-		m_samples->stop(data & 0x07);
 }
 
 static const char *const pt554_sample_names[] =
 {
 	"*ftaerobi",
-	"00",
-	"01",
-	"02",
-	"03",
-	"04",
-	"05",
-	"06",
-	"07",
+	"00",   // hello, let's go
+	"01",   // rest
+	"02",   // good
+	"03",   // hai
+	"04",   // four
+	"05",   // three
+	"06",   // two
+	"07",   // one
 	nullptr
 };
 

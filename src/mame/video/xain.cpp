@@ -98,14 +98,14 @@ void xain_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(xain_state::charram_w)
+void xain_state::charram_w(offs_t offset, uint8_t data)
 {
 	m_charram[offset] = data;
 	m_char_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
-WRITE8_MEMBER(xain_state::flipscreen_w)
+void xain_state::flipscreen_w(uint8_t data)
 {
 	flip_screen_set(data & 1);
 }

@@ -35,12 +35,11 @@ void bigevglf_state::bigevglf_vidram_addr_w(uint8_t data)
 
 void bigevglf_state::bigevglf_vidram_w(offs_t offset, uint8_t data)
 {
-	uint32_t x, y, o;
-	o = m_vidram_bank + offset;
+	uint32_t o = m_vidram_bank + offset;
 	m_vidram[o + 0x10000 * m_plane_selected] = data;
-	y = o >>8;
-	x = (o & 255);
-	m_tmp_bitmap[m_plane_selected].pix16(y, x) = data;
+	uint32_t y = o >>8;
+	uint32_t x = (o & 255);
+	m_tmp_bitmap[m_plane_selected].pix(y, x) = data;
 }
 
 uint8_t bigevglf_state::bigevglf_vidram_r(offs_t offset)

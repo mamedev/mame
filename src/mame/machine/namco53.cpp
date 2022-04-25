@@ -107,12 +107,7 @@ void namco_53xx_device::P_w(uint8_t data)
 
 WRITE_LINE_MEMBER(namco_53xx_device::chip_select)
 {
-machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_53xx_device::chip_select_sync),this), state);
-}
-
-TIMER_CALLBACK_MEMBER( namco_53xx_device::chip_select_sync )
-{
-	m_cpu->set_input_line(0, param);
+	m_cpu->set_input_line(0, state);
 }
 
 uint8_t namco_53xx_device::read()

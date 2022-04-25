@@ -41,7 +41,7 @@ protected:
 	virtual void video_start() override;
 
 private:
-	uint8_t m_crtc_vreg[0x100], m_crtc_index;
+	uint8_t m_crtc_vreg[0x100]{}, m_crtc_index = 0;
 
 	required_shared_ptr<uint16_t> m_vram;
 	required_device<mc6845_device> m_mc6845;
@@ -97,18 +97,17 @@ uint32_t b16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	{
 		for(int x=0;x<mc6845_h_display;x++)
 		{
-			int tile = m_vram[x+y*mc6845_h_display] & 0xff;
-			int color = (m_vram[x+y*mc6845_h_display] & 0x700) >> 8;
-			int pen;
+			int const tile = m_vram[x+y*mc6845_h_display] & 0xff;
+			int const color = (m_vram[x+y*mc6845_h_display] & 0x700) >> 8;
 
 			for(int yi=0;yi<mc6845_tile_height;yi++)
 			{
 				for(int xi=0;xi<8;xi++)
 				{
-					pen = (m_char_rom[tile*16+yi] >> (7-xi) & 1) ? color : 0;
+					int const pen = (m_char_rom[tile*16+yi] >> (7-xi) & 1) ? color : 0;
 
 					if(y*mc6845_tile_height < 400 && x*8+xi < 640) /* TODO: safety check */
-						bitmap.pix16(y*mc6845_tile_height+yi, x*8+xi) = m_palette->pen(pen);
+						bitmap.pix(y*mc6845_tile_height+yi, x*8+xi) = m_palette->pen(pen);
 				}
 			}
 		}

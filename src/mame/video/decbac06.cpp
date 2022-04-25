@@ -316,8 +316,8 @@ void deco_bac06_device::custom_tilemap_draw(bitmap_ind16 &bitmap,
 	src_y += cliprect.top();
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		u16 *dstpix = &bitmap.pix16(y);
-		u8 *dstpri = &primap.pix8(y);
+		u16 *dstpix = &bitmap.pix(y);
+		u8 *dstpri = &primap.pix(y);
 		if (row_scroll_enabled)
 			src_x=scrollx + rowscroll_ptr[(src_y >> (control1[3] & 0xf)) & (0x1ff >> (control1[3] & 0xf))];
 		else
@@ -332,8 +332,8 @@ void deco_bac06_device::custom_tilemap_draw(bitmap_ind16 &bitmap,
 			if (col_scroll_enabled)
 				column_offset=colscroll_ptr[((src_x >> 3) >> (control1[2] & 0xf)) & (0x3f >> (control1[2] & 0xf))];
 
-			const u16 p = src_bitmap.pix16((src_y + column_offset) & height_mask, src_x & width_mask);
-			const u8 colpri = flags_bitmap.pix8((src_y + column_offset) & height_mask, src_x & width_mask);
+			const u16 p = src_bitmap.pix((src_y + column_offset) & height_mask, src_x & width_mask);
+			const u8 colpri = flags_bitmap.pix((src_y + column_offset) & height_mask, src_x & width_mask);
 
 			const bool is_drawn = ((flags & TILEMAP_DRAW_OPAQUE) ||
 					((colpri & TILEMAP_PIXEL_LAYER0) && (flags & TILEMAP_DRAW_LAYER0)) ||

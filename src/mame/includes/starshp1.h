@@ -71,8 +71,8 @@ public:
 
 private:
 	virtual void machine_start() override;
-	DECLARE_WRITE8_MEMBER(starshp1_collision_reset_w);
-	DECLARE_WRITE8_MEMBER(starshp1_analog_in_w);
+	void starshp1_collision_reset_w(uint8_t data);
+	void starshp1_analog_in_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ship_explode_w);
 	DECLARE_WRITE_LINE_MEMBER(circle_mod_w);
 	DECLARE_WRITE_LINE_MEMBER(circle_kill_w);
@@ -80,13 +80,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(inverse_w);
 	DECLARE_WRITE_LINE_MEMBER(mux_w);
 	DECLARE_WRITE_LINE_MEMBER(led_w);
-	DECLARE_READ8_MEMBER(starshp1_rng_r);
-	DECLARE_WRITE8_MEMBER(starshp1_ssadd_w);
-	DECLARE_WRITE8_MEMBER(starshp1_sspic_w);
-	DECLARE_WRITE8_MEMBER(starshp1_playfield_w);
+	uint8_t starshp1_rng_r();
+	void starshp1_ssadd_w(offs_t offset, uint8_t data);
+	void starshp1_sspic_w(uint8_t data);
+	void starshp1_playfield_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(attract_w);
 	DECLARE_WRITE_LINE_MEMBER(phasor_w);
-	DECLARE_WRITE8_MEMBER(starshp1_analog_out_w);
+	void starshp1_analog_out_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void video_start() override;
 	void starshp1_palette(palette_device &palette) const;
@@ -111,30 +111,30 @@ private:
 	void starshp1_map(address_map &map);
 
 private:
-	int m_analog_in_select;
-	int m_attract;
+	int m_analog_in_select = 0;
+	int m_attract = 0;
 	required_shared_ptr<uint8_t> m_playfield_ram;
 	required_shared_ptr<uint8_t> m_hpos_ram;
 	required_shared_ptr<uint8_t> m_vpos_ram;
 	required_shared_ptr<uint8_t> m_obj_ram;
-	int m_ship_explode;
-	int m_ship_picture;
-	int m_ship_hoffset;
-	int m_ship_voffset;
-	int m_ship_size;
-	int m_circle_hpos;
-	int m_circle_vpos;
-	int m_circle_size;
-	int m_circle_mod;
-	int m_circle_kill;
-	int m_phasor;
-	int m_collision_latch;
-	int m_starfield_kill;
-	int m_mux;
-	int m_inverse;
+	int m_ship_explode = 0;
+	int m_ship_picture = 0;
+	int m_ship_hoffset = 0;
+	int m_ship_voffset = 0;
+	int m_ship_size = 0;
+	int m_circle_hpos = 0;
+	int m_circle_vpos = 0;
+	int m_circle_size = 0;
+	int m_circle_mod = 0;
+	int m_circle_kill = 0;
+	int m_phasor = 0;
+	int m_collision_latch = 0;
+	int m_starfield_kill = 0;
+	int m_mux = 0;
+	int m_inverse = 0;
 	std::unique_ptr<uint16_t[]> m_LSFR;
 	bitmap_ind16 m_helper;
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_device> m_discrete;

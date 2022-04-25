@@ -240,7 +240,7 @@ void deco_mxc06_device::device_start()
 {
 	m_colpri_cb.resolve();
 	m_flip_screen = false;
-	m_spritelist = make_unique_clear<struct sprite_t[]>(0x400);
+	m_spritelist = std::make_unique<sprite_t[]>(0x400);
 
 	save_item(NAME(m_flip_screen));
 }

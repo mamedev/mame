@@ -29,7 +29,6 @@ It works on the old A34 MCU because the game keeps reading D0 while computing.
 #include "cpu/hmcs40/hmcs40.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/pwm.h"
 #include "speaker.h"
 

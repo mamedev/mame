@@ -86,7 +86,7 @@ void am2910_device::device_reset()
 		m_execute_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
 }
 
-void am2910_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void am2910_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_CLOCK)
 	{

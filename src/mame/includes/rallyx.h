@@ -34,35 +34,39 @@ public:
 	void rallyx(machine_config &config);
 	void tactcian(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	// memory pointers
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_radarattr;
-	uint8_t *  m_spriteram;
-	uint8_t *  m_spriteram2;
-	uint8_t *  m_radarx;
-	uint8_t *  m_radary;
+	uint8_t *  m_spriteram = nullptr;
+	uint8_t *  m_spriteram2 = nullptr;
+	uint8_t *  m_radarx = nullptr;
+	uint8_t *  m_radary = nullptr;
 
 	// video-related
-	tilemap_t  *m_bg_tilemap;
-	tilemap_t  *m_fg_tilemap;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	tilemap_t  *m_fg_tilemap = nullptr;
 
 	// misc
 	static constexpr unsigned JUNGLER_MAX_STARS = 1000;
 
 	struct jungler_star
 	{
-		uint16_t x, y;
-		uint8_t color;
+		uint16_t x = 0, y = 0;
+		uint8_t color = 0;
 	};
 
-	bool      m_last_bang;
-	uint8_t   m_spriteram_base;
-	bool      m_stars_enable;
-	uint16_t  m_total_stars;
+	bool      m_last_bang = 0;
+	uint8_t   m_spriteram_base = 0;
+	bool      m_stars_enable = 0;
+	uint16_t  m_total_stars = 0;
 	uint8_t   m_drawmode_table[4];
 	struct jungler_star m_stars[JUNGLER_MAX_STARS];
-	bool      m_main_irq_mask;
+	bool      m_main_irq_mask = 0;
+	uint8_t   m_interrupt_vector = 0;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -74,6 +78,7 @@ private:
 	required_device<screen_device> m_screen;
 
 	void rallyx_interrupt_vector_w(uint8_t data);
+	IRQ_CALLBACK_MEMBER(interrupt_vector_r);
 	void bang_w(int state);
 	void irq_mask_w(int state);
 	void nmi_mask_w(int state);
@@ -95,7 +100,6 @@ private:
 	TILE_GET_INFO_MEMBER(locomotn_bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(locomotn_fg_get_tile_info);
 
-	DECLARE_MACHINE_START(rallyx);
 	DECLARE_VIDEO_START(rallyx);
 	DECLARE_VIDEO_START(jungler);
 	DECLARE_VIDEO_START(locomotn);

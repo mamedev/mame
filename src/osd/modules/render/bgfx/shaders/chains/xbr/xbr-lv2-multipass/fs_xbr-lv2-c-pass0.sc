@@ -5,7 +5,7 @@ $input v_texcoord0, v_texcoord1, v_texcoord2, v_texcoord3, v_texcoord4, v_texcoo
 
 /*
    Hyllian's xBR LV2 C (squared) - pass0 Shader
-   
+
    Copyright (C) 2011-2015 Hyllian - sergiogdb@gmail.com
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -119,11 +119,11 @@ void main()
 	vec4 interp_restriction_lv1      = clamp(vec4(notEqual(e,f)) * vec4(notEqual(e,h))  * ( neq(f,b) * neq(f,c) + neq(h,d) * neq(h,g) + eq(e,i) * (neq(f,f4) * neq(f,i4) + neq(h,h5) * neq(h,i5)) + eq(e,g) + eq(e,c)), vec4(0.0, 0.0, 0.0, 0.0), vec4(1.0, 1.0, 1.0, 1.0));
 	vec4 interp_restriction_lv2_left = vec4(notEqual(e,g)) * vec4(notEqual(d,g));
 	vec4 interp_restriction_lv2_up   = vec4(notEqual(e,c)) * vec4(notEqual(b,c));
-	
+
 	vec4 edr      = vec4(lessThan(weighted_distance(e, c, g, i, h5, f4, h, f), weighted_distance(h, d, i5, f, i4, b, e, i))) * interp_restriction_lv1;
 	vec4 edr_left = vec4(lessThanEqual(coef * df(f,g), df(h,c))) * interp_restriction_lv2_left * edr;
 	vec4 edr_up   = vec4(greaterThanEqual(df(f,g), coef * df(h,c))) * interp_restriction_lv2_up * edr;
-	
+
 	vec3 info;
 	info.x = dot(edr,      vec4(8.0, 4.0, 2.0, 1.0));
 	info.y = dot(edr_left, vec4(8.0, 4.0, 2.0, 1.0));

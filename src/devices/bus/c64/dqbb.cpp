@@ -53,7 +53,8 @@ c64_dqbb_cartridge_device::c64_dqbb_cartridge_device(const machine_config &mconf
 void c64_dqbb_cartridge_device::device_start()
 {
 	// allocate memory
-	m_nvram.allocate(0x4000);
+	m_nvram = std::make_unique<uint8_t[]>(0x4000);
+	save_pointer(NAME(m_nvram), 0x4000);
 
 	// state saving
 	save_item(NAME(m_cs));

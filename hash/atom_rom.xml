@@ -321,8 +321,8 @@ license:CC0
 
 	<software name="psdebug">
 		<description>Psion Debug</description>
-		<year>198?</year>
-		<publisher>Psion</publisher>
+		<year>1982</year>
+		<publisher>Psion Computers</publisher>
 		<info name="usage" value="Type DEBUG" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
@@ -331,10 +331,10 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="psedit">
+	<software name="psedit" cloneof="psdebug">
 		<description>Psion Edit</description>
-		<year>198?</year>
-		<publisher>Psion</publisher>
+		<year>1982</year>
+		<publisher>Psion Computers</publisher>
 		<info name="usage" value="Type EDIT" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">

@@ -76,9 +76,9 @@ sg1_b.e1       4096     0x92ef3c13      D2732D
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
-#include "sound/2203intf.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
+#include "sound/ymopn.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
@@ -141,15 +141,15 @@ private:
 	void sound_io_map(address_map &map);
 	void sound_map(address_map &map);
 
-	uint8_t m_sound_cmd;
+	uint8_t m_sound_cmd = 0;
 	required_shared_ptr<uint8_t> m_vram;
 	required_shared_ptr<uint8_t> m_attr;
-	tilemap_t *m_sc0_tilemap;
-	tilemap_t *m_sc0w_tilemap;
-	tilemap_t *m_sc1_tilemap;
-	uint8_t m_p1_hopper;
-	uint8_t m_p2_hopper;
-	uint8_t m_mux_data;
+	tilemap_t *m_sc0_tilemap = nullptr;
+	tilemap_t *m_sc0w_tilemap = nullptr;
+	tilemap_t *m_sc1_tilemap = nullptr;
+	uint8_t m_p1_hopper = 0;
+	uint8_t m_p2_hopper = 0;
+	uint8_t m_mux_data = 0;
 	required_device_array<i8255_device, 2> m_ppi;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_device<cpu_device> m_soundcpu;
@@ -283,7 +283,7 @@ uint32_t kingdrby_state::screen_update_kingdrby(screen_device &screen, bitmap_rg
 	m_sc0w_tilemap->set_scrolly(0, 32);
 
 	/* maybe it needs two window tilemaps? (one at the top, the other at the bottom)*/
-	clip.set(visarea.min_x, 256, 192, visarea.max_y);
+	clip.set(visarea.min_x, 255, 192, visarea.max_y);
 
 	/*TILEMAP_DRAW_CATEGORY + TILEMAP_DRAW_OPAQUE doesn't suit well?*/
 	m_sc0_tilemap->draw(screen, bitmap, cliprect, 0,0);

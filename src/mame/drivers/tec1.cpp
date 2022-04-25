@@ -2,7 +2,7 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-    TEC-1 driver, written by Robbbert in April, 2009 for MESS.
+TEC-1 driver, written by Robbbert in April, 2009.
 
 The TEC-1 was a single-board "computer" described in Talking Electronics
 magazine, issues number 10 and 11. Talking Electronics do not have dates on
@@ -42,10 +42,12 @@ Each key causes a beep to be heard. You may need to press more than once
 to get it to register.
 
 Inbuilt games - press the following sequence of keys:
-- Welcome: RESET D 1 + 0 2 AD 0 2 7 0 GO GO (Paste: D1^02 -0270XX)
-- Nim: RESET AD 3 E 0 GO GO (Paste: -3E0XX)
-- Invaders: RESET AD 3 2 0 GO GO (Paste: -320XX)
-- Luna Lander: RESET AD 4 9 0 GO GO (Paste: -490XX)
+- Invaders:     RESET AD 0 0 0 8 GO GO (Paste: -0008XX)
+- Nim:          RESET AD 0 0 1 0 GO GO (Paste: -0010XX)
+- Lunar Lander: RESET AD 0 0 1 8 GO GO (Paste: -0018XX)
+Tunes:
+- Bealach An Doirin: RESET AD 0 0 2 8 GO GO (Paste: -0028XX)
+- Biking up the strand: RESET AD 0 0 3 0 GO GO (Paste: -0030XX)
 
 Thanks to Chris Schwartz who dumped his ROM for me way back in the old days.
 It's only taken 25 years to get around to emulating it...
@@ -84,7 +86,6 @@ class tec1_state : public driver_device
 public:
 	tec1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_key_pressed(0)
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
 		, m_cass(*this, "cassette")
@@ -106,9 +107,9 @@ private:
 	void tecjmon_digit_w(u8 data);
 	void segment_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(da_w);
-	bool m_key_pressed;
-	u8 m_seg;
-	u8 m_digit;
+	bool m_key_pressed = 0;
+	u8 m_seg = 0U;
+	u8 m_digit = 0U;
 	void tec1_io(address_map &map);
 	void tec1_map(address_map &map);
 	void tecjmon_io(address_map &map);

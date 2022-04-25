@@ -44,7 +44,7 @@ protected:
 	virtual void rom_bank_updated() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	virtual int find_sample(int adrs, int bank, int voice);
 
@@ -78,6 +78,8 @@ protected:
 
 	virtual const inline bool ch_mulaw(C140_VOICE *v) { return BIT(v->mode, 3); }
 	// bit 6 used, unknown
+
+	u8 keyon_status_read(u16 offset);
 
 	TIMER_CALLBACK_MEMBER(int1_on);
 
@@ -116,7 +118,7 @@ protected:
 	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	virtual int find_sample(int adrs, int bank, int voice) override;
 

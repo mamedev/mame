@@ -38,7 +38,7 @@ TILE_GET_INFO_MEMBER(mcr68_state::get_bg_tile_info)
  *
  *************************************/
 
-VIDEO_START_MEMBER(mcr68_state,mcr68)
+void mcr68_state::video_start()
 {
 	/* initialize the background tilemap */
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mcr68_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 32,32);
@@ -53,10 +53,9 @@ VIDEO_START_MEMBER(mcr68_state,mcr68)
  *
  *************************************/
 
-WRITE16_MEMBER(mcr68_state::mcr68_videoram_w)
+void mcr68_state::mcr68_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	uint16_t *videoram = m_videoram;
-	COMBINE_DATA(&videoram[offset]);
+	COMBINE_DATA(&m_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 

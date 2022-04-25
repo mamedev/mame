@@ -1036,17 +1036,15 @@ uint32_t sfbonus_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	/* render reels to bitmap */
 	draw_reel_layer(screen,*m_temp_reel_bitmap,cliprect,0);
 
+	for (int y = 0; y < 288; y++)
 	{
-		for (int y = 0; y < 288; y++)
-		{
-			for (int x = 0; x < 512; x++)
-			{
-				uint16_t* src = &m_temp_reel_bitmap->pix16(y, x);
-				uint16_t* dst = &bitmap.pix16(y, x);
+		uint16_t const *const src = &m_temp_reel_bitmap->pix(y);
+		uint16_t *const dst = &bitmap.pix(y);
 
-				if ((src[0]&0x100)==0x000)
-					dst[0] = src[0];
-			}
+		for (int x = 0; x < 512; x++)
+		{
+			if ((src[x]&0x100)==0x000)
+				dst[x] = src[x];
 		}
 	}
 
@@ -1059,17 +1057,15 @@ uint32_t sfbonus_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	}
 	m_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
+	for (int y = 0; y < 288; y++)
 	{
-		for (int y = 0; y < 288; y++)
-		{
-			for (int x = 0; x < 512; x++)
-			{
-				uint16_t* src = &m_temp_reel_bitmap->pix16(y, x);
-				uint16_t* dst = &bitmap.pix16(y, x);
+		uint16_t const *const src = &m_temp_reel_bitmap->pix(y);
+		uint16_t *const dst = &bitmap.pix(y);
 
-				if ((src[0]&0x100)==0x100)
-					dst[0] = src[0]-0x100;
-			}
+		for (int x = 0; x < 512; x++)
+		{
+			if ((src[x]&0x100)==0x100)
+				dst[x] = src[x]-0x100;
 		}
 	}
 #if 0

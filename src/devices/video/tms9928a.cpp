@@ -351,7 +351,7 @@ void tms9928a_device::register_write(u8 data)
 	}
 }
 
-void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	// Handle GROM clock if present
 	if (id==GROMCLK)
@@ -365,7 +365,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	int raw_vpos = screen().vpos();
 	int vpos = raw_vpos * m_vertical_size / screen().height();
 	uint16_t BackColour = m_Regs[7] & 15;
-	uint32_t *p = &m_tmpbmp.pix32(vpos);
+	uint32_t *p = &m_tmpbmp.pix(vpos);
 
 	int y = vpos - m_top_border;
 
@@ -740,6 +740,8 @@ void tms9928a_device::device_start()
 	m_line_timer = timer_alloc(TIMER_LINE);
 	m_gromclk_timer = timer_alloc(GROMCLK);
 
+	m_INT = 1; // force initial update
+
 	set_palette();
 
 	save_item(NAME(m_Regs[0]));
@@ -784,9 +786,9 @@ void tms9928a_device::device_reset()
 	m_patternmask = 0x3fff;
 	m_Addr = 0;
 	m_ReadAhead = 0;
-	m_INT = 0;
 	m_latch = 0;
 	m_mode = 0;
+	check_interrupt();
 
 	m_line_timer->adjust( screen().time_until_pos( 0, HORZ_DISPLAY_START ) );
 

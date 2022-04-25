@@ -57,7 +57,25 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define LOG_SAM     0
+#define LOG_FBITS   (1U <<  1)
+#define LOG_VBITS   (1U <<  2)
+#define LOG_PBITS   (1U <<  3)
+#define LOG_TBITS   (1U <<  4)
+#define LOG_MBITS   (1U <<  5)
+#define LOG_RBITS   (1U <<  6)
+
+#define VERBOSE (0)
+// #define VERBOSE (LOG_FBITS)
+// #define VERBOSE (LOG_FBITS | LOG_VBITS | LOG_PBITS | LOG_TBITS | LOG_MBITS | LOG_RBITS)
+
+#include "logmacro.h"
+
+#define LOGFBITS(...) LOGMASKED(LOG_FBITS, __VA_ARGS__)
+#define LOGVBITS(...) LOGMASKED(LOG_VBITS, __VA_ARGS__)
+#define LOGPBITS(...) LOGMASKED(LOG_PBITS, __VA_ARGS__)
+#define LOGTBITS(...) LOGMASKED(LOG_TBITS, __VA_ARGS__)
+#define LOGMBITS(...) LOGMASKED(LOG_MBITS, __VA_ARGS__)
+#define LOGRBITS(...) LOGMASKED(LOG_RBITS, __VA_ARGS__)
 
 DEFINE_DEVICE_TYPE(SAM6883, sam6883_device, "sam6883", "MC6883 SAM")
 
@@ -75,13 +93,13 @@ sam6883_device::sam6883_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, SAM6883, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, sam6883_friend_device_interface(mconfig, *this, 4)
-	, m_ram_config("RAM", ENDIANNESS_BIG, 8, 16, 0)
-	, m_rom0_config("ROM0", ENDIANNESS_BIG, 8, 13, 0)
-	, m_rom1_config("ROM1", ENDIANNESS_BIG, 8, 13, 0)
-	, m_rom2_config("ROM2", ENDIANNESS_BIG, 8, 14, 0)
-	, m_io0_config("I/O0", ENDIANNESS_BIG, 8, 5, 0)
-	, m_io1_config("I/O1", ENDIANNESS_BIG, 8, 5, 0)
-	, m_io2_config("I/O2", ENDIANNESS_BIG, 8, 5, 0)
+	, m_ram_config("ram", ENDIANNESS_BIG, 8, 16, 0)
+	, m_rom0_config("rom0", ENDIANNESS_BIG, 8, 13, 0)
+	, m_rom1_config("rom1", ENDIANNESS_BIG, 8, 13, 0)
+	, m_rom2_config("rom2", ENDIANNESS_BIG, 8, 14, 0)
+	, m_io0_config("io0", ENDIANNESS_BIG, 8, 5, 0)
+	, m_io1_config("io1", ENDIANNESS_BIG, 8, 5, 0)
+	, m_io2_config("io2", ENDIANNESS_BIG, 8, 5, 0)
 	, m_boot_config("boot", ENDIANNESS_BIG, 8, 7, 0)
 {
 }
@@ -131,6 +149,8 @@ void sam6883_device::device_start()
 
 	// save state support
 	save_item(NAME(m_sam_state));
+	save_item(NAME(m_divider));
+	save_item(NAME(m_counter_mask));
 	save_item(NAME(m_counter));
 	save_item(NAME(m_counter_xdiv));
 	save_item(NAME(m_counter_ydiv));
@@ -302,16 +322,9 @@ void sam6883_device::update_memory()
 			// 64k mode (dynamic)
 		case SAM_STATE_M1|SAM_STATE_M0:
 			// 64k mode (static)
-			if (m_sam_state & SAM_STATE_TY)
-			{
-				// full 64k RAM
-				m_counter_mask = 0xFFFF;
-			}
-			else
-			{
-				// ROM/RAM
-				m_counter_mask = 0x7FFF;
-			}
+			// full 64k RAM or ROM/RAM
+			// CoCo Max requires these two be treated the same
+			m_counter_mask = 0xfFFF;
 			break;
 	}
 }
@@ -370,6 +383,48 @@ void sam6883_device::internal_write(offs_t offset, uint8_t data)
 		update_memory();
 	if (xorval & (SAM_STATE_R1|SAM_STATE_R0))
 		update_cpu_clock();
+
+	if (xorval & (SAM_STATE_F6|SAM_STATE_F5|SAM_STATE_F4|SAM_STATE_F3|SAM_STATE_F2|SAM_STATE_F1|SAM_STATE_F0))
+	{
+		LOGFBITS("%s: SAM F Address: $%04x\n",
+			machine().describe_context(),
+			display_offset());
+	}
+
+	if (xorval & (SAM_STATE_V0|SAM_STATE_V1|SAM_STATE_V2))
+	{
+		LOGVBITS("%s: SAM V Bits: $%02x\n",
+			machine().describe_context(),
+			(m_sam_state & (SAM_STATE_V0|SAM_STATE_V1|SAM_STATE_V2)));
+	}
+
+	if (xorval & (SAM_STATE_P1))
+	{
+		LOGPBITS("%s: SAM P1 Bit: $%02x\n",
+			machine().describe_context(),
+			(m_sam_state & (SAM_STATE_P1)) >> 10);
+	}
+
+	if (xorval & (SAM_STATE_TY))
+	{
+		LOGTBITS("%s: SAM TY Bit: $%02x\n",
+			machine().describe_context(),
+			(m_sam_state & (SAM_STATE_TY)) >> 15);
+	}
+
+	if (xorval & (SAM_STATE_M0|SAM_STATE_M1))
+	{
+		LOGMBITS("%s: SAM M Bits: $%02x\n",
+			machine().describe_context(),
+			(m_sam_state & (SAM_STATE_M0|SAM_STATE_M1)) >> 13);
+	}
+
+	if (xorval & (SAM_STATE_R0|SAM_STATE_R1))
+	{
+		LOGRBITS("%s: SAM R Bits: $%02x\n",
+			machine().describe_context(),
+			(m_sam_state & (SAM_STATE_R0|SAM_STATE_R1)) >> 11);
+	}
 }
 
 

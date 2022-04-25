@@ -183,4 +183,16 @@ B-6118 : Home & Economics
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="scanpack">
+		<description>Compudata Scan 6.1 Test Pack v1.0</description><!-- Test device for floppy drives -->
+		<year>1983</year>
+		<publisher>Compudata</publisher>
+		<part name="cart" interface="sorcerer_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="compudata_scan61.rom" size="8192" crc="6ab4f151" sha1="0f86f34a55b216b38a4ad664fc15ca6da2148950"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

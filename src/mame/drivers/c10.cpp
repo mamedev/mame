@@ -17,10 +17,14 @@ constantly looking at.
 *****************************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
+
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
 
 class c10_state : public driver_device
 {
@@ -29,38 +33,41 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_rom(*this, "maincpu")
-		, m_p_videoram(*this, "videoram")
-		, m_p_chargen(*this, "chargen")
 		, m_ram(*this, "mainram")
+		, m_vram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
 	{ }
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void c10(machine_config &config);
 
 private:
-	void c10_io(address_map &map);
-	void c10_mem(address_map &map);
-	virtual void machine_reset() override;
+	void machine_reset() override;
+	void machine_start() override;
+
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
-	required_shared_ptr<u8> m_p_videoram;
-	required_region_ptr<u8> m_p_chargen;
-	memory_passthrough_handler *m_rom_shadow_tap;
 	required_shared_ptr<u8> m_ram;
+	required_shared_ptr<u8> m_vram;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 
 
-void c10_state::c10_mem(address_map &map)
+void c10_state::mem_map(address_map &map)
 {
-	map.unmap_value_high();
 	map(0x0000, 0x7fff).ram().share("mainram");
 	map(0x8000, 0xbfff).rom().region("maincpu", 0);
 	map(0xc000, 0xf0a1).ram();
 	map(0xf0a2, 0xffff).ram().share("videoram");
 }
 
-void c10_state::c10_io(address_map &map)
+void c10_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 }
@@ -69,24 +76,30 @@ void c10_state::c10_io(address_map &map)
 static INPUT_PORTS_START( c10 )
 INPUT_PORTS_END
 
+void c10_state::machine_start()
+{
+}
+
 void c10_state::machine_reset()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_rom(0x0000, 0x0fff, m_rom);   // do it here for F3
-	m_rom_shadow_tap = program.install_read_tap(0x8000, 0x8fff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
-	{
-		if (!machine().side_effects_disabled())
-		{
-			// delete this tap
-			m_rom_shadow_tap->remove();
+	m_rom_shadow_tap.remove();
+	m_rom_shadow_tap = program.install_read_tap(
+			0x8000, 0x8fff,
+			"rom_shadow_r",
+			[this] (offs_t offset, u8 &data, u8 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					// delete this tap
+					m_rom_shadow_tap.remove();
 
-			// reinstall ram over the rom shadow
-			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x0fff, m_ram);
-		}
-
-		// return the original data
-		return data;
-	});
+					// reinstall RAM over the ROM shadow
+					m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x0fff, m_ram);
+				}
+			},
+			&m_rom_shadow_tap);
 }
 
 /* This system appears to have inline attribute bytes of unknown meaning.
@@ -94,24 +107,23 @@ void c10_state::machine_reset()
 uint32_t c10_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	//static uint8_t framecnt=0;
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,ma=0,x,xx;
+	uint16_t sy=0,ma=0;
 
 	//framecnt++;
 
-	for (y = 0; y < 25; y++)
+	for (uint8_t y = 0; y < 25; y++)
 	{
-		for (ra = 0; ra < 10; ra++)
+		for (uint8_t ra = 0; ra < 10; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
-			xx = ma;
-			for (x = ma; x < ma + 80; x++)
+			uint16_t xx = ma;
+			for (uint16_t x = ma; x < ma + 80; x++)
 			{
-				gfx = 0;
+				uint8_t gfx = 0;
 				if (ra < 9)
 				{
-					chr = m_p_videoram[xx++];
+					uint8_t chr = m_vram[xx++];
 
 				//  /* Take care of flashing characters */
 				//  if ((chr < 0x80) && (framecnt & 0x08))
@@ -139,7 +151,7 @@ uint32_t c10_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 }
 
 /* F4 Character Displayer */
-static const gfx_layout c10_charlayout =
+static const gfx_layout charlayout =
 {
 	8, 9,                   /* 8 x 9 characters */
 	512,                    /* 512 characters */
@@ -153,7 +165,7 @@ static const gfx_layout c10_charlayout =
 };
 
 static GFXDECODE_START( gfx_c10 )
-	GFXDECODE_ENTRY( "chargen", 0x0000, c10_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, charlayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -161,8 +173,8 @@ void c10_state::c10(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(8'000'000) / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &c10_state::c10_mem);
-	m_maincpu->set_addrmap(AS_IO, &c10_state::c10_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &c10_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &c10_state::io_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -185,6 +197,8 @@ ROM_START( c10 )
 	ROM_REGION( 0x2000, "chargen", 0 )
 	ROM_LOAD( "c10_char.ic9", 0x0000, 0x2000, CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
 ROM_END
+
+} // anonymous namespace
 
 /* Driver */
 

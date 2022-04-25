@@ -175,9 +175,10 @@ Notes:
 #include "bus/ata/ataintf.h"
 #include "bus/ata/idehd.h"
 #include "cpu/powerpc/ppc.h"
-#include "cpu/tlcs900/tlcs900.h"
+#include "cpu/tlcs900/tmp95c063.h"
 #include "machine/nvram.h"
 #include "video/poly.h"
+#include "screen.h"
 
 /*
     Interesting mem areas
@@ -213,6 +214,7 @@ Notes:
         0x7004:            0x4003d554()
         0x7005:            0x4003d168()
         0x8000:            ?                                        Used by vibration (force feedback?) on pwrshovl
+        0x9100:            ?                                        Dendego3 speedometer and brake meter. io_shared[0x1c3c] = speed, io_shared[0x1c3e] = brake
         0xa000:            ?                                        Used by vibration (force feedback?) on pwrshovl
         0xf000:            0x4002f328() TLCS_Init
         0xf010:            0x4002f074()                             Enables TLCS watchdog timer
@@ -506,6 +508,9 @@ Notes:
     0x10000105:
 */
 
+
+namespace {
+
 #define LOG_PPC_TO_TLCS_COMMANDS        1
 #define LOG_TLCS_TO_PPC_COMMANDS        1
 
@@ -545,7 +550,9 @@ public:
 		m_iocpu(*this, "iocpu"),
 		m_work_ram(*this, "work_ram"),
 		m_mbox_ram(*this, "mbox_ram"),
-		m_ata(*this, "ata")
+		m_ata(*this, "ata"),
+		m_scr_base(0),
+		m_hdd_serial_number(nullptr)
 	{
 	}
 
@@ -564,6 +571,11 @@ public:
 	void init_styphp();
 
 	required_device<screen_device> m_screen;
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	required_device<ppc_device> m_maincpu;
@@ -584,34 +596,31 @@ private:
 	std::unique_ptr<uint32_t[]> m_screen_ram;
 	std::unique_ptr<uint32_t[]> m_frame_ram;
 	std::unique_ptr<uint32_t[]> m_texture_ram;
-	uint32_t m_video_unk_reg[0x10];
+	uint32_t m_video_unk_reg[0x10]{};
 
-	uint32_t m_video_fifo_ptr;
-	uint32_t m_video_ram_ptr;
-	uint32_t m_video_reg;
-	uint32_t m_scr_base;
+	uint32_t m_video_fifo_ptr = 0;
+	uint32_t m_video_ram_ptr = 0;
+	uint32_t m_video_reg = 0;
+	uint32_t m_scr_base = 0;
 
-	//uint64_t m_video_fifo_mem[4];
+	//uint64_t m_video_fifo_mem[4]{};
 
-	uint16_t m_io_share_ram[0x2000];
+	uint16_t m_io_share_ram[0x2000]{};
 
-	const char *m_hdd_serial_number;
+	const char *m_hdd_serial_number = nullptr;
 
 	uint8_t tlcs_common_r(offs_t offset);
 	void tlcs_common_w(offs_t offset, uint8_t data);
 	uint8_t tlcs_rtc_r(offs_t offset);
 	void tlcs_rtc_w(offs_t offset, uint8_t data);
 
-	uint8_t m_rtcdata[8];
+	uint8_t m_rtcdata[8]{};
 
 
-	uint32_t m_reg105;
+	uint32_t m_reg105 = 0;
 
 	std::unique_ptr<taitotz_renderer> m_renderer;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	uint32_t screen_update_taitotz(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(taitotz_vbi);
 	uint16_t tlcs_ide0_r(offs_t offset, uint16_t mem_mask = ~0);
@@ -630,11 +639,11 @@ private:
 	void tlcs900h_mem(address_map &map);
 };
 
-class taitotz_renderer : public poly_manager<float, taitotz_polydata, 6, 50000>
+class taitotz_renderer : public poly_manager<float, taitotz_polydata, 6>
 {
 public:
 	taitotz_renderer(taitotz_state &state, int width, int height, uint32_t *scrram, uint32_t *texram)
-		: poly_manager<float, taitotz_polydata, 6, 50000>(state.machine()),
+		: poly_manager<float, taitotz_polydata, 6>(state.machine()),
 			m_state(state)
 	{
 		m_fb = std::make_unique<bitmap_rgb32>(width, height);
@@ -683,47 +692,47 @@ private:
 	taitotz_state &m_state;
 	std::unique_ptr<bitmap_rgb32> m_fb;
 	std::unique_ptr<bitmap_ind32> m_zbuffer;
-	uint32_t *m_texture;
-	uint32_t *m_screen_ram;
+	uint32_t *m_texture = nullptr;
+	uint32_t *m_screen_ram = nullptr;
 
 	rectangle m_cliprect;
 
-	PLANE m_clip_plane[6];
-	float m_matrix[4][3];
+	PLANE m_clip_plane[6]{};
+	float m_matrix[4][3]{};
 
-	float m_diffuse_intensity;
-	float m_ambient_intensity;
-	float m_specular_intensity;
-	float m_specular_power;
+	float m_diffuse_intensity = 0;
+	float m_ambient_intensity = 0;
+	float m_specular_intensity = 0;
+	float m_specular_power = 0;
 
-	int m_ambient_r;
-	int m_ambient_g;
-	int m_ambient_b;
-	int m_diffuse_r;
-	int m_diffuse_g;
-	int m_diffuse_b;
-	int m_specular_r;
-	int m_specular_g;
-	int m_specular_b;
+	int m_ambient_r = 0;
+	int m_ambient_g = 0;
+	int m_ambient_b = 0;
+	int m_diffuse_r = 0;
+	int m_diffuse_g = 0;
+	int m_diffuse_b = 0;
+	int m_specular_r = 0;
+	int m_specular_g = 0;
+	int m_specular_b = 0;
 
-	float m_vp_center_x;
-	float m_vp_center_y;
-	float m_vp_focus;
-	float m_vp_x;
-	float m_vp_y;
-	float m_vp_mul;
+	float m_vp_center_x = 0;
+	float m_vp_center_y = 0;
+	float m_vp_focus = 0;
+	float m_vp_x = 0;
+	float m_vp_y = 0;
+	float m_vp_mul = 0;
 
-	uint32_t m_reg_100;
-	uint32_t m_reg_101;
-	uint32_t m_reg_102;
+	uint32_t m_reg_100 = 0;
+	uint32_t m_reg_101 = 0;
+	uint32_t m_reg_102 = 0;
 
-	uint32_t m_reg_10000100;
-	uint32_t m_reg_10000101;
+	uint32_t m_reg_10000100 = 0;
+	uint32_t m_reg_10000101 = 0;
 
-	uint32_t m_tnl_fifo[64];
-	uint32_t m_direct_fifo[64];
-	int m_tnl_fifo_ptr;
-	int m_direct_fifo_ptr;
+	uint32_t m_tnl_fifo[64]{};
+	uint32_t m_direct_fifo[64]{};
+	int m_tnl_fifo_ptr = 0;
+	int m_direct_fifo_ptr = 0;
 };
 
 
@@ -781,6 +790,8 @@ void taitotz_state::video_start()
 	m_renderer = std::make_unique<taitotz_renderer>(*this, width, height, m_screen_ram.get(), m_texture_ram.get());
 
 	//machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&taitotz_exit, &machine()));
+
+	m_video_reg = 0;
 }
 
 static const float dot3_tex_table[32] =
@@ -845,12 +856,12 @@ static inline uint32_t generate_texel_address(int iu, int iv)
 
 void taitotz_renderer::draw_scanline_noz(int32_t scanline, const extent_t &extent, const taitotz_polydata &extradata, int threadid)
 {
-	uint32_t *fb = &m_fb->pix32(scanline);
+	uint32_t *const fb = &m_fb->pix(scanline);
 
 	float u = extent.param[POLY_U].start;
 	float v = extent.param[POLY_V].start;
-	float du = extent.param[POLY_U].dpdx;
-	float dv = extent.param[POLY_V].dpdx;
+	float const du = extent.param[POLY_U].dpdx;
+	float const dv = extent.param[POLY_V].dpdx;
 
 	uint32_t *texram = &m_texture[extradata.texture * 0x1000];
 
@@ -879,24 +890,24 @@ void taitotz_renderer::draw_scanline_noz(int32_t scanline, const extent_t &exten
 
 void taitotz_renderer::draw_scanline(int32_t scanline, const extent_t &extent, const taitotz_polydata &extradata, int threadid)
 {
-	uint32_t *fb = &m_fb->pix32(scanline);
-	float *zb = (float*)&m_zbuffer->pix32(scanline);
+	uint32_t *const fb = &m_fb->pix(scanline);
+	float *const zb = (float*)&m_zbuffer->pix(scanline);
 
 	float ooz = extent.param[POLY_Z].start;
 	float uoz = extent.param[POLY_U].start;
 	float voz = extent.param[POLY_V].start;
-	float dooz = extent.param[POLY_Z].dpdx;
-	float duoz = extent.param[POLY_U].dpdx;
-	float dvoz = extent.param[POLY_V].dpdx;
+	const float dooz = extent.param[POLY_Z].dpdx;
+	const float duoz = extent.param[POLY_U].dpdx;
+	const float dvoz = extent.param[POLY_V].dpdx;
 
 	float nx= extent.param[POLY_NX].start;
 	float dnx = extent.param[POLY_NX].dpdx;
 	float ny = extent.param[POLY_NY].start;
-	float dny = extent.param[POLY_NY].dpdx;
+	const float dny = extent.param[POLY_NY].dpdx;
 	float nz = extent.param[POLY_NZ].start;
-	float dnz = extent.param[POLY_NZ].dpdx;
+	const float dnz = extent.param[POLY_NZ].dpdx;
 
-	uint32_t *texram = &m_texture[extradata.texture * 0x1000];
+	uint32_t *const texram = &m_texture[extradata.texture * 0x1000];
 	uint32_t alpha = extradata.alpha & 0x1f;
 	uint32_t alpha_enable = extradata.alpha & 0x80;
 
@@ -1245,7 +1256,7 @@ void taitotz_renderer::render_tnl_object(uint32_t address, float scale, uint8_t 
 	int index = 0;
 	do
 	{
-		taitotz_polydata &extra = object_data_alloc();
+		taitotz_polydata &extra = object_data().next();
 
 		int num_verts;
 
@@ -1334,7 +1345,7 @@ void taitotz_renderer::render_tnl_object(uint32_t address, float scale, uint8_t 
 
 		for (int i=2; i < num_verts; i++)
 		{
-			render_triangle(m_cliprect, render_delegate(&taitotz_renderer::draw_scanline, this), 6, v[0], v[i-1], v[i]);
+			render_triangle<6>(m_cliprect, render_delegate(&taitotz_renderer::draw_scanline, this), v[0], v[i-1], v[i]);
 		}
 	}
 	while (!end);
@@ -1406,7 +1417,7 @@ void taitotz_renderer::push_direct_poly_fifo(uint32_t data)
 	if (m_direct_fifo_ptr >= expected_size)
 	{
 		vertex_t v[8];
-		taitotz_polydata &extra = object_data_alloc();
+		taitotz_polydata &extra = object_data().next();
 
 		int index = 4;
 		for (int i=0; i < num_verts; i++)
@@ -1424,7 +1435,7 @@ void taitotz_renderer::push_direct_poly_fifo(uint32_t data)
 
 		for (int i=2; i < num_verts; i++)
 		{
-			render_triangle(m_cliprect, render_delegate(&taitotz_renderer::draw_scanline_noz, this), 3, v[0], v[i-1], v[i]);
+			render_triangle<3>(m_cliprect, render_delegate(&taitotz_renderer::draw_scanline_noz, this), v[0], v[i-1], v[i]);
 		}
 
 		m_direct_fifo_ptr = 0;
@@ -1435,11 +1446,11 @@ uint32_t taitotz_state::screen_update_taitotz(screen_device &screen, bitmap_rgb3
 {
 	m_renderer->draw(bitmap, cliprect);
 
-	uint16_t *screen_src = (uint16_t*)&m_screen_ram[m_scr_base];
+	uint16_t const *screen_src = (uint16_t*)&m_screen_ram[m_scr_base];
 
 	for (int j=0; j < 384; j++)
 	{
-		uint32_t *fb = &bitmap.pix32(j);
+		uint32_t *const fb = &bitmap.pix(j);
 		for (int i=0; i < 512; i++)
 		{
 			uint16_t p = *screen_src++;
@@ -2016,7 +2027,7 @@ void taitotz_state::ppc_common_w(offs_t offset, uint64_t data, uint64_t mem_mask
 				m_io_share_ram[0xfff] == 0x6000 || m_io_share_ram[0xfff] == 0x6010)
 			{
 				//m_maincpu->spin_until_trigger(PPC_TLCS_COMM_TRIGGER);
-				m_maincpu->spin_until_interrupt();
+				//m_maincpu->spin_until_interrupt();
 			}
 
 			// pwrshovl sometimes writes commands during command handling... make sure that doesn't happen
@@ -2537,6 +2548,56 @@ static INPUT_PORTS_START( styphp )
 	PORT_START("ANALOG8")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(dendego3)
+	PORT_START("INPUTS1")
+	PORT_BIT(0x00000001, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_SERVICE_NO_TOGGLE(0x00000002, IP_ACTIVE_LOW) /* Test Button */
+	PORT_BIT(0x00000004, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000008, IP_ACTIVE_LOW, IPT_SERVICE) PORT_NAME("Service") PORT_CODE(KEYCODE_7)
+	PORT_BIT(0x00000010, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000020, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000040, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000080, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("INPUTS2")
+	PORT_BIT(0x00000001, IP_ACTIVE_LOW, IPT_COIN1)                                    // Coin
+	PORT_BIT(0x00000002, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000004, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000008, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000010, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000020, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000040, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000080, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("INPUTS3")
+	PORT_BIT(0x00000001, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000002, IP_ACTIVE_LOW, IPT_START1)                                   // Start
+	PORT_BIT(0x00000004, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000008, IP_ACTIVE_LOW, IPT_BUTTON7)                                  // Train Horn
+	PORT_BIT(0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1)                                  // "NOCH0"
+	PORT_BIT(0x000000e0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("INPUTS4")
+	PORT_BIT(0x00000001, IP_ACTIVE_LOW, IPT_BUTTON3)                                  // "NOCH2"
+	PORT_BIT(0x00000002, IP_ACTIVE_LOW, IPT_BUTTON5)                                  // "NOCH4"
+	PORT_BIT(0x00000004, IP_ACTIVE_LOW, IPT_BUTTON2)                                  // "NOCH1"
+	PORT_BIT(0x00000008, IP_ACTIVE_LOW, IPT_BUTTON4)                                  // "NOCH3"
+	PORT_BIT(0x00000010, IP_ACTIVE_LOW, IPT_BUTTON6)                                  // "NOCH5"
+	PORT_BIT(0x00000020, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000040, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000080, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("ANALOG1")
+	PORT_BIT(0x3ff, 0x000, IPT_PADDLE) PORT_MINMAX(0x000, 0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_CENTERDELTA(0) PORT_NAME("Brake Lever")
+	PORT_START("ANALOG2")
+	PORT_START("ANALOG3")
+	PORT_START("ANALOG4")
+	PORT_START("ANALOG5")
+	PORT_START("ANALOG6")
+	PORT_START("ANALOG7")
+	PORT_START("ANALOG8")
+INPUT_PORTS_END
+
 void taitotz_state::machine_reset()
 {
 	if (m_hdd_serial_number != nullptr)
@@ -2992,6 +3053,9 @@ ROM_START( dendego3 )
 	DISK_IMAGE( "ddg3", 0, SHA1(468d699e02ef0a0242de4e7038613cc5d0545591) )
 ROM_END
 
+} // Anonymous namespace
+
+
 GAME( 1999, taitotz,   0,        taitotz,  taitotz,  taitotz_state, empty_init,    ROT0, "Taito", "Type Zero BIOS", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT )
 GAME( 1998, batlgear,  taitotz,  taitotz,  batlgr2,  taitotz_state, init_batlgear, ROT0, "Taito", "Battle Gear (Ver 2.40 A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NODEVICE_LAN )
 GAME( 1999, landhigh,  taitotz,  landhigh, landhigh, taitotz_state, init_landhigh, ROT0, "Taito", "Landing High Japan (Ver 2.01 OK)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
@@ -3000,7 +3064,7 @@ GAME( 1999, pwrshovl,  taitotz,  taitotz,  pwrshovl, taitotz_state, init_pwrshov
 GAME( 1999, pwrshovla, pwrshovl, taitotz,  pwrshovl, taitotz_state, init_pwrshovl, ROT0, "Taito", "Power Shovel ni Norou!! - Power Shovel Simulator (v2.07J, alt)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // seem to be some differences in drive content, but identifies as the same revision, is it just user data changes??
 GAME( 2000, batlgr2,   taitotz,  taitotz,  batlgr2,  taitotz_state, init_batlgr2,  ROT0, "Taito", "Battle Gear 2 (v2.04J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NODEVICE_LAN )
 GAME( 2000, batlgr2a,  batlgr2,  taitotz,  batlgr2,  taitotz_state, init_batlgr2a, ROT0, "Taito", "Battle Gear 2 (v2.01J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NODEVICE_LAN )
-GAME( 2000, dendego3,  taitotz,  taitotz,  taitotz,  taitotz_state, init_dendego3, ROT0, "Taito", "Densha de GO 3! Tsukin-hen (V2.03J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 2001/01/27 09:52:56
+GAME( 2000, dendego3,  taitotz,  taitotz,  dendego3, taitotz_state, init_dendego3, ROT0, "Taito", "Densha de GO 3! Tsukin-hen (V2.03J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 2001/01/27 09:52:56
 GAME( 2000, styphp,    taitotz,  taitotz,  styphp,   taitotz_state, init_styphp,   ROT0, "Taito", "Stunt Typhoon Plus (Ver 2.04 J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2002, raizpin,   taitotz,  taitotz,  taitotz,  taitotz_state, init_raizpin,  ROT0, "Taito", "Raizin Ping Pong (V2.01O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2002, raizpinj,  raizpin,  taitotz,  taitotz,  taitotz_state, init_raizpinj, ROT0, "Taito", "Raizin Ping Pong (V2.01J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

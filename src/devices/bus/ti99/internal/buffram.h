@@ -14,7 +14,7 @@
 
 #pragma once
 
-namespace bus { namespace ti99 { namespace internal {
+namespace bus::ti99::internal {
 
 // =========== Buffered RAM ================
 class buffered_ram_device : public device_t, public device_nvram_interface
@@ -30,12 +30,13 @@ public:
 	void set_buffered(bool on) { m_buffered = on; }
 
 private:
-	void device_start() override;
+	virtual void device_start() override;
 
 	// derived class overrides
-	void nvram_default() override;
-	void nvram_read(emu_file &file) override;
-	void nvram_write(emu_file &file) override;
+	virtual void nvram_default() override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
+	virtual bool nvram_can_write() override { return m_buffered; }
 
 	bool m_buffered;
 	int m_size;
@@ -43,7 +44,7 @@ private:
 };
 
 
-} } } // end namespace bus::ti99::internal
+} // end namespace bus::ti99::internal
 
 DECLARE_DEVICE_TYPE_NS(BUFF_RAM, bus::ti99::internal, buffered_ram_device)
 

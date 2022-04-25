@@ -13,7 +13,6 @@
 #include "emu.h"
 #include "ccpu.h"
 #include "ccpudasm.h"
-#include "debugger.h"
 
 
 DEFINE_DEVICE_TYPE(CCPU, ccpu_cpu_device, "ccpu", "Cinematronics CPU")
@@ -599,6 +598,7 @@ void ccpu_cpu_device::execute_run()
 			/* CST */
 			case 0xf7:
 				m_watchdog = 0;
+				[[fallthrough]];
 			/* ADDP */
 			case 0xe7:
 				tempval = RDMEM(m_I);

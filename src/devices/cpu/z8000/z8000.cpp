@@ -16,9 +16,6 @@
 #include "z8000.h"
 #include "z8000cpu.h"
 
-#include "debugger.h"
-#include "debug/debugcon.h"
-
 //#define VERBOSE 1
 #include "logmacro.h"
 
@@ -36,10 +33,10 @@ z8002_device::z8002_device(const machine_config &mconfig, device_type type, cons
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 16, addrbits, 0)
 	, m_data_config("data", ENDIANNESS_BIG, 16, addrbits, 0)
-	, m_io_config("I/O", ENDIANNESS_BIG, 16, 16, 0)
-	, m_opcodes_config("first word", ENDIANNESS_BIG, 16, addrbits, 0)
+	, m_io_config("io_std", ENDIANNESS_BIG, 16, 16, 0)
+	, m_opcodes_config("first_word", ENDIANNESS_BIG, 16, addrbits, 0)
 	, m_stack_config("stack", ENDIANNESS_BIG, 16, addrbits, 0)
-	, m_sio_config("special I/O", ENDIANNESS_BIG, 16, 16, 0)
+	, m_sio_config("io_spc", ENDIANNESS_BIG, 16, 16, 0)
 	, m_iack_in(*this)
 	, m_mo_out(*this)
 	, m_ppc(0), m_pc(0), m_psapseg(0), m_psapoff(0), m_fcw(0), m_refresh(0), m_nspseg(0), m_nspoff(0), m_irq_req(0), m_irq_vec(0), m_op_valid(0), m_nmi_state(0), m_mi(0), m_halt(false), m_icount(0)
@@ -520,7 +517,6 @@ void z8002_device::register_debug_state()
 	state_add( STATE_GENPC, "GENPC", m_pc ).noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_ppc ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_fcw ).formatstr("%16s").noshow();
-	state_add( STATE_GENSP, "GENSP", m_nspoff ).noshow();
 }
 
 void z8002_device::state_string_export(const device_state_entry &entry, std::string &str) const

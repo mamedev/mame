@@ -25,7 +25,7 @@
 #include "includes/trs80m2.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 
 #define KEYBOARD_TAG "keyboard"
@@ -98,7 +98,7 @@ void trs80m2_state::write(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE8_MEMBER( trs80m2_state::rom_enable_w )
+void trs80m2_state::rom_enable_w(uint8_t data)
 {
 	/*
 
@@ -118,7 +118,7 @@ WRITE8_MEMBER( trs80m2_state::rom_enable_w )
 	m_boot_rom = BIT(data, 0);
 }
 
-WRITE8_MEMBER( trs80m2_state::drvslt_w )
+void trs80m2_state::drvslt_w(uint8_t data)
 {
 	/*
 
@@ -155,7 +155,7 @@ WRITE8_MEMBER( trs80m2_state::drvslt_w )
 	m_fdc->dden_w(!BIT(data, 7));
 }
 
-READ8_MEMBER( trs80m2_state::keyboard_r )
+uint8_t trs80m2_state::keyboard_r()
 {
 	// clear keyboard interrupt
 	if (!m_kbirq)
@@ -170,7 +170,7 @@ READ8_MEMBER( trs80m2_state::keyboard_r )
 	return m_key_data;
 }
 
-READ8_MEMBER( trs80m2_state::rtc_r )
+uint8_t trs80m2_state::rtc_r()
 {
 	// clear RTC interrupt
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -178,7 +178,7 @@ READ8_MEMBER( trs80m2_state::rtc_r )
 	return 0;
 }
 
-READ8_MEMBER( trs80m2_state::nmi_r )
+uint8_t trs80m2_state::nmi_r()
 {
 	/*
 
@@ -212,7 +212,7 @@ READ8_MEMBER( trs80m2_state::nmi_r )
 	return data;
 }
 
-WRITE8_MEMBER( trs80m2_state::nmi_w )
+void trs80m2_state::nmi_w(uint8_t data)
 {
 	/*
 
@@ -252,17 +252,17 @@ WRITE8_MEMBER( trs80m2_state::nmi_w )
 	m_msel = BIT(data, 7);
 }
 
-READ8_MEMBER( trs80m2_state::fdc_r )
+uint8_t trs80m2_state::fdc_r(offs_t offset)
 {
 	return m_fdc->read(offset) ^ 0xff;
 }
 
-WRITE8_MEMBER( trs80m2_state::fdc_w )
+void trs80m2_state::fdc_w(offs_t offset, uint8_t data)
 {
 	m_fdc->write(offset, data ^ 0xff);
 }
 
-WRITE8_MEMBER( trs80m16_state::tcl_w )
+void trs80m16_state::tcl_w(uint8_t data)
 {
 	/*
 
@@ -289,7 +289,7 @@ WRITE8_MEMBER( trs80m16_state::tcl_w )
 	m_ual = (m_ual & 0x1fe) | BIT(data, 7);
 }
 
-WRITE8_MEMBER( trs80m16_state::ual_w )
+void trs80m16_state::ual_w(uint8_t data)
 {
 	/*
 
@@ -391,7 +391,7 @@ INPUT_PORTS_END
 
 MC6845_UPDATE_ROW( trs80m2_state::crtc_update_row )
 {
-	const pen_t *pen = m_palette->pens();
+	pen_t const *const pen = m_palette->pens();
 
 	int x = 0;
 
@@ -409,7 +409,7 @@ MC6845_UPDATE_ROW( trs80m2_state::crtc_update_row )
 			int dout = BIT(data, 7);
 			int color = (dcursor ^ drevid ^ dout) && de;
 
-			bitmap.pix32(vbp + y, hbp + x++) = pen[color];
+			bitmap.pix(vbp + y, hbp + x++) = pen[color];
 
 			data <<= 1;
 		}
@@ -437,8 +437,6 @@ WRITE_LINE_MEMBER( trs80m2_state::vsync_w )
 
 void trs80m2_state::video_start()
 {
-	// allocate memory
-	m_video_ram.allocate(0x800);
 }
 
 uint32_t trs80m2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -725,10 +723,10 @@ void trs80m2_state::trs80m2(machine_config &config)
 	FD1791(config, m_fdc, 8_MHz_XTAL / 4);
 	m_fdc->intrq_wr_callback().set(m_pio, FUNC(z80pio_device::port_a_write));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(z80dma_device::rdy_w));
-	FLOPPY_CONNECTOR(config, FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, FD1791_TAG":1", trs80m2_floppies, nullptr, floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, FD1791_TAG":2", trs80m2_floppies, nullptr, floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, FD1791_TAG":3", trs80m2_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1791_TAG":1", trs80m2_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1791_TAG":2", trs80m2_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1791_TAG":3", trs80m2_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 
 	Z80CTC(config, m_ctc, 8_MHz_XTAL / 2);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -818,10 +816,10 @@ void trs80m16_state::trs80m16(machine_config &config)
 	FD1791(config, m_fdc, 8_MHz_XTAL / 4);
 	m_fdc->intrq_wr_callback().set(m_pio, FUNC(z80pio_device::port_a_write));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(z80dma_device::rdy_w));
-	FLOPPY_CONNECTOR(config, FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, FD1791_TAG":1", trs80m2_floppies, nullptr, floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, FD1791_TAG":2", trs80m2_floppies, nullptr, floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, FD1791_TAG":3", trs80m2_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1791_TAG":1", trs80m2_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1791_TAG":2", trs80m2_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1791_TAG":3", trs80m2_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 
 	Z80CTC(config, m_ctc, 8_MHz_XTAL / 2);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);

@@ -102,12 +102,12 @@ READ_LINE_MEMBER(spcforce_state::t0_r)
 }
 
 
-WRITE8_MEMBER(spcforce_state::soundtrigger_w)
+void spcforce_state::soundtrigger_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(0, (~data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(spcforce_state::misc_outputs_w)
+void spcforce_state::misc_outputs_w(uint8_t data)
 {
 	m_lamps[0] = BIT(data, 0); // 1P start lamp
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 1));
@@ -264,7 +264,7 @@ static constexpr int COLORTABLE_SOURCE[] =
 
 void spcforce_state::spcforce_palette(palette_device &palette) const
 {
-	for (int i = 0; i < ARRAY_LENGTH(COLORTABLE_SOURCE); i++)
+	for (int i = 0; i < std::size(COLORTABLE_SOURCE); i++)
 	{
 		int const data = COLORTABLE_SOURCE[i];
 		rgb_t const color = rgb_t(pal1bit(data >> 0), pal1bit(data >> 1), pal1bit(data >> 2));
@@ -311,7 +311,7 @@ void spcforce_state::spcforce(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spcforce);
-	PALETTE(config, m_palette, FUNC(spcforce_state::spcforce_palette), ARRAY_LENGTH(COLORTABLE_SOURCE));
+	PALETTE(config, m_palette, FUNC(spcforce_state::spcforce_palette), std::size(COLORTABLE_SOURCE));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

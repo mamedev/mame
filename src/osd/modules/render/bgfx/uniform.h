@@ -23,6 +23,8 @@ public:
 
 	virtual void upload();
 
+	void create();
+
 	// Getters
 	std::string name() { return m_name; }
 	bgfx::UniformType::Enum type() const { return m_type; }

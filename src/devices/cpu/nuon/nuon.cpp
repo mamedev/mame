@@ -11,7 +11,6 @@
 #include "emu.h"
 #include "nuon.h"
 #include "nuondasm.h"
-#include "debugger.h"
 
 #define VERBOSE_LEVEL   (0)
 

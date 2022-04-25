@@ -148,7 +148,7 @@ void irobot_state::irobot_map(address_map &map)
 	map(0x1300, 0x1300).mirror(0xff).r("adc", FUNC(adc0809_device::data_r));
 	map(0x1400, 0x143f).rw(FUNC(irobot_state::quad_pokeyn_r), FUNC(irobot_state::quad_pokeyn_w));
 	map(0x1800, 0x18ff).w(FUNC(irobot_state::irobot_paletteram_w));
-	map(0x1900, 0x19ff).writeonly();            /* Watchdog reset */
+	map(0x1900, 0x19ff).nopw();            /* Watchdog reset */
 	map(0x1a00, 0x1a00).w(FUNC(irobot_state::irobot_clearfirq_w));
 	map(0x1b00, 0x1b03).mirror(0xfc).w("adc", FUNC(adc0809_device::address_offset_start_w));
 	map(0x1c00, 0x1fff).ram().share("videoram");

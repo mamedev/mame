@@ -79,23 +79,23 @@ public:
 	required_device<screen_device> m_screen;
 	required_device_array<kcexp_slot_device, 3> m_expansions;
 
-	// defined in machine/kc.c
+	// defined in machine/kc.cpp
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	// modules read/write
-	DECLARE_READ8_MEMBER ( expansion_read );
-	DECLARE_WRITE8_MEMBER( expansion_write );
-	DECLARE_READ8_MEMBER ( expansion_4000_r );
-	DECLARE_WRITE8_MEMBER( expansion_4000_w );
-	DECLARE_READ8_MEMBER ( expansion_8000_r );
-	DECLARE_WRITE8_MEMBER( expansion_8000_w );
-	DECLARE_READ8_MEMBER ( expansion_c000_r );
-	DECLARE_WRITE8_MEMBER( expansion_c000_w );
-	DECLARE_READ8_MEMBER ( expansion_e000_r );
-	DECLARE_WRITE8_MEMBER( expansion_e000_w );
-	DECLARE_READ8_MEMBER ( expansion_io_read );
-	DECLARE_WRITE8_MEMBER( expansion_io_write );
+	uint8_t expansion_read(offs_t offset);
+	void expansion_write(offs_t offset, uint8_t data);
+	uint8_t expansion_4000_r(offs_t offset);
+	void expansion_4000_w(offs_t offset, uint8_t data);
+	uint8_t expansion_8000_r(offs_t offset);
+	void expansion_8000_w(offs_t offset, uint8_t data);
+	uint8_t expansion_c000_r(offs_t offset);
+	void expansion_c000_w(offs_t offset, uint8_t data);
+	uint8_t expansion_e000_r(offs_t offset);
+	void expansion_e000_w(offs_t offset, uint8_t data);
+	uint8_t expansion_io_read(offs_t offset);
+	void expansion_io_write(offs_t offset, uint8_t data);
 
 	// bankswitch
 	virtual void update_0x00000();
@@ -126,29 +126,29 @@ public:
 	// speaker
 	void speaker_update();
 
-	// defined in video/kc.c
+	// defined in video/kc.cpp
 	virtual void video_start() override;
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER( video_toggle_blink_state );
 	void video_draw_8_pixels(bitmap_ind16 &bitmap, int x, int y, uint8_t colour_byte, uint8_t gfx_byte);
 
 	// driver state
-	uint8_t *             m_ram_base;
-	std::unique_ptr<uint8_t[]> m_video_ram;
-	int                 m_pio_data[2];
-	int                 m_high_resolution;
-	uint8_t               m_ardy;
-	uint8_t               m_brdy;
-	int                 m_kc85_blink_state;
-	int                 m_k0_line;
-	int                 m_k1_line;
-	uint8_t               m_speaker_level;
+	uint8_t *             m_ram_base = nullptr;
+	std::unique_ptr<uint8_t[]> m_video_ram{};
+	int                 m_pio_data[2]{};
+	int                 m_high_resolution = 0;
+	uint8_t               m_ardy = 0U;
+	uint8_t               m_brdy = 0U;
+	int                 m_kc85_blink_state = 0;
+	int                 m_k0_line = 0;
+	int                 m_k1_line = 0;
+	uint8_t               m_speaker_level = 0U;
 
 	// cassette
-	emu_timer *         m_cassette_timer;
-	emu_timer *         m_cassette_oneshot_timer;
-	int                 m_astb;
-	int                 m_cassette_in;
+	emu_timer *         m_cassette_timer = nullptr;
+	emu_timer *         m_cassette_oneshot_timer = nullptr;
+	int                 m_astb = 0;
+	int                 m_cassette_in = 0;
 
 	void kc85_palette(palette_device &palette) const;
 	TIMER_CALLBACK_MEMBER(kc_cassette_oneshot_timer);
@@ -171,27 +171,27 @@ public:
 		: kc_state(mconfig, type, tag)
 	{ }
 
-	// defined in machine/kc.c
+	// defined in machine/kc.cpp
 	virtual void machine_reset() override;
 
 	virtual void update_0x04000() override;
 	virtual void update_0x08000() override;
 	virtual void update_0x0c000() override;
 
-	DECLARE_READ8_MEMBER( kc85_4_86_r );
-	DECLARE_READ8_MEMBER( kc85_4_84_r );
-	DECLARE_WRITE8_MEMBER( kc85_4_86_w );
-	DECLARE_WRITE8_MEMBER( kc85_4_84_w );
+	uint8_t kc85_4_86_r();
+	uint8_t kc85_4_84_r();
+	void kc85_4_86_w(uint8_t data);
+	void kc85_4_84_w(uint8_t data);
 
-	// defined in video/kc.c
+	// defined in video/kc.cpp
 	virtual void video_start() override;
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 	void video_control_w(int data);
 
 	// driver state
-	uint8_t               m_port_84_data;
-	uint8_t               m_port_86_data;
-	uint8_t *             m_display_video_ram;
+	uint8_t               m_port_84_data = 0U;
+	uint8_t               m_port_86_data = 0U;
+	uint8_t *             m_display_video_ram = 0U;
 	void kc85_4(machine_config &config);
 	void kc85_5(machine_config &config);
 	void kc85_4_io(address_map &map);

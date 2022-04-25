@@ -30,9 +30,9 @@ const char *const sm8500_disassembler::s_mnemonic[] =
 };
 
 const uint32_t sm8500_disassembler::s_flags[] = {
-	0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, STEP_COND, STEP_COND,
 	0, 0, 0, 0, 0, 0, 0, 0, STEP_OVER, STEP_OVER, 0,
-	0, 0, 0, 0, 0, 0, STEP_OVER, 0,
+	0, 0, 0, 0, 0, 0, STEP_COND, 0,
 	0, 0, 0, 0, 0, STEP_OVER, 0, 0,
 	STEP_OUT, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, STEP_OUT, 0, 0,
@@ -372,30 +372,35 @@ offs_t sm8500_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			ea += opcodes.r8(pos++);
 			util::stream_format(stream, "$%04X", ea);
 			break;
-		case AM_5A:
+		case AM_5A: // see issue #7451
 			ea = opcodes.r8(pos++);
 			ea2 = opcodes.r8(pos++);
 			switch( ea & 0xC0 ) {
 			case 0x00:
 				util::stream_format(stream, "CMP (rr%02Xh),$%02Xh", ea & 7, ea2); break;
 			case 0x40:
-				util::stream_format(stream, "undef $%04X", ea); break;
+				util::stream_format(stream, "CMP (rr%02Xh)+,$%02Xh", ea & 7, ea2); break;
 			case 0x80:
 				ea3 = opcodes.r8(pos++);
 				util::stream_format(stream, "CMP (rr%02Xh+%02Xh),$%02Xh", ea & 7, ea2, ea3); break;
 			case 0xC0:
-				util::stream_format(stream, "undef $%04X", ea); break;
+				util::stream_format(stream, "CMP -(rr%02Xh)+,$%02Xh", ea & 7, ea2); break;
 			}
 			break;
-		case AM_5B:
+		case AM_5B: // see issue #7451
 			ea = opcodes.r8(pos++);
 			ea2 = opcodes.r8(pos++);
 			ea3 = (ea << 8) | ea2;
 			switch( ea & 0xC0 ) {
+			case 0x00:
+				util::stream_format(stream, "MOV (rr%02Xh),$%02Xh", ea & 7, ea2); break;
 			case 0x40:
-				util::stream_format(stream, "MOV (rr%02Xh)+,$%02Xh", ea & 7, ea2); break; // could be AND instead of MOV
-			default:
-				util::stream_format(stream, "undef $%04X", ea3); break;
+				util::stream_format(stream, "MOV (rr%02Xh)+,$%02Xh", ea & 7, ea2); break;
+			case 0x80:
+				ea3 = opcodes.r8(pos++);
+				util::stream_format(stream, "MOV (rr%02Xh+%02Xh),$%02Xh", ea & 7, ea2, ea3); break;
+			case 0xC0:
+				util::stream_format(stream, "MOV -(rr%02Xh),$%02Xh", ea & 7, ea2); break;
 			}
 			break;
 		case AM_ss:
@@ -571,5 +576,5 @@ offs_t sm8500_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		util::stream_format(stream, "%s", s_mnemonic[ instr->mnemonic ]);
 	}
 
-	return (pos - pc) | s_flags[instr->mnemonic] | SUPPORTED;
+	return (pos - pc) | (instr->arguments == AM_cjp && (op & 0x07) != 0 ? STEP_COND : s_flags[instr->mnemonic]) | SUPPORTED;
 }

@@ -2,9 +2,9 @@
 // copyright-holders:Robbbert
 /**********************************************************************************************
 
-        Vegas 6809
+Vegas 6809
 
-        Skeleton driver
+Skeleton driver
 
 Devices:
 
@@ -31,21 +31,22 @@ M modify memory (. to exit)
 
 ToDo:
 
-   - Colours (Looks like characters 0xc0-0xff produce coloured lores gfx).
+- Colours (Looks like characters 0xc0-0xff produce coloured lores gfx).
 
-   - Connect the RTC interrupt pin (not supported currently)
+- Connect the RTC interrupt pin (not supported currently)
 
-   - Find the missing character generator rom.
+- Find the missing character generator rom.
 
-   - Schematic is almost useless, riddled with omissions and errors. All documents are in
-     French. The parts list only has half of the parts.
+- Schematic is almost useless, riddled with omissions and errors. All documents are in
+    French. The parts list only has half of the parts.
 
-   - Need software (there are floppy images, but they are not yet in a supported format)
+- Need software (there are floppy images, but they are not yet in a supported format)
 
 
 *******************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6809/m6809.h"
 #include "imagedev/floppy.h"
 #include "machine/6821pia.h"
@@ -57,17 +58,19 @@ ToDo:
 #include "machine/wd_fdc.h"
 #include "sound/spkrdev.h"
 #include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 class v6809_state : public driver_device
 {
 public:
 	v6809_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_video_address(0)
 		, m_pia0(*this, "pia0")
 		, m_maincpu(*this, "maincpu")
 		, m_crtc(*this, "crtc")
@@ -81,10 +84,11 @@ public:
 
 	void v6809(machine_config &config);
 
-private:
-	virtual void machine_reset() override;
+protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
+private:
 	DECLARE_WRITE_LINE_MEMBER(speaker_en_w);
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	u8 pb_r();
@@ -98,11 +102,11 @@ private:
 
 	void v6809_mem(address_map &map);
 
-	u16 m_video_address;
-	bool m_speaker_en;
-	u8 m_video_index;
-	u8 m_term_data;
-	u8 m_vidbyte;
+	u16 m_video_address = 0U;
+	bool m_speaker_en = false;
+	u8 m_video_index = 0U;
+	u8 m_term_data = 0U;
+	u8 m_vidbyte = 0U;
 	std::unique_ptr<u8[]> m_vram;
 	required_device<pia6821_device> m_pia0;
 	required_device<cpu_device> m_maincpu;
@@ -177,16 +181,14 @@ GFXDECODE_END
 
 MC6845_UPDATE_ROW( v6809_state::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	u8 chr,gfx;
-	u16 mem,x;
-	u32 *p = &bitmap.pix32(y);
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	u32 *p = &bitmap.pix(y);
 
-	for (x = 0; x < x_count; x++)
+	for (u16 x = 0; x < x_count; x++)
 	{
-		mem = (ma + x) & 0x7ff;
-		chr = m_vram[mem];
-		gfx = m_p_chargen[(chr<<4) | ra] ^ ((x == cursor_x) ? 0xff : 0);
+		u16 mem = (ma + x) & 0x7ff;
+		u8 chr = m_vram[mem];
+		u8 gfx = m_p_chargen[(chr<<4) | ra] ^ ((x == cursor_x) ? 0xff : 0);
 
 		/* Display a scanline of a character (8 pixels) */
 		*p++ = palette[BIT(gfx, 7)];
@@ -334,7 +336,7 @@ void v6809_state::v6809(machine_config &config)
 	pia1.irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
 	ptm6840_device &ptm(PTM6840(config, "ptm", 16_MHz_XTAL / 4));
-	ptm.set_external_clocks(4000000/14, 4000000/14, 4000000/14/8);
+	ptm.set_external_clocks(4000000.0/14.0, 4000000.0/14.0, (4000000.0/14.0)/8.0);
 	ptm.o1_callback().set(FUNC(v6809_state::speaker_en_w));
 	ptm.o2_callback().set(FUNC(v6809_state::speaker_w));
 	ptm.irq_callback().set_inputline("maincpu", M6809_IRQ_LINE);
@@ -353,8 +355,8 @@ void v6809_state::v6809(machine_config &config)
 	//rtc.irq_handler().set(m_pia0, FUNC(pia6821_device::cb2_w));   // unsupported by RTC emulation
 
 	MB8876(config, m_fdc, 16_MHz_XTAL / 16);
-	FLOPPY_CONNECTOR(config, "fdc:0", v6809_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", v6809_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", v6809_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", v6809_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 
 /* ROM definition */
@@ -369,6 +371,9 @@ ROM_START( v6809 )
 	ROM_LOAD( "2716_444-29_h19font.bin", 0x0000, 0x0800, BAD_DUMP CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
 	ROM_RELOAD(0x0800, 0x0800)
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

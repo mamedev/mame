@@ -64,7 +64,7 @@
     BLACK SCREEN.
 
     In the real environment, the HSGPL has usually been set up on delivery.
-    In MESS we have to create a suitable HSGPL memory content. Best practice
+    In MAME we have to create a suitable HSGPL memory content. Best practice
     is to start the TI-99/4A console with EVPC support (driver ti99_4ev) with
     a plugged-in HSGPL and to go through the setup process there.
     Finally, the nvram files of the HSGPL must be copied into this driver's nvram
@@ -97,7 +97,7 @@
     Video and sound
     ---------------
     The SGCPU relies on the EVPC or EVPC2 card to provide video capabilities.
-    This card (rel.1) is emulated in MESS and is based on the v9938 video
+    This card (rel.1) is emulated in MAME and is based on the v9938 video
     display processor.
     In order to route the VDP interrupt to the SGCPU card, the previously
     unused LCP* line in the Peripheral Expansion Box is used.
@@ -116,7 +116,6 @@
 *****************************************************************************/
 
 #include "emu.h"
-#include "bus/ti99/ti99defs.h"
 #include "bus/ti99/joyport/joyport.h"
 #include "bus/ti99/peb/peribox.h"
 #include "cpu/tms9900/tms9900.h"
@@ -125,8 +124,9 @@
 #include "machine/tms9901.h"
 #include "speaker.h"
 
-#define TI99_SGCPU_TAG "sgcpu"
-#define TI99_AMSRAM_TAG "amsram1meg"
+#define SGCPU_AMSRAM_TAG  "amsram1meg"
+#define SGCPU_PADRAM_TAG  "scratchpad"
+#define SGCPU_TMS9901_TAG     "tms9901"
 
 // Debugging
 #define LOG_WARN        (1U<<1)   // Warnings
@@ -141,20 +141,24 @@
 
 #include "logmacro.h"
 
+
+namespace {
+
 class ti99_4p_state : public driver_device
 {
 public:
 	ti99_4p_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_cpu(*this, "maincpu"),
-		m_tms9901(*this, TI_TMS9901_TAG),
+		m_tms9901(*this, SGCPU_TMS9901_TAG),
 		m_cassette(*this, "cassette"),
 		m_peribox(*this, TI_PERIBOX_TAG),
 		m_joyport(*this, TI_JOYPORT_TAG),
-		m_scratchpad(*this, TI99_PADRAM_TAG),
-		m_amsram(*this, TI99_AMSRAM_TAG),
+		m_scratchpad(*this, SGCPU_PADRAM_TAG),
+		m_amsram(*this, SGCPU_AMSRAM_TAG),
 		m_keyboard(*this, "COL%u", 0U),
-		m_alpha(*this, "ALPHA")
+		m_alpha(*this, "ALPHA"),
+		m_rom(*this, "maincpu")
 	{ }
 
 	void ti99_4p_60hz(machine_config &config);
@@ -218,7 +222,7 @@ private:
 	void set_keyboard_column(int number, int data);
 
 	// Pointer to EPROM
-	uint16_t *m_rom;
+	required_region_ptr<uint16_t> m_rom;
 
 	// First joystick. 6 for TI-99/4A
 	static constexpr int FIRSTJOY=6;
@@ -302,7 +306,6 @@ void ti99_4p_state::memmap_setaddress(address_map &map)
 void ti99_4p_state::crumap(address_map &map)
 {
 	map(0x0000, 0x1fff).rw(FUNC(ti99_4p_state::cruread), FUNC(ti99_4p_state::cruwrite));
-	map(0x0000, 0x03ff).rw(m_tms9901, FUNC(tms9901_device::read), FUNC(tms9901_device::write));
 }
 
 /*
@@ -439,6 +442,10 @@ void ti99_4p_state::setaddress(offs_t address, uint16_t busctrl)
 
 	m_decode = SGCPU_NONE;
 	m_muxready = true;
+
+	// Trigger the TMS9901 clock when A10 is 1
+	if ((m_addr_buf & 0x0020) != 0)
+		m_tms9901->update_clock();
 
 	m_decode = decode_address(m_addr_buf);
 
@@ -692,6 +699,12 @@ WRITE_LINE_MEMBER( ti99_4p_state::datamux_clock_in )
 */
 void ti99_4p_state::cruwrite(offs_t offset, uint8_t data)
 {
+	// Internal 9901
+	// We cannot use the map because device in the Peribox may want to see the
+	// CRU address on the bus (see sidmaster)
+	if ((offset & 0xfc00)==0)
+		m_tms9901->write(offset & 0x3f, data);
+
 	int addroff = offset<<1;
 
 	if ((addroff & 0xff00)==MAP_CRU_BASE)
@@ -717,6 +730,13 @@ void ti99_4p_state::cruwrite(offs_t offset, uint8_t data)
 uint8_t ti99_4p_state::cruread(offs_t offset)
 {
 	uint8_t value = 0;
+
+	// Internal 9901
+	// We cannot use the map because devices in the Peribox may want to see the
+	// CRU address on the bus (see sidmaster)
+	if ((offset & 0xfc00)==0)
+		value = m_tms9901->read(offset & 0x3f);
+
 	m_peribox->crureadz(offset<<1, &value);
 	return value;
 }
@@ -969,8 +989,6 @@ void ti99_4p_state::driver_start()
 	m_sysready = ASSERT_LINE;
 	m_muxready = true;
 
-	m_rom = (uint16_t*)(memregion("maincpu")->base());
-
 	save_item(NAME(m_int1));
 	save_item(NAME(m_int2));
 	save_item(NAME(m_keyboard_column));
@@ -1055,10 +1073,10 @@ void ti99_4p_state::ti99_4p_60hz(machine_config& config)
 	m_peribox->lcp_cb().set(FUNC(ti99_4p_state::video_interrupt_in));
 
 	// Scratch pad RAM 1024 bytes (4 times the size of the TI-99/4A)
-	RAM(config, TI99_PADRAM_TAG).set_default_size("1K").set_default_value(0);
+	RAM(config, SGCPU_PADRAM_TAG).set_default_size("1K").set_default_value(0);
 
 	// AMS RAM 1 MiB
-	RAM(config, TI99_AMSRAM_TAG).set_default_size("1M").set_default_value(0);
+	RAM(config, SGCPU_AMSRAM_TAG).set_default_size("1M").set_default_value(0);
 
 	// Cassette drives
 	SPEAKER(config, "cass_out").front_center();
@@ -1068,13 +1086,15 @@ void ti99_4p_state::ti99_4p_60hz(machine_config& config)
 	TI99_JOYPORT(config, m_joyport, 0, ti99_joyport_options_plain, "twinjoy");
 }
 
-
 ROM_START(ti99_4p)
 	/*CPU memory space*/
 	ROM_REGION16_BE(0x10000, "maincpu", 0)
 	ROM_LOAD16_BYTE("sgcpu_hb.bin", 0x0000, 0x8000, CRC(aa100730) SHA1(35e585b2dcd3f2a0005bebb15ede6c5b8c787366) ) /* system ROMs */
 	ROM_LOAD16_BYTE("sgcpu_lb.bin", 0x0001, 0x8000, CRC(2a5dc818) SHA1(dec141fe2eea0b930859cbe1ebd715ac29fa8ecb) ) /* system ROMs */
 ROM_END
+
+} // Anonymous namespace
+
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE       INPUT    CLASS          INIT        COMPANY                 FULLNAME                FLAGS
 COMP( 1996, ti99_4p, 0,      0,      ti99_4p_60hz, ti99_4p, ti99_4p_state, empty_init, "System-99 User Group", "SGCPU (aka TI-99/4P)", MACHINE_SUPPORTS_SAVE )

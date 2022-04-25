@@ -4,7 +4,7 @@
 
 Namco System II
 
-  machine.c
+  namcos2.cpp
 
   Functions to emulate general aspects of the machine (RAM, ROM, interrupts,
   I/O ports)
@@ -20,7 +20,7 @@ Namco System II
 
 
 
-READ16_MEMBER( namcos2_state::namcos2_finallap_prot_r )
+uint16_t namcos2_state::namcos2_finallap_prot_r(offs_t offset)
 {
 	static const uint16_t table0[8] = { 0x0000,0x0040,0x0440,0x2440,0x2480,0xa080,0x8081,0x8041 };
 	static const uint16_t table1[8] = { 0x0040,0x0060,0x0060,0x0860,0x0864,0x08e4,0x08e5,0x08a5 };
@@ -80,13 +80,12 @@ void namcos2_state::machine_start()
 	for (int i = 0; i < 0x10; i++)
 		m_audiobank->configure_entry(i, memregion("audiocpu")->base() + (i % max) * 0x4000);
 
+	save_pointer(NAME(m_eeprom), 0x2000);
+	save_item(NAME(m_sendval));
 }
 
 void namcos2_state::machine_reset()
 {
-//  address_space &space = m_maincpu->space(AS_PROGRAM);
-//  address_space &audio_space = m_audiocpu->space(AS_PROGRAM);
-
 	/* Initialise the bank select in the sound CPU */
 	m_audiobank->set_entry(0); /* Page in bank 0 */
 
@@ -141,12 +140,12 @@ void namcos2_state::system_reset_w(uint8_t data)
 /* EEPROM Load/Save and read/write handling                  */
 /*************************************************************/
 
-WRITE8_MEMBER( namcos2_state::eeprom_w )
+void namcos2_state::eeprom_w(offs_t offset, uint8_t data)
 {
 	m_eeprom[offset] = data;
 }
 
-READ8_MEMBER( namcos2_state::eeprom_r )
+uint8_t namcos2_state::eeprom_r(offs_t offset)
 {
 	return m_eeprom[offset];
 }
@@ -186,7 +185,7 @@ suzuk8h2    1993
 sws93       1993    334         $014e
  *************************************************************/
 
-READ16_MEMBER( namcos2_state::namcos2_68k_key_r )
+uint16_t namcos2_state::namcos2_68k_key_r(offs_t offset)
 {
 	switch (m_gametype)
 	{
@@ -203,7 +202,7 @@ READ16_MEMBER( namcos2_state::namcos2_68k_key_r )
 		break;
 
 	case NAMCOS2_STEEL_GUNNER_2:
-		switch( offset )
+		switch(offset)
 		{
 			case 4: return 0x15a;
 		}
@@ -358,22 +357,21 @@ READ16_MEMBER( namcos2_state::namcos2_68k_key_r )
 	return machine().rand()&0xffff;
 }
 
-WRITE16_MEMBER( namcos2_state::namcos2_68k_key_w )
+void namcos2_state::namcos2_68k_key_w(offs_t offset, uint16_t data)
 {
-	int gametype = m_gametype;
-	if( gametype == NAMCOS2_MARVEL_LAND && offset == 5 )
+	if( m_gametype == NAMCOS2_MARVEL_LAND && offset == 5 )
 	{
 		if (data == 0x615E) m_sendval = 1;
 	}
-	if( gametype == NAMCOS2_ROLLING_THUNDER_2 && offset == 4 )
+	if( m_gametype == NAMCOS2_ROLLING_THUNDER_2 && offset == 4 )
 	{
 		if (data == 0x13EC) m_sendval = 1;
 	}
-	if( gametype == NAMCOS2_ROLLING_THUNDER_2 && offset == 7 )
+	if( m_gametype == NAMCOS2_ROLLING_THUNDER_2 && offset == 7 )
 	{
 		if (data == 0x13EC) m_sendval = 1;
 	}
-	if( gametype == NAMCOS2_MARVEL_LAND && offset == 6 )
+	if( m_gametype == NAMCOS2_MARVEL_LAND && offset == 6 )
 	{
 		if (data == 0x1001) m_sendval = 0;
 	}
@@ -393,21 +391,21 @@ WRITE16_MEMBER( namcos2_state::namcos2_68k_key_w )
 /*  Sound sub-system                                          */
 /**************************************************************/
 
-WRITE8_MEMBER( namcos2_state::sound_bankselect_w )
+void namcos2_state::sound_bankselect_w(uint8_t data)
 {
 	m_audiobank->set_entry(data>>4);
 }
 
-READ16_MEMBER( namcos2_state::c140_rom_r )
+uint16_t namcos2_state::c140_rom_r(offs_t offset)
 {
 	/*
-		Verified from schematics:
-		MD0-MD3 : Connected in 3N "voice0" D0-D3 or D4-D7, Nibble changeable with 74LS157
-		MD4-MD11 : Connected in 3M "voice1" or 3L "voice2" D0-D7
-		MA0-MA18 : Connected in Address bus of ROMs
-		MA19 : Connected in 74LS157 Select Pin
-		MA20 : Connected in 74LS157 Strobe(Enable) Pin
-		MA21 : ROM select in MD4-MD11 area
+	    Verified from schematics:
+	    MD0-MD3 : Connected in 3N "voice0" D0-D3 or D4-D7, Nibble changeable with 74LS157
+	    MD4-MD11 : Connected in 3M "voice1" or 3L "voice2" D0-D7
+	    MA0-MA18 : Connected in Address bus of ROMs
+	    MA19 : Connected in 74LS157 Select Pin
+	    MA20 : Connected in 74LS157 Strobe(Enable) Pin
+	    MA21 : ROM select in MD4-MD11 area
 	*/
 	if (m_c140_region != nullptr)
 	{

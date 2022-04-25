@@ -320,7 +320,7 @@ void raiden2cop_device::cop_write_byte(int address, uint8_t data)
 
 
 
-WRITE16_MEMBER(raiden2cop_device::cop_pgm_data_w)
+void raiden2cop_device::cop_pgm_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	assert(ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15);
 	cop_program[cop_latch_addr] = data;
@@ -437,26 +437,26 @@ void raiden2cop_device::dump_table()
 }
 
 
-WRITE16_MEMBER(raiden2cop_device::cop_pgm_addr_w)
+void raiden2cop_device::cop_pgm_addr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	assert(ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15);
 	assert(data < 0x100);
 	cop_latch_addr = data;
 }
 
-WRITE16_MEMBER(raiden2cop_device::cop_pgm_value_w)
+void raiden2cop_device::cop_pgm_value_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	assert(ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15);
 	cop_latch_value = data;
 }
 
-WRITE16_MEMBER(raiden2cop_device::cop_pgm_mask_w)
+void raiden2cop_device::cop_pgm_mask_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	assert(ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15);
 	cop_latch_mask = data;
 }
 
-WRITE16_MEMBER(raiden2cop_device::cop_pgm_trigger_w)
+void raiden2cop_device::cop_pgm_trigger_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	assert(ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15);
 	cop_latch_trigger = data;
@@ -684,52 +684,52 @@ int raiden2cop_device::check_command_matches(int command, uint16_t seq0, uint16_
 
 /*** Regular DMA ***/
 
-WRITE16_MEMBER(raiden2cop_device::cop_dma_adr_rel_w)
+void raiden2cop_device::cop_dma_adr_rel_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&cop_dma_adr_rel);
 }
 
-WRITE16_MEMBER(raiden2cop_device::cop_dma_v1_w)
+void raiden2cop_device::cop_dma_v1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&cop_dma_v1);
 }
 
-WRITE16_MEMBER(raiden2cop_device::cop_dma_v2_w)
+void raiden2cop_device::cop_dma_v2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&cop_dma_v2);
 }
 
-WRITE16_MEMBER(raiden2cop_device::cop_dma_dst_w)
+void raiden2cop_device::cop_dma_dst_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&cop_dma_dst[cop_dma_mode]);
 }
 
-READ16_MEMBER(raiden2cop_device::cop_dma_mode_r)
+uint16_t raiden2cop_device::cop_dma_mode_r()
 {
 	return cop_dma_mode;
 }
 
-WRITE16_MEMBER(raiden2cop_device::cop_dma_mode_w)
+void raiden2cop_device::cop_dma_mode_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&cop_dma_mode);
 }
 
-WRITE16_MEMBER(raiden2cop_device::cop_dma_src_w)
+void raiden2cop_device::cop_dma_src_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&cop_dma_src[cop_dma_mode]);
 }
 
-WRITE16_MEMBER(raiden2cop_device::cop_dma_size_w)
+void raiden2cop_device::cop_dma_size_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&cop_dma_size[cop_dma_mode]);
 }
 
-WRITE16_MEMBER(raiden2cop_device::cop_pal_brightness_val_w)
+void raiden2cop_device::cop_pal_brightness_val_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&pal_brightness_val);
 }
 
-WRITE16_MEMBER(raiden2cop_device::cop_pal_brightness_mode_w)
+void raiden2cop_device::cop_pal_brightness_mode_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&pal_brightness_mode);
 }
@@ -743,7 +743,7 @@ uint8_t raiden2cop_device::fade_table(int v)
 	return (low * (high | (high >> 5)) + 0x210) >> 10;
 }
 
-WRITE16_MEMBER(raiden2cop_device::cop_dma_trigger_w)
+void raiden2cop_device::cop_dma_trigger_w(uint16_t data)
 {
 #if 0
 	if (cop_dma_mode != 0x14 && cop_dma_mode != 0x15)
@@ -888,14 +888,14 @@ void raiden2cop_device::bcd_update()
 	cop_itoa_digits[9] = 0;
 }
 
-WRITE16_MEMBER(raiden2cop_device::cop_itoa_low_w)
+void raiden2cop_device::cop_itoa_low_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	cop_itoa = (cop_itoa & ~uint32_t(mem_mask)) | (data & mem_mask);
 
 	bcd_update();
 }
 
-WRITE16_MEMBER(raiden2cop_device::cop_itoa_high_w)
+void raiden2cop_device::cop_itoa_high_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	cop_itoa = (cop_itoa & ~(mem_mask << 16)) | ((data & mem_mask) << 16);
 
@@ -903,7 +903,7 @@ WRITE16_MEMBER(raiden2cop_device::cop_itoa_high_w)
 	bcd_update();
 }
 
-WRITE16_MEMBER(raiden2cop_device::cop_itoa_mode_w)
+void raiden2cop_device::cop_itoa_mode_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// BCD / Number conversion related parameter
 	// The former working hypothesis that this value is some sort of digit count is almost certainly incorrect
@@ -913,63 +913,63 @@ WRITE16_MEMBER(raiden2cop_device::cop_itoa_mode_w)
 	COMBINE_DATA(&cop_itoa_mode);
 }
 
-READ16_MEMBER(raiden2cop_device::cop_itoa_digits_r)
+uint16_t raiden2cop_device::cop_itoa_digits_r(offs_t offset)
 {
 	return cop_itoa_digits[offset*2] | (cop_itoa_digits[offset*2+1] << 8);
 }
 
-READ16_MEMBER( raiden2cop_device::cop_status_r)
+uint16_t raiden2cop_device::cop_status_r()
 {
 	return cop_status;
 }
 
-READ16_MEMBER( raiden2cop_device::cop_angle_r)
+uint16_t raiden2cop_device::cop_angle_r()
 {
 	return cop_angle;
 }
 
-READ16_MEMBER( raiden2cop_device::cop_dist_r)
+uint16_t raiden2cop_device::cop_dist_r()
 {
 	return cop_dist;
 }
 
-WRITE16_MEMBER( raiden2cop_device::cop_scale_w)
+void raiden2cop_device::cop_scale_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&cop_scale);
 	cop_scale &= 3;
 }
 
-WRITE16_MEMBER( raiden2cop_device::cop_angle_target_w)
+void raiden2cop_device::cop_angle_target_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&cop_angle_target);
 }
 
-WRITE16_MEMBER( raiden2cop_device::cop_angle_step_w)
+void raiden2cop_device::cop_angle_step_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&cop_angle_step);
 }
 
-READ16_MEMBER( raiden2cop_device::cop_reg_high_r)
+uint16_t raiden2cop_device::cop_reg_high_r(offs_t offset)
 {
 	return cop_regs[offset] >> 16;
 }
 
-WRITE16_MEMBER( raiden2cop_device::cop_reg_high_w)
+void raiden2cop_device::cop_reg_high_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	cop_regs[offset] = (cop_regs[offset] & ~(mem_mask << 16)) | ((data & mem_mask) << 16);
 }
 
-READ16_MEMBER( raiden2cop_device::cop_reg_low_r)
+uint16_t raiden2cop_device::cop_reg_low_r(offs_t offset)
 {
 	return cop_regs[offset];
 }
 
-WRITE16_MEMBER( raiden2cop_device::cop_reg_low_w)
+void raiden2cop_device::cop_reg_low_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	cop_regs[offset] = (cop_regs[offset] & ~uint32_t(mem_mask)) | (data & mem_mask);
 }
 
-WRITE16_MEMBER( raiden2cop_device::cop_hitbox_baseadr_w)
+void raiden2cop_device::cop_hitbox_baseadr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&cop_hit_baseadr);
 }
@@ -1071,7 +1071,7 @@ void  raiden2cop_device::cop_collision_update_hitbox(uint16_t data, int slot, ui
 }
 
 
-WRITE16_MEMBER( raiden2cop_device::cop_cmd_w)
+void raiden2cop_device::cop_cmd_w(offs_t offset, uint16_t data)
 {
 	find_trigger_match(data, 0xf800);
 
@@ -1188,100 +1188,100 @@ WRITE16_MEMBER( raiden2cop_device::cop_cmd_w)
 	}
 }
 
-READ16_MEMBER( raiden2cop_device::cop_collision_status_r)
+uint16_t raiden2cop_device::cop_collision_status_r()
 {
 	return cop_hit_status;
 }
 
 
-READ16_MEMBER( raiden2cop_device::cop_collision_status_val_r)
+uint16_t raiden2cop_device::cop_collision_status_val_r(offs_t offset)
 {
 	return cop_hit_val[offset];
 }
 
-READ16_MEMBER( raiden2cop_device::cop_collision_status_stat_r)
+uint16_t raiden2cop_device::cop_collision_status_stat_r()
 {
 	return cop_hit_val_stat;
 }
 
-WRITE16_MEMBER( raiden2cop_device::cop_sort_lookup_hi_w)
+void raiden2cop_device::cop_sort_lookup_hi_w(uint16_t data)
 {
 	cop_sort_lookup = (cop_sort_lookup&0x0000ffff)|(data<<16);
 }
 
-WRITE16_MEMBER( raiden2cop_device::cop_sort_lookup_lo_w)
+void raiden2cop_device::cop_sort_lookup_lo_w(uint16_t data)
 {
 	cop_sort_lookup = (cop_sort_lookup&0xffff0000)|(data&0xffff);
 }
 
-WRITE16_MEMBER( raiden2cop_device::cop_sort_ram_addr_hi_w)
+void raiden2cop_device::cop_sort_ram_addr_hi_w(uint16_t data)
 {
 	cop_sort_ram_addr = (cop_sort_ram_addr&0x0000ffff)|(data<<16);
 }
 
-WRITE16_MEMBER( raiden2cop_device::cop_sort_ram_addr_lo_w)
+void raiden2cop_device::cop_sort_ram_addr_lo_w(uint16_t data)
 {
 	cop_sort_ram_addr = (cop_sort_ram_addr&0xffff0000)|(data&0xffff);
 }
 
-WRITE16_MEMBER( raiden2cop_device::cop_sort_param_w)
+void raiden2cop_device::cop_sort_param_w(uint16_t data)
 {
 	cop_sort_param = data;
 }
 
 // TODO: trampoline
-WRITE16_MEMBER( raiden2cop_device::cop_sort_dma_trig_w)
+void raiden2cop_device::cop_sort_dma_trig_w(uint16_t data)
 {
 	dma_zsorting(data);
 }
 
 /* Random number generators (only verified on 68k games) */
 
-READ16_MEMBER(raiden2cop_device::cop_prng_r)
+uint16_t raiden2cop_device::cop_prng_r()
 {
 	return m_host_cpu->total_cycles() % (m_cop_rng_max_value + 1);
 }
 
 /* max possible value returned by the RNG at 0x5a*, trusted */
-WRITE16_MEMBER(raiden2cop_device::cop_prng_maxvalue_w)
+void raiden2cop_device::cop_prng_maxvalue_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_cop_rng_max_value);
 }
 
-READ16_MEMBER(raiden2cop_device::cop_prng_maxvalue_r)
+uint16_t raiden2cop_device::cop_prng_maxvalue_r()
 {
 	return m_cop_rng_max_value;
 }
 
 // misc used by 68k games (mostly grainbow?)
 
-WRITE16_MEMBER( raiden2cop_device::cop_sprite_dma_param_hi_w)
+void raiden2cop_device::cop_sprite_dma_param_hi_w(uint16_t data)
 {
 	m_cop_sprite_dma_param = (m_cop_sprite_dma_param&0x0000ffff)|(data<<16);
 }
 
-WRITE16_MEMBER( raiden2cop_device::cop_sprite_dma_param_lo_w)
+void raiden2cop_device::cop_sprite_dma_param_lo_w(uint16_t data)
 {
 	m_cop_sprite_dma_param = (m_cop_sprite_dma_param&0xffff0000)|(data&0xffff);
 }
 
-WRITE16_MEMBER(raiden2cop_device::cop_sprite_dma_size_w)
+void raiden2cop_device::cop_sprite_dma_size_w(uint16_t data)
 {
 	m_cop_sprite_dma_size = data;
 }
 
 
-WRITE16_MEMBER( raiden2cop_device::cop_sprite_dma_src_hi_w)
+void raiden2cop_device::cop_sprite_dma_src_hi_w(uint16_t data)
 {
 	m_cop_sprite_dma_src = (m_cop_sprite_dma_src&0x0000ffff)|(data<<16);
 }
 
-WRITE16_MEMBER( raiden2cop_device::cop_sprite_dma_src_lo_w)
+void raiden2cop_device::cop_sprite_dma_src_lo_w(uint16_t data)
 {
 	m_cop_sprite_dma_src = (m_cop_sprite_dma_src&0xffff0000)|(data&0xffff);
 }
 
-WRITE16_MEMBER(raiden2cop_device::cop_sprite_dma_inc_w)
+void raiden2cop_device::cop_sprite_dma_inc_w(uint16_t data)
 {
 	if (data)
 		printf("Warning: COP RAM 0x410 used with %04x\n", data);
@@ -1307,41 +1307,41 @@ WRITE16_MEMBER(raiden2cop_device::cop_sprite_dma_inc_w)
 
 // Involved with 0x9100/0x9180 and 0x9900/0x9980
 // Some angle results seem to be stored here as well; legionna writes here when 0x138e raises the divide by zero flag
-WRITE16_MEMBER( raiden2cop_device::cop_unk_param_a_w)
+void raiden2cop_device::cop_unk_param_a_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_cop_unk_param_a);
 }
 
 // Involved with 0x9100/0x9180 and 0x9900/0x9980
-WRITE16_MEMBER( raiden2cop_device::cop_unk_param_b_w)
+void raiden2cop_device::cop_unk_param_b_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_cop_unk_param_b);
 }
 
 // cupsoc always writes 0xF before commands 0x5105, 0x5905, 0xD104 and 0xF105 and 0xE before 0xDDE5, then resets this to zero
 // zeroteam writes 0xE here before 0xEDE5, then resets it to zero
-WRITE16_MEMBER( raiden2cop_device::cop_precmd_w)
+void raiden2cop_device::cop_precmd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_cop_precmd);
 }
 
 // cupsoc writes a longword before 0x5105 or 0xF105 (always 0xC000 for the latter)
-WRITE16_MEMBER( raiden2cop_device::cop_rom_addr_lo_w)
+void raiden2cop_device::cop_rom_addr_lo_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_cop_rom_addr_lo);
 }
 
-WRITE16_MEMBER( raiden2cop_device::cop_rom_addr_hi_w)
+void raiden2cop_device::cop_rom_addr_hi_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_cop_rom_addr_hi);
 }
 
-WRITE16_MEMBER(raiden2cop_device::cop_sprite_dma_abs_y_w)
+void raiden2cop_device::cop_sprite_dma_abs_y_w(uint16_t data)
 {
 	m_cop_sprite_dma_abs_y = data;
 }
 
-WRITE16_MEMBER(raiden2cop_device::cop_sprite_dma_abs_x_w)
+void raiden2cop_device::cop_sprite_dma_abs_x_w(uint16_t data)
 {
 	m_cop_sprite_dma_abs_x = data;
 }
@@ -1359,7 +1359,7 @@ WRITE16_MEMBER(raiden2cop_device::cop_sprite_dma_abs_x_w)
 
 
 
-WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
+void raiden2cop_device::LEGACY_cop_cmd_w(offs_t offset, uint16_t data)
 {
 	int command;
 

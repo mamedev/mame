@@ -1,8 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Mirko Buffoni
+// copyright-holders:Dan Boris, Mirko Buffoni, Aaron Giles, Couriersud
 /***************************************************************************
-
-    mcs48.c
 
     Intel MCS-48/UPI-41 Portable Emulator
 
@@ -17,16 +15,16 @@
 #pragma once
 
 
-
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
 
-/* register access indexes */
+// register access indexes
 enum
 {
 	MCS48_PC,
 	MCS48_PSW,
+	MCS48_SP,
 	MCS48_A,
 	MCS48_TC,
 	MCS48_TPRE,
@@ -48,7 +46,7 @@ enum
 };
 
 
-/* I/O port access indexes */
+// I/O port access indexes
 enum
 {
 	MCS48_INPUT_IRQ = 0,
@@ -72,33 +70,33 @@ enum
     TYPES
 ***************************************************************************/
 
-/* Official Intel MCS-48 parts */
-DECLARE_DEVICE_TYPE(I8021, i8021_device)    /* 1k internal ROM,      64 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8022, i8022_device)    /* 2k internal ROM,     128 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8035, i8035_device)    /* external ROM,         64 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8048, i8048_device)    /* 1k internal ROM,      64 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8648, i8648_device)    /* 1k internal OTP ROM,  64 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8748, i8748_device)    /* 1k internal EEPROM,   64 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8039, i8039_device)    /* external ROM,        128 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8049, i8049_device)    /* 2k internal ROM,     128 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8749, i8749_device)    /* 2k internal EEPROM,  128 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8040, i8040_device)    /* external ROM,        256 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8050, i8050_device)    /* 4k internal ROM,     256 bytes internal RAM */
+// Official Intel MCS-48 parts
+DECLARE_DEVICE_TYPE(I8021,   i8021_device)    // 1k internal ROM,       64 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8022,   i8022_device)    // 2k internal ROM,      128 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8035,   i8035_device)    // external ROM,          64 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8048,   i8048_device)    // 1k internal ROM,       64 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8648,   i8648_device)    // 1k internal OTP ROM,   64 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8748,   i8748_device)    // 1k internal UV EPROM,  64 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8039,   i8039_device)    // external ROM,         128 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8049,   i8049_device)    // 2k internal ROM,      128 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8749,   i8749_device)    // 2k internal UV EPROM, 128 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8040,   i8040_device)    // external ROM,         256 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8050,   i8050_device)    // 4k internal ROM,      256 bytes internal RAM
 
-/* Official Intel UPI-41 parts */
-DECLARE_DEVICE_TYPE(I8041A,  i8041a_device)   /* 1k internal ROM,      64 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8741A,  i8741a_device)   /* 1k internal EEPROM,   64 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8041AH, i8041ah_device)  /* 1k internal ROM,     128 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8741AH, i8741ah_device)  /* 1k internal EEPROM,  128 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8042,   i8042_device)    /* 2k internal ROM,     128 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8742,   i8742_device)    /* 2k internal EEPROM,  128 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8042AH, i8042ah_device)  /* 2k internal ROM,     256 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8742AH, i8742ah_device)  /* 2k internal EEPROM,  256 bytes internal RAM */
+// Official Intel UPI-41 parts
+DECLARE_DEVICE_TYPE(I8041A,  i8041a_device)   // 1k internal ROM,       64 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8741A,  i8741a_device)   // 1k internal UV EPROM,  64 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8041AH, i8041ah_device)  // 1k internal ROM,      128 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8741AH, i8741ah_device)  // 1k internal UV EPROM, 128 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8042,   i8042_device)    // 2k internal ROM,      128 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8742,   i8742_device)    // 2k internal UV EPROM, 128 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8042AH, i8042ah_device)  // 2k internal ROM,      256 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8742AH, i8742ah_device)  // 2k internal UV EPROM, 256 bytes internal RAM
 
-/* Clones */
-DECLARE_DEVICE_TYPE(MB8884, mb8884_device)  /* 8035 clone */
-DECLARE_DEVICE_TYPE(N7751, n7751_device)    /* 8048 clone */
-DECLARE_DEVICE_TYPE(M58715, m58715_device)  /* 8049 clone */
+// Clones
+DECLARE_DEVICE_TYPE(MB8884,  mb8884_device)   // 8035 clone
+DECLARE_DEVICE_TYPE(N7751,   n7751_device)    // 8048 clone
+DECLARE_DEVICE_TYPE(M58715,  m58715_device)   // 8049 clone
 
 
 
@@ -140,7 +138,7 @@ public:
 	template <typename... T> void set_t0_clk_cb(T &&... args) { m_t0_clk_func.set(std::forward<T>(args)...); }
 
 protected:
-	typedef int (mcs48_cpu_device::*mcs48_ophandler)();
+	typedef void (mcs48_cpu_device::*mcs48_ophandler)();
 
 	// construction/destruction
 	mcs48_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rom_size, int ram_size, uint8_t feature_mask, const mcs48_ophandler *opcode_table);
@@ -149,12 +147,13 @@ protected:
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override { update_regptr(); }
 
 	// device_execute_interface overrides
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 15 - 1) / 15; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 15); }
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
-	virtual uint32_t execute_max_cycles() const noexcept override { return 3; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 2+2; } // opcode+irq
 	virtual uint32_t execute_input_lines() const noexcept override { return 2; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
@@ -184,48 +183,49 @@ protected:
 	clock_update_delegate m_t0_clk_func;
 	devcb_write_line m_prog_out_cb;
 
-	uint16_t      m_prevpc;             /* 16-bit previous program counter */
-	uint16_t      m_pc;                 /* 16-bit program counter */
+	uint16_t      m_prevpc;             // 16-bit previous program counter
+	uint16_t      m_pc;                 // 16-bit program counter
 
-	uint8_t       m_a;                  /* 8-bit accumulator */
-	uint8_t *     m_regptr;             /* pointer to r0-r7 */
-	uint8_t       m_psw;                /* 8-bit psw */
-	uint8_t       m_p1;                 /* 8-bit latched port 1 */
-	uint8_t       m_p2;                 /* 8-bit latched port 2 */
-	uint8_t       m_ea;                 /* 1-bit latched ea input */
-	uint8_t       m_timer;              /* 8-bit timer */
-	uint8_t       m_prescaler;          /* 5-bit timer prescaler */
-	uint8_t       m_t1_history;         /* 8-bit history of the T1 input */
-	uint8_t       m_sts;                /* 8-bit status register (UPI-41 only, except for F1) */
-	uint8_t       m_dbbi;               /* 8-bit input data buffer (UPI-41 only) */
-	uint8_t       m_dbbo;               /* 8-bit output data buffer (UPI-41 only) */
+	uint8_t       m_a;                  // 8-bit accumulator
+	uint8_t *     m_regptr;             // pointer to r0-r7
+	uint8_t       m_psw;                // 8-bit PSW
+	bool          m_f1;                 // F1 flag (F0 is in PSW)
+	uint8_t       m_p1;                 // 8-bit latched port 1
+	uint8_t       m_p2;                 // 8-bit latched port 2
+	uint8_t       m_ea;                 // 1-bit latched ea input
+	uint8_t       m_timer;              // 8-bit timer
+	uint8_t       m_prescaler;          // 5-bit timer prescaler
+	uint8_t       m_t1_history;         // 8-bit history of the T1 input
+	uint8_t       m_sts;                // 4-bit status register + OBF/IBF flags (UPI-41 only)
+	uint8_t       m_dbbi;               // 8-bit input data buffer (UPI-41 only)
+	uint8_t       m_dbbo;               // 8-bit output data buffer (UPI-41 only)
 
-	bool          m_irq_state;          /* true if the IRQ line is active */
-	bool          m_irq_polled;         /* true if last instruction was JNI (and not taken) */
-	bool          m_irq_in_progress;    /* true if an IRQ is in progress */
-	bool          m_timer_overflow;     /* true on a timer overflow; cleared by taking interrupt */
-	bool          m_timer_flag;         /* true on a timer overflow; cleared on JTF */
-	bool          m_tirq_enabled;       /* true if the timer IRQ is enabled */
-	bool          m_xirq_enabled;       /* true if the external IRQ is enabled */
-	uint8_t       m_timecount_enabled;  /* bitmask of timer/counter enabled */
-	bool          m_flags_enabled;      /* true if I/O flags have been enabled (UPI-41 only) */
-	bool          m_dma_enabled;        /* true if DMA has been enabled (UPI-41 only) */
+	bool          m_irq_state;          // true if the IRQ line is active
+	bool          m_irq_polled;         // true if last instruction was JNI (and not taken)
+	bool          m_irq_in_progress;    // true if an IRQ is in progress
+	bool          m_timer_overflow;     // true on a timer overflow; cleared by taking interrupt
+	bool          m_timer_flag;         // true on a timer overflow; cleared on JTF
+	bool          m_tirq_enabled;       // true if the timer IRQ is enabled
+	bool          m_xirq_enabled;       // true if the external IRQ is enabled
+	uint8_t       m_timecount_enabled;  // bitmask of timer/counter enabled
+	bool          m_flags_enabled;      // true if I/O flags have been enabled (UPI-41 only)
+	bool          m_dma_enabled;        // true if DMA has been enabled (UPI-41 only)
 
-	uint16_t      m_a11;                /* A11 value, either 0x000 or 0x800 */
+	uint16_t      m_a11;                // A11 value, either 0x000 or 0x800
 
-	int         m_icount;
+	int           m_icount;
 
-	/* Memory spaces */
+	// Memory spaces
 	memory_access<12, 0, 0, ENDIANNESS_LITTLE>::cache m_program;
 	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
 	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 
 	required_shared_ptr<uint8_t> m_dataptr;
 
-	uint8_t       m_feature_mask;       /* processor feature flags */
-	uint16_t      m_int_rom_size;       /* internal rom size */
+	uint8_t       m_feature_mask;       // processor feature flags
+	uint16_t      m_int_rom_size;       // internal rom size
 
-	uint8_t       m_rtemp;              /* temporary for import/export */
+	uint8_t       m_rtemp;              // temporary for import/export
 
 	static const mcs48_ophandler s_mcs48_opcodes[256];
 	static const mcs48_ophandler s_upi41_opcodes[256];
@@ -233,14 +233,14 @@ protected:
 	static const mcs48_ophandler s_i8022_opcodes[256];
 	const mcs48_ophandler *const m_opcode_table;
 
-	/* ROM is mapped to AS_PROGRAM */
+	// ROM is mapped to AS_PROGRAM
 	uint8_t program_r(offs_t a)         { return m_program.read_byte(a); }
 
-	/* RAM is mapped to AS_DATA */
+	// RAM is mapped to AS_DATA
 	uint8_t ram_r(offs_t a)             { return m_data.read_byte(a); }
 	void    ram_w(offs_t a, uint8_t v)  { m_data.write_byte(a, v); }
 
-	/* ports are mapped to AS_IO and callbacks */
+	// ports are mapped to AS_IO and callbacks
 	uint8_t ext_r(offs_t a)             { return m_io.read_byte(a); }
 	void    ext_w(offs_t a, uint8_t v)  { m_io.write_byte(a, v); }
 	uint8_t port_r(offs_t a)            { return m_port_in_cb[a - 1](); }
@@ -260,257 +260,261 @@ protected:
 	void execute_addc(uint8_t dat);
 	void execute_jmp(uint16_t address);
 	void execute_call(uint16_t address);
-	void execute_jcc(uint8_t result);
+	void execute_jcc(bool result);
 	uint8_t p2_mask();
 	void expander_operation(expander_op operation, uint8_t port);
-	int check_irqs();
+	void check_irqs();
 	void burn_cycles(int count);
 
-	int illegal();
-	int add_a_r0();
-	int add_a_r1();
-	int add_a_r2();
-	int add_a_r3();
-	int add_a_r4();
-	int add_a_r5();
-	int add_a_r6();
-	int add_a_r7();
-	int add_a_xr0();
-	int add_a_xr1();
-	int add_a_n();
-	int adc_a_r0();
-	int adc_a_r1();
-	int adc_a_r2();
-	int adc_a_r3();
-	int adc_a_r4();
-	int adc_a_r5();
-	int adc_a_r6();
-	int adc_a_r7();
-	int adc_a_xr0();
-	int adc_a_xr1();
-	int adc_a_n();
-	int anl_a_r0();
-	int anl_a_r1();
-	int anl_a_r2();
-	int anl_a_r3();
-	int anl_a_r4();
-	int anl_a_r5();
-	int anl_a_r6();
-	int anl_a_r7();
-	int anl_a_xr0();
-	int anl_a_xr1();
-	int anl_a_n();
-	int anl_bus_n();
-	int anl_p1_n();
-	int anl_p2_n();
-	int anld_p4_a();
-	int anld_p5_a();
-	int anld_p6_a();
-	int anld_p7_a();
-	int call_0();
-	int call_1();
-	int call_2();
-	int call_3();
-	int call_4();
-	int call_5();
-	int call_6();
-	int call_7();
-	int clr_a();
-	int clr_c();
-	int clr_f0();
-	int clr_f1();
-	int cpl_a();
-	int cpl_c();
-	int cpl_f0();
-	int cpl_f1();
-	int da_a();
-	int dec_a();
-	int dec_r0();
-	int dec_r1();
-	int dec_r2();
-	int dec_r3();
-	int dec_r4();
-	int dec_r5();
-	int dec_r6();
-	int dec_r7();
-	int dis_i();
-	int dis_tcnti();
-	int djnz_r0();
-	int djnz_r1();
-	int djnz_r2();
-	int djnz_r3();
-	int djnz_r4();
-	int djnz_r5();
-	int djnz_r6();
-	int djnz_r7();
-	int en_i();
-	int en_tcnti();
-	int en_dma();
-	int en_flags();
-	int ent0_clk();
-	int in_a_p0();
-	int in_a_p1();
-	int in_a_p2();
-	int ins_a_bus();
-	int in_a_dbb();
-	int inc_a();
-	int inc_r0();
-	int inc_r1();
-	int inc_r2();
-	int inc_r3();
-	int inc_r4();
-	int inc_r5();
-	int inc_r6();
-	int inc_r7();
-	int inc_xr0();
-	int inc_xr1();
-	int jb_0();
-	int jb_1();
-	int jb_2();
-	int jb_3();
-	int jb_4();
-	int jb_5();
-	int jb_6();
-	int jb_7();
-	int jc();
-	int jf0();
-	int jf1();
-	int jnc();
-	int jni();
-	int jnibf();
-	int jnt_0();
-	int jnt_1();
-	int jnz();
-	int jobf();
-	int jtf();
-	int jt_0();
-	int jt_1();
-	int jz();
-	int jmp_0();
-	int jmp_1();
-	int jmp_2();
-	int jmp_3();
-	int jmp_4();
-	int jmp_5();
-	int jmp_6();
-	int jmp_7();
-	int jmpp_xa();
-	int mov_a_n();
-	int mov_a_psw();
-	int mov_a_r0();
-	int mov_a_r1();
-	int mov_a_r2();
-	int mov_a_r3();
-	int mov_a_r4();
-	int mov_a_r5();
-	int mov_a_r6();
-	int mov_a_r7();
-	int mov_a_xr0();
-	int mov_a_xr1();
-	int mov_a_t();
-	int mov_psw_a();
-	int mov_sts_a();
-	int mov_r0_a();
-	int mov_r1_a();
-	int mov_r2_a();
-	int mov_r3_a();
-	int mov_r4_a();
-	int mov_r5_a();
-	int mov_r6_a();
-	int mov_r7_a();
-	int mov_r0_n();
-	int mov_r1_n();
-	int mov_r2_n();
-	int mov_r3_n();
-	int mov_r4_n();
-	int mov_r5_n();
-	int mov_r6_n();
-	int mov_r7_n();
-	int mov_t_a();
-	int mov_xr0_a();
-	int mov_xr1_a();
-	int mov_xr0_n();
-	int mov_xr1_n();
-	int movd_a_p4();
-	int movd_a_p5();
-	int movd_a_p6();
-	int movd_a_p7();
-	int movd_p4_a();
-	int movd_p5_a();
-	int movd_p6_a();
-	int movd_p7_a();
-	int movp_a_xa();
-	int movp3_a_xa();
-	int movx_a_xr0();
-	int movx_a_xr1();
-	int movx_xr0_a();
-	int movx_xr1_a();
-	int nop();
-	int orl_a_r0();
-	int orl_a_r1();
-	int orl_a_r2();
-	int orl_a_r3();
-	int orl_a_r4();
-	int orl_a_r5();
-	int orl_a_r6();
-	int orl_a_r7();
-	int orl_a_xr0();
-	int orl_a_xr1();
-	int orl_a_n();
-	int orl_bus_n();
-	int orl_p1_n();
-	int orl_p2_n();
-	int orld_p4_a();
-	int orld_p5_a();
-	int orld_p6_a();
-	int orld_p7_a();
-	int outl_bus_a();
-	int outl_p0_a();
-	int outl_p1_a();
-	int outl_p2_a();
-	int out_dbb_a();
-	int ret();
-	int retr();
-	int rl_a();
-	int rlc_a();
-	int rr_a();
-	int rrc_a();
-	int sel_mb0();
-	int sel_mb1();
-	int sel_rb0();
-	int sel_rb1();
-	int stop_tcnt();
-	int strt_cnt();
-	int strt_t();
-	int swap_a();
-	int xch_a_r0();
-	int xch_a_r1();
-	int xch_a_r2();
-	int xch_a_r3();
-	int xch_a_r4();
-	int xch_a_r5();
-	int xch_a_r6();
-	int xch_a_r7();
-	int xch_a_xr0();
-	int xch_a_xr1();
-	int xchd_a_xr0();
-	int xchd_a_xr1();
-	int xrl_a_r0();
-	int xrl_a_r1();
-	int xrl_a_r2();
-	int xrl_a_r3();
-	int xrl_a_r4();
-	int xrl_a_r5();
-	int xrl_a_r6();
-	int xrl_a_r7();
-	int xrl_a_xr0();
-	int xrl_a_xr1();
-	int xrl_a_n();
+	void illegal();
+	void add_a_r0();
+	void add_a_r1();
+	void add_a_r2();
+	void add_a_r3();
+	void add_a_r4();
+	void add_a_r5();
+	void add_a_r6();
+	void add_a_r7();
+	void add_a_xr0();
+	void add_a_xr1();
+	void add_a_n();
+	void adc_a_r0();
+	void adc_a_r1();
+	void adc_a_r2();
+	void adc_a_r3();
+	void adc_a_r4();
+	void adc_a_r5();
+	void adc_a_r6();
+	void adc_a_r7();
+	void adc_a_xr0();
+	void adc_a_xr1();
+	void adc_a_n();
+	void anl_a_r0();
+	void anl_a_r1();
+	void anl_a_r2();
+	void anl_a_r3();
+	void anl_a_r4();
+	void anl_a_r5();
+	void anl_a_r6();
+	void anl_a_r7();
+	void anl_a_xr0();
+	void anl_a_xr1();
+	void anl_a_n();
+	void anl_bus_n();
+	void anl_p1_n();
+	void anl_p2_n();
+	void anld_p4_a();
+	void anld_p5_a();
+	void anld_p6_a();
+	void anld_p7_a();
+	void call_0();
+	void call_1();
+	void call_2();
+	void call_3();
+	void call_4();
+	void call_5();
+	void call_6();
+	void call_7();
+	void clr_a();
+	void clr_c();
+	void clr_f0();
+	void clr_f1();
+	void cpl_a();
+	void cpl_c();
+	void cpl_f0();
+	void cpl_f1();
+	void da_a();
+	void dec_a();
+	void dec_r0();
+	void dec_r1();
+	void dec_r2();
+	void dec_r3();
+	void dec_r4();
+	void dec_r5();
+	void dec_r6();
+	void dec_r7();
+	void dis_i();
+	void dis_tcnti();
+	void djnz_r0();
+	void djnz_r1();
+	void djnz_r2();
+	void djnz_r3();
+	void djnz_r4();
+	void djnz_r5();
+	void djnz_r6();
+	void djnz_r7();
+	void en_i();
+	void en_tcnti();
+	void en_dma();
+	void en_flags();
+	void ent0_clk();
+	void in_a_p0();
+	void in_a_p1();
+	void in_a_p2();
+	void ins_a_bus();
+	void in_a_dbb();
+	void inc_a();
+	void inc_r0();
+	void inc_r1();
+	void inc_r2();
+	void inc_r3();
+	void inc_r4();
+	void inc_r5();
+	void inc_r6();
+	void inc_r7();
+	void inc_xr0();
+	void inc_xr1();
+	void jb_0();
+	void jb_1();
+	void jb_2();
+	void jb_3();
+	void jb_4();
+	void jb_5();
+	void jb_6();
+	void jb_7();
+	void jc();
+	void jf0();
+	void jf1();
+	void jnc();
+	void jni();
+	void jnibf();
+	void jnt_0();
+	void jnt_1();
+	void jnz();
+	void jobf();
+	void jtf();
+	void jt_0();
+	void jt_1();
+	void jz();
+	void jmp_0();
+	void jmp_1();
+	void jmp_2();
+	void jmp_3();
+	void jmp_4();
+	void jmp_5();
+	void jmp_6();
+	void jmp_7();
+	void jmpp_xa();
+	void mov_a_n();
+	void mov_a_psw();
+	void mov_a_r0();
+	void mov_a_r1();
+	void mov_a_r2();
+	void mov_a_r3();
+	void mov_a_r4();
+	void mov_a_r5();
+	void mov_a_r6();
+	void mov_a_r7();
+	void mov_a_xr0();
+	void mov_a_xr1();
+	void mov_a_t();
+	void mov_psw_a();
+	void mov_sts_a();
+	void mov_r0_a();
+	void mov_r1_a();
+	void mov_r2_a();
+	void mov_r3_a();
+	void mov_r4_a();
+	void mov_r5_a();
+	void mov_r6_a();
+	void mov_r7_a();
+	void mov_r0_n();
+	void mov_r1_n();
+	void mov_r2_n();
+	void mov_r3_n();
+	void mov_r4_n();
+	void mov_r5_n();
+	void mov_r6_n();
+	void mov_r7_n();
+	void mov_t_a();
+	void mov_xr0_a();
+	void mov_xr1_a();
+	void mov_xr0_n();
+	void mov_xr1_n();
+	void movd_a_p4();
+	void movd_a_p5();
+	void movd_a_p6();
+	void movd_a_p7();
+	void movd_p4_a();
+	void movd_p5_a();
+	void movd_p6_a();
+	void movd_p7_a();
+	void movp_a_xa();
+	void movp3_a_xa();
+	void movx_a_xr0();
+	void movx_a_xr1();
+	void movx_xr0_a();
+	void movx_xr1_a();
+	void nop();
+	void orl_a_r0();
+	void orl_a_r1();
+	void orl_a_r2();
+	void orl_a_r3();
+	void orl_a_r4();
+	void orl_a_r5();
+	void orl_a_r6();
+	void orl_a_r7();
+	void orl_a_xr0();
+	void orl_a_xr1();
+	void orl_a_n();
+	void orl_bus_n();
+	void orl_p1_n();
+	void orl_p2_n();
+	void orld_p4_a();
+	void orld_p5_a();
+	void orld_p6_a();
+	void orld_p7_a();
+	void outl_bus_a();
+	void outl_p0_a();
+	void outl_p1_a();
+	void outl_p2_a();
+	void out_dbb_a();
+	void ret();
+	void retr();
+	void rl_a();
+	void rlc_a();
+	void rr_a();
+	void rrc_a();
+	void sel_mb0();
+	void sel_mb1();
+	void sel_rb0();
+	void sel_rb1();
+	void stop_tcnt();
+	void strt_cnt();
+	void strt_t();
+	void swap_a();
+	void xch_a_r0();
+	void xch_a_r1();
+	void xch_a_r2();
+	void xch_a_r3();
+	void xch_a_r4();
+	void xch_a_r5();
+	void xch_a_r6();
+	void xch_a_r7();
+	void xch_a_xr0();
+	void xch_a_xr1();
+	void xchd_a_xr0();
+	void xchd_a_xr1();
+	void xrl_a_r0();
+	void xrl_a_r1();
+	void xrl_a_r2();
+	void xrl_a_r3();
+	void xrl_a_r4();
+	void xrl_a_r5();
+	void xrl_a_r6();
+	void xrl_a_r7();
+	void xrl_a_xr0();
+	void xrl_a_xr1();
+	void xrl_a_n();
 };
 
 class i8021_device : public mcs48_cpu_device
 {
 public:
+	// configuration
+	auto p0_in_cb() { return bus_in_cb(); }
+	auto p0_out_cb() { return bus_out_cb(); }
+
 	// construction/destruction
 	i8021_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -620,7 +624,7 @@ public:
 class upi41_cpu_device : public mcs48_cpu_device
 {
 public:
-	/* functions for talking to the input/output buffers on the UPI41-class chips */
+	// functions for talking to the input/output buffers on the UPI41-class chips
 	uint8_t upi41_master_r(offs_t offset);
 	void upi41_master_w(offs_t offset, uint8_t data);
 
@@ -688,4 +692,4 @@ public:
 };
 
 
-#endif  // MAME_CPU_MCS48_MCS48_H
+#endif // MAME_CPU_MCS48_MCS48_H

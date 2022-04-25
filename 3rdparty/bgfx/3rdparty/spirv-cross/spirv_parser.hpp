@@ -1,5 +1,6 @@
 /*
- * Copyright 2018-2019 Arm Limited
+ * Copyright 2018-2021 Arm Limited
+ * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,6 +13,12 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ */
+
+/*
+ * At your option, you may choose to accept this material under either:
+ *  1. The Apache License, Version 2.0, found at <http://www.apache.org/licenses/LICENSE-2.0>, or
+ *  2. The MIT License, found at <http://opensource.org/licenses/MIT>.
  */
 
 #ifndef SPIRV_CROSS_PARSER_HPP
@@ -84,10 +91,10 @@ private:
 
 	// This must be an ordered data structure so we always pick the same type aliases.
 	SmallVector<uint32_t> global_struct_cache;
+	SmallVector<std::pair<uint32_t, uint32_t>> forward_pointer_fixups;
 
 	bool types_are_logically_equivalent(const SPIRType &a, const SPIRType &b) const;
 	bool variable_storage_is_aliased(const SPIRVariable &v) const;
-	void make_constant_null(uint32_t id, uint32_t type);
 };
 } // namespace SPIRV_CROSS_NAMESPACE
 

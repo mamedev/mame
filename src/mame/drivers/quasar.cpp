@@ -14,6 +14,7 @@
   - Phase 3 - seems awfully hard - dip settings ?
   - Hook up Coin Counter
   - Test/Service Mode - not working?
+  - No attract demo? is this correct?
 
 ************************************************************************
 
@@ -33,7 +34,6 @@ I8085 Sound Board
 #include "includes/quasar.h"
 #include "cpu/s2650/s2650.h"
 #include "cpu/mcs48/mcs48.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 /************************************************************************
@@ -46,17 +46,17 @@ I8085 Sound Board
 
 ************************************************************************/
 
-WRITE8_MEMBER(quasar_state::video_page_select_w)
+void quasar_state::video_page_select_w(offs_t offset, uint8_t data)
 {
 	m_page = offset & 0x03;
 }
 
-WRITE8_MEMBER(quasar_state::io_page_select_w)
+void quasar_state::io_page_select_w(offs_t offset, uint8_t data)
 {
 	m_io_page = offset & 0x03;
 }
 
-WRITE8_MEMBER(quasar_state::quasar_video_w)
+void quasar_state::quasar_video_w(offs_t offset, uint8_t data)
 {
 	switch (m_page)
 	{
@@ -67,7 +67,7 @@ WRITE8_MEMBER(quasar_state::quasar_video_w)
 	}
 }
 
-READ8_MEMBER(quasar_state::quasar_IO_r)
+uint8_t quasar_state::quasar_IO_r()
 {
 	uint8_t ans = 0;
 
@@ -82,12 +82,12 @@ READ8_MEMBER(quasar_state::quasar_IO_r)
 	return ans;
 }
 
-WRITE8_MEMBER(quasar_state::quasar_bullet_w)
+void quasar_state::quasar_bullet_w(offs_t offset, uint8_t data)
 {
 	m_bullet_ram[offset] = (data ^ 0xff);
 }
 
-WRITE8_MEMBER(quasar_state::quasar_sh_command_w)
+void quasar_state::quasar_sh_command_w(uint8_t data)
 {
 	// bit 4 = Sound Invader : Linked to an NE555V circuit
 	// Not handled yet
@@ -98,7 +98,7 @@ WRITE8_MEMBER(quasar_state::quasar_sh_command_w)
 	m_soundlatch->write((data & 8) + ((data >> 1) & 3) + ((data << 2) & 4));
 }
 
-READ8_MEMBER(quasar_state::quasar_sh_command_r)
+uint8_t quasar_state::quasar_sh_command_r()
 {
 	return m_soundlatch->read() + (ioport("DSW2")->read() & 0x30);
 }
@@ -196,9 +196,9 @@ static INPUT_PORTS_START( quasar )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x20, "5" )
 	PORT_DIPSETTING(    0x30, "6" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Free_Play ) ) // requires initial coin, but doesn't decrease coins on game over
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "Test Mode" )                 /* confirmed */
 	PORT_DIPSETTING(    0x00, "Collisions excluded" )
 	PORT_DIPSETTING(    0x80, "Collisions included" )
@@ -343,9 +343,6 @@ void quasar_state::quasar(machine_config &config)
 
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 ROM_START( quasar )

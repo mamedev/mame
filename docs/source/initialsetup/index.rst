@@ -1,7 +1,8 @@
 Getting MAME prepared
 ---------------------
 
-This section covers initial preparation work needed to use MAME, including downloading and compiling MAME.
+This section covers initial preparation work needed to use MAME, including
+downloading MAME, compiling MAME from source, and configuring MAME.
 
 .. toctree::
 	:titlesonly:
@@ -9,3 +10,4 @@ This section covers initial preparation work needed to use MAME, including downl
 	mameintro
 	installingmame
 	compilingmame
+	configuringmame

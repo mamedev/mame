@@ -494,51 +494,51 @@ license:CC0
 		</screen>
 
 		<!-- Button lamps -->
-		<bezel name="lamp8" element="CASHOUT" inputtag="P2" inputmask="0x01">
+		<element name="lamp8" ref="CASHOUT" inputtag="P2" inputmask="0x01">
 			<bounds x="0.27" y="3.02" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp9" element="1LINE" inputtag="P2" inputmask="0x02">
+		</element>
+		<element name="lamp9" ref="1LINE" inputtag="P2" inputmask="0x02">
 			<bounds x="0.68" y="3.02" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp10" element="5LINES" inputtag="P2" inputmask="0x04">
+		</element>
+		<element name="lamp10" ref="5LINES" inputtag="P2" inputmask="0x04">
 			<bounds x="1.09" y="3.02" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp11" element="10LINES" inputtag="P2" inputmask="0x08">
+		</element>
+		<element name="lamp11" ref="10LINES" inputtag="P2" inputmask="0x08">
 			<bounds x="1.51" y="3.02" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp12" element="15LINES" inputtag="P2" inputmask="0x10">
+		</element>
+		<element name="lamp12" ref="15LINES" inputtag="P2" inputmask="0x10">
 			<bounds x="1.91" y="3.02" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp13" element="20LINES" inputtag="P2" inputmask="0x20">
+		</element>
+		<element name="lamp13" ref="20LINES" inputtag="P2" inputmask="0x20">
 			<bounds x="2.32" y="3.02" width="0.3" height="0.3" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp7" element="SERVICE" inputtag="P1" inputmask="0x80">
+		<element name="lamp7" ref="SERVICE" inputtag="P1" inputmask="0x80">
 			<bounds x="0.27" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp5" element="BET1R" inputtag="P1" inputmask="0x20">
+		</element>
+		<element name="lamp5" ref="BET1R" inputtag="P1" inputmask="0x20">
 			<bounds x="1.09" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp4" element="BET2" inputtag="P1" inputmask="0x10">
+		</element>
+		<element name="lamp4" ref="BET2" inputtag="P1" inputmask="0x10">
 			<bounds x="1.51" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp3" element="BET3B" inputtag="P1" inputmask="0x08">
+		</element>
+		<element name="lamp3" ref="BET3B" inputtag="P1" inputmask="0x08">
 			<bounds x="1.91" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp0" element="GAMBLE" inputtag="P1" inputmask="0x01">
+		</element>
+		<element name="lamp0" ref="GAMBLE" inputtag="P1" inputmask="0x01">
 			<bounds x="2.73" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp1" element="TAKE_WIN" inputtag="P1" inputmask="0x02">
+		</element>
+		<element name="lamp1" ref="TAKE_WIN" inputtag="P1" inputmask="0x02">
 			<bounds x="3.14" y="3.43" width="0.3" height="0.3" />
-		</bezel>
+		</element>
 
 		<!-- Tower lamps -->
-		<bezel name="lamp17" element="WHITELAMP">
+		<element name="lamp17" ref="WHITELAMP">
 			<bounds x="3.68" y="3.31" width="0.10" height="0.10" />
-		</bezel>
-		<bezel name="lamp16" element="REDLAMP">
+		</element>
+		<element name="lamp16" ref="REDLAMP">
 			<bounds x="3.68" y="3.43" width="0.10" height="0.10" />
-		</bezel>
+		</element>
 	</view>
 
 	<view name="Button Lamps - 20 Lines, 5 Credits">
@@ -547,57 +547,57 @@ license:CC0
 		</screen>
 
 		<!-- Button lamps -->
-		<bezel name="lamp8" element="CASHOUT" inputtag="P2" inputmask="0x01">
+		<element name="lamp8" ref="CASHOUT" inputtag="P2" inputmask="0x01">
 			<bounds x="0.27" y="3.02" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp9" element="1LINE" inputtag="P2" inputmask="0x02">
+		</element>
+		<element name="lamp9" ref="1LINE" inputtag="P2" inputmask="0x02">
 			<bounds x="0.68" y="3.02" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp10" element="5LINES" inputtag="P2" inputmask="0x04">
+		</element>
+		<element name="lamp10" ref="5LINES" inputtag="P2" inputmask="0x04">
 			<bounds x="1.09" y="3.02" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp11" element="10LINES" inputtag="P2" inputmask="0x08">
+		</element>
+		<element name="lamp11" ref="10LINES" inputtag="P2" inputmask="0x08">
 			<bounds x="1.51" y="3.02" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp12" element="15LINES" inputtag="P2" inputmask="0x10">
+		</element>
+		<element name="lamp12" ref="15LINES" inputtag="P2" inputmask="0x10">
 			<bounds x="1.91" y="3.02" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp13" element="20LINES" inputtag="P2" inputmask="0x20">
+		</element>
+		<element name="lamp13" ref="20LINES" inputtag="P2" inputmask="0x20">
 			<bounds x="2.32" y="3.02" width="0.3" height="0.3" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp7" element="SERVICE" inputtag="P1" inputmask="0x80">
+		<element name="lamp7" ref="SERVICE" inputtag="P1" inputmask="0x80">
 			<bounds x="0.27" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp6" element="BET1R" inputtag="P1" inputmask="0x40">
+		</element>
+		<element name="lamp6" ref="BET1R" inputtag="P1" inputmask="0x40">
 			<bounds x="0.68" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp5" element="BET2" inputtag="P1" inputmask="0x20">
+		</element>
+		<element name="lamp5" ref="BET2" inputtag="P1" inputmask="0x20">
 			<bounds x="1.09" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp4" element="BET3" inputtag="P1" inputmask="0x10">
+		</element>
+		<element name="lamp4" ref="BET3" inputtag="P1" inputmask="0x10">
 			<bounds x="1.51" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp3" element="BET4" inputtag="P1" inputmask="0x08">
+		</element>
+		<element name="lamp3" ref="BET4" inputtag="P1" inputmask="0x08">
 			<bounds x="1.91" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp2" element="BET5B" inputtag="P1" inputmask="0x04">
+		</element>
+		<element name="lamp2" ref="BET5B" inputtag="P1" inputmask="0x04">
 			<bounds x="2.32" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp0" element="GAMBLE" inputtag="P1" inputmask="0x01">
+		</element>
+		<element name="lamp0" ref="GAMBLE" inputtag="P1" inputmask="0x01">
 			<bounds x="2.73" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp1" element="TAKE_WIN" inputtag="P1" inputmask="0x02">
+		</element>
+		<element name="lamp1" ref="TAKE_WIN" inputtag="P1" inputmask="0x02">
 			<bounds x="3.14" y="3.43" width="0.3" height="0.3" />
-		</bezel>
+		</element>
 
 		<!-- Tower lamps -->
-		<bezel name="lamp17" element="WHITELAMP">
+		<element name="lamp17" ref="WHITELAMP">
 			<bounds x="3.68" y="3.31" width="0.10" height="0.10" />
-		</bezel>
-		<bezel name="lamp16" element="REDLAMP">
+		</element>
+		<element name="lamp16" ref="REDLAMP">
 			<bounds x="3.68" y="3.43" width="0.10" height="0.10" />
-		</bezel>
+		</element>
 	</view>
 
 	<view name="Button Lamps - 20 Lines, 10 Credits">
@@ -606,57 +606,57 @@ license:CC0
 		</screen>
 
 		<!-- Button lamps -->
-		<bezel name="lamp8" element="CASHOUT" inputtag="P2" inputmask="0x01">
+		<element name="lamp8" ref="CASHOUT" inputtag="P2" inputmask="0x01">
 			<bounds x="0.27" y="3.02" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp9" element="1LINE" inputtag="P2" inputmask="0x02">
+		</element>
+		<element name="lamp9" ref="1LINE" inputtag="P2" inputmask="0x02">
 			<bounds x="0.68" y="3.02" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp10" element="5LINES" inputtag="P2" inputmask="0x04">
+		</element>
+		<element name="lamp10" ref="5LINES" inputtag="P2" inputmask="0x04">
 			<bounds x="1.09" y="3.02" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp11" element="10LINES" inputtag="P2" inputmask="0x08">
+		</element>
+		<element name="lamp11" ref="10LINES" inputtag="P2" inputmask="0x08">
 			<bounds x="1.51" y="3.02" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp12" element="15LINES" inputtag="P2" inputmask="0x10">
+		</element>
+		<element name="lamp12" ref="15LINES" inputtag="P2" inputmask="0x10">
 			<bounds x="1.91" y="3.02" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp13" element="20LINES" inputtag="P2" inputmask="0x20">
+		</element>
+		<element name="lamp13" ref="20LINES" inputtag="P2" inputmask="0x20">
 			<bounds x="2.32" y="3.02" width="0.3" height="0.3" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp7" element="SERVICE" inputtag="P1" inputmask="0x80">
+		<element name="lamp7" ref="SERVICE" inputtag="P1" inputmask="0x80">
 			<bounds x="0.27" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp6" element="BET1R" inputtag="P1" inputmask="0x40">
+		</element>
+		<element name="lamp6" ref="BET1R" inputtag="P1" inputmask="0x40">
 			<bounds x="0.68" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp5" element="BET2" inputtag="P1" inputmask="0x20">
+		</element>
+		<element name="lamp5" ref="BET2" inputtag="P1" inputmask="0x20">
 			<bounds x="1.09" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp4" element="BET3" inputtag="P1" inputmask="0x10">
+		</element>
+		<element name="lamp4" ref="BET3" inputtag="P1" inputmask="0x10">
 			<bounds x="1.51" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp3" element="BET5" inputtag="P1" inputmask="0x08">
+		</element>
+		<element name="lamp3" ref="BET5" inputtag="P1" inputmask="0x08">
 			<bounds x="1.91" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp2" element="BET10B" inputtag="P1" inputmask="0x04">
+		</element>
+		<element name="lamp2" ref="BET10B" inputtag="P1" inputmask="0x04">
 			<bounds x="2.32" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp0" element="GAMBLE" inputtag="P1" inputmask="0x01">
+		</element>
+		<element name="lamp0" ref="GAMBLE" inputtag="P1" inputmask="0x01">
 			<bounds x="2.73" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp1" element="TAKE_WIN" inputtag="P1" inputmask="0x02">
+		</element>
+		<element name="lamp1" ref="TAKE_WIN" inputtag="P1" inputmask="0x02">
 			<bounds x="3.14" y="3.43" width="0.3" height="0.3" />
-		</bezel>
+		</element>
 
 		<!-- Tower lamps -->
-		<bezel name="lamp17" element="WHITELAMP">
+		<element name="lamp17" ref="WHITELAMP">
 			<bounds x="3.68" y="3.31" width="0.10" height="0.10" />
-		</bezel>
-		<bezel name="lamp16" element="REDLAMP">
+		</element>
+		<element name="lamp16" ref="REDLAMP">
 			<bounds x="3.68" y="3.43" width="0.10" height="0.10" />
-		</bezel>
+		</element>
 	</view>
 
 	<view name="Button Lamps - 20 Lines, 20 Credits">
@@ -665,57 +665,57 @@ license:CC0
 		</screen>
 
 		<!-- Button lamps -->
-		<bezel name="lamp8" element="CASHOUT" inputtag="P2" inputmask="0x01">
+		<element name="lamp8" ref="CASHOUT" inputtag="P2" inputmask="0x01">
 			<bounds x="0.27" y="3.02" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp9" element="1LINE" inputtag="P2" inputmask="0x02">
+		</element>
+		<element name="lamp9" ref="1LINE" inputtag="P2" inputmask="0x02">
 			<bounds x="0.68" y="3.02" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp10" element="5LINES" inputtag="P2" inputmask="0x04">
+		</element>
+		<element name="lamp10" ref="5LINES" inputtag="P2" inputmask="0x04">
 			<bounds x="1.09" y="3.02" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp11" element="10LINES" inputtag="P2" inputmask="0x08">
+		</element>
+		<element name="lamp11" ref="10LINES" inputtag="P2" inputmask="0x08">
 			<bounds x="1.51" y="3.02" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp12" element="15LINES" inputtag="P2" inputmask="0x10">
+		</element>
+		<element name="lamp12" ref="15LINES" inputtag="P2" inputmask="0x10">
 			<bounds x="1.91" y="3.02" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp13" element="20LINES" inputtag="P2" inputmask="0x20">
+		</element>
+		<element name="lamp13" ref="20LINES" inputtag="P2" inputmask="0x20">
 			<bounds x="2.32" y="3.02" width="0.3" height="0.3" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp7" element="SERVICE" inputtag="P1" inputmask="0x80">
+		<element name="lamp7" ref="SERVICE" inputtag="P1" inputmask="0x80">
 			<bounds x="0.27" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp6" element="BET1R" inputtag="P1" inputmask="0x40">
+		</element>
+		<element name="lamp6" ref="BET1R" inputtag="P1" inputmask="0x40">
 			<bounds x="0.68" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp5" element="BET2" inputtag="P1" inputmask="0x20">
+		</element>
+		<element name="lamp5" ref="BET2" inputtag="P1" inputmask="0x20">
 			<bounds x="1.09" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp4" element="BET3" inputtag="P1" inputmask="0x10">
+		</element>
+		<element name="lamp4" ref="BET3" inputtag="P1" inputmask="0x10">
 			<bounds x="1.51" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp3" element="BET5" inputtag="P1" inputmask="0x08">
+		</element>
+		<element name="lamp3" ref="BET5" inputtag="P1" inputmask="0x08">
 			<bounds x="1.91" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp2" element="BET20B" inputtag="P1" inputmask="0x04">
+		</element>
+		<element name="lamp2" ref="BET20B" inputtag="P1" inputmask="0x04">
 			<bounds x="2.32" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp0" element="GAMBLE" inputtag="P1" inputmask="0x01">
+		</element>
+		<element name="lamp0" ref="GAMBLE" inputtag="P1" inputmask="0x01">
 			<bounds x="2.73" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp1" element="TAKE_WIN" inputtag="P1" inputmask="0x02">
+		</element>
+		<element name="lamp1" ref="TAKE_WIN" inputtag="P1" inputmask="0x02">
 			<bounds x="3.14" y="3.43" width="0.3" height="0.3" />
-		</bezel>
+		</element>
 
 		<!-- Tower lamps -->
-		<bezel name="lamp17" element="WHITELAMP">
+		<element name="lamp17" ref="WHITELAMP">
 			<bounds x="3.68" y="3.31" width="0.10" height="0.10" />
-		</bezel>
-		<bezel name="lamp16" element="REDLAMP">
+		</element>
+		<element name="lamp16" ref="REDLAMP">
 			<bounds x="3.68" y="3.43" width="0.10" height="0.10" />
-		</bezel>
+		</element>
 	</view>
 
 	<view name="Button Lamps - 20 Lines, 25 Credits">
@@ -724,57 +724,57 @@ license:CC0
 		</screen>
 
 		<!-- Button lamps -->
-		<bezel name="lamp8" element="CASHOUT" inputtag="P2" inputmask="0x01">
+		<element name="lamp8" ref="CASHOUT" inputtag="P2" inputmask="0x01">
 			<bounds x="0.27" y="3.02" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp9" element="1LINE" inputtag="P2" inputmask="0x02">
+		</element>
+		<element name="lamp9" ref="1LINE" inputtag="P2" inputmask="0x02">
 			<bounds x="0.68" y="3.02" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp10" element="5LINES" inputtag="P2" inputmask="0x04">
+		</element>
+		<element name="lamp10" ref="5LINES" inputtag="P2" inputmask="0x04">
 			<bounds x="1.09" y="3.02" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp11" element="10LINES" inputtag="P2" inputmask="0x08">
+		</element>
+		<element name="lamp11" ref="10LINES" inputtag="P2" inputmask="0x08">
 			<bounds x="1.51" y="3.02" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp12" element="15LINES" inputtag="P2" inputmask="0x10">
+		</element>
+		<element name="lamp12" ref="15LINES" inputtag="P2" inputmask="0x10">
 			<bounds x="1.91" y="3.02" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp13" element="20LINES" inputtag="P2" inputmask="0x20">
+		</element>
+		<element name="lamp13" ref="20LINES" inputtag="P2" inputmask="0x20">
 			<bounds x="2.32" y="3.02" width="0.3" height="0.3" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp7" element="SERVICE" inputtag="P1" inputmask="0x80">
+		<element name="lamp7" ref="SERVICE" inputtag="P1" inputmask="0x80">
 			<bounds x="0.27" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp6" element="BET1R" inputtag="P1" inputmask="0x40">
+		</element>
+		<element name="lamp6" ref="BET1R" inputtag="P1" inputmask="0x40">
 			<bounds x="0.68" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp5" element="BET2" inputtag="P1" inputmask="0x20">
+		</element>
+		<element name="lamp5" ref="BET2" inputtag="P1" inputmask="0x20">
 			<bounds x="1.09" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp4" element="BET3" inputtag="P1" inputmask="0x10">
+		</element>
+		<element name="lamp4" ref="BET3" inputtag="P1" inputmask="0x10">
 			<bounds x="1.51" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp3" element="BET5" inputtag="P1" inputmask="0x08">
+		</element>
+		<element name="lamp3" ref="BET5" inputtag="P1" inputmask="0x08">
 			<bounds x="1.91" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp2" element="BET25B" inputtag="P1" inputmask="0x04">
+		</element>
+		<element name="lamp2" ref="BET25B" inputtag="P1" inputmask="0x04">
 			<bounds x="2.32" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp0" element="GAMBLE" inputtag="P1" inputmask="0x01">
+		</element>
+		<element name="lamp0" ref="GAMBLE" inputtag="P1" inputmask="0x01">
 			<bounds x="2.73" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp1" element="TAKE_WIN" inputtag="P1" inputmask="0x02">
+		</element>
+		<element name="lamp1" ref="TAKE_WIN" inputtag="P1" inputmask="0x02">
 			<bounds x="3.14" y="3.43" width="0.3" height="0.3" />
-		</bezel>
+		</element>
 
 		<!-- Tower lamps -->
-		<bezel name="lamp17" element="WHITELAMP">
+		<element name="lamp17" ref="WHITELAMP">
 			<bounds x="3.68" y="3.31" width="0.10" height="0.10" />
-		</bezel>
-		<bezel name="lamp16" element="REDLAMP">
+		</element>
+		<element name="lamp16" ref="REDLAMP">
 			<bounds x="3.68" y="3.43" width="0.10" height="0.10" />
-		</bezel>
+		</element>
 	</view>
 
 	<view name="Button Lamps - 20 Lines, 50 Credits">
@@ -783,62 +783,56 @@ license:CC0
 		</screen>
 
 		<!-- Button lamps -->
-		<bezel name="lamp8" element="CASHOUT" inputtag="P2" inputmask="0x01">
+		<element name="lamp8" ref="CASHOUT" inputtag="P2" inputmask="0x01">
 			<bounds x="0.27" y="3.02" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp9" element="1LINE" inputtag="P2" inputmask="0x02">
+		</element>
+		<element name="lamp9" ref="1LINE" inputtag="P2" inputmask="0x02">
 			<bounds x="0.68" y="3.02" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp10" element="5LINES" inputtag="P2" inputmask="0x04">
+		</element>
+		<element name="lamp10" ref="5LINES" inputtag="P2" inputmask="0x04">
 			<bounds x="1.09" y="3.02" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp11" element="10LINES" inputtag="P2" inputmask="0x08">
+		</element>
+		<element name="lamp11" ref="10LINES" inputtag="P2" inputmask="0x08">
 			<bounds x="1.51" y="3.02" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp12" element="15LINES" inputtag="P2" inputmask="0x10">
+		</element>
+		<element name="lamp12" ref="15LINES" inputtag="P2" inputmask="0x10">
 			<bounds x="1.91" y="3.02" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp13" element="20LINES" inputtag="P2" inputmask="0x20">
+		</element>
+		<element name="lamp13" ref="20LINES" inputtag="P2" inputmask="0x20">
 			<bounds x="2.32" y="3.02" width="0.3" height="0.3" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp7" element="SERVICE" inputtag="P1" inputmask="0x80">
+		<element name="lamp7" ref="SERVICE" inputtag="P1" inputmask="0x80">
 			<bounds x="0.27" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp6" element="BET1R" inputtag="P1" inputmask="0x40">
+		</element>
+		<element name="lamp6" ref="BET1R" inputtag="P1" inputmask="0x40">
 			<bounds x="0.68" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp5" element="BET5" inputtag="P1" inputmask="0x20">
+		</element>
+		<element name="lamp5" ref="BET5" inputtag="P1" inputmask="0x20">
 			<bounds x="1.09" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp4" element="BET10" inputtag="P1" inputmask="0x10">
+		</element>
+		<element name="lamp4" ref="BET10" inputtag="P1" inputmask="0x10">
 			<bounds x="1.51" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp3" element="BET25" inputtag="P1" inputmask="0x08">
+		</element>
+		<element name="lamp3" ref="BET25" inputtag="P1" inputmask="0x08">
 			<bounds x="1.91" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp2" element="BET50B" inputtag="P1" inputmask="0x04">
+		</element>
+		<element name="lamp2" ref="BET50B" inputtag="P1" inputmask="0x04">
 			<bounds x="2.32" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp0" element="GAMBLE" inputtag="P1" inputmask="0x01">
+		</element>
+		<element name="lamp0" ref="GAMBLE" inputtag="P1" inputmask="0x01">
 			<bounds x="2.73" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp1" element="TAKE_WIN" inputtag="P1" inputmask="0x02">
+		</element>
+		<element name="lamp1" ref="TAKE_WIN" inputtag="P1" inputmask="0x02">
 			<bounds x="3.14" y="3.43" width="0.3" height="0.3" />
-		</bezel>
+		</element>
 
 		<!-- Tower lamps -->
-		<bezel name="lamp17" element="WHITELAMP">
+		<element name="lamp17" ref="WHITELAMP">
 			<bounds x="3.68" y="3.31" width="0.10" height="0.10" />
-		</bezel>
-		<bezel name="lamp16" element="REDLAMP">
+		</element>
+		<element name="lamp16" ref="REDLAMP">
 			<bounds x="3.68" y="3.43" width="0.10" height="0.10" />
-		</bezel>
-	</view>
-
-	<view name="Screen">
-		<screen index="0">
-			<bounds left="0" top="0" right="4" bottom="3" />
-		</screen>
+		</element>
 	</view>
 </mamelayout>

@@ -27,7 +27,7 @@
 #include "cpu/m6809/konami.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
 
 #include "chqflag.lh"

@@ -44,12 +44,12 @@ private:
 	TIMER_CALLBACK_MEMBER(scanline_interrupt);
 	void scanline_int_ack_w(uint16_t data);
 
-	DECLARE_WRITE16_MEMBER(interrupt_scan_w);
-	DECLARE_WRITE16_MEMBER(paletteram_w);
-	DECLARE_WRITE16_MEMBER(intensity_w);
-	DECLARE_WRITE16_MEMBER(xscroll_w);
-	DECLARE_WRITE16_MEMBER(yscroll_w);
-	DECLARE_WRITE16_MEMBER(slip_w);
+	void interrupt_scan_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void intensity_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void xscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void yscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void slip_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
@@ -72,10 +72,10 @@ private:
 	required_shared_ptr<uint16_t> m_xscroll;
 	required_shared_ptr<uint16_t> m_yscroll;
 
-	double          m_brightness;
+	double          m_brightness = 0;
 	bitmap_ind16 m_pfbitmap;
 
-	emu_timer *m_scanline_interrupt_timer;
+	emu_timer *m_scanline_interrupt_timer = nullptr;
 
 	static const atari_motion_objects_config s_mob_config;
 };

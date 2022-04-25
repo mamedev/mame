@@ -168,7 +168,7 @@ void msm6242_device::device_post_load()
 //  fires
 //-------------------------------------------------
 
-void msm6242_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void msm6242_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{
@@ -325,11 +325,11 @@ void msm6242_device::update_timer()
 		{
 			case IRQ_HOUR:
 				callback_ticks += (59 - get_clock_register(RTC_MINUTE)) * (0x8000 * 60);
-				// fall through
+				[[fallthrough]];
 
 			case IRQ_MINUTE:
 				callback_ticks += (59 - get_clock_register(RTC_SECOND)) * 0x8000;
-				// fall through
+				[[fallthrough]];
 
 			case IRQ_SECOND:
 				callback_ticks += 0x8000 - m_tick;

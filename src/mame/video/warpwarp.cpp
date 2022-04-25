@@ -222,13 +222,13 @@ VIDEO_START_MEMBER(warpwarp_state,warpwarp)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(warpwarp_state::geebee_videoram_w)
+void warpwarp_state::geebee_videoram_w(offs_t offset, uint8_t data)
 {
 	m_geebee_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(warpwarp_state::warpwarp_videoram_w)
+void warpwarp_state::warpwarp_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
@@ -245,7 +245,7 @@ WRITE8_MEMBER(warpwarp_state::warpwarp_videoram_w)
 inline void warpwarp_state::plot(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, pen_t pen)
 {
 	if (cliprect.contains(x, y))
-		bitmap.pix16(y, x) = pen;
+		bitmap.pix(y, x) = pen;
 }
 
 void warpwarp_state::draw_ball(bitmap_ind16 &bitmap, const rectangle &cliprect,pen_t pen)

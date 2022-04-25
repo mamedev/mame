@@ -159,7 +159,7 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
 
 
@@ -209,7 +209,7 @@ void wwfsstar_state::sound_map(address_map &map)
  as used by the above memory map
 *******************************************************************************/
 
-WRITE16_MEMBER(wwfsstar_state::scroll_w)
+void wwfsstar_state::scroll_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -222,12 +222,12 @@ WRITE16_MEMBER(wwfsstar_state::scroll_w)
 	}
 }
 
-WRITE16_MEMBER(wwfsstar_state::flipscreen_w)
+void wwfsstar_state::flipscreen_w(uint16_t data)
 {
 	flip_screen_set(data & 1);
 }
 
-WRITE16_MEMBER(wwfsstar_state::irqack_w)
+void wwfsstar_state::irqack_w(offs_t offset, uint16_t data)
 {
 	if (offset == 0)
 		m_maincpu->set_input_line(6, CLEAR_LINE);

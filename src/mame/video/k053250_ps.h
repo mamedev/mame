@@ -33,11 +33,11 @@ public:
 	}
 	auto dmairq_cb() { return m_dmairq_cb.bind(); }
 
-	DECLARE_READ16_MEMBER(reg_r);
-	DECLARE_WRITE16_MEMBER(reg_w);
-	DECLARE_READ16_MEMBER(ram_r);
-	DECLARE_WRITE16_MEMBER(ram_w);
-	DECLARE_READ16_MEMBER(rom_r);
+	uint16_t reg_r(offs_t offset);
+	void reg_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t rom_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 	DECLARE_READ_LINE_MEMBER(dmairq_r);
 
@@ -45,7 +45,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -58,21 +58,21 @@ private:
 	};
 
 	devcb_write_line m_dmairq_cb;
-	int m_timer_lvcdma_state;
-	bool m_dmairq_on;
+	int m_timer_lvcdma_state = 0;
+	bool m_dmairq_on = false;
 
 	// configuration
 	int m_offx, m_offy;
 
-	emu_timer *m_timer_lvcdma;
+	emu_timer *m_timer_lvcdma = nullptr;
 
 	// internal state
 	required_region_ptr<uint8_t> m_rom;
 	std::vector<uint8_t> m_unpacked_rom;
 	std::vector<uint16_t> m_ram;
-	uint16_t *m_buffer[2];
-	uint8_t m_regs[8];
-	uint8_t m_page;
+	uint16_t *m_buffer[2]{};
+	uint8_t m_regs[8]{};
+	uint8_t m_page = 0;
 
 	// internal helpers
 	void unpack_nibbles();

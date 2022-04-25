@@ -6,7 +6,7 @@ $output v_texcoord0, v_texcoord1, v_texcoord2, v_color0
 
 /*
    Hyllian's xBR LV2 - noblend - pass1 Shader
-  
+
    Copyright (C) 2011-2015 Hyllian - sergiogdb@gmail.com
 
    Permission is hereby granted, free of charge, to any person obtaining a copy

@@ -7,11 +7,10 @@
 
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "sound/okim6295.h"
-#include "sound/3812intf.h"
-#include "sound/okim6295.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "emupal.h"
 #include "tilemap.h"
+#include "video/bufsprite.h"
 
 class drgnmst_base_state : public driver_device
 {
@@ -42,11 +41,11 @@ protected:
 	required_device<cpu_device> m_maincpu;
 
 	/* video-related */
-	tilemap_t     *m_bg_tilemap;
-	tilemap_t     *m_fg_tilemap;
-	tilemap_t     *m_md_tilemap;
+	tilemap_t     *m_bg_tilemap = nullptr;
+	tilemap_t     *m_fg_tilemap = nullptr;
+	tilemap_t     *m_md_tilemap = nullptr;
 
-	bool m_alt_scrolling;
+	bool m_alt_scrolling = false;
 
 private:
 	/* memory pointers */
@@ -56,7 +55,7 @@ private:
 	required_shared_ptr<uint16_t> m_md_videoram;
 	required_shared_ptr<uint16_t> m_rowscrollram;
 	required_shared_ptr<uint16_t> m_vidregs2;
-	required_shared_ptr<uint16_t> m_spriteram;
+	required_device<buffered_spriteram16_device> m_spriteram;
 
 	/* devices */
 	void coin_w(uint16_t data);
@@ -104,12 +103,12 @@ private:
 	optional_device_array<okim6295_device, 2> m_oki;
 
 	/* misc */
-	uint8_t       m_snd_command;
-	uint16_t      m_snd_flag;
-	uint8_t       m_oki_control;
-	uint8_t       m_oki_command;
-	uint8_t       m_pic16c5x_port0;
-	uint8_t       m_oki_bank[2];
+	uint8_t       m_snd_command = 0U;
+	uint16_t      m_snd_flag = 0U;
+	uint8_t       m_oki_control = 0U;
+	uint8_t       m_oki_command = 0U;
+	uint8_t       m_pic16c5x_port0 = 0U;
+	uint8_t       m_oki_bank[2]{};
 
 	void snd_command_w(uint8_t data);
 	void snd_flag_w(uint8_t data);

@@ -468,6 +468,13 @@ static INPUT_PORTS_START( btime3 ) // Used for btime3 and btimem
 	PORT_DIPSETTING(    0x00, "Sound Test Only" )
 	PORT_DIPSETTING(    0x10, "Cross Hatch Only" )
 	PORT_DIPSETTING(    0x20, "Normal Test" )  // Use Coin A to advance the tests
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:2,3")
+	PORT_DIPSETTING(    0x06, "30000" )
+	PORT_DIPSETTING(    0x04, "50000" )
+	PORT_DIPSETTING(    0x02, "80000"  )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cookrace )
@@ -1123,17 +1130,6 @@ static INPUT_PORTS_START( sdtennis )
 	// and the coinage DIP switches are ignored in this case
 INPUT_PORTS_END
 
-static const gfx_layout tile8layout =
-{
-	8,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	8*8
-};
-
 static const gfx_layout disco_tile8layout =
 {
 	8,8,
@@ -1180,32 +1176,32 @@ static const gfx_layout bnj_tile16layout =
 };
 
 static GFXDECODE_START( gfx_btime )
-	GFXDECODE_ENTRY( "gfx1", 0, tile8layout,     0, 1 ) /* char set #1 */
-	GFXDECODE_ENTRY( "gfx1", 0, tile16layout,    0, 1 ) /* sprites */
-	GFXDECODE_ENTRY( "gfx2", 0, tile16layout,    8, 1 ) /* background tiles */
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar, 0, 1 ) /* char set #1 */
+	GFXDECODE_ENTRY( "gfx1", 0, tile16layout,     0, 1 ) /* sprites */
+	GFXDECODE_ENTRY( "gfx2", 0, tile16layout,     8, 1 ) /* background tiles */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_cookrace )
-	GFXDECODE_ENTRY( "gfx1", 0, tile8layout,     0, 1 ) /* char set #1 */
-	GFXDECODE_ENTRY( "gfx1", 0, tile16layout,    0, 1 ) /* sprites */
-	GFXDECODE_ENTRY( "gfx2", 0, tile8layout,     8, 1 ) /* background tiles */
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar, 0, 1 ) /* char set #1 */
+	GFXDECODE_ENTRY( "gfx1", 0, tile16layout,     0, 1 ) /* sprites */
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x3_planar, 8, 1 ) /* background tiles */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_lnc )
-	GFXDECODE_ENTRY( "gfx1", 0, tile8layout,     0, 1 ) /* char set #1 */
-	GFXDECODE_ENTRY( "gfx1", 0, tile16layout,    0, 1 ) /* sprites */
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar, 0, 1 ) /* char set #1 */
+	GFXDECODE_ENTRY( "gfx1", 0, tile16layout,     0, 1 ) /* sprites */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_bnj )
-	GFXDECODE_ENTRY( "gfx1", 0, tile8layout,     0, 1 ) /* char set #1 */
-	GFXDECODE_ENTRY( "gfx1", 0, tile16layout,    0, 1 ) /* sprites */
-	GFXDECODE_ENTRY( "gfx2", 0, bnj_tile16layout,8, 1 ) /* background tiles */
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar, 0, 1 ) /* char set #1 */
+	GFXDECODE_ENTRY( "gfx1", 0, tile16layout,     0, 1 ) /* sprites */
+	GFXDECODE_ENTRY( "gfx2", 0, bnj_tile16layout, 8, 1 ) /* background tiles */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_zoar )
-	GFXDECODE_ENTRY( "gfx1", 0, tile8layout,     0, 8 ) /* char set #1 */
-	GFXDECODE_ENTRY( "gfx3", 0, tile16layout,    0, 8 ) /* sprites */
-	GFXDECODE_ENTRY( "gfx2", 0, tile16layout,    0, 8 ) /* background tiles */
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar, 0, 8 ) /* char set #1 */
+	GFXDECODE_ENTRY( "gfx3", 0, tile16layout,     0, 8 ) /* sprites */
+	GFXDECODE_ENTRY( "gfx2", 0, tile16layout,     0, 8 ) /* background tiles */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_disco )
@@ -1807,7 +1803,7 @@ ROM_END
 
 ROM_START( wtennis )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ten14.h4",     0xc000, 0x1000, CRC(f7b27303) SHA1(043476429bcc8def412f77d1f79a01586d984bfc) )
+	ROM_LOAD( "ten14.h4",     0xc000, 0x0800, CRC(fd343474) SHA1(1e1fd3f20ce1c7533767344f924029c8c62139a1) )
 	ROM_LOAD( "ten4.d4",      0xd000, 0x1000, CRC(e465d82c) SHA1(c357dcf17539150425574985afa559db2e6ab834) ) // was t4
 	ROM_LOAD( "ten3.c4",      0xe000, 0x1000, CRC(8f090eab) SHA1(baeef8ee05010bf44cf8865a22911f3d458df1b0) ) // was t3
 	ROM_LOAD( "ten2.a4",      0xf000, 0x1000, CRC(d2f9dd30) SHA1(1faa088806e8627b5e561d8b99054d295045dcfb) ) // was t2
@@ -2158,8 +2154,7 @@ void btime_state::init_disco()
 
 void btime_state::init_cookrace()
 {
-	m_audiocpu->space(AS_PROGRAM).install_read_bank(0x0200, 0x0fff, "bank10");
-	membank("bank10")->set_base(memregion("audiocpu")->base() + 0xe200);
+	m_audiocpu->space(AS_PROGRAM).install_rom(0x0200, 0x0fff, memregion("audiocpu")->base() + 0xe200);
 	m_audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
 }
 
@@ -2173,8 +2168,7 @@ void btime_state::init_wtennis()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc15f, 0xc15f, read8smo_delegate(*this, FUNC(btime_state::wtennis_reset_hack_r)));
 
-	m_audiocpu->space(AS_PROGRAM).install_read_bank(0x0200, 0x0fff, "bank10");
-	membank("bank10")->set_base(memregion("audiocpu")->base() + 0xe200);
+	m_audiocpu->space(AS_PROGRAM).install_rom(0x0200, 0x0fff, memregion("audiocpu")->base() + 0xe200);
 	m_audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
 }
 

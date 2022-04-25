@@ -80,7 +80,7 @@ void elf2_state::elf2_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x0000, 0x00ff).bankrw("bank1");
+	// Ram is added dynamically
 }
 
 void elf2_state::elf2_io(address_map &map)
@@ -212,10 +212,8 @@ void elf2_state::machine_start()
 	m_led_h->rbi_w(1);
 
 	/* setup memory banking */
-	program.install_read_bank(0x0000, 0x00ff, "bank1");
+	program.install_rom(0x0000, 0x00ff, m_ram->pointer());
 	program.install_write_handler(0x0000, 0x00ff, write8sm_delegate(*this, FUNC(elf2_state::memory_w)));
-	membank("bank1")->configure_entry(0, m_ram->pointer());
-	membank("bank1")->set_entry(0);
 
 	/* register for state saving */
 	save_item(NAME(m_data));

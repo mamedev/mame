@@ -52,22 +52,22 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	uint8_t m_sound_latch;
-	uint8_t m_LS74_clr;
-	uint8_t m_LS74_q;
-	uint8_t m_gain_control;
-	emu_timer *m_interrupt_timer;
-	int m_flipscreen;
+	uint8_t m_sound_latch = 0;
+	uint8_t m_LS74_clr = 0;
+	uint8_t m_LS74_q = 0;
+	uint8_t m_gain_control = 0;
+	emu_timer *m_interrupt_timer = nullptr;
+	uint8_t m_flipscreen = 0;
 	std::unique_ptr<uint32_t[]> m_prom_tab;
 	bitmap_ind16 m_bitmap;
 
-	DECLARE_WRITE16_MEMBER(cpu_irq_ack_w);
-	DECLARE_READ8_MEMBER(sound_r);
-	DECLARE_WRITE16_MEMBER(vreg_w);
+	void cpu_irq_ack_w(uint16_t data);
+	uint8_t sound_r();
+	void vreg_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void ay8910_portB_0_w(uint8_t data);
 	void ay8910_portA_0_w(uint8_t data);
 
-	void magmax_palette(palette_device &palette) const;
+	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 

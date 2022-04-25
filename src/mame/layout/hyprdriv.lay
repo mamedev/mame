@@ -92,96 +92,96 @@ license:CC0
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
 
-		<bezel name="lamp0" element="start" inputtag="SYSTEM" inputmask="0x04">
+		<element name="lamp0" ref="start" inputtag="SYSTEM" inputmask="0x04">
 			<bounds x="3.60" y="3.1" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp2" element="view1" inputtag="IN1" inputmask="0x10">
+		</element>
+		<element name="lamp2" ref="view1" inputtag="IN1" inputmask="0x10">
 			<bounds x="0.025" y="3.025" width="0.125" height="0.125" />
-		</bezel>
-		<bezel name="lamp1" element="view2" inputtag="IN1" inputmask="0x20">
+		</element>
+		<element name="lamp1" ref="view2" inputtag="IN1" inputmask="0x20">
 			<bounds x="0.025" y="3.175" width="0.125" height="0.125" />
-		</bezel>
-		<bezel name="lamp3" element="view3" inputtag="IN1" inputmask="0x40">
+		</element>
+		<element name="lamp3" ref="view3" inputtag="IN1" inputmask="0x40">
 			<bounds x="0.025" y="3.325" width="0.125" height="0.125" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp4" element="lamp">
+		<element name="lamp4" ref="lamp">
 			<bounds x="1.785" y="3.2" width="0.1" height="0.1" />
-		</bezel>
-		<bezel name="lamp5" element="lamp">
+		</element>
+		<element name="lamp5" ref="lamp">
 			<bounds x="1.895" y="3.2" width="0.1" height="0.1" />
-		</bezel>
-		<bezel name="lamp6" element="lamp">
+		</element>
+		<element name="lamp6" ref="lamp">
 			<bounds x="2.005" y="3.2" width="0.1" height="0.1" />
-		</bezel>
-		<bezel name="lamp7" element="lamp">
+		</element>
+		<element name="lamp7" ref="lamp">
 			<bounds x="2.115" y="3.2" width="0.1" height="0.1" />
-		</bezel>
+		</element>
 
-		<bezel name="led4" element="led">
+		<element name="led4" ref="led">
 			<bounds x="3.43" y="3.025" width="0.025" height="0.025" />
-		</bezel>
-		<bezel name="led3" element="led">
+		</element>
+		<element name="led3" ref="led">
 			<bounds x="3.46" y="3.025" width="0.025" height="0.025" />
-		</bezel>
-		<bezel name="led2" element="led">
+		</element>
+		<element name="led2" ref="led">
 			<bounds x="3.49" y="3.025" width="0.025" height="0.025" />
-		</bezel>
-		<bezel name="led1" element="led">
+		</element>
+		<element name="led1" ref="led">
 			<bounds x="3.52" y="3.025" width="0.025" height="0.025" />
-		</bezel>
-		<bezel name="led0" element="led">
+		</element>
+		<element name="led0" ref="led">
 			<bounds x="3.55" y="3.025" width="0.025" height="0.025" />
-		</bezel>
+		</element>
 
-		<bezel name="led9" element="led">
+		<element name="led9" ref="led">
 			<bounds x="3.43" y="3.055" width="0.025" height="0.025" />
-		</bezel>
-		<bezel name="led8" element="led">
+		</element>
+		<element name="led8" ref="led">
 			<bounds x="3.46" y="3.055" width="0.025" height="0.025" />
-		</bezel>
-		<bezel name="led7" element="led">
+		</element>
+		<element name="led7" ref="led">
 			<bounds x="3.49" y="3.055" width="0.025" height="0.025" />
-		</bezel>
-		<bezel name="led6" element="led">
+		</element>
+		<element name="led6" ref="led">
 			<bounds x="3.52" y="3.055" width="0.025" height="0.025" />
-		</bezel>
-		<bezel name="led5" element="led">
+		</element>
+		<element name="led5" ref="led">
 			<bounds x="3.55" y="3.055" width="0.025" height="0.025" />
-		</bezel>
+		</element>
 
-		<bezel name="led10" element="led">
+		<element name="led10" ref="led">
 			<bounds x="3.325" y="3.085" width="0.025" height="0.025" />
-		</bezel>
+		</element>
 
-		<bezel name="led11" element="led">
+		<element name="led11" ref="led">
 			<bounds x="3.295" y="3.115" width="0.025" height="0.025" />
-		</bezel>
-		<bezel name="led12" element="led">
+		</element>
+		<element name="led12" ref="led">
 			<bounds x="3.325" y="3.115" width="0.025" height="0.025" />
-		</bezel>
-		<bezel name="led13" element="led">
+		</element>
+		<element name="led13" ref="led">
 			<bounds x="3.355" y="3.115" width="0.025" height="0.025" />
-		</bezel>
+		</element>
 
-		<bezel name="led14" element="led">
+		<element name="led14" ref="led">
 			<bounds x="3.295" y="3.145" width="0.025" height="0.025" />
-		</bezel>
-		<bezel name="led15" element="led">
+		</element>
+		<element name="led15" ref="led">
 			<bounds x="3.325" y="3.145" width="0.025" height="0.025" />
-		</bezel>
-		<bezel name="led16" element="led">
+		</element>
+		<element name="led16" ref="led">
 			<bounds x="3.355" y="3.145" width="0.025" height="0.025" />
-		</bezel>
+		</element>
 
-		<bezel name="led17" element="led">
+		<element name="led17" ref="led">
 			<bounds x="3.295" y="3.175" width="0.025" height="0.025" />
-		</bezel>
-		<bezel name="led18" element="led">
+		</element>
+		<element name="led18" ref="led">
 			<bounds x="3.325" y="3.175" width="0.025" height="0.025" />
-		</bezel>
-		<bezel name="led19" element="led">
+		</element>
+		<element name="led19" ref="led">
 			<bounds x="3.355" y="3.175" width="0.025" height="0.025" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

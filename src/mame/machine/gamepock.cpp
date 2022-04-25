@@ -154,14 +154,14 @@ uint32_t gamepock_state::screen_update_gamepock(screen_device &screen, bitmap_in
 	{
 		for ( int j = 0; j < 50; j++ )
 		{
-			bitmap.pix16(i * 8 + 0, 49 - j ) = ( m_hd44102ch[0].ram[ad+j] & 0x01 ) ? 0 : 1;
-			bitmap.pix16(i * 8 + 1, 49 - j ) = ( m_hd44102ch[0].ram[ad+j] & 0x02 ) ? 0 : 1;
-			bitmap.pix16(i * 8 + 2, 49 - j ) = ( m_hd44102ch[0].ram[ad+j] & 0x04 ) ? 0 : 1;
-			bitmap.pix16(i * 8 + 3, 49 - j ) = ( m_hd44102ch[0].ram[ad+j] & 0x08 ) ? 0 : 1;
-			bitmap.pix16(i * 8 + 4, 49 - j ) = ( m_hd44102ch[0].ram[ad+j] & 0x10 ) ? 0 : 1;
-			bitmap.pix16(i * 8 + 5, 49 - j ) = ( m_hd44102ch[0].ram[ad+j] & 0x20 ) ? 0 : 1;
-			bitmap.pix16(i * 8 + 6, 49 - j ) = ( m_hd44102ch[0].ram[ad+j] & 0x40 ) ? 0 : 1;
-			bitmap.pix16(i * 8 + 7, 49 - j ) = ( m_hd44102ch[0].ram[ad+j] & 0x80 ) ? 0 : 1;
+			bitmap.pix(i * 8 + 0, 49 - j ) = ( m_hd44102ch[0].ram[ad+j] & 0x01 ) ? 0 : 1;
+			bitmap.pix(i * 8 + 1, 49 - j ) = ( m_hd44102ch[0].ram[ad+j] & 0x02 ) ? 0 : 1;
+			bitmap.pix(i * 8 + 2, 49 - j ) = ( m_hd44102ch[0].ram[ad+j] & 0x04 ) ? 0 : 1;
+			bitmap.pix(i * 8 + 3, 49 - j ) = ( m_hd44102ch[0].ram[ad+j] & 0x08 ) ? 0 : 1;
+			bitmap.pix(i * 8 + 4, 49 - j ) = ( m_hd44102ch[0].ram[ad+j] & 0x10 ) ? 0 : 1;
+			bitmap.pix(i * 8 + 5, 49 - j ) = ( m_hd44102ch[0].ram[ad+j] & 0x20 ) ? 0 : 1;
+			bitmap.pix(i * 8 + 6, 49 - j ) = ( m_hd44102ch[0].ram[ad+j] & 0x40 ) ? 0 : 1;
+			bitmap.pix(i * 8 + 7, 49 - j ) = ( m_hd44102ch[0].ram[ad+j] & 0x80 ) ? 0 : 1;
 		}
 		ad += 0x40;
 	}
@@ -172,14 +172,14 @@ uint32_t gamepock_state::screen_update_gamepock(screen_device &screen, bitmap_in
 	{
 		for ( int j = 0; j < 50; j++ )
 		{
-			bitmap.pix16(i * 8 + 0, j ) = ( m_hd44102ch[1].ram[ad+j] & 0x01 ) ? 0 : 1;
-			bitmap.pix16(i * 8 + 1, j ) = ( m_hd44102ch[1].ram[ad+j] & 0x02 ) ? 0 : 1;
-			bitmap.pix16(i * 8 + 2, j ) = ( m_hd44102ch[1].ram[ad+j] & 0x04 ) ? 0 : 1;
-			bitmap.pix16(i * 8 + 3, j ) = ( m_hd44102ch[1].ram[ad+j] & 0x08 ) ? 0 : 1;
-			bitmap.pix16(i * 8 + 4, j ) = ( m_hd44102ch[1].ram[ad+j] & 0x10 ) ? 0 : 1;
-			bitmap.pix16(i * 8 + 5, j ) = ( m_hd44102ch[1].ram[ad+j] & 0x20 ) ? 0 : 1;
-			bitmap.pix16(i * 8 + 6, j ) = ( m_hd44102ch[1].ram[ad+j] & 0x40 ) ? 0 : 1;
-			bitmap.pix16(i * 8 + 7, j ) = ( m_hd44102ch[1].ram[ad+j] & 0x80 ) ? 0 : 1;
+			bitmap.pix(i * 8 + 0, j ) = ( m_hd44102ch[1].ram[ad+j] & 0x01 ) ? 0 : 1;
+			bitmap.pix(i * 8 + 1, j ) = ( m_hd44102ch[1].ram[ad+j] & 0x02 ) ? 0 : 1;
+			bitmap.pix(i * 8 + 2, j ) = ( m_hd44102ch[1].ram[ad+j] & 0x04 ) ? 0 : 1;
+			bitmap.pix(i * 8 + 3, j ) = ( m_hd44102ch[1].ram[ad+j] & 0x08 ) ? 0 : 1;
+			bitmap.pix(i * 8 + 4, j ) = ( m_hd44102ch[1].ram[ad+j] & 0x10 ) ? 0 : 1;
+			bitmap.pix(i * 8 + 5, j ) = ( m_hd44102ch[1].ram[ad+j] & 0x20 ) ? 0 : 1;
+			bitmap.pix(i * 8 + 6, j ) = ( m_hd44102ch[1].ram[ad+j] & 0x40 ) ? 0 : 1;
+			bitmap.pix(i * 8 + 7, j ) = ( m_hd44102ch[1].ram[ad+j] & 0x80 ) ? 0 : 1;
 		}
 		ad += 0x40;
 	}
@@ -190,25 +190,25 @@ uint32_t gamepock_state::screen_update_gamepock(screen_device &screen, bitmap_in
 	{
 		for ( int j = 0; j < 25; j++ )
 		{
-			bitmap.pix16(i * 8 + 0, 50 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x01 ) ? 0 : 1;
-			bitmap.pix16(i * 8 + 1, 50 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x02 ) ? 0 : 1;
-			bitmap.pix16(i * 8 + 2, 50 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x04 ) ? 0 : 1;
-			bitmap.pix16(i * 8 + 3, 50 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x08 ) ? 0 : 1;
-			bitmap.pix16(i * 8 + 4, 50 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x10 ) ? 0 : 1;
-			bitmap.pix16(i * 8 + 5, 50 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x20 ) ? 0 : 1;
-			bitmap.pix16(i * 8 + 6, 50 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x40 ) ? 0 : 1;
-			bitmap.pix16(i * 8 + 7, 50 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x80 ) ? 0 : 1;
+			bitmap.pix(i * 8 + 0, 50 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x01 ) ? 0 : 1;
+			bitmap.pix(i * 8 + 1, 50 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x02 ) ? 0 : 1;
+			bitmap.pix(i * 8 + 2, 50 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x04 ) ? 0 : 1;
+			bitmap.pix(i * 8 + 3, 50 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x08 ) ? 0 : 1;
+			bitmap.pix(i * 8 + 4, 50 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x10 ) ? 0 : 1;
+			bitmap.pix(i * 8 + 5, 50 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x20 ) ? 0 : 1;
+			bitmap.pix(i * 8 + 6, 50 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x40 ) ? 0 : 1;
+			bitmap.pix(i * 8 + 7, 50 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x80 ) ? 0 : 1;
 		}
 		for ( int j = 25; j < 50; j++ )
 		{
-			bitmap.pix16(32 + i * 8 + 0, 25 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x01 ) ? 0 : 1;
-			bitmap.pix16(32 + i * 8 + 1, 25 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x02 ) ? 0 : 1;
-			bitmap.pix16(32 + i * 8 + 2, 25 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x04 ) ? 0 : 1;
-			bitmap.pix16(32 + i * 8 + 3, 25 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x08 ) ? 0 : 1;
-			bitmap.pix16(32 + i * 8 + 4, 25 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x10 ) ? 0 : 1;
-			bitmap.pix16(32 + i * 8 + 5, 25 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x20 ) ? 0 : 1;
-			bitmap.pix16(32 + i * 8 + 6, 25 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x40 ) ? 0 : 1;
-			bitmap.pix16(32 + i * 8 + 7, 25 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x80 ) ? 0 : 1;
+			bitmap.pix(32 + i * 8 + 0, 25 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x01 ) ? 0 : 1;
+			bitmap.pix(32 + i * 8 + 1, 25 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x02 ) ? 0 : 1;
+			bitmap.pix(32 + i * 8 + 2, 25 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x04 ) ? 0 : 1;
+			bitmap.pix(32 + i * 8 + 3, 25 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x08 ) ? 0 : 1;
+			bitmap.pix(32 + i * 8 + 4, 25 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x10 ) ? 0 : 1;
+			bitmap.pix(32 + i * 8 + 5, 25 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x20 ) ? 0 : 1;
+			bitmap.pix(32 + i * 8 + 6, 25 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x40 ) ? 0 : 1;
+			bitmap.pix(32 + i * 8 + 7, 25 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x80 ) ? 0 : 1;
 		}
 		ad += 0x40;
 	}

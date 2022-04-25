@@ -82,8 +82,8 @@ public:
 
 private:
 
-	u8 m_term_data;
-	u8 m_port3;
+	u8 m_term_data = 0U;
+	u8 m_port3 = 0U;
 	virtual void machine_reset() override;
 	void port3_w(u8 data);
 	u8 port3_r();

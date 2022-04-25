@@ -165,7 +165,7 @@ void bus_mouse_device::device_reset()
 	LOG("irq rate: %d Hz\n", hz);
 }
 
-void bus_mouse_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void bus_mouse_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	irq = !irq;
 

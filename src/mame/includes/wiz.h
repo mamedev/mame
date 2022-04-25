@@ -58,30 +58,30 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram2;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
-	int32_t m_flipx;
-	int32_t m_flipy;
-	int32_t m_bgcolor;
-	uint8_t m_charbank[2];
-	uint8_t m_palbank[2];
-	uint8_t m_main_nmi_mask;
-	uint8_t m_sound_nmi_mask;
-	uint8_t m_sprite_bank;
+	int32_t m_flipx = 0;
+	int32_t m_flipy = 0;
+	int32_t m_bgcolor = 0;
+	uint8_t m_charbank[2]{};
+	uint8_t m_palbank[2]{};
+	uint8_t m_main_nmi_mask = 0;
+	uint8_t m_sound_nmi_mask = 0;
+	uint8_t m_sprite_bank = 0;
 
-	int m_dsc0;
-	int m_dsc1;
+	int m_dsc0 = 0;
+	int m_dsc1 = 0;
 
-	DECLARE_READ8_MEMBER(wiz_protection_r);
-	DECLARE_WRITE8_MEMBER(wiz_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(wiz_main_nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(wiz_sound_nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(wiz_palette_bank_w);
-	DECLARE_WRITE8_MEMBER(wiz_sprite_bank_w);
-	DECLARE_WRITE8_MEMBER(wiz_bgcolor_w);
-	DECLARE_WRITE8_MEMBER(wiz_char_bank_w);
-	DECLARE_WRITE8_MEMBER(wiz_flipx_w);
-	DECLARE_WRITE8_MEMBER(wiz_flipy_w);
-	DECLARE_WRITE8_MEMBER(stinger_explosion_w);
-	DECLARE_WRITE8_MEMBER(stinger_shot_w);
+	uint8_t wiz_protection_r();
+	void wiz_coin_counter_w(offs_t offset, uint8_t data);
+	void wiz_main_nmi_mask_w(uint8_t data);
+	void wiz_sound_nmi_mask_w(uint8_t data);
+	void wiz_palette_bank_w(offs_t offset, uint8_t data);
+	void wiz_sprite_bank_w(uint8_t data);
+	void wiz_bgcolor_w(uint8_t data);
+	void wiz_char_bank_w(offs_t offset, uint8_t data);
+	void wiz_flipx_w(uint8_t data);
+	void wiz_flipy_w(uint8_t data);
+	void stinger_explosion_w(uint8_t data);
+	void stinger_shot_w(uint8_t data);
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;

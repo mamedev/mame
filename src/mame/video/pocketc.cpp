@@ -29,10 +29,10 @@ const int pocketc_state::colortable[8][2] =
 
 void pocketc_state::pocketc_palette(palette_device &palette) const
 {
-	for (int i = 0; i < ARRAY_LENGTH(indirect_palette); i++)
+	for (int i = 0; i < std::size(indirect_palette); i++)
 		palette.set_indirect_color(i, indirect_palette[i]);
 
-	for (int i = 0; i < ARRAY_LENGTH(colortable); i++)
+	for (int i = 0; i < std::size(colortable); i++)
 	{
 		palette.set_pen_indirect(i*2,   colortable[i][0]);
 		palette.set_pen_indirect(i*2+1, colortable[i][1]);
@@ -44,5 +44,5 @@ void pocketc_state::pocketc_draw_special(bitmap_ind16 &bitmap, int x, int y, con
 	for (int i = 0; i < 5; i++, y++)
 		for (int j = 0; fig[i][j]; j++)
 			if (fig[i][j] != ' ')
-				bitmap.pix16(y, x + j) = color;
+				bitmap.pix(y, x + j) = color;
 }

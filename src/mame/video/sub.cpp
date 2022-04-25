@@ -39,19 +39,19 @@ TILE_GET_INFO_MEMBER(sub_state::get_tile_info)
 	tileinfo.set(0, code, color, 0);
 }
 
-WRITE8_MEMBER(sub_state::vram_w)
+void sub_state::vram_w(offs_t offset, uint8_t data)
 {
 	m_vram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(sub_state::attr_w)
+void sub_state::attr_w(offs_t offset, uint8_t data)
 {
 	m_attr[offset] = data;
 	m_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(sub_state::scrolly_w)
+void sub_state::scrolly_w(offs_t offset, uint8_t data)
 {
 	m_scrolly[offset] = data;
 	m_tilemap->set_scrolly(offset,m_scrolly[offset]);

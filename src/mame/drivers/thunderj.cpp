@@ -72,7 +72,7 @@ void thunderj_state::machine_start()
  *
  *************************************/
 
-READ16_MEMBER(thunderj_state::special_port2_r)
+uint16_t thunderj_state::special_port2_r()
 {
 	int result = ioport("260012")->read();
 	result ^= 0x0010;
@@ -80,7 +80,7 @@ READ16_MEMBER(thunderj_state::special_port2_r)
 }
 
 
-WRITE16_MEMBER(thunderj_state::latch_w)
+void thunderj_state::latch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* reset extra CPU */
 	if (ACCESSING_BITS_0_7)
@@ -215,22 +215,10 @@ static const gfx_layout anlayout =
 };
 
 
-static const gfx_layout pfmolayout =
-{
-	8,8,
-	RGN_FRAC(1,4),
-	4,
-	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
-
 static GFXDECODE_START( gfx_thunderj )
-	GFXDECODE_ENTRY( "gfx1", 0, pfmolayout,  512,  96 ) /* sprites & playfield */
-	GFXDECODE_ENTRY( "gfx2", 0, pfmolayout,  256, 112 ) /* sprites & playfield */
-	GFXDECODE_ENTRY( "gfx3", 0, anlayout,      0, 512 ) /* characters 8x8 */
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_planar,  512,  96 ) /* sprites & playfield */
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_planar,  256, 112 ) /* sprites & playfield */
+	GFXDECODE_ENTRY( "gfx3", 0, anlayout,            0, 512 ) /* characters 8x8 */
 GFXDECODE_END
 
 
@@ -282,7 +270,7 @@ void thunderj_state::thunderj(machine_config &config)
 	ATARI_JSA_II(config, m_jsa, 0);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_6);
 	m_jsa->test_read_cb().set_ioport("260012").bit(1);
-	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_jsa->add_route(ALL_OUTPUTS, "mono", 0.8);
 }
 
 

@@ -7,7 +7,6 @@
 #include "emu.h"
 #include "sound/ad1848.h"
 
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -28,17 +27,12 @@ void ad1848_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
 	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
 void ad1848_device::device_start()
 {
-	m_timer = timer_alloc(0, nullptr);
+	m_timer = timer_alloc(0);
 	m_irq_cb.resolve_safe();
 	m_drq_cb.resolve_safe();
 	save_item(NAME(m_regs.idx));
@@ -162,7 +156,7 @@ void ad1848_device::dack_w(uint8_t data)
 		m_drq_cb(CLEAR_LINE);
 }
 
-void ad1848_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ad1848_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if(!m_play)
 		return;

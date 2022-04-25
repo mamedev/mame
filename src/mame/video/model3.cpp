@@ -28,45 +28,6 @@
 #define TRI_BUFFER_SIZE                 50000
 #define TRI_ALPHA_BUFFER_SIZE           15000
 
-struct model3_polydata
-{
-	cached_texture *texture;
-	uint32_t color;
-	uint32_t texture_param;
-	int transparency;
-	int intensity;
-};
-
-class model3_renderer : public poly_manager<float, model3_polydata, 6, 50000>
-{
-public:
-	model3_renderer(model3_state &state, int width, int height)
-		: poly_manager<float, model3_polydata, 6, 50000>(state.machine())
-	{
-		m_fb = std::make_unique<bitmap_rgb32>(width, height);
-		m_zb = std::make_unique<bitmap_ind32>(width, height);
-	}
-
-	void draw(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_opaque_triangles(const m3_triangle* tris, int num_tris);
-	void draw_alpha_triangles(const m3_triangle* tris, int num_tris);
-	void clear_fb();
-	void clear_zb();
-	void draw_scanline_solid(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
-	void draw_scanline_solid_trans(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
-	void draw_scanline_tex(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
-	void draw_scanline_tex_colormod(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
-	void draw_scanline_tex_contour(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
-	void draw_scanline_tex_trans(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
-	void draw_scanline_tex_alpha(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
-	void wait_for_polys();
-
-private:
-	std::unique_ptr<bitmap_rgb32> m_fb;
-	std::unique_ptr<bitmap_ind32> m_zb;
-};
-
-
 
 /*****************************************************************************/
 
@@ -141,8 +102,8 @@ void model3_state::model3_exit()
 	fclose(file);
 #endif
 
-//  invalidate_texture(0, 0, 0, 6, 5);
-//  invalidate_texture(1, 0, 0, 6, 5);
+	invalidate_texture(0, 0, 0, 6, 5);
+	invalidate_texture(1, 0, 0, 6, 5);
 }
 
 void model3_state::video_start()
@@ -172,10 +133,10 @@ void model3_state::video_start()
 	int width = m_screen->width();
 	int height = m_screen->height();
 
-	m_renderer = auto_alloc(machine(), model3_renderer(*this, width, height));
+	m_renderer = std::make_unique<model3_renderer>(machine(), width, height);
 
-	m_tri_buffer = auto_alloc_array_clear(machine(), m3_triangle, TRI_BUFFER_SIZE);
-	m_tri_alpha_buffer = auto_alloc_array_clear(machine(), m3_triangle, TRI_ALPHA_BUFFER_SIZE);
+	m_tri_buffer = std::make_unique<m3_triangle[]>(TRI_BUFFER_SIZE);
+	m_tri_alpha_buffer = std::make_unique<m3_triangle[]>(TRI_ALPHA_BUFFER_SIZE);
 
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&model3_state::model3_exit, this));
 
@@ -196,6 +157,8 @@ void model3_state::video_start()
 	m_polygon_ram = make_unique_clear<uint32_t[]>(0x400000/4);
 
 	m_vid_reg0 = 0;
+
+	std::fill_n(&m_texcache[0][0][0], 2 * (1024 / 32) * (2048 / 32), nullptr);
 
 	m_layer4[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(model3_state::tile_info_layer0_4bit)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_layer8[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(model3_state::tile_info_layer0_8bit)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
@@ -245,12 +208,11 @@ TILE_GET_INFO_MEMBER(model3_state::tile_info_layer3_8bit) { MODEL3_TILE_INFO8(0x
 #ifdef UNUSED_FUNCTION
 void model3_state::draw_texture_sheet(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
-	for(y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint16_t *d = &bitmap.pix16(y);
+		uint16_t *const d = &bitmap.pix(y);
 		int index = (y*2)*2048;
-		for(x = cliprect.min_x; x <= cliprect.max_x; x++) {
+		for(int x = cliprect.min_x; x <= cliprect.max_x; x++) {
 			uint16_t pix = m_texture_ram[0][index];
 			index+=4;
 			if(pix != 0) {
@@ -292,8 +254,8 @@ void model3_state::draw_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, i
 
 	for (int y = y1; y <= y2; y++)
 	{
-		uint32_t* dst = &bitmap.pix32(y);
-		uint16_t* src = &pixmap.pix16(iy & 0x1ff);
+		uint32_t *const dst = &bitmap.pix(y);
+		uint16_t const *const src = &pixmap.pix(iy & 0x1ff);
 
 		int rowscroll = BYTE_REVERSE16(rowscroll_ram[((layer * 0x200) + y) ^ NATIVE_ENDIAN_VALUE_LE_BE(3,0)]) & 0x7fff;
 		if (rowscroll & 0x100)
@@ -388,24 +350,24 @@ uint32_t model3_state::screen_update_model3(screen_device &screen, bitmap_rgb32 
 
 
 
-READ64_MEMBER(model3_state::model3_char_r)
+uint64_t model3_state::model3_char_r(offs_t offset)
 {
 	return m_m3_char_ram[offset];
 }
 
-WRITE64_MEMBER(model3_state::model3_char_w)
+void model3_state::model3_char_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	COMBINE_DATA(&m_m3_char_ram[offset]);
 	m_gfxdecode->gfx(0)->mark_dirty(offset / 4);
 	m_gfxdecode->gfx(1)->mark_dirty(offset / 8);
 }
 
-READ64_MEMBER(model3_state::model3_tile_r)
+uint64_t model3_state::model3_tile_r(offs_t offset)
 {
 	return m_m3_tile_ram[offset];
 }
 
-WRITE64_MEMBER(model3_state::model3_tile_w)
+void model3_state::model3_tile_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	COMBINE_DATA(&m_m3_tile_ram[offset]);
 
@@ -483,7 +445,7 @@ WRITE64_MEMBER(model3_state::model3_tile_w)
 */
 
 
-READ64_MEMBER(model3_state::model3_vid_reg_r)
+uint64_t model3_state::model3_vid_reg_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -496,7 +458,7 @@ READ64_MEMBER(model3_state::model3_vid_reg_r)
 	return 0;
 }
 
-WRITE64_MEMBER(model3_state::model3_vid_reg_w)
+void model3_state::model3_vid_reg_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	switch(offset)
 	{
@@ -515,7 +477,7 @@ WRITE64_MEMBER(model3_state::model3_vid_reg_w)
 	}
 }
 
-WRITE64_MEMBER(model3_state::model3_palette_w)
+void model3_state::model3_palette_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	COMBINE_DATA(&m_paletteram64[offset]);
 	uint32_t data1 = BYTE_REVERSE32((uint32_t)(m_paletteram64[offset] >> 32));
@@ -525,7 +487,7 @@ WRITE64_MEMBER(model3_state::model3_palette_w)
 	m_palette->set_pen_color((offset*2)+1, pal5bit(data2 >> 0), pal5bit(data2 >> 5), pal5bit(data2 >> 10));
 }
 
-READ64_MEMBER(model3_state::model3_palette_r)
+uint64_t model3_state::model3_palette_r(offs_t offset)
 {
 	return m_paletteram64[offset];
 }
@@ -552,7 +514,7 @@ void model3_state::invalidate_texture(int page, int texx, int texy, int texwidth
 			{
 				cached_texture *freeme = m_texcache[page][texy + y][texx + x];
 				m_texcache[page][texy + y][texx + x] = freeme->next;
-				auto_free(machine(), freeme);
+				delete freeme;
 			}
 }
 
@@ -570,10 +532,7 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 			return tex;
 
 	/* create a new texture */
-	tex = (cached_texture *)auto_alloc_array(machine(), uint8_t, sizeof(cached_texture) + (2 * pixwidth * 2 * pixheight) * sizeof(rgb_t));
-	tex->width = texwidth;
-	tex->height = texheight;
-	tex->format = format;
+	tex = new cached_texture(texwidth, texheight, format);
 
 	/* set the new texture */
 	tex->next = m_texcache[page][texy][texx];
@@ -583,7 +542,7 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 	for (y = 0; y < pixheight; y++)
 	{
 		const uint16_t *texsrc = &m_texture_ram[page][(texy * 32 + y) * 2048 + texx * 32];
-		rgb_t *dest = tex->data + 2 * pixwidth * y;
+		rgb_t *dest = &tex->data[2 * pixwidth * y];
 
 		switch (format)
 		{
@@ -662,7 +621,7 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 
 	/* create the vertical mirror of the texture */
 	for (y = 0; y < pixheight; y++)
-		memcpy(tex->data + 2 * pixwidth * (pixheight * 2 - 1 - y), tex->data + 2 * pixwidth * y, sizeof(rgb_t) * pixwidth * 2);
+		memcpy(&tex->data[2 * pixwidth * (pixheight * 2 - 1 - y)], &tex->data[2 * pixwidth * y], sizeof(rgb_t) * pixwidth * 2);
 
 	/* remember the overall alpha */
 	tex->alpha = alpha >> 24;
@@ -981,7 +940,7 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 */
 
 
-WRITE64_MEMBER(model3_state::real3d_display_list_w)
+void model3_state::real3d_display_list_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 	{
@@ -993,7 +952,7 @@ WRITE64_MEMBER(model3_state::real3d_display_list_w)
 	}
 }
 
-WRITE64_MEMBER(model3_state::real3d_polygon_ram_w)
+void model3_state::real3d_polygon_ram_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 	{
@@ -1358,7 +1317,7 @@ void model3_state::real3d_polygon_ram_dma(uint32_t src, uint32_t dst, int length
 	}
 }
 
-WRITE64_MEMBER(model3_state::real3d_cmd_w)
+void model3_state::real3d_cmd_w(uint64_t data)
 {
 	real3d_display_list_end();
 }
@@ -1397,8 +1356,8 @@ static void matrix_multiply(MATRIX a, MATRIX b, MATRIX *out)
 
 void model3_state::init_matrix_stack()
 {
-	MATRIX *matrix_stack;
-	matrix_stack = m_matrix_stack = auto_alloc_array_clear(machine(), MATRIX, MATRIX_STACK_SIZE);
+	m_matrix_stack = std::make_unique<MATRIX[]>(MATRIX_STACK_SIZE);
+	MATRIX *matrix_stack = &m_matrix_stack[0];
 
 	/* initialize the first matrix as identity */
 	matrix_stack[0][0][0] = 1.0f;
@@ -2024,14 +1983,12 @@ void model3_state::real3d_traverse_display_list()
 
 void model3_renderer::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int i, j;
-
-	for (j = cliprect.min_y; j <= cliprect.max_y; ++j)
+	for (int j = cliprect.min_y; j <= cliprect.max_y; ++j)
 	{
-		uint32_t *dst = &bitmap.pix32(j);
-		uint32_t *src = &m_fb->pix32(j);
+		uint32_t *const dst = &bitmap.pix(j);
+		uint32_t const *const src = &m_fb->pix(j);
 
-		for (i = cliprect.min_x; i <= cliprect.max_x; ++i)
+		for (int i = cliprect.min_x; i <= cliprect.max_x; ++i)
 		{
 			if (src[i] & 0xff000000)
 			{
@@ -2098,7 +2055,7 @@ void model3_renderer::draw_opaque_triangles(const m3_triangle* tris, int num_tri
 				v[i].p[4] = tri->v[i].p[2];
 			}
 
-			model3_polydata &extra = object_data_alloc();
+			model3_polydata &extra = object_data().next();
 			extra.texture = tri->texture;
 			extra.transparency = tri->transparency;
 			extra.texture_param = tri->param;
@@ -2106,14 +2063,14 @@ void model3_renderer::draw_opaque_triangles(const m3_triangle* tris, int num_tri
 
 			if (tri->param & TRI_PARAM_ALPHA_TEST)
 			{
-				render_triangle(cliprect, render_delegate(&model3_renderer::draw_scanline_tex_contour, this), 5, v[0], v[1], v[2]);
+				render_triangle<5>(cliprect, render_delegate(&model3_renderer::draw_scanline_tex_contour, this), v[0], v[1], v[2]);
 			}
 			else
 			{
 				if (tri->param & TRI_PARAM_COLOR_MOD)
-					render_triangle(cliprect, render_delegate(&model3_renderer::draw_scanline_tex_colormod, this), 5, v[0], v[1], v[2]);
+					render_triangle<5>(cliprect, render_delegate(&model3_renderer::draw_scanline_tex_colormod, this), v[0], v[1], v[2]);
 				else
-					render_triangle(cliprect, render_delegate(&model3_renderer::draw_scanline_tex, this), 5, v[0], v[1], v[2]);
+					render_triangle<5>(cliprect, render_delegate(&model3_renderer::draw_scanline_tex, this), v[0], v[1], v[2]);
 			}
 		}
 		else
@@ -2126,10 +2083,10 @@ void model3_renderer::draw_opaque_triangles(const m3_triangle* tris, int num_tri
 				v[i].p[1] = tri->v[i].p[2];
 			}
 
-			model3_polydata &extra = object_data_alloc();
+			model3_polydata &extra = object_data().next();
 			extra.color = tri->color;
 
-			render_triangle(cliprect, render_delegate(&model3_renderer::draw_scanline_solid, this), 2, v[0], v[1], v[2]);
+			render_triangle<2>(cliprect, render_delegate(&model3_renderer::draw_scanline_solid, this), v[0], v[1], v[2]);
 		}
 	}
 }
@@ -2163,12 +2120,12 @@ void model3_renderer::draw_alpha_triangles(const m3_triangle* tris, int num_tris
 				v[i].p[4] = tri->v[i].p[2];
 			}
 
-			model3_polydata &extra = object_data_alloc();
+			model3_polydata &extra = object_data().next();
 			extra.texture = tri->texture;
 			extra.transparency = tri->transparency;
 			extra.texture_param = tri->param;
 
-			render_triangle(cliprect, render_delegate(&model3_renderer::draw_scanline_tex_alpha, this), 5, v[0], v[1], v[2]);
+			render_triangle<5>(cliprect, render_delegate(&model3_renderer::draw_scanline_tex_alpha, this), v[0], v[1], v[2]);
 		}
 		else
 		{
@@ -2180,19 +2137,19 @@ void model3_renderer::draw_alpha_triangles(const m3_triangle* tris, int num_tris
 				v[i].p[1] = tri->v[i].p[2];
 			}
 
-			model3_polydata &extra = object_data_alloc();
+			model3_polydata &extra = object_data().next();
 			extra.color = tri->color;
 			extra.transparency = tri->transparency;
 
-			render_triangle(cliprect, render_delegate(&model3_renderer::draw_scanline_solid_trans, this), 2, v[0], v[1], v[2]);
+			render_triangle<2>(cliprect, render_delegate(&model3_renderer::draw_scanline_solid_trans, this), v[0], v[1], v[2]);
 		}
 	}
 }
 
 void model3_renderer::draw_scanline_solid(int32_t scanline, const extent_t &extent, const model3_polydata &polydata, int threadid)
 {
-	uint32_t *fb = &m_fb->pix32(scanline);
-	float *zb = (float*)&m_zb->pix32(scanline);
+	uint32_t *const fb = &m_fb->pix(scanline);
+	float *const zb = (float*)&m_zb->pix(scanline);
 
 	float z = extent.param[0].start;
 	float dz = extent.param[0].dpdx;
@@ -2221,8 +2178,8 @@ void model3_renderer::draw_scanline_solid(int32_t scanline, const extent_t &exte
 
 void model3_renderer::draw_scanline_solid_trans(int32_t scanline, const extent_t &extent, const model3_polydata &polydata, int threadid)
 {
-	uint32_t *fb = &m_fb->pix32(scanline);
-	float *zb = (float*)&m_zb->pix32(scanline);
+	uint32_t *const fb = &m_fb->pix(scanline);
+	float *const zb = (float*)&m_zb->pix(scanline);
 
 	float z = extent.param[0].start;
 	float dz = extent.param[0].dpdx;
@@ -2289,8 +2246,8 @@ do {                                                                            
 
 void model3_renderer::draw_scanline_tex(int32_t scanline, const extent_t &extent, const model3_polydata &polydata, int threadid)
 {
-	uint32_t *fb = &m_fb->pix32(scanline);
-	float *zb = (float*)&m_zb->pix32(scanline);
+	uint32_t *const fb = &m_fb->pix(scanline);
+	float *const zb = (float*)&m_zb->pix(scanline);
 	const cached_texture *texture = polydata.texture;
 
 	float z = extent.param[0].start;
@@ -2333,8 +2290,8 @@ void model3_renderer::draw_scanline_tex(int32_t scanline, const extent_t &extent
 
 void model3_renderer::draw_scanline_tex_colormod(int32_t scanline, const extent_t &extent, const model3_polydata &polydata, int threadid)
 {
-	uint32_t *fb = &m_fb->pix32(scanline);
-	float *zb = (float*)&m_zb->pix32(scanline);
+	uint32_t *const fb = &m_fb->pix(scanline);
+	float *const zb = (float*)&m_zb->pix(scanline);
 	const cached_texture *texture = polydata.texture;
 
 	float z = extent.param[0].start;
@@ -2380,8 +2337,8 @@ void model3_renderer::draw_scanline_tex_colormod(int32_t scanline, const extent_
 
 void model3_renderer::draw_scanline_tex_contour(int32_t scanline, const extent_t &extent, const model3_polydata &polydata, int threadid)
 {
-	uint32_t *fb = &m_fb->pix32(scanline);
-	float *zb = (float*)&m_zb->pix32(scanline);
+	uint32_t *const fb = &m_fb->pix(scanline);
+	float *const zb = (float*)&m_zb->pix(scanline);
 	const cached_texture *texture = polydata.texture;
 
 	float z = extent.param[0].start;
@@ -2432,8 +2389,8 @@ void model3_renderer::draw_scanline_tex_contour(int32_t scanline, const extent_t
 
 void model3_renderer::draw_scanline_tex_trans(int32_t scanline, const extent_t &extent, const model3_polydata &polydata, int threadid)
 {
-	uint32_t *fb = &m_fb->pix32(scanline);
-	float *zb = (float*)&m_zb->pix32(scanline);
+	uint32_t *const fb = &m_fb->pix(scanline);
+	float *const zb = (float*)&m_zb->pix(scanline);
 	const cached_texture *texture = polydata.texture;
 
 	float z = extent.param[0].start;
@@ -2481,8 +2438,8 @@ void model3_renderer::draw_scanline_tex_trans(int32_t scanline, const extent_t &
 
 void model3_renderer::draw_scanline_tex_alpha(int32_t scanline, const extent_t &extent, const model3_polydata &polydata, int threadid)
 {
-	uint32_t *fb = &m_fb->pix32(scanline);
-	float *zb = (float*)&m_zb->pix32(scanline);
+	uint32_t *const fb = &m_fb->pix(scanline);
+	float *const zb = (float*)&m_zb->pix(scanline);
 	const cached_texture *texture = polydata.texture;
 
 	float z = extent.param[0].start;

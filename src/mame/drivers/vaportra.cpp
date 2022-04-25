@@ -20,23 +20,23 @@
 #include "includes/vaportra.h"
 
 #include "cpu/m68000/m68000.h"
-#include "sound/2203intf.h"
-#include "sound/ym2151.h"
 #include "sound/okim6295.h"
+#include "sound/ymopm.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 
 
 /******************************************************************************/
 
-READ8_MEMBER(vaportra_state::irq6_ack_r)
+uint8_t vaportra_state::irq6_ack_r()
 {
 	m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
 
 	return (0);
 }
 
-WRITE8_MEMBER(vaportra_state::irq6_ack_w)
+void vaportra_state::irq6_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
 }

@@ -976,342 +976,283 @@ Any state="9" items are not displayed and are only used for object alignment
 		<rect state="0"><color red="0.15" green="0.06" blue="0.00" /><bounds left="0" top="0" right="1" bottom="1" /></rect>
 	</element>
 
-	<element name="Canvas">
-		<rect>
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds left="0" top="0" right="1" bottom="1" />
-		</rect>
-	</element>
-
 
 
 
 
 	<view name="Blank Playfield">
 
-		<!-- Background -->
-		<backdrop element="Canvas"><bounds x="000" y="000" width="640" height="480" /></backdrop>
+		<collection name="Playfield">
 
-		<bezel element="Draw_White"><bounds x="000" y="000" width="640" height="001" /></bezel>
-		<bezel element="Draw_White"><bounds x="000" y="000" width="001" height="480" /></bezel>
-		<bezel element="Draw_White"><bounds x="640" y="000" width="001" height="480" /></bezel>
-		<bezel element="Draw_White"><bounds x="000" y="480" width="640" height="001" /></bezel>
-		<bezel element="Draw_White"><bounds x="320" y="000" width="001" height="480" /></bezel>
-		<bezel element="Draw_White"><bounds x="320" y="320" width="320" height="001" /></bezel>
-		<!--    <bezel element="Draw_White"><bounds x="159" y="000" width="001" height="480" /></bezel> -->
+			<element ref="Draw_White"><bounds x="0" y="0" width="320" height="1" /></element>
+			<element ref="Draw_White"><bounds x="0" y="480" width="320" height="1" /></element>
+			<element ref="Draw_White"><bounds x="0" y="0" width="1" height="480" /></element>
+			<element ref="Draw_White"><bounds x="320" y="0" width="1" height="480" /></element>
 
 
-		<bezel element="Title_Bally"><bounds x="430" y="18" width="105" height="30" /></bezel>
-
-		<bezel element="Text_Playfield"><bounds x="040" y="010" width="250" height="14" /></bezel>
-		<bezel element="Text_Legend"><bounds x="018" y="35" width="300" height="12" /></bezel>
+			<element ref="Text_Playfield"><bounds x="040" y="010" width="250" height="14" /></element>
+			<element ref="Text_Legend"><bounds x="018" y="35" width="300" height="12" /></element>
 
 
-		<!-- Backbox -->
-
-		<!-- MPU Board Power On Self Test LED -->
-		<bezel element="Text_MPU_LED">         <bounds x="609" y="342" width="30" height="10" /></bezel>
-		<bezel name="led0" element="LED_Green"><bounds x="618" y="328" width="10" height="10" /></bezel>
-
-		<!-- MPU Board Activity Switch -->
-		<bezel element="Text_Activity">                                      <bounds x="540" y="342" width="50" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="TEST" inputmask="0x02"><bounds x="550" y="331" width="20" height="10" /></bezel>
-		<bezel element="Key_0">                                              <bounds x="571" y="330" width="10" height="10" /></bezel>
+			<!-- Misc Lamps -->
+			<element name="lamp55" ref="Credit_Indicator"><bounds x="23" y="456" width="70" height="21" /></element>    <!-- Credit Indicator -->
 
 
-		<!-- Player 1 Score -->
-		<bezel name="lamp14" element="Lamp_P1"><bounds x="330" y="55" width="15" height="15" /></bezel>         <!-- Backbox ~ 1st Player Up -->
-		<bezel name="digit17" element="Digit"><bounds x="360" y="55" width="10" height="15" /></bezel>
-		<bezel name="digit16" element="Digit"><bounds x="374" y="55" width="10" height="15" /></bezel>
-		<bezel name="digit15" element="Digit"><bounds x="388" y="55" width="10" height="15" /></bezel>
-		<bezel name="digit14" element="Digit"><bounds x="402" y="55" width="10" height="15" /></bezel>
-		<bezel name="digit13" element="Digit"><bounds x="416" y="55" width="10" height="15" /></bezel>
-		<bezel name="digit12" element="Digit"><bounds x="430" y="55" width="10" height="15" /></bezel>
-		<bezel name="digit11" element="Digit"><bounds x="444" y="55" width="10" height="15" /></bezel>
-
-		<!-- Player 2 Score -->
-		<bezel name="lamp29" element="Lamp_P2"><bounds x="615" y="55" width="15" height="15" /></bezel>         <!-- Backbox ~ 2nd Player Up -->
-		<bezel name="digit27" element="Digit"><bounds x="506" y="55" width="10" height="15" /></bezel>
-		<bezel name="digit26" element="Digit"><bounds x="520" y="55" width="10" height="15" /></bezel>
-		<bezel name="digit25" element="Digit"><bounds x="534" y="55" width="10" height="15" /></bezel>
-		<bezel name="digit24" element="Digit"><bounds x="548" y="55" width="10" height="15" /></bezel>
-		<bezel name="digit23" element="Digit"><bounds x="562" y="55" width="10" height="15" /></bezel>
-		<bezel name="digit22" element="Digit"><bounds x="576" y="55" width="10" height="15" /></bezel>
-		<bezel name="digit21" element="Digit"><bounds x="590" y="55" width="10" height="15" /></bezel>
-
-		<!-- Player 3 Score -->
-		<bezel name="lamp44" element="Lamp_P3"><bounds x="330" y="250" width="15" height="15" /></bezel>        <!-- Backbox ~ 3rd Player Up -->
-		<bezel name="digit37" element="Digit"><bounds x="360" y="250" width="10" height="15" /></bezel>
-		<bezel name="digit36" element="Digit"><bounds x="374" y="250" width="10" height="15" /></bezel>
-		<bezel name="digit35" element="Digit"><bounds x="388" y="250" width="10" height="15" /></bezel>
-		<bezel name="digit34" element="Digit"><bounds x="402" y="250" width="10" height="15" /></bezel>
-		<bezel name="digit33" element="Digit"><bounds x="416" y="250" width="10" height="15" /></bezel>
-		<bezel name="digit32" element="Digit"><bounds x="430" y="250" width="10" height="15" /></bezel>
-		<bezel name="digit31" element="Digit"><bounds x="444" y="250" width="10" height="15" /></bezel>
-
-		<!-- Player 4 Score -->
-		<bezel name="lamp59" element="Lamp_P4"><bounds x="615" y="250" width="15" height="15" /></bezel>        <!-- Backbox ~ 4th Player Up -->
-		<bezel name="digit47" element="Digit"><bounds x="506" y="250" width="10" height="15" /></bezel>
-		<bezel name="digit46" element="Digit"><bounds x="520" y="250" width="10" height="15" /></bezel>
-		<bezel name="digit45" element="Digit"><bounds x="534" y="250" width="10" height="15" /></bezel>
-		<bezel name="digit44" element="Digit"><bounds x="548" y="250" width="10" height="15" /></bezel>
-		<bezel name="digit43" element="Digit"><bounds x="562" y="250" width="10" height="15" /></bezel>
-		<bezel name="digit42" element="Digit"><bounds x="576" y="250" width="10" height="15" /></bezel>
-		<bezel name="digit41" element="Digit"><bounds x="590" y="250" width="10" height="15" /></bezel>
-
-		<!-- Credits and Ball In Play / Match -->
-		<bezel element="Text_Credit"><bounds x="542" y="142" width="48" height="8" /></bezel>
-		<bezel name="lamp12"  element="Ball_In_Play"><bounds x="586" y="105" width="50" height="11" /></bezel>  <!-- Backbox ~ Ball In Play -->
-		<bezel name="lamp25"  element="Match"><bounds x="596" y="152" width="25" height="11" /></bezel>         <!-- Backbox ~ Match -->
-		<bezel name="digit55" element="Digit"><bounds x="554" y="125" width="10" height="15" /></bezel>
-		<bezel name="digit54" element="Digit"><bounds x="568" y="125" width="10" height="15" /></bezel>
-		<bezel name="digit52" element="Digit"><bounds x="596" y="125" width="10" height="15" /></bezel>
-		<bezel name="digit51" element="Digit"><bounds x="610" y="125" width="10" height="15" /></bezel>
-
-		<bezel name="lamp10" element="Shoot_Again"><bounds x="420" y="295" width="60" height="19" /></bezel>    <!-- Backbox ~ Same Player Shoots Again -->
-		<bezel name="lamp13" element="Lamp_1P"><bounds x="345" y="297" width="15" height="15" /></bezel>        <!-- Backbox ~ 1 Player Game -->
-		<bezel name="lamp28" element="Lamp_2P"><bounds x="360" y="297" width="15" height="15" /></bezel>        <!-- Backbox ~ 2 Player Game -->
-		<bezel name="lamp43" element="Lamp_3P"><bounds x="375" y="297" width="15" height="15" /></bezel>        <!-- Backbox ~ 3 Player Game -->
-		<bezel name="lamp58" element="Lamp_4P"><bounds x="390" y="297" width="15" height="15" /></bezel>        <!-- Backbox ~ 4 Player Game -->
-		<bezel name="lamp27" element="High_Score_To_Date"><bounds x="438" y="6" width="90" height="11" /></bezel>   <!-- Backbox ~ High Score To Date -->
-		<bezel name="lamp42" element="Game_Over"><bounds x="580" y="300" width="45" height="11" /></bezel>      <!-- Backbox ~ Game Over -->
-		<bezel name="lamp57" element="Tilt"><bounds x="480" y="297" width="50" height="16" /></bezel>           <!-- Backbox ~ Tilt -->
+			<!-- Outhole -->
+			<element name="solenoid6"  ref="Solenoid_Outhole">                        <bounds x="150" y="455" width="58" height="22" /></element>
+			<element ref="Switch_RollOn_WireForm_Left" inputtag="X0" inputmask="0x80"><bounds x="163" y="453" width="20" height="16" /></element>
+			<element ref="Key_BSpace">                                                <bounds x="185" y="455" width="15" height="14" /></element>
 
 
 
-		<bezel element="Text_Lamps"><bounds x="410" y="360" width="60" height="11" /></bezel>
-		<bezel element="Text_15"><bounds x="552" y="373" width="30" height="11" /></bezel>
-		<bezel element="Text_30"><bounds x="552" y="388" width="30" height="11" /></bezel>
-		<bezel element="Text_45"><bounds x="552" y="403" width="30" height="11" /></bezel>
-		<bezel element="Text_60"><bounds x="552" y="418" width="30" height="11" /></bezel>
-
-		<!-- Lamps controlled by U1 on Lamp Driver Board -->
-		<bezel name="lamp0"  element="Lamp_White"><bounds x="330" y="375" width="8" height="8" /></bezel>
-		<bezel name="lamp1"  element="Lamp_White"><bounds x="345" y="375" width="8" height="8" /></bezel>
-		<bezel name="lamp2"  element="Lamp_White"><bounds x="360" y="375" width="8" height="8" /></bezel>
-		<bezel name="lamp3"  element="Lamp_White"><bounds x="375" y="375" width="8" height="8" /></bezel>
-		<bezel name="lamp4"  element="Lamp_White"><bounds x="390" y="375" width="8" height="8" /></bezel>
-		<bezel name="lamp5"  element="Lamp_White"><bounds x="405" y="375" width="8" height="8" /></bezel>
-		<bezel name="lamp6"  element="Lamp_White"><bounds x="420" y="375" width="8" height="8" /></bezel>
-		<bezel name="lamp7"  element="Lamp_White"><bounds x="435" y="375" width="8" height="8" /></bezel>
-		<bezel name="lamp8"  element="Lamp_White"><bounds x="450" y="375" width="8" height="8" /></bezel>
-		<bezel name="lamp9"  element="Lamp_White"><bounds x="465" y="375" width="8" height="8" /></bezel>
-		<bezel name="lamp10" element="Lamp_White"><bounds x="480" y="375" width="8" height="8" /></bezel>
-		<bezel name="lamp11" element="Lamp_White"><bounds x="495" y="375" width="8" height="8" /></bezel>
-		<bezel name="lamp12" element="Lamp_White"><bounds x="510" y="375" width="8" height="8" /></bezel>
-		<bezel name="lamp13" element="Lamp_White"><bounds x="525" y="375" width="8" height="8" /></bezel>
-		<bezel name="lamp14" element="Lamp_White"><bounds x="540" y="375" width="8" height="8" /></bezel>
-
-		<!-- Lamps controlled by U2 on Lamp Driver Board -->
-		<bezel name="lamp15" element="Lamp_White"><bounds x="330" y="390" width="8" height="8" /></bezel>
-		<bezel name="lamp16" element="Lamp_White"><bounds x="345" y="390" width="8" height="8" /></bezel>
-		<bezel name="lamp17" element="Lamp_White"><bounds x="360" y="390" width="8" height="8" /></bezel>
-		<bezel name="lamp18" element="Lamp_White"><bounds x="375" y="390" width="8" height="8" /></bezel>
-		<bezel name="lamp19" element="Lamp_White"><bounds x="390" y="390" width="8" height="8" /></bezel>
-		<bezel name="lamp20" element="Lamp_White"><bounds x="405" y="390" width="8" height="8" /></bezel>
-		<bezel name="lamp21" element="Lamp_White"><bounds x="420" y="390" width="8" height="8" /></bezel>
-		<bezel name="lamp22" element="Lamp_White"><bounds x="435" y="390" width="8" height="8" /></bezel>
-		<bezel name="lamp23" element="Lamp_White"><bounds x="450" y="390" width="8" height="8" /></bezel>
-		<bezel name="lamp24" element="Lamp_White"><bounds x="465" y="390" width="8" height="8" /></bezel>
-		<bezel name="lamp25" element="Lamp_White"><bounds x="480" y="390" width="8" height="8" /></bezel>
-		<bezel name="lamp26" element="Lamp_White"><bounds x="495" y="390" width="8" height="8" /></bezel>
-		<bezel name="lamp27" element="Lamp_White"><bounds x="510" y="390" width="8" height="8" /></bezel>
-		<bezel name="lamp28" element="Lamp_White"><bounds x="525" y="390" width="8" height="8" /></bezel>
-		<bezel name="lamp29" element="Lamp_White"><bounds x="540" y="390" width="8" height="8" /></bezel>
-
-		<!-- Lamps controlled by U3 on Lamp Driver Board -->
-		<bezel name="lamp30" element="Lamp_White"><bounds x="330" y="405" width="8" height="8" /></bezel>
-		<bezel name="lamp31" element="Lamp_White"><bounds x="345" y="405" width="8" height="8" /></bezel>
-		<bezel name="lamp32" element="Lamp_White"><bounds x="360" y="405" width="8" height="8" /></bezel>
-		<bezel name="lamp33" element="Lamp_White"><bounds x="375" y="405" width="8" height="8" /></bezel>
-		<bezel name="lamp34" element="Lamp_White"><bounds x="390" y="405" width="8" height="8" /></bezel>
-		<bezel name="lamp35" element="Lamp_White"><bounds x="405" y="405" width="8" height="8" /></bezel>
-		<bezel name="lamp36" element="Lamp_White"><bounds x="420" y="405" width="8" height="8" /></bezel>
-		<bezel name="lamp37" element="Lamp_White"><bounds x="435" y="405" width="8" height="8" /></bezel>
-		<bezel name="lamp38" element="Lamp_White"><bounds x="450" y="405" width="8" height="8" /></bezel>
-		<bezel name="lamp39" element="Lamp_White"><bounds x="465" y="405" width="8" height="8" /></bezel>
-		<bezel name="lamp40" element="Lamp_White"><bounds x="480" y="405" width="8" height="8" /></bezel>
-		<bezel name="lamp41" element="Lamp_White"><bounds x="495" y="405" width="8" height="8" /></bezel>
-		<bezel name="lamp42" element="Lamp_White"><bounds x="510" y="405" width="8" height="8" /></bezel>
-		<bezel name="lamp43" element="Lamp_White"><bounds x="525" y="405" width="8" height="8" /></bezel>
-		<bezel name="lamp44" element="Lamp_White"><bounds x="540" y="405" width="8" height="8" /></bezel>
-
-		<!-- Lamps controlled by U4 on Lamp Driver Board -->
-		<bezel name="lamp45" element="Lamp_White"><bounds x="330" y="420" width="8" height="8" /></bezel>
-		<bezel name="lamp46" element="Lamp_White"><bounds x="345" y="420" width="8" height="8" /></bezel>
-		<bezel name="lamp47" element="Lamp_White"><bounds x="360" y="420" width="8" height="8" /></bezel>
-		<bezel name="lamp48" element="Lamp_White"><bounds x="375" y="420" width="8" height="8" /></bezel>
-		<bezel name="lamp49" element="Lamp_White"><bounds x="390" y="420" width="8" height="8" /></bezel>
-		<bezel name="lamp50" element="Lamp_White"><bounds x="405" y="420" width="8" height="8" /></bezel>
-		<bezel name="lamp51" element="Lamp_White"><bounds x="420" y="420" width="8" height="8" /></bezel>
-		<bezel name="lamp52" element="Lamp_White"><bounds x="435" y="420" width="8" height="8" /></bezel>
-		<bezel name="lamp53" element="Lamp_White"><bounds x="450" y="420" width="8" height="8" /></bezel>
-		<bezel name="lamp54" element="Lamp_White"><bounds x="465" y="420" width="8" height="8" /></bezel>
-		<bezel name="lamp55" element="Lamp_White"><bounds x="480" y="420" width="8" height="8" /></bezel>
-		<bezel name="lamp56" element="Lamp_White"><bounds x="495" y="420" width="8" height="8" /></bezel>
-		<bezel name="lamp57" element="Lamp_White"><bounds x="510" y="420" width="8" height="8" /></bezel>
-		<bezel name="lamp58" element="Lamp_White"><bounds x="525" y="420" width="8" height="8" /></bezel>
-		<bezel name="lamp59" element="Lamp_White"><bounds x="540" y="420" width="8" height="8" /></bezel>
+			<element ref="Text_Switch"><bounds x="070" y="65" width="70" height="12" /></element>
+			<element ref="ST0">        <bounds x="020" y="080" width="30" height="11" /></element>
+			<element ref="ST1">        <bounds x="055" y="080" width="30" height="11" /></element>
+			<element ref="ST2">        <bounds x="090" y="080" width="30" height="11" /></element>
+			<element ref="ST3">        <bounds x="125" y="080" width="30" height="11" /></element>
+			<element ref="ST4">        <bounds x="160" y="080" width="30" height="11" /></element>
+			<element ref="I0">         <bounds x="001" y="100" width="20" height="11" /></element>
+			<element ref="I1">         <bounds x="001" y="130" width="20" height="11" /></element>
+			<element ref="I2">         <bounds x="001" y="160" width="20" height="11" /></element>
+			<element ref="I3">         <bounds x="001" y="190" width="20" height="11" /></element>
+			<element ref="I4">         <bounds x="001" y="220" width="20" height="11" /></element>
+			<element ref="I5">         <bounds x="001" y="250" width="20" height="11" /></element>
+			<element ref="I6">         <bounds x="001" y="280" width="20" height="11" /></element>
+			<element ref="I7">         <bounds x="001" y="310" width="20" height="11" /></element>
 
 
-		<bezel element="Text_Solenoids"><bounds x="382" y="437" width="100" height="11" /></bezel>
-		<bezel name="solenoid0"  element="Solenoid_PullDown"><bounds x="330" y="452" width="9" height="19" /></bezel>
-		<bezel name="solenoid1"  element="Solenoid_PullDown"><bounds x="345" y="452" width="9" height="19" /></bezel>
-		<bezel name="solenoid2"  element="Solenoid_PullDown"><bounds x="360" y="452" width="9" height="19" /></bezel>
-		<bezel name="solenoid3"  element="Solenoid_PullDown"><bounds x="375" y="452" width="9" height="19" /></bezel>
-		<bezel name="solenoid4"  element="Solenoid_PullDown"><bounds x="390" y="452" width="9" height="19" /></bezel>
-		<bezel name="solenoid5"  element="Solenoid_PullDown"><bounds x="405" y="452" width="9" height="19" /></bezel>
-		<bezel name="solenoid6"  element="Solenoid_PullDown"><bounds x="420" y="452" width="9" height="19" /></bezel>
-		<bezel name="solenoid7"  element="Solenoid_PullDown"><bounds x="435" y="452" width="9" height="19" /></bezel>
-		<bezel name="solenoid8"  element="Solenoid_PullDown"><bounds x="450" y="452" width="9" height="19" /></bezel>
-		<bezel name="solenoid9"  element="Solenoid_PullDown"><bounds x="465" y="452" width="9" height="19" /></bezel>
-		<bezel name="solenoid10" element="Solenoid_PullDown"><bounds x="480" y="452" width="9" height="19" /></bezel>
-		<bezel name="solenoid11" element="Solenoid_PullDown"><bounds x="495" y="452" width="9" height="19" /></bezel>
-		<bezel name="solenoid12" element="Solenoid_PullDown"><bounds x="510" y="452" width="9" height="19" /></bezel>
-		<bezel name="solenoid13" element="Solenoid_PullDown"><bounds x="525" y="452" width="9" height="19" /></bezel>
-		<bezel name="solenoid14" element="Solenoid_PullDown"><bounds x="540" y="452" width="9" height="19" /></bezel>
-
-		<bezel element="Text_Coils"><bounds x="572" y="437" width="50" height="11" /></bezel>
-		<bezel name="solenoid16" element="Coil_PullDown"><bounds x="570" y="459" width="09" height="12" /></bezel>
-		<bezel name="solenoid17" element="Coil_PullDown"><bounds x="585" y="459" width="09" height="12" /></bezel>
-		<bezel name="solenoid18" element="Coil_PullDown"><bounds x="600" y="459" width="09" height="12" /></bezel>
-		<bezel name="solenoid19" element="Coil_PullDown"><bounds x="615" y="459" width="09" height="12" /></bezel>
+			<element ref="Switch_Push-Button" inputtag="X0" inputmask="0x01"><bounds x="25" y="100" width="20" height="10" /></element>
+			<element ref="Key_Dot">                                          <bounds x="28" y="107" width="14" height="14" /></element>
+			<element ref="Switch_Push-Button" inputtag="X0" inputmask="0x02"><bounds x="25" y="130" width="20" height="10" /></element>
+			<element ref="Key_FSlash">                                       <bounds x="31" y="141" width="10" height="10" /></element>
+			<element ref="Switch_Push-Button" inputtag="X0" inputmask="0x04"><bounds x="25" y="160" width="20" height="10" /></element>
+			<element ref="Key_OBrkt">                                        <bounds x="31" y="171" width="10" height="10" /></element>
+			<element ref="Switch_Push-Button" inputtag="X0" inputmask="0x08"><bounds x="25" y="190" width="20" height="10" /></element>
+			<element ref="Key_CBrkt">                                        <bounds x="31" y="201" width="10" height="10" /></element>
+			<element ref="Switch_Push-Button" inputtag="X0" inputmask="0x10"><bounds x="25" y="220" width="20" height="10" /></element>
+			<element ref="Key_BSlash">                                       <bounds x="31" y="231" width="10" height="10" /></element>
+			<element ref="Switch_Push-Button" inputtag="X0" inputmask="0x20"><bounds x="25" y="250" width="20" height="10" /></element>
+			<element ref="Key_1">                                            <bounds x="31" y="261" width="10" height="10" /></element>
+			<element ref="Switch_Push-Button" inputtag="X0" inputmask="0x40"><bounds x="25" y="280" width="20" height="10" /></element>
+			<element ref="Key_T">                                            <bounds x="31" y="291" width="10" height="10" /></element>
+			<element ref="Switch_Push-Button" inputtag="X0" inputmask="0x80"><bounds x="25" y="310" width="20" height="10" /></element>
+			<element ref="Key_BSpace">                                       <bounds x="28" y="320" width="15" height="14" /></element>
 
 
-
-		<!-- Cabinet Switches -->
-		<bezel element="Text_Service">                                       <bounds x="485" y="342" width="50" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="TEST" inputmask="0x01"><bounds x="495" y="331" width="20" height="10" /></bezel>
-		<bezel element="Key_9">                                              <bounds x="516" y="330" width="10" height="10" /></bezel>
-
-		<bezel element="Text_Slam">                                     <bounds x="430" y="342" width="50" height="10" /></bezel>
-		<bezel element="Switch_SlamTilt" inputtag="X1" inputmask="0x80"><bounds x="434" y="331" width="25" height="08" /></bezel>
-		<bezel element="Key_Equals">                                    <bounds x="461" y="330" width="10" height="10" /></bezel>
-
-		<bezel element="Text_Tilt">                                 <bounds x="380" y="342" width="50" height="10" /></bezel>
-		<bezel element="Switch_Tilt" inputtag="X0" inputmask="0x40"><bounds x="390" y="324" width="17" height="17" /></bezel>
-		<bezel element="Key_T">                                     <bounds x="411" y="330" width="10" height="10" /></bezel>
-
-
-		<!-- Misc Solenoids -->
-		<bezel name="solenoid5"  element="Solenoid_Knocker"><bounds x="336" y="321" width="09" height="22" /></bezel>
-		<bezel element="Text_Knocker">   <!-- Knocker -->   <bounds x="322" y="342" width="40" height="10" /></bezel>
-
-		<!-- Misc Lamps -->
-		<bezel name="lamp55" element="Credit_Indicator"><bounds x="23" y="456" width="70" height="21" /></bezel>    <!-- Credit Indicator -->
+			<element ref="Switch_Push-Button" inputtag="X1" inputmask="0x01"><bounds x="60" y="100" width="20" height="10" /></element>
+			<element ref="Key_7">                                            <bounds x="66" y="111" width="10" height="10" /></element>
+			<element ref="Switch_Push-Button" inputtag="X1" inputmask="0x02"><bounds x="60" y="130" width="20" height="10" /></element>
+			<element ref="Key_5">                                            <bounds x="66" y="141" width="10" height="10" /></element>
+			<element ref="Switch_Push-Button" inputtag="X1" inputmask="0x04"><bounds x="60" y="160" width="20" height="10" /></element>
+			<element ref="Key_6">                                            <bounds x="66" y="171" width="10" height="10" /></element>
+			<element ref="Switch_Push-Button" inputtag="X1" inputmask="0x08"><bounds x="60" y="190" width="20" height="10" /></element>
+			<element ref="Key_Enter">                                        <bounds x="63" y="199" width="15" height="14" /></element>
+			<element ref="Switch_Push-Button" inputtag="X1" inputmask="0x10"><bounds x="60" y="220" width="20" height="10" /></element>
+			<element ref="Key_Quote">                                        <bounds x="64" y="230" width="14" height="14" /></element>
+			<element ref="Switch_Push-Button" inputtag="X1" inputmask="0x20"><bounds x="60" y="250" width="20" height="10" /></element>
+			<element ref="Key_SColon">                                       <bounds x="65" y="259" width="11" height="11" /></element>
+			<element ref="Switch_Push-Button" inputtag="X1" inputmask="0x40"><bounds x="60" y="280" width="20" height="10" /></element>
+			<element ref="Key_L">                                            <bounds x="66" y="291" width="10" height="10" /></element>
+			<element ref="Switch_Push-Button" inputtag="X1" inputmask="0x80"><bounds x="60" y="310" width="20" height="10" /></element>
+			<element ref="Key_Equals">                                       <bounds x="66" y="321" width="10" height="10" /></element>
 
 
-		<!-- Outhole -->
-		<bezel name="solenoid6"  element="Solenoid_Outhole">                        <bounds x="150" y="455" width="58" height="22" /></bezel>
-		<bezel element="Switch_RollOn_WireForm_Left" inputtag="X0" inputmask="0x80"><bounds x="163" y="453" width="20" height="16" /></bezel>
-		<bezel element="Key_BSpace">                                                <bounds x="185" y="455" width="15" height="14" /></bezel>
+			<element ref="Switch_Push-Button" inputtag="X2" inputmask="0x01"><bounds x="095" y="100" width="20" height="10" /></element>
+			<element ref="Key_K">                                            <bounds x="101" y="111" width="10" height="10" /></element>
+			<element ref="Switch_Push-Button" inputtag="X2" inputmask="0x02"><bounds x="095" y="130" width="20" height="10" /></element>
+			<element ref="Key_J">                                            <bounds x="101" y="141" width="10" height="10" /></element>
+			<element ref="Switch_Push-Button" inputtag="X2" inputmask="0x04"><bounds x="095" y="160" width="20" height="10" /></element>
+			<element ref="Key_H">                                            <bounds x="101" y="171" width="10" height="10" /></element>
+			<element ref="Switch_Push-Button" inputtag="X2" inputmask="0x08"><bounds x="095" y="190" width="20" height="10" /></element>
+			<element ref="Key_G">                                            <bounds x="101" y="201" width="10" height="10" /></element>
+			<element ref="Switch_Push-Button" inputtag="X2" inputmask="0x10"><bounds x="095" y="220" width="20" height="10" /></element>
+			<element ref="Key_F">                                            <bounds x="101" y="231" width="10" height="10" /></element>
+			<element ref="Switch_Push-Button" inputtag="X2" inputmask="0x20"><bounds x="095" y="250" width="20" height="10" /></element>
+			<element ref="Key_D">                                            <bounds x="101" y="261" width="10" height="10" /></element>
+			<element ref="Switch_Push-Button" inputtag="X2" inputmask="0x40"><bounds x="095" y="280" width="20" height="10" /></element>
+			<element ref="Key_S">                                            <bounds x="101" y="291" width="10" height="10" /></element>
+			<element ref="Switch_Push-Button" inputtag="X2" inputmask="0x80"><bounds x="095" y="310" width="20" height="10" /></element>
+			<element ref="Key_A">                                            <bounds x="101" y="321" width="10" height="10" /></element>
 
 
-
-		<bezel element="Text_Switch"><bounds x="070" y="65" width="70" height="12" /></bezel>
-		<bezel element="ST0">        <bounds x="020" y="080" width="30" height="11" /></bezel>
-		<bezel element="ST1">        <bounds x="055" y="080" width="30" height="11" /></bezel>
-		<bezel element="ST2">        <bounds x="090" y="080" width="30" height="11" /></bezel>
-		<bezel element="ST3">        <bounds x="125" y="080" width="30" height="11" /></bezel>
-		<bezel element="ST4">        <bounds x="160" y="080" width="30" height="11" /></bezel>
-		<bezel element="I0">         <bounds x="001" y="100" width="20" height="11" /></bezel>
-		<bezel element="I1">         <bounds x="001" y="130" width="20" height="11" /></bezel>
-		<bezel element="I2">         <bounds x="001" y="160" width="20" height="11" /></bezel>
-		<bezel element="I3">         <bounds x="001" y="190" width="20" height="11" /></bezel>
-		<bezel element="I4">         <bounds x="001" y="220" width="20" height="11" /></bezel>
-		<bezel element="I5">         <bounds x="001" y="250" width="20" height="11" /></bezel>
-		<bezel element="I6">         <bounds x="001" y="280" width="20" height="11" /></bezel>
-		<bezel element="I7">         <bounds x="001" y="310" width="20" height="11" /></bezel>
-
-
-		<bezel element="Switch_Push-Button" inputtag="X0" inputmask="0x01"><bounds x="25" y="100" width="20" height="10" /></bezel>
-		<bezel element="Key_Dot">                                          <bounds x="28" y="107" width="14" height="14" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X0" inputmask="0x02"><bounds x="25" y="130" width="20" height="10" /></bezel>
-		<bezel element="Key_FSlash">                                       <bounds x="31" y="141" width="10" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X0" inputmask="0x04"><bounds x="25" y="160" width="20" height="10" /></bezel>
-		<bezel element="Key_OBrkt">                                        <bounds x="31" y="171" width="10" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X0" inputmask="0x08"><bounds x="25" y="190" width="20" height="10" /></bezel>
-		<bezel element="Key_CBrkt">                                        <bounds x="31" y="201" width="10" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X0" inputmask="0x10"><bounds x="25" y="220" width="20" height="10" /></bezel>
-		<bezel element="Key_BSlash">                                       <bounds x="31" y="231" width="10" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X0" inputmask="0x20"><bounds x="25" y="250" width="20" height="10" /></bezel>
-		<bezel element="Key_1">                                            <bounds x="31" y="261" width="10" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X0" inputmask="0x40"><bounds x="25" y="280" width="20" height="10" /></bezel>
-		<bezel element="Key_T">                                            <bounds x="31" y="291" width="10" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X0" inputmask="0x80"><bounds x="25" y="310" width="20" height="10" /></bezel>
-		<bezel element="Key_BSpace">                                       <bounds x="28" y="320" width="15" height="14" /></bezel>
+			<element ref="Switch_Push-Button" inputtag="X3" inputmask="0x01"><bounds x="130" y="100" width="20" height="10" /></element>
+			<element ref="Key_O">                                            <bounds x="136" y="111" width="10" height="10" /></element>
+			<element ref="Switch_Push-Button" inputtag="X3" inputmask="0x02"><bounds x="130" y="130" width="20" height="10" /></element>
+			<element ref="Key_I">                                            <bounds x="136" y="141" width="10" height="10" /></element>
+			<element ref="Switch_Push-Button" inputtag="X3" inputmask="0x04"><bounds x="130" y="160" width="20" height="10" /></element>
+			<element ref="Key_U">                                            <bounds x="136" y="171" width="10" height="10" /></element>
+			<element ref="Switch_Push-Button" inputtag="X3" inputmask="0x08"><bounds x="130" y="190" width="20" height="10" /></element>
+			<element ref="Key_Y">                                            <bounds x="136" y="201" width="10" height="10" /></element>
+			<element ref="Switch_Push-Button" inputtag="X3" inputmask="0x10"><bounds x="130" y="220" width="20" height="10" /></element>
+			<element ref="Key_R">                                            <bounds x="136" y="231" width="10" height="10" /></element>
+			<element ref="Switch_Push-Button" inputtag="X3" inputmask="0x20"><bounds x="130" y="250" width="20" height="10" /></element>
+			<element ref="Key_E">                                            <bounds x="136" y="261" width="10" height="10" /></element>
+			<element ref="Switch_Push-Button" inputtag="X3" inputmask="0x40"><bounds x="130" y="280" width="20" height="10" /></element>
+			<element ref="Key_W">                                            <bounds x="136" y="291" width="10" height="10" /></element>
+			<element ref="Switch_Push-Button" inputtag="X3" inputmask="0x80"><bounds x="130" y="310" width="20" height="10" /></element>
+			<element ref="Key_Q">                                            <bounds x="136" y="321" width="10" height="10" /></element>
 
 
-		<bezel element="Switch_Push-Button" inputtag="X1" inputmask="0x01"><bounds x="60" y="100" width="20" height="10" /></bezel>
-		<bezel element="Key_7">                                            <bounds x="66" y="111" width="10" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X1" inputmask="0x02"><bounds x="60" y="130" width="20" height="10" /></bezel>
-		<bezel element="Key_5">                                            <bounds x="66" y="141" width="10" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X1" inputmask="0x04"><bounds x="60" y="160" width="20" height="10" /></bezel>
-		<bezel element="Key_6">                                            <bounds x="66" y="171" width="10" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X1" inputmask="0x08"><bounds x="60" y="190" width="20" height="10" /></bezel>
-		<bezel element="Key_Enter">                                        <bounds x="63" y="199" width="15" height="14" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X1" inputmask="0x10"><bounds x="60" y="220" width="20" height="10" /></bezel>
-		<bezel element="Key_Quote">                                        <bounds x="64" y="230" width="14" height="14" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X1" inputmask="0x20"><bounds x="60" y="250" width="20" height="10" /></bezel>
-		<bezel element="Key_SColon">                                       <bounds x="65" y="259" width="11" height="11" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X1" inputmask="0x40"><bounds x="60" y="280" width="20" height="10" /></bezel>
-		<bezel element="Key_L">                                            <bounds x="66" y="291" width="10" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X1" inputmask="0x80"><bounds x="60" y="310" width="20" height="10" /></bezel>
-		<bezel element="Key_Equals">                                       <bounds x="66" y="321" width="10" height="10" /></bezel>
+			<element ref="Switch_Push-Button" inputtag="X4" inputmask="0x01"><bounds x="165" y="100" width="20" height="10" /></element>
+			<element ref="Key_Comma">                                        <bounds x="168" y="107" width="14" height="14" /></element>
+			<element ref="Switch_Push-Button" inputtag="X4" inputmask="0x02"><bounds x="165" y="130" width="20" height="10" /></element>
+			<element ref="Key_M">                                            <bounds x="171" y="141" width="10" height="10" /></element>
+			<element ref="Switch_Push-Button" inputtag="X4" inputmask="0x04"><bounds x="165" y="160" width="20" height="10" /></element>
+			<element ref="Key_N">                                            <bounds x="171" y="171" width="10" height="10" /></element>
+			<element ref="Switch_Push-Button" inputtag="X4" inputmask="0x08"><bounds x="165" y="190" width="20" height="10" /></element>
+			<element ref="Key_B">                                            <bounds x="171" y="201" width="10" height="10" /></element>
+			<element ref="Switch_Push-Button" inputtag="X4" inputmask="0x10"><bounds x="165" y="220" width="20" height="10" /></element>
+			<element ref="Key_V">                                            <bounds x="171" y="231" width="10" height="10" /></element>
+			<element ref="Switch_Push-Button" inputtag="X4" inputmask="0x20"><bounds x="165" y="250" width="20" height="10" /></element>
+			<element ref="Key_C">                                            <bounds x="171" y="261" width="10" height="10" /></element>
+			<element ref="Switch_Push-Button" inputtag="X4" inputmask="0x40"><bounds x="165" y="280" width="20" height="10" /></element>
+			<element ref="Key_X">                                            <bounds x="171" y="291" width="10" height="10" /></element>
+			<element ref="Switch_Push-Button" inputtag="X4" inputmask="0x80"><bounds x="165" y="310" width="20" height="10" /></element>
+			<element ref="Key_Z">                                            <bounds x="171" y="321" width="10" height="10" /></element>
+
+		</collection>
 
 
-		<bezel element="Switch_Push-Button" inputtag="X2" inputmask="0x01"><bounds x="095" y="100" width="20" height="10" /></bezel>
-		<bezel element="Key_K">                                            <bounds x="101" y="111" width="10" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X2" inputmask="0x02"><bounds x="095" y="130" width="20" height="10" /></bezel>
-		<bezel element="Key_J">                                            <bounds x="101" y="141" width="10" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X2" inputmask="0x04"><bounds x="095" y="160" width="20" height="10" /></bezel>
-		<bezel element="Key_H">                                            <bounds x="101" y="171" width="10" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X2" inputmask="0x08"><bounds x="095" y="190" width="20" height="10" /></bezel>
-		<bezel element="Key_G">                                            <bounds x="101" y="201" width="10" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X2" inputmask="0x10"><bounds x="095" y="220" width="20" height="10" /></bezel>
-		<bezel element="Key_F">                                            <bounds x="101" y="231" width="10" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X2" inputmask="0x20"><bounds x="095" y="250" width="20" height="10" /></bezel>
-		<bezel element="Key_D">                                            <bounds x="101" y="261" width="10" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X2" inputmask="0x40"><bounds x="095" y="280" width="20" height="10" /></bezel>
-		<bezel element="Key_S">                                            <bounds x="101" y="291" width="10" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X2" inputmask="0x80"><bounds x="095" y="310" width="20" height="10" /></bezel>
-		<bezel element="Key_A">                                            <bounds x="101" y="321" width="10" height="10" /></bezel>
+		<collection name="Backglass">
+
+			<element ref="Draw_White"><bounds x="320" y="0" width="320" height="1" /></element>
+			<element ref="Draw_White"><bounds x="320" y="320" width="320" height="1" /></element>
+			<element ref="Draw_White"><bounds x="320" y="0" width="1" height="320" /></element>
+			<element ref="Draw_White"><bounds x="640" y="0" width="1" height="320" /></element>
 
 
-		<bezel element="Switch_Push-Button" inputtag="X3" inputmask="0x01"><bounds x="130" y="100" width="20" height="10" /></bezel>
-		<bezel element="Key_O">                                            <bounds x="136" y="111" width="10" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X3" inputmask="0x02"><bounds x="130" y="130" width="20" height="10" /></bezel>
-		<bezel element="Key_I">                                            <bounds x="136" y="141" width="10" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X3" inputmask="0x04"><bounds x="130" y="160" width="20" height="10" /></bezel>
-		<bezel element="Key_U">                                            <bounds x="136" y="171" width="10" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X3" inputmask="0x08"><bounds x="130" y="190" width="20" height="10" /></bezel>
-		<bezel element="Key_Y">                                            <bounds x="136" y="201" width="10" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X3" inputmask="0x10"><bounds x="130" y="220" width="20" height="10" /></bezel>
-		<bezel element="Key_R">                                            <bounds x="136" y="231" width="10" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X3" inputmask="0x20"><bounds x="130" y="250" width="20" height="10" /></bezel>
-		<bezel element="Key_E">                                            <bounds x="136" y="261" width="10" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X3" inputmask="0x40"><bounds x="130" y="280" width="20" height="10" /></bezel>
-		<bezel element="Key_W">                                            <bounds x="136" y="291" width="10" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X3" inputmask="0x80"><bounds x="130" y="310" width="20" height="10" /></bezel>
-		<bezel element="Key_Q">                                            <bounds x="136" y="321" width="10" height="10" /></bezel>
+			<element ref="Title_Bally"><bounds x="430" y="18" width="105" height="30" /></element>
 
 
-		<bezel element="Switch_Push-Button" inputtag="X4" inputmask="0x01"><bounds x="165" y="100" width="20" height="10" /></bezel>
-		<bezel element="Key_Comma">                                        <bounds x="168" y="107" width="14" height="14" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X4" inputmask="0x02"><bounds x="165" y="130" width="20" height="10" /></bezel>
-		<bezel element="Key_M">                                            <bounds x="171" y="141" width="10" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X4" inputmask="0x04"><bounds x="165" y="160" width="20" height="10" /></bezel>
-		<bezel element="Key_N">                                            <bounds x="171" y="171" width="10" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X4" inputmask="0x08"><bounds x="165" y="190" width="20" height="10" /></bezel>
-		<bezel element="Key_B">                                            <bounds x="171" y="201" width="10" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X4" inputmask="0x10"><bounds x="165" y="220" width="20" height="10" /></bezel>
-		<bezel element="Key_V">                                            <bounds x="171" y="231" width="10" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X4" inputmask="0x20"><bounds x="165" y="250" width="20" height="10" /></bezel>
-		<bezel element="Key_C">                                            <bounds x="171" y="261" width="10" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X4" inputmask="0x40"><bounds x="165" y="280" width="20" height="10" /></bezel>
-		<bezel element="Key_X">                                            <bounds x="171" y="291" width="10" height="10" /></bezel>
-		<bezel element="Switch_Push-Button" inputtag="X4" inputmask="0x80"><bounds x="165" y="310" width="20" height="10" /></bezel>
-		<bezel element="Key_Z">                                            <bounds x="171" y="321" width="10" height="10" /></bezel>
+			<!-- Player 1 Score -->
+			<element name="lamp14" ref="Lamp_P1"><bounds x="330" y="55" width="15" height="15" /></element>         <!-- Backbox ~ 1st Player Up -->
+			<element name="digit17" ref="Digit"><bounds x="360" y="55" width="10" height="15" /></element>
+			<element name="digit16" ref="Digit"><bounds x="374" y="55" width="10" height="15" /></element>
+			<element name="digit15" ref="Digit"><bounds x="388" y="55" width="10" height="15" /></element>
+			<element name="digit14" ref="Digit"><bounds x="402" y="55" width="10" height="15" /></element>
+			<element name="digit13" ref="Digit"><bounds x="416" y="55" width="10" height="15" /></element>
+			<element name="digit12" ref="Digit"><bounds x="430" y="55" width="10" height="15" /></element>
+			<element name="digit11" ref="Digit"><bounds x="444" y="55" width="10" height="15" /></element>
+
+			<!-- Player 2 Score -->
+			<element name="lamp29" ref="Lamp_P2"><bounds x="615" y="55" width="15" height="15" /></element>         <!-- Backbox ~ 2nd Player Up -->
+			<element name="digit27" ref="Digit"><bounds x="506" y="55" width="10" height="15" /></element>
+			<element name="digit26" ref="Digit"><bounds x="520" y="55" width="10" height="15" /></element>
+			<element name="digit25" ref="Digit"><bounds x="534" y="55" width="10" height="15" /></element>
+			<element name="digit24" ref="Digit"><bounds x="548" y="55" width="10" height="15" /></element>
+			<element name="digit23" ref="Digit"><bounds x="562" y="55" width="10" height="15" /></element>
+			<element name="digit22" ref="Digit"><bounds x="576" y="55" width="10" height="15" /></element>
+			<element name="digit21" ref="Digit"><bounds x="590" y="55" width="10" height="15" /></element>
+
+			<!-- Player 3 Score -->
+			<element name="lamp44" ref="Lamp_P3"><bounds x="330" y="250" width="15" height="15" /></element>        <!-- Backbox ~ 3rd Player Up -->
+			<element name="digit37" ref="Digit"><bounds x="360" y="250" width="10" height="15" /></element>
+			<element name="digit36" ref="Digit"><bounds x="374" y="250" width="10" height="15" /></element>
+			<element name="digit35" ref="Digit"><bounds x="388" y="250" width="10" height="15" /></element>
+			<element name="digit34" ref="Digit"><bounds x="402" y="250" width="10" height="15" /></element>
+			<element name="digit33" ref="Digit"><bounds x="416" y="250" width="10" height="15" /></element>
+			<element name="digit32" ref="Digit"><bounds x="430" y="250" width="10" height="15" /></element>
+			<element name="digit31" ref="Digit"><bounds x="444" y="250" width="10" height="15" /></element>
+
+			<!-- Player 4 Score -->
+			<element name="lamp59" ref="Lamp_P4"><bounds x="615" y="250" width="15" height="15" /></element>        <!-- Backbox ~ 4th Player Up -->
+			<element name="digit47" ref="Digit"><bounds x="506" y="250" width="10" height="15" /></element>
+			<element name="digit46" ref="Digit"><bounds x="520" y="250" width="10" height="15" /></element>
+			<element name="digit45" ref="Digit"><bounds x="534" y="250" width="10" height="15" /></element>
+			<element name="digit44" ref="Digit"><bounds x="548" y="250" width="10" height="15" /></element>
+			<element name="digit43" ref="Digit"><bounds x="562" y="250" width="10" height="15" /></element>
+			<element name="digit42" ref="Digit"><bounds x="576" y="250" width="10" height="15" /></element>
+			<element name="digit41" ref="Digit"><bounds x="590" y="250" width="10" height="15" /></element>
+
+			<!-- Credits and Ball In Play / Match -->
+			<element ref="Text_Credit"><bounds x="542" y="142" width="48" height="8" /></element>
+			<element name="lamp12"  ref="Ball_In_Play"><bounds x="586" y="105" width="50" height="11" /></element>  <!-- Backbox ~ Ball In Play -->
+			<element name="lamp25"  ref="Match"><bounds x="596" y="152" width="25" height="11" /></element>         <!-- Backbox ~ Match -->
+			<element name="digit55" ref="Digit"><bounds x="554" y="125" width="10" height="15" /></element>
+			<element name="digit54" ref="Digit"><bounds x="568" y="125" width="10" height="15" /></element>
+			<element name="digit52" ref="Digit"><bounds x="596" y="125" width="10" height="15" /></element>
+			<element name="digit51" ref="Digit"><bounds x="610" y="125" width="10" height="15" /></element>
+
+			<element name="lamp10" ref="Shoot_Again"><bounds x="420" y="295" width="60" height="19" /></element>    <!-- Backbox ~ Same Player Shoots Again -->
+			<element name="lamp13" ref="Lamp_1P"><bounds x="345" y="297" width="15" height="15" /></element>        <!-- Backbox ~ 1 Player Game -->
+			<element name="lamp28" ref="Lamp_2P"><bounds x="360" y="297" width="15" height="15" /></element>        <!-- Backbox ~ 2 Player Game -->
+			<element name="lamp43" ref="Lamp_3P"><bounds x="375" y="297" width="15" height="15" /></element>        <!-- Backbox ~ 3 Player Game -->
+			<element name="lamp58" ref="Lamp_4P"><bounds x="390" y="297" width="15" height="15" /></element>        <!-- Backbox ~ 4 Player Game -->
+			<element name="lamp27" ref="High_Score_To_Date"><bounds x="438" y="6" width="90" height="11" /></element>   <!-- Backbox ~ High Score To Date -->
+			<element name="lamp42" ref="Game_Over"><bounds x="580" y="300" width="45" height="11" /></element>      <!-- Backbox ~ Game Over -->
+			<element name="lamp57" ref="Tilt"><bounds x="480" y="297" width="50" height="16" /></element>           <!-- Backbox ~ Tilt -->
+
+		</collection>
+
+
+		<collection name="I/O Test">
+
+			<element ref="Draw_White"><bounds x="320" y="320" width="320" height="1" /></element>
+			<element ref="Draw_White"><bounds x="320" y="480" width="320" height="1" /></element>
+			<element ref="Draw_White"><bounds x="320" y="320" width="1" height="160" /></element>
+			<element ref="Draw_White"><bounds x="640" y="320" width="1" height="160" /></element>
+
+
+			<element ref="Text_Lamps"><bounds x="410" y="360" width="60" height="11" /></element>
+			<element ref="Text_15"><bounds x="552" y="373" width="30" height="11" /></element>
+			<element ref="Text_30"><bounds x="552" y="388" width="30" height="11" /></element>
+			<element ref="Text_45"><bounds x="552" y="403" width="30" height="11" /></element>
+			<element ref="Text_60"><bounds x="552" y="418" width="30" height="11" /></element>
+
+			<!-- Lamps controlled by U1-U4 00-14 on Lamp Driver Board -->
+			<repeat count="4">
+				<param name="s" start="0" increment="15" />
+				<param name="y" start="375" increment="15" />
+				<repeat count="15">
+					<param name="n" start="~s~" increment="1" />
+					<param name="x" start="330" increment="15" />
+					<element name="lamp~n~" ref="Lamp_White"><bounds x="~x~" y="~y~" width="8" height="8" /></element>
+				</repeat>
+			</repeat>
+
+
+			<element ref="Text_Solenoids"><bounds x="382" y="437" width="100" height="11" /></element>
+			<repeat count="15">
+				<param name="n" start="0" increment="1" />
+				<param name="x" start="330" increment="15" />
+				<element name="solenoid~n~" ref="Solenoid_PullDown"><bounds x="~x~" y="452" width="9" height="19" /></element>
+			</repeat>
+
+			<element ref="Text_Coils"><bounds x="572" y="437" width="50" height="11" /></element>
+			<element name="solenoid16" ref="Coil_PullDown"><bounds x="570" y="459" width="09" height="12" /></element>
+			<element name="solenoid17" ref="Coil_PullDown"><bounds x="585" y="459" width="09" height="12" /></element>
+			<element name="solenoid18" ref="Coil_PullDown"><bounds x="600" y="459" width="09" height="12" /></element>
+			<element name="solenoid19" ref="Coil_PullDown"><bounds x="615" y="459" width="09" height="12" /></element>
+
+
+			<!-- Cabinet Switches -->
+			<element ref="Text_Service">                                       <bounds x="485" y="342" width="50" height="10" /></element>
+			<element ref="Switch_Push-Button" inputtag="TEST" inputmask="0x01"><bounds x="495" y="331" width="20" height="10" /></element>
+			<element ref="Key_9">                                              <bounds x="516" y="330" width="10" height="10" /></element>
+
+			<element ref="Text_Slam">                                     <bounds x="430" y="342" width="50" height="10" /></element>
+			<element ref="Switch_SlamTilt" inputtag="X1" inputmask="0x80"><bounds x="434" y="331" width="25" height="08" /></element>
+			<element ref="Key_Equals">                                    <bounds x="461" y="330" width="10" height="10" /></element>
+
+			<element ref="Text_Tilt">                                 <bounds x="380" y="342" width="50" height="10" /></element>
+			<element ref="Switch_Tilt" inputtag="X0" inputmask="0x40"><bounds x="390" y="324" width="17" height="17" /></element>
+			<element ref="Key_T">                                     <bounds x="411" y="330" width="10" height="10" /></element>
+
+			<!-- MPU Board Activity Switch -->
+			<element ref="Text_Activity">                                      <bounds x="540" y="342" width="50" height="10" /></element>
+			<element ref="Switch_Push-Button" inputtag="TEST" inputmask="0x02"><bounds x="550" y="331" width="20" height="10" /></element>
+			<element ref="Key_0">                                              <bounds x="571" y="330" width="10" height="10" /></element>
+
+			<!-- MPU Board Power On Self Test LED -->
+			<element name="led0" ref="LED_Green"><bounds x="618" y="328" width="10" height="10" /></element>
+			<element ref="Text_MPU_LED">         <bounds x="609" y="342" width="30" height="10" /></element>
+
+
+			<!-- Misc Solenoids -->
+			<element name="solenoid5"  ref="Solenoid_Knocker"><bounds x="336" y="321" width="09" height="22" /></element>
+			<element ref="Text_Knocker">   <!-- Knocker -->   <bounds x="322" y="342" width="40" height="10" /></element>
+
+		</collection>
 
 	</view>
 

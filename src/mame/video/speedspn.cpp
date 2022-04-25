@@ -27,7 +27,7 @@ void speedspn_state::video_start()
 	save_item(NAME(m_vidram));
 }
 
-WRITE8_MEMBER(speedspn_state::vidram_w)
+void speedspn_state::vidram_w(offs_t offset, uint8_t data)
 {
 	m_vidram[offset + m_bank_vidram] = data;
 
@@ -35,26 +35,26 @@ WRITE8_MEMBER(speedspn_state::vidram_w)
 		m_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE8_MEMBER(speedspn_state::attram_w)
+void speedspn_state::attram_w(offs_t offset, uint8_t data)
 {
 	m_attram[offset] = data;
 
 	m_tilemap->mark_tile_dirty(offset^0x400);
 }
 
-READ8_MEMBER(speedspn_state::vidram_r)
+uint8_t speedspn_state::vidram_r(offs_t offset)
 {
 	return m_vidram[offset + m_bank_vidram];
 }
 
-WRITE8_MEMBER(speedspn_state::vidram_bank_w)
+void speedspn_state::vidram_bank_w(uint8_t data)
 {
 //  logerror("VidRam Bank: %04x\n", data);
 	m_bank_vidram = data & 1;
 	m_bank_vidram *= 0x1000;
 }
 
-WRITE8_MEMBER(speedspn_state::display_disable_w)
+void speedspn_state::display_disable_w(uint8_t data)
 {
 //  logerror("Global display: %u\n", data);
 	m_display_disable = data & 1;

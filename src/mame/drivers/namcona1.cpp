@@ -14,11 +14,12 @@ NA-1 Games:
 -   Emeraldia (C358)
 
 NA-2 Games:
--   Knuckle Heads (C3??)
+-   Knuckle Heads (C360)
 -   Numan Athletics (C359)
 -   Emeraldia (C358)
 -   Nettou! Gekitou! Quiztou!! (C365)
 -   X-Day 2 (C394)
+-   Zelos (no keycus)
 
 
 To Do:
@@ -28,7 +29,7 @@ To Do:
   area is uninitialized, the game software automatically writes these values there,
   but then hangs.
   *cgangpzl, cgangpzlj, exvania, exvaniaj, knckheadjp, quiztou
-- xday2: unemulated printer and RTC devices (check test mode game options), also battery always returns NG
+- xday2: unemulated printer and RTC devices (check test mode game options)
 
 - X-Day 2:
     Rom board  M112
@@ -587,7 +588,7 @@ void namcona1_state::namcona1_main_map(address_map &map)
 	map(0xf00000, 0xf01fff).ram().w(FUNC(namcona1_state::paletteram_w)).share("paletteram");
 	map(0xf40000, 0xf7ffff).rw(FUNC(namcona1_state::gfxram_r), FUNC(namcona1_state::gfxram_w)).share("cgram");
 	map(0xff0000, 0xffbfff).ram().w(FUNC(namcona1_state::videoram_w)).share("videoram");
-	map(0xffd000, 0xffdfff).ram();                         /* unknown */
+	map(0xffc000, 0xffdfff).ram();                         /* expects RAM here for some games or it won't boot*/
 	map(0xffe000, 0xffefff).ram().share("scroll");      /* scroll registers */
 	map(0xfff000, 0xffffff).ram().share("spriteram");   /* spriteram */
 }
@@ -595,6 +596,25 @@ void namcona1_state::namcona1_main_map(address_map &map)
 void namcona1_state::namcona1_c219_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).ram().share("workram");
+}
+
+void namcona2_state::zelos_ctrl_w(u16 data)
+{
+	// bit 15 to 7 are set during I/O test when switching between the 9 'windows'. Output test? Maybe which 'window' screen to update?
+	// at least bit 4 to 1 are used, too
+
+	m_zelos_ctrl = data;
+
+	//if (data & 0x007f)
+	//  logerror("zelos_ctrl_w: %04x\n", data);
+}
+
+void namcona2_state::zelos_main_map(address_map &map)
+{
+	namcona1_main_map(map);
+
+	map(0xd00000, 0xd00001).w(FUNC(namcona2_state::zelos_ctrl_w));
+	// map(0xd40000, 0xd40001).w(FUNC(namcona2_state::)); // bit 1 alternatively set and cleared in test mode
 }
 
 u8 xday2_namcona2_state::printer_r()
@@ -727,6 +747,7 @@ void namcona1_state::port8_w(u8 data)
 void namcona1_state::machine_start()
 {
 	m_mEnableInterrupts = 0;
+	std::fill(std::begin(m_mcu_mailbox), std::end(m_mcu_mailbox), 0);
 	save_item(NAME(m_mEnableInterrupts));
 	save_item(NAME(m_count));
 	save_item(NAME(m_mcu_mailbox));
@@ -879,6 +900,47 @@ static INPUT_PORTS_START(namcona1_quiz)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_SERVICE1)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(zelost) // TODO: to be adjusted when the game will work, for now using PORT_NAME to name them as the I/O test does
+	PORT_START("P1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON8) PORT_PLAYER(3) PORT_NAME("LINE 8")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_PLAYER(3) PORT_NAME("LINE 6")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_PLAYER(3) PORT_NAME("LINE 4")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(3) PORT_NAME("LINE 2")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("D.GAME") // double up game?
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("PAY OUT")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN) // no effect in I/O test
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN) // "
+
+	PORT_START("P2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("A.L.B.") // ???
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON7) PORT_PLAYER(3) PORT_NAME("LINE 7")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_PLAYER(3) PORT_NAME("LINE 5")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(3) PORT_NAME("LINE 3")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("T.SCORE") // take score?
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN) // no effect in I/O test
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN) // "
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(3) PORT_NAME("LINE 1")
+
+	PORT_START("P3")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN) // no effect in I/O test
+
+	PORT_START("P4")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN) // no effect in I/O test
+
+	PORT_START("DSW")
+	PORT_DIPNAME(0x01, 0x01, "DIP2 (Freeze)")
+	PORT_DIPSETTING(   0x01, DEF_STR(Off))
+	PORT_DIPSETTING(   0x00, DEF_STR(On))
+	PORT_DIPNAME(0x02, 0x02, "DIP1 (Test)")
+	PORT_DIPSETTING(   0x02, DEF_STR(Off))
+	PORT_DIPSETTING(   0x00, DEF_STR(On))
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN) // no effect in I/O test
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN) // no effect in I/O test
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN) // no effect in I/O test
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN) // no effect in I/O test
+	PORT_SERVICE(0x40, IP_ACTIVE_LOW)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN) // no effect in I/O test
+INPUT_PORTS_END
 
 /***************************************************************************/
 
@@ -951,7 +1013,7 @@ void namcona1_state::scanline_interrupt(int scanline)
 	}
 }
 
-void namcona1_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void namcona1_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_SCANLINE)
 	{
@@ -1054,6 +1116,13 @@ void namcona2_state::namcona2(machine_config &config)
 //  m_maincpu->set_addrmap(AS_PROGRAM, &namcona2_state::namcona2_main_map);
 }
 
+void namcona2_state::zelos(machine_config &config)
+{
+	namcona2(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcona2_state::zelos_main_map);
+}
+
 void xday2_namcona2_state::xday2(machine_config &config)
 {
 	namcona_base(config);
@@ -1083,6 +1152,7 @@ void namcona2_state::init_knckhead()        { m_gametype = NAMCO_KNCKHEAD; }
 void namcona2_state::init_numanath()        { m_gametype = NAMCO_NUMANATH; }
 void namcona2_state::init_quiztou()         { m_gametype = NAMCO_QUIZTOU; }
 void xday2_namcona2_state::init_xday2()     { m_gametype = NAMCO_XDAY2; }
+void namcona2_state::init_zelos()           { m_gametype = -1; save_item(NAME(m_zelos_ctrl)); }
 
 ROM_START(bkrtmaq)
 	ROM_REGION(0x200000, "maincpu", 0)
@@ -1287,6 +1357,21 @@ ROM_END
 **************************************/
 
 
+// runs on several Namco NA-2 PCBs. Cabinet pic shows 9 screens for main display + 5 screens (one per terminal)
+ROM_START(bbbingo) // uses NA E4M8 ROM PCB with unpopulated keycus
+	ROM_REGION(0x200000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE("bi1-slp1.6c", 0x000001, 0x080000, CRC(07a9a78d) SHA1(73f8933a26adc7725f046ac99c536e151f5c3fa2))
+	ROM_LOAD16_BYTE("bi1-slp0.6f", 0x000000, 0x080000, CRC(9642b4fa) SHA1(900687e1596e4f18a09b80b3a38a4597c4da16da))
+
+	ROM_REGION16_BE(0x800000, "maskrom", ROMREGION_ERASE00)
+	ROM_LOAD16_BYTE("bi1-slp5.2c", 0x000001, 0x080000, CRC(fb3dbcf2) SHA1(f94d339491215cf05dfe616f963560dc47aed472))
+	ROM_LOAD16_BYTE("bi1-slp4.2f", 0x000000, 0x080000, CRC(82d34c59) SHA1(638af6cfec3b09a4b35139bba51bcd21711efa2b))
+	// 0x100000 - 0x1fffff empty
+	ROM_LOAD16_BYTE("bi1-slp3.3c", 0x200001, 0x080000, CRC(4c1f16c4) SHA1(360eb5aaee83b7e6b6d0902aaab75b045cf72d3f))
+	ROM_LOAD16_BYTE("bi1-slp2.3f", 0x200000, 0x080000, CRC(a09cef53) SHA1(96c666a3a4f1747afe32bf791537b211bc8ac6d8))
+ROM_END
+
+
 ROM_START(emeralda) /* NA-2 Game PCB, clones are NA-1 based; see games listed above */
 	ROM_REGION(0x200000, "maincpu", 0)
 	ROM_LOAD16_BYTE("em2-ep0l.6c", 0x000001, 0x080000, CRC(ff1479dc) SHA1(ea945d97ed909be13fb6e062742c7142c0d96c31)) /* 0xc00000 */
@@ -1424,6 +1509,28 @@ ROM_START(xday2)
 	ROM_LOAD16_BYTE("xds1-dat3.8c", 0x400000, 0x200000, CRC(8980acc4) SHA1(ecd94a3d3a38923e8e322cd8863671af26e30812))
 ROM_END
 
+// an 8-liner game that runs on several Namco NA-2 PCBs. Cabinet pic shows 9 screens (one per reel, called windows in IO test) + 5 screens (one per terminal)
+ROM_START(zelos)
+	ROM_REGION(0x200000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE("zs1 slp 1b.6c", 0x000001, 0x080000, CRC(d71df137) SHA1(457d3e7cb352b44706567e8346dcde82393d13c1))
+	ROM_LOAD16_BYTE("zs1 slp 0b.6f", 0x000000, 0x080000, CRC(5807ef9e) SHA1(5dde8d71637de480d1d679d88b25509c229c6056))
+
+	ROM_REGION16_BE(0x800000, "maskrom", ROMREGION_ERASE00)
+	// not populated
+ROM_END
+
+ROM_START(zelost) // this uses a different ROM board: Namco MDROM PCB - 8625961102 with MB8464A-15LL battery-backed RAM
+	ROM_REGION(0x200000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE("zs1 stp 1e.3e", 0x000001, 0x080000, CRC(3a593d12) SHA1(1941c5e88e425f83fc8e22e48e7bf18f231efb78))
+	ROM_LOAD16_BYTE("zs1 stp 0e.6e", 0x000000, 0x080000, CRC(e331f84c) SHA1(77812e50c49093883a9ec71290f45d398abac5fd))
+
+	ROM_REGION16_BE(0x800000, "maskrom", ROMREGION_ERASE00)
+	// not populated
+
+	ROM_REGION(0x0800, "eeprom", 0) // default EEPROM, to avoid error on start-up
+	ROM_LOAD("eeprom", 0x0000, 0x0800, CRC(ac117acc) SHA1(fa7d8d1f47cc0cbcc37d1fa4d41d76a109320b0b))
+ROM_END
+
 // NA-1 (C69 MCU)
 GAME(1992, bkrtmaq,    0,        namcona1, namcona1_quiz,  namcona1_state, init_bkrtmaq,  ROT0, "Namco", "Bakuretsu Quiz Ma-Q Dai Bouken (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 GAME(1992, cgangpzl,   0,        namcona1,  namcona1_joy,  namcona1_state, init_cgangpzl, ROT0, "Namco", "Cosmo Gang the Puzzle (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
@@ -1448,3 +1555,6 @@ GAME(1993, numanath,   0,        namcona2,  namcona1_joy,  namcona2_state, init_
 GAME(1993, numanathj,  numanath, namcona2,  namcona1_joy,  namcona2_state, init_numanath, ROT0, "Namco", "Numan Athletics (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 GAME(1993, quiztou,    0,        namcona2,  namcona1_quiz, namcona2_state, init_quiztou,  ROT0, "Namco", "Nettou! Gekitou! Quiztou!! (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 GAME(1995, xday2,      0,        xday2,     namcona1_joy,  xday2_namcona2_state, init_xday2, ROT0, "Namco", "X-Day 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
+GAME(1994, zelos,      0,        zelos,     namcona1_joy,  namcona2_state, init_zelos,    ROT0, "Namco", "Zelos (Japan, main unit)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL) // waits for communication with the terminals
+GAME(1994, zelost,     0,        zelos,     zelost,        namcona2_state, init_zelos,    ROT0, "Namco", "Zelos (Japan, terminal)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL) // no way to insert medal. Maybe needs communication with main unit?
+GAME(1996, bbbingo,    0,        zelos,     namcona1_joy,  namcona2_state, init_zelos,    ROT0, "Namco", "Bin Bin Bingo (Japan, main unit)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL) // waits for communication with the terminals

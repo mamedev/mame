@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "dp8390.h"
 
-#define DP8390_BYTE_ORDER(w) ((m_regs.dcr & 3) == 3 ? ((data << 8) | (data >> 8)) : data)
+#define DP8390_BYTE_ORDER(w) ((m_regs.dcr & 3) == 3 ? swapendian_int16(data) : data)
 #define LOOPBACK (!(m_regs.dcr & 8) && (m_regs.tcr & 6))
 
 DEFINE_DEVICE_TYPE(DP8390D,  dp8390d_device,  "dp8390d",  "DP8390D NIC")

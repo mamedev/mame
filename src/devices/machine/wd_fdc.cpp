@@ -22,8 +22,10 @@
 #define LOG_STATE   (1U << 12) // Show state machine
 #define LOG_LIVE    (1U << 13) // Live states
 #define LOG_FUNC    (1U << 14) // Function calls
+#define LOG_CRC     (1U << 15) // CRC errors
 
-#define VERBOSE (LOG_GENERAL)
+#define VERBOSE (LOG_DESC)
+//#define VERBOSE (LOG_DESC | LOG_COMMAND | LOG_MATCH | LOG_WRITE | LOG_STATE | LOG_LINES | LOG_COMP | LOG_CRC )
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -42,6 +44,7 @@
 #define LOGSTATE(...) LOGMASKED(LOG_STATE, __VA_ARGS__)
 #define LOGLIVE(...) LOGMASKED(LOG_LIVE, __VA_ARGS__)
 #define LOGFUNC(...) LOGMASKED(LOG_FUNC, __VA_ARGS__)
+#define LOGCRC(...) LOGMASKED(LOG_CRC, __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -78,6 +81,58 @@ DEFINE_DEVICE_TYPE(WD2797,     wd2797_device,     "wd2797",     "Western Digital
 DEFINE_DEVICE_TYPE(WD1770,     wd1770_device,     "wd1770",     "Western Digital WD1770 FDC")
 DEFINE_DEVICE_TYPE(WD1772,     wd1772_device,     "wd1772",     "Western Digital WD1772 FDC")
 DEFINE_DEVICE_TYPE(WD1773,     wd1773_device,     "wd1773",     "Western Digital WD1773 FDC")
+
+static const char *const states[] =
+{
+	"IDLE",
+	"RESTORE",
+	"SEEK",
+	"STEP",
+	"READ_SECTOR",
+	"READ_TRACK",
+	"READ_ID",
+	"WRITE_TRACK",
+	"WRITE_SECTOR",
+	"SPINUP",
+	"SPINUP_WAIT",
+	"SPINUP_DONE",
+	"SETTLE_WAIT",
+	"SETTLE_DONE",
+	"DATA_LOAD_WAIT",
+	"DATA_LOAD_WAIT_DONE",
+	"SEEK_MOVE",
+	"SEEK_WAIT_STEP_TIME",
+	"SEEK_WAIT_STEP_TIME_DONE",
+	"SEEK_WAIT_STABILIZATION_TIME",
+	"SEEK_WAIT_STABILIZATION_TIME_DONE",
+	"SEEK_DONE",
+	"WAIT_INDEX",
+	"WAIT_INDEX_DONE",
+	"SCAN_ID",
+	"SCAN_ID_FAILED",
+	"SECTOR_READ",
+	"SECTOR_WRITE",
+	"TRACK_DONE",
+	"INITIAL_RESTORE",
+	"DUMMY",
+	"SEARCH_ADDRESS_MARK_HEADER",
+	"READ_HEADER_BLOCK_HEADER",
+	"READ_DATA_BLOCK_HEADER",
+	"READ_ID_BLOCK_TO_LOCAL",
+	"READ_ID_BLOCK_TO_DMA",
+	"READ_ID_BLOCK_TO_DMA_BYTE",
+	"SEARCH_ADDRESS_MARK_DATA",
+	"SEARCH_ADDRESS_MARK_DATA_FAILED",
+	"READ_SECTOR_DATA",
+	"READ_SECTOR_DATA_BYTE",
+	"READ_TRACK_DATA",
+	"READ_TRACK_DATA_BYTE",
+	"WRITE_TRACK_DATA",
+	"WRITE_BYTE",
+	"WRITE_BYTE_DONE",
+	"WRITE_SECTOR_PRE",
+	"WRITE_SECTOR_PRE_BYTE"
+};
 
 wd_fdc_device_base::wd_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
@@ -128,7 +183,11 @@ void wd_fdc_device_base::device_start()
 	enmf = false;
 	floppy = nullptr;
 	status = 0x00;
+	data = 0x00;
+	track = 0x00;
 	mr = true;
+
+	delay_int = false;
 
 	save_item(NAME(status));
 	save_item(NAME(command));
@@ -168,14 +227,12 @@ void wd_fdc_device_base::soft_reset()
 WRITE_LINE_MEMBER(wd_fdc_device_base::mr_w)
 {
 	if(mr && !state) {
-		command = 0x00;
+		command = 0x03;
 		main_state = IDLE;
 		sub_state = IDLE;
 		cur_live.state = IDLE;
-		track = 0x00;
 		sector = 0x01;
 		status = 0x00;
-		data = 0x00;
 		cmd_buffer = track_buffer = sector_buffer = -1;
 		counter = 0;
 		status_type_1 = true;
@@ -203,9 +260,13 @@ WRITE_LINE_MEMBER(wd_fdc_device_base::mr_w)
 		intrq_cond = 0;
 		live_abort();
 	} else if(state && !mr) {
-		// trigger a restore after everything else is reset too, in particular the floppy device itself
-		sub_state = INITIAL_RESTORE;
-		t_gen->adjust(attotime::zero);
+		// WD1770/72 (supposedly) not perform RESTORE after reset
+		if (!motor_control) {
+			// trigger a restore after everything else is reset too, in particular the floppy device itself
+			status |= S_BUSY;
+			sub_state = INITIAL_RESTORE;
+			t_gen->adjust(attotime::zero);
+		}
 		mr = true;
 	}
 }
@@ -254,7 +315,7 @@ WRITE_LINE_MEMBER(wd_fdc_device_base::dden_w)
 	}
 }
 
-void wd_fdc_device_base::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void wd_fdc_device_base::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	LOGEVENT("Event fired for timer %s\n", (id==TM_GEN)? "TM_GEN" : (id==TM_CMD)? "TM_CMD" : (id==TM_TRACK)? "TM_TRACK" : "TM_SECTOR");
 	live_sync();
@@ -431,6 +492,7 @@ void wd_fdc_device_base::seek_continue()
 			if(cur_live.crc) {
 				status |= S_CRC;
 				live_start(SEARCH_ADDRESS_MARK_HEADER);
+				LOGCRC("CRC error in seek\n");
 				return;
 			}
 			command_end();
@@ -536,6 +598,7 @@ void wd_fdc_device_base::read_sector_continue()
 			if(cur_live.crc) {
 				status |= S_CRC;
 				live_start(SEARCH_ADDRESS_MARK_HEADER);
+				LOGCRC("CRC error in readsector\n");
 				return;
 			}
 			sector_size = calc_sector_size(cur_live.idbuf[3], command);
@@ -551,8 +614,10 @@ void wd_fdc_device_base::read_sector_continue()
 
 		case SECTOR_READ:
 			LOGSTATE("SECTOR_READ\n");
-			if(cur_live.crc)
+			if(cur_live.crc) {
 				status |= S_CRC;
+				LOGCRC("CRC error in readsector %04X\n",cur_live.crc);
+			}
 
 			if(command & 0x10 && !(status & S_RNF)) {
 				sector++;
@@ -916,6 +981,7 @@ void wd_fdc_device_base::write_sector_continue()
 			if(cur_live.crc) {
 				status |= S_CRC;
 				live_start(SEARCH_ADDRESS_MARK_HEADER);
+				LOGCRC("CRC error in writesector\n");
 				return;
 			}
 			sector_size = calc_sector_size(cur_live.idbuf[3], command);
@@ -953,15 +1019,27 @@ void wd_fdc_device_base::interrupt_start()
 
 	LOGCOMMAND("cmd: forced interrupt (c=%02x)\n", command);
 
+	// If writing a byte to a sector, then wait until it's written before terminating
+	// This behavior is required by the RM nimbus driver, otherwise the forced interrupt
+	// at the end of a multiple sector write occasionally prevents the CRC byte being
+	// written, causing the disk to be corrupted.
+	if(/*((main_state == READ_SECTOR) && (cur_live.state == READ_SECTOR_DATA)) ||*/
+		((main_state == WRITE_SECTOR) && (cur_live.state == WRITE_BYTE))) {
+		delay_int = true;
+		return;
+	} else {
+		delay_int = false;
+	}
+
+	//logerror("main_state=%s, cur_live.state=%s\n",states[main_state],states[cur_live.state]);
+
 	if(status & S_BUSY) {
 		main_state = sub_state = cur_live.state = IDLE;
 		cur_live.tm = attotime::never;
 		status &= ~S_BUSY;
 		drop_drq();
 		motor_timeout = 0;
-	}
-	else
-	{
+	} else {
 		// when a force interrupt command is issued and there is no
 		// currently running command, return the status type 1 bits
 		status_type_1 = true;
@@ -973,6 +1051,21 @@ void wd_fdc_device_base::interrupt_start()
 		intrq = true;
 		if(!intrq_cb.isnull())
 			intrq_cb(intrq);
+	}
+
+	if(spinup_on_interrupt) { // see notes in FD1771 and WD1772 constructors, might be true for other FDC types as well.
+		motor_timeout = 0;
+
+		if (head_control)
+			set_hld();
+
+		if(motor_control) {
+			status |= S_MON | S_SPIN;
+
+			mon_cb(0);
+			if (floppy && !disable_motor_control)
+				floppy->mon_w(0);
+		}
 	}
 
 	if(command & 0x03) {
@@ -1054,11 +1147,16 @@ void wd_fdc_device_base::do_generic()
 
 void wd_fdc_device_base::do_cmd_w()
 {
+	// it is actually possible to send another command even while in busy state.
+	// currently we simply accept any commands, but chip logic is probably more complex
+	// (presumably it is only possible change to a command of the same type).
+#if 0
 	// Only available command when busy is interrupt
 	if(main_state != IDLE && (cmd_buffer & 0xf0) != 0xd0) {
 		cmd_buffer = -1;
 		return;
 	}
+#endif
 	command = cmd_buffer;
 	cmd_buffer = -1;
 
@@ -1122,6 +1220,14 @@ void wd_fdc_device_base::cmd_w(uint8_t val)
 
 	LOGCOMP("Initiating command %02x\n", val);
 
+	// INTRQ flip-flop logic from die schematics:
+	//  Reset conditions:
+	//   - Command register write
+	//   - Status register read
+	//  Setting conditions:
+	//   - While command register contain Dx (interrupt cmd) and one or more I0-I3 conditions met
+	//   - Command-specific based on PLL microprogram
+	// No other logic present in real chips, descriptions of "Forced interrupt" (Dx) command in datasheets are wrong.
 	if (intrq) {
 		intrq = false;
 		if(!intrq_cb.isnull())
@@ -1138,13 +1244,6 @@ void wd_fdc_device_base::cmd_w(uint8_t val)
 	{
 		// checkme timings
 		delay_cycles(t_cmd, dden ? delay_register_commit * 2 : delay_register_commit);
-		if (spinup_on_interrupt)  // see note in WD1772 constructor, might be true for other FDC types as well.
-		{
-			if (head_control)
-				set_hld();
-			if (motor_control)
-				spinup();
-		}
 	}
 	else
 	{
@@ -1202,6 +1301,8 @@ uint8_t wd_fdc_device_base::status_r()
 
 	uint8_t val = status;
 	if (inverted_bus) val ^= 0xff;
+
+	LOGCOMP("Status value: %02X\n",val);
 
 	return val;
 }
@@ -1426,6 +1527,9 @@ void wd_fdc_device_base::index_callback(floppy_image_device *floppy, int state)
 	case TRACK_DONE:
 		live_abort();
 		break;
+
+	case DUMMY:
+		return;
 
 	default:
 		logerror("%s: Index pulse on unknown sub-state %d\n", machine().time().to_string(), sub_state);
@@ -1749,6 +1853,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 			if(cur_live.bit_counter == 16*6) {
 				if(cur_live.crc) {
 					status |= S_CRC;
+					LOGCRC("CRC error in live_run\n");
 				}
 
 				// Already synchronous
@@ -1873,7 +1978,12 @@ void wd_fdc_device_base::live_run(attotime limit)
 			} else if(slot < sector_size+2) {
 				// CRC
 				if(slot == sector_size+1) {
-					live_delay(IDLE);
+					// act on delayed interrupt if active
+/*                  if(delay_int) {
+                        interrupt_start();
+                        return;
+                    }
+*/                  live_delay(IDLE);
 					return;
 				}
 			}
@@ -2088,6 +2198,11 @@ void wd_fdc_device_base::live_run(attotime limit)
 					else {
 						pll_stop_writing(floppy, cur_live.tm);
 						cur_live.state = IDLE;
+
+						// Act on delayed interrupt if set.
+						if(delay_int)
+							interrupt_start();
+
 						return;
 					}
 
@@ -2117,9 +2232,15 @@ void wd_fdc_device_base::live_run(attotime limit)
 						live_write_mfm(cur_live.crc >> 8);
 					else if(cur_live.byte_counter < sector_size + 16+3)
 						live_write_mfm(0xff);
+//                      live_write_mfm(0x4e);
 					else {
 						pll_stop_writing(floppy, cur_live.tm);
 						cur_live.state = IDLE;
+
+						// Act on delayed interrupt if set.
+						if(delay_int)
+							interrupt_start();
+
 						return;
 					}
 				}
@@ -2231,8 +2352,11 @@ void wd_fdc_device_base::set_hld()
 {
 	if(head_control && !hld) {
 		hld = true;
+		int temp = sub_state;
+		sub_state = DUMMY;
 		if(!hld_cb.isnull())
 			hld_cb(hld);
+		sub_state = temp;
 	}
 }
 
@@ -2240,8 +2364,11 @@ void wd_fdc_device_base::drop_hld()
 {
 	if(head_control && hld) {
 		hld = false;
+		int temp = sub_state;
+		sub_state = DUMMY;
 		if(!hld_cb.isnull())
 			hld_cb(hld);
+		sub_state = temp;
 	}
 }
 
@@ -2514,7 +2641,7 @@ bool wd_fdc_digital_device_base::digital_pll_t::write_next_bit(bool bit, attotim
 		uint16_t pre_counter = counter;
 		counter += increment;
 		if(bit && !(pre_counter & 0x400) && (counter & 0x400))
-			if(write_position < ARRAY_LENGTH(write_buffer))
+			if(write_position < std::size(write_buffer))
 				write_buffer[write_position++] = etime;
 		slot++;
 		tm = etime;
@@ -2870,6 +2997,7 @@ wd2791_device::wd2791_device(const machine_config &mconfig, const char *tag, dev
 wd2793_device::wd2793_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, WD2793, tag, owner, clock)
 {
 	step_times = fd179x_step_times;
+
 	delay_register_commit = 16;
 	delay_command_commit = 12;
 	disable_mfm = false;
@@ -2934,7 +3062,7 @@ int wd2797_device::calc_sector_size(uint8_t size, uint8_t command) const
 wd1770_device::wd1770_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_digital_device_base(mconfig, WD1770, tag, owner, clock)
 {
 	step_times = wd_digital_step_times;
-	delay_register_commit = 32;
+	delay_register_commit = 16;
 	delay_command_commit = 36; // official 48 is too high for oric jasmin boot
 	disable_mfm = false;
 	has_enmf = false;
@@ -2952,7 +3080,7 @@ wd1772_device::wd1772_device(const machine_config &mconfig, const char *tag, dev
 	const static int wd1772_step_times[4] = { 12000, 24000, 4000, 6000 };
 
 	step_times = wd1772_step_times;
-	delay_register_commit = 32;
+	delay_register_commit = 16;
 	delay_command_commit = 48;
 	disable_mfm = false;
 	has_enmf = false;
@@ -2978,7 +3106,7 @@ int wd1772_device::settle_time() const
 wd1773_device::wd1773_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_digital_device_base(mconfig, WD1773, tag, owner, clock)
 {
 	step_times = wd_digital_step_times;
-	delay_register_commit = 32;
+	delay_register_commit = 16;
 	delay_command_commit = 48;
 	disable_mfm = false;
 	has_enmf = false;

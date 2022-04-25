@@ -47,7 +47,6 @@ private:
 	uint8_t dma_read_byte(offs_t offset);
 	void dma_write_byte(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
 };
 
 DECLARE_DEVICE_TYPE(ISBC_208, isbc_208_device)

@@ -430,6 +430,8 @@
 #include "tilemap.h"
 
 
+namespace {
+
 #define MASTER_CLOCK    XTAL(16'000'000)          /* unknown */
 #define CPU_CLOCK       MASTER_CLOCK/4      /* guess... seems accurate */
 #define CRTC_CLOCK      MASTER_CLOCK/24     /* it gives 63.371293 Hz. with current settings */
@@ -471,8 +473,8 @@ private:
 	void avt_map(address_map &map);
 	void avt_portmap(address_map &map);
 
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_crtc_vreg[0x100],m_crtc_index;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_crtc_vreg[0x100]{}, m_crtc_index = 0;
 	required_device<z80_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<z80pio_device> m_pio0;
@@ -538,6 +540,12 @@ TILE_GET_INFO_MEMBER(avt_state::get_bg_tile_info)
 void avt_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(avt_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 28, 32);
+
+	m_crtc_index = 0;
+	std::fill(std::begin(m_crtc_vreg), std::end(m_crtc_vreg), 0);
+
+	save_item(NAME(m_crtc_index));
+	save_item(NAME(m_crtc_vreg));
 }
 
 
@@ -1089,6 +1097,8 @@ ROM_START( avtnfl )
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "avtnfl", 0x0000, 0x0200, CRC(ac975c82) SHA1(9d124115cd7905482bc197462b65d3b5afdab99b) )
 ROM_END
+
+} // Anonymous namespace
 
 
 /*********************************************

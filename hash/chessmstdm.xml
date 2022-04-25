@@ -8,10 +8,10 @@ license:CC0
 	<software name="pm10">
 		<description>PM10 Openings</description>
 		<year>1987</year>
-		<publisher>VEB Mikroelektronik Erfurt</publisher>
+		<publisher>VEB Mikroelektronik "Karl Marx" Erfurt</publisher>
 		<part name="cart" interface="chessmstdm_cart">
 			<dataarea name="rom" size="0x2000">
-				<rom name="PM10_bm400.bin" size="0x2000" crc="aa784d7a" sha1="fd2d6cac9805a5aaf4f51b7c974d0314a402c186"/>
+				<rom name="bm400.d201" size="0x2000" crc="aa784d7a" sha1="fd2d6cac9805a5aaf4f51b7c974d0314a402c186"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19,10 +19,11 @@ license:CC0
 	<software name="pm11">
 		<description>PM11 Endings</description>
 		<year>1987</year>
-		<publisher>VEB Mikroelektronik Erfurt</publisher>
+		<publisher>VEB Mikroelektronik "Karl Marx" Erfurt</publisher>
 		<part name="cart" interface="chessmstdm_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="PM11_bm403_bm607.bin" size="0x4000" crc="5af4f3e2" sha1="7c9befc6182d65ca0c7d53820a0f84a3a55b9c78"/>
+				<rom name="bm403.d201" offset="0x0000" size="0x2000" crc="dd5e0963" sha1="65220b289c7f8b68efe686afd81828ed387bd7dc"/>
+				<rom name="bm607.d204" offset="0x2000" size="0x2000" crc="77b77684" sha1="90036ffd91159b2ca600dea81ed2c7dc41d1ea2d"/>
 			</dataarea>
 		</part>
 	</software>

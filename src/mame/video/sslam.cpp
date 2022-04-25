@@ -82,7 +82,7 @@ TILE_GET_INFO_MEMBER(sslam_state::get_sslam_tx_tile_info)
 	tileinfo.set(3,code+0xc000 ,colr >> 12,0);
 }
 
-WRITE16_MEMBER(sslam_state::sslam_tx_tileram_w)
+void sslam_state::sslam_tx_tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_tx_tileram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
@@ -98,7 +98,7 @@ TILE_GET_INFO_MEMBER(sslam_state::get_sslam_md_tile_info)
 	tileinfo.set(2,code+0x2000 ,colr >> 12,0);
 }
 
-WRITE16_MEMBER(sslam_state::sslam_md_tileram_w)
+void sslam_state::sslam_md_tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_md_tileram[offset]);
 	m_md_tilemap->mark_tile_dirty(offset);
@@ -114,7 +114,7 @@ TILE_GET_INFO_MEMBER(sslam_state::get_sslam_bg_tile_info)
 	tileinfo.set(1,code ,colr >> 13,0);
 }
 
-WRITE16_MEMBER(sslam_state::sslam_bg_tileram_w)
+void sslam_state::sslam_bg_tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg_tileram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -131,7 +131,7 @@ TILE_GET_INFO_MEMBER(powerbls_state::get_powerbls_bg_tile_info)
 	tileinfo.set(1,code,colr,0);
 }
 
-WRITE16_MEMBER(powerbls_state::powerbls_bg_tileram_w)
+void powerbls_state::powerbls_bg_tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg_tileram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset>>1);

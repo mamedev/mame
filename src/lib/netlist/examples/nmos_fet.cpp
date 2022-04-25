@@ -7,7 +7,7 @@
 
 
 #include "netlist/devices/net_lib.h"
-#include "netlist/analog/nld_twoterm.h"
+#include "netlist/devices/net_lib.h"
 
 NETLIST_START(nmos)
 	/* Standard stuff */

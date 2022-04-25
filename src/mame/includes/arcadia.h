@@ -56,41 +56,28 @@ public:
 	void arcadia(machine_config &config);
 
 protected:
-	DECLARE_READ_LINE_MEMBER(vsync_r);
-	uint8_t video_r(offs_t offset);
-	void video_w(offs_t offset, uint8_t data);
-
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	void palette_init(palette_device &palette) const;
-	uint32_t screen_update_arcadia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(video_line);
-	void arcadia_mem(address_map &map);
-
-	void draw_char(uint8_t *ch, int charcode, int y, int x);
-	void vh_draw_line(int y, uint8_t chars1[16]);
-	int sprite_collision(int n1, int n2);
-	void draw_sprites();
 
 private:
-	int m_line;
-	int m_charline;
-	int m_shift;
-	int m_ad_delay;
-	int m_ad_select;
-	int m_ypos;
-	int m_graphics;
-	int m_doublescan;
-	int m_lines26;
-	int m_multicolor;
-	struct { int x, y; } m_pos[4];
-	uint8_t m_bg[262][16+2*XPOS/8];
-	uint8_t m_rectangle[0x40][8];
-	uint8_t m_chars[0x40][8];
-	int m_breaker;
+	int m_line = 0;
+	int m_charline = 0;
+	int m_shift = 0;
+	int m_ad_delay = 0;
+	int m_ad_select = 0;
+	int m_ypos = 0;
+	int m_graphics = 0;
+	int m_doublescan = 0;
+	int m_lines26 = 0;
+	int m_multicolor = 0;
+	struct { int x = 0, y = 0; } m_pos[4];
+	uint8_t m_bg[262][16+2*XPOS/8]{};
+	uint8_t m_rectangle[0x40][8]{};
+	uint8_t m_chars[0x40][8]{};
+	int m_breaker = 0;
 	union
 	{
-		uint8_t data[0x400];
+		uint8_t data[0x400]{};
 		struct
 		{
 			// 0x1800
@@ -135,6 +122,19 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
+
+	DECLARE_READ_LINE_MEMBER(vsync_r);
+	uint8_t video_r(offs_t offset);
+	void video_w(offs_t offset, uint8_t data);
+	void palette_init(palette_device &palette) const;
+	uint32_t screen_update_arcadia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(video_line);
+	void arcadia_mem(address_map &map);
+
+	void draw_char(uint8_t *ch, int charcode, int y, int x);
+	void vh_draw_line(int y, uint8_t chars1[16]);
+	int sprite_collision(int n1, int n2);
+	void draw_sprites();
 };
 
 #endif // MAME_INCLUDES_ARCADIA_H

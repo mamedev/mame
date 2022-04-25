@@ -8,8 +8,6 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/hp_ipc_dsk.h"
 
 hp_ipc_format::hp_ipc_format() : wd177x_format(formats)
@@ -38,5 +36,5 @@ const hp_ipc_format::format hp_ipc_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_HP_IPC_FORMAT = &floppy_image_format_creator<hp_ipc_format>;
+const hp_ipc_format FLOPPY_HP_IPC_FORMAT;
 

@@ -8,8 +8,6 @@
 
   M6809 for game, Z80 and YM-2203 for sound.
 
-2009/06 - DIP Location and Defaults verified against Speed Rumbler manual.
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -18,7 +16,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
-#include "sound/2203intf.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -248,14 +246,12 @@ GFXDECODE_END
 void srumbler_state::srumbler(machine_config &config)
 {
 	/* basic machine hardware */
-	MC6809(config, m_maincpu, 6000000);        /* HD68B09P at 6 MHz (?) */
+	MC6809(config, m_maincpu, 16_MHz_XTAL / 2); // HD68B09P
 	m_maincpu->set_addrmap(AS_PROGRAM, &srumbler_state::srumbler_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(srumbler_state::interrupt), "screen", 0, 1);
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 3000000));        /* 3 MHz ??? */
+	z80_device &audiocpu(Z80(config, "audiocpu", 16_MHz_XTAL / 4));
 	audiocpu.set_addrmap(AS_PROGRAM, &srumbler_state::srumbler_sound_map);
-	audiocpu.set_periodic_int(FUNC(srumbler_state::irq0_line_hold), attotime::from_hz(4*60));
-
 
 	/* video hardware */
 	BUFFERED_SPRITERAM8(config, m_spriteram);
@@ -278,13 +274,14 @@ void srumbler_state::srumbler(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	ym2203_device &ym1(YM2203(config, "ym1", 4000000));
+	ym2203_device &ym1(YM2203(config, "ym1", 16_MHz_XTAL / 4));
+	ym1.irq_handler().set_inputline("audiocpu", 0);
 	ym1.add_route(0, "mono", 0.10);
 	ym1.add_route(1, "mono", 0.10);
 	ym1.add_route(2, "mono", 0.10);
 	ym1.add_route(3, "mono", 0.30);
 
-	ym2203_device &ym2(YM2203(config, "ym2", 4000000));
+	ym2203_device &ym2(YM2203(config, "ym2", 16_MHz_XTAL / 4));
 	ym2.add_route(0, "mono", 0.10);
 	ym2.add_route(1, "mono", 0.10);
 	ym2.add_route(2, "mono", 0.10);

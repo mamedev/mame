@@ -18,8 +18,10 @@
 #include "vbiparse.h"
 #include "avhuff.h"
 
-#include <type_traits>
+#include <algorithm>
+#include <system_error>
 #include <utility>
+#include <vector>
 
 
 //**************************************************************************
@@ -156,7 +158,7 @@ protected:
 	};
 
 	// common laserdisc states
-	enum player_state
+	enum player_state : uint32_t
 	{
 		LDSTATE_NONE,                           // unspecified state
 		LDSTATE_EJECTING,                       // in the process of ejecting
@@ -188,7 +190,7 @@ protected:
 	};
 
 	// slider position
-	enum slider_position
+	enum slider_position : uint32_t
 	{
 		SLIDER_MINIMUM,                         // at the minimum value
 		SLIDER_VIRTUAL_LEADIN,                  // within the virtual lead-in area
@@ -202,8 +204,8 @@ protected:
 	struct player_state_info
 	{
 		player_state    m_state;                // current state
-		int32_t           m_substate;             // internal sub-state; starts at 0 on any state change
-		int32_t           m_param;                // parameter for current state
+		int32_t         m_substate;             // internal sub-state; starts at 0 on any state change
+		int32_t         m_param;                // parameter for current state
 		attotime        m_endtime;              // minimum ending time for current state
 	};
 
@@ -216,11 +218,11 @@ protected:
 	virtual void device_start() override;
 	virtual void device_stop() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_validity_check(validity_checker &valid) const override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// subclass helpers
 	void set_audio_squelch(bool squelchleft, bool squelchright) { m_stream->update(); m_audiosquelch = (squelchleft ? 1 : 0) | (squelchright ? 2 : 0); }
@@ -231,6 +233,7 @@ protected:
 	int32_t generic_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime, player_state_info &curstate);
 
 	// general helpers
+	bool is_cav_disc() const { return m_is_cav_disc; }
 	bool is_start_of_frame(const vbi_metadata &vbi);
 	int frame_from_metadata(const vbi_metadata &metadata);
 	int chapter_from_metadata(const vbi_metadata &metadata);
@@ -244,8 +247,8 @@ private:
 	{
 		bitmap_yuy16        m_bitmap;               // cached bitmap
 		bitmap_yuy16        m_visbitmap;            // wrapper around bitmap with only visible lines
-		uint8_t               m_numfields;            // number of fields in this frame
-		int32_t               m_lastfield;            // last absolute field number
+		uint8_t             m_numfields;            // number of fields in this frame
+		int32_t             m_lastfield;            // last absolute field number
 	};
 
 	// internal helpers
@@ -260,55 +263,57 @@ private:
 	void read_track_data();
 	static void *read_async_static(void *param, int threadid);
 	void process_track_data();
-	void config_load(config_type cfg_type, util::xml::data_node const *parentnode);
+	void config_load(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode);
 	void config_save(config_type cfg_type, util::xml::data_node *parentnode);
 
 	// configuration
 	get_disc_delegate m_getdisc_callback;
 	audio_delegate m_audio_callback;  // audio streaming callback
 	laserdisc_overlay_config m_orig_config;     // original overlay configuration
-	uint32_t              m_overwidth;            // overlay screen width
-	uint32_t              m_overheight;           // overlay screen height
+	uint32_t            m_overwidth;            // overlay screen width
+	uint32_t            m_overheight;           // overlay screen height
 	rectangle           m_overclip;             // overlay visarea
 	screen_update_rgb32_delegate m_overupdate_rgb32; // overlay update delegate
 
 	// disc parameters
 	chd_file *          m_disc;                 // handle to the disc itself
-	std::vector<uint8_t>      m_vbidata;              // pointer to precomputed VBI data
+	std::vector<uint8_t> m_vbidata;             // pointer to precomputed VBI data
+	bool                m_is_cav_disc;          // precomputed check if the mounted disc is CAV
 	int                 m_width;                // width of video
 	int                 m_height;               // height of video
-	uint32_t              m_fps_times_1million;   // frame rate of video
+	uint32_t            m_fps_times_1million;   // frame rate of video
 	int                 m_samplerate;           // audio samplerate
-	int                 m_readresult;           // result of the most recent read
-	uint32_t              m_chdtracks;            // number of tracks in the CHD
-	avhuff_decompress_config m_avhuff_config;   // decompression configuration
+	std::error_condition m_readresult;          // result of the most recent read
+	uint32_t            m_chdtracks;            // number of tracks in the CHD
+	bitmap_yuy16        m_avhuff_video;         // decompresed frame buffer
+	avhuff_decoder::config m_avhuff_config;     // decompression configuration
 
 	// async operations
 	osd_work_queue *    m_work_queue;           // work queue
-	uint32_t              m_queued_hunknum;       // queued hunk
+	uint32_t            m_queued_hunknum;       // queued hunk
 
 	// core states
-	uint8_t               m_audiosquelch;         // audio squelch state: bit 0 = audio 1, bit 1 = audio 2
-	uint8_t               m_videosquelch;         // video squelch state: bit 0 = on/off
-	uint8_t               m_fieldnum;             // field number (0 or 1)
-	int32_t               m_curtrack;             // current track at this end of this vsync
-	uint32_t              m_maxtrack;             // maximum track number
+	uint8_t             m_audiosquelch;         // audio squelch state: bit 0 = audio 1, bit 1 = audio 2
+	uint8_t             m_videosquelch;         // video squelch state: bit 0 = on/off
+	uint8_t             m_fieldnum;             // field number (0 or 1)
+	int32_t             m_curtrack;             // current track at this end of this vsync
+	uint32_t            m_maxtrack;             // maximum track number
 	attoseconds_t       m_attospertrack;        // attoseconds per track, or 0 if not moving
 	attotime            m_sliderupdate;         // time of last slider update
 
 	// video data
 	frame_data          m_frame[3];             // circular list of frames
-	uint8_t               m_videoindex;           // index of the current video buffer
+	uint8_t             m_videoindex;           // index of the current video buffer
 	bitmap_yuy16        m_emptyframe;           // blank frame
 
 	// audio data
 	sound_stream *      m_stream;
 	std::vector<int16_t>       m_audiobuffer[2];       // buffer for audio samples
-	uint32_t              m_audiobufsize;         // size of buffer
-	uint32_t              m_audiobufin;           // input index
-	uint32_t              m_audiobufout;          // output index
-	uint32_t              m_audiocursamples;      // current samples this track
-	uint32_t              m_audiomaxsamples;      // maximum samples per track
+	uint32_t            m_audiobufsize;         // size of buffer
+	uint32_t            m_audiobufin;           // input index
+	uint32_t            m_audiobufout;          // output index
+	uint32_t            m_audiocursamples;      // current samples this track
+	uint32_t            m_audiomaxsamples;      // maximum samples per track
 
 	// metadata
 	vbi_metadata        m_metadata[2];          // metadata parsed from the stream, for each field
@@ -326,7 +331,7 @@ private:
 };
 
 // iterator - interface iterator works for subclasses too
-typedef device_interface_iterator<laserdisc_device> laserdisc_device_iterator;
+typedef device_interface_enumerator<laserdisc_device> laserdisc_device_enumerator;
 
 
 

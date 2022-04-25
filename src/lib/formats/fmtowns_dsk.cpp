@@ -8,8 +8,6 @@
  *  Created on: 23/03/2014
  */
 
-	#include <cassert>
-
 #include "formats/fmtowns_dsk.h"
 
 fmtowns_format::fmtowns_format() : wd177x_format(formats)
@@ -40,4 +38,4 @@ const fmtowns_format::format fmtowns_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_FMTOWNS_FORMAT = &floppy_image_format_creator<fmtowns_format>;
+const fmtowns_format FLOPPY_FMTOWNS_FORMAT;

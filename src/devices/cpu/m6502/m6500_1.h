@@ -56,14 +56,14 @@ public:
 	auto pd_out_cb() { return m_port_out_cb[3].bind(); }
 	auto cntr_out_cb() { return m_cntr_out_cb.bind(); }
 
-	DECLARE_READ8_MEMBER(pa_r) { return m_port_buf[0]; }
-	DECLARE_READ8_MEMBER(pb_r) { return m_port_buf[1]; }
-	DECLARE_READ8_MEMBER(pc_r) { return m_port_buf[2]; }
-	DECLARE_READ8_MEMBER(pd_r) { return m_port_buf[3]; }
-	void pa_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(pb_w);
-	DECLARE_WRITE8_MEMBER(pc_w);
-	DECLARE_WRITE8_MEMBER(pd_w);
+	u8 pa_r() { return m_port_buf[0]; }
+	u8 pb_r() { return m_port_buf[1]; }
+	u8 pc_r() { return m_port_buf[2]; }
+	u8 pd_r() { return m_port_buf[3]; }
+	void pa_w(u8 data);
+	void pb_w(u8 data);
+	void pc_w(u8 data);
+	void pd_w(u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER(cntr_w);
 
@@ -90,19 +90,19 @@ protected:
 	virtual void internal_update(u64 current_time) override;
 	using m6502_mcu_device::internal_update;
 
-	DECLARE_READ8_MEMBER(read_control_register);
-	DECLARE_WRITE8_MEMBER(write_control_register);
+	u8 read_control_register();
+	void write_control_register(u8 data);
 	void update_irq();
 
-	DECLARE_READ8_MEMBER(read_port);
-	DECLARE_WRITE8_MEMBER(write_port);
-	DECLARE_WRITE8_MEMBER(clear_edge);
+	u8 read_port(offs_t offset);
+	void write_port(offs_t offset, u8 data);
+	void clear_edge(offs_t offset, u8 data);
 	template <unsigned Port> TIMER_CALLBACK_MEMBER(set_port_in);
 
-	DECLARE_READ8_MEMBER(read_upper_count);
-	DECLARE_READ8_MEMBER(read_lower_count);
-	template <bool Transfer> DECLARE_WRITE8_MEMBER(write_upper_latch);
-	DECLARE_WRITE8_MEMBER(write_lower_latch);
+	u8 read_upper_count();
+	u8 read_lower_count();
+	template <bool Transfer> void write_upper_latch(u8 data);
+	void write_lower_latch(u8 data);
 	u64 update_counter(u64 current_time);
 	bool should_count() const;
 	bool pulse_generator_mode() const;

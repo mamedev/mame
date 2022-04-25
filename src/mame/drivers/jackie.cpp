@@ -3,6 +3,7 @@
 /*
 Happy Jackie (c) 1993 IGS.
 Video Slot machine game for amusement only.
+IGS PCB N0-T0039-4
 
 Driver by David Haywood and Mirko Buffoni
 */
@@ -49,7 +50,7 @@ Note
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/timer.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -118,15 +119,15 @@ private:
 	output_finder<> m_led;
 	output_finder<6> m_lamps;
 
-	int m_exp_bank;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_reel_tilemap[3];
-	int m_irq_enable;
-	int m_nmi_enable;
-	int m_bg_enable;
-	int m_hopper;
-	uint8_t m_out[3];
-	uint16_t m_unk_reg[3][5];
+	int m_exp_bank = 0;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_reel_tilemap[3]{};
+	int m_irq_enable = 0;
+	int m_nmi_enable = 0;
+	int m_bg_enable = 0;
+	int m_hopper = 0;
+	uint8_t m_out[3]{};
+	uint16_t m_unk_reg[3][5]{};
 };
 
 
@@ -342,7 +343,7 @@ uint8_t jackie_state::expram_r(offs_t offset)
 void jackie_state::prg_map(address_map &map)
 {
 	map(0x0000, 0xefff).rom();
-	map(0xf000, 0xffff).ram().region("maincpu", 0xf000);
+	map(0xf000, 0xffff).ram();
 }
 
 void jackie_state::io_map(address_map &map)

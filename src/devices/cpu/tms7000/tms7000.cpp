@@ -260,7 +260,6 @@ void tms7000_device::device_start()
 
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
-	state_add(STATE_GENSP, "GENSP", m_sp).formatstr("%02X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_sr).formatstr("%8s").noshow();
 }
 
@@ -585,6 +584,7 @@ void tms7000_device::tms7000_pf_w(offs_t offset, uint8_t data)
 					logerror("%s: CMOS low-power halt mode enabled\n", tag());
 			}
 			data &= ~0x20;
+			[[fallthrough]];
 		case 0x13:
 			// d0-d4: prescaler reload value
 			// d5: t2: cascade from t1

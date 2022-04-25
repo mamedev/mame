@@ -1,10 +1,23 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/**********************************************************************
+/**************************************************************************************************
 
-    CCBUS Slot interface for PC-98xx family
+    C-bus slot interface for PC-98xx family
 
-**********************************************************************/
+    a.k.a. NEC version of the ISA bus.
+    C-bus -> Card Bus
+
+    TODO:
+    - stub interface, checkout what actually belongs here.
+      Speculation is that C-bus has ROM / RAM slots always in the 0xc0000-0xdffff region,
+      and some opacity can be added if true.
+    - move pc9801_cbus_devices declaration from pc9801 driver in here;
+    - 8-bit I/O smearing should be handled here;
+    - INT# should be handled here too;
+    - Best way to inform user when it tries to install incompatible boards?
+    - Support for PCI bridging on later machines (cfr. pc9801cx3);
+
+**************************************************************************************************/
 
 #include "emu.h"
 #include "pc9801_cbus.h"
@@ -15,7 +28,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(PC9801CBUS_SLOT, pc9801_slot_device, "pc9801_slot", "PC-9801 sound cbus slot")
+DEFINE_DEVICE_TYPE(PC9801CBUS_SLOT, pc9801_slot_device, "pc9801_slot", "PC-9801 C-bus slot")
 
 
 
@@ -95,7 +108,7 @@ void pc9801_slot_device::device_start()
 //  m_card = dynamic_cast<device_pc9801_slot_card_interface *>(get_card_device());
 }
 
-void pc9801_slot_device::install_io(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler)
+template<typename R, typename W> void pc9801_slot_device::install_io(offs_t start, offs_t end, R rhandler, W whandler)
 {
 	int buswidth = m_iospace->data_width();
 	switch(buswidth)
@@ -110,6 +123,43 @@ void pc9801_slot_device::install_io(offs_t start, offs_t end, read8_delegate rha
 			m_iospace->install_readwrite_handler(start, end, rhandler, whandler, 0xffffffff);
 			break;
 		default:
-			fatalerror("PC-9801-26: Bus width %d not supported\n", buswidth);
+			fatalerror("PC-9801 C-bus: Bus width %d not supported\n", buswidth);
 	}
+}
+
+template void pc9801_slot_device::install_io<read8_delegate,    write8_delegate   >(offs_t start, offs_t end, read8_delegate rhandler,    write8_delegate whandler);
+template void pc9801_slot_device::install_io<read8s_delegate,   write8s_delegate  >(offs_t start, offs_t end, read8s_delegate rhandler,   write8s_delegate whandler);
+template void pc9801_slot_device::install_io<read8sm_delegate,  write8sm_delegate >(offs_t start, offs_t end, read8sm_delegate rhandler,  write8sm_delegate whandler);
+template void pc9801_slot_device::install_io<read8smo_delegate, write8smo_delegate>(offs_t start, offs_t end, read8smo_delegate rhandler, write8smo_delegate whandler);
+
+// boilerplate code for boards that has configurable I/O with either Jumpers or Dip-Switches
+// NB: client must have a mechanism to remember what port has been used before and after calling this,
+// in order to avoid "last instantiated wins" issues with overlapping board full configs.
+void pc9801_slot_device::flush_install_io(const char *client_tag, u16 old_io, u16 new_io, u16 size, read8sm_delegate rhandler, write8sm_delegate whandler)
+{
+	// initialize if client have this unmapped (such as first boot)
+	// device_start fns cannot read input ports ...
+	if (old_io == 0)
+		old_io = new_io;
+
+	logerror("%s: %s uninstall I/O at %04x-%04x\n",
+		this->tag(),
+		client_tag,
+		old_io,
+		old_io + size
+	);
+	this->io_space().unmap_readwrite(old_io, old_io + size);
+
+	logerror("%s: %s install I/O at %04x-%04x\n",
+		this->tag(),
+		client_tag,
+		new_io,
+		new_io + size
+	);
+	this->install_io(
+		new_io,
+		new_io + size,
+		rhandler,
+		whandler
+	);
 }

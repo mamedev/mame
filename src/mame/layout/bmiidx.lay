@@ -64,91 +64,91 @@ license:CC0
 			<bounds left="0" top="0" right="426" bottom="240"/>
 		</screen>
 
-		<bezel name="1p" element="1p"><bounds x="0" y="240" width="48" height="16"/></bezel>
-		<bezel name="2p" element="2p"><bounds x="0" y="256" width="48" height="16"/></bezel>
-		<bezel name="effect" element="effect"><bounds x="0" y="272" width="48" height="16"/></bezel>
-		<bezel name="vefx" element="vefx"><bounds x="0" y="288" width="48" height="16"/></bezel>
+		<element name="1p" ref="1p"><bounds x="0" y="240" width="48" height="16"/></element>
+		<element name="2p" ref="2p"><bounds x="0" y="256" width="48" height="16"/></element>
+		<element name="effect" ref="effect"><bounds x="0" y="272" width="48" height="16"/></element>
+		<element name="vefx" ref="vefx"><bounds x="0" y="288" width="48" height="16"/></element>
 
-		<bezel name="credit" element="credit"><bounds x="64" y="240" width="48" height="16"/></bezel>
-		<bezel name="neonlamp" element="neonlamp"><bounds x="64" y="256" width="48" height="16"/></bezel>
-		<bezel name="unknown1" element="neonlamp"><bounds x="64" y="272" width="48" height="16"/></bezel>
-		<bezel name="unknown2" element="neonlamp"><bounds x="64" y="288" width="48" height="16"/></bezel>
+		<element name="credit" ref="credit"><bounds x="64" y="240" width="48" height="16"/></element>
+		<element name="neonlamp" ref="neonlamp"><bounds x="64" y="256" width="48" height="16"/></element>
+		<element name="unknown1" ref="neonlamp"><bounds x="64" y="272" width="48" height="16"/></element>
+		<element name="unknown2" ref="neonlamp"><bounds x="64" y="288" width="48" height="16"/></element>
 
-		<bezel name="spotlight0" element="spotlight0"><bounds x="128" y="240" width="48" height="16"/></bezel>
-		<bezel name="spotlight1" element="spotlight1"><bounds x="128" y="256" width="48" height="16"/></bezel>
-		<bezel name="spotlight2" element="spotlight2"><bounds x="128" y="272" width="48" height="16"/></bezel>
-		<bezel name="spotlight3" element="spotlight3"><bounds x="128" y="288" width="48" height="16"/></bezel>
+		<element name="spotlight0" ref="spotlight0"><bounds x="128" y="240" width="48" height="16"/></element>
+		<element name="spotlight1" ref="spotlight1"><bounds x="128" y="256" width="48" height="16"/></element>
+		<element name="spotlight2" ref="spotlight2"><bounds x="128" y="272" width="48" height="16"/></element>
+		<element name="spotlight3" ref="spotlight3"><bounds x="128" y="288" width="48" height="16"/></element>
 
-		<bezel name="spotlight4" element="spotlight4"><bounds x="192" y="240" width="48" height="16"/></bezel>
-		<bezel name="spotlight5" element="spotlight5"><bounds x="192" y="256" width="48" height="16"/></bezel>
-		<bezel name="spotlight6" element="spotlight6"><bounds x="192" y="272" width="48" height="16"/></bezel>
-		<bezel name="spotlight7" element="spotlight7"><bounds x="192" y="288" width="48" height="16"/></bezel>
+		<element name="spotlight4" ref="spotlight4"><bounds x="192" y="240" width="48" height="16"/></element>
+		<element name="spotlight5" ref="spotlight5"><bounds x="192" y="256" width="48" height="16"/></element>
+		<element name="spotlight6" ref="spotlight6"><bounds x="192" y="272" width="48" height="16"/></element>
+		<element name="spotlight7" ref="spotlight7"><bounds x="192" y="288" width="48" height="16"/></element>
 
-		<bezel name="led0" element="led" state="0">
+		<element name="led0" ref="led" state="0">
 			<bounds x="0" y="304" width="32" height="64"/>
-		</bezel>
-		<bezel name="led1" element="led" state="0">
+		</element>
+		<element name="led1" ref="led" state="0">
 			<bounds x="32" y="304" width="32" height="64"/>
-		</bezel>
-		<bezel name="led2" element="led" state="0">
+		</element>
+		<element name="led2" ref="led" state="0">
 			<bounds x="64" y="304" width="32" height="64"/>
-		</bezel>
-		<bezel name="led3" element="led" state="0">
+		</element>
+		<element name="led3" ref="led" state="0">
 			<bounds x="96" y="304" width="32" height="64"/>
-		</bezel>
-		<bezel name="led4" element="led" state="0">
+		</element>
+		<element name="led4" ref="led" state="0">
 			<bounds x="128" y="304" width="32" height="64"/>
-		</bezel>
-		<bezel name="led5" element="led" state="0">
+		</element>
+		<element name="led5" ref="led" state="0">
 			<bounds x="160" y="304" width="32" height="64"/>
-		</bezel>
-		<bezel name="led6" element="led" state="0">
+		</element>
+		<element name="led6" ref="led" state="0">
 			<bounds x="192" y="304" width="32" height="64"/>
-		</bezel>
-		<bezel name="led7" element="led" state="0">
+		</element>
+		<element name="led7" ref="led" state="0">
 			<bounds x="224" y="304" width="32" height="64"/>
-		</bezel>
-		<bezel name="led8" element="led" state="0">
+		</element>
+		<element name="led8" ref="led" state="0">
 			<bounds x="256" y="304" width="32" height="64"/>
-		</bezel>
+		</element>
 
-		<bezel name="key1-1" element="key1-1"><bounds x="0" y="368" width="48" height="16"/></bezel>
-		<bezel name="key1-2" element="key1-2"><bounds x="0" y="384" width="48" height="16"/></bezel>
-		<bezel name="key1-3" element="key1-3"><bounds x="0" y="400" width="48" height="16"/></bezel>
-		<bezel name="key1-4" element="key1-4"><bounds x="0" y="416" width="48" height="16"/></bezel>
+		<element name="key1-1" ref="key1-1"><bounds x="0" y="368" width="48" height="16"/></element>
+		<element name="key1-2" ref="key1-2"><bounds x="0" y="384" width="48" height="16"/></element>
+		<element name="key1-3" ref="key1-3"><bounds x="0" y="400" width="48" height="16"/></element>
+		<element name="key1-4" ref="key1-4"><bounds x="0" y="416" width="48" height="16"/></element>
 
-		<bezel name="key1-5" element="key1-5"><bounds x="64" y="368" width="48" height="16"/></bezel>
-		<bezel name="key1-6" element="key1-6"><bounds x="64" y="384" width="48" height="16"/></bezel>
-		<bezel name="key1-7" element="key1-7"><bounds x="64" y="400" width="48" height="16"/></bezel>
-		<bezel name="key2-1" element="key2-1"><bounds x="64" y="416" width="48" height="16"/></bezel>
+		<element name="key1-5" ref="key1-5"><bounds x="64" y="368" width="48" height="16"/></element>
+		<element name="key1-6" ref="key1-6"><bounds x="64" y="384" width="48" height="16"/></element>
+		<element name="key1-7" ref="key1-7"><bounds x="64" y="400" width="48" height="16"/></element>
+		<element name="key2-1" ref="key2-1"><bounds x="64" y="416" width="48" height="16"/></element>
 
-		<bezel name="key2-2" element="key2-2"><bounds x="128" y="368" width="48" height="16"/></bezel>
-		<bezel name="key2-3" element="key2-3"><bounds x="128" y="384" width="48" height="16"/></bezel>
-		<bezel name="key2-4" element="key2-4"><bounds x="128" y="400" width="48" height="16"/></bezel>
-		<bezel name="key2-5" element="key2-5"><bounds x="128" y="416" width="48" height="16"/></bezel>
+		<element name="key2-2" ref="key2-2"><bounds x="128" y="368" width="48" height="16"/></element>
+		<element name="key2-3" ref="key2-3"><bounds x="128" y="384" width="48" height="16"/></element>
+		<element name="key2-4" ref="key2-4"><bounds x="128" y="400" width="48" height="16"/></element>
+		<element name="key2-5" ref="key2-5"><bounds x="128" y="416" width="48" height="16"/></element>
 
-		<bezel name="key2-6" element="key2-6"><bounds x="192" y="368" width="48" height="16"/></bezel>
-		<bezel name="key2-7" element="key2-7"><bounds x="192" y="384" width="48" height="16"/></bezel>
-		<bezel name="unknown3" element="unknown3"><bounds x="192" y="400" width="48" height="16"/></bezel>
-		<bezel name="unknown4" element="unknown4"><bounds x="192" y="416" width="48" height="16"/></bezel>
+		<element name="key2-6" ref="key2-6"><bounds x="192" y="368" width="48" height="16"/></element>
+		<element name="key2-7" ref="key2-7"><bounds x="192" y="384" width="48" height="16"/></element>
+		<element name="unknown3" ref="unknown3"><bounds x="192" y="400" width="48" height="16"/></element>
+		<element name="unknown4" ref="unknown4"><bounds x="192" y="416" width="48" height="16"/></element>
 
-		<bezel name="main_led0" element="main_led0"><bounds x="0" y="432" width="24" height="16"/></bezel>
-		<bezel name="main_led1" element="main_led1"><bounds x="32" y="432" width="24" height="16"/></bezel>
-		<bezel name="main_led2" element="main_led2"><bounds x="64" y="432" width="24" height="16"/></bezel>
-		<bezel name="main_led3" element="main_led3"><bounds x="96" y="432" width="24" height="16"/></bezel>
-		<bezel name="main_led4" element="main_led4"><bounds x="128" y="432" width="24" height="16"/></bezel>
-		<bezel name="main_led5" element="main_led5"><bounds x="160" y="432" width="24" height="16"/></bezel>
-		<bezel name="main_led6" element="main_led6"><bounds x="192" y="432" width="24" height="16"/></bezel>
-		<bezel name="main_led7" element="main_led7"><bounds x="224" y="432" width="24" height="16"/></bezel>
-		<bezel name="main_led8" element="main_led8"><bounds x="256" y="432" width="24" height="16"/></bezel>
+		<element name="main_led0" ref="main_led0"><bounds x="0" y="432" width="24" height="16"/></element>
+		<element name="main_led1" ref="main_led1"><bounds x="32" y="432" width="24" height="16"/></element>
+		<element name="main_led2" ref="main_led2"><bounds x="64" y="432" width="24" height="16"/></element>
+		<element name="main_led3" ref="main_led3"><bounds x="96" y="432" width="24" height="16"/></element>
+		<element name="main_led4" ref="main_led4"><bounds x="128" y="432" width="24" height="16"/></element>
+		<element name="main_led5" ref="main_led5"><bounds x="160" y="432" width="24" height="16"/></element>
+		<element name="main_led6" ref="main_led6"><bounds x="192" y="432" width="24" height="16"/></element>
+		<element name="main_led7" ref="main_led7"><bounds x="224" y="432" width="24" height="16"/></element>
+		<element name="main_led8" ref="main_led8"><bounds x="256" y="432" width="24" height="16"/></element>
 
-		<bezel name="spu_led0" element="spu_led0"><bounds x="0" y="448" width="24" height="16"/></bezel>
-		<bezel name="spu_led1" element="spu_led1"><bounds x="32" y="448" width="24" height="16"/></bezel>
-		<bezel name="spu_led2" element="spu_led2"><bounds x="64" y="448" width="24" height="16"/></bezel>
-		<bezel name="spu_led3" element="spu_led3"><bounds x="96" y="448" width="24" height="16"/></bezel>
-		<bezel name="spu_led4" element="spu_led4"><bounds x="128" y="448" width="24" height="16"/></bezel>
-		<bezel name="spu_led5" element="spu_led5"><bounds x="160" y="448" width="24" height="16"/></bezel>
-		<bezel name="spu_led6" element="spu_led6"><bounds x="192" y="448" width="24" height="16"/></bezel>
-		<bezel name="spu_led7" element="spu_led7"><bounds x="224" y="448" width="24" height="16"/></bezel>
+		<element name="spu_led0" ref="spu_led0"><bounds x="0" y="448" width="24" height="16"/></element>
+		<element name="spu_led1" ref="spu_led1"><bounds x="32" y="448" width="24" height="16"/></element>
+		<element name="spu_led2" ref="spu_led2"><bounds x="64" y="448" width="24" height="16"/></element>
+		<element name="spu_led3" ref="spu_led3"><bounds x="96" y="448" width="24" height="16"/></element>
+		<element name="spu_led4" ref="spu_led4"><bounds x="128" y="448" width="24" height="16"/></element>
+		<element name="spu_led5" ref="spu_led5"><bounds x="160" y="448" width="24" height="16"/></element>
+		<element name="spu_led6" ref="spu_led6"><bounds x="192" y="448" width="24" height="16"/></element>
+		<element name="spu_led7" ref="spu_led7"><bounds x="224" y="448" width="24" height="16"/></element>
 	</view>
 </mamelayout>

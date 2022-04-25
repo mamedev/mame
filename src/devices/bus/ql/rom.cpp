@@ -29,7 +29,6 @@ DEFINE_DEVICE_TYPE(QL_ROM_CARTRIDGE_SLOT, ql_rom_cartridge_slot_device, "ql_rom_
 
 device_ql_rom_cartridge_card_interface::device_ql_rom_cartridge_card_interface(const machine_config &mconfig, device_t &device) :
 	device_interface(device, "qlrom"),
-	m_rom(*this, "rom"),
 	m_slot(dynamic_cast<ql_rom_cartridge_slot_device *>(device.owner())),
 	m_romoeh(0)
 {
@@ -63,7 +62,8 @@ void device_ql_rom_cartridge_card_interface::interface_post_start()
 ql_rom_cartridge_slot_device::ql_rom_cartridge_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, QL_ROM_CARTRIDGE_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_ql_rom_cartridge_card_interface>(mconfig, *this),
-	device_image_interface(mconfig, *this), m_card(nullptr)
+	device_cartrom_image_interface(mconfig, *this),
+	m_card(nullptr)
 {
 }
 
@@ -89,14 +89,9 @@ image_init_result ql_rom_cartridge_slot_device::call_load()
 {
 	if (m_card)
 	{
-		size_t size;
-
 		if (!loaded_through_softlist())
 		{
-			size = length();
-
-			m_card->m_rom.allocate(size);
-			fread(m_card->m_rom, size);
+			fread(m_card->m_rom, length());
 		}
 		else
 		{

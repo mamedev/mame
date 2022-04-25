@@ -65,6 +65,8 @@ void spg110_device::configure_spg_io(spg2xx_io_device* io)
 	io->portc_out().set(FUNC(spg110_device::portc_w));
 	io->adc_in<0>().set(FUNC(spg110_device::adc_r<0>));
 	io->adc_in<1>().set(FUNC(spg110_device::adc_r<1>));
+	io->adc_in<2>().set(FUNC(spg110_device::adc_r<2>));
+	io->adc_in<3>().set(FUNC(spg110_device::adc_r<3>));
 	io->chip_select().set(FUNC(spg110_device::cs_w));
 //  io->pal_read_callback().set(FUNC(spg110_device::get_pal_r));
 //  io->write_timer_irq_callback().set(FUNC(spg110_device::timerirq_w));

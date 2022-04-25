@@ -3,6 +3,12 @@
 license:CC0
 -->
 <mamelayout version="2">
+	<element name="sysled" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+
 	<element name="abort" defstate="0">
 		<disk state="0">
 			<bounds x="0.0" y="0.0" width="2.444444444" height="1.0" />
@@ -116,24 +122,31 @@ license:CC0
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
 
-		<bezel name="lamp0" element="abort" inputtag="SYSTEM" inputmask="0x04">
+		<element name="lamp0" ref="abort" inputtag="SYSTEM" inputmask="0x04">
 			<bounds x="3.696222222" y="3.323888889" width="0.268666667" height="0.134333333" />
-		</bezel>
-		<bezel name="lamp5" element="music" inputtag="IN1" inputmask="0x08">
+		</element>
+		<element name="lamp5" ref="music" inputtag="IN1" inputmask="0x08">
 			<bounds x="0.512222222" y="3.323888889" width="0.268666667" height="0.134333333" />
-		</bezel>
-		<bezel name="lamp3" element="view3" inputtag="IN1" inputmask="0x04">
+		</element>
+		<element name="lamp3" ref="view3" inputtag="IN1" inputmask="0x04">
 			<bounds x="0.386666667" y="3.041388889" width="0.268666667" height="0.134333333" />
-		</bezel>
-		<bezel name="lamp2" element="view2" inputtag="IN1" inputmask="0x02">
+		</element>
+		<element name="lamp2" ref="view2" inputtag="IN1" inputmask="0x02">
 			<bounds x="0.160666667" y="3.160666667" width="0.268666667" height="0.134333333" />
-		</bezel>
-		<bezel name="lamp1" element="view1" inputtag="IN1" inputmask="0x01">
+		</element>
+		<element name="lamp1" ref="view1" inputtag="IN1" inputmask="0x01">
 			<bounds x="0.035111111" y="3.323888889" width="0.268666667" height="0.134333333" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp8" element="leader">
+		<element name="lamp8" ref="leader">
 			<bounds x="1.75" y="3.1" width="0.5" height="0.23" />
-		</bezel>
+		</element>
+
+		<collection name="System LED" visible="no">
+			<element name="system_led" ref="sysled">
+				<bounds x="1.3" y="3.1" width="0.2" height="0.3" />
+			</element>
+		</collection>
 	</view>
+
 </mamelayout>

@@ -55,7 +55,7 @@ static constexpr rgb_t pcw16_palette[PCW16_NUM_COLOURS] =
 
 inline void pcw16_state::pcw16_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color)
 {
-	bitmap.pix16(y, x) = (uint16_t)color;
+	bitmap.pix(y, x) = (uint16_t)color;
 }
 
 /* Initialise the palette */

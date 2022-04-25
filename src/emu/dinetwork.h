@@ -23,7 +23,7 @@ public:
 	bool get_promisc() const { return m_promisc; }
 	int get_interface() const { return m_intf; }
 
-	int send(u8 *buf, int len);
+	int send(u8 *buf, int len, int fcs = 0);
 
 	// TODO: de-virtualise this when existing devices implement delayed receive
 	virtual void recv_cb(u8 *buf, int len);
@@ -50,6 +50,6 @@ protected:
 
 
 // iterator
-typedef device_interface_iterator<device_network_interface> network_interface_iterator;
+typedef device_interface_enumerator<device_network_interface> network_interface_enumerator;
 
 #endif // MAME_EMU_DINETWORK_H

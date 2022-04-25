@@ -7,5 +7,6 @@
 #pragma once
 
 extern void default_scsi_devices(device_slot_interface &device);
+extern void mac_scsi_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_NSCSI_DEVICES_H

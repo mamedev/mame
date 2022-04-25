@@ -28,6 +28,8 @@ upd4701_device::upd4701_device(const machine_config &mconfig, const char *tag, d
 	, m_starty(0)
 	, m_x(0)
 	, m_y(0)
+	, m_last_x_read(0)
+	, m_last_y_read(0)
 	, m_switches(0)
 	, m_latchswitches(0)
 	, m_cf(true)
@@ -60,13 +62,15 @@ void upd4701_device::device_start()
 	save_item(NAME(m_starty));
 	save_item(NAME(m_x));
 	save_item(NAME(m_y));
+	save_item(NAME(m_last_x_read));
+	save_item(NAME(m_last_y_read));
 	save_item(NAME(m_switches));
 	save_item(NAME(m_latchswitches));
 	save_item(NAME(m_cf));
 
-	// register special callback for analog inputs
+	// register special callback for inputs
 	if (m_portx.found() || m_porty.found())
-		machine().add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(&upd4701_device::analog_update, this));
+		machine().add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(&upd4701_device::update, this));
 }
 
 //-------------------------------------------------
@@ -211,15 +215,36 @@ void upd4701_device::reset_xy_w(u8 data)
 }
 
 //-------------------------------------------------
-//  analog_update - per-frame input update
+//  update - per-frame input update
 //-------------------------------------------------
 
-void upd4701_device::analog_update()
+void upd4701_device::update()
 {
 	if (m_portx.found())
-		x_add(m_portx->read() & MASK_COUNTER);
+	{
+		u16 x = m_portx->read() & MASK_COUNTER;
+		x_add(x - m_last_x_read);
+		m_last_x_read = x;
+	}
 	if (m_porty.found())
-		y_add(m_porty->read() & MASK_COUNTER);
+	{
+		u16 y = m_porty->read() & MASK_COUNTER;
+		y_add(y - m_last_y_read);
+		m_last_y_read = y;
+	}
+}
+
+//-------------------------------------------------
+//  recalibrate - refresh saved X & Y inputs
+//  (to be used if the input source changes)
+//-------------------------------------------------
+
+void upd4701_device::recalibrate()
+{
+	if (m_portx.found())
+		m_last_x_read = m_portx->read() & MASK_COUNTER;
+	if (m_porty.found())
+		m_last_y_read = m_porty->read() & MASK_COUNTER;
 }
 
 //-------------------------------------------------

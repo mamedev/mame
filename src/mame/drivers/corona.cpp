@@ -313,6 +313,8 @@
 #include "luckyrlt.lh"
 
 
+namespace {
+
 #define WC81_MAIN_XTAL      XTAL(24'000'000)        /* Main crystal for Winners Circle 28*28 pins PCB's */
 #define WC82_MAIN_XTAL      XTAL(18'432'000)    /* Main crystal for Winners Circle 18*22 pins PCB's */
 #define RE_MAIN_XTAL        XTAL(16'000'000)        /* Main for roulette boards */
@@ -378,14 +380,14 @@ private:
 	void winner82_sound_cpu_io_map(address_map &map);
 	void winner82_sound_map(address_map &map);
 
-	uint8_t m_blitter_x_reg;
-	uint8_t m_blitter_y_reg;
-	uint8_t m_blitter_aux_reg;
-	uint8_t m_blitter_unk_reg;
+	uint8_t m_blitter_x_reg = 0;
+	uint8_t m_blitter_y_reg = 0;
+	uint8_t m_blitter_aux_reg = 0;
+	uint8_t m_blitter_unk_reg = 0;
 	std::unique_ptr<uint8_t[]> m_videobuf;
-	uint8_t m_lamp;
-	uint8_t m_lamp_old;
-	int m_input_selector;
+	uint8_t m_lamp = 0;
+	uint8_t m_lamp_old = 0;
+	uint8_t m_input_selector = 0;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<screen_device> m_screen;
@@ -495,26 +497,24 @@ void corona_state::blitter_trig_wdht_w(uint8_t data)
 void corona_state::video_start()
 {
 	m_videobuf = make_unique_clear<uint8_t[]>(VIDEOBUF_SIZE);
+
+	m_lamp_old = 0;
 }
 
 uint32_t corona_state::screen_update_winner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y;
-
-	for (y = 0; y < 256; y++)
-		for (x = 0; x < 256; x++)
-			bitmap.pix16(y, x) = m_videobuf[y * 512 + x];
+	for (int y = 0; y < 256; y++)
+		for (int x = 0; x < 256; x++)
+			bitmap.pix(y, x) = m_videobuf[y * 512 + x];
 
 	return 0;
 }
 
 uint32_t corona_state::screen_update_luckyrlt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y;
-
-	for (y = 0; y < 256; y++)
-		for (x = 0; x < 256; x++)
-			bitmap.pix16(255 - y, x) = m_videobuf[y * 512 + x];
+	for (int y = 0; y < 256; y++)
+		for (int x = 0; x < 256; x++)
+			bitmap.pix(255 - y, x) = m_videobuf[y * 512 + x];
 
 	return 0;
 }
@@ -1745,6 +1745,8 @@ ROM_START(luckyrlt)
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "promrulxx.123",  0x0000, 0x0020, CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
 ROM_END
+
+} // Anonymous namespace
 
 
 /******************************************

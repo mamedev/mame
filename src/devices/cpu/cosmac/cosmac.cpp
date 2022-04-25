@@ -16,9 +16,7 @@ TODO:
 **********************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "cosmac.h"
-#include "coreutil.h"
 
 // permit our enums to be saved
 ALLOW_SAVE_TYPE(cosmac_device::cosmac_mode);
@@ -528,8 +526,8 @@ void cosmac_device::device_reset()
 	m_df = 0;
 	m_p = 0;
 
-	for (int i = 0; i < ARRAY_LENGTH(m_r); i++)
-		m_r[i] = machine().rand() & 0xffff;
+	for (uint16_t &r : m_r)
+		r = machine().rand() & 0xffff;
 }
 
 
@@ -860,7 +858,7 @@ inline void cosmac_device::run_state()
 	{
 	case cosmac_state::STATE_0_FETCH:
 		m_op = 0;
-
+		[[fallthrough]];
 	case cosmac_state::STATE_0_FETCH_2ND:
 		fetch_instruction();
 		break;
@@ -872,7 +870,7 @@ inline void cosmac_device::run_state()
 
 	case cosmac_state::STATE_1_EXECUTE:
 		sample_ef_lines();
-
+		[[fallthrough]];
 	case cosmac_state::STATE_1_EXECUTE_2ND:
 		execute_instruction();
 		debug();

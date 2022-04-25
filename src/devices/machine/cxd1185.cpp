@@ -482,7 +482,7 @@ void cxd1185_device::ioport_w(u8 data)
 	m_port_out_cb(0, m_ioport & mask, mask);
 }
 
-void cxd1185_device::state_timer(void *ptr, s32 param)
+void cxd1185_device::state_timer(s32 param)
 {
 	// step state machine
 	int delay = state_step();

@@ -16,6 +16,7 @@ public:
 	void set_basenote(int node) { m_basenode = node; }
 
 	DECLARE_WRITE_LINE_MEMBER( reset );
+	WRITE_LINE_MEMBER( chip_select );
 	void write(uint8_t data);
 
 protected:
@@ -23,9 +24,6 @@ protected:
 	virtual void device_start() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
-
-	TIMER_CALLBACK_MEMBER( latch_callback );
-	TIMER_CALLBACK_MEMBER( irq_clear );
 
 private:
 	// internal state
@@ -39,6 +37,7 @@ private:
 	uint8_t R0_r();
 	void O_w(uint8_t data);
 	void R1_w(uint8_t data);
+	TIMER_CALLBACK_MEMBER( write_sync );
 };
 
 DECLARE_DEVICE_TYPE(NAMCO_54XX, namco_54xx_device)

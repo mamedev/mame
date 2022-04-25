@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Mariusz Wojcieszek, Angelo Salese
+// copyright-holders:Mariusz Wojcieszek, Angelo Salese, Brian Johnson
 /***************************************************************************
 
     QX-10
@@ -11,6 +11,7 @@
 
     Done:
     - preliminary memory map
+    - sound
     - floppy (upd765)
     - DMA
     - Interrupts (pic8295)
@@ -33,23 +34,28 @@
 
 #include "emu.h"
 
+#include "bus/centronics/ctronics.h"
+#include "bus/epson_qx/option.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
 #include "machine/am9517a.h"
 #include "machine/i8255.h"
 #include "machine/mc146818.h"
+#include "machine/output_latch.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/qx10kbd.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
 #include "machine/z80sio.h"
+#include "sound/spkrdev.h"
+#include "speaker.h"
 #include "video/upd7220.h"
 #include "emupal.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "imagedev/snapquik.h"
 
 
@@ -79,12 +85,16 @@ public:
 		m_hgdc(*this, "upd7220"),
 		m_rtc(*this, "rtc"),
 		m_kbd(*this, "kbd"),
+		m_centronics(*this, "centronics"),
+		m_bus(*this, "bus"),
+		m_speaker(*this, "speaker"),
 		m_vram_bank(0),
 		m_char_rom(*this, "chargen"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_ram(*this, RAM_TAG),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_ram_view(*this, "ramview")
 	{
 	}
 
@@ -100,15 +110,18 @@ private:
 
 	void update_memory_mapping();
 
+	void update_speaker();
+
 	void qx10_18_w(uint8_t data);
 	void prom_sel_w(uint8_t data);
 	void cmos_sel_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( qx10_upd765_interrupt );
+	void update_fdd_motor(uint8_t state);
 	void fdd_motor_w(uint8_t data);
 	uint8_t qx10_30_r();
-	uint8_t gdc_dack_r();
-	void gdc_dack_w(uint8_t data);
+	void zoom_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( tc_w );
+	void sqw_out(uint8_t state);
 	uint8_t mc146818_r(offs_t offset);
 	void mc146818_w(offs_t offset, uint8_t data);
 	IRQ_CALLBACK_MEMBER( inta_call );
@@ -119,8 +132,20 @@ private:
 	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
+
+	uint8_t portb_r();
+	void portc_w(uint8_t data);
+
+	void centronics_busy_handler(uint8_t state);
+	void centronics_fault_handler(uint8_t state);
+	void centronics_perror_handler(uint8_t state);
+	void centronics_select_handler(uint8_t state);
+	void centronics_sense_handler(uint8_t state);
+
 	DECLARE_WRITE_LINE_MEMBER(keyboard_clk);
 	DECLARE_WRITE_LINE_MEMBER(keyboard_irq);
+	DECLARE_WRITE_LINE_MEMBER(speaker_freq);
+	DECLARE_WRITE_LINE_MEMBER(speaker_duration);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
@@ -147,6 +172,9 @@ private:
 	required_device<upd7220_device> m_hgdc;
 	required_device<mc146818_device> m_rtc;
 	required_device<rs232_port_device> m_kbd;
+	required_device<centronics_device> m_centronics;
+	required_device<bus::epson_qx::option_bus_device> m_bus;
+	required_device<speaker_sound_device>   m_speaker;
 	uint8_t m_vram_bank;
 	//required_shared_ptr<uint8_t> m_video_ram;
 	std::unique_ptr<uint16_t[]> m_video_ram;
@@ -158,51 +186,73 @@ private:
 	required_device<palette_device> m_palette;
 
 	/* FDD */
-	int     m_fdcint;
-	int     m_fdcmotor;
-	//int     m_fdcready;
+	int     m_fdcint = 0;
+	uint8_t  m_motor_clk = 0;
+	uint16_t m_counter = 0;
+	//int     m_fdcready = 0;
+
+	int m_spkr_enable = 0;
+	int m_spkr_freq = 0;
+	int m_pit1_out0 = 0;
+
+	/* centronics */
+	int m_centronics_error = 0;
+	int m_centronics_busy = 0;
+	int m_centronics_paper = 0;
+	int m_centronics_select = 0;
+	int m_centronics_sense = 0;
+
 
 	/* memory */
-	int     m_membank;
-	int     m_memprom;
-	int     m_memcmos;
-	uint8_t   m_cmosram[0x800];
+	memory_view m_ram_view;
+	int     m_external_bank = 0;
+	int     m_membank = 0;
+	int     m_memprom = 0;
+	int     m_memcmos = 0;
+	uint8_t   m_cmosram[0x800]{};
 
-	uint8_t m_color_mode;
+	uint8_t m_color_mode = 0;
+	uint8_t m_zoom = 0;
 };
 
 UPD7220_DISPLAY_PIXELS_MEMBER( qx10_state::hgdc_display_pixels )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	int xi,gfx[3];
-	uint8_t pen;
-
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	int gfx[3];
+	address &= 0xffff;
 	if(m_color_mode)
 	{
-		gfx[0] = m_video_ram[((address) + 0x00000) >> 1];
-		gfx[1] = m_video_ram[((address) + 0x20000) >> 1];
-		gfx[2] = m_video_ram[((address) + 0x40000) >> 1];
+		gfx[0] = m_video_ram[address + 0x00000];
+		gfx[1] = m_video_ram[address + 0x10000];
+		gfx[2] = m_video_ram[address + 0x20000];
 	}
 	else
 	{
-		gfx[0] = m_video_ram[(address) >> 1];
+		gfx[0] = m_video_ram[address];
 		gfx[1] = 0;
 		gfx[2] = 0;
 	}
 
-	for(xi=0;xi<16;xi++)
+	for(int xi=0;xi<16;xi++)
 	{
+		uint8_t pen;
 		pen = ((gfx[0] >> xi) & 1) ? 1 : 0;
 		pen|= ((gfx[1] >> xi) & 1) ? 2 : 0;
 		pen|= ((gfx[2] >> xi) & 1) ? 4 : 0;
-
-		bitmap.pix32(y, x + xi) = palette[pen];
+		for (int z = 0; z <= m_zoom; ++z)
+		{
+			int xval = ((x+xi)*(m_zoom+1))+z;
+			if (xval >= bitmap.cliprect().width() * 2)
+				continue;
+			bitmap.pix(y, xval) = palette[pen];
+		}
 	}
 }
 
 UPD7220_DRAW_TEXT_LINE_MEMBER( qx10_state::hgdc_draw_text )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	addr &= 0xffff;
 
 	for (int x = 0; x < pitch; x++)
 	{
@@ -226,8 +276,8 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( qx10_state::hgdc_draw_text )
 
 			for (int xi = 0; xi < 8; xi++)
 			{
-				int res_x = x * 8 + xi;
-				int res_y = y + yi;
+				int res_x = ((x * 8) + xi) * (m_zoom + 1);
+				int res_y = y + (yi * (m_zoom + 1));
 
 				if(!m_screen->visible_area().contains(res_x, res_y))
 					continue;
@@ -238,8 +288,14 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( qx10_state::hgdc_draw_text )
 				else
 					pen = ((tile_data >> xi) & 1) ? color : 0;
 
-				if(pen)
-					bitmap.pix32(res_y, res_x) = palette[pen];
+				for (int zx = 0; zx <= m_zoom; ++zx)
+				{
+					for (int zy = 0; zy <= m_zoom; ++zy)
+					{
+						if(pen)
+							bitmap.pix(res_y+zy, res_x+zx) = palette[pen];
+					}
+				}
 			}
 		}
 	}
@@ -255,11 +311,28 @@ uint32_t qx10_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap,
 }
 
 /*
+    Sound
+*/
+void qx10_state::update_speaker()
+{
+
+	/*
+	 *                 freq -----
+	 * pit1_out0 -----            NAND ---- level
+	 *                 NAND -----
+	 * !enable   -----
+	 */
+
+	uint8_t level = ((!m_spkr_enable && m_pit1_out0) || !m_spkr_freq) ? 1 : 0;
+	m_speaker->level_w(level);
+}
+
+/*
     Memory
 */
 void qx10_state::update_memory_mapping()
 {
-	int drambank = 0;
+	int drambank = -1;
 
 	if (m_membank & 1)
 	{
@@ -278,27 +351,48 @@ void qx10_state::update_memory_mapping()
 		drambank = 3;
 	}
 
-	if (!m_memprom)
+	if (drambank >= 0 || !m_memprom || m_memcmos)
 	{
-		membank("bank1")->set_base(memregion("maincpu")->base());
+		m_ram_view.select(0);
+		if (!m_memprom)
+		{
+			membank("bank1")->set_base(memregion("maincpu")->base());
+		}
+		else
+		{
+			membank("bank1")->set_base(m_ram->pointer() + drambank*64*1024);
+		}
+		if (m_memcmos)
+		{
+			membank("bank2")->set_base(m_cmosram);
+		}
+		else
+		{
+			membank("bank2")->set_base(m_ram->pointer() + drambank*64*1024 + 32*1024);
+		}
 	}
 	else
 	{
-		membank("bank1")->set_base(m_ram->pointer() + drambank*64*1024);
+		if (m_external_bank)
+		{
+			m_ram_view.select(1);;
+		}
+		else
+		{
+			m_ram_view.disable();
+		}
 	}
-	if (m_memcmos)
-	{
-		membank("bank2")->set_base(m_cmosram);
-	}
-	else
-	{
-		membank("bank2")->set_base(m_ram->pointer() + drambank*64*1024 + 32*1024);
-	}
+
 }
 
 void qx10_state::qx10_18_w(uint8_t data)
 {
 	m_membank = (data >> 4) & 0x0f;
+	m_spkr_enable = (data >> 2) & 0x01;
+	m_external_bank = (data >> 3) & 0x01;
+	m_pit_1->write_gate2(BIT(data, 1));
+	m_pit_1->write_gate0(data & 1);
+	update_speaker();
 	update_memory_mapping();
 }
 
@@ -312,6 +406,11 @@ void qx10_state::cmos_sel_w(uint8_t data)
 {
 	m_memcmos = data & 1;
 	update_memory_mapping();
+}
+
+void qx10_state::zoom_w(uint8_t data)
+{
+	m_zoom = data & 0x0f;
 }
 
 /***********************************************************
@@ -329,7 +428,7 @@ QUICKLOAD_LOAD_MEMBER(qx10_state::quickload_cb)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
-	if (quickload_size >= 0xfd00)
+	if (image.length() >= 0xfd00)
 		return image_init_result::FAIL;
 
 	/* The right RAM bank must be active */
@@ -344,6 +443,7 @@ QUICKLOAD_LOAD_MEMBER(qx10_state::quickload_cb)
 	}
 
 	/* Load image to the TPA (Transient Program Area) */
+	uint16_t quickload_size = image.length();
 	for (uint16_t i = 0; i < quickload_size; i++)
 	{
 		uint8_t data;
@@ -380,11 +480,22 @@ WRITE_LINE_MEMBER( qx10_state::qx10_upd765_interrupt )
 	m_pic_m->ir6_w(state);
 }
 
+void qx10_state::update_fdd_motor(uint8_t state)
+{
+	for (auto& fdd : m_floppy)
+	{
+		floppy_image_device *floppy = fdd->get_device();
+		if (floppy)
+		{
+			floppy->mon_w(state);
+		}
+	}
+}
+
 void qx10_state::fdd_motor_w(uint8_t data)
 {
-	m_fdcmotor = 1;
-
-	m_floppy[0]->get_device()->mon_w(false);
+	m_counter = 0;
+	update_fdd_motor(0);
 	// motor off controlled by clock
 }
 
@@ -396,9 +507,55 @@ uint8_t qx10_state::qx10_30_r()
 	floppy2 = m_floppy[1]->get_device();
 
 	return m_fdcint |
-			/*m_fdcmotor*/ 0 << 1 |
+			BIT(m_counter, 11) << 1 |
 			((floppy1 != nullptr) || (floppy2 != nullptr) ? 1 : 0) << 3 |
 			m_membank << 4;
+}
+
+void qx10_state::centronics_busy_handler(uint8_t state)
+{
+	m_centronics_busy = state;
+}
+
+void qx10_state::centronics_perror_handler(uint8_t state)
+{
+	m_centronics_paper = state;
+}
+
+void qx10_state::centronics_fault_handler(uint8_t state)
+{
+	m_centronics_error = state;
+}
+
+void qx10_state::centronics_select_handler(uint8_t state)
+{
+	m_centronics_select = state;
+}
+
+void qx10_state::centronics_sense_handler(uint8_t state)
+{
+	m_centronics_sense = state;
+}
+
+uint8_t qx10_state::portb_r()
+{
+	uint8_t status = 0;
+
+	status |= m_centronics_error  << 3;
+	status |= m_centronics_paper  << 4;
+	status |= m_centronics_busy   << 5;
+	status |= m_centronics_sense  << 6;
+	status |= m_centronics_select << 7;
+
+	return status;
+}
+
+void qx10_state::portc_w(uint8_t data)
+{
+	m_centronics->write_strobe(BIT(data, 0));
+	m_centronics->write_autofd(BIT(data, 4));
+	m_centronics->write_init(!BIT(data, 5));
+	m_pic_s->ir0_w(BIT(data, 3));
 }
 
 /*
@@ -410,21 +567,11 @@ WRITE_LINE_MEMBER(qx10_state::dma_hrq_changed)
 	m_dma_1->hack_w(state);
 }
 
-uint8_t qx10_state::gdc_dack_r()
-{
-	logerror("GDC DACK read\n");
-	return 0;
-}
-
-void qx10_state::gdc_dack_w(uint8_t data)
-{
-	logerror("GDC DACK write %02x\n", data);
-}
-
 WRITE_LINE_MEMBER( qx10_state::tc_w )
 {
 	/* floppy terminal count */
 	m_fdc->tc_w(!state);
+	m_bus->slots_w<&bus::epson_qx::option_slot_device::eopf>(state);
 }
 
 /*
@@ -456,6 +603,23 @@ void qx10_state::memory_write_byte(offs_t offset, uint8_t data)
 /*
     MC146818
 */
+void qx10_state::sqw_out(uint8_t state)
+{
+	uint8_t clk = !(state || BIT(m_counter, 11));
+	uint16_t cnt = m_counter;
+
+	if (!clk && m_motor_clk)
+	{
+		cnt = (cnt + 1) & 0xfff;
+	}
+	if (BIT(cnt, 11) && !BIT(m_counter, 11))
+	{
+		update_fdd_motor(1);
+	}
+
+	m_motor_clk = clk;
+	m_counter = cnt;
+}
 
 void qx10_state::mc146818_w(offs_t offset, uint8_t data)
 {
@@ -478,6 +642,18 @@ WRITE_LINE_MEMBER(qx10_state::keyboard_clk)
 	// clock keyboard too
 	m_scc->rxca_w(state);
 	m_scc->txca_w(state);
+}
+
+WRITE_LINE_MEMBER(qx10_state::speaker_duration)
+{
+	m_pit1_out0 = state;
+	update_speaker();
+}
+
+WRITE_LINE_MEMBER(qx10_state::speaker_freq)
+{
+	m_spkr_freq = state;
+	update_speaker();
 }
 
 /*
@@ -540,8 +716,10 @@ void qx10_state::vram_bank_w(uint8_t data)
 void qx10_state::qx10_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x7fff).bankrw("bank1");
-	map(0x8000, 0xdfff).bankrw("bank2");
+	map(0x0000, 0xdfff).view(m_ram_view);
+	m_ram_view[0](0x0000, 0x7fff).bankrw("bank1");
+	m_ram_view[0](0x8000, 0xdfff).bankrw("bank2");
+	m_ram_view[1](0x0000, 0xdfff).unmaprw();
 	map(0xe000, 0xffff).ram();
 }
 
@@ -562,12 +740,11 @@ void qx10_state::qx10_io(address_map &map)
 	map(0x30, 0x33).rw(FUNC(qx10_state::qx10_30_r), FUNC(qx10_state::fdd_motor_w));
 	map(0x34, 0x35).m(m_fdc, FUNC(upd765a_device::map));
 	map(0x38, 0x39).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
-//  map(0x3a, 0x3a) GDC zoom
+	map(0x3a, 0x3a).w(FUNC(qx10_state::zoom_w));
 //  map(0x3b, 0x3b) GDC light pen req
 	map(0x3c, 0x3d).rw(FUNC(qx10_state::mc146818_r), FUNC(qx10_state::mc146818_w));
 	map(0x40, 0x4f).rw(m_dma_1, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x50, 0x5f).rw(m_dma_2, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
-//  map(0xfc, 0xfd) Multi-Font comms
 }
 
 /* Input ports */
@@ -622,12 +799,20 @@ INPUT_PORTS_END
 
 void qx10_state::machine_start()
 {
+	m_bus->set_memview(m_ram_view[1]);
 }
 
 void qx10_state::machine_reset()
 {
 	m_dma_1->dreq0_w(1);
+	m_dma_1->dreq1_w(1);
 
+	m_spkr_enable = 0;
+	m_pit1_out0 = 1;
+
+	m_zoom = 0;
+
+	m_external_bank = 0;
 	m_memprom = 0;
 	m_memcmos = 0;
 	m_membank = 0;
@@ -693,7 +878,7 @@ uint16_t qx10_state::vram_r(offs_t offset)
 	else if(m_vram_bank & 2) { bank = 1; } // G
 	else if(m_vram_bank & 4) { bank = 2; } // R
 
-	return m_video_ram[offset + (0x20000 * bank)];
+	return m_video_ram[offset + (0x10000 * bank)];
 }
 
 void qx10_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -704,12 +889,12 @@ void qx10_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	else if(m_vram_bank & 2) { bank = 1; } // G
 	else if(m_vram_bank & 4) { bank = 2; } // R
 
-	COMBINE_DATA(&m_video_ram[offset + (0x20000 * bank)]);
+	COMBINE_DATA(&m_video_ram[offset + (0x10000 * bank)]);
 }
 
 void qx10_state::upd7220_map(address_map &map)
 {
-	map(0x00000, 0x3ffff).rw(FUNC(qx10_state::vram_r), FUNC(qx10_state::vram_w));
+	map(0x0000, 0xffff).rw(FUNC(qx10_state::vram_r), FUNC(qx10_state::vram_w)).mirror(0x30000);
 }
 
 static void keyboard(device_slot_interface &device)
@@ -743,8 +928,11 @@ void qx10_state::qx10(machine_config &config)
 */
 	PIT8253(config, m_pit_1, 0);
 	m_pit_1->set_clk<0>(1200);
+	m_pit_1->out_handler<0>().set(FUNC(qx10_state::speaker_duration));
 	m_pit_1->set_clk<1>(1200);
+	m_pit_1->out_handler<1>().set(m_pic_s, FUNC(pic8259_device::ir5_w));
 	m_pit_1->set_clk<2>(MAIN_CLK / 8);
+	m_pit_1->out_handler<2>().set(m_pic_m, FUNC(pic8259_device::ir1_w));
 
 /*
     Timer 1
@@ -755,6 +943,7 @@ void qx10_state::qx10(machine_config &config)
 */
 	PIT8253(config, m_pit_2, 0);
 	m_pit_2->set_clk<0>(MAIN_CLK / 8);
+	m_pit_2->out_handler<0>().set(FUNC(qx10_state::speaker_freq));
 	m_pit_2->set_clk<1>(MAIN_CLK / 8);
 	m_pit_2->out_handler<1>().set(FUNC(qx10_state::keyboard_clk));
 	m_pit_2->set_clk<2>(MAIN_CLK / 8);
@@ -779,34 +968,40 @@ void qx10_state::qx10(machine_config &config)
 	m_scc->out_int_callback().set(FUNC(qx10_state::keyboard_irq));
 
 	AM9517A(config, m_dma_1, MAIN_CLK/4);
+	m_dma_1->dreq_active_low();
 	m_dma_1->out_hreq_callback().set(FUNC(qx10_state::dma_hrq_changed));
 	m_dma_1->out_eop_callback().set(FUNC(qx10_state::tc_w));
 	m_dma_1->in_memr_callback().set(FUNC(qx10_state::memory_read_byte));
 	m_dma_1->out_memw_callback().set(FUNC(qx10_state::memory_write_byte));
 	m_dma_1->in_ior_callback<0>().set(m_fdc, FUNC(upd765a_device::dma_r));
-	m_dma_1->in_ior_callback<1>().set(FUNC(qx10_state::gdc_dack_r));
-	//m_dma_1->in_ior_callback<2>().set(m_hgdc, FUNC(upd7220_device::dack_r));
+	m_dma_1->in_ior_callback<1>().set(m_hgdc, FUNC(upd7220_device::dack_r));
 	m_dma_1->out_iow_callback<0>().set(m_fdc, FUNC(upd765a_device::dma_w));
-	m_dma_1->out_iow_callback<1>().set(FUNC(qx10_state::gdc_dack_w));
-	//m_dma_1->out_iow_callback<2>().set(m_hgdc, FUNC(upd7220_device::dack_w));
+	m_dma_1->out_iow_callback<1>().set(m_hgdc, FUNC(upd7220_device::dack_w));
+
 	AM9517A(config, m_dma_2, MAIN_CLK/4);
+	m_dma_2->dreq_active_low();
 
 	I8255(config, m_ppi, 0);
+	m_ppi->out_pa_callback().set("prndata", FUNC(output_latch_device::write));
+	m_ppi->in_pb_callback().set(FUNC(qx10_state::portb_r));
+	m_ppi->out_pc_callback().set(FUNC(qx10_state::portc_w));
 
 	UPD7220(config, m_hgdc, 16.67_MHz_XTAL/4/2);
 	m_hgdc->set_addrmap(0, &qx10_state::upd7220_map);
 	m_hgdc->set_display_pixels(FUNC(qx10_state::hgdc_display_pixels));
 	m_hgdc->set_draw_text(FUNC(qx10_state::hgdc_draw_text));
+	m_hgdc->drq_wr_callback().set(m_dma_1, FUNC(am9517a_device::dreq1_w)).invert();
 	m_hgdc->set_screen("screen");
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->irq().set(m_pic_s, FUNC(pic8259_device::ir2_w));
+	m_rtc->sqw().set(FUNC(qx10_state::sqw_out));
 
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set(FUNC(qx10_state::qx10_upd765_interrupt));
 	m_fdc->drq_wr_callback().set(m_dma_1, FUNC(am9517a_device::dreq0_w)).invert();
-	FLOPPY_CONNECTOR(config, m_floppy[0], qx10_floppies, "525dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy[1], qx10_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], qx10_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], qx10_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_scc, FUNC(upd7201_device::rxb_w));
@@ -814,8 +1009,55 @@ void qx10_state::qx10(machine_config &config)
 	RS232_PORT(config, m_kbd, keyboard, "qx10");
 	m_kbd->rxd_handler().set(m_scc, FUNC(upd7201_device::rxa_w));
 
+	output_latch_device &prndata(OUTPUT_LATCH(config, "prndata"));
+	CENTRONICS(config, m_centronics, centronics_devices, nullptr);
+	m_centronics->set_output_latch(prndata);
+	m_centronics->ack_handler().set(m_ppi, FUNC(i8255_device::pc6_w));
+	m_centronics->busy_handler().set(FUNC(qx10_state::centronics_busy_handler));
+	m_centronics->perror_handler().set(FUNC(qx10_state::centronics_perror_handler));
+	m_centronics->fault_handler().set(FUNC(qx10_state::centronics_fault_handler));
+	m_centronics->select_handler().set(FUNC(qx10_state::centronics_select_handler));
+	m_centronics->sense_handler().set(FUNC(qx10_state::centronics_sense_handler));
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
+
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("256K");
+
+	EPSON_QX_OPTION_BUS(config, m_bus, MAIN_CLK / 4);
+	m_dma_1->out_iow_callback<2>().set(m_bus, FUNC(bus::epson_qx::option_bus_device::dackf_w));
+	m_dma_1->in_ior_callback<2>().set(m_bus, FUNC(bus::epson_qx::option_bus_device::dackf_r));
+	m_dma_2->out_iow_callback<0>().set(m_bus, FUNC(bus::epson_qx::option_bus_device::dacks_w<0>));
+	m_dma_2->in_ior_callback<0>().set(m_bus, FUNC(bus::epson_qx::option_bus_device::dacks_r<0>));
+	m_dma_2->out_iow_callback<1>().set(m_bus, FUNC(bus::epson_qx::option_bus_device::dacks_w<1>));
+	m_dma_2->in_ior_callback<1>().set(m_bus, FUNC(bus::epson_qx::option_bus_device::dacks_r<1>));
+	m_dma_2->out_iow_callback<2>().set(m_bus, FUNC(bus::epson_qx::option_bus_device::dacks_w<2>));
+	m_dma_2->in_ior_callback<2>().set(m_bus, FUNC(bus::epson_qx::option_bus_device::dacks_r<2>));
+	m_dma_2->out_iow_callback<3>().set(m_bus, FUNC(bus::epson_qx::option_bus_device::dacks_w<3>));
+	m_dma_2->in_ior_callback<3>().set(m_bus, FUNC(bus::epson_qx::option_bus_device::dacks_r<3>));
+	m_dma_2->out_eop_callback().set(m_bus, FUNC(bus::epson_qx::option_bus_device::slots_w<&bus::epson_qx::option_slot_device::eops>));
+	m_bus->out_drqf_callback().set(m_dma_1, FUNC(am9517a_device::dreq2_w));
+	m_bus->out_rdyf_callback().set(m_dma_1, FUNC(am9517a_device::ready_w));
+	m_bus->out_drqs_callback<0>().set(m_dma_2, FUNC(am9517a_device::dreq0_w));
+	m_bus->out_drqs_callback<1>().set(m_dma_2, FUNC(am9517a_device::dreq1_w));
+	m_bus->out_drqs_callback<2>().set(m_dma_2, FUNC(am9517a_device::dreq2_w));
+	m_bus->out_drqs_callback<3>().set(m_dma_2, FUNC(am9517a_device::dreq3_w));
+	m_bus->out_rdys_callback().set(m_dma_2, FUNC(am9517a_device::ready_w));
+	m_bus->out_inth1_callback().set(m_pic_m, FUNC(pic8259_device::ir2_w));
+	m_bus->out_inth2_callback().set(m_pic_m, FUNC(pic8259_device::ir3_w));
+	m_bus->out_intl_callback<0>().set(m_pic_s, FUNC(pic8259_device::ir1_w));
+	m_bus->out_intl_callback<1>().set(m_pic_s, FUNC(pic8259_device::ir3_w));
+	m_bus->out_intl_callback<2>().set(m_pic_s, FUNC(pic8259_device::ir4_w));
+	m_bus->out_intl_callback<3>().set(m_pic_s, FUNC(pic8259_device::ir6_w));
+	m_bus->out_intl_callback<4>().set(m_pic_s, FUNC(pic8259_device::ir7_w));
+	m_bus->set_iospace(m_maincpu, AS_IO);
+	EPSON_QX_OPTION_BUS_SLOT(config, "option1", m_bus, 0, bus::epson_qx::option_bus_devices, nullptr);
+	EPSON_QX_OPTION_BUS_SLOT(config, "option2", m_bus, 1, bus::epson_qx::option_bus_devices, nullptr);
+	EPSON_QX_OPTION_BUS_SLOT(config, "option3", m_bus, 2, bus::epson_qx::option_bus_devices, nullptr);
+	EPSON_QX_OPTION_BUS_SLOT(config, "option4", m_bus, 3, bus::epson_qx::option_bus_devices, nullptr);
+	EPSON_QX_OPTION_BUS_SLOT(config, "option5", m_bus, 4, bus::epson_qx::option_bus_devices, nullptr);
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("qx10_flop");
@@ -831,12 +1073,6 @@ ROM_START( qx10 )
 	ROM_SYSTEM_BIOS(1, "v003", "v0.03")
 	ROMX_LOAD( "ipl003.bin", 0x0000, 0x0800, CRC(3cbc4008) SHA1(cc8c7d1aa0cca8f9753d40698b2dc6802fd5f890), ROM_BIOS(1))
 
-	/* This is probably the i8039 program ROM for the Q10MF Multifont card, and the actual font ROMs are missing (6 * HM43128) */
-	/* The first part of this rom looks like code for an embedded controller?
-	    From 0300 on, is a keyboard lookup table */
-	ROM_REGION( 0x0800, "i8039", 0 )
-	ROM_LOAD( "m12020a.3e", 0x0000, 0x0800, CRC(fa27f333) SHA1(73d27084ca7b002d5f370220d8da6623a6e82132))
-
 	ROM_REGION( 0x1000, "chargen", 0 )
 //  ROM_LOAD( "qge.2e",   0x0000, 0x0800, BAD_DUMP CRC(ed93cb81) SHA1(579e68bde3f4184ded7d89b72c6936824f48d10b))  //this one contains special characters only
 //  ROM_LOAD( "qge.2e",   0x0000, 0x1000, BAD_DUMP CRC(eb31a2d5) SHA1(6dc581bf2854a07ae93b23b6dfc9c7abd3c0569e))
@@ -846,4 +1082,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY  FULLNAME  FLAGS */
-COMP( 1983, qx10, 0,      0,      qx10,    qx10,  qx10_state, empty_init, "Epson", "QX-10",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1983, qx10, 0,      0,      qx10,    qx10,  qx10_state, empty_init, "Epson", "QX-10",  MACHINE_NOT_WORKING )

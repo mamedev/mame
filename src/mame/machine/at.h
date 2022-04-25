@@ -7,7 +7,7 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/am9517a.h"
-#include "bus/pc_kbd/pc_kbdc.h"
+#include "machine/at_keybc.h"
 #include "bus/isa/isa.h"
 #include "sound/spkrdev.h"
 #include "softlist.h"
@@ -15,12 +15,17 @@
 class at_mb_device : public device_t
 {
 public:
-	at_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	at_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void map(address_map &map);
 
+	auto kbd_clk() { return subdevice<at_keyboard_controller_device>("keybc")->kbd_clk(); }
+	auto kbd_data() { return subdevice<at_keyboard_controller_device>("keybc")->kbd_data(); }
+
 	uint8_t page8_r(offs_t offset);
 	void page8_w(offs_t offset, uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(kbd_clk_w);
+	DECLARE_WRITE_LINE_MEMBER(kbd_data_w);
 	uint8_t portb_r();
 	void portb_w(uint8_t data);
 	void write_rtc(offs_t offset, uint8_t data);
@@ -48,16 +53,18 @@ private:
 	required_device<pit8254_device> m_pit8254;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<mc146818_device> m_mc146818;
-	uint8_t m_at_spkrdata;
-	uint8_t m_pit_out2;
-	int m_dma_channel;
-	bool m_cur_eop, m_cur_eop2;
-	uint8_t m_dma_offset[2][4];
-	uint8_t m_at_pages[0x10];
-	uint16_t m_dma_high_byte;
-	uint8_t m_at_speaker;
-	uint8_t m_channel_check;
-	uint8_t m_nmi_enabled;
+	optional_device<at_keyboard_controller_device> m_keybc; // removed in mtouchxl.cpp and vis.cpp
+
+	uint8_t m_at_spkrdata = 0;
+	uint8_t m_pit_out2 = 0;
+	int m_dma_channel = 0;
+	bool m_cur_eop = false, m_cur_eop2 = false;
+	uint8_t m_dma_offset[2][4]{};
+	uint8_t m_at_pages[0x10]{};
+	uint16_t m_dma_high_byte = 0;
+	uint8_t m_at_speaker = 0;
+	uint8_t m_channel_check = 0;
+	uint8_t m_nmi_enabled = 0;
 
 	DECLARE_WRITE_LINE_MEMBER(pit8254_out2_changed);
 

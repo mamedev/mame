@@ -28,10 +28,9 @@ TODO:
 #include "cpu/m6800/m6800.h"
 #include "cpu/z80/z80.h"
 #include "machine/clock.h"
-#include "sound/2203intf.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
+#include "sound/ymopn.h"
 #include "video/jangou_blitter.h"
 #include "video/resnet.h"
 #include "emupal.h"
@@ -175,14 +174,12 @@ void nightgal_state::video_start()
 
 uint32_t nightgal_state::screen_update_nightgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y;
-
-	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
 		const uint8_t *src = &m_blitter->blit_buffer(y, cliprect.min_x);
-		uint16_t *dst = &m_tmp_bitmap->pix16(y, cliprect.min_x);
+		uint16_t *dst = &m_tmp_bitmap->pix(y, cliprect.min_x);
 
-		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
 			uint32_t srcpix = *src++;
 			*dst++ = m_palette->pen((srcpix & 0xf) | m_pal_bank);
@@ -420,8 +417,8 @@ void nightgal_state::sexygal_audionmi_w(uint8_t data)
 void nightgal_state::sweetgal_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x807f).ram().share("sound_ram");
-	map(0xe000, 0xefff).rw(FUNC(nightgal_state::royalqn_comm_r), FUNC(nightgal_state::royalqn_comm_w)).share("comms_ram");
+	map(0x8000, 0x807f).lrw8([this](offs_t off) { return m_sound_ram[off]; }, "snd_r", [this](offs_t off, u8 data) { m_sound_ram[off] = data; }, "snd_w");
+	map(0xe000, 0xefff).rw(FUNC(nightgal_state::royalqn_comm_r), FUNC(nightgal_state::royalqn_comm_w));
 	map(0xf000, 0xffff).ram();
 }
 
@@ -454,9 +451,9 @@ void nightgal_state::sgaltrop_io(address_map &map)
 	common_sexygal_io(map);
 
 	// not actually a YM2203?
-	map(0x01, 0x01).r("ymsnd", FUNC(ym2203_device::read_port_r));
-	map(0x02, 0x02).w("ymsnd", FUNC(ym2203_device::write_port_w));
-	map(0x03, 0x03).w("ymsnd", FUNC(ym2203_device::control_port_w));
+	map(0x01, 0x01).r("ymsnd", FUNC(ym2203_device::data_r));
+	map(0x02, 0x02).w("ymsnd", FUNC(ym2203_device::data_w));
+	map(0x03, 0x03).w("ymsnd", FUNC(ym2203_device::address_w));
 }
 
 void nightgal_state::sexygal_nsc_map(address_map &map)
@@ -783,7 +780,7 @@ void nightgal_state::machine_reset()
 	m_z80_latch = 0;
 	m_mux_data = 0;
 
-	memset(m_blit_raw_data, 0, ARRAY_LENGTH(m_blit_raw_data));
+	std::fill(std::begin(m_blit_raw_data), std::end(m_blit_raw_data), 0);
 }
 
 void nightgal_state::royalqn(machine_config &config)
@@ -836,9 +833,6 @@ void nightgal_state::sexygal(machine_config &config)
 	sampleclk.signal_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	config.device_remove("aysnd");
 
@@ -883,7 +877,7 @@ Night Gal
 OSC:20MHz
 CPU:Z80
 SND:AY-3-8910
-ETC:CUSTOM(The surface of the chip is scrached, so the name of the chip is unknown), MemoryBackup
+ETC:CUSTOM(The surface of the chip is scratched, so the name of the chip is unknown), MemoryBackup
 
 NGAL_01.BIN graphic
 NGAL_02.BIN graphic
@@ -935,7 +929,7 @@ Night Bunny
 CPU: Z80
 Sound: AY-3-8910
 OSC: 20.000MHz
-Other: surface scrached DIP40 (NB1413M3?)
+Other: surface scratched DIP40 (NB1413M3?)
 
 ROMs:
 1.3A

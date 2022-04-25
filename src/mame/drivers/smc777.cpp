@@ -29,7 +29,7 @@
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "imagedev/snapquik.h"
 #include "speaker.h"
 
@@ -127,30 +127,30 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	uint8_t *m_ipl_rom;
+	uint8_t *m_ipl_rom = nullptr;
 	std::unique_ptr<uint8_t[]> m_work_ram;
 	std::unique_ptr<uint8_t[]> m_vram;
 	std::unique_ptr<uint8_t[]> m_attr;
 	std::unique_ptr<uint8_t[]> m_gvram;
 	std::unique_ptr<uint8_t[]> m_pcg;
 
-	uint8_t m_keyb_press;
-	uint8_t m_keyb_press_flag;
-	uint8_t m_shift_press_flag;
-	uint8_t m_backdrop_pen;
-	uint8_t m_display_reg;
-	uint8_t m_fdc_irq_flag;
-	uint8_t m_fdc_drq_flag;
-	uint8_t m_system_data;
-	struct { uint8_t r,g,b; } m_pal;
-	uint8_t m_raminh,m_raminh_pending_change; //bankswitch
-	uint8_t m_raminh_prefetch;
-	uint8_t m_pal_mode;
-	uint8_t m_keyb_cmd;
-	uint8_t m_crtc_vreg[0x20];
-	uint8_t m_crtc_addr;
-	bool m_vsync_idf;
-	bool m_vsync_ief;
+	uint8_t m_keyb_press = 0;
+	uint8_t m_keyb_press_flag = 0;
+	uint8_t m_shift_press_flag = 0;
+	uint8_t m_backdrop_pen = 0;
+	uint8_t m_display_reg = 0;
+	uint8_t m_fdc_irq_flag = 0;
+	uint8_t m_fdc_drq_flag = 0;
+	uint8_t m_system_data = 0;
+	struct { uint8_t r = 0, g = 0, b = 0; } m_pal;
+	uint8_t m_raminh = 0, m_raminh_pending_change = 0; //bankswitch
+	uint8_t m_raminh_prefetch = 0;
+	uint8_t m_pal_mode = 0;
+	uint8_t m_keyb_cmd = 0;
+	uint8_t m_crtc_vreg[0x20]{};
+	uint8_t m_crtc_addr = 0;
+	bool m_vsync_idf = false;
+	bool m_vsync_ief = false;
 };
 
 
@@ -164,47 +164,44 @@ void smc777_state::video_start()
 
 uint32_t smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x,y,yi;
 	uint16_t count;
-	int x_width;
 
 //  popmessage("%d %d %d %d",mc6845_v_char_total,mc6845_v_total_adj,mc6845_v_display,mc6845_v_sync_pos);
 
 	bitmap.fill(m_palette->pen(m_backdrop_pen), cliprect);
 
-	x_width = ((m_display_reg & 0x80) >> 7);
+	int x_width = ((m_display_reg & 0x80) >> 7);
 
 	count = 0x0000;
 
-	for(yi=0;yi<8;yi++)
+	for(int yi=0;yi<8;yi++)
 	{
-		for(y=0;y<200;y+=8)
+		for(int y=0;y<200;y+=8)
 		{
-			for(x=0;x<160;x++)
+			for(int x=0;x<160;x++)
 			{
-				uint16_t color;
+				uint16_t color = (m_gvram[count] & 0xf0) >> 4;
 
-				color = (m_gvram[count] & 0xf0) >> 4;
 				/* todo: clean this up! */
 				//if(x_width)
 				{
-					bitmap.pix16(y+yi+CRTC_MIN_Y, x*4+0+CRTC_MIN_X) = m_palette->pen(color);
-					bitmap.pix16(y+yi+CRTC_MIN_Y, x*4+1+CRTC_MIN_X) = m_palette->pen(color);
+					bitmap.pix(y+yi+CRTC_MIN_Y, x*4+0+CRTC_MIN_X) = m_palette->pen(color);
+					bitmap.pix(y+yi+CRTC_MIN_Y, x*4+1+CRTC_MIN_X) = m_palette->pen(color);
 				}
 				//else
 				//{
-				//  bitmap.pix16(y+yi+CRTC_MIN_Y, x*2+0+CRTC_MIN_X) = m_palette->pen(color);
+				//  bitmap.pix(y+yi+CRTC_MIN_Y, x*2+0+CRTC_MIN_X) = m_palette->pen(color);
 				//}
 
 				color = (m_gvram[count] & 0x0f) >> 0;
 				//if(x_width)
 				{
-					bitmap.pix16(y+yi+CRTC_MIN_Y, x*4+2+CRTC_MIN_X) = m_palette->pen(color);
-					bitmap.pix16(y+yi+CRTC_MIN_Y, x*4+3+CRTC_MIN_X) = m_palette->pen(color);
+					bitmap.pix(y+yi+CRTC_MIN_Y, x*4+2+CRTC_MIN_X) = m_palette->pen(color);
+					bitmap.pix(y+yi+CRTC_MIN_Y, x*4+3+CRTC_MIN_X) = m_palette->pen(color);
 				}
 				//else
 				//{
-				//  bitmap.pix16(y+yi+CRTC_MIN_Y, x*2+1+CRTC_MIN_X) = m_palette->pen(color);
+				//  bitmap.pix(y+yi+CRTC_MIN_Y, x*2+1+CRTC_MIN_X) = m_palette->pen(color);
 				//}
 
 				count++;
@@ -216,9 +213,9 @@ uint32_t smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 
 
 	count = 0x0000;
 
-	for(y=0;y<25;y++)
+	for(int y=0;y<25;y++)
 	{
-		for(x=0;x<80/(x_width+1);x++)
+		for(int x=0;x<80/(x_width+1);x++)
 		{
 			/*
 			-x-- ---- blink
@@ -229,11 +226,9 @@ uint32_t smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 
 			int color = m_attr[count] & 7;
 			int bk_color = (m_attr[count] & 0x18) >> 3;
 			int blink = m_attr[count] & 0x40;
-			int xi;
-			int bk_pen;
 			//int bk_struct[4] = { -1, 0x10, 0x11, (color & 7) ^ 8 };
 
-			bk_pen = -1;
+			int bk_pen = -1;
 			switch(bk_color & 3)
 			{
 				case 0: bk_pen = -1; break; //transparent
@@ -245,23 +240,21 @@ uint32_t smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 
 			if(blink && m_screen->frame_number() & 0x10) //blinking, used by Dragon's Alphabet
 				color = bk_pen;
 
-			for(yi=0;yi<8;yi++)
+			for(int yi=0;yi<8;yi++)
 			{
-				for(xi=0;xi<8;xi++)
+				for(int xi=0;xi<8;xi++)
 				{
-					int pen;
-
-					pen = ((m_pcg[tile*8+yi]>>(7-xi)) & 1) ? (color+m_pal_mode) : bk_pen;
+					int pen = ((m_pcg[tile*8+yi]>>(7-xi)) & 1) ? (color+m_pal_mode) : bk_pen;
 
 					if (pen != -1)
 					{
 						if(x_width)
 						{
-							bitmap.pix16(y*8+CRTC_MIN_Y+yi, (x*8+xi)*2+0+CRTC_MIN_X) = m_palette->pen(pen);
-							bitmap.pix16(y*8+CRTC_MIN_Y+yi, (x*8+xi)*2+1+CRTC_MIN_X) = m_palette->pen(pen);
+							bitmap.pix(y*8+CRTC_MIN_Y+yi, (x*8+xi)*2+0+CRTC_MIN_X) = m_palette->pen(pen);
+							bitmap.pix(y*8+CRTC_MIN_Y+yi, (x*8+xi)*2+1+CRTC_MIN_X) = m_palette->pen(pen);
 						}
 						else
-							bitmap.pix16(y*8+CRTC_MIN_Y+yi, x*8+CRTC_MIN_X+xi) = m_palette->pen(pen);
+							bitmap.pix(y*8+CRTC_MIN_Y+yi, x*8+CRTC_MIN_X+xi) = m_palette->pen(pen);
 					}
 				}
 			}
@@ -269,9 +262,7 @@ uint32_t smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 
 			// draw cursor
 			if(mc6845_cursor_addr == count)
 			{
-				int xc,yc,cursor_on;
-
-				cursor_on = 0;
+				int cursor_on = 0;
 				switch(mc6845_cursor_y_start & 0x60)
 				{
 					case 0x00: cursor_on = 1; break; //always on
@@ -282,17 +273,17 @@ uint32_t smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 
 
 				if(cursor_on)
 				{
-					for(yc=0;yc<(8-(mc6845_cursor_y_start & 7));yc++)
+					for(int yc=0;yc<(8-(mc6845_cursor_y_start & 7));yc++)
 					{
-						for(xc=0;xc<8;xc++)
+						for(int xc=0;xc<8;xc++)
 						{
 							if(x_width)
 							{
-								bitmap.pix16(y*8+CRTC_MIN_Y-yc+7, (x*8+xc)*2+0+CRTC_MIN_X) = m_palette->pen(0x7);
-								bitmap.pix16(y*8+CRTC_MIN_Y-yc+7, (x*8+xc)*2+1+CRTC_MIN_X) = m_palette->pen(0x7);
+								bitmap.pix(y*8+CRTC_MIN_Y-yc+7, (x*8+xc)*2+0+CRTC_MIN_X) = m_palette->pen(0x7);
+								bitmap.pix(y*8+CRTC_MIN_Y-yc+7, (x*8+xc)*2+1+CRTC_MIN_X) = m_palette->pen(0x7);
 							}
 							else
-								bitmap.pix16(y*8+CRTC_MIN_Y-yc+7, x*8+CRTC_MIN_X+xc) = m_palette->pen(0x7);
+								bitmap.pix(y*8+CRTC_MIN_Y-yc+7, x*8+CRTC_MIN_X+xc) = m_palette->pen(0x7);
 						}
 					}
 				}
@@ -417,7 +408,7 @@ QUICKLOAD_LOAD_MEMBER(smc777_state::quickload_cb)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
-	if (quickload_size >= 0xfd00)
+	if (image.length() >= 0xfd00)
 		return image_init_result::FAIL;
 
 	/* The right RAM bank must be active */
@@ -430,6 +421,7 @@ QUICKLOAD_LOAD_MEMBER(smc777_state::quickload_cb)
 	}
 
 	/* Load image to the TPA (Transient Program Area) */
+	uint16_t quickload_size = image.length();
 	for (uint16_t i = 0; i < quickload_size; i++)
 	{
 		uint8_t data;
@@ -1140,8 +1132,8 @@ void smc777_state::smc777(machine_config &config)
 	m_fdc->drq_wr_callback().set(FUNC(smc777_state::fdc_drq_w));
 
 	// does it really support 16 of them?
-	FLOPPY_CONNECTOR(config, "fdc:0", smc777_floppies, "ssdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", smc777_floppies, "ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", smc777_floppies, "ssdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", smc777_floppies, "ssdd", floppy_image_device::default_mfm_floppy_formats);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("smc777");
 	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(smc777_state::quickload_cb));

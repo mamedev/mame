@@ -7,7 +7,6 @@
 */
 
 #include "emu.h"
-#include "debugger.h"
 #include "pdp8.h"
 #include "pdp8dasm.h"
 
@@ -51,7 +50,7 @@ DEFINE_DEVICE_TYPE(PDP8, pdp8_device, "pdp8_cpu", "DEC PDP8")
 
 pdp8_device::pdp8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, PDP8, tag, owner, clock),
-		m_program_config("program", ENDIANNESS_BIG, 12, 12),
+		m_program_config("program", ENDIANNESS_BIG, 16, 12, -1),
 		m_pc(0),
 		m_ac(0),
 		m_mb(0),
@@ -63,6 +62,7 @@ pdp8_device::pdp8_device(const machine_config &mconfig, const char *tag, device_
 		m_icount(0)
 {
 	// Allocate & setup
+	m_program_config.m_is_octal = true;
 }
 
 
@@ -115,18 +115,15 @@ void pdp8_device::device_reset()
 
 
 //-------------------------------------------------
-//  memory_space_config - return the configuration
-//  of the specified address space, or nullptr if
-//  the space doesn't exist
+//  memory_space_config - return a vector of
+//  address space configurations for this device
 //-------------------------------------------------
 
-const address_space_config *pdp8_device::memory_space_config(int spacenum) const
+device_memory_interface::space_config_vector pdp8_device::memory_space_config() const
 {
-	if (spacenum == AS_PROGRAM)
-	{
-		return &m_program_config;
-	}
-	return nullptr;
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+	};
 }
 
 
@@ -140,7 +137,7 @@ void pdp8_device::state_string_export(const device_state_entry &entry, std::stri
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c", m_halt ? 'H' : '.');
+			str = util::string_format("%c", m_halt ? 'H' : '.');
 			break;
 	}
 }
@@ -151,7 +148,7 @@ void pdp8_device::state_string_export(const device_state_entry &entry, std::stri
 //  helper function
 //-------------------------------------------------
 
-std::unique_ptr<util::disasm_interface> pdp8_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> pdp8_device::create_disassembler()
 {
 	return std::make_unique<pdp8_disassembler>();
 }
@@ -218,7 +215,7 @@ void pdp8_device::execute_run()
 
 		debugger_instruction_hook(m_pc);
 
-		uint16_t op = m_program->read_word(m_pc);
+		uint16_t op [[maybe_unused]] = m_program->read_word(m_pc);
 
 		--m_icount;
 	}

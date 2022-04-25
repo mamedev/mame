@@ -33,7 +33,6 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/6840ptm.h"
 #include "machine/nvram.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -630,6 +629,9 @@ void esripsys_state::init_esripsys()
 
 	subdevice<nvram_device>("nvram")->set_base(m_cmos_ram.get(), CMOS_RAM_SIZE);
 
+	// FIXME: arbitrarily initialize bank1 to avoid debugger crash
+	membank("bank1")->set_base(&memregion("game_cpu")->base()[0x10000]);
+
 	membank("bank2")->set_base(&rom[0x0000]);
 	membank("bank3")->set_base(&rom[0x4000]);
 	membank("bank4")->set_base(&rom[0x8000]);
@@ -700,11 +702,8 @@ void esripsys_state::esripsys(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	MC3410(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
-	mc3408_device &dacvol(MC3408(config, "dacvol", 0)); // unknown DAC
-	dacvol.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	dacvol.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dacvol", 1.0, DAC_VREF_POS_INPUT);
+	mc3408_device &dacvol(MC3408(config, "dacvol", 0));
+	dacvol.set_output_range(0, 1).add_route(0, m_dac, 1.0, DAC_INPUT_RANGE_HI).add_route(0, m_dac, -1.0, DAC_INPUT_RANGE_LO); // unknown DAC
 
 	TMS5220(config, m_tms, 640000).add_route(ALL_OUTPUTS, "speaker", 1.0);
 

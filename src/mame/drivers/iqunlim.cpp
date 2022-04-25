@@ -56,6 +56,7 @@ A4 = MAX232
 #include "cpu/m68000/m68000.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "softlist_dev.h"
 
 class iqunlim_state : public driver_device
 {

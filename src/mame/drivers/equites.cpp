@@ -415,7 +415,7 @@ READ_LINE_MEMBER(gekisou_state::gekisou_unknown_bit_r)
 void gekisou_state::gekisou_unknown_bit_w(offs_t offset, uint16_t data)
 {
 	// data bit is A17 (offset)
-	m_gekisou_unknown_bit = (offset == 0) ? 0 : 1;;
+	m_gekisou_unknown_bit = (offset == 0) ? 0 : 1;
 }
 
 

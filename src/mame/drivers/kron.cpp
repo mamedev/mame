@@ -161,7 +161,7 @@ private:
 	required_region_ptr<uint8_t> m_chargen;
 	required_shared_ptr<uint8_t> m_vram;
 	required_device<pc_keyboard_device> m_keyboard;
-	uint8_t m_kbd_data;
+	uint8_t m_kbd_data = 0;
 };
 
 void kron180_state::kron180_mem(address_map &map)
@@ -169,8 +169,7 @@ void kron180_state::kron180_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).rom().region("roms", 0x8000);
 	map(0x8000, 0x85ff).ram().mirror(0x6000);
-	map(0x8600, 0x95ff).ram().share(m_vram).mirror(0x6000);
-	map(0x9600, 0x9fff).ram().mirror(0x6000);
+	map(0x8600, 0x9fff).ram().share(m_vram).mirror(0x6000);
 }
 
 /*   IO decoding
@@ -218,36 +217,31 @@ void kron180_state::kron180_iomap(address_map &map)
 
 /* Input ports */
 static INPUT_PORTS_START (kron180)
-	PORT_INCLUDE(pc_keyboard)
 INPUT_PORTS_END
 
 /* Video TODO: find and understand the char table within main rom */
 uint32_t kron180_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y;
-	int vramad;
-	uint8_t *chardata;
-	uint8_t charcode;
-
 	LOGSCREEN("%s()\n", FUNCNAME);
-	vramad = 0;
+	int vramad = 0;
 	for (int row = 0; row < 25 * 8; row += 8)
 	{
+		uint8_t charcode;
 		for (int col = 0; col < 80 * 8; col += 8)
 		{
 			/* look up the character data */
 			charcode = m_vram[vramad];
 			if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN("\n %c at X=%d Y=%d: ", charcode, col, row);
-			chardata = &m_chargen[(charcode * 8) + 8];
+			uint8_t const *chardata = &m_chargen[(charcode * 8) + 8];
 			/* plot the character */
-			for (y = 0; y < 8; y++)
+			for (int y = 0; y < 8; y++)
 			{
 				chardata--;
 				if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN("\n  %02x: ", *chardata);
-				for (x = 0; x < 8; x++)
+				for (int x = 0; x < 8; x++)
 				{
 					if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN(" %02x: ", *chardata);
-					bitmap.pix16(row + (8 - y), col + (8 - x)) = (*chardata & (1 << x)) ? 1 : 0;
+					bitmap.pix(row + (8 - y), col + (8 - x)) = (*chardata & (1 << x)) ? 1 : 0;
 				}
 			}
 			vramad += 2;
@@ -261,7 +255,7 @@ uint32_t kron180_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 /* Interrupt Handling */
 #if 0
-WRITE8_MEMBER(kron180_state::irq0_ack_w)
+void kron180_state::irq0_ack_w(uint8_t data)
 {
 	m_irq0_ack = data;
 	if ((data & 1) == 1)

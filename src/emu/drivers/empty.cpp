@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /*************************************************************************
 
-    empty.c
+    empty.cpp
 
     Empty driver.
 
@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "emuopts.h"
-#include "render.h"
+#include "screen.h"
 
 //**************************************************************************
 //  DRIVER STATE

@@ -13,7 +13,7 @@ osd_ticks_t osd_ticks(void)
 static void BM_count_leading_zeros_noasm(benchmark::State& state) {
 	uint32_t cnt = 0x332533;
 	while (state.KeepRunning()) {
-		(void)count_leading_zeros(cnt);
+		(void)count_leading_zeros_32(cnt);
 		cnt++;
 	}
 }

@@ -2,17 +2,23 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    crsshair.c
+    crsshair.cpp
 
     Crosshair handling.
+
 ***************************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
-#include "rendutil.h"
-#include "config.h"
-#include "xmlfile.h"
 #include "crsshair.h"
+
+#include "config.h"
+#include "emuopts.h"
+#include "fileio.h"
+#include "render.h"
+#include "rendutil.h"
+#include "screen.h"
+
+#include "xmlfile.h"
 
 
 
@@ -118,7 +124,7 @@ render_crosshair::render_crosshair(running_machine &machine, int player)
 	, m_time(0)
 {
 	// for now, use the main screen
-	m_screen = screen_device_iterator(machine.root_device()).first();
+	m_screen = screen_device_enumerator(machine.root_device()).first();
 }
 
 
@@ -167,32 +173,45 @@ void render_crosshair::set_default_bitmap()
 
 void render_crosshair::create_bitmap()
 {
-	int x, y;
-	rgb_t color = m_player < ARRAY_LENGTH(crosshair_colors) ? crosshair_colors[m_player] : rgb_t::white();
+	rgb_t color = m_player < std::size(crosshair_colors) ? crosshair_colors[m_player] : rgb_t::white();
 
 	// if we have a bitmap and texture for this player, kill it
-	if (m_bitmap == nullptr)
+	if (!m_bitmap)
 	{
 		m_bitmap = std::make_unique<bitmap_argb32>();
 		m_texture = m_machine.render().texture_alloc(render_texture::hq_scale);
+	}
+	else
+	{
+		m_bitmap->reset();
 	}
 
 	emu_file crossfile(m_machine.options().crosshair_path(), OPEN_FLAG_READ);
 	if (!m_name.empty())
 	{
 		// look for user specified file
-		std::string filename = m_name + ".png";
-		render_load_png(*m_bitmap, crossfile, nullptr, filename.c_str());
+		if (!crossfile.open(m_name + ".png"))
+		{
+			render_load_png(*m_bitmap, crossfile);
+			crossfile.close();
+		}
 	}
 	else
 	{
 		// look for default cross?.png in crsshair/game dir
-		std::string filename = string_format("cross%d.png", m_player + 1);
-		render_load_png(*m_bitmap, crossfile, m_machine.system().name, filename.c_str());
+		std::string const filename = string_format("cross%d.png", m_player + 1);
+		if (!crossfile.open(m_machine.system().name + (PATH_SEPARATOR + filename)))
+		{
+			render_load_png(*m_bitmap, crossfile);
+			crossfile.close();
+		}
 
 		// look for default cross?.png in crsshair dir
-		if (!m_bitmap->valid())
-			render_load_png(*m_bitmap, crossfile, nullptr, filename.c_str());
+		if (!m_bitmap->valid() && !crossfile.open(filename))
+		{
+			render_load_png(*m_bitmap, crossfile);
+			crossfile.close();
+		}
 	}
 
 	/* if that didn't work, use the built-in one */
@@ -203,14 +222,14 @@ void render_crosshair::create_bitmap()
 		m_bitmap->fill(rgb_t(0x00,0xff,0xff,0xff));
 
 		/* extract the raw source data to it */
-		for (y = 0; y < CROSSHAIR_RAW_SIZE / 2; y++)
+		for (int y = 0; y < CROSSHAIR_RAW_SIZE / 2; y++)
 		{
 			/* assume it is mirrored vertically */
-			u32 *dest0 = &m_bitmap->pix32(y);
-			u32 *dest1 = &m_bitmap->pix32(CROSSHAIR_RAW_SIZE - 1 - y);
+			u32 *const dest0 = &m_bitmap->pix(y);
+			u32 *const dest1 = &m_bitmap->pix(CROSSHAIR_RAW_SIZE - 1 - y);
 
 			/* extract to two rows simultaneously */
-			for (x = 0; x < CROSSHAIR_RAW_SIZE; x++)
+			for (int x = 0; x < CROSSHAIR_RAW_SIZE; x++)
 				if ((crosshair_raw_top[y * CROSSHAIR_RAW_ROWBYTES + x / 8] << (x % 8)) & 0x80)
 					dest0[x] = dest1[x] = rgb_t(0xff,0x00,0x00,0x00) | color;
 		}
@@ -222,6 +241,50 @@ void render_crosshair::create_bitmap()
 
 
 //-------------------------------------------------
+//  update_position - update the crosshair values
+//  for the given player
+//-------------------------------------------------
+
+void render_crosshair::update_position()
+{
+	// read all the lightgun values
+	bool gotx = false, goty = false;
+	for (auto const &port : m_machine.ioport().ports())
+		for (ioport_field const &field : port.second->fields())
+			if (field.player() == m_player && field.crosshair_axis() != CROSSHAIR_AXIS_NONE && field.enabled())
+			{
+				// handle X axis
+				if (field.crosshair_axis() == CROSSHAIR_AXIS_X)
+				{
+					m_x = field.crosshair_read();
+					gotx = true;
+					if (field.crosshair_altaxis() != 0)
+					{
+						m_y = field.crosshair_altaxis();
+						goty = true;
+					}
+				}
+
+				// handle Y axis
+				else
+				{
+					m_y = field.crosshair_read();
+					goty = true;
+					if (field.crosshair_altaxis() != 0)
+					{
+						m_x = field.crosshair_altaxis();
+						gotx = true;
+					}
+				}
+
+				// if we got both, stop
+				if (gotx && goty)
+					return;
+			}
+}
+
+
+//-------------------------------------------------
 //  animate - update the crosshair state
 //-------------------------------------------------
 
@@ -229,7 +292,7 @@ void render_crosshair::animate(u16 auto_time)
 {
 	// read all the port values
 	if (m_used)
-		m_machine.ioport().crosshair_position(m_player, m_x, m_y);
+		update_position();
 
 	// auto visibility
 	if (m_mode == CROSSHAIR_VISIBILITY_AUTO)
@@ -283,6 +346,7 @@ void render_crosshair::draw(render_container &container, u8 fade)
 crosshair_manager::crosshair_manager(running_machine &machine)
 	: m_machine(machine)
 	, m_usage(false)
+	, m_fade(0)
 	, m_animation_counter(0)
 	, m_auto_time(CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT)
 {
@@ -294,7 +358,7 @@ crosshair_manager::crosshair_manager(running_machine &machine)
 
 	/* determine who needs crosshairs */
 	for (auto &port : machine.ioport().ports())
-		for (ioport_field &field : port.second->fields())
+		for (ioport_field const &field : port.second->fields())
 			if (field.crosshair_axis() != CROSSHAIR_AXIS_NONE)
 			{
 				int player = field.player();
@@ -311,11 +375,15 @@ crosshair_manager::crosshair_manager(running_machine &machine)
 
 	/* register callbacks for when we load/save configurations */
 	if (m_usage)
-		machine.configuration().config_register("crosshairs", config_load_delegate(&crosshair_manager::config_load, this), config_save_delegate(&crosshair_manager::config_save, this));
+	{
+		machine.configuration().config_register("crosshairs",
+				configuration_manager::load_delegate(&crosshair_manager::config_load, this),
+				configuration_manager::save_delegate(&crosshair_manager::config_save, this));
+	}
 
 	/* register the animation callback */
-	screen_device *first_screen = screen_device_iterator(machine.root_device()).first();
-	if (first_screen != nullptr)
+	screen_device *first_screen = screen_device_enumerator(machine.root_device()).first();
+	if (first_screen)
 		first_screen->register_vblank_callback(vblank_state_delegate(&crosshair_manager::animate, this));
 }
 
@@ -382,19 +450,15 @@ void crosshair_manager::render(screen_device &screen)
     configuration file
 -------------------------------------------------*/
 
-void crosshair_manager::config_load(config_type cfg_type, util::xml::data_node const *parentnode)
+void crosshair_manager::config_load(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode)
 {
-	/* Note: crosshair_load() is only registered if croshairs are used */
+	// Note: crosshair_load() is only registered if croshairs are used
 
-	/* we only care about game files */
-	if (cfg_type != config_type::GAME)
+	// we only care about system-specific configuration
+	if ((cfg_type != config_type::SYSTEM) || !parentnode)
 		return;
 
-	/* might not have any data */
-	if (parentnode == nullptr)
-		return;
-
-	/* loop and get player crosshair info */
+	// loop and get player crosshair info
 	for (util::xml::data_node const *crosshairnode = parentnode->get_child("crosshair"); crosshairnode; crosshairnode = crosshairnode->get_next_sibling("crosshair"))
 	{
 		int const player = crosshairnode->get_attribute_int("player", -1);
@@ -411,8 +475,7 @@ void crosshair_manager::config_load(config_type cfg_type, util::xml::data_node c
 				if (mode >= CROSSHAIR_VISIBILITY_OFF && mode <= CROSSHAIR_VISIBILITY_AUTO)
 				{
 					crosshair.set_mode(u8(mode));
-					/* set visibility as specified by mode */
-					/* auto mode starts with visibility off */
+					// set visibility as specified by mode - auto mode starts with visibility off
 					crosshair.set_visible(mode == CROSSHAIR_VISIBILITY_ON);
 				}
 
@@ -422,7 +485,7 @@ void crosshair_manager::config_load(config_type cfg_type, util::xml::data_node c
 		}
 	}
 
-	/* get, check, and store auto visibility time */
+	// get, check, and store auto visibility time
 	util::xml::data_node const *crosshairnode = parentnode->get_child("autotime");
 	if (crosshairnode)
 	{
@@ -440,10 +503,10 @@ void crosshair_manager::config_load(config_type cfg_type, util::xml::data_node c
 
 void crosshair_manager::config_save(config_type cfg_type, util::xml::data_node *parentnode)
 {
-	/* Note: crosshair_save() is only registered if crosshairs are used */
+	// Note: crosshair_save() is only registered if crosshairs are used
 
-	/* we only care about game files */
-	if (cfg_type != config_type::GAME)
+	// we only create system-specific configuration
+	if (cfg_type != config_type::SYSTEM)
 		return;
 
 	for (int player = 0; player < MAX_PLAYERS; player++)
@@ -452,7 +515,7 @@ void crosshair_manager::config_save(config_type cfg_type, util::xml::data_node *
 
 		if (crosshair.is_used())
 		{
-			/* create a node */
+			// create a node
 			util::xml::data_node *const crosshairnode = parentnode->add_child("crosshair", nullptr);
 
 			if (crosshairnode != nullptr)
@@ -474,20 +537,19 @@ void crosshair_manager::config_save(config_type cfg_type, util::xml::data_node *
 					changed = true;
 				}
 
-				/* if nothing changed, kill the node */
+				// if nothing changed, kill the node
 				if (!changed)
 					crosshairnode->delete_node();
 			}
 		}
 	}
 
-	/* always store autotime so that it stays at the user value if it is needed */
+	// always store autotime so that it stays at the user value if it is needed
 	if (m_auto_time != CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT)
 	{
-		/* create a node */
+		// create a node
 		util::xml::data_node *const crosshairnode = parentnode->add_child("autotime", nullptr);
-
-		if (crosshairnode != nullptr)
+		if (crosshairnode)
 			crosshairnode->set_attribute_int("val", m_auto_time);
 	}
 

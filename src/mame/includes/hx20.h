@@ -101,22 +101,22 @@ private:
 	void update_interrupt();
 
 	// CPU state
-	int m_slave_sio;
-	int m_slave_rx;
-	int m_slave_tx;
-	int m_slave_flag;
-	int m_rtc_irq;
+	int m_slave_sio = 0;
+	int m_slave_rx = 0;
+	int m_slave_tx = 0;
+	int m_slave_flag = 0;
+	int m_rtc_irq = 0;
 
 	// keyboard state
-	uint8_t m_ksc;
-	int m_kbrequest;
+	uint8_t m_ksc = 0;
+	int m_kbrequest = 0;
 
 	// video state
-	uint8_t m_lcd_data;
+	uint8_t m_lcd_data = 0;
 
 	// sio state
-	int m_sio_rx;
-	int m_sio_pin;
+	int m_sio_rx = 0;
+	int m_sio_pin = 0;
 
 	void hx20_mem(address_map &map);
 	void hx20_sub_mem(address_map &map);

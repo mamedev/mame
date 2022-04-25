@@ -86,14 +86,14 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<beep_device> m_beep;
 
-	u8 m_line_base;
-	u8 m_line_count;
-	bool m_latch_full;
-	u8 m_mcu_p2;
-	bool m_hsync;
+	u8 m_line_base = 0;
+	u8 m_line_count = 0;
+	bool m_latch_full = false;
+	u8 m_mcu_p2 = 0;
+	bool m_hsync = false;
 
-	emu_timer *m_hsync_on_timer;
-	emu_timer *m_hsync_off_timer;
+	emu_timer *m_hsync_on_timer = nullptr;
+	emu_timer *m_hsync_off_timer = nullptr;
 };
 
 void m79152pc_state::beep_w(offs_t offset, uint8_t data)
@@ -134,7 +134,7 @@ void m79152pc_state::lc_reset_w(u8 data)
 void m79152pc_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x3fff).rom().region("maincpu", 0);;
+	map(0x0000, 0x3fff).rom().region("maincpu", 0);
 	map(0x4000, 0x47ff).ram();
 	map(0x8000, 0x8fff).ram().share("videoram");
 	map(0x9000, 0x9fff).ram().share("attributes");
@@ -185,10 +185,10 @@ TIMER_CALLBACK_MEMBER(m79152pc_state::hsync_off)
 
 void m79152pc_state::screen_draw_line(bitmap_ind16 &bitmap, unsigned y)
 {
-	u16 ma = u16(m_line_base) << 4;
-	u8 ra = m_line_count & 0xf;
+	const u16 ma = u16(m_line_base) << 4;
+	const u8 ra = m_line_count & 0xf;
 
-	u16 *p = &bitmap.pix16(y++);
+	u16 *p = &bitmap.pix(y++);
 
 	for (u16 x = ma; x < ma + 80; x++)
 	{

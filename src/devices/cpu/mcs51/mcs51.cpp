@@ -131,7 +131,6 @@
  */
 
 #include "emu.h"
-#include "debugger.h"
 #include "mcs51.h"
 #include "mcs51dasm.h"
 
@@ -243,6 +242,10 @@ DEFINE_DEVICE_TYPE(I80C51GB, i80c51gb_device, "i80c51gb", "Intel 80C51GB")
 DEFINE_DEVICE_TYPE(AT89C52, at89c52_device, "at89c52", "Atmel AT89C52")
 DEFINE_DEVICE_TYPE(AT89S52, at89s52_device, "at89s52", "Atmel AT89S52")
 DEFINE_DEVICE_TYPE(AT89C4051, at89c4051_device, "at89c4051", "Atmel AT89C4051")
+DEFINE_DEVICE_TYPE(DS80C320, ds80c320_device, "ds80c320", "Dallas DS80C320 HSM")
+DEFINE_DEVICE_TYPE(SAB80C535, sab80c535_device, "sab80c535", "Siemens SAB80C535")
+DEFINE_DEVICE_TYPE(I8344, i8344_device, "i8344", "Intel 8344AH RUPI-44")
+DEFINE_DEVICE_TYPE(I8744, i8744_device, "i8744", "Intel 8744H RUPI-44")
 DEFINE_DEVICE_TYPE(DS5002FP, ds5002fp_device, "ds5002fp", "Dallas DS5002FP")
 
 
@@ -287,7 +290,6 @@ mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type ty
 	m_ds5002fp.crc = 0;
 
 	/* default to standard cmos interfacing */
-
 	for (auto & elem : m_forced_inputs)
 		elem = 0;
 }
@@ -403,6 +405,26 @@ at89s52_device::at89s52_device(const machine_config &mconfig, const char *tag, d
 
 at89c4051_device::at89c4051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i80c51_device(mconfig, AT89C4051, tag, owner, clock, 12, 7)
+{
+}
+
+ds80c320_device::ds80c320_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i80c52_device(mconfig, DS80C320, tag, owner, clock, 0, 8)
+{
+}
+
+sab80c535_device::sab80c535_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i80c51_device(mconfig, SAB80C535, tag, owner, clock, 0, 8)
+{
+}
+
+i8344_device::i8344_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mcs51_cpu_device(mconfig, I8344, tag, owner, clock, 0, 8)
+{
+}
+
+i8744_device::i8744_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mcs51_cpu_device(mconfig, I8744, tag, owner, clock, 12, 8)
 {
 }
 
@@ -1357,8 +1379,7 @@ void mcs51_cpu_device::update_serial(int cycles)
 /* Check and update status of serial port */
 void mcs51_cpu_device::update_irq_prio(uint8_t ipl, uint8_t iph)
 {
-	int i;
-	for (i=0; i<8; i++)
+	for (int i=0; i<8; i++)
 		m_irq_prio[i] = ((ipl >> i) & 1) | (((iph >>i ) & 1) << 1);
 }
 
@@ -1743,9 +1764,8 @@ void mcs51_cpu_device::check_irqs()
 	uint8_t int_vec = 0;
 	uint8_t int_mask;
 	int priority_request = -1;
-	int i;
 
-	//If All Inerrupts Disabled or no pending abort..
+	//If All Interrupts Disabled or no pending abort..
 	int_mask = (GET_EA ? IE : 0x00);
 
 	if (m_features & FEATURE_I8052)
@@ -1766,7 +1786,7 @@ void mcs51_cpu_device::check_irqs()
 
 	if (!ints)  return;
 
-	/* CLear IDL - got enabled interrupt */
+	/* Clear IDL - got enabled interrupt */
 	if (m_features & FEATURE_CMOS)
 	{
 		/* any interrupt terminates idle mode */
@@ -1778,7 +1798,7 @@ void mcs51_cpu_device::check_irqs()
 				SET_PD(0);
 	}
 
-	for (i=0; i<m_num_interrupts; i++)
+	for (int i=0; i<m_num_interrupts; i++)
 	{
 		if (ints & (1<<i))
 		{
@@ -1793,7 +1813,6 @@ void mcs51_cpu_device::check_irqs()
 	/* Skip the interrupt request if currently processing interrupt
 	 * and the new request does not have a higher priority
 	 */
-
 	LOG(("Request: %d\n", priority_request));
 	if (m_irq_active && (priority_request <= m_cur_irq_prio))
 	{
@@ -1857,7 +1876,6 @@ void mcs51_cpu_device::check_irqs()
 		 *  no flags are cleared, PFW is reset by software
 		 *  This has the same vector as V_TF2.
 		 */
-
 	}
 }
 
@@ -2040,7 +2058,12 @@ void mcs51_cpu_device::execute_run()
 
 		/* decrement the timed access window */
 		if (m_features & FEATURE_DS5002FP)
+		{
 			m_ds5002fp.ta_window = (m_ds5002fp.ta_window ? (m_ds5002fp.ta_window - 1) : 0x00);
+
+			if (m_ds5002fp.rnr_delay > 0)
+				m_ds5002fp.rnr_delay-=m_inst_cycles;
+		}
 
 		/* If the chip entered in idle mode, end the loop */
 		if ((m_features & FEATURE_CMOS) && GET_IDL)
@@ -2147,7 +2170,6 @@ void mcs51_cpu_device::device_start()
 	m_serial_tx_cb.resolve_safe();
 
 	/* Save states */
-
 	save_item(NAME(m_ppc));
 	save_item(NAME(m_pc));
 	save_item(NAME(m_last_op));
@@ -2164,6 +2186,7 @@ void mcs51_cpu_device::device_start()
 	save_item(NAME(m_irq_active) );
 	save_item(NAME(m_ds5002fp.previous_ta) );
 	save_item(NAME(m_ds5002fp.ta_window) );
+	save_item(NAME(m_ds5002fp.rnr_delay) );
 	save_item(NAME(m_ds5002fp.range) );
 	save_item(NAME(m_uart.data_out));
 	save_item(NAME(m_uart.bits_to_send));
@@ -2236,6 +2259,7 @@ void mcs51_cpu_device::device_reset()
 	m_t1_cnt = 0;
 	m_t2_cnt = 0;
 	m_t2ex_cnt = 0;
+
 	/* Flag as NO IRQ in Progress */
 	m_irq_active = 0;
 	m_cur_irq_prio = -1;
@@ -2243,6 +2267,8 @@ void mcs51_cpu_device::device_reset()
 	m_last_bit = 0;
 
 	/* these are all defined reset states */
+	RWM = 0;
+	PPC = PC;
 	PC = 0;
 	SP = 0x7;
 	SET_PSW(0);
@@ -2261,6 +2287,7 @@ void mcs51_cpu_device::device_reset()
 	TH0 = 0;
 	TL1 = 0;
 	TL0 = 0;
+
 	/* set the port configurations to all 1's */
 	SET_P3(0xff);
 	SET_P2(0xff);
@@ -2304,6 +2331,7 @@ void mcs51_cpu_device::device_reset()
 		m_ds5002fp.previous_ta = 0;
 		m_ds5002fp.ta_window = 0;
 		m_ds5002fp.range = (GET_RG1 << 1) | GET_RG0;
+		m_ds5002fp.rnr_delay = 160;
 	}
 
 	m_uart.data_out = 0;
@@ -2447,6 +2475,26 @@ void ds5002fp_device::sfr_write(size_t offset, uint8_t data)
 	m_data.write_byte((size_t) offset | 0x100, data);
 }
 
+
+uint8_t ds5002fp_device::handle_rnr()
+{
+	if (m_ds5002fp.rnr_delay <= 0)
+	{
+		m_ds5002fp.rnr_delay = 160; // delay before another random number can be read
+		return machine().rand();
+	}
+	else
+		return 0x00;
+}
+
+bool ds5002fp_device::is_rnr_ready()
+{
+	if (m_ds5002fp.rnr_delay <= 0)
+		return true;
+	else
+		return false;
+}
+
 uint8_t ds5002fp_device::sfr_read(size_t offset)
 {
 	switch (offset)
@@ -2456,8 +2504,10 @@ uint8_t ds5002fp_device::sfr_read(size_t offset)
 		case ADDR_CRCH:     DS5_LOGR(CRCH, data);       break;
 		case ADDR_MCON:     DS5_LOGR(MCON, data);       break;
 		case ADDR_TA:       DS5_LOGR(TA, data);         break;
-		case ADDR_RNR:      DS5_LOGR(RNR, data);        break;
-		case ADDR_RPCTL:    DS5_LOGR(RPCTL, data); return 0x80; break; /* touchgo stalls unless bit 7 is set, why? documentation is unclear */
+		case ADDR_RNR:      DS5_LOGR(RNR, data);
+			return handle_rnr();
+		case ADDR_RPCTL:    DS5_LOGR(RPCTL, data);  /* touchgo stalls unless bit 7 is set, RNR status (Random Number status) */
+			return (is_rnr_ready() ? 0x80 : 0x00);  /* falling through to sfr_read for the remaining bits stops high score data loading? */
 		case ADDR_RPS:      DS5_LOGR(RPS, data);        break;
 		case ADDR_PCON:
 			SET_PFW(0);     /* reset PFW flag */
@@ -2500,16 +2550,24 @@ void ds5002fp_device::nvram_default()
 	}
 }
 
-void ds5002fp_device::nvram_read( emu_file &file )
+bool ds5002fp_device::nvram_read( util::read_stream &file )
 {
-	file.read( m_scratchpad, 0x80 );
-	file.read( m_sfr_ram, 0x80 );
+	size_t actual;
+	if (file.read( m_scratchpad, 0x80, actual ) || actual != 0x80)
+		return false;
+	if (file.read( m_sfr_ram, 0x80, actual ) || actual != 0x80)
+		return false;
+	return true;
 }
 
-void ds5002fp_device::nvram_write( emu_file &file )
+bool ds5002fp_device::nvram_write( util::write_stream &file )
 {
-	file.write( m_scratchpad, 0x80 );
-	file.write( m_sfr_ram, 0x80 );
+	size_t actual;
+	if (file.write( m_scratchpad, 0x80, actual ) || actual != 0x80)
+		return false;
+	if (file.write( m_sfr_ram, 0x80, actual ) || actual != 0x80)
+		return false;
+	return true;
 }
 
 std::unique_ptr<util::disasm_interface> mcs51_cpu_device::create_disassembler()
@@ -2545,6 +2603,26 @@ std::unique_ptr<util::disasm_interface> i87c51fa_device::create_disassembler()
 std::unique_ptr<util::disasm_interface> i80c51gb_device::create_disassembler()
 {
 	return std::make_unique<i8xc51gb_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> ds80c320_device::create_disassembler()
+{
+	return std::make_unique<ds80c320_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> sab80c535_device::create_disassembler()
+{
+	return std::make_unique<sab80c515_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> i8344_device::create_disassembler()
+{
+	return std::make_unique<rupi44_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> i8744_device::create_disassembler()
+{
+	return std::make_unique<rupi44_disassembler>();
 }
 
 std::unique_ptr<util::disasm_interface> ds5002fp_device::create_disassembler()

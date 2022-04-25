@@ -54,39 +54,10 @@ nes_cne_shlz_device::nes_cne_shlz_device(const machine_config &mconfig, const ch
 
 
 
-void nes_cne_decathl_device::device_start()
-{
-	common_start();
-}
-
-void nes_cne_decathl_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_cne_fsb_device::device_start()
-{
-	common_start();
-}
-
 void nes_cne_fsb_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0xff);
-	chr8(0, m_chr_source);
-}
-
-void nes_cne_shlz_device::device_start()
-{
-	common_start();
-}
-
-void nes_cne_shlz_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
 	chr8(0, m_chr_source);
 }
 

@@ -11,7 +11,6 @@
 #include "machine/s3c2440.h"
 #include "machine/smartmed.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -46,7 +45,7 @@ private:
 	required_ioport m_penx;
 	required_ioport m_peny;
 
-	uint32_t m_port[9];
+	uint32_t m_port[9] = { };
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
@@ -243,9 +242,6 @@ void mini2440_state::mini2440(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 	UDA1341TS(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // uda1341ts.u12
 	UDA1341TS(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // uda1341ts.u12
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 
 	S3C2440(config, m_s3c2440, 12000000);
 	m_s3c2440->set_palette_tag("palette");

@@ -15,9 +15,9 @@
 #include "machine/slapstic.h"
 #include "machine/timer.h"
 #include "video/atarimo.h"
-#include "sound/ym2151.h"
 #include "sound/pokey.h"
 #include "sound/tms5220.h"
+#include "sound/ymopm.h"
 #include "screen.h"
 #include "tilemap.h"
 
@@ -35,6 +35,7 @@ public:
 		m_tms5220(*this, "tms"),
 		m_soundctl(*this, "soundctl"),
 		m_slapstic(*this, "slapstic"),
+		m_slapstic_bank(*this, "slapstic_bank"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_playfield_tilemap(*this, "playfield"),
@@ -65,8 +66,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
 	void mixer_w(uint8_t data);
-	void swap_memory(void *ptr1, void *ptr2, int bytes);
-	void common_init(int vindctr2);
+	void common_init();
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	uint32_t screen_update_gauntlet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -86,6 +86,7 @@ private:
 	required_device<tms5220_device> m_tms5220;
 	required_device<ls259_device> m_soundctl;
 	required_device<atari_slapstic_device> m_slapstic;
+	required_memory_bank m_slapstic_bank;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -95,12 +96,14 @@ private:
 	required_shared_ptr<uint16_t> m_yscroll;
 	required_device<atari_motion_objects_device> m_mob;
 
-	uint16_t          m_sound_reset_val;
-	uint8_t           m_vindctr2_screen_refresh;
-	uint8_t           m_playfield_tile_bank;
-	uint8_t           m_playfield_color_bank;
+	uint16_t          m_sound_reset_val = 0;
+	bool              m_vindctr2_screen_refresh = false;
+	uint8_t           m_playfield_tile_bank = 0;
+	uint8_t           m_playfield_color_bank = 0;
 
 	static const atari_motion_objects_config s_mob_config;
+
+	void slapstic_tweak(offs_t offset, u16 &, u16);
 };
 
 #endif // MAME_INCLUDES_GAUNTLET_H

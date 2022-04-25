@@ -87,37 +87,40 @@ void timelimt_state::video_start()
 
 	m_fg_tilemap->set_transparent_pen(0);
 
+	m_scrollx = 0;
+	m_scrolly = 0;
+
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));
 }
 
 /***************************************************************************/
 
-WRITE8_MEMBER(timelimt_state::videoram_w)
+void timelimt_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(timelimt_state::bg_videoram_w)
+void timelimt_state::bg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(timelimt_state::scroll_x_lsb_w)
+void timelimt_state::scroll_x_lsb_w(uint8_t data)
 {
 	m_scrollx &= 0x100;
 	m_scrollx |= data & 0xff;
 }
 
-WRITE8_MEMBER(timelimt_state::scroll_x_msb_w)
+void timelimt_state::scroll_x_msb_w(uint8_t data)
 {
 	m_scrollx &= 0xff;
 	m_scrollx |= ( data & 1 ) << 8;
 }
 
-WRITE8_MEMBER(timelimt_state::scroll_y_w)
+void timelimt_state::scroll_y_w(uint8_t data)
 {
 	m_scrolly = data;
 }
@@ -125,7 +128,7 @@ WRITE8_MEMBER(timelimt_state::scroll_y_w)
 
 void timelimt_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for( int offs = m_spriteram.bytes(); offs >= 0; offs -= 4 )
+	for( int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4 )
 	{
 		int sy = 240 - m_spriteram[offs];
 		int sx = m_spriteram[offs+3];

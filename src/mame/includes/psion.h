@@ -60,19 +60,19 @@ protected:
 	required_device<nvram_device> m_nvram2;
 	optional_device<nvram_device> m_nvram3;
 
-	uint16_t m_kb_counter;
-	uint8_t m_enable_nmi;
+	uint16_t m_kb_counter = 0;
+	uint8_t m_enable_nmi = 0;
 	optional_shared_ptr<uint8_t> m_sys_register;
 	uint8_t m_stby_pwr;
-	uint8_t m_pulse;
+	uint8_t m_pulse = 0;
 
 	// RAM/ROM banks
 	required_shared_ptr<uint8_t> m_ram;
 	std::unique_ptr<uint8_t[]> m_paged_ram;
-	uint8_t m_rom_bank;
-	uint8_t m_ram_bank;
-	uint8_t m_ram_bank_count;
-	uint8_t m_rom_bank_count;
+	uint8_t m_rom_bank = 0;
+	uint8_t m_ram_bank = 0;
+	uint8_t m_ram_bank_count = 0;
+	uint8_t m_rom_bank_count = 0;
 
 	required_ioport_array<7> m_kb_lines;
 
@@ -88,8 +88,8 @@ protected:
 	void port6_w(uint8_t data);
 	uint8_t port6_r();
 	void io_rw(uint16_t offset);
-	DECLARE_WRITE8_MEMBER( io_w );
-	DECLARE_READ8_MEMBER( io_r );
+	void io_w(offs_t offset, uint8_t data);
+	uint8_t io_r(offs_t offset);
 	void psion_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer);
 
@@ -115,9 +115,9 @@ public:
 private:
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( reset_kb_counter_r );
-	DECLARE_READ8_MEMBER( inc_kb_counter_r );
-	DECLARE_READ8_MEMBER( switchoff_r );
+	uint8_t reset_kb_counter_r();
+	uint8_t inc_kb_counter_r();
+	uint8_t switchoff_r();
 
 	HD44780_PIXEL_UPDATE(psion1_pixel_update);
 	void psion1_mem(address_map &map);

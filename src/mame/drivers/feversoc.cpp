@@ -63,6 +63,12 @@ U0562 LH28F800SU OBJ2-1
 U0563 LH28F800SU OBJ3-1
 U0564 LH28F800SU OBJ4-1
 
+U0218 RTL8019AS Realtek Full-Duplex Ethernet Controller with Plug and Play Function
+X221 20MHz
+U0225 YCL20F001N 10 Base T Low Pass Filter
+
+U089 MAX232 Dual EIA Driver/Receiver
+
 *******************************************************************************************/
 
 #include "emu.h"

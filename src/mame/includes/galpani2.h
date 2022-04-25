@@ -55,9 +55,9 @@ private:
 	required_shared_ptr<uint16_t> m_ram2;
 	optional_shared_ptr<uint16_t> m_spriteram;
 
-	uint16_t m_eeprom_word;
-	uint16_t m_old_mcu_nmi1;
-	uint16_t m_old_mcu_nmi2;
+	uint16_t m_eeprom_word = 0U;
+	uint16_t m_old_mcu_nmi1 = 0U;
+	uint16_t m_old_mcu_nmi2 = 0U;
 
 	void galpani2_mcu_init_w(uint8_t data);
 	void galpani2_mcu_nmi1_w(uint8_t data);

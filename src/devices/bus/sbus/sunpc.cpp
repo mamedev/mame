@@ -54,18 +54,18 @@ void sbus_sunpc_device::install_device()
 	m_sbus->install_device(m_base, m_base + 0x1ffffff, *this, &sbus_sunpc_device::mem_map);
 }
 
-READ32_MEMBER(sbus_sunpc_device::unknown_r)
+uint32_t sbus_sunpc_device::unknown_r(offs_t offset, uint32_t mem_mask)
 {
 	logerror("%s: unknown_r: %08x & %08x\n", machine().describe_context(), offset << 2, mem_mask);
 	return 0;
 }
 
-WRITE32_MEMBER(sbus_sunpc_device::unknown_w)
+void sbus_sunpc_device::unknown_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("%s: unknown_w: %08x = %08x & %08x\n", machine().describe_context(), offset << 2, data, mem_mask);
 }
 
-READ32_MEMBER(sbus_sunpc_device::rom_r)
+uint32_t sbus_sunpc_device::rom_r(offs_t offset)
 {
 	return ((uint32_t*)m_rom->base())[offset];
 }

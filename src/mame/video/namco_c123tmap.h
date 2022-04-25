@@ -13,7 +13,7 @@ class namco_c123tmap_device : public device_t, public device_gfx_interface
 {
 public:
 	// construction/destruction
-	namco_c123tmap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	namco_c123tmap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	void set_color_base(int color) { m_color_base = color; }
 	void set_offset(int xoffs, int yoffs)

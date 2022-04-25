@@ -77,7 +77,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	tilemap_t*             m_bg_tilemap;
+	tilemap_t*             m_bg_tilemap = nullptr;
 };
 
 

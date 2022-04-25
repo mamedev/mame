@@ -33,8 +33,8 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
-	DECLARE_READ32_MEMBER(regs_r);
-	DECLARE_WRITE32_MEMBER(regs_w);
+	uint32_t regs_r(offs_t offset, uint32_t mem_mask = ~0);
+	void regs_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

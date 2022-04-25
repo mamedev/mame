@@ -1,0 +1,230 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="z80clock" description="Z80 Clock ROMs">
+
+	<software name="clock">
+		<description>Z80 Clock (2021-11-06 19:03:38)</description>
+		<year>2021</year>
+		<publisher>Tom Storey</publisher>
+
+		<part name="u12" interface="u12">
+			<dataarea name="rom" size="0x20000">
+				<rom name="clock-c6749875.rom" size="0x6000" crc="4fdf1cab" sha1="be439b63f53a77595ba0be1832b9eae502ecdd61" offset="0" />
+			</dataarea>
+		</part>
+		<part name="u14" interface="u14">
+			<dataarea name="rom" size="0x20000">
+				<rom name="tz_rom-5e1a454c.rom" size="0x2000" crc="185914b8" sha1="1e33f4351e2d512c11bf5d656d69b15de2a34892" offset="0" />
+			</dataarea>
+		</part>
+		<part name="u15" interface="u15">
+			<feature name="led_driver" value="tlc5916"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="char_rom-8bdb0934.rom" size="0x200" crc="0ade51ca" sha1="ef7e9f5b17529461d08197565627a06889b00faa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clockg" cloneof="clock">
+		<description>Z80 Clock (2020-12-13 19:28:27)</description>
+		<year>2020</year>
+		<publisher>Tom Storey</publisher>
+
+		<part name="u12" interface="u12">
+			<dataarea name="rom" size="0x20000">
+				<rom name="clock-af08144c.rom" size="0x6000" crc="5654842d" sha1="f5438e3d7e9605347fa39c4af5f8f125c36165a7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="u14" interface="u14">
+			<dataarea name="rom" size="0x20000">
+				<rom name="tz_rom-5e1a454c.rom" size="0x2000" crc="185914b8" sha1="1e33f4351e2d512c11bf5d656d69b15de2a34892" offset="0" />
+			</dataarea>
+		</part>
+		<part name="u15" interface="u15">
+			<feature name="led_driver" value="tlc5916"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="char_rom-8bdb0934.rom" size="0x200" crc="0ade51ca" sha1="ef7e9f5b17529461d08197565627a06889b00faa" offset="0" /> <!-- 12th September 2020-->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clockf" cloneof="clock">
+		<description>Z80 Clock (2020-04-03 00:43:52)</description>
+		<year>2020</year>
+		<publisher>Tom Storey</publisher>
+
+		<part name="u12" interface="u12">
+			<dataarea name="rom" size="0x20000">
+				<rom name="clock-52be0378.rom" size="0x6000" crc="6ad33b64" sha1="7c1812b46ff81fc1fc096465673f4bac562137d3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="u14" interface="u14">
+			<dataarea name="rom" size="0x20000">
+				<rom name="tz_rom-5e1a454c.rom" size="0x2000" crc="185914b8" sha1="1e33f4351e2d512c11bf5d656d69b15de2a34892" offset="0" />
+			</dataarea>
+		</part>
+		<part name="u15" interface="u15">
+			<feature name="led_driver" value="74hc595"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="char_rom-c318c2b9.rom" size="0x200" crc="bb29f5d2" sha1="af411c5ca214f2fc5e3b7682e90ed17458f4ce6b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clocke" cloneof="clock">
+		<description>Z80 Clock (2020-04-02 05:23:01)</description>
+		<year>2020</year>
+		<publisher>Tom Storey</publisher>
+
+		<part name="u12" interface="u12">
+			<dataarea name="rom" size="0x20000">
+				<rom name="clock-bffbf853.rom" size="0x6000" crc="f80ff5ef" sha1="08497a1e0ddf0b654b1f332c21c112bb92356942" offset="0" />
+			</dataarea>
+		</part>
+		<part name="u14" interface="u14">
+			<dataarea name="rom" size="0x20000">
+				<rom name="tz_rom-5e1a454c.rom" size="0x2000" crc="185914b8" sha1="1e33f4351e2d512c11bf5d656d69b15de2a34892" offset="0" />
+			</dataarea>
+		</part>
+		<part name="u15" interface="u15">
+			<feature name="led_driver" value="74hc595"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="char_rom-c318c2b9.rom" size="0x200" crc="bb29f5d2" sha1="af411c5ca214f2fc5e3b7682e90ed17458f4ce6b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clockd" cloneof="clock">
+		<description>Z80 Clock (2020-04-02 04:35:59)</description>
+		<year>2020</year>
+		<publisher>Tom Storey</publisher>
+
+		<part name="u12" interface="u12">
+			<dataarea name="rom" size="0x20000">
+				<!--<rom name="serial_mon-04168702.rom" size="0x2000" crc="57ca3b8c" sha1="b56f4fc9be69e4ccfc4ad826d9cee8bb95436734" offset="0" />-->
+			</dataarea>
+		</part>
+		<part name="u13" interface="u13">
+			<dataarea name="rom" size="0x1800">
+				<rom name="clock-e90071ef.rom" size="0x1800" crc="dbe99cd4" sha1="f417db7e45daf96dc556f11848446ac81b61fdf8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="u14" interface="u14">
+			<dataarea name="rom" size="0x20000">
+				<rom name="tz_rom-5e1a454c.rom" size="0x2000" crc="185914b8" sha1="1e33f4351e2d512c11bf5d656d69b15de2a34892" offset="0" />
+			</dataarea>
+		</part>
+		<part name="u15" interface="u15">
+			<feature name="led_driver" value="74hc595"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="char_rom-c318c2b9.rom" size="0x200" crc="bb29f5d2" sha1="af411c5ca214f2fc5e3b7682e90ed17458f4ce6b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clockc" cloneof="clock">
+		<description>Z80 Clock (2020-04-01 00:24:57)</description>
+		<year>2020</year>
+		<publisher>Tom Storey</publisher>
+
+		<part name="u12" interface="u12">
+			<dataarea name="rom" size="0x20000">
+				<!--<rom name="serial_mon-04168702.rom" size="0x2000" crc="57ca3b8c" sha1="b56f4fc9be69e4ccfc4ad826d9cee8bb95436734" offset="0" />-->
+			</dataarea>
+		</part>
+		<part name="u13" interface="u13">
+			<dataarea name="rom" size="0x1800">
+				<rom name="clock-e4452c84.rom" size="0x1800" crc="66a55e92" sha1="da9f639e2d9dcf520e3de3374728be07eb9a01e4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="u14" interface="u14">
+			<dataarea name="rom" size="0x20000">
+				<rom name="tz_rom-5e1a454c.rom" size="0x2000" crc="185914b8" sha1="1e33f4351e2d512c11bf5d656d69b15de2a34892" offset="0" />
+			</dataarea>
+		</part>
+		<part name="u15" interface="u15">
+			<feature name="led_driver" value="74hc595"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="char_rom-c318c2b9.rom" size="0x200" crc="bb29f5d2" sha1="af411c5ca214f2fc5e3b7682e90ed17458f4ce6b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clockb" cloneof="clock">
+		<description>Z80 Clock (2020-03-31 23:19:35)</description>
+		<year>2020</year>
+		<publisher>Tom Storey</publisher>
+
+		<part name="u12" interface="u12">
+			<dataarea name="rom" size="0x20000">
+				<!--<rom name="serial_mon-04168702.rom" size="0x2000" crc="57ca3b8c" sha1="b56f4fc9be69e4ccfc4ad826d9cee8bb95436734" offset="0" />-->
+			</dataarea>
+		</part>
+		<part name="u13" interface="u13">
+			<dataarea name="rom" size="0x1800">
+				<rom name="clock-4f5dce74.rom" size="0x1800" crc="6f87f4fa" sha1="e2e2cd42a124abc6a9d18183569a1a0504be17d0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="u14" interface="u14">
+			<dataarea name="rom" size="0x20000">
+				<rom name="tz_rom-5e1a454c.rom" size="0x2000" crc="185914b8" sha1="1e33f4351e2d512c11bf5d656d69b15de2a34892" offset="0" />
+			</dataarea>
+		</part>
+		<part name="u15" interface="u15">
+			<feature name="led_driver" value="74hc595"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="char_rom-c318c2b9.rom" size="0x200" crc="bb29f5d2" sha1="af411c5ca214f2fc5e3b7682e90ed17458f4ce6b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clocka" cloneof="clock">
+		<description>Z80 Clock (2020-03-31 05:44:04)</description>
+		<year>2020</year>
+		<publisher>Tom Storey</publisher>
+
+		<part name="u12" interface="u12">
+			<dataarea name="rom" size="0x20000">
+				<rom name="clock-b4273e17.rom" size="0x6000" crc="c3da9609" sha1="ca8b4f96474bb3ea6d7a47816204b418c6cc2af0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="u14" interface="u14">
+			<dataarea name="rom" size="0x20000">
+				<rom name="tz_rom-5e1a454c.rom" size="0x2000" crc="185914b8" sha1="1e33f4351e2d512c11bf5d656d69b15de2a34892" offset="0" />
+			</dataarea>
+		</part>
+		<part name="u15" interface="u15">
+			<feature name="led_driver" value="74hc595"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="char_rom-c318c2b9.rom" size="0x200" crc="bb29f5d2" sha1="af411c5ca214f2fc5e3b7682e90ed17458f4ce6b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="serialmon">
+		<description>Serial Monitor (2020-03-31 23:15:49)</description>
+		<year>2020</year>
+		<publisher>Tom Storey</publisher>
+
+		<part name="u12" interface="u12">
+			<dataarea name="rom" size="0x20000">
+				<rom name="serial_mon-04168702.rom" size="0x2000" crc="57ca3b8c" sha1="b56f4fc9be69e4ccfc4ad826d9cee8bb95436734" offset="0" />
+			</dataarea>
+		</part>
+		<part name="u14" interface="u14">
+			<dataarea name="rom" size="0x20000">
+				<rom name="tz_rom-5e1a454c.rom" size="0x2000" crc="185914b8" sha1="1e33f4351e2d512c11bf5d656d69b15de2a34892" offset="0" />
+			</dataarea>
+		</part>
+		<part name="u15" interface="u15">
+			<feature name="led_driver" value="74hc595"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="char_rom-c318c2b9.rom" size="0x200" crc="bb29f5d2" sha1="af411c5ca214f2fc5e3b7682e90ed17458f4ce6b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

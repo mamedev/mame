@@ -11,18 +11,19 @@ license:CC0
 		<publisher>Bongartz + Schmidt Datentechnik</publisher>
 		<part name="cart" interface="alphatro_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="escape_be_d2_rom_pack_1.bin" size="8192" crc="6f387744" sha1="e30b5c51db2cc69968b1483a99260dae1ad7b220" offset="0" />
-				<rom name="escape_be_d2_rom_pack_2.bin" size="8192" crc="bc524428" sha1="78a79d12e454fd322f366f4c385770b7dd2b465c" offset="8192" />
+				<rom name="escape_be_d2_rom_pack_1.bin" size="8192" crc="6f387744" sha1="e30b5c51db2cc69968b1483a99260dae1ad7b220" offset="0x0000" />
+				<rom name="escape_be_d2_rom_pack_2.bin" size="8192" crc="bc524428" sha1="78a79d12e454fd322f366f4c385770b7dd2b465c" offset="0x2000" />
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="microtxt">
-		<description>MicroText</description>
+		<description>Micro-Text</description>
 		<year>1983</year>
 		<publisher>VictorSoft</publisher>
 		<part name="cart" interface="alphatro_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="microtext.bin" size="8192" crc="7a7eba6b" sha1="e75465ee6b397f806674fa645264fb2633ba7470" offset="8192" />
+				<rom name="microtext.bin" size="8192" crc="7a7eba6b" sha1="e75465ee6b397f806674fa645264fb2633ba7470" offset="0x2000" />
 			</dataarea>
 		</part>
 	</software>

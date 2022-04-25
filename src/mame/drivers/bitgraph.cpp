@@ -13,7 +13,7 @@
     - 32K ROM
     - 128K RAM (includes frame buffer)
     - 3 serial ports, each driven by 6850 ACIA
-    - some kind of baud rate generator, possibly COM8016
+    - unknown baud rate generator (possibly COM8016)
     - sync serial port, driven by 6854 but apparently never supported by ROM
     - 682x PIA
     - AY-3-891x PSG
@@ -59,6 +59,7 @@
 #include "screen.h"
 #include "speaker.h"
 
+
 #define M68K_TAG "maincpu"
 #define PPU_TAG "ppu"
 
@@ -81,12 +82,14 @@
 #define LOG_DEBUG     (1U <<  2)
 
 //#define VERBOSE (LOG_DEBUG)
-//#define LOG_OUTPUT_FUNC printf
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGPIA(...) LOGMASKED(LOG_PIA, __VA_ARGS__)
 #define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
 
+
+namespace {
 
 class bitgraph_state : public driver_device
 {
@@ -110,6 +113,13 @@ public:
 	{ }
 
 	static constexpr feature_type imperfect_features() { return feature::KEYBOARD; }
+
+	void bitgrpha(machine_config &config);
+	void bitgrphb(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	uint8_t pia_r(offs_t offset);
 	void pia_w(offs_t offset, uint8_t data);
@@ -135,19 +145,17 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	uint8_t ppu_read(offs_t offset);
+	[[maybe_unused]] uint8_t ppu_read(offs_t offset);
 	void ppu_write(offs_t offset, uint8_t data);
-	void ppu_i8243_w(offs_t offset, uint8_t data);
+	template <unsigned Offset> void ppu_i8243_w(uint8_t data);
 
 	void bg_motherboard(machine_config &config);
-	void bitgrpha(machine_config &config);
-	void bitgrphb(machine_config &config);
+	[[maybe_unused]] void bg_ppu(machine_config &config);
+
 	void bitgrapha_mem(address_map &map);
 	void bitgraphb_mem(address_map &map);
 	void ppu_io(address_map &map);
-private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<acia6850_device> m_acia0;
@@ -163,11 +171,11 @@ private:
 	optional_device<centronics_device> m_centronics;
 	required_device<screen_device> m_screen;
 
-	uint8_t *m_videoram;
-	uint8_t m_misccr;
-	uint8_t m_pia_a;
-	uint8_t m_pia_b;
-	uint8_t m_ppu[4];
+	uint8_t *m_videoram = nullptr;
+	uint8_t m_misccr = 0;
+	uint8_t m_pia_a = 0;
+	uint8_t m_pia_b = 0;
+	uint8_t m_ppu[4]{};
 };
 
 void bitgraph_state::bitgrapha_mem(address_map &map)
@@ -213,7 +221,6 @@ INPUT_PORTS_END
 static DEVICE_INPUT_DEFAULTS_START( kbd_rs232_defaults )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_300 )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_300 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
@@ -240,7 +247,7 @@ READ_LINE_MEMBER(bitgraph_state::pia_ca1_r)
 
 WRITE_LINE_MEMBER(bitgraph_state::pia_cb2_w)
 {
-	// XXX shut up verbose log
+	// no-op to shut up verbose log
 }
 
 uint8_t bitgraph_state::pia_pa_r()
@@ -384,16 +391,13 @@ void bitgraph_state::adlc_w(offs_t offset, uint8_t data)
 
 uint32_t bitgraph_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t gfx = 0;
-	int x, y;
-
-	for (y = 0; y < 768; y++)
+	for (int y = 0; y < 768; y++)
 	{
-		uint16_t *p = &bitmap.pix16(y);
+		uint16_t *p = &bitmap.pix(y);
 
-		for (x = 0; x < 1024 / 8; x += 2)
+		for (int x = 0; x < 1024 / 8; x += 2)
 		{
-			gfx = m_videoram[(x + 1) | (y << 7)];
+			uint8_t gfx = m_videoram[(x + 1) | (y << 7)];
 			for (int i = 7; i >= 0; i--)
 			{
 				*p++ = BIT(gfx, i);
@@ -422,12 +426,10 @@ void bitgraph_state::ppu_write(offs_t offset, uint8_t data)
 	m_ppu[offset] = data;
 }
 
-#ifdef UNUSED_FUNCTION
 void bitgraph_state::ppu_io(address_map &map)
 {
 //  map(0x00, 0x00).r(FUNC(bitgraph_state::ppu_irq));
 }
-#endif
 
 /*
     p4  O: Centronics data 3..0
@@ -435,29 +437,29 @@ void bitgraph_state::ppu_io(address_map &map)
     p6  O: Centronics control
     p7  I: Centronics status
 */
-void bitgraph_state::ppu_i8243_w(offs_t offset, uint8_t data)
+template <unsigned Offset> void bitgraph_state::ppu_i8243_w(uint8_t data)
 {
-	LOG("PPU 8243 %d <- %02X\n", offset + 4, data);
-	switch (offset)
+	LOG("PPU 8243 %d <- %02X\n", Offset, data);
+	switch (Offset)
 	{
-	case 0:
+	case 4:
 		m_centronics->write_data0(BIT(data, 0));
 		m_centronics->write_data1(BIT(data, 1));
 		m_centronics->write_data2(BIT(data, 2));
 		m_centronics->write_data3(BIT(data, 3));
 		break;
-	case 1:
+	case 5:
 		m_centronics->write_data4(BIT(data, 0));
 		m_centronics->write_data5(BIT(data, 1));
 		m_centronics->write_data6(BIT(data, 2));
 		m_centronics->write_data7(BIT(data, 3));
 		break;
-	case 2:
+	case 6:
 		m_centronics->write_strobe(BIT(data, 0));
 		// 1: Paper instruction
 		m_centronics->write_init(BIT(data, 2));
 		break;
-	case 3:
+	case 7:
 		m_centronics->write_ack(BIT(data, 0));
 		m_centronics->write_busy(BIT(data, 1));
 		m_centronics->write_perror(BIT(data, 2));
@@ -525,7 +527,6 @@ void bitgraph_state::bg_motherboard(machine_config &config)
 	rs232d.dcd_handler().set(m_acia2, FUNC(acia6850_device::write_dcd));
 	rs232d.cts_handler().set(m_acia2, FUNC(acia6850_device::write_cts));
 
-	// XXX actual part may be something else
 	COM8116(config, m_dbrga, 5.0688_MHz_XTAL);
 	m_dbrga->fr_handler().set(FUNC(bitgraph_state::com8116_a_fr_w));
 	m_dbrga->ft_handler().set(FUNC(bitgraph_state::com8116_a_ft_w));
@@ -550,7 +551,6 @@ void bitgraph_state::bg_motherboard(machine_config &config)
 	m_psg->add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
-#ifdef UNUSED_FUNCTION
 void bitgraph_state::bg_ppu(machine_config &config)
 {
 	i8035_device &ppu(I8035(config, PPU_TAG, XTAL(6'900'000)));
@@ -559,8 +559,14 @@ void bitgraph_state::bg_ppu(machine_config &config)
 	ppu.prog_out_cb().set("i8243", FUNC(i8243_device::prog_w));
 
 	i8243_device &i8243(I8243(config, "i8243"));
-	i8243.read_handler().set_nop();
-	i8243.write_handler().set(FUNC(bitgraph_state::ppu_i8243_w));
+	i8243.p4_in_cb().set_constant(0);
+	i8243.p5_in_cb().set_constant(0);
+	i8243.p6_in_cb().set_constant(0);
+	i8243.p7_in_cb().set_constant(0);
+	i8243.p4_out_cb().set(FUNC(bitgraph_state::ppu_i8243_w<4>));
+	i8243.p5_out_cb().set(FUNC(bitgraph_state::ppu_i8243_w<5>));
+	i8243.p6_out_cb().set(FUNC(bitgraph_state::ppu_i8243_w<6>));
+	i8243.p7_out_cb().set(FUNC(bitgraph_state::ppu_i8243_w<7>));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->ack_handler().set("cent_status_in", FUNC(input_buffer_device::write_bit6));
@@ -573,7 +579,6 @@ void bitgraph_state::bg_ppu(machine_config &config)
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
 }
-#endif
 
 void bitgraph_state::bitgrpha(machine_config &config)
 {
@@ -640,6 +645,8 @@ ROM_START( bitgrphb )
 	ROM_REGION( 0x800, PPU_TAG, 0 )
 	ROM_LOAD( "bg_mouse_u9.bin", 0x0000, 0x0800, CRC(fd827ff5) SHA1(6d4a8e9b18c7610c5cfde40464826d144d387601))
 ROM_END
+
+} // anonymous namespace
 
 /* Driver */
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME          FLAGS

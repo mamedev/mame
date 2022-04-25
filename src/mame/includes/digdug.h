@@ -22,21 +22,24 @@ public:
 	void dzigzag(machine_config &config);
 	void digdug(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
 private:
 	required_device<er2055_device> m_earom;
 	required_shared_ptr<uint8_t> m_digdug_objram;
 	required_shared_ptr<uint8_t> m_digdug_posram;
 	required_shared_ptr<uint8_t> m_digdug_flpram;
 
-	uint8_t m_bg_select;
-	uint8_t m_tx_color_mode;
-	uint8_t m_bg_disable;
-	uint8_t m_bg_color_bank;
+	uint8_t m_bg_select = 0U;
+	uint8_t m_tx_color_mode = 0U;
+	uint8_t m_bg_disable = 0U;
+	uint8_t m_bg_color_bank = 0U;
 
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(tx_get_tile_info);
-	DECLARE_VIDEO_START(digdug);
 	void digdug_palette(palette_device &palette) const;
 	uint32_t screen_update_digdug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -48,7 +51,6 @@ private:
 	uint8_t earom_read();
 	void earom_write(offs_t offset, uint8_t data);
 	void earom_control_w(uint8_t data);
-	virtual void machine_start() override;
 
 	void digdug_map(address_map &map);
 };

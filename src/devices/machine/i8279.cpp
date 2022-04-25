@@ -298,7 +298,7 @@ void i8279_device::timer_mainloop()
 	{
 		u8 rl = m_in_rl_cb(0) ^ 0xff;     // inverted
 		u8 addr = m_scanner & 7;
-		assert(addr < ARRAY_LENGTH(m_s_ram));
+		assert(addr < std::size(m_s_ram));
 
 		// see if key still down from last time
 		u8 keys_down = rl & ~m_s_ram[addr];
@@ -444,7 +444,7 @@ u8 i8279_device::data_r()
 	if (sensor_mode)
 	{
 	// read sensor ram
-		assert(m_s_ram_ptr < ARRAY_LENGTH(m_s_ram));
+		assert(m_s_ram_ptr < std::size(m_s_ram));
 		data = m_s_ram[m_s_ram_ptr];
 		if (!machine().side_effects_disabled())
 		{
@@ -487,8 +487,9 @@ u8 i8279_device::data_r()
 				case 0x10: // underrun
 					if (!fifo_size)
 						break;
+					[[fallthrough]];
 				default:
-					printf("Invalid status: %X\n", m_status);
+					logerror("Invalid status: %X\n", m_status);
 			}
 		}
 		m_status = (m_status & 0xd0) | fifo_size; // turn off overrun & full

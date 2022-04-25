@@ -12,7 +12,7 @@ PCB Information (needs tidying:)
 
 TOP Board
 .20u    27c4001 stickered   U20
-                #1537 V1.0  a 1 was hadwritten over the 0
+                #1537 V1.0  a 1 was handwritten over the 0
 
 .u7     stamped     (c) 1997
                 ACCLAIM COINOP
@@ -75,7 +75,7 @@ U4 on daughter board        Zoran ZR36050PQC
                             85 GF7B9726E
 
 U11 on main board           Removed heatsink, Couldn't see anything...
-
+                            On a second PCB: IDT 79RV5000-200BS272 YA9802C
 
 U71 on main board           Galileo
                             GT-64010A-B-0
@@ -126,7 +126,7 @@ Xilinx  XC3120A
     DT72811
     DT71256 x2
     DT72271
-29.500000 osciallator by ZR36120PQC
+29.500000 oscillator by ZR36120PQC
 Medium size chip with heat sink on it
 
 ***************************************************************************/
@@ -140,6 +140,8 @@ Medium size chip with heat sink on it
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 /* TODO: Two 3Dfx Voodoo chipsets are used in SLI configuration */
 // #define USE_TWO_3DFX
@@ -158,6 +160,11 @@ public:
 
 	void magictg(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	required_device<mips3_device>       m_mips;
 	required_device<adsp2181_device>    m_adsp;
@@ -167,10 +174,10 @@ private:
 	/* ASIC */
 	struct
 	{
-		uint32_t src_addr;
-		uint32_t dst_addr;
-		uint32_t ctrl;
-		uint32_t count;
+		uint32_t src_addr = 0;
+		uint32_t dst_addr = 0;
+		uint32_t ctrl = 0;
+		uint32_t count = 0;
 	} m_dma_ch[3];
 
 
@@ -179,34 +186,34 @@ private:
 
 	struct
 	{
-		uint16_t bdma_internal_addr;
-		uint16_t bdma_external_addr;
-		uint16_t bdma_control;
-		uint16_t bdma_word_count;
+		uint16_t bdma_internal_addr = 0;
+		uint16_t bdma_external_addr = 0;
+		uint16_t bdma_control = 0;
+		uint16_t bdma_word_count = 0;
 	} m_adsp_regs;
 
 
 	/* 3Dfx Voodoo */
-	required_device_array<voodoo_device, 2> m_voodoo;
+	required_device_array<generic_voodoo_device, 2> m_voodoo;
 
 	struct
 	{
 		/* PCI */
-		uint32_t command;
-		uint32_t base_addr;
+		uint32_t command = 0;
+		uint32_t base_addr = 0;
 
-		uint32_t init_enable;
+		uint32_t init_enable = 0;
 	} m_voodoo_pci_regs[2];
 
 
 	struct
 	{
 		/* PCI */
-		uint32_t command;
-		uint32_t base_addr;
+		uint32_t command = 0;
+		uint32_t base_addr = 0;
 
 		/* Memory-mapped */
-		uint32_t as_regs[19];
+		uint32_t as_regs[0x200]{}; // was 19, increased to 0x200 for coverity 315123, needed for zr36120_r/w, to stop crash at start.
 	} m_zr36120;
 
 
@@ -235,10 +242,6 @@ private:
 	void adsp_io_map(address_map &map);
 	void adsp_program_map(address_map &map);
 	void magictg_map(address_map &map);
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 
 	uint32_t pci_dev0_r(int function, int reg, uint32_t mem_mask);
 	void pci_dev0_w(int function, int reg, uint32_t data, uint32_t mem_mask);
@@ -250,7 +253,7 @@ protected:
 #endif
 	uint32_t zr36120_pci_r(int function, int reg, uint32_t mem_mask);
 	void zr36120_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
-public:
+
 	uint32_t screen_update_magictg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
@@ -298,7 +301,7 @@ void magictg_state::video_start()
 
 uint32_t magictg_state::screen_update_magictg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	return m_voodoo[0]->voodoo_update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
+	return m_voodoo[0]->update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
 
@@ -355,7 +358,7 @@ void magictg_state::voodoo_0_pci_w(int function, int reg, uint32_t data, uint32_
 			break;
 		case 0x40:
 			m_voodoo_pci_regs[0].init_enable = data;
-			m_voodoo[0]->voodoo_set_init_enable(data);
+			m_voodoo[0]->set_init_enable(data);
 			break;
 
 		default:
@@ -400,7 +403,7 @@ void magictg_state::voodoo_1_pci_w(int function, int reg, uint32_t data, uint32_
 			break;
 		case 0x40:
 			m_voodoo_pci_regs[1].init_enable = data;
-			voodoo_set_init_enable(state->m_voodoo[1], data);
+			set_init_enable(state->m_voodoo[1], data);
 			break;
 
 		default:
@@ -849,9 +852,9 @@ void magictg_state::magictg_map(address_map &map)
 {
 	map(0x00000000, 0x007fffff).ram(); // 8MB RAM
 	map(0x00800000, 0x0081003f).ram(); // ?
-	map(0x0a000000, 0x0affffff).rw("voodoo_0", FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
+	map(0x0a000000, 0x0affffff).rw("voodoo_0", FUNC(generic_voodoo_device::read), FUNC(generic_voodoo_device::write));
 #if defined(USE_TWO_3DFX)
-	map(0x0b000000, 0x0bffffff).rw("voodoo_1", FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
+	map(0x0b000000, 0x0bffffff).rw("voodoo_1", FUNC(voodoo_device_base::read), FUNC(voodoo_device_base::write));
 	map(0x0c000000, 0x0c000fff).rw(FUNC(magictg_state::zr36120_r), FUNC(magictg_state::zr36120_w));
 #else
 	map(0x0b000000, 0x0b000fff).rw(FUNC(magictg_state::zr36120_r), FUNC(magictg_state::zr36120_w));
@@ -912,7 +915,7 @@ INPUT_PORTS_END
 
 void magictg_state::magictg(machine_config &config)
 {
-	R5000BE(config, m_mips, 150000000); /* TODO: CPU type and clock are unknown */
+	R5000BE(config, m_mips, 200000000); // exact model 79RV5000-200BS272 rated for 200MHz, clock not measured
 	//m_mips->set_icache_size(16384); /* TODO: Unknown */
 	//m_mips->set_dcache_size(16384); /* TODO: Unknown */
 	m_mips->set_addrmap(AS_PROGRAM, &magictg_state::magictg_map);
@@ -937,17 +940,19 @@ void magictg_state::magictg(machine_config &config)
 #endif
 	pcibus.set_device(9, FUNC(magictg_state::zr36120_pci_r), FUNC(magictg_state::zr36120_pci_w)); // TODO: ZR36120 device
 
-	VOODOO_1(config, m_voodoo[0], STD_VOODOO_1_CLOCK);
+	VOODOO_1(config, m_voodoo[0], voodoo_1_device::NOMINAL_CLOCK);
 	m_voodoo[0]->set_fbmem(2);
 	m_voodoo[0]->set_tmumem(4,0);
-	m_voodoo[0]->set_screen_tag("screen");
-	m_voodoo[0]->set_cpu_tag(m_mips);
+	m_voodoo[0]->set_status_cycles(1000); // optimization to consume extra cycles when polling status
+	m_voodoo[0]->set_screen("screen");
+	m_voodoo[0]->set_cpu(m_mips);
 
-	VOODOO_1(config, m_voodoo[1], STD_VOODOO_1_CLOCK);
+	VOODOO_1(config, m_voodoo[1], voodoo_1_device::NOMINAL_CLOCK);
 	m_voodoo[1]->set_fbmem(2);
 	m_voodoo[1]->set_tmumem(4,0);
-	m_voodoo[1]->set_screen_tag("screen");
-	m_voodoo[1]->set_cpu_tag(m_mips);
+	m_voodoo[1]->set_status_cycles(1000); // optimization to consume extra cycles when polling status
+	m_voodoo[1]->set_screen("screen");
+	m_voodoo[1]->set_cpu(m_mips);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -1016,6 +1021,8 @@ ROM_START( magictga )
 	ROM_REGION( 0x400000, "key", 0 )
 	ROM_LOAD( "magic.k0.u20", 0x000000, 0x400000, BAD_DUMP CRC(63ab0e9e) SHA1(c4f0b009860ee499496ed7fc1f14ef1e221c1085) )
 ROM_END
+
+} // Anonymous namespace
 
 
 /*************************************

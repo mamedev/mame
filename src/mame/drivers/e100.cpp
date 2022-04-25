@@ -235,7 +235,7 @@ uint32_t e100_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 				for (x = 0; x < 8; x++)
 				{
 					if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN(" %02x: ", *chardata);
-					bitmap.pix16(row + y, col + x) = (*chardata & (1 << x)) ? 1 : 0;
+					bitmap.pix(row + y, col + x) = (*chardata & (1 << x)) ? 1 : 0;
 				}
 				chardata++;
 			}

@@ -4,7 +4,7 @@
 #include "crsshair.h"
 #include "cpu/z80/z80.h"
 #include "video/315_5124.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "includes/sms.h"
 
 #define VERBOSE 0
@@ -559,17 +559,7 @@ uint8_t gamegear_state::gg_input_port_00_r()
 
 uint8_t sms1_state::sscope_r(offs_t offset)
 {
-	int sscope = m_port_scope->read();
-
-	// On SMSJ, address $fffb also controls the built-in 3-D port, that works
-	// in parallel with the 3-D adapter that is inserted into the card slot.
-
-	if ( sscope )
-	{
-		// Scope is attached
-		return m_sscope_state;
-	}
-
+	// SegaScope is write-only and writes are mirrored in RAM, from where the values read come from.
 	return read_ram(0x3ff8 + offset);
 }
 
@@ -577,6 +567,9 @@ uint8_t sms1_state::sscope_r(offs_t offset)
 void sms1_state::sscope_w(offs_t offset, uint8_t data)
 {
 	write_ram(0x3ff8 + offset, data);
+
+	// On SMSJ, address $fffb also controls the built-in 3-D port, that can work
+	// in parallel with the 3-D adapter that is inserted into the card slot.
 
 	int sscope = m_port_scope->read();
 
@@ -1433,7 +1426,7 @@ void gamegear_state::screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rg
 
 				if (sms_y2 >= vdp_bitmap.cliprect().min_y && sms_y2 <= vdp_bitmap.cliprect().max_y)
 				{
-					uint32_t *vdp_buffer =  &vdp_bitmap.pix32(sms_y2);
+					uint32_t *const vdp_buffer =  &vdp_bitmap.pix(sms_y2);
 
 					int sms_x = sms_min_x;
 					int x_min_i = plot_min_x - plot_x_first_group;
@@ -1496,7 +1489,7 @@ void gamegear_state::screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rg
 				line3 = m_line_buffer.get() + ((sms_y + y_i + 1) & 0x03) * 160;
 				line4 = m_line_buffer.get() + ((sms_y + y_i + 2) & 0x03) * 160;
 
-				uint32_t *p_bitmap = &bitmap.pix32(visarea.min_y + plot_y_group + y_i, visarea.min_x);
+				uint32_t *const p_bitmap = &bitmap.pix(visarea.min_y + plot_y_group + y_i, visarea.min_x);
 
 				for (int plot_x = plot_min_x; plot_x <= plot_max_x; plot_x++)
 				{
@@ -1555,9 +1548,9 @@ uint32_t gamegear_state::screen_update_gamegear(screen_device &screen, bitmap_rg
 		// (it would be better to generalize this in the core, to be used for all LCD systems)
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			uint32_t *linedst = &bitmap.pix32(y);
-			uint32_t *line0 = &source_bitmap->pix32(y);
-			uint32_t *line1 = &m_prev_bitmap.pix32(y);
+			uint32_t *const linedst = &bitmap.pix(y);
+			uint32_t const *const line0 = &source_bitmap->pix(y);
+			uint32_t const *const line1 = &m_prev_bitmap.pix(y);
 			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				uint32_t color0 = line0[x];
@@ -1568,9 +1561,9 @@ uint32_t gamegear_state::screen_update_gamegear(screen_device &screen, bitmap_rg
 				uint16_t r1 = (color1 >> 16) & 0x000000ff;
 				uint16_t g1 = (color1 >>  8) & 0x000000ff;
 				uint16_t b1 = (color1 >>  0) & 0x000000ff;
-				uint8_t r = (uint8_t)((r0 + r1) >> 1);
-				uint8_t g = (uint8_t)((g0 + g1) >> 1);
-				uint8_t b = (uint8_t)((b0 + b1) >> 1);
+				uint8_t r = uint8_t((r0 + r1) >> 1);
+				uint8_t g = uint8_t((g0 + g1) >> 1);
+				uint8_t b = uint8_t((b0 + b1) >> 1);
 				linedst[x] = (r << 16) | (g << 8) | b;
 			}
 		}

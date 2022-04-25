@@ -78,32 +78,26 @@ void avigo_state::video_start()
 
 uint32_t avigo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int y;
-	int b;
-	int x;
-
 	/* draw avigo display */
-	for (y=0; y<AVIGO_SCREEN_HEIGHT; y++)
+	for (int y=0; y<AVIGO_SCREEN_HEIGHT; y++)
 	{
-		int by;
 		uint8_t *line_ptr = &m_video_memory[y*(AVIGO_SCREEN_WIDTH>>3)];
 
-		x = 0;
-		for (by=((AVIGO_SCREEN_WIDTH>>3)-1); by>=0; by--)
+		int x = 0;
+		for (int by=((AVIGO_SCREEN_WIDTH>>3)-1); by>=0; by--)
 		{
-			int px;
 			uint8_t byte = line_ptr[0];
 
-			px = x;
-			for (b=7; b>=0; b--)
+			int px = x;
+			for (int b=7; b>=0; b--)
 			{
-				bitmap.pix16(y, px) = ((byte>>7) & 0x01);
+				bitmap.pix(y, px) = ((byte>>7) & 0x01);
 				px++;
-				byte = byte<<1;
+				byte <<= 1;
 			}
 
 			x = px;
-			line_ptr = line_ptr+1;
+			line_ptr++;
 		}
 	}
 	return 0;

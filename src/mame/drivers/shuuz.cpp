@@ -41,7 +41,7 @@ void shuuz_state::machine_start()
  *
  *************************************/
 
-WRITE16_MEMBER(shuuz_state::latch_w)
+void shuuz_state::latch_w(uint16_t data)
 {
 }
 
@@ -53,7 +53,7 @@ WRITE16_MEMBER(shuuz_state::latch_w)
  *
  *************************************/
 
-READ16_MEMBER(shuuz_state::leta_r)
+uint16_t shuuz_state::leta_r(offs_t offset)
 {
 	/* trackball -- rotated 45 degrees? */
 	int which = offset & 1;
@@ -80,7 +80,7 @@ READ16_MEMBER(shuuz_state::leta_r)
  *
  *************************************/
 
-READ16_MEMBER(shuuz_state::special_port0_r)
+uint16_t shuuz_state::special_port0_r()
 {
 	int result = ioport("SYSTEM")->read();
 

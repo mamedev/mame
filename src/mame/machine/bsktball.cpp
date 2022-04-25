@@ -21,14 +21,11 @@ WRITE_LINE_MEMBER(bsktball_state::nmion_w)
 /***************************************************************************
     bsktball_interrupt
 ***************************************************************************/
-/* NMI every 32V, IRQ every VBLANK */
+
 TIMER_DEVICE_CALLBACK_MEMBER(bsktball_state::bsktball_scanline)
 {
-	int scanline = param;
-
-	if(scanline == 0) // vblank irq
-		m_maincpu->set_input_line(0, HOLD_LINE);
-	else if(((scanline % 28) == 0) && (m_nmi_on)) // 32v timer irq
+	// NMI every 32V
+	if (m_nmi_on)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 

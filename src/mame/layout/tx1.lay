@@ -51,7 +51,7 @@ license:CC0
 		</disk>
 	</element>
 
-	<view name="Shifter-3R">
+	<view name="Triple-Screen Shifter-R">
 		<screen index="0">
 			<bounds x="0" y="0" width="640" height="480" />
 		</screen>
@@ -62,13 +62,12 @@ license:CC0
 			<bounds x="1280" y="0" width="640" height="480" />
 		</screen>
 
-<bezel element="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
-
+		<element ref="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
 			<bounds x="1886" y="414" width="32" height="64" />
 			<color alpha="0.6" />
-		</bezel>
+		</element>
 	</view>
-	<view name="Shifter-3L">
+	<view name="Triple-Screen Shifter-L">
 		<screen index="0">
 			<bounds x="0" y="0" width="640" height="480" />
 		</screen>
@@ -79,32 +78,29 @@ license:CC0
 			<bounds x="1280" y="0" width="640" height="480" />
 		</screen>
 
-<bezel element="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
-
+		<element ref="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
 			<bounds x="2" y="414" width="32" height="64" />
 			<color alpha="0.6" />
-		</bezel>
+		</element>
 	</view>
-	<view name="Shifter-1R">
+	<view name="Single-Screen Shifter-R">
 		<screen index="1">
 			<bounds x="0" y="0" width="640" height="480" />
 		</screen>
 
-<bezel element="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
-
+		<element ref="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
 			<bounds x="606" y="414" width="32" height="64" />
 			<color alpha="0.6" />
-		</bezel>
+		</element>
 	</view>
-	<view name="Shifter-1L">
+	<view name="Single-Screen Shifter-L">
 		<screen index="1">
 			<bounds x="0" y="0" width="640" height="480" />
 		</screen>
 
-<bezel element="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
-
+		<element ref="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
 			<bounds x="2" y="414" width="32" height="64" />
 			<color alpha="0.6" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

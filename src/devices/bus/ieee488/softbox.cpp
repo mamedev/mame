@@ -221,7 +221,6 @@ void softbox_device::ppi1_pc_w(uint8_t data)
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_EVEN )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
@@ -376,7 +375,7 @@ void softbox_device::ieee488_ifc(int state)
 //  dbrg_w - baud rate selection
 //-------------------------------------------------
 
-WRITE8_MEMBER( softbox_device::dbrg_w )
+void softbox_device::dbrg_w(uint8_t data)
 {
 	m_dbrg->str_w(data & 0x0f);
 	m_dbrg->stt_w(data >> 4);

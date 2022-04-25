@@ -417,7 +417,7 @@ void phi_device::device_reset()
 	update_488();
 }
 
-void phi_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void phi_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	LOG_NOISY("tmr %d enabled %d\n" , id , timer.enabled());
 	update_fsm();

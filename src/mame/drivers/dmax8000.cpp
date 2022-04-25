@@ -34,7 +34,7 @@ What there is of the schematic shows no sign of a daisy chain or associated inte
 #include "machine/mm58174.h"
 #include "bus/rs232/rs232.h"
 
-
+namespace {
 
 class dmax8000_state : public driver_device
 {
@@ -42,26 +42,31 @@ public:
 	dmax8000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_rom(*this, "maincpu")
+		, m_ram(*this, "mainram")
+		, m_bank1(*this, "bank1")
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 	{ }
 
 	void dmax8000(machine_config &config);
 
-	void init_dmax8000();
-
 private:
-	DECLARE_MACHINE_RESET(dmax8000);
-	void port0c_w(uint8_t data);
-	void port0d_w(uint8_t data);
-	void port14_w(uint8_t data);
-	void port40_w(uint8_t data);
+	void machine_reset() override;
+	void machine_start() override;
+	void port0c_w(u8 data);
+	void port0d_w(u8 data);
+	void port14_w(u8 data);
+	void port40_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
-	void dmax8000_io(address_map &map);
-	void dmax8000_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_rom;
+	required_shared_ptr<u8> m_ram;
+	required_memory_bank    m_bank1;
 	required_device<fd1793_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 };
@@ -72,7 +77,7 @@ WRITE_LINE_MEMBER( dmax8000_state::fdc_drq_w )
 	if (state) printf("DRQ ");
 }
 
-void dmax8000_state::port0c_w(uint8_t data)
+void dmax8000_state::port0c_w(u8 data)
 {
 	printf("Port0c=%X\n", data);
 	m_fdc->dden_w(BIT(data, 6));
@@ -86,28 +91,28 @@ void dmax8000_state::port0c_w(uint8_t data)
 	}
 }
 
-void dmax8000_state::port0d_w(uint8_t data)
+void dmax8000_state::port0d_w(u8 data)
 {
 	printf("Port0d=%X\n", data);
 }
 
-void dmax8000_state::port14_w(uint8_t data)
+void dmax8000_state::port14_w(u8 data)
 {
 	printf("Port14=%X\n", data);
 }
 
-void dmax8000_state::port40_w(uint8_t data)
+void dmax8000_state::port40_w(u8 data)
 {
-	membank("bankr0")->set_entry(BIT(data, 0));
+	m_bank1->set_entry(BIT(~data, 0));
 }
 
-void dmax8000_state::dmax8000_mem(address_map &map)
+void dmax8000_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x0fff).bankr("bankr0").bankw("bankw0");
-	map(0x1000, 0xffff).ram();
+	map(0x0000, 0xffff).ram().share("mainram");
+	map(0x0000, 0x0fff).bankr("bank1");
 }
 
-void dmax8000_state::dmax8000_io(address_map &map)
+void dmax8000_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
@@ -129,21 +134,16 @@ void dmax8000_state::dmax8000_io(address_map &map)
 static INPUT_PORTS_START( dmax8000 )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER( dmax8000_state, dmax8000 )
+void dmax8000_state::machine_reset()
 {
-	membank("bankr0")->set_entry(0); // point at rom
-	membank("bankw0")->set_entry(0); // always write to ram
-	m_maincpu->reset();
+	m_bank1->set_entry(1);
 	m_maincpu->set_input_line_vector(0, 0xee); // Z80 - fdc vector
 }
 
-void dmax8000_state::init_dmax8000()
+void dmax8000_state::machine_start()
 {
-	uint8_t *main = memregion("maincpu")->base();
-
-	membank("bankr0")->configure_entry(1, &main[0x0000]);
-	membank("bankr0")->configure_entry(0, &main[0x10000]);
-	membank("bankw0")->configure_entry(0, &main[0x0000]);
+	m_bank1->configure_entry(0, m_ram);
+	m_bank1->configure_entry(1, m_rom);
 }
 
 static void floppies(device_slot_interface &device)
@@ -156,9 +156,8 @@ void dmax8000_state::dmax8000(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 4'000'000); // no idea what crystal is used, but 4MHz clock is confirmed
-	m_maincpu->set_addrmap(AS_PROGRAM, &dmax8000_state::dmax8000_mem);
-	m_maincpu->set_addrmap(AS_IO, &dmax8000_state::dmax8000_io);
-	MCFG_MACHINE_RESET_OVERRIDE(dmax8000_state, dmax8000)
+	m_maincpu->set_addrmap(AS_PROGRAM, &dmax8000_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &dmax8000_state::io_map);
 
 	z80ctc_device &ctc(Z80CTC(config, "ctc", 4_MHz_XTAL));
 	ctc.set_clk<0>(4_MHz_XTAL / 2); // 2MHz
@@ -193,7 +192,7 @@ void dmax8000_state::dmax8000(machine_config &config)
 	FD1793(config, m_fdc, 2'000'000); // no idea
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_fdc->drq_wr_callback().set(FUNC(dmax8000_state::fdc_drq_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", floppies, "8dsdd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	MM58174(config, "rtc", 0);
 }
@@ -201,12 +200,12 @@ void dmax8000_state::dmax8000(machine_config &config)
 
 /* ROM definition */
 ROM_START( dmax8000 )
-	ROM_REGION( 0x11000, "maincpu", 0 )
-	ROM_LOAD( "rev1_0.rom", 0x10000, 0x001000, CRC(acbec83f) SHA1(fce0a4307a791250dbdc6bb6a190f7fec3619d82) )
-	// ROM_LOAD( "rev1_1.rom", 0x10000, 0x001000, CRC(2eb98a61) SHA1(cdd9a58f63ee7e3d3dd1c4ae3fd4376b308fd10f) )  // this is a hacked rom to speed up the serial port
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "rev1_0.rom", 0x0000, 0x001000, CRC(acbec83f) SHA1(fce0a4307a791250dbdc6bb6a190f7fec3619d82) )
+	// ROM_LOAD( "rev1_1.rom", 0x0000, 0x001000, CRC(2eb98a61) SHA1(cdd9a58f63ee7e3d3dd1c4ae3fd4376b308fd10f) )  // this is a hacked rom to speed up the serial port
 ROM_END
 
-/* Driver */
+} // Anonymous namespace
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY    FULLNAME        FLAGS
-COMP( 1981, dmax8000, 0,      0,      dmax8000, dmax8000, dmax8000_state, init_dmax8000, "Datamax", "Datamax 8000", MACHINE_NOT_WORKING )
+COMP( 1981, dmax8000, 0,      0,      dmax8000, dmax8000, dmax8000_state, empty_init, "Datamax", "Datamax 8000", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

@@ -85,6 +85,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class konamigq_state : public driver_device
 {
 public:
@@ -112,17 +114,15 @@ private:
 	required_device<k056800_device> m_k056800;
 	required_shared_ptr<uint8_t> m_pcmram;
 
-	uint8_t m_sector_buffer[ 512 ];
-	uint8_t m_sound_ctrl;
-	uint8_t m_sound_intck;
+	uint8_t m_sector_buffer[ 512 ]{};
+	uint8_t m_sound_ctrl = 0;
+	uint8_t m_sound_intck = 0;
 
 	void eeprom_w(uint16_t data);
 	void pcmram_w(offs_t offset, uint8_t data);
 	uint8_t pcmram_r(offs_t offset);
 	uint16_t tms57002_status_word_r();
 	void tms57002_control_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_MACHINE_START(konamigq);
-	DECLARE_MACHINE_RESET(konamigq);
 	INTERRUPT_GEN_MEMBER(tms_sync);
 	DECLARE_WRITE_LINE_MEMBER(k054539_irq_gen);
 
@@ -458,5 +458,8 @@ ROM_START( cryptklr )
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":harddisk:image" )
 	DISK_IMAGE( "420uaa04", 0, SHA1(67cb1418fc0de2a89fc61847dc9efb9f1bebb347) )
 ROM_END
+
+} // Anonymous namespace
+
 
 GAME( 1995, cryptklr, 0, konamigq, konamigq, konamigq_state, empty_init, ROT0, "Konami", "Crypt Killer (GQ420 UAA)", 0 )

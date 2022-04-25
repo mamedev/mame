@@ -691,16 +691,14 @@ uint32_t cclimber_state::screen_update_cclimber(screen_device &screen, bitmap_in
 
 uint32_t cclimber_state::screen_update_yamato(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i;
-	uint8_t *sky_rom = memregion("user1")->base() + 0x1200;
+	uint8_t const *const sky_rom = memregion("user1")->base() + 0x1200;
 
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 	{
-		int j;
 		pen_t pen = YAMATO_SKY_PEN_BASE + sky_rom[(m_flip_x ? 0x80 : 0) + (i >> 1)];
 
-		for (j = 0; j < 0x100; j++)
-			bitmap.pix16(j, (i - 8) & 0xff) = pen;
+		for (int j = 0; j < 0x100; j++)
+			bitmap.pix(j, (i - 8) & 0xff) = pen;
 	}
 
 	draw_playfield(screen, bitmap, cliprect);

@@ -6,14 +6,13 @@
 #include "includes/pokechmp.h"
 
 
-WRITE8_MEMBER(pokechmp_state::pokechmp_videoram_w)
+void pokechmp_state::pokechmp_videoram_w(offs_t offset, uint8_t data)
 {
-	uint8_t *videoram = m_videoram;
-	videoram[offset] = data;
+	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(pokechmp_state::pokechmp_flipscreen_w)
+void pokechmp_state::pokechmp_flipscreen_w(uint8_t data)
 {
 	if (flip_screen() != (data & 0x80))
 	{

@@ -14,6 +14,9 @@
 #include "ui/ui.h"
 #include "ui/utils.h"
 
+#include "corestr.h"
+#include "unicode.h"
+
 
 namespace ui {
 
@@ -44,32 +47,30 @@ menu_selector::~menu_selector()
 //  handle
 //-------------------------------------------------
 
-void menu_selector::handle()
+void menu_selector::handle(event const *ev)
 {
 	// process the menu
-	const event *menu_event = process(0);
-
-	if (menu_event != nullptr && menu_event->itemref != nullptr)
+	if (ev && ev->itemref)
 	{
-		if (menu_event->iptkey == IPT_UI_SELECT)
+		if (ev->iptkey == IPT_UI_SELECT)
 		{
 			int selection(-1);
 			for (size_t idx = 0; (m_str_items.size() > idx) && (0 > selection); ++idx)
-				if ((void*)&m_str_items[idx] == menu_event->itemref)
+				if ((void*)&m_str_items[idx] == ev->itemref)
 					selection = int(unsigned(idx));
 
 			m_handler(selection);
 
 			stack_pop();
 		}
-		else if (menu_event->iptkey == IPT_SPECIAL)
+		else if (ev->iptkey == IPT_SPECIAL)
 		{
-			if (input_character(m_search, menu_event->unichar, uchar_is_printable))
+			if (input_character(m_search, ev->unichar, uchar_is_printable))
 				reset(reset_options::SELECT_FIRST);
 		}
 
 		// escape pressed with non-empty text clears the text
-		else if (menu_event->iptkey == IPT_UI_CANCEL && !m_search.empty())
+		else if (ev->iptkey == IPT_UI_CANCEL && !m_search.empty())
 		{
 			m_search.clear();
 			reset(reset_options::SELECT_FIRST);
@@ -88,7 +89,7 @@ void menu_selector::populate(float &customtop, float &custombottom)
 		find_matches(m_search.c_str());
 
 		for (int curitem = 0; m_searchlist[curitem]; ++curitem)
-			item_append(*m_searchlist[curitem], "", 0, (void *)m_searchlist[curitem]);
+			item_append(*m_searchlist[curitem], 0, (void *)m_searchlist[curitem]);
 	}
 	else
 	{
@@ -97,7 +98,7 @@ void menu_selector::populate(float &customtop, float &custombottom)
 			if ((0 <= m_initial) && (unsigned(m_initial) == index))
 				set_selected_index(index);
 
-			item_append(m_str_items[index], "", 0, (void *)&m_str_items[index]);
+			item_append(m_str_items[index], 0, (void *)&m_str_items[index]);
 		}
 	}
 
@@ -116,16 +117,16 @@ void menu_selector::custom_render(void *selectedref, float top, float bottom, fl
 	draw_text_box(
 			std::begin(tempbuf), std::end(tempbuf),
 			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
 			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 
 	// get the text for 'UI Select'
-	tempbuf[0] = string_format(_("Double click or press %1$s to select"), machine().input().seq_name(machine().ioport().type_seq(IPT_UI_SELECT, 0, SEQ_TYPE_STANDARD)));
+	tempbuf[0] = string_format(_("Double-click or press %1$s to select"), ui().get_general_input_setting(IPT_UI_SELECT));
 	draw_text_box(
 			std::begin(tempbuf), std::end(tempbuf),
 			origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
-			ui::text_layout::CENTER, ui::text_layout::NEVER, false,
-			ui().colors().text_color(), UI_RED_COLOR, 1.0f);
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
+			ui().colors().text_color(), ui().colors().background_color(), 1.0f);
 }
 
 //-------------------------------------------------

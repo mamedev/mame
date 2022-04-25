@@ -286,7 +286,7 @@ pc_keyboard_device::pc_keyboard_device(const machine_config &mconfig, const char
 
 pc_keyboard_device::pc_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	m_ioport(*this, ":pc_keyboard_%u", 0),
+	m_ioport(*this, "pc_keyboard_%u", 0),
 	m_out_keypress_func(*this)
 {
 }
@@ -300,7 +300,7 @@ at_keyboard_device::at_keyboard_device(const machine_config &mconfig, const char
 }
 
 
-void pc_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pc_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	polling();
 	if(!charqueue_empty())
@@ -315,12 +315,12 @@ void pc_keyboard_device::device_start()
 	save_item(NAME(m_on));
 	save_item(NAME(m_head));
 	save_item(NAME(m_tail));
-	save_pointer(NAME(m_queue), ARRAY_LENGTH(m_queue));
-	save_pointer(NAME(m_make), ARRAY_LENGTH(m_make));
+	save_item(NAME(m_queue));
+	save_item(NAME(m_make));
 
-	memset(m_make, 0, sizeof(m_make));
+	std::fill(std::begin(m_make), std::end(m_make), 0);
 
-	machine().ioport().natkeyboard().configure(
+	machine().natkeyboard().configure(
 		ioport_queue_chars_delegate(&pc_keyboard_device::queue_chars, this),
 		ioport_accept_char_delegate(&pc_keyboard_device::accept_char, this),
 		ioport_charqueue_empty_delegate(&pc_keyboard_device::charqueue_empty, this));
@@ -383,7 +383,7 @@ void pc_keyboard_device::queue_insert(uint8_t data)
 
 	m_queue[m_head] = data;
 	m_head++;
-	m_head %= ARRAY_LENGTH(m_queue);
+	m_head %= std::size(m_queue);
 }
 
 
@@ -392,7 +392,7 @@ int pc_keyboard_device::queue_size(void)
 	int queue_size;
 	queue_size = m_head - m_tail;
 	if (queue_size < 0)
-		queue_size += ARRAY_LENGTH(m_queue);
+		queue_size += std::size(m_queue);
 	return queue_size;
 }
 
@@ -626,7 +626,7 @@ uint8_t pc_keyboard_device::read()
 		logerror("read(): Keyboard Read 0x%02x\n",data);
 
 	m_tail++;
-	m_tail %= ARRAY_LENGTH(m_queue);
+	m_tail %= std::size(m_queue);
 	return data;
 }
 
@@ -1117,7 +1117,7 @@ INPUT_PORTS_START( pc_keyboard )
 	PORT_BIT ( 0xff80, 0x0000, IPT_UNUSED )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( at_keyboard )
+static INPUT_PORTS_START( at_keyboard )
 	PORT_START("pc_keyboard_0")
 	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED )     /* unused scancode 0 */
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc") PORT_CODE(KEYCODE_ESC) /* Esc                         01  81 */
@@ -1241,6 +1241,18 @@ INPUT_PORTS_START( at_keyboard )
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Print Screen") PORT_CODE(KEYCODE_PRTSCR) /* Print Screen alternate      77  f7 */
 	PORT_BIT ( 0xfffe, 0x0000, IPT_UNUSED )
 INPUT_PORTS_END
+
+
+ioport_constructor pc_keyboard_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(pc_keyboard);
+}
+
+
+ioport_constructor at_keyboard_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(at_keyboard);
+}
 
 /***************************************************************************
   Inputx stuff

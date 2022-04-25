@@ -5,6 +5,8 @@
     SH6578 NES clone hardware
     enhanced NES, different to VT / OneBus systems
 
+    "UMC 1997.2 A35551S" on CPU die (maxx6in1)
+
     video rendering is changed significantly compared to NES so not using NES PPU device
     has 256x256 pixel pages, attributes are stored next to tile numbers (not in their own table after them) etc.
 
@@ -33,9 +35,9 @@ class nes_sh6578_state : public driver_device
 public:
 	nes_sh6578_state(const machine_config& mconfig, device_type type, const char* tag) :
 		driver_device(mconfig, type, tag),
+		m_bank(*this, "cartbank"),
 		m_maincpu(*this, "maincpu"),
 		m_ppu(*this, "ppu"),
-		m_bank(*this, "cartbank"),
 		m_fullrom(*this, "fullrom"),
 		m_screen(*this, "screen"),
 		m_apu(*this, "nesapu"),
@@ -55,10 +57,14 @@ protected:
 
 	void sprite_dma_w(address_space &space, uint8_t data);
 
+	virtual void io_w(uint8_t data);
+	virtual void extio_w(uint8_t data);
+	bool m_isbanked;
+	required_memory_bank m_bank;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ppu_sh6578_device> m_ppu;
-	required_memory_bank m_bank;
 	required_device<address_map_bank_device> m_fullrom;
 	required_device<screen_device> m_screen;
 	required_device<nesapu_device> m_apu;
@@ -99,7 +105,6 @@ private:
 
 	uint8_t io0_r();
 	uint8_t io1_r();
-	void io_w(uint8_t data);
 
 	uint8_t psg1_4014_r();
 	uint8_t psg1_4015_r();
@@ -136,11 +141,31 @@ private:
 	// this might be game specific
 	uint8_t m_previo;
 	uint8_t m_iolatch[2];
-	bool m_isbanked;
 	required_ioport_array<2> m_in;
 };
 
+class nes_sh6578_abl_wikid_state : public nes_sh6578_state
+{
+public:
+	nes_sh6578_abl_wikid_state(const machine_config& mconfig, device_type type, const char* tag) :
+		nes_sh6578_state(mconfig, type, tag)
+	{ }
 
+protected:
+	virtual void io_w(uint8_t data) override;
+};
+
+class nes_sh6578_max10in1_state : public nes_sh6578_state
+{
+public:
+	nes_sh6578_max10in1_state(const machine_config& mconfig, device_type type, const char* tag) :
+		nes_sh6578_state(mconfig, type, tag)
+	{ }
+
+protected:
+	virtual void extio_w(uint8_t data) override;
+	virtual void machine_reset() override;
+};
 
 uint8_t nes_sh6578_state::bank_r(int bank, uint16_t offset)
 {
@@ -398,13 +423,33 @@ void nes_sh6578_state::io_w(uint8_t data)
 		}
 	}
 
+	m_previo = data;
+}
+
+void nes_sh6578_abl_wikid_state::io_w(uint8_t data)
+{
+	nes_sh6578_state::io_w(data);
+
 	if (m_isbanked)
 	{
 		m_bank->set_entry((data>>1)&1);
 	}
-
-	m_previo = data;
 }
+
+void nes_sh6578_state::extio_w(uint8_t data)
+{
+	logerror("%s: extio_w : %02x\n", machine().describe_context(), data);
+}
+
+void nes_sh6578_max10in1_state::extio_w(uint8_t data)
+{
+	logerror("%s: extio_w : %02x (max10in1)\n", machine().describe_context(), data);
+
+	m_bank->set_entry((data & 0x80) >> 7);
+}
+
+
+
 
 
 uint8_t nes_sh6578_state::psg1_4014_r()
@@ -454,6 +499,13 @@ void nes_sh6578_state::nes_sh6578_map(address_map& map)
 	map(0x4017, 0x4017).rw(FUNC(nes_sh6578_state::io1_r), FUNC(nes_sh6578_state::psg1_4017_w));
 
 	map(0x4020, 0x4020).w(FUNC(nes_sh6578_state::timing_setting_control_w));
+	//4021 write keyboard output port
+	//4022 read/write keyboard data control
+	//4023 read/write joystick,mouse control
+	//4024 read - mouse port / write - mouse baud
+	//4025 write - Printer Port
+	map(0x4026, 0x4026).w(FUNC(nes_sh6578_state::extio_w));
+	//4027 read/write - DAC data register
 
 	map(0x4031, 0x4031).w(FUNC(nes_sh6578_state::initial_startup_w));
 	map(0x4032, 0x4032).w(FUNC(nes_sh6578_state::irq_mask_w));
@@ -508,6 +560,12 @@ void nes_sh6578_state::machine_reset()
 
 	m_irqmask = 0xff;
 	m_timerval = 0x00;
+}
+
+void nes_sh6578_max10in1_state::machine_reset()
+{
+	nes_sh6578_state::machine_reset();
+	m_bank->set_entry(1);
 }
 
 void nes_sh6578_state::machine_start()
@@ -641,14 +699,79 @@ ROM_START( ablwikid )
 	ROM_LOAD( "mx29f1610atc.u2", 0x00000, 0x200000, CRC(f16abf79) SHA1(aeccbb40d7fdd451ba8e5cca20464da2cf116461) )
 ROM_END
 
+ROM_START( maxx5in1 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "vsmaxxcasino5_e28f008sa_89a2.bin", 0x00000, 0x100000, CRC(e3d8f24f) SHA1(121411e72d53eabe6be927d1db2f871d59a9e08e) )
+ROM_END
+
+ROM_START( maxx6in1 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "maxx6in1.bin", 0x00000, 0x100000, CRC(8e582298) SHA1(89892b9095dbd5101cdf2477a66abd2cb11ad8c8) )
+ROM_END
+
+ROM_START( max10in1 )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "csmaxxcasino10.bin", 0x000000, 0x200000, CRC(2a05e9af) SHA1(fcf591c22ce8773f72e9d0fa0bae545f6a82a063) )
+ROM_END
+
+ROM_START( vsmaxx15 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "vsmaxx15n1_e28f008sa_89a2.bin", 0x00000, 0x100000, CRC(713955ce) SHA1(f5ff02055fd4574cedc2f056d19388207a7244c0) )
+ROM_END
+
+ROM_START( vsmaxx25 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD( "vsmaxx25_am29lv160dt_000122c4.bin", 0x00000, 0x200000, CRC(0efd1625) SHA1(34e83f748af3eee475c5b2b24ff03c00c1b5b8ed) )
+ROM_END
+
+ROM_START( dgun806 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD( "dgpnpdgu806as29lv160be_000422c4.bin", 0x00000, 0x200000, CRC(576d6caf) SHA1(fdfa4712e6ed66d2af41ccfbfbf870cd01f7b0f7) )
+ROM_END
+
+
+
+ROM_START( dancmix3 )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "e28f008sa.u5", 0x00000, 0x100000, CRC(faf6480c) SHA1(68bf79910e091443aecc7bf256cd5378a04c550e) )
+ROM_END
+
+CONS( 200?, maxx5in1,  0, 0,  nes_sh6578, nes_sh6578, nes_sh6578_state,  init_nes_sh6578, "Senario / JungleTac", "Vs Maxx 5-in-1 Casino / Senario Card & Casino Games", 0 ) // advertised on box as 'With Solitaire" (was there an even older version without it?)
+
+CONS( 200?, maxx6in1,  0, 0,  nes_sh6578, nes_sh6578, nes_sh6578_state,  init_nes_sh6578, "Senario / JungleTac", "Vs Maxx 6-in-1 Casino / Senario Card & Casino Games", 0 ) // advertised on box as "With Texas Hold 'Em" (which is the added game since the 5-in-1)
+
+CONS( 200?, max10in1,  0, 0,  nes_sh6578, nes_sh6578, nes_sh6578_max10in1_state,  init_nes_sh6578, "Senario / JungleTac", "Vs Maxx 10-in-1 Casino / Senario Card & Casino Games", 0 )
+
+// titles below have various issues (DMA, split interrupt timing etc.)
+
+// aka Wik!d Joystick, sometimes also called Air Blaster like the real Air Blaster game.  Wik!d seems a rebranding (a 'gift' company) so did ABL reuse the Air Blaster name here instead?
+CONS( 200?, ablwikid,    0,  0,  nes_sh6578_pal, nes_sh6578, nes_sh6578_abl_wikid_state, init_nes_sh6578, "Advance Bright Ltd. / JungleTac", "Wikid Joystick 14-in-1", MACHINE_NOT_WORKING )
+
+CONS( 2001?, ts_handy11,  0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Techno Source / JungleTac", "Handy Boy 11-in-1 (TV Play Power)", MACHINE_NOT_WORKING ) // possibly newer than 2001
+
+// from a blue coloured unit, a yellow one exists, is it the same?
+CONS( 2004?, vsmaxx15,    0,  0,  nes_sh6578, nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Senario / JungleTac", "Vs Maxx 15-in-1", MACHINE_NOT_WORKING )
+
+// This is from the blue coloured unit with the 1p/2p slider (does it do anything / get read anywhere?)
+// A version of the 25-in-1 on VT hardware also exists, with the downgraded version of Big Racing & removed copyrights etc. (probably the purple tinted version without the 1p/2p slider)
+CONS( 2004?, vsmaxx25,    0,  0,  nes_sh6578, nes_sh6578, nes_sh6578_max10in1_state, init_nes_sh6578, "Senario / JungleTac", "Vs Maxx 25-in-1 (SH6578 hardware)", MACHINE_NOT_WORKING )
+
+// DGUN-806 on sticker on battery compartment. DreamGear had some other products with the same pad type but different DGUN numbers on the packaging, is the ROM the same?
+CONS( 2004?, dgun806,    0,  0,  nes_sh6578, nes_sh6578, nes_sh6578_max10in1_state, init_nes_sh6578, "dreamGEAR", "Plug 'N' Play 25-in-1 (DGUN-806)", MACHINE_NOT_WORKING )
+
+
+
+// titles below need inputs mapping to go further
 
 CONS( 1997, bandgpad,    0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Bandai", "Multi Game Player Gamepad", MACHINE_NOT_WORKING )
-CONS( 1997, bandggcn,    0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Bandai", "Go! Go! Connie-chan! Asobou Mouse", MACHINE_NOT_WORKING )
 
-// possibly newer than 2001
-CONS( 2001, ts_handy11,  0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Techno Source", "Handy Boy 11-in-1 (TV Play Power)", MACHINE_NOT_WORKING )
+CONS( 1997, bandggcn,    0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Bandai", "Go! Go! Connie-chan! Asobou Mouse", MACHINE_NOT_WORKING )
 
 CONS( 200?, cpatrolm,    0,  0,  nes_sh6578_pal, nes_sh6578, nes_sh6578_state, init_nes_sh6578, "TimeTop", "City Patrolman", MACHINE_NOT_WORKING )
 
-// ROM is banked
-CONS( 200?, ablwikid,    0,  0,  nes_sh6578_pal, nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Advance Bright Ltd.", "Wikid Joystick", MACHINE_NOT_WORKING ) // or Wik!d Joystick
+// Super Moto 3 https://youtu.be/DR5Y_r6C_qk - has JungleTac copyrights intact, and appears to have the SH6578 versions of the games
+
+// Handy Max 15-in-1 https://youtu.be/jQTUHj1cP-k - has JungleTac copyrights intact, and appears to have the SH6578 versions of the games
+
+// has sampled audio, not supported (make sure it isn't being done by an external device)
+CONS( 201?, dancmix3, 0, 0, nes_sh6578_pal, nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Venom", "TV Dance Mat 4 Games in 1 (Mix Party 3 / Dance Mix 3)", MACHINE_NOT_WORKING )

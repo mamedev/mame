@@ -94,33 +94,33 @@ void suprridr_state::suprridr_palette(palette_device &palette) const
  *
  *************************************/
 
-WRITE8_MEMBER(suprridr_state::flipx_w)
+void suprridr_state::flipx_w(uint8_t data)
 {
 	m_flipx = data & 1;
 	machine().tilemap().set_flip_all((m_flipx ? TILEMAP_FLIPX : 0) | (m_flipy ? TILEMAP_FLIPY : 0));
 }
 
 
-WRITE8_MEMBER(suprridr_state::flipy_w)
+void suprridr_state::flipy_w(uint8_t data)
 {
 	m_flipy = data & 1;
 	machine().tilemap().set_flip_all((m_flipx ? TILEMAP_FLIPX : 0) | (m_flipy ? TILEMAP_FLIPY : 0));
 }
 
 
-WRITE8_MEMBER(suprridr_state::fgdisable_w)
+void suprridr_state::fgdisable_w(uint8_t data)
 {
 	m_fg_tilemap->enable(~data & 1);
 }
 
 
-WRITE8_MEMBER(suprridr_state::fgscrolly_w)
+void suprridr_state::fgscrolly_w(uint8_t data)
 {
 	m_fg_tilemap->set_scrolly(0, data);
 }
 
 
-WRITE8_MEMBER(suprridr_state::bgscrolly_w)
+void suprridr_state::bgscrolly_w(uint8_t data)
 {
 	m_bg_tilemap->set_scrolly(0, data);
 }
@@ -139,7 +139,7 @@ int suprridr_state::is_screen_flipped()
  *
  *************************************/
 
-WRITE8_MEMBER(suprridr_state::bgram_w)
+void suprridr_state::bgram_w(offs_t offset, uint8_t data)
 {
 	m_bgram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -147,7 +147,7 @@ WRITE8_MEMBER(suprridr_state::bgram_w)
 }
 
 
-WRITE8_MEMBER(suprridr_state::fgram_w)
+void suprridr_state::fgram_w(offs_t offset, uint8_t data)
 {
 	m_fgram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -167,19 +167,19 @@ uint32_t suprridr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	const rectangle &visarea = screen.visible_area();
 
 	/* render left 4 columns with no scroll */
-	subclip = visarea;;
+	subclip = visarea;
 	subclip.max_x = subclip.min_x + (m_flipx ? 1*8 : 4*8) - 1;
 	subclip &= cliprect;
 	m_bg_tilemap_noscroll->draw(screen, bitmap, subclip, 0, 0);
 
 	/* render right 1 column with no scroll */
-	subclip = visarea;;
+	subclip = visarea;
 	subclip.min_x = subclip.max_x - (m_flipx ? 4*8 : 1*8) + 1;
 	subclip &= cliprect;
 	m_bg_tilemap_noscroll->draw(screen, bitmap, subclip, 0, 0);
 
 	/* render the middle columns normally */
-	subclip = visarea;;
+	subclip = visarea;
 	subclip.min_x += m_flipx ? 1*8 : 4*8;
 	subclip.max_x -= m_flipx ? 4*8 : 1*8;
 	subclip &= cliprect;

@@ -60,16 +60,16 @@ private:
 
 	int calc_cs(offs_t address) const;
 
-	DECLARE_READ16_MEMBER( m68307_internal_base_r );
-	DECLARE_WRITE16_MEMBER( m68307_internal_base_w );
-	DECLARE_READ16_MEMBER( m68307_internal_timer_r );
-	DECLARE_WRITE16_MEMBER( m68307_internal_timer_w );
-	DECLARE_READ16_MEMBER( m68307_internal_sim_r );
-	DECLARE_WRITE16_MEMBER( m68307_internal_sim_w );
-	DECLARE_READ8_MEMBER( m68307_internal_serial_r );
-	DECLARE_WRITE8_MEMBER( m68307_internal_serial_w );
-	DECLARE_READ8_MEMBER( m68307_internal_mbus_r );
-	DECLARE_WRITE8_MEMBER( m68307_internal_mbus_w );
+	uint16_t m68307_internal_base_r(offs_t offset, uint16_t mem_mask = ~0);
+	void m68307_internal_base_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t m68307_internal_timer_r(offs_t offset, uint16_t mem_mask = ~0);
+	void m68307_internal_timer_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t m68307_internal_sim_r(address_space &space, offs_t offset, uint16_t mem_mask = ~0);
+	void m68307_internal_sim_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t m68307_internal_serial_r(offs_t offset);
+	void m68307_internal_serial_w(offs_t offset, uint8_t data);
+	uint8_t m68307_internal_mbus_r(offs_t offset);
+	void m68307_internal_mbus_w(offs_t offset, uint8_t data);
 
 	void internal_map(address_map &map);
 	void cpu_space_map(address_map &map);

@@ -225,14 +225,14 @@ private:
 	required_device<scc85c30_device> m_sccterm2;
 
 	// Pointer to System ROMs needed by bootvect_r and masking RAM buffer for post reset accesses
-	uint32_t  *m_sysrom;
-	uint32_t  m_sysram[2];
+	uint32_t  *m_sysrom = nullptr;
+	uint32_t  m_sysram[2]{};
 
 	// PCC registers
-	uint8_t   m_genpurp_stat;
+	uint8_t   m_genpurp_stat = 0;
 
 	// VME chip registers
-	uint8_t   m_vc_cntl_conf;
+	uint8_t   m_vc_cntl_conf = 0;
 };
 
 void mvme147_state::mvme147_mem(address_map &map)
@@ -290,8 +290,8 @@ uint32_t mvme147_state::bootvect_r(offs_t offset){
 }
 
 void mvme147_state::bootvect_w(offs_t offset, uint32_t data, uint32_t mem_mask){
-	m_sysram[offset % ARRAY_LENGTH(m_sysram)] &= ~mem_mask;
-	m_sysram[offset % ARRAY_LENGTH(m_sysram)] |= (data & mem_mask);
+	m_sysram[offset % std::size(m_sysram)] &= ~mem_mask;
+	m_sysram[offset % std::size(m_sysram)] |= (data & mem_mask);
 	m_sysrom = &m_sysram[0]; // redirect all upcoming accesses to masking RAM until reset.
 }
 

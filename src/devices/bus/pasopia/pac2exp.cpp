@@ -88,5 +88,5 @@ void pasopia_pa7234_device::pac2_write(offs_t offset, u8 data)
 
 	// 1, 2, 3, 4 or 7 may supposedly be written here
 	if ((offset & 3) == 3 && (data & 0x07) != 0)
-		m_slot_selected = (data & 0x03) - 1;
+		m_slot_selected = (data - 1) & 0x03;
 }

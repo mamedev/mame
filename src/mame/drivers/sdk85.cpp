@@ -50,7 +50,7 @@ Press 0 to restart.
 #include "machine/i8155.h"
 #include "machine/i8355.h"
 #include "machine/i8279.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "sdk85.lh"
 
 
@@ -66,7 +66,7 @@ public:
 		, m_ramio(*this, "ramio")
 		, m_expramio(*this, "expramio")
 		, m_tty(*this, "tty")
-		, m_keyboard(*this, "X%u", 0)
+		, m_keyboard(*this, "X%u", 0U)
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
@@ -82,12 +82,12 @@ private:
 	void digit_w(u8 data);
 	u8 kbd_r();
 
-	void sdk85_io(address_map &map);
-	void sdk85_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
-	u8 m_digit;
+	u8 m_digit = 0U;
 	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
+	virtual void machine_start() override;
 
 	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<i8279_device> m_kdc;
@@ -104,6 +104,12 @@ void sdk85_state::machine_reset()
 {
 	// Prevent spurious TRAP when system is reset
 	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+}
+
+void sdk85_state::machine_start()
+{
+	m_digits.resolve();
+	save_item(NAME(m_digit));
 }
 
 WRITE_LINE_MEMBER(sdk85_state::reset_w)
@@ -133,7 +139,7 @@ READ_LINE_MEMBER(sdk85_state::sid_r)
 		return m_tty->rxd_r();
 }
 
-void sdk85_state::sdk85_mem(address_map &map)
+void sdk85_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x07ff).r(m_romio, FUNC(i8355_device::memory_r));
@@ -144,7 +150,7 @@ void sdk85_state::sdk85_mem(address_map &map)
 	map(0x2800, 0x28ff).mirror(0x0700).rw(m_expramio, FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
 }
 
-void sdk85_state::sdk85_io(address_map &map)
+void sdk85_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00, 0x03).mirror(0x04).rw(m_romio, FUNC(i8355_device::io_r), FUNC(i8355_device::io_w));
@@ -210,7 +216,6 @@ u8 sdk85_state::kbd_r()
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_110 )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_110 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_EVEN )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
@@ -220,8 +225,8 @@ void sdk85_state::sdk85(machine_config &config)
 {
 	/* basic machine hardware */
 	I8085A(config, m_maincpu, 6.144_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &sdk85_state::sdk85_mem);
-	m_maincpu->set_addrmap(AS_IO, &sdk85_state::sdk85_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sdk85_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &sdk85_state::io_map);
 	m_maincpu->in_sid_func().set(FUNC(sdk85_state::sid_r));
 	m_maincpu->out_sod_func().set(m_tty, FUNC(rs232_port_device::write_txd)).invert();
 
@@ -264,4 +269,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME  FLAGS */
-COMP( 1977, sdk85, 0,      0,      sdk85,   sdk85, sdk85_state, empty_init, "Intel", "MCS-85 System Design Kit", MACHINE_NO_SOUND_HW)
+COMP( 1977, sdk85, 0,      0,      sdk85,   sdk85, sdk85_state, empty_init, "Intel", "MCS-85 System Design Kit", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

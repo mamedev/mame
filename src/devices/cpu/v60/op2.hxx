@@ -257,13 +257,11 @@ uint32_t v60_device::opCMPF()
 uint32_t v60_device::op5FUNHANDLED()
 {
 	fatalerror("Unhandled 5F opcode at %08x\n", PC);
-	return 0; /* never reached, fatalerror won't return */
 }
 
 uint32_t v60_device::op5CUNHANDLED()
 {
 	fatalerror("Unhandled 5C opcode at %08x\n", PC);
-	return 0; /* never reached, fatalerror won't return */
 }
 
 const v60_device::am_func v60_device::s_Op5FTable[32] =

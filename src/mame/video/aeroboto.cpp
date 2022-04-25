@@ -120,9 +120,7 @@ void aeroboto_state::aeroboto_tilecolor_w(offs_t offset, uint8_t data)
 
 void aeroboto_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	int offs;
-
-	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
+	for (int offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
 		int x = m_spriteram[offs + 3];
 		int y = 240 - m_spriteram[offs];
@@ -144,10 +142,9 @@ void aeroboto_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 uint32_t aeroboto_state::screen_update_aeroboto(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const rectangle splitrect1(0, 255, 0, 39);
-	const rectangle splitrect2(0, 255, 40, 255);
-	uint8_t *src_base, *src_colptr, *src_rowptr;
-	int src_offsx, src_colmask, sky_color, star_color, x, y, i, j, pen;
+	rectangle const splitrect1(0, 255, 0, 39);
+	rectangle const splitrect2(0, 255, 40, 255);
+	int sky_color, star_color;
 
 	sky_color = star_color = *m_bgcolor << 2;
 
@@ -165,30 +162,30 @@ uint32_t aeroboto_state::screen_update_aeroboto(screen_device &screen, bitmap_in
 		bitmap.fill(sky_color, cliprect);
 
 		// actual scroll speed is unknown but it can be adjusted by changing the SCROLL_SPEED constant
-		m_sx += (char)(*m_starx - m_ox);
+		m_sx += char(*m_starx - m_ox);
 		m_ox = *m_starx;
-		x = m_sx / SCROLL_SPEED;
+		int const x = m_sx / SCROLL_SPEED;
 
 		if (*m_vscroll != 0xff)
-			m_sy += (char)(*m_stary - m_oy);
+			m_sy += char(*m_stary - m_oy);
 		m_oy = *m_stary;
-		y = m_sy / SCROLL_SPEED;
+		int const y = m_sy / SCROLL_SPEED;
 
-		src_base = m_stars_rom;
+		uint8_t const *const src_base = m_stars_rom;
 
-		for (i = 0; i < 256; i++)
+		for (int i = 0; i < 256; i++)
 		{
-			src_offsx = (x + i) & 0xff;
-			src_colmask = 1 << (src_offsx & 7);
+			int src_offsx = (x + i) & 0xff;
+			int const src_colmask = 1 << (src_offsx & 7);
 			src_offsx >>= 3;
-			src_colptr = src_base + src_offsx;
-			pen = star_color + ((i + 8) >> 4 & 1);
+			uint8_t const *const src_colptr = src_base + src_offsx;
+			int const pen = star_color + ((i + 8) >> 4 & 1);
 
-			for (j = 0; j < 256; j++)
+			for (int j = 0; j < 256; j++)
 			{
-				src_rowptr = src_colptr + (((y + j) & 0xff) << 5 );
+				uint8_t const *const src_rowptr = src_colptr + (((y + j) & 0xff) << 5 );
 				if (!((unsigned)*src_rowptr & src_colmask))
-					bitmap.pix16(j, i) = pen;
+					bitmap.pix(j, i) = pen;
 			}
 		}
 	}
@@ -199,7 +196,7 @@ uint32_t aeroboto_state::screen_update_aeroboto(screen_device &screen, bitmap_in
 		bitmap.fill(sky_color, cliprect);
 	}
 
-	for (y = 0; y < 64; y++)
+	for (int y = 0; y < 64; y++)
 		m_bg_tilemap->set_scrollx(y, m_hscroll[y]);
 
 	// the playfield is part of a splitscreen and should not overlap with status display

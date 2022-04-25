@@ -272,8 +272,8 @@ ROMs:
 #include "machine/adc0804.h"
 #include "machine/fd1094.h"
 #include "machine/nvram.h"
-#include "sound/ym2151.h"
 #include "sound/segapcm.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
 
 
@@ -477,7 +477,7 @@ WRITE_LINE_MEMBER(segaxbd_state::timer_irq_w)
 uint8_t segaxbd_state::analog_r()
 {
 	// on the write, latch the selected input port and stash the value
-	int which = (m_pc_0 >> 2) & 7;
+	const int which = (m_pc_0 >> 2) & 7;
 	uint8_t value = m_adc_ports[which].read_safe(0x10);
 
 	// reverse some port values
@@ -526,7 +526,7 @@ void segaxbd_state::pd_0_w(uint8_t data)
 	// Output port:
 	//  D7: Amplifier mute control (1= sounding, 0= muted)
 	//  D6-D0: CN D pin A17-A23 (output level 1= high, 0= low) - usually set up as lamps and coincounter
-	machine().sound().system_enable(data & 0x80);
+	machine().sound().system_mute(!BIT(data, 7));
 
 	generic_iochip0_lamps_w(data);
 }
@@ -537,7 +537,7 @@ void segaxbd_state::pd_0_w(uint8_t data)
 //  port
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaxbd_state::iocontrol_w )
+void segaxbd_state::iocontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -558,7 +558,7 @@ WRITE16_MEMBER( segaxbd_state::iocontrol_w )
 //  writes to this address for Line of Fire
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaxbd_state::loffire_sync0_w )
+void segaxbd_state::loffire_sync0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_loffire_sync[offset]);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
@@ -570,7 +570,7 @@ WRITE16_MEMBER( segaxbd_state::loffire_sync0_w )
 //  Super Monaco GP
 //-------------------------------------------------
 
-READ16_MEMBER( segaxbd_state::smgp_excs_r )
+uint16_t segaxbd_state::smgp_excs_r(offs_t offset)
 {
 	//logerror("%06X:smgp_excs_r(%04X)\n", m_maincpu->pc(), offset*2);
 	return 0xffff;
@@ -582,7 +582,7 @@ READ16_MEMBER( segaxbd_state::smgp_excs_r )
 //  Super Monaco GP
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaxbd_state::smgp_excs_w )
+void segaxbd_state::smgp_excs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//logerror("%06X:smgp_excs_w(%04X) = %04X & %04X\n", m_maincpu->pc(), offset*2, data, mem_mask);
 }
@@ -597,7 +597,7 @@ WRITE16_MEMBER( segaxbd_state::smgp_excs_w )
 //  device_timer - handle device timers
 //-------------------------------------------------
 
-void segaxbd_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void segaxbd_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -721,7 +721,7 @@ void segaxbd_state::smgp_motor_w(uint8_t data)
 //  dual-port communications RAM for Royal Ascot
 //-------------------------------------------------
 
-READ8_MEMBER(segaxbd_rascot_state::commram_r)
+uint8_t segaxbd_rascot_state::commram_r(offs_t offset)
 {
 	return m_commram->right_r(m_commram_bank << 3 | offset);
 }
@@ -732,7 +732,7 @@ READ8_MEMBER(segaxbd_rascot_state::commram_r)
 //  dual-port communications RAM for Royal Ascot
 //-------------------------------------------------
 
-WRITE8_MEMBER(segaxbd_rascot_state::commram_w)
+void segaxbd_rascot_state::commram_w(offs_t offset, uint8_t data)
 {
 	m_commram->right_w(m_commram_bank << 3 | offset, data);
 }
@@ -743,7 +743,7 @@ WRITE8_MEMBER(segaxbd_rascot_state::commram_w)
 //  of 8 bytes
 //-------------------------------------------------
 
-WRITE8_MEMBER(segaxbd_rascot_state::commram_bank_w)
+void segaxbd_rascot_state::commram_bank_w(uint8_t data)
 {
 	m_commram_bank = data;
 }
@@ -767,7 +767,7 @@ uint8_t segaxbd_state::lastsurv_port_r()
 
 void segaxbd_state::lastsurv_muxer_w(uint8_t data)
 {
-	machine().sound().system_enable(data & 0x80);
+	machine().sound().system_mute(!BIT(data, 7));
 
 	m_lastsurv_mux = (data >> 5) & 3;
 	generic_iochip0_lamps_w(data & 0x9f);
@@ -889,7 +889,7 @@ void segaxbd_state::palette_init()
 //  paletteram_w - handle writes to palette RAM
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaxbd_state::paletteram_w )
+void segaxbd_state::paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// compute the number of entries
 	if (m_palette_entries == 0)
@@ -4665,7 +4665,7 @@ void segaxbd_state::install_loffire(void)
 	m_adc_reverse[1] = m_adc_reverse[3] = true;
 
 	// install sync hack on core shared memory
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x29c000, 0x29c011, write16_delegate(*this, FUNC(segaxbd_state::loffire_sync0_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x29c000, 0x29c011, write16s_delegate(*this, FUNC(segaxbd_state::loffire_sync0_w)));
 	m_loffire_sync = m_subram0;
 }
 
@@ -4678,7 +4678,8 @@ void segaxbd_new_state::init_loffire()
 void segaxbd_state::install_smgp(void)
 {
 	// map /EXCS space
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2f0000, 0x2f3fff, read16_delegate(*this, FUNC(segaxbd_state::smgp_excs_r)), write16_delegate(*this, FUNC(segaxbd_state::smgp_excs_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2f0000, 0x2f3fff, read16sm_delegate(*this, FUNC(segaxbd_state::smgp_excs_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x2f0000, 0x2f3fff, write16s_delegate(*this, FUNC(segaxbd_state::smgp_excs_w)));
 }
 
 void segaxbd_new_state::init_smgp()

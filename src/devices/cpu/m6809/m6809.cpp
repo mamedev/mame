@@ -104,7 +104,6 @@ March 2013 NPW:
 *****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "m6809.h"
 #include "m6809inl.h"
 #include "6x09dasm.h"
@@ -616,7 +615,7 @@ mc6809_device::mc6809_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 
 mc6809e_device::mc6809e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: m6809_base_device(mconfig, tag, owner, clock, MC6809E, 1)
+	: m6809_base_device(mconfig, tag, owner, clock, MC6809E, 1)
 {
 }
 

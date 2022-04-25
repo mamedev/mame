@@ -225,8 +225,8 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "sound/ymopl.h"
 #include "video/decospr.h"
 #include "emupal.h"
 #include "screen.h"
@@ -273,14 +273,14 @@ private:
 	required_shared_ptr_array<uint16_t, 2> m_vram;
 
 	/* video-related */
-	tilemap_t  *m_tilemap[2];
+	tilemap_t  *m_tilemap[2]{};
 	std::unique_ptr<bitmap_ind16> m_pixmap;
 
 	/* misc */
-	uint8_t m_prot_val;
-	uint8_t m_input_data;
-	uint8_t m_priority_reg;
-	uint8_t m_gfx_bank;
+	uint8_t m_prot_val = 0;
+	uint8_t m_input_data = 0;
+	uint8_t m_priority_reg = 0;
+	uint8_t m_gfx_bank = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -315,7 +315,7 @@ uint8_t nmg5_state::pixmap_r(offs_t offset)
 	int const sy = offset >> 8;
 	int const sx = (offset & 0xff) << 1;
 
-	return ((m_pixmap->pix16(sy & 0xff, sx & ~1) & 0xf) << 4) | (m_pixmap->pix16(sy & 0xff, sx |  1) & 0xf);
+	return ((m_pixmap->pix(sy & 0xff, sx & ~1) & 0xf) << 4) | (m_pixmap->pix(sy & 0xff, sx |  1) & 0xf);
 }
 
 void nmg5_state::pixmap_w(offs_t offset, uint8_t data)
@@ -323,8 +323,8 @@ void nmg5_state::pixmap_w(offs_t offset, uint8_t data)
 	int const sy = offset >> 8;
 	int const sx = (offset & 0xff) << 1;
 
-	m_pixmap->pix16(sy & 0xff, sx & ~1) = 0x300 + ((data & 0xf0) >> 4);
-	m_pixmap->pix16(sy & 0xff, sx |  1) = 0x300 + (data & 0x0f);
+	m_pixmap->pix(sy & 0xff, sx & ~1) = 0x300 + ((data & 0xf0) >> 4);
+	m_pixmap->pix(sy & 0xff, sx |  1) = 0x300 + (data & 0x0f);
 }
 
 template<int Layer>

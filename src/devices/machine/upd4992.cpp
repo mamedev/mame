@@ -38,6 +38,7 @@ upd4992_device::upd4992_device(const machine_config &mconfig, const char *tag, d
 	, device_rtc_interface(mconfig, *this)
 	, m_timer_clock(nullptr)
 {
+	std::fill(std::begin(m_rtc_regs), std::end(m_rtc_regs), 0);
 }
 
 
@@ -62,7 +63,7 @@ void upd4992_device::device_start()
 }
 
 
-void upd4992_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void upd4992_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

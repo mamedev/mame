@@ -2,6 +2,10 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0
+
+General usage instructions: Keep pressing Ctrl until you get the choice of Yes or No.
+Press left-arrow to choose Yes. Press Ctrl. Press M so that GAME flashes. Press Ctrl and the game will start.
+
 -->
 
 <softwarelist name="svmu" description="Sega Visual Memory Unit quickloads">
@@ -257,7 +261,622 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-
-
 <!-- Samples from the Katana SDK -->
+
+	<software name="5pin">
+		<description>5 Pin Bowling Game</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="12800">
+				<rom name="5 Pin Bowling Game.vms" size="12800" crc="be9f0b22" sha1="8296c596af730f23ef92df10325b1d47ca251c7c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adv">
+		<description>Adventure VMU</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="11776">
+				<rom name="Adventure VMU.vms" size="11776" crc="adb69a7d" sha1="536491c4f328e919dc8602de5eb7a490ccacf017"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alienf">
+		<description>Alien Fighter</description>
+		<year>200?</year>
+		<publisher>Soren Gust</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="45056">
+				<rom name="Alien Fighter.vms" size="45056" crc="9024dc10" sha1="11ee72e77fc4535794d5ecdff72c905afbf0a455"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aliens">
+		<description>Alien Shooter</description>
+		<year>200?</year>
+		<publisher>Dream Machine</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="21504">
+				<rom name="Alien Shooter.vms" size="21504" crc="ca41dfc6" sha1="a161443ee946c489926e5c59a41c61f684cb6ff1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bask">
+		<description>Basketball</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="9216">
+				<rom name="Basketball.vms" size="9216" crc="8e79cf4d" sha1="73ca5f58115ca74c01d78f395525ebc312caa47d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bounce">
+		<description>Bounce</description>
+		<year>200?</year>
+		<publisher>John Maushammer</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="3584">
+				<rom name="Bounce.vms" size="3584" crc="5d153a61" sha1="323782bf9d084eeab808ccc96e5ae0d632cadcb7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dcanim2">
+		<description>DC Anim v2.0</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="4608">
+				<rom name="DC Anim v2.0.vms" size="4608" crc="d0e8f5da" sha1="e0dc1f73391a4192d244bbf0a526fd5e91e95f8f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="direct">
+		<description>DirectVMS Start Rom</description>
+		<year>2000</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="1536">
+				<rom name="DirectVMS Start Rom.vms" size="1536" crc="d15c1881" sha1="8c32f73c270aff4876e9fb02c688b637860c32d0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dream">
+		<description>Dream Racer</description>
+		<year>200?</year>
+		<publisher>Dream Machine</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="22016">
+				<rom name="Dream Racer.vms" size="22016" crc="a0c111fe" sha1="c6b9b3f5b03bdc25bef53d580e5a79b45adc8e6c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fat">
+		<description>Fat Rain</description>
+		<year>2000</year>
+		<publisher>Inutero</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="9960">
+				<rom name="Fat Rain.vms" size="9960" crc="71e31666" sha1="1f1b37c01f35a9636884f375683b87f98c44d8af"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="freak">
+		<description>Freak Skater 2</description>
+		<year>2000</year>
+		<publisher>Freakware</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="28672">
+				<rom name="Freak Skater 2.vms" size="28672" crc="e84c206d" sha1="6ea7abd21a948a7069ff4b2b17fe2bb60a457293"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frog">
+		<description>Frog In A Blender</description>
+		<year>200?</year>
+		<publisher>Dreamcast Domain</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="15872">
+				<rom name="Frog In A Blender.vms" size="15872" crc="49b78d5b" sha1="e6adf38d8ec7fdb29145280a15e73ac77f702a73"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="glucky">
+		<description>Glucky Laby</description>
+		<year>2000</year>
+		<publisher>Inutero</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="33751">
+				<rom name="Glucky Laby.vms" size="33751" crc="e8dc8756" sha1="729ce23b12b02c112a548ffb9be919ae0922a1ec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guess">
+		<description>Guess The Square</description>
+		<year>200?</year>
+		<publisher>JW</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="9216">
+				<rom name="Guess The Square.vms" size="9216" crc="d4e0ed98" sha1="e481ec92bd81dc05813a6cee4cd8e34eb791014e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jim">
+		<description>Jim Light</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="18432">
+				<rom name="Jim Light.vms" size="18432" crc="a0bf3280" sha1="60bce91e4dcada1818336b0c187210a9acba6548"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jims">
+		<description>Jims Bowling</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="23552">
+				<rom name="Jims Bowling.vms" size="23552" crc="7f49f088" sha1="a57a9c0a8a76f0336adfca40ce1e78a79ba6271f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jojo">
+		<description>Jojo's Problem</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="7680">
+				<rom name="Jojo's Problem.vms" size="7680" crc="6a05fb01" sha1="d8db51780ff9eff0ee062c967e9ee65179f7c51e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="killem">
+		<description>Kill Em All</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="7680">
+				<rom name="Kill Em All.vms" size="7680" crc="658b821b" sha1="8cf80899f3eb073bdf6f05d595f647645710b37b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="killh">
+		<description>Kill Hyman 3</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="20480">
+				<rom name="Kill Hyman 3.vms" size="20480" crc="7a78bef0" sha1="47291fe428c5cd3ae10b3c20024f912032074eb4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="light">
+		<description>Lightsaber Battle</description>
+		<year>200?</year>
+		<publisher>Ryan J</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="13312">
+				<rom name="Lightsaber Battle.vms" size="13312" crc="42ac9d6e" sha1="4eae9d717987bb7e4b37a5941ae4604e27d32f68"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magic">
+		<description>Magic 8-Ball</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="6144">
+				<rom name="Magic 8-Ball.vms" size="6144" crc="6549d5a4" sha1="27438bcd6baff836d5ecd32887d716a622ab6c37"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="metal">
+		<description>Metal Gear Stealth</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="20480">
+				<rom name="Metal Gear Stealth.vms" size="20480" crc="26a5c318" sha1="218153ff6522e235c02e2c68f7f84b35cc169de2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mines">
+		<description>Minesweeper</description>
+		<year>200?</year>
+		<publisher>Soren Gust</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="5632">
+				<rom name="Minesweeper.vms" size="5632" crc="d099c6ee" sha1="1b1bec0642e16aae531e3cb8565b45ea69ce2f24"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mini">
+		<description>Mini Racer</description>
+		<year>200?</year>
+		<publisher>Mad Mat</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="29696">
+				<rom name="Mini Racer.vms" size="29696" crc="b3c46a8b" sha1="7b15b18a6a00e150515900ab4ea5d61265656545"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="muddy">
+		<description>Muddy Says</description>
+		<year>200?</year>
+		<publisher>Muddy</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="12288">
+				<rom name="Muddy Says.vms" size="12288" crc="078ad8ef" sha1="6459306cd885798840b76493c14d60c4eb28e502"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="paper">
+		<description>Paper Attack</description>
+		<year>2000</year>
+		<publisher>Inutero</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="9310">
+				<rom name="Paper Attack.vms" size="9310" crc="d7b33182" sha1="579b8fd417634cdd8eca244f950829aa9d6bd146"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pong">
+		<description>Pong Beta</description>
+		<year>200?</year>
+		<publisher>John Maushammer</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="3584">
+				<rom name="Pong Beta.vms" size="3584" crc="40e8a4fd" sha1="0defe53f777525d804a1247647b9681f1aac63ec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puzzle">
+		<description>Puzzle</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="3584">
+				<rom name="Puzzle.vms" size="3584" crc="b0b3abb2" sha1="ce2f6e0e77c762e484f4ed89d246dc12b5024572"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qte">
+		<description>Quick Time Events</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="12288">
+				<rom name="QTE.vms" size="12288" crc="17a314d5" sha1="0523dc74751675b51aa796a6cf13b29f33a85d6e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rainbow">
+		<description>Rainbow 6</description>
+		<year>200?</year>
+		<publisher>Ryan</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="16384">
+				<rom name="Rainbow 6.vms" size="16384" crc="33f1976e" sha1="7d8c86f52183b3e08ba7603ee9ea569daa4c4b31"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="raining">
+		<description>Raining Squares</description>
+		<year>200?</year>
+		<publisher>Sebastian Mihai</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="3072">
+				<rom name="rainingsquares.vms" size="3072" crc="cc0c6a9d" sha1="aaaffc81b1186d230f9750a62b35774fb2e35565"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="revenge">
+		<description>Revenge</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="23552">
+				<rom name="Revenge.vms" size="23552" crc="73433490" sha1="ae850eba28ba5962053c58a7d15b69019cee607c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sample">
+		<description>Sample</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="17408">
+				<rom name="Sample.vms" size="17408" crc="d6a740a9" sha1="c519adfc96038e5eb87135ae3ce209b1fb7a8f88"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scroll">
+		<description>Scroll Demo</description>
+		<year>2000</year>
+		<publisher>Virtua MUnstaz</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="3584">
+				<rom name="Scroll Demo.vms" size="3584" crc="b5fc1205" sha1="bb78f704b2d22ed458172f2616d8a068d191591f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shell">
+		<description>Shell Game</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="17920">
+				<rom name="Shell Game.vms" size="17920" crc="f6e47049" sha1="16e677510c09712ab1872a934186a307e7f13bdc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simon">
+		<description>Simon</description>
+		<year>200?</year>
+		<publisher>Bryan</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="20992">
+				<rom name="Simon.vms" size="20992" crc="98bd6f15" sha1="0a6282e684f67f5ac0bf060fcb873340d2f099e4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sniper">
+		<description>Sniper</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="14848">
+				<rom name="Sniper.vms" size="14848" crc="6c88a1ea" sha1="e6300c888bb658a714df83bbf846a3bc3c893d4b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="star">
+		<description>Star Wars</description>
+		<year>200?</year>
+		<publisher>J Bryan</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="13312">
+				<rom name="Star Wars.vms" size="13312" crc="1aeb87ba" sha1="580ae5ac7208b4506ef370d7f94d3b6a314053e9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="super">
+		<description>Supercross VMU</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="14336">
+				<rom name="Supercross VMU.vms" size="14336" crc="5a940864" sha1="bc3a79095314e309a55157a87eae39fca3a0a3d5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swampy">
+		<description>Swampy</description>
+		<year>2000</year>
+		<publisher>Inuendo</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="9061">
+				<rom name="Swampy.vms" size="9061" crc="21b6bba1" sha1="50a8bfe9d1c7c80da4beec8c70e68a5132d73d6d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris">
+		<description>Tetris</description>
+		<year>200?</year>
+		<publisher>Marcus Comstedt</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="3584">
+				<rom name="Tetris.vms" size="3584" crc="dd3b31c1" sha1="f5f811edbff70361df8fdc2b7c4654478806ca41"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timec">
+		<description>Time Crisis</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="17920">
+				<rom name="Time Crisis.vms" size="17920" crc="f974ab81" sha1="df3b8e22657676cc9aacca9020ad6e802deed279"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="times">
+		<description>Time Shooter</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="23552">
+				<rom name="Time Shooter.vms" size="23552" crc="583e6a02" sha1="b18472d70b7f5dd974f03ea9c8d861aa269623c4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="until">
+		<description>Until Death</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="5632">
+				<rom name="Until Death.vms" size="5632" crc="09da457e" sha1="9db47cadf266a4522705676505a773c5a3af709a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="teacher">
+		<description>Virtual Teacher</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="7168">
+				<rom name="Virtual Teacher.vms" size="7168" crc="5b134400" sha1="5495c0c7602024266cdd4ba2401bb79b22f6ed58"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sketch">
+		<description>VM-a-Sketch</description>
+		<year>200?</year>
+		<publisher>RAMTronics</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="2048">
+				<rom name="VM-a-Sketch.vms" size="2048" crc="71565ae5" sha1="4d483e4ecc9ccabd7243f05ad136f99909e2ff7b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sketchb">
+		<description>VM-a-Sketch Beta v1.4</description>
+		<year>200?</year>
+		<publisher>RAMTronics</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="2048">
+				<rom name="VM-a-Sketch Beta.vms" size="2048" crc="8a1f08ad" sha1="30bc22bb652fdb59b500a10991cdcfbdca1af775"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boxing">
+		<description>VMU Boxing</description>
+		<year>200?</year>
+		<publisher>VM Team 1</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="23552">
+				<rom name="VMU Boxing.vms" size="23552" crc="cf268c13" sha1="79e00e6eb3643c2fd24624a3bb949a8f757cd41f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dice">
+		<description>VMU Dice</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="6144">
+				<rom name="VMU Dice.vms" size="6144" crc="566fc06c" sha1="ccf481e830d3504721da0ca8f5f40d1798df51fc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fighter">
+		<description>VMU Fighter v1.4</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="17920">
+				<rom name="VMU Fighter.vms" size="17920" crc="5e23c893" sha1="a01d163e8fe2811a670e7f5ea5c6199d9b336ae2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacman">
+		<description>VMU Mini Pacman</description>
+		<year>200?</year>
+		<publisher>Alessandro Sanasi</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="34304">
+				<rom name="VMU Mini Pacman.vms" size="34304" crc="45f0c57a" sha1="dc9463f4d4926fad07195e4501992ac2c7c9ba2e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="racer">
+		<description>VMU Racer</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="20480">
+				<rom name="VMU Racer.vms" size="20480" crc="2bbd5c42" sha1="d5be68d996208bd431e7512570c91a7dfbd30ff9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vision">
+		<description>VMU Vision</description>
+		<year>200?</year>
+		<publisher>Alessandro Sanasi</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="7680">
+				<rom name="VMU Vision.vms" size="7680" crc="52b6c4a1" sha1="0e8c68f3917c107c7c396c380567cbf8ce5c4fb8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="player">
+		<description>VMUV Player 001</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="28672">
+				<rom name="VMUV Player 001.vms" size="28672" crc="5022c789" sha1="b883a154db78df0979b31e838baff434b8670927"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winvmsr">
+		<description>WinVMS Rain</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="2048">
+				<rom name="WinVMS Rain.vms" size="2048" crc="6576b06f" sha1="0e3684b250540ea3a0d19873540d0d314fad6f9b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winvms">
+		<description>WinVMS Start Rom</description>
+		<year>2000</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="1536">
+				<rom name="WinVMS Start Rom.vms" size="1536" crc="e0aca19f" sha1="4190baf8e7afd929f370ad58838c9e31c1f46ed4"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

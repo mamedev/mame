@@ -17,21 +17,21 @@ public:
 	// so that we can filter logging, sound ALU gets used hundreds of times a frame, so logging it is unwise
 	void set_sound_alu() { m_is_sound_alu = true; }
 
-	DECLARE_READ8_MEMBER(alu_out_1_r);
-	DECLARE_READ8_MEMBER(alu_out_2_r);
-	DECLARE_READ8_MEMBER(alu_out_3_r);
-	DECLARE_READ8_MEMBER(alu_out_4_r);
-	DECLARE_READ8_MEMBER(alu_out_5_r);
-	DECLARE_READ8_MEMBER(alu_out_6_r);
+	uint8_t alu_out_1_r();
+	uint8_t alu_out_2_r();
+	uint8_t alu_out_3_r();
+	uint8_t alu_out_4_r();
+	uint8_t alu_out_5_r();
+	uint8_t alu_out_6_r();
 
-	DECLARE_WRITE8_MEMBER(alu_oprand_1_w);
-	DECLARE_WRITE8_MEMBER(alu_oprand_2_w);
-	DECLARE_WRITE8_MEMBER(alu_oprand_3_w);
-	DECLARE_WRITE8_MEMBER(alu_oprand_4_w);
-	DECLARE_WRITE8_MEMBER(alu_oprand_5_mult_w);
-	DECLARE_WRITE8_MEMBER(alu_oprand_6_mult_w);
-	DECLARE_WRITE8_MEMBER(alu_oprand_5_div_w);
-	DECLARE_WRITE8_MEMBER(alu_oprand_6_div_w);
+	void alu_oprand_1_w(uint8_t data);
+	void alu_oprand_2_w(uint8_t data);
+	void alu_oprand_3_w(uint8_t data);
+	void alu_oprand_4_w(uint8_t data);
+	void alu_oprand_5_mult_w(uint8_t data);
+	void alu_oprand_6_mult_w(uint8_t data);
+	void alu_oprand_5_div_w(uint8_t data);
+	void alu_oprand_6_div_w(uint8_t data);
 
 
 protected:
@@ -39,7 +39,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	bool m_is_sound_alu;
+	bool m_is_sound_alu = false;
 
 	uint8_t m_alu_oprand[4];
 	uint8_t m_alu_oprand_mult[2];

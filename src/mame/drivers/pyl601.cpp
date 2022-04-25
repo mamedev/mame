@@ -2,23 +2,23 @@
 // copyright-holders:Miodrag Milanovic, Robbbert
 /***************************************************************************
 
-        Pyldin-601
+Pyldin-601
 
-        12/05/2009 Skeleton driver.
-        22/04/2012 Added sound, fixed keyboard, marked as working [Robbbert]
+2009-05-12 Skeleton driver.
+2012-04-22 Added sound, fixed keyboard, marked as working [Robbbert]
 
-        ToDo?
-        - PYL601 - command 'MODE80' does nothing
+ToDo?
+- PYL601 - command 'MODE80' does nothing
 
-        - PYL601a - most software looks odd (unplayable) because of the
-          different design of the screen.
-        - PYL601A - command 'MODE40' doesn't go to 40-columns, instead
-          there is a space between each letter.
+- PYL601a - most software looks odd (unplayable) because of the
+            different design of the screen.
+- PYL601A - command 'MODE40' doesn't go to 40-columns, instead
+            there is a space between each letter.
 
 
-        The BASIC
-        - to get back to dos, enter SYSTEM
-        - It has its own internal monitor: MON to enter, Q to exit.
+The BASIC
+- to get back to dos, enter SYSTEM
+- It has its own internal monitor: MON to enter, Q to exit.
 
 
 
@@ -44,7 +44,7 @@
 #include "video/mc6845.h"
 
 #include "emupal.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -54,14 +54,14 @@
 class pyl601_state : public driver_device
 {
 public:
-	pyl601_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_speaker(*this, "speaker"),
-		m_fdc(*this, "upd765"),
-		m_floppy(*this, "upd765:%u", 0U),
-		m_ram(*this, RAM_TAG),
-		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette")
+	pyl601_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_speaker(*this, "speaker")
+		, m_fdc(*this, "upd765")
+		, m_floppy(*this, "upd765:%u", 0U)
+		, m_ram(*this, RAM_TAG)
+		, m_maincpu(*this, "maincpu")
+		, m_palette(*this, "palette")
 	{ }
 
 	void pyl601(machine_config &config);
@@ -92,16 +92,16 @@ private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	INTERRUPT_GEN_MEMBER(pyl601_interrupt);
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 	void mem_map(address_map &map);
 
-	uint8_t m_rom_page;
-	uint32_t m_vdisk_addr;
-	uint8_t m_key_code;
-	uint8_t m_keyboard_clk;
-	uint8_t m_video_mode;
-	uint8_t m_tick50_mark;
-	uint8_t m_floppy_ctrl;
+	uint8_t m_rom_page = 0U;
+	uint32_t m_vdisk_addr = 0U;
+	uint8_t m_key_code = 0U;
+	uint8_t m_keyboard_clk = 0U;
+	uint8_t m_video_mode = 0U;
+	uint8_t m_tick50_mark = 0U;
+	uint8_t m_floppy_ctrl = 0U;
 
 	required_device<speaker_sound_device> m_speaker;
 	required_device<upd765a_device> m_fdc;
@@ -286,7 +286,7 @@ void pyl601_state::mem_map(address_map &map)
 	map(0xe6d0, 0xe6d1).m(m_fdc, FUNC(upd765a_device::map));
 	map(0xe6f0, 0xe6f0).rw(FUNC(pyl601_state::rom_page_r), FUNC(pyl601_state::rom_page_w));
 	map(0xe700, 0xefff).bankrw("bank4");
-	map(0xf000, 0xffff).bankr("bank5").bankw("bank6");
+	map(0xf000, 0xffff).rom().region("maincpu",0).bankw("bank6");
 }
 
 /* Input ports */
@@ -395,7 +395,6 @@ void pyl601_state::machine_reset()
 	membank("bank2")->set_base(ram + 0xc000);
 	membank("bank3")->set_base(ram + 0xe000);
 	membank("bank4")->set_base(ram + 0xe700);
-	membank("bank5")->set_base(memregion("maincpu")->base());
 	membank("bank6")->set_base(ram + 0xf000);
 
 	m_maincpu->reset();
@@ -414,27 +413,26 @@ void pyl601_state::machine_start()
 
 MC6845_UPDATE_ROW( pyl601_state::pyl601_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t *charrom = memregion("chargen")->base();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint8_t const *const charrom = memregion("chargen")->base();
 
-	int column, bit, i;
-	uint8_t data;
 	if (BIT(m_video_mode, 5) == 0)
 	{
-		for (column = 0; column < x_count; column++)
+		for (int column = 0; column < x_count; column++)
 		{
 			uint8_t code = m_ram->pointer()[(((ma + column) & 0x0fff) + 0xf000)];
 			code = ((code << 1) | (code >> 7)) & 0xff;
+			uint8_t data;
 			if (column == cursor_x-2)
 				data = 0xff;
 			else
 				data = charrom[((code << 3) | (ra & 0x07)) & 0x7ff];
 
-			for (bit = 0; bit < 8; bit++)
+			for (int bit = 0; bit < 8; bit++)
 			{
 				int x = (column * 8) + bit;
 
-				bitmap.pix32(y, x) = palette[BIT(data, 7)];
+				bitmap.pix(y, x) = palette[BIT(data, 7)];
 
 				data <<= 1;
 			}
@@ -442,12 +440,12 @@ MC6845_UPDATE_ROW( pyl601_state::pyl601_update_row )
 	}
 	else
 	{
-		for (i = 0; i < x_count; i++)
+		for (int i = 0; i < x_count; i++)
 		{
-			data = m_ram->pointer()[(((ma + i) << 3) | (ra & 0x07)) & 0xffff];
-			for (bit = 0; bit < 8; bit++)
+			uint8_t data = m_ram->pointer()[(((ma + i) << 3) | (ra & 0x07)) & 0xffff];
+			for (int bit = 0; bit < 8; bit++)
 			{
-				bitmap.pix32(y, (i * 8) + bit) = palette[BIT(data, 7)];
+				bitmap.pix(y, (i * 8) + bit) = palette[BIT(data, 7)];
 				data <<= 1;
 			}
 		}
@@ -456,25 +454,23 @@ MC6845_UPDATE_ROW( pyl601_state::pyl601_update_row )
 
 MC6845_UPDATE_ROW( pyl601_state::pyl601a_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t *charrom = memregion("chargen")->base();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint8_t const *const charrom = memregion("chargen")->base();
 
-	int column, bit, i;
-	uint8_t data;
 	if (BIT(m_video_mode, 5) == 0)
 	{
-		for (column = 0; column < x_count; column++)
+		for (int column = 0; column < x_count; column++)
 		{
-			uint8_t code = m_ram->pointer()[(((ma + column) & 0x0fff) + 0xf000)];
-			data = charrom[((code << 4) | (ra & 0x07)) & 0xfff];
+			uint8_t const code = m_ram->pointer()[(((ma + column) & 0x0fff) + 0xf000)];
+			uint8_t data = charrom[((code << 4) | (ra & 0x07)) & 0xfff];
 			if (column == cursor_x)
 				data = 0xff;
 
-			for (bit = 0; bit < 8; bit++)
+			for (int bit = 0; bit < 8; bit++)
 			{
-				int x = (column * 8) + bit;
+				int const x = (column * 8) + bit;
 
-				bitmap.pix32(y, x) = palette[BIT(data, 7)];
+				bitmap.pix(y, x) = palette[BIT(data, 7)];
 
 				data <<= 1;
 			}
@@ -482,12 +478,12 @@ MC6845_UPDATE_ROW( pyl601_state::pyl601a_update_row )
 	}
 	else
 	{
-		for (i = 0; i < x_count; i++)
+		for (int i = 0; i < x_count; i++)
 		{
-			data = m_ram->pointer()[(((ma + i) << 3) | (ra & 0x07)) & 0xffff];
-			for (bit = 0; bit < 8; bit++)
+			uint8_t data = m_ram->pointer()[(((ma + i) << 3) | (ra & 0x07)) & 0xffff];
+			for (int bit = 0; bit < 8; bit++)
 			{
-				bitmap.pix32(y, (i * 8) + bit) = palette[BIT(data, 7)];
+				bitmap.pix(y, (i * 8) + bit) = palette[BIT(data, 7)];
 				data <<= 1;
 			}
 		}
@@ -507,9 +503,11 @@ INTERRUPT_GEN_MEMBER(pyl601_state::pyl601_interrupt)
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
-FLOPPY_FORMATS_MEMBER( pyl601_state::floppy_formats )
-	FLOPPY_PYLDIN_FORMAT
-FLOPPY_FORMATS_END
+void pyl601_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_PYLDIN_FORMAT);
+}
 
 static void pyl601_floppies(device_slot_interface &device)
 {

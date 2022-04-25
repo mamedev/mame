@@ -67,107 +67,44 @@ license:CC0
 		</text>
 	</element>
 	<element name="vfd0">
-	<led14segsc>
+		<led14segsc>
 			<color red="0" green="0.6" blue="1.0" />
-	</led14segsc>
+		</led14segsc>
 	</element>
 
-	<view name="Adder and Lamps">
-		<bezel name="lamp0" element="p1start">
-			<bounds x="145" y="280" width="28" height="14" />
-		</bezel>
-		<bezel name="lamp1" element="p2start">
-			<bounds x="180" y="280" width="28" height="14" />
-		</bezel>
-		<bezel name="lamp3" element="a">
-			<bounds x="215" y="280" width="28" height="14" />
-		</bezel>
-		<bezel name="lamp4" element="b">
-			<bounds x="250" y="280" width="28" height="14" />
-		</bezel>
-		<bezel name="lamp5" element="c">
-			<bounds x="285" y="280" width="28" height="14" />
-		</bezel>
-		<bezel name="lamp7" element="enter">
-			<bounds x="320" y="280" width="28" height="14" />
-		</bezel>
-		<bezel name="door" element="door0">
-			<bounds x="370" y="280" width="28" height="14" />
-		</bezel>
-		<screen index="0">
-			<bounds x="0" y="0" width="400" height="280" />
-		</screen>
-	</view>
-	<view name="Adder,VFD and Lamps">
-		<bezel name="lamp0" element="p1start">
-			<bounds x="145" y="280" width="28" height="14" />
-		</bezel>
-		<bezel name="lamp1" element="p2start">
-			<bounds x="180" y="280" width="28" height="14" />
-		</bezel>
-		<bezel name="lamp3" element="a">
-			<bounds x="215" y="280" width="28" height="14" />
-		</bezel>
-		<bezel name="lamp4" element="b">
-			<bounds x="250" y="280" width="28" height="14" />
-		</bezel>
-		<bezel name="lamp5" element="c">
-			<bounds x="285" y="280" width="28" height="14" />
-		</bezel>
-		<bezel name="lamp7" element="enter">
-			<bounds x="320" y="280" width="28" height="14" />
-		</bezel>
-		<bezel name="door" element="door0">
-			<bounds x="370" y="280" width="28" height="14" />
-		</bezel>
-		<bezel name="vfd0" element="vfd0" state="0">
-			<bounds x="0" y="280" width="9" height="14"/>
-		</bezel>
-		<bezel name="vfd1" element="vfd0" state="0">
-			<bounds x="9" y="280" width="9" height="14"/>
-		</bezel>
-		<bezel name="vfd2" element="vfd0" state="0">
-			<bounds x="18" y="280" width="9" height="14"/>
-		</bezel>
-		<bezel name="vfd3" element="vfd0" state="0">
-			<bounds x="27" y="280" width="9" height="14"/>
-		</bezel>
-		<bezel name="vfd4" element="vfd0" state="0">
-			<bounds x="36" y="280" width="9" height="14"/>
-		</bezel>
-		<bezel name="vfd5" element="vfd0" state="0">
-			<bounds x="45" y="280" width="9" height="14"/>
-		</bezel>
-		<bezel name="vfd6" element="vfd0" state="0">
-			<bounds x="54" y="280" width="9" height="14"/>
-		</bezel>
-		<bezel name="vfd7" element="vfd0" state="0">
-			<bounds x="63" y="280" width="9" height="14"/>
-		</bezel>
-		<bezel name="vfd8" element="vfd0" state="0">
-			<bounds x="72" y="280" width="9" height="14"/>
-		</bezel>
-		<bezel name="vfd9" element="vfd0" state="0">
-			<bounds x="81" y="280" width="9" height="14"/>
-		</bezel>
-		<bezel name="vfd10" element="vfd0" state="0">
-			<bounds x="90" y="280" width="9" height="14"/>
-		</bezel>
-		<bezel name="vfd11" element="vfd0" state="0">
-			<bounds x="99" y="280" width="9" height="14"/>
-		</bezel>
-		<bezel name="vfd12" element="vfd0" state="0">
-			<bounds x="108" y="280" width="9" height="14"/>
-		</bezel>
-		<bezel name="vfd13" element="vfd0" state="0">
-			<bounds x="117" y="280" width="9" height="14"/>
-		</bezel>
-		<bezel name="vfd14" element="vfd0" state="0">
-			<bounds x="126" y="280" width="9" height="14"/>
-		</bezel>
-		<bezel name="vfd15" element="vfd0" state="0">
-			<bounds x="135" y="280" width="9" height="14"/>
-		</bezel>
+	<view name="Adder, VFD and Lamps">
+		<collection name="Lamps">
+			<element name="lamp0" ref="p1start">
+				<bounds x="145" y="280" width="28" height="14" />
+			</element>
+			<element name="lamp1" ref="p2start">
+				<bounds x="180" y="280" width="28" height="14" />
+			</element>
+			<element name="lamp3" ref="a">
+				<bounds x="215" y="280" width="28" height="14" />
+			</element>
+			<element name="lamp4" ref="b">
+				<bounds x="250" y="280" width="28" height="14" />
+			</element>
+			<element name="lamp5" ref="c">
+				<bounds x="285" y="280" width="28" height="14" />
+			</element>
+			<element name="lamp7" ref="enter">
+				<bounds x="320" y="280" width="28" height="14" />
+			</element>
+			<element name="door" ref="door0">
+				<bounds x="370" y="280" width="28" height="14" />
+			</element>
+		</collection>
+		<collection name="VFD" visible="no">
+			<repeat count="16">
+				<param name="n" start="0" increment="1" />
+				<param name="x" start="0" increment="9" />
+				<element name="vfd~n~" ref="vfd0" state="0">
+					<bounds x="~x~" y="280" width="9" height="14"/>
+				</element>
+			</repeat>
+		</collection>
 		<screen index="0">
 			<bounds x="0" y="0" width="400" height="280" />
 		</screen>

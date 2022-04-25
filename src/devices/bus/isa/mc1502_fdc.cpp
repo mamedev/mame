@@ -19,10 +19,6 @@
 
 DEFINE_DEVICE_TYPE(MC1502_FDC, mc1502_fdc_device, "mc1502_fdc", "MC-1502 floppy")
 
-FLOPPY_FORMATS_MEMBER( mc1502_fdc_device::floppy_formats )
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
-
 static void mc1502_floppies(device_slot_interface &device)
 {
 	device.option_add("525qd", FLOPPY_525_QD);
@@ -45,8 +41,8 @@ void mc1502_fdc_device::device_add_mconfig(machine_config &config)
 	FD1793(config, m_fdc, 16_MHz_XTAL / 16);
 	m_fdc->intrq_wr_callback().set(FUNC(mc1502_fdc_device::mc1502_fdc_irq_drq));
 	m_fdc->drq_wr_callback().set(FUNC(mc1502_fdc_device::mc1502_fdc_irq_drq));
-	FLOPPY_CONNECTOR(config, "fdc:0", mc1502_floppies, "525qd", mc1502_fdc_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", mc1502_floppies, "525qd", mc1502_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", mc1502_floppies, "525qd", floppy_image_device::default_pc_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", mc1502_floppies, "525qd", floppy_image_device::default_pc_floppy_formats);
 }
 
 //-------------------------------------------------

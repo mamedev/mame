@@ -242,7 +242,7 @@ void bubbles_state::cmos_w(offs_t offset, u8 data)
  *
  *************************************/
 
-WRITE8_MEMBER(williams_state::watchdog_reset_w)
+void williams_state::watchdog_reset_w(u8 data)
 {
 	/* yes, the data bits are checked for this specific value */
 	if (data == 0x39)
@@ -250,7 +250,7 @@ WRITE8_MEMBER(williams_state::watchdog_reset_w)
 }
 
 
-WRITE8_MEMBER(williams2_state::watchdog_reset_w)
+void williams2_state::watchdog_reset_w(u8 data)
 {
 	/* yes, the data bits are checked for this specific value */
 	if ((data & 0x3f) == 0x14)
@@ -378,6 +378,9 @@ void blaster_state::machine_start()
 	/* register for save states */
 	save_item(NAME(m_vram_bank));
 	save_item(NAME(m_rom_bank));
+
+	m_vram_bank = 0;
+	m_rom_bank = 0;
 }
 
 
@@ -508,16 +511,16 @@ TIMER_CALLBACK_MEMBER(joust2_state::deferred_snd_cmd_w)
 }
 
 
-WRITE_LINE_MEMBER(joust2_state::pia_3_cb1_w)
+WRITE_LINE_MEMBER(joust2_state::pia_s11_bg_strobe_w)
 {
 	m_current_sound_data = (m_current_sound_data & ~0x100) | ((state << 8) & 0x100);
-	m_cvsd_sound->write(m_current_sound_data);
+	m_bg->ctrl_w(state);
 }
 
 
 void joust2_state::snd_cmd_w(u8 data)
 {
 	m_current_sound_data = (m_current_sound_data & ~0xff) | (data & 0xff);
-	m_cvsd_sound->write(m_current_sound_data);
+	m_bg->data_w(data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(joust2_state::deferred_snd_cmd_w),this), m_current_sound_data);
 }

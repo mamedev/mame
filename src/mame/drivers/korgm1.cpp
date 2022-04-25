@@ -66,7 +66,7 @@ void korgm1_state::video_start()
 HD44780_PIXEL_UPDATE(korgm1_state::lcd_pixel_update)
 {
 	if (x < 5 && y < 8 && line < 2 && pos < 40)
-		bitmap.pix16(line * 8 + y, pos * 6 + x) = state;
+		bitmap.pix(line * 8 + y, pos * 6 + x) = state;
 }
 
 void korgm1_state::pio_pa_w(u8 data)
@@ -191,7 +191,7 @@ void korgm1_state::korgm1(machine_config &config)
 	V50(config, m_maincpu, 32_MHz_XTAL / 2); // µPD70216
 	m_maincpu->set_addrmap(AS_PROGRAM, &korgm1_state::korgm1_map);
 	m_maincpu->set_addrmap(AS_IO, &korgm1_state::korgm1_io);
-	m_maincpu->out_handler<2>().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
+	m_maincpu->tout2_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 2x µPD43256C-15L + battery
 

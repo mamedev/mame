@@ -23,7 +23,7 @@ Pasting:
 
 Example program: ("organ" from p82 of the manual)
 -F20=C4^0D^35^C4^00^31^C4^08^C8^F6^C5^01^E4^FF^98^08^8F^00^06^E4^07^07^90^EB^B8^E6^9C^EE^90^E5^-F20X
-Pressing keys will produces different tones.
+Pressing keys will produce different tones.
 
 
 TODO:
@@ -37,12 +37,12 @@ TODO:
 #include "imagedev/cassette.h"
 #include "machine/ins8154.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 #include "video/pwm.h"
 
 #include "mk14.lh"
 
+namespace {
 
 class mk14_state : public driver_device
 {
@@ -211,10 +211,6 @@ void mk14_state::mk14(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	ZN425E(config, "dac8", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // Ferranti ZN425E
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac8", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac8", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* devices */
 	ins8154_device &ic8(INS8154(config, "ic8"));
@@ -237,7 +233,7 @@ ROM_START( mk14 )
 	ROMX_LOAD( "scios_v1.bin", 0x0000, 0x0200, CRC(3d2477e7) SHA1(795829a2025e24d87a413e245d72a284f872e0db), ROM_BIOS(1))
 ROM_END
 
-/* Driver */
+} // Anonymous namespace
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                 FULLNAME  FLAGS
 COMP( 1977, mk14, 0,      0,      mk14,    mk14,  mk14_state, empty_init, "Science of Cambridge", "MK-14", MACHINE_SUPPORTS_SAVE )

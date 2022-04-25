@@ -61,11 +61,15 @@ public:
 	auto cb1_handler() { return m_cb1_handler.bind(); }
 	auto cb2_handler() { return m_cb2_handler.bind(); }
 
+	// from slot
 	DECLARE_WRITE_LINE_MEMBER(cb1_w) { m_cb1_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER(cb2_w) { m_cb2_handler(state); }
 
+	// from host
 	uint8_t pb_r();
 	void pb_w(uint8_t data);
+	void write_cb1(int state);
+	void write_cb2(int state);
 
 protected:
 	// device-level overrides
@@ -86,6 +90,8 @@ class device_bbc_joyport_interface : public device_interface
 public:
 	virtual uint8_t pb_r() { return 0xff; }
 	virtual void pb_w(uint8_t data) { }
+	virtual void write_cb1(int state) { }
+	virtual void write_cb2(int state) { }
 
 protected:
 	device_bbc_joyport_interface(const machine_config &mconfig, device_t &device);

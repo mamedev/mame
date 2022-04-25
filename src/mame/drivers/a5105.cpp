@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese, Robbbert
+// copyright-holders:Angelo Salese
 /***************************************************************************
 
 A5105
@@ -78,7 +78,7 @@ private:
 	void pcg_addr_w(uint8_t data);
 	void pcg_val_w(uint8_t data);
 	void a5105_palette(palette_device &palette) const;
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
@@ -86,13 +86,13 @@ private:
 	void a5105_mem(address_map &map);
 	void upd7220_map(address_map &map);
 
-	uint8_t *m_ram_base;
-	uint8_t *m_rom_base;
-	uint8_t *m_char_ram;
-	uint16_t m_pcg_addr;
-	uint16_t m_pcg_internal_addr;
-	uint8_t m_key_mux;
-	uint8_t m_memsel[4];
+	uint8_t *m_ram_base = 0;
+	uint8_t *m_rom_base = 0;
+	uint8_t *m_char_ram = 0;
+	uint16_t m_pcg_addr = 0U;
+	uint16_t m_pcg_internal_addr = 0U;
+	uint8_t m_key_mux = 0U;
+	uint8_t m_memsel[4]{};
 	required_device<z80_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<upd7220_device> m_hgdc;
@@ -114,13 +114,13 @@ UPD7220_DISPLAY_PIXELS_MEMBER( a5105_state::hgdc_display_pixels )
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
-	int const gfx = m_video_ram[(address & 0x1ffff) >> 1];
+	int const gfx = m_video_ram[(address & 0xffff)];
 
 	for (int xi = 0; xi < 16; xi++)
 	{
 		int const pen = ((gfx >> xi) & 1) ? 7 : 0;
 
-		bitmap.pix32(y, x + xi) = palette[pen];
+		bitmap.pix(y, x + xi) = palette[pen];
 	}
 }
 
@@ -151,7 +151,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( a5105_state::hgdc_draw_text )
 					pen = 0;
 
 				if (m_screen->visible_area().contains(res_x+0, res_y))
-					bitmap.pix32(res_y, res_x) = palette[pen];
+					bitmap.pix(res_y, res_x) = palette[pen];
 			}
 		}
 	}
@@ -287,12 +287,12 @@ void a5105_state::a5105_memsel_w(uint8_t data)
 		{
 		case 0:
 			membank("bank1")->set_base(m_rom_base);
-			prog.install_read_bank(0x0000, 0x3fff, "bank1");
+			prog.install_read_bank(0x0000, 0x3fff, membank("bank1"));
 			prog.unmap_write(0x0000, 0x3fff);
 			break;
 		case 2:
 			membank("bank1")->set_base(m_ram_base);
-			prog.install_readwrite_bank(0x0000, 0x3fff, "bank1");
+			prog.install_readwrite_bank(0x0000, 0x3fff, membank("bank1"));
 			break;
 		default:
 			prog.unmap_readwrite(0x0000, 0x3fff);
@@ -308,17 +308,17 @@ void a5105_state::a5105_memsel_w(uint8_t data)
 		{
 		case 0:
 			membank("bank2")->set_base(m_rom_base + 0x4000);
-			prog.install_read_bank(0x4000, 0x7fff, "bank2");
+			prog.install_read_bank(0x4000, 0x7fff, membank("bank2"));
 			prog.unmap_write(0x4000, 0x4000);
 			break;
 		case 1:
 			membank("bank2")->set_base(memregion("k5651")->base());
-			prog.install_read_bank(0x4000, 0x7fff, "bank2");
+			prog.install_read_bank(0x4000, 0x7fff, membank("bank2"));
 			prog.unmap_write(0x4000, 0x4000);
 			break;
 		case 2:
 			membank("bank2")->set_base(m_ram_base + 0x4000);
-			prog.install_readwrite_bank(0x4000, 0x7fff, "bank2");
+			prog.install_readwrite_bank(0x4000, 0x7fff, membank("bank2"));
 			break;
 		default:
 			prog.unmap_readwrite(0x4000, 0x7fff);
@@ -334,12 +334,12 @@ void a5105_state::a5105_memsel_w(uint8_t data)
 		{
 		case 0:
 			membank("bank3")->set_base(m_rom_base + 0x8000);
-			prog.install_read_bank(0x8000, 0xbfff, "bank3");
+			prog.install_read_bank(0x8000, 0xbfff, membank("bank3"));
 			prog.unmap_write(0x8000, 0xbfff);
 			break;
 		case 2:
 			membank("bank3")->set_base(m_ram_base + 0x8000);
-			prog.install_readwrite_bank(0x8000, 0xbfff, "bank3");
+			prog.install_readwrite_bank(0x8000, 0xbfff, membank("bank3"));
 			break;
 		default:
 			prog.unmap_readwrite(0x8000, 0xbfff);
@@ -355,7 +355,7 @@ void a5105_state::a5105_memsel_w(uint8_t data)
 		{
 		case 2:
 			membank("bank4")->set_base(m_ram_base + 0xc000);
-			prog.install_readwrite_bank(0xc000, 0xffff, "bank4");
+			prog.install_readwrite_bank(0xc000, 0xffff, membank("bank4"));
 			break;
 		default:
 			prog.unmap_readwrite(0xc000, 0xffff);
@@ -570,9 +570,11 @@ void a5105_state::upd7220_map(address_map &map)
 	map(0x00000, 0x1ffff).ram().share("video_ram");
 }
 
-FLOPPY_FORMATS_MEMBER( a5105_state::floppy_formats )
-	FLOPPY_A5105_FORMAT
-FLOPPY_FORMATS_END
+void a5105_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_A5105_FORMAT);
+}
 
 static void a5105_floppies(device_slot_interface &device)
 {

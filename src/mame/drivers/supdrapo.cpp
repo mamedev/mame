@@ -97,7 +97,7 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_char_bank;
 
-	uint8_t m_wdog;
+	uint8_t m_wdog = 0;
 
 	uint8_t rng_r();
 	void wdog8000_w(uint8_t data);
@@ -280,7 +280,7 @@ void supdrapo_state::sdpoker_mem(address_map &map)
 {
 	map(0x0000, 0x4fff).rom();
 	map(0x5000, 0x50ff).ram().share("col_line");
-	map(0x57ff, 0x57ff).ram().share("col_line");
+	map(0x5700, 0x57ff).ram().share("col_line");
 	map(0x5800, 0x58ff).ram().share("col_line");
 	map(0x6000, 0x67ff).ram(); //work ram
 	map(0x6800, 0x6bff).ram().share("videoram");

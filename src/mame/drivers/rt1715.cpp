@@ -9,8 +9,6 @@
     Notes:
     - keyboard connected to sio channel a
     - sio channel a clock output connected to ctc trigger 0
-    - memory map not 100% clear
-    - rt1715w: SCP3 boot loops while executing PROFILE.SUB
 
     Docs:
     - http://www.robotrontechnik.de/html/computer/pc1715w.htm
@@ -23,18 +21,18 @@
 ****************************************************************************/
 
 #include "emu.h"
+
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
+#include "machine/keyboard.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
 #include "machine/z80ctc.h"
-#include "machine/z80sio.h"
 #include "machine/z80dma.h"
 #include "machine/z80pio.h"
+#include "machine/z80sio.h"
 #include "video/i8275.h"
-
-#include "bus/rs232/rs232.h"
-#include "machine/keyboard.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -43,7 +41,7 @@
 #define LOG_BANK    (1U <<  1)
 
 #define VERBOSE (LOG_GENERAL)
-//#define LOG_OUTPUT_FUNC printf
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGBANK(format, ...)    LOGMASKED(LOG_BANK,   "%11.6f at %s: " format, machine().time().as_double(), machine().describe_context(), __VA_ARGS__)
@@ -70,8 +68,7 @@ public:
 		, m_p_chargen(*this, "gfx")
 		, m_videoram(*this, "videoram")
 		, m_p_cas(*this, "prom")
-	{
-	}
+	{ }
 
 	void rt1715(machine_config &config);
 	void rt1715w(machine_config &config);
@@ -126,11 +123,11 @@ private:
 	optional_device<ram_device> m_videoram;
 	optional_region_ptr<uint8_t> m_p_cas;
 
-	int m_led1_val;
-	int m_led2_val;
-	u8 m_krfd;
-	uint16_t m_dma_adr;
-	int m_r, m_w;
+	int m_led1_val = 0;
+	int m_led2_val = 0;
+	u8 m_krfd = 0U;
+	uint16_t m_dma_adr = 0U;
+	int m_r = 0, m_w = 0;
 };
 
 
@@ -424,7 +421,7 @@ WRITE_LINE_MEMBER(rt1715_state::crtc_drq_w)
 
 I8275_DRAW_CHARACTER_MEMBER(rt1715_state::crtc_display_pixels)
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	u8 gfx = (lten) ? 0xff : 0;
 
 	if (!vsp)
@@ -434,7 +431,7 @@ I8275_DRAW_CHARACTER_MEMBER(rt1715_state::crtc_display_pixels)
 		gfx ^= 0xff;
 
 	for (u8 i=0; i<8; i++)
-		bitmap.pix32(y, x + i) = palette[BIT(gfx, 7-i) ? (hlgt ? 2 : 1) : 0];
+		bitmap.pix(y, x + i) = palette[BIT(gfx, 7-i) ? (hlgt ? 2 : 1) : 0];
 }
 
 /* F4 Character Displayer */
@@ -525,7 +522,7 @@ void rt1715_state::rt1715w_io(address_map &map)
 	map(0x34, 0x37).portr("S8"); // KON -- Konfigurations-schalter FD (config switch -- A114, DIP S8)
 //  map(0x38, 0x3b) // SR (RST1) -- Ru:cksetzen von Flip-Flops im FD
 //  map(0x3c, 0x3f) // RST (RST2) -- Ru:cksetzen von Flip-Flops in V.24 (Pru:ftechnik)
-	// used via DMA only
+	// these two ports are accessed only via DMA
 	map(0x40, 0x40).r(m_fdc, FUNC(i8272a_device::msr_r));
 	map(0x41, 0x41).rw(m_fdc, FUNC(i8272a_device::dma_r), FUNC(i8272a_device::dma_w));
 }
@@ -597,7 +594,7 @@ static INPUT_PORTS_START( k7658 )
 	// D10 --- E10 --- B10 C10 E52 E51
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(')') 
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(')')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':')
@@ -806,8 +803,8 @@ void rt1715_state::rt1715w(machine_config &config)
 	// operates in polled mode
 	I8272A(config, m_fdc, 8'000'000 / 4, false);
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w)).invert();
-	FLOPPY_CONNECTOR(config, "i8272:0", rt1715w_floppies, "525qd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "i8272:1", rt1715w_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "i8272:0", rt1715w_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "i8272:1", rt1715w_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
 
 	Z80DMA(config, m_dma, 15.9744_MHz_XTAL / 4);
 	m_dma->out_busreq_callback().set(FUNC(rt1715_state::busreq_w));
@@ -884,6 +881,6 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY     FULLNAME                             FLAGS
-COMP( 1986, rt1715,   0,      0,      rt1715,  k7658, rt1715_state, empty_init, "Robotron", "Robotron PC-1715",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1986, rt1715lc, rt1715, 0,      rt1715,  k7658, rt1715_state, empty_init, "Robotron", "Robotron PC-1715 (latin/cyrillic)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1986, rt1715,   0,      0,      rt1715,  k7658,   rt1715_state, empty_init, "Robotron", "Robotron PC-1715",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1986, rt1715lc, rt1715, 0,      rt1715,  k7658,   rt1715_state, empty_init, "Robotron", "Robotron PC-1715 (latin/cyrillic)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
 COMP( 1986, rt1715w,  rt1715, 0,      rt1715w, rt1715w, rt1715_state, empty_init, "Robotron", "Robotron PC-1715W",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

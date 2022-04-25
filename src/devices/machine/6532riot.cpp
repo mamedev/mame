@@ -502,7 +502,7 @@ void riot6532_device::device_reset()
 	m_timer->adjust(attotime::from_ticks(256 << m_timershift, clock()));
 }
 
-void riot6532_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void riot6532_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

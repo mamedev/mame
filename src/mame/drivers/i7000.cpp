@@ -52,7 +52,7 @@
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 #include "tilemap.h"
 
@@ -83,8 +83,8 @@ private:
 	required_ioport_array<8> m_kbd;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint8_t m_row;
-	tilemap_t *m_bg_tilemap;
+	uint8_t m_row = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);

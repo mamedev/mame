@@ -8,22 +8,22 @@ The Pocket Challenge V2 appears to be compatible with the Wonderswan from a soft
  List of software from ja.wikipedia.org (which might miss some later re-release)
 
  * 進研ゼミ 中学講座
- 中1数学                 [dumped]
+ 中1数学                          [dumped]
  中2数学
- 実技4教科              [dumped x 2]
- 中学理科 (1分野)
- 中学理科 (2分野)
- 中学理科パック          [dumped x 2]
- 中学地理
+ 実技4教科                        [dumped x 2]
+ 中学理科 (1分野)                  [dumped]
+ 中学理科 (2分野)                  [dumped]
+ 中学理科パック                      [dumped x 2]
+ 中学地理                         [dumped]
  中学歴史
- 中学地理・歴史パック     [dumped x 3]
- 中1 ENGLISH               [dumped]
+ 中学地理・歴史パック                   [dumped x 3]
+ 中1 ENGLISH                     [dumped]
  中2 ENGLISH
  中学公民
- 中一国語・百人一首            [dumped]
- 中1 英数国パック
- 中2 英数国パック
- 中3 英・数・公民パック
+ 中一国語・百人一首                   [dumped]
+ 中1 英数国パック                    [dumped]
+ 中2 英数国パック                    [dumped]
+ 中3 英・数・公民パック                 [dumped]
  小学校総まとめ(国・算・理・社)+中1英数国パック
  英検 3級・4級
  漢検 3級・4級・5級
@@ -50,7 +50,7 @@ The Pocket Challenge V2 appears to be compatible with the Wonderswan from a soft
 			<feature name="bt1" value="BATTERY" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
-				<rom name="2bb113 1112711.u1" size="4194304" crc="4e0b65b4" sha1="3a8ded7174ad8e0003604dca4ea158eeefac4610" offset="000000" />
+				<rom name="2bb113 1112711.u1" size="4194304" crc="4e0b65b4" sha1="3a8ded7174ad8e0003604dca4ea158eeefac4610" />
 			</dataarea>
 			<dataarea name="sram" size="0x2000">
 			</dataarea>
@@ -66,7 +66,7 @@ The Pocket Challenge V2 appears to be compatible with the Wonderswan from a soft
 		<part name="cart" interface="wswan_cart">
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="0x400000">
-				<rom name="2BD400.bin" size="0x400000" crc="93454b4a" sha1="3d820b91bb0fed87fc9343a8bc57c81256e4c490" offset="000000" />
+				<rom name="2BD400.bin" size="0x400000" crc="93454b4a" sha1="3d820b91bb0fed87fc9343a8bc57c81256e4c490" />
 			</dataarea>
 			<dataarea name="sram" size="0x2000">
 			</dataarea>
@@ -82,7 +82,7 @@ The Pocket Challenge V2 appears to be compatible with the Wonderswan from a soft
 		<part name="cart" interface="wswan_cart">
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="0x400000">
-				<rom name="4BD400.bin" size="0x400000" crc="4cfd118d" sha1="8b395327209dae56461ef792cd2183d803e4687d" offset="000000" />
+				<rom name="4BD400.bin" size="0x400000" crc="4cfd118d" sha1="8b395327209dae56461ef792cd2183d803e4687d" />
 			</dataarea>
 			<dataarea name="sram" size="0x2000">
 			</dataarea>
@@ -98,7 +98,7 @@ The Pocket Challenge V2 appears to be compatible with the Wonderswan from a soft
 		<part name="cart" interface="wswan_cart">
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="0x400000">
-				<rom name="6FD400.bin" size="0x400000" crc="0ac0e39d" sha1="1c47daf71ef4277fcf3eabfa4697827c7c322867" offset="000000" />
+				<rom name="6FD400.bin" size="0x400000" crc="0ac0e39d" sha1="1c47daf71ef4277fcf3eabfa4697827c7c322867" />
 			</dataarea>
 			<dataarea name="sram" size="0x2000">
 			</dataarea>
@@ -106,7 +106,7 @@ The Pocket Challenge V2 appears to be compatible with the Wonderswan from a soft
 	</software>
 
 	<software name="churika" supported="no">
-		<description>Shinkenzemi Chuugaku Kouza - Chuugaku Rika (1 Bunya) (2 Bunya) (2PL)</description>
+		<description>Shinkenzemi Chuugaku Kouza - Chuugaku Rika (1-bun'ya) (2-bun'ya) (2PL)</description>
 		<year>2002</year>
 		<publisher>Benesse Corporation</publisher>
 		<info name="serial" value="2BF400" />
@@ -114,7 +114,7 @@ The Pocket Challenge V2 appears to be compatible with the Wonderswan from a soft
 		<part name="cart" interface="wswan_cart">
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="0x200000">
-				<rom name="2BF400.bin" size="0x200000" crc="75379357" sha1="791cd70cc9dc49a7ff38cc22a374c7d19eef1f70" offset="000000" />
+				<rom name="2BF400.bin" size="0x200000" crc="75379357" sha1="791cd70cc9dc49a7ff38cc22a374c7d19eef1f70" />
 			</dataarea>
 			<dataarea name="sram" size="0x2000">
 			</dataarea>
@@ -122,7 +122,7 @@ The Pocket Challenge V2 appears to be compatible with the Wonderswan from a soft
 	</software>
 
 	<software name="churika6" cloneof="churika" supported="no">
-		<description>Shinkenzemi Chuugaku Kouza - Chuugaku Rika (1 Bunya) (2 Bunya) (6PL)</description>
+		<description>Shinkenzemi Chuugaku Kouza - Chuugaku Rika (1-bun'ya) (2-bun'ya) (6PL)</description>
 		<year>2006</year>
 		<publisher>Benesse Corporation</publisher>
 		<info name="serial" value="6FF400" />
@@ -130,7 +130,7 @@ The Pocket Challenge V2 appears to be compatible with the Wonderswan from a soft
 		<part name="cart" interface="wswan_cart">
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="0x400000">
-				<rom name="6FF400.bin" size="0x400000" crc="fc46a921" sha1="5b2fd488c6ab734dcf8893509589a751458ce977" offset="000000" />
+				<rom name="6FF400.bin" size="0x400000" crc="fc46a921" sha1="5b2fd488c6ab734dcf8893509589a751458ce977" />
 			</dataarea>
 			<dataarea name="sram" size="0x2000">
 			</dataarea>
@@ -146,7 +146,7 @@ The Pocket Challenge V2 appears to be compatible with the Wonderswan from a soft
 		<part name="cart" interface="wswan_cart">
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="0x400000">
-				<rom name="2BG410.bin" size="0x400000" crc="84b430e9" sha1="bb1de1f0fc80a85f3b7fb7e53ed04718855aaf0b" offset="000000" />
+				<rom name="2BG410.bin" size="0x400000" crc="84b430e9" sha1="bb1de1f0fc80a85f3b7fb7e53ed04718855aaf0b" />
 			</dataarea>
 			<dataarea name="sram" size="0x2000">
 			</dataarea>
@@ -168,7 +168,7 @@ The Pocket Challenge V2 appears to be compatible with the Wonderswan from a soft
 			<feature name="bt1" value="BATTERY" />
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="4194304">
-				<rom name="3gb410 3020320 jitugi4 32-14n.u1" size="4194304" crc="2ff15e1a" sha1="f6c61d95fb26063c9d49ed0f36169aafbd6a3738" offset="000000" />
+				<rom name="3gb410 3020320 jitugi4 32-14n.u1" size="4194304" crc="2ff15e1a" sha1="f6c61d95fb26063c9d49ed0f36169aafbd6a3738" />
 			</dataarea>
 			<dataarea name="sram" size="0x2000">
 			</dataarea>
@@ -176,7 +176,7 @@ The Pocket Challenge V2 appears to be compatible with the Wonderswan from a soft
 	</software>
 
 	<software name="chukoku" supported="no">
-		<description>Shinkenzemi Chuugaku Kouza - Chuu1 Kokugo-Hyakunin Isshu (2JA)</description>
+		<description>Shinkenzemi Chuugaku Kouza - Chuuichi Kokugo-Hyakunin Isshu (2JA)</description>
 		<year>2002</year>
 		<publisher>Benesse Corporation</publisher>
 		<info name="serial" value="2BK401" />
@@ -184,7 +184,7 @@ The Pocket Challenge V2 appears to be compatible with the Wonderswan from a soft
 		<part name="cart" interface="wswan_cart">
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="0x400000">
-				<rom name="2BK401.bin" size="0x400000" crc="b9d67f24" sha1="15c86cf056f680b91f2a6c15329bb31b44e030c6" offset="000000" />
+				<rom name="2BK401.bin" size="0x400000" crc="b9d67f24" sha1="15c86cf056f680b91f2a6c15329bb31b44e030c6" />
 			</dataarea>
 			<dataarea name="sram" size="0x2000">
 			</dataarea>
@@ -192,7 +192,7 @@ The Pocket Challenge V2 appears to be compatible with the Wonderswan from a soft
 	</software>
 
 	<software name="chu1suga" supported="no">
-		<description>Shinkenzemi Chuugaku Kouza - Chuu1 Suugaku (2M1)</description>
+		<description>Shinkenzemi Chuugaku Kouza - Chuu 1 Suugaku (2M1)</description>
 		<year>2002</year>
 		<publisher>Benesse Corporation</publisher>
 		<info name="serial" value="2BM110" />
@@ -200,7 +200,239 @@ The Pocket Challenge V2 appears to be compatible with the Wonderswan from a soft
 		<part name="cart" interface="wswan_cart">
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="0x200000">
-				<rom name="2BM110.bin" size="0x200000" crc="723a239d" sha1="a21d7c39ef64a37e0055c17d97c2ae7da29b8240" offset="000000" />
+				<rom name="2BM110.bin" size="0x200000" crc="723a239d" sha1="a21d7c39ef64a37e0055c17d97c2ae7da29b8240" />
+			</dataarea>
+			<dataarea name="sram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chuuchiri" supported="no">
+		<description>Chuugaku Chiri (4C)</description>
+		<year>2004</year>
+		<publisher>Benesse Corporation</publisher>
+		<info name="serial" value="4BD410" />
+		<info name="alt_title" value="中学地理 (4C)" />
+		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="IRT0256S-M1" />
+			<feature name="u1" value="4BD410 4040521" />
+			<feature name="u2" value="CS18LV02563BC-70" />
+			<feature name="u3" value="GIZA 5158" />
+			<feature name="u4" value="??" /> <!-- not readable -->
+			<feature name="bt1" value="BATTERY" />
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="2097152">
+				<rom name="4bd410.pc2" size="2097152" crc="3c820f61" sha1="576c74d55786bd6b68f2d1bdc35e0363b6076bd4" />
+			</dataarea>
+			<dataarea name="sram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chuurika1b" supported="no">
+		<description>Chuugaku Rika (1-bun'ya) (5L1)</description>
+		<year>2002</year>
+		<publisher>Benesse Corporation</publisher>
+		<info name="serial" value="5FF411" />
+		<info name="alt_title" value="中学理科（１分野） (5L1)" />
+		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="IRT0256S-M1" />
+			<feature name="u1" value="5FF411 5012118" />
+			<feature name="u2" value="BS62LV256TC-70" />
+			<feature name="u3" value="GIZA 4073" />
+			<feature name="u4" value="2003 442XN" />
+			<feature name="bt1" value="BATTERY" />
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="2097152">
+				<rom name="5ff411.pc2" size="2097152" crc="c0653c7e" sha1="8abae2464c429bebea72a2428a90b74cc86204f8" />
+			</dataarea>
+			<dataarea name="sram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chuurika2b" supported="no">
+		<description>Chuugaku Rika (2-bun'ya) (5L2)</description>
+		<year>2002</year>
+		<publisher>Benesse Corporation</publisher>
+		<info name="serial" value="5FF412" />
+		<info name="alt_title" value="中学理科（２分野） (5L2)" />
+		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="IRT0256S-M1" />
+			<feature name="u1" value="5FF412 5012118" />
+			<feature name="u2" value="BS62LV256TC-70" />
+			<feature name="u3" value="GIZA 4073" />
+			<feature name="u4" value="2003 442XN" />
+			<feature name="bt1" value="BATTERY" />
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="2097152">
+				<rom name="5ff412.pc2" size="2097152" crc="3686dc22" sha1="67c349a92f647637a563015351daae6d9b3a80da" />
+			</dataarea>
+			<dataarea name="sram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chuurika1ba" cloneof="chuurika1b" supported="no">
+		<description>Chuugaku Rika (1-bun'ya) (4L1)</description>
+		<year>2006</year>
+		<publisher>Benesse Corporation</publisher>
+		<info name="serial" value="6FF421" />
+		<info name="alt_title" value="中学理科（１分野） (4L1)" />
+		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="IRT0256S-M1" />
+			<feature name="u1" value="6FF421 5122813" />
+			<feature name="u2" value="CS18LV02563BC-70" />
+			<feature name="u3" value="GIZA 6174" />
+			<feature name="u4" value="2003 601ML" />
+			<feature name="bt1" value="BATTERY" />
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="2097152">
+				<rom name="6ff421.pc2" size="2097152" crc="bf3b02b3" sha1="fe6f99a852f6ee76847e4542f2ccd113c41f49fd" />
+			</dataarea>
+			<dataarea name="sram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chuurika2ba" cloneof="chuurika2b" supported="no">
+		<description>Chuugaku Rika (2-bun'ya) (4L2)</description>
+		<year>2006</year>
+		<publisher>Benesse Corporation</publisher>
+		<info name="serial" value="6FF422" />
+		<info name="alt_title" value="中学理科（２分野） (4L2)" />
+		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="IRT0256S-M1" />
+			<feature name="u1" value="6FF422 5122813" />
+			<feature name="u2" value="CS18LV02563BC-70" />
+			<feature name="u3" value="GIZA 6174" />
+			<feature name="u4" value="2003 602MA" />
+			<feature name="bt1" value="BATTERY" />
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="2097152">
+				<rom name="6ff422.pc2" size="2097152" crc="659a0b6d" sha1="40fbf94202e45440de9db7631a10746975c5f7bd" />
+			</dataarea>
+			<dataarea name="sram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chuu1eisu" supported="no">
+		<description>Chuu 1 Eisuukoku Pack (7P)</description>
+		<year>2006</year>
+		<publisher>Benesse Corporation</publisher>
+		<info name="serial" value="6FP105" />
+		<info name="alt_title" value="中１英数国パック (7P)" />
+		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="IRKLT128" />
+			<feature name="u1" value="6FP105 6103018" />
+			<feature name="u2" value="CS18LV10243DCR70" />
+			<feature name="u3" value="GIZA 7132" />
+			<feature name="u4" value="KARNAK 645MA" />
+			<!-- u5 empty -->
+			<!-- u6 empty -->
+			<feature name="bt1" value="BATTERY" />
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="16777216">
+				<rom name="6fp105.pc2" size="16777216" crc="51b5822d" sha1="f842220a95a9bed6ef372da1380bafb53ff6c92a" />
+			</dataarea>
+			<dataarea name="sram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chuu2enc" supported="no">
+		<description>Chuu 2 Eisuukoku Pack (NEW CROWN, TOTAL ENGLISH Taiouban) (6PF)</description>
+		<year>2006</year>
+		<publisher>Benesse Corporation</publisher>
+		<info name="serial" value="6FP203" />
+		<info name="alt_title" value="中２英数国パック (NEW CROWN, TOTAL ENGLISH対応版) (6PF)" />
+		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="IRKLT064" />
+			<!-- u1 no space on PCB -->
+			<feature name="u2" value="CS18LV10243DCR70" />
+			<feature name="u3" value="GIZA 6174" />
+			<feature name="u4" value="KARNAK 552MK" />
+			<!-- u5 empty -->
+			<!-- u6 empty -->
+			<feature name="u7" value="6FP203 6010622" />
+			<feature name="bt1" value="BATTERY" />
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="8388608">
+				<rom name="6fp203.pc2" size="8388608" crc="1bbb32a0" sha1="9529ba9a06846dc6d9cedf13881363922e63fbe0" />
+			</dataarea>
+			<dataarea name="sram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chuu2ess" supported="no">
+		<description>Chuu 2 Eisuukoku Pack (SUNSHINE, ONE WORLD Taiouban) (7PE)</description>
+		<year>2006</year>
+		<publisher>Benesse Corporation</publisher>
+		<info name="serial" value="6FP212" />
+		<info name="alt_title" value="中２英数国パック (SUNSHINE, ONE WORLD対応版) (7PE)" />
+		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="IRKLT064" />
+			<!-- u1 no space on PCB -->
+			<feature name="u2" value="CS18LV10243DCR70" />
+			<feature name="u3" value="GIZA 6425" />
+			<feature name="u4" value="KARNAK 648NM" />
+			<!-- u5 empty -->
+			<!-- u6 empty -->
+			<feature name="u7" value="6FP212 6090711" />
+			<feature name="bt1" value="BATTERY" />
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="8388608">
+				<rom name="6fp212.pc2" size="8388608" crc="d2dbdf31" sha1="b6230b8c700daf4d2e613b12900d85a44773f9a4" />
+			</dataarea>
+			<dataarea name="sram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chuu3enc" supported="no">
+		<description>Chuu 3 Ei-Suu-Koumin Pack (NEW CROWN, TOTAL ENGLISH Taiouban) (7PI)</description>
+		<year>2006</year>
+		<publisher>Benesse Corporation</publisher>
+		<info name="serial" value="6FP313" />
+		<info name="alt_title" value="中３英・数・公民パック (NEW CROWN, TOTAL ENGLISH対応版) (7PI)" />
+		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="IRKLT064" />
+			<!-- u1 no space on PCB -->
+			<feature name="u2" value="CS18LV10243DCR70" />
+			<feature name="u3" value="GIZA 6425" />
+			<feature name="u4" value="KARNAK 646MK" />
+			<!-- u5 empty -->
+			<!-- u6 empty -->
+			<feature name="u7" value="6FP313 6092516" />
+			<feature name="bt1" value="BATTERY" />
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="8388608">
+				<rom name="6fp313.pc2" size="8388608" crc="c14378c8" sha1="2581babb2c8d3e3d8977e4aa1efea269c606e780" />
+			</dataarea>
+			<dataarea name="sram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Internal checksum is 0xb0a3, dump checksum is 0xb0e3. Cart dumped multiple times so either the cart is corrupt or the internal checksum is wrong -->
+	<software name="chuu3enca" cloneof="chuu3enc" supported="no">
+		<description>Chuu 3 Ei-Suu-Koumin Pack (NEW CROWN, TOTAL ENGLISH Taiouban) (5PI)</description>
+		<year>2004</year>
+		<publisher>Benesse Corporation</publisher>
+		<info name="serial" value="5FP303" />
+		<info name="alt_title" value="中３英・数・公民パック (NEW CROWN, TOTAL ENGLISH対応版) (5PI)" />
+		<part name="cart" interface="wswan_cart">
+			<feature name="pcb" value="IRK4096S-M1" />
+			<feature name="u1" value="5FP303 4110112" />
+			<feature name="u2" value="CS18LV10243DC-70" />
+			<feature name="u3" value="GIZA 4973" />
+			<feature name="u4" value="??" /> <!-- not readable -->
+			<feature name="bt1" value="BATTERY" />
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="8388608">
+				<rom name="5fp303.pc2" size="8388608" crc="9797db5e" sha1="07d6c8465932b88973b5e16678467c7315a20b2e" />
 			</dataarea>
 			<dataarea name="sram" size="0x2000">
 			</dataarea>
@@ -208,4 +440,3 @@ The Pocket Challenge V2 appears to be compatible with the Wonderswan from a soft
 	</software>
 
 </softwarelist>
-

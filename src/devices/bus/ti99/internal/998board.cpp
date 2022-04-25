@@ -128,13 +128,13 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_MAINBOARD8, bus::ti99::internal, mainboard8_device, "ti998_mainboard", "TI-99/8 Mainboard")
-DEFINE_DEVICE_TYPE_NS(TI99_VAQUERRO, bus::ti99::internal, vaquerro_device, "ti998_vaquerro", "TI-99/8 Logical Address Space Decoder")
-DEFINE_DEVICE_TYPE_NS(TI99_MOFETTA, bus::ti99::internal, mofetta_device, "ti998_mofetta", "TI-99/8 Physical Address Space Decoder")
-DEFINE_DEVICE_TYPE_NS(TI99_OSO, bus::ti99::internal, oso_device, "ti998_oso", "TI-99/8 Hexbus interface")
-DEFINE_DEVICE_TYPE_NS(TI99_AMIGO, bus::ti99::internal, amigo_device, "ti998_amigo", "TI-99/8 Address space mapper")
+DEFINE_DEVICE_TYPE(TI99_MAINBOARD8, bus::ti99::internal::mainboard8_device, "ti998_mainboard", "TI-99/8 Mainboard")
+DEFINE_DEVICE_TYPE(TI99_VAQUERRO, bus::ti99::internal::vaquerro_device, "ti998_vaquerro", "TI-99/8 Logical Address Space Decoder")
+DEFINE_DEVICE_TYPE(TI99_MOFETTA, bus::ti99::internal::mofetta_device, "ti998_mofetta", "TI-99/8 Physical Address Space Decoder")
+DEFINE_DEVICE_TYPE(TI99_OSO, bus::ti99::internal::oso_device, "ti998_oso", "TI-99/8 Hexbus interface")
+DEFINE_DEVICE_TYPE(TI99_AMIGO, bus::ti99::internal::amigo_device, "ti998_amigo", "TI-99/8 Address space mapper")
 
-namespace bus { namespace ti99 { namespace internal {
+namespace bus::ti99::internal {
 
 enum
 {
@@ -160,8 +160,8 @@ mainboard8_device::mainboard8_device(const machine_config &mconfig, const char *
 	m_amigo(*this, TI998_AMIGO_TAG),
 	m_oso(*this, TI998_OSO_TAG),
 	m_maincpu(*owner, "maincpu"),
-	m_video(*owner, TI_VDP_TAG),               // subdevice of main class
-	m_sound(*owner, TI_SOUNDCHIP_TAG),
+	m_video(*owner, TI998_VDP_TAG),
+	m_sound(*owner, TI998_SOUNDCHIP_TAG),
 	m_speech(*owner, TI998_SPEECHSYN_TAG),
 	m_gromport(*owner, TI99_GROMPORT_TAG),
 	m_ioport(*owner, TI99_IOPORT_TAG),
@@ -189,6 +189,7 @@ mainboard8_device::mainboard8_device(const machine_config &mconfig, const char *
 	m_p3grom0(*owner, TI998_GLIB30_TAG),
 	m_p3grom1(*owner, TI998_GLIB31_TAG),
 	m_p3grom2(*owner, TI998_GLIB32_TAG),
+	m_tms9901(*owner, TI998_TMS9901_TAG),
 	m_sgrom_idle(true),
 	m_tsgrom_idle(true),
 	m_p8grom_idle(true),
@@ -351,7 +352,7 @@ void mainboard8_device::debugger_write(offs_t offset, uint8_t data)
 
 // =============== CRU bus access ==================
 
-READ8Z_MEMBER(mainboard8_device::crureadz)
+void mainboard8_device::crureadz(offs_t offset, uint8_t *value)
 {
 	m_ioport->crureadz(offset, value);
 }
@@ -382,6 +383,10 @@ void mainboard8_device::setaddress(offs_t offset, uint8_t busctrl)
 	// Save the logical address
 	m_logical_address = offset;
 	m_physical_address = 0;
+
+	// Trigger the 9901's clock if S0=1
+	if ((offset & 0x0020) != 0)
+		m_tms9901->update_clock();
 
 	// In TI's bit order, A14 is the second line from the right side (2^1)
 	m_A14_set = ((m_logical_address & 2)!=0); // Needed for clock_in
@@ -1153,7 +1158,7 @@ vaquerro_device::vaquerro_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-SETADDRESS_DBIN_MEMBER( vaquerro_device::set_address )
+void vaquerro_device::set_address(offs_t offset, int state)
 {
 	// Do the decoding
 	// state = dbin, offset = address
@@ -1602,7 +1607,7 @@ mofetta_device::mofetta_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-SETADDRESS_DBIN_MEMBER( mofetta_device::set_address )
+void mofetta_device::set_address(offs_t offset, int state)
 {
 	if (!m_gotfirstword)
 	{
@@ -2266,7 +2271,7 @@ void amigo_device::device_reset()
 oso_device::oso_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	bus::hexbus::hexbus_chained_device(mconfig, TI99_OSO, tag, owner, clock),
 	m_int(*this),
-	m_hexbusout(*this, ":" TI_HEXBUS_TAG),
+	m_hexbusout(*this, ":" TI998_HEXBUS_TAG),
 	m_data(0),
 	m_status(0xff),
 	m_control(0),
@@ -2748,5 +2753,4 @@ void oso_device::device_start()
 	save_item(NAME(m_xmit));
 }
 
-} } } // end namespace bus::ti99::internal
-
+} // end namespace bus::ti99::internal

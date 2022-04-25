@@ -215,7 +215,7 @@ void mc14411_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void mc14411_device::device_timer(emu_timer &timer, device_timer_id id, int32_t param, void *ptr)
+void mc14411_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id >= TIMER_F1 && id <= TIMER_F16)
 	{
@@ -251,7 +251,8 @@ void mc14411_device::rate_select_w(uint8_t data)
 	if (m_divider != (data & 3))
 	{
 		m_divider = data & 3;
-		notify_clock_changed();
+		if (started())
+			notify_clock_changed();
 	}
 }
 
@@ -267,7 +268,8 @@ void mc14411_device::rsa_w(int state)
 	if ((m_divider & RSA) != (state == ASSERT_LINE ? RSA : 0))
 	{
 		m_divider = (m_divider & ~RSA) | (state == ASSERT_LINE ? RSA : 0);
-		notify_clock_changed();
+		if (started())
+			notify_clock_changed();
 	}
 }
 
@@ -283,7 +285,8 @@ void mc14411_device::rsb_w(int state)
 	if ((m_divider & RSB) != (state == ASSERT_LINE ? RSB : 0))
 	{
 		m_divider = (m_divider & ~RSB) | (state == ASSERT_LINE ? RSB : 0);
-		notify_clock_changed();
+		if (started())
+			notify_clock_changed();
 	}
 }
 

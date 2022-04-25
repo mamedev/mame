@@ -46,7 +46,7 @@ ds1386_device::ds1386_device(const machine_config &mconfig, device_type type, co
 	, m_watchdog_timer(nullptr)
 	, m_inta_timer(nullptr)
 	, m_intb_timer(nullptr)
-	, m_default_data(*this, DEVICE_SELF, size)
+	, m_default_data(*this, DEVICE_SELF)
 	, m_hundredths(0)
 	, m_seconds(0)
 	, m_minutes(0)
@@ -199,7 +199,7 @@ void ds1386_device::watchdog_alarm()
 	}
 }
 
-void ds1386_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ds1386_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -412,14 +412,16 @@ void ds1386_device::nvram_default()
 	m_ram[REGISTER_COMMAND] = COMMAND_TE | COMMAND_WAM | COMMAND_TDM;
 }
 
-void ds1386_device::nvram_read(emu_file &file)
+bool ds1386_device::nvram_read(util::read_stream &file)
 {
-	file.read(&m_ram[0], m_ram_size);
+	size_t actual;
+	return !file.read(&m_ram[0], m_ram_size, actual) && actual == m_ram_size;
 }
 
-void ds1386_device::nvram_write(emu_file &file)
+bool ds1386_device::nvram_write(util::write_stream &file)
 {
-	file.write(&m_ram[0], m_ram_size);
+	size_t actual;
+	return !file.write(&m_ram[0], m_ram_size, actual) && actual == m_ram_size;
 }
 
 void ds1386_device::data_w(offs_t offset, uint8_t data)

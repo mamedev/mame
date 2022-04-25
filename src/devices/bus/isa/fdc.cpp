@@ -17,11 +17,12 @@
 #include "logmacro.h"
 
 
-FLOPPY_FORMATS_MEMBER( isa8_fdc_device::floppy_formats )
-	FLOPPY_PC_FORMAT,
-	FLOPPY_NASLITE_FORMAT,
-	FLOPPY_IBMXDF_FORMAT
-FLOPPY_FORMATS_END
+void isa8_fdc_device::floppy_formats(format_registration &fr)
+{
+	fr.add_pc_formats();
+	fr.add(FLOPPY_NASLITE_FORMAT);
+	fr.add(FLOPPY_IBMXDF_FORMAT);
+}
 
 static void pc_dd_floppies(device_slot_interface &device)
 {
@@ -42,10 +43,6 @@ isa8_fdc_device::isa8_fdc_device(const machine_config &mconfig, device_type type
 	device_t(mconfig, type, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
 	m_fdc(*this, "fdc")
-{
-}
-
-void isa8_fdc_device::device_reset()
 {
 }
 
@@ -80,7 +77,9 @@ void isa8_fdc_device::eop_w(int state)
 }
 
 
-isa8_upd765_fdc_device::isa8_upd765_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) : isa8_fdc_device(mconfig, type, tag, owner, clock)
+isa8_upd765_fdc_device::isa8_upd765_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: isa8_fdc_device(mconfig, type, tag, owner, clock)
+	, dor(0x00)
 {
 }
 
@@ -94,7 +93,11 @@ void isa8_upd765_fdc_device::device_start()
 
 	irq = drq = false;
 	fdc_irq = fdc_drq = false;
-	dor = 0x00;
+}
+
+void isa8_upd765_fdc_device::device_reset()
+{
+	dor_w(0x00);
 }
 
 // Bits 0-1 select one of the 4 drives, but only if the associated
@@ -109,7 +112,6 @@ void isa8_upd765_fdc_device::device_start()
 void isa8_upd765_fdc_device::dor_w(uint8_t data)
 {
 	LOG("dor = %02x\n", data);
-	uint8_t pdor = dor;
 	dor = data;
 
 	for(int i=0; i<4; i++)
@@ -124,8 +126,7 @@ void isa8_upd765_fdc_device::dor_w(uint8_t data)
 
 	check_irq();
 	check_drq();
-	if((pdor^dor) & 4)
-		m_fdc->soft_reset();
+	m_fdc->reset_w(!BIT(dor, 2));
 }
 
 uint8_t isa8_upd765_fdc_device::dor_r()
@@ -191,8 +192,8 @@ void isa8_fdc_xt_device::device_add_mconfig(machine_config &config)
 	upd765a_device &upd765a(UPD765A(config, m_fdc, 8'000'000, false, false));
 	upd765a.intrq_wr_callback().set(FUNC(isa8_fdc_xt_device::fdc_irq_w));
 	upd765a.drq_wr_callback().set(FUNC(isa8_fdc_xt_device::fdc_drq_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", pc_dd_floppies, "525dd", isa8_fdc_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", pc_dd_floppies, "525dd", isa8_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", pc_dd_floppies, "525dd", isa8_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", pc_dd_floppies, "525dd", isa8_fdc_device::floppy_formats).enable_sound(true);
 }
 
 void isa8_fdc_xt_device::device_start()
@@ -230,8 +231,8 @@ void isa8_fdc_at_device::device_add_mconfig(machine_config &config)
 	upd765a_device &upd765a(UPD765A(config, m_fdc, 8'000'000, false, false));
 	upd765a.intrq_wr_callback().set(FUNC(isa8_fdc_at_device::fdc_irq_w));
 	upd765a.drq_wr_callback().set(FUNC(isa8_fdc_at_device::fdc_drq_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats).enable_sound(true);
 }
 
 // Decoding is through a PAL, so presumably complete
@@ -260,8 +261,8 @@ void isa8_fdc_smc_device::device_add_mconfig(machine_config &config)
 	smc37c78_device &smc(SMC37C78(config, m_fdc, 24'000'000));
 	smc.intrq_wr_callback().set(FUNC(isa8_fdc_device::irq_w));
 	smc.drq_wr_callback().set(FUNC(isa8_fdc_device::drq_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats).enable_sound(true);
 }
 
 void isa8_fdc_smc_device::device_start()
@@ -281,8 +282,8 @@ void isa8_fdc_ps2_device::device_add_mconfig(machine_config &config)
 	n82077aa.set_mode(n82077aa_device::mode_t::PS2);
 	n82077aa.intrq_wr_callback().set(FUNC(isa8_fdc_device::irq_w));
 	n82077aa.drq_wr_callback().set(FUNC(isa8_fdc_device::drq_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats).enable_sound(true);
 }
 
 void isa8_fdc_ps2_device::device_start()
@@ -301,8 +302,8 @@ void isa8_fdc_superio_device::device_add_mconfig(machine_config &config)
 	pc_fdc_superio_device &superio(PC_FDC_SUPERIO(config, m_fdc, 24'000'000));
 	superio.intrq_wr_callback().set(FUNC(isa8_fdc_device::irq_w));
 	superio.drq_wr_callback().set(FUNC(isa8_fdc_device::drq_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats).enable_sound(true);
 }
 
 void isa8_fdc_superio_device::device_start()

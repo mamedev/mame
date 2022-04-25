@@ -60,7 +60,7 @@ bgfx_chain_entry::~bgfx_chain_entry()
 
 void bgfx_chain_entry::submit(int view, chain_manager::screen_prim &prim, texture_manager& textures, uint16_t screen_count, uint16_t screen_width, uint16_t screen_height, float screen_scale_x, float screen_scale_y, float screen_offset_x, float screen_offset_y, uint32_t rotation_type, bool swap_xy, uint64_t blend, int32_t screen)
 {
-	if (!setup_view(view, screen_width, screen_height, screen))
+	if (!setup_view(textures, view, screen_width, screen_height, screen))
 	{
 		return;
 	}
@@ -250,7 +250,7 @@ void bgfx_chain_entry::setup_auto_uniforms(chain_manager::screen_prim &prim, tex
 	setup_screenindex_uniform(screen);
 }
 
-bool bgfx_chain_entry::setup_view(int view, uint16_t screen_width, uint16_t screen_height, int32_t screen) const
+bool bgfx_chain_entry::setup_view(texture_manager &textures, int view, uint16_t screen_width, uint16_t screen_height, int32_t screen) const
 {
 	bgfx::FrameBufferHandle handle = BGFX_INVALID_HANDLE;
 	uint16_t width = screen_width;
@@ -272,8 +272,11 @@ bool bgfx_chain_entry::setup_view(int view, uint16_t screen_width, uint16_t scre
 
 	const bgfx::Caps* caps = bgfx::getCaps();
 
+	std::string name = m_inputs[0]->texture() + std::to_string(screen);
+	const float right_ratio = (float)textures.provider(name)->width() / textures.provider(name)->rowpixels();
+
 	float projMat[16];
-	bx::mtxOrtho(projMat, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f, 0.0f, caps->homogeneousDepth);
+	bx::mtxOrtho(projMat, 0.0f, right_ratio, 1.0f, 0.0f, 0.0f, 100.0f, 0.0f, caps->homogeneousDepth);
 	bgfx::setViewTransform(view, nullptr, projMat);
 
 	m_clear->bind(view);

@@ -46,18 +46,18 @@ private:
 	optional_shared_ptr<uint8_t> m_scratchram;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
-	uint8_t *m_fg_gfx;   /* prosoccr */
-	std::unique_ptr<uint8_t[]> m_charram;   /* prosoccr */
-	uint8_t m_io_ram[16];
+	uint8_t *m_fg_gfx = nullptr;   /* prosoccr */
+	std::unique_ptr<uint8_t[]> m_charram{};   /* prosoccr */
+	uint8_t m_io_ram[16]{};
 
-	int m_bank;
-	int m_latch;
-	uint8_t m_gfx_rom_readback;
-	int m_background_color;
-	int m_background_disable;
+	int m_bank = 0;
+	int m_latch = 0;
+	uint8_t m_gfx_rom_readback = 0U;
+	int m_background_color = 0;
+	int m_background_disable = 0;
 
-	tilemap_t *m_back_tilemap;
-	tilemap_t *m_fix_tilemap;
+	tilemap_t *m_back_tilemap = nullptr;
+	tilemap_t *m_fix_tilemap = nullptr;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -65,22 +65,22 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_READ8_MEMBER(deco16_bank_r);
-	DECLARE_READ8_MEMBER(deco16_io_r);
-	DECLARE_WRITE8_MEMBER(deco16_bank_w);
-	DECLARE_READ8_MEMBER(prosoccr_bank_r);
-	DECLARE_READ8_MEMBER(prosoccr_charram_r);
-	DECLARE_WRITE8_MEMBER(prosoccr_charram_w);
-	DECLARE_WRITE8_MEMBER(prosoccr_char_bank_w);
-	DECLARE_WRITE8_MEMBER(prosoccr_io_bank_w);
-	DECLARE_READ8_MEMBER(prosport_charram_r);
-	DECLARE_WRITE8_MEMBER(prosport_charram_w);
-	DECLARE_WRITE8_MEMBER(deco16_io_w);
-	DECLARE_WRITE8_MEMBER(prosoccr_io_w);
-	DECLARE_WRITE8_MEMBER(prosport_io_w);
-	DECLARE_WRITE8_MEMBER(liberate_videoram_w);
-	DECLARE_WRITE8_MEMBER(liberate_colorram_w);
-	DECLARE_WRITE8_MEMBER(prosport_bg_vram_w);
+	uint8_t deco16_bank_r(offs_t offset);
+	uint8_t deco16_io_r(offs_t offset);
+	void deco16_bank_w(uint8_t data);
+	uint8_t prosoccr_bank_r(offs_t offset);
+	uint8_t prosoccr_charram_r(offs_t offset);
+	void prosoccr_charram_w(offs_t offset, uint8_t data);
+	void prosoccr_char_bank_w(uint8_t data);
+	void prosoccr_io_bank_w(uint8_t data);
+	uint8_t prosport_charram_r(offs_t offset);
+	void prosport_charram_w(offs_t offset, uint8_t data);
+	void deco16_io_w(offs_t offset, uint8_t data);
+	void prosoccr_io_w(offs_t offset, uint8_t data);
+	void prosport_io_w(offs_t offset, uint8_t data);
+	void liberate_videoram_w(offs_t offset, uint8_t data);
+	void liberate_colorram_w(offs_t offset, uint8_t data);
+	void prosport_bg_vram_w(offs_t offset, uint8_t data);
 	TILEMAP_MAPPER_MEMBER(back_scan);
 	TILEMAP_MAPPER_MEMBER(fix_scan);
 	TILE_GET_INFO_MEMBER(get_back_tile_info);

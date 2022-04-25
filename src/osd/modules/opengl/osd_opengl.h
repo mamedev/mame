@@ -21,7 +21,7 @@
 		#ifdef _MSC_VER
 			#include <windows.h>
 			#include "GL/GL.h"
-			#include "bgfx/3rdparty/khronos/gl/glext.h "
+			#include "bgfx/3rdparty/khronos/gl/glext.h"
 			#ifndef USE_DISPATCH_GL
 			#include "bgfx/3rdparty/khronos/wgl/wglext.h"
 			#endif

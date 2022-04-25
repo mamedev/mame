@@ -11,13 +11,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "machine/8530scc.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/applefdc.h"
-#include "machine/sonydriv.h"
 #include "includes/macpci.h"
-#include "machine/ram.h"
-#include "debugger.h"
 
 #define LOG_ADB         0
 #define LOG_VIA         0
@@ -63,7 +57,7 @@ void macpci_state::mac_via_out_b(uint8_t data)
 	m_cuda->set_tip((data&0x20) ? 1 : 0);
 }
 
-READ16_MEMBER ( macpci_state::mac_via_r )
+uint16_t macpci_state::mac_via_r(offs_t offset)
 {
 	uint16_t data;
 
@@ -79,7 +73,7 @@ READ16_MEMBER ( macpci_state::mac_via_r )
 	return data | (data<<8);
 }
 
-WRITE16_MEMBER ( macpci_state::mac_via_w )
+void macpci_state::mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset >>= 8;
 	offset &= 0x0f;
@@ -150,7 +144,7 @@ void macpci_state::init_##label()  \
 
 MAC_DRIVER_INIT(pippin, PCIMODEL_MAC_PIPPIN)
 
-READ32_MEMBER(macpci_state::mac_read_id)
+uint32_t macpci_state::mac_read_id()
 {
 	printf("Mac read ID reg @ PC=%x\n", m_maincpu->pc());
 
@@ -166,23 +160,23 @@ READ32_MEMBER(macpci_state::mac_read_id)
 
 /* 8530 SCC interface */
 
-READ16_MEMBER ( macpci_state::mac_scc_r )
+uint16_t macpci_state::mac_scc_r(offs_t offset)
 {
 	uint16_t result = m_scc->reg_r(offset);
 	return (result << 8) | result;
 }
 
-WRITE16_MEMBER ( macpci_state::mac_scc_w )
+void macpci_state::mac_scc_w(offs_t offset, uint16_t data)
 {
 	m_scc->reg_w(offset, data);
 }
 
-WRITE16_MEMBER ( macpci_state::mac_scc_2_w )
+void macpci_state::mac_scc_2_w(offs_t offset, uint16_t data)
 {
 	m_scc->reg_w(offset, data >> 8);
 }
 
-READ8_MEMBER(macpci_state::mac_5396_r)
+uint8_t macpci_state::mac_5396_r(offs_t offset)
 {
 	if (offset < 0x100)
 	{
@@ -197,7 +191,7 @@ READ8_MEMBER(macpci_state::mac_5396_r)
 	//return 0;
 }
 
-WRITE8_MEMBER(macpci_state::mac_5396_w)
+void macpci_state::mac_5396_w(offs_t offset, uint8_t data)
 {
 	if (offset < 0x100)
 	{

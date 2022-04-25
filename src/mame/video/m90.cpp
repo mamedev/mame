@@ -150,7 +150,7 @@ void m90_state::bomblord_draw_sprites(screen_device &screen, bitmap_ind16 &bitma
 	int x,y,sprite,colour,fx,fy;
 
 
-	while ((offs < m_spriteram.bytes()/2) & (m_spriteram[offs+0] != 0x8000))
+	while ((offs < m_spriteram.bytes()/2) && (m_spriteram[offs+0] != 0x8000))
 	{
 		last_sprite = offs;
 		offs += 4;
@@ -187,7 +187,7 @@ void m90_state::dynablsb_draw_sprites(screen_device &screen, bitmap_ind16 &bitma
 	int offs = 0, last_sprite = 0;
 	int x,y,sprite,colour,fx,fy;
 
-	while ((offs < m_spriteram.bytes()/2) & (m_spriteram[offs+0] != 0xffff))
+	while ((offs < m_spriteram.bytes()/2) && (m_spriteram[offs+0] != 0xffff))
 	{
 		last_sprite = offs;
 		offs += 4;
@@ -219,7 +219,7 @@ void m90_state::dynablsb_draw_sprites(screen_device &screen, bitmap_ind16 &bitma
 	}
 }
 
-WRITE16_MEMBER(m90_state::m90_video_w)
+void m90_state::m90_video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_video_data[offset]);
 
@@ -235,7 +235,7 @@ WRITE16_MEMBER(m90_state::m90_video_w)
 	}
 }
 
-WRITE16_MEMBER(m90_state::bootleg_video_w)
+void m90_state::bootleg_video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_video_data[offset]);
 

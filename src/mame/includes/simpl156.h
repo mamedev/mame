@@ -52,7 +52,7 @@ private:
 	optional_device<decospr_device> m_sprgen;
 	required_device<palette_device> m_palette;
 	std::unique_ptr<u16[]> m_spriteram;
-	size_t m_spriteram_size;
+	size_t m_spriteram_size = 0;
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
 
@@ -63,11 +63,11 @@ private:
 	void mainram_w(offs_t offset, u32 data, u32 mem_mask);
 	template<unsigned Layer> u32 rowscroll_r(offs_t offset);
 	template<unsigned Layer> void rowscroll_w(offs_t offset, u32 data, u32 mem_mask);
-	DECLARE_READ32_MEMBER(joemacr_speedup_r);
-	DECLARE_READ32_MEMBER(chainrec_speedup_r);
-	DECLARE_READ32_MEMBER(prtytime_speedup_r);
-	DECLARE_READ32_MEMBER(charlien_speedup_r);
-	DECLARE_READ32_MEMBER(osman_speedup_r);
+	u32 joemacr_speedup_r();
+	u32 chainrec_speedup_r();
+	u32 prtytime_speedup_r();
+	u32 charlien_speedup_r();
+	u32 osman_speedup_r();
 
 	virtual void video_start() override;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

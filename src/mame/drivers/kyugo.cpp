@@ -154,6 +154,12 @@ void kyugo_state::kyugo_main_map(address_map &map)
 	map(0xf000, 0xf7ff).ram().share(m_shared_ram);
 }
 
+void kyugo_state::srdmissn_main_map(address_map &map)
+{
+	kyugo_main_map(map);
+	map(0xe000, 0xe7ff).ram().share(m_shared_ram);
+}
+
 void kyugo_state::gyrodine_main_map(address_map &map)
 {
 	kyugo_main_map(map);
@@ -212,6 +218,7 @@ void kyugo_state::srdmissn_sub_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram().share(m_shared_ram);
+	map(0x8800, 0x8fff).ram();
 	map(0xf400, 0xf400).portr("SYSTEM");
 	map(0xf401, 0xf401).portr("P1");
 	map(0xf402, 0xf402).portr("P2");
@@ -684,6 +691,7 @@ void kyugo_state::srdmissn(machine_config &config)
 	kyugo_base(config);
 
 	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &kyugo_state::srdmissn_main_map);
 	m_subcpu->set_addrmap(AS_PROGRAM, &kyugo_state::srdmissn_sub_map);
 	m_subcpu->set_addrmap(AS_IO, &kyugo_state::srdmissn_sub_portmap);
 }
@@ -1021,11 +1029,11 @@ ROM_START( 99lstwarb ) // copyright blanked, seems based on 99lstwara, given it 
 	ROM_LOAD( "6.27128",      0x10000, 0x4000, CRC(7d9e1e7e) SHA1(81dd8e933a1195e5f119a2b957828a4bf22bea35) ) // sprites - plane 2
 	ROM_LOAD( "7.27128",      0x14000, 0x4000, CRC(8b6fa1c4) SHA1(061ae1849e685dd838f61ea1d6e72a579f38ecc6) ) // sprites - plane 2
 
-	ROM_REGION( 0x0340, "proms", 0 ) // not dumped for this PCB
-	ROM_LOAD( "b.1j",         0x0000, 0x0100, CRC(3ea35431) SHA1(b45318ce898f03a338435a3f6109483d246ff914) ) // blue
-	ROM_LOAD( "g.1h",         0x0100, 0x0100, CRC(acd7a69e) SHA1(b18eab8f669f0a8105a4bbffa346c4b19491c451) ) // green
-	ROM_LOAD( "r.1f",         0x0200, 0x0100, CRC(b7f48b41) SHA1(2d84dc29c0ab43729014129e6392207db0f56e9e) ) // red
-	ROM_LOAD( "n82s123n.5j",  0x0300, 0x0020, CRC(cce2e29f) SHA1(787c65b7d69bcd224b45138fdbbf3fdae296dda6) ) // char lookup table
+	ROM_REGION( 0x0340, "proms", 0 ) // not dumped for this PCB, the 1st stage background requires a palette not present here, so these are not correct for this set.
+	ROM_LOAD( "b.1j",         0x0000, 0x0100, BAD_DUMP CRC(3ea35431) SHA1(b45318ce898f03a338435a3f6109483d246ff914) ) // blue
+	ROM_LOAD( "g.1h",         0x0100, 0x0100, BAD_DUMP CRC(acd7a69e) SHA1(b18eab8f669f0a8105a4bbffa346c4b19491c451) ) // green
+	ROM_LOAD( "r.1f",         0x0200, 0x0100, BAD_DUMP CRC(b7f48b41) SHA1(2d84dc29c0ab43729014129e6392207db0f56e9e) ) // red
+	ROM_LOAD( "n82s123n.5j",  0x0300, 0x0020, BAD_DUMP CRC(cce2e29f) SHA1(787c65b7d69bcd224b45138fdbbf3fdae296dda6) ) // char lookup table
 	ROM_LOAD( "m1.2c",        0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) // timing? (not used)
 
 	ROM_REGION( 0x400, "plds", 0 )
@@ -1576,24 +1584,6 @@ ROM_END
 
 /*************************************
  *
- *  Game specific initialization
- *
- *************************************/
-
-
-void kyugo_state::init_srdmissn()
-{
-	// shared RAM is mapped at 0xe000 as well
-	m_maincpu->space(AS_PROGRAM).install_ram(0xe000, 0xe7ff, m_shared_ram);
-
-	// extra RAM on sub CPU
-	m_subcpu->space(AS_PROGRAM).install_ram(0x8800, 0x8fff);
-}
-
-
-
-/*************************************
- *
  *  Game drivers
  *
  *************************************/
@@ -1610,12 +1600,12 @@ GAME( 1985, sonofphx,  repulse,  repulse,   repulse,  kyugo_state, empty_init,  
 GAME( 1985, flashgal,  0,        repulse,   flashgal, kyugo_state, empty_init,    ROT0,  "Kyugo / Sega",                            "Flashgal (set 1)",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1985, flashgalk, flashgal, repulse,   flashgal, kyugo_state, empty_init,    ROT0,  "Kyugo / Sega",                            "Flashgal (set 1, Kyugo logo)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1985, flashgala, flashgal, flashgala, flashgal, kyugo_state, empty_init,    ROT0,  "Kyugo / Sega",                            "Flashgal (set 2)",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1986, srdmissn,  0,        srdmissn,  srdmissn, kyugo_state, init_srdmissn, ROT90, "Kyugo / Taito Corporation",               "S.R.D. Mission",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1986, fx,        srdmissn, srdmissn,  srdmissn, kyugo_state, init_srdmissn, ROT90, "bootleg",                                 "F-X (bootleg of S.R.D. Mission)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1986, legend,    0,        legend,    legend,   kyugo_state, init_srdmissn, ROT0,  "Kyugo / Sega",                            "Legend",                               MACHINE_SUPPORTS_SAVE ) // no copyright (maybe also a bootleg?)
-GAME( 1986, legendb,   legend,   legend,    legend,   kyugo_state, init_srdmissn, ROT0,  "bootleg",                                 "Legion (bootleg of Legend)",           MACHINE_SUPPORTS_SAVE ) // no copyright
-GAME( 1987, airwolf,   0,        srdmissn,  airwolf,  kyugo_state, init_srdmissn, ROT0,  "Kyugo",                                   "Airwolf",                              MACHINE_SUPPORTS_SAVE )
-GAME( 1987, airwolfa,  airwolf,  srdmissn,  airwolf,  kyugo_state, init_srdmissn, ROT0,  "Kyugo (United Amusements license)",       "Airwolf (US)",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, skywolf,   airwolf,  srdmissn,  skywolf,  kyugo_state, init_srdmissn, ROT0,  "bootleg",                                 "Sky Wolf (set 1)",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1987, skywolf2,  airwolf,  srdmissn,  airwolf,  kyugo_state, init_srdmissn, ROT0,  "bootleg",                                 "Sky Wolf (set 2)",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1987, skywolf3,  airwolf,  srdmissn,  airwolf,  kyugo_state, init_srdmissn, ROT0,  "bootleg",                                 "Sky Wolf (set 3)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1986, srdmissn,  0,        srdmissn,  srdmissn, kyugo_state, empty_init,    ROT90, "Kyugo / Taito Corporation",               "S.R.D. Mission",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1986, fx,        srdmissn, srdmissn,  srdmissn, kyugo_state, empty_init,    ROT90, "bootleg",                                 "F-X (bootleg of S.R.D. Mission)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1986, legend,    0,        legend,    legend,   kyugo_state, empty_init,    ROT0,  "Kyugo / Sega",                            "Legend",                               MACHINE_SUPPORTS_SAVE ) // no copyright (maybe also a bootleg?)
+GAME( 1986, legendb,   legend,   legend,    legend,   kyugo_state, empty_init,    ROT0,  "bootleg",                                 "Legion (bootleg of Legend)",           MACHINE_SUPPORTS_SAVE ) // no copyright
+GAME( 1987, airwolf,   0,        srdmissn,  airwolf,  kyugo_state, empty_init,    ROT0,  "Kyugo",                                   "Airwolf",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1987, airwolfa,  airwolf,  srdmissn,  airwolf,  kyugo_state, empty_init,    ROT0,  "Kyugo (United Amusements license)",       "Airwolf (US)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, skywolf,   airwolf,  srdmissn,  skywolf,  kyugo_state, empty_init,    ROT0,  "bootleg",                                 "Sky Wolf (set 1)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1987, skywolf2,  airwolf,  srdmissn,  airwolf,  kyugo_state, empty_init,    ROT0,  "bootleg",                                 "Sky Wolf (set 2)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1987, skywolf3,  airwolf,  srdmissn,  airwolf,  kyugo_state, empty_init,    ROT0,  "bootleg",                                 "Sky Wolf (set 3)",                     MACHINE_SUPPORTS_SAVE )

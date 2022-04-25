@@ -116,9 +116,9 @@ initials
 #include "machine/rescap.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "sound/ym2151.h"
-#include "sound/3812intf.h"
 #include "sound/k051649.h"
+#include "sound/ymopm.h"
+#include "sound/ymopl.h"
 #include "speaker.h"
 
 #include "konamigt.lh"
@@ -252,7 +252,7 @@ WRITE_LINE_MEMBER(nemesis_state::sound_nmi_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE16_MEMBER(nemesis_state::bubsys_mcu_w)
+void nemesis_state::bubsys_mcu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bubsys_control_ram[offset]);
 	//logerror("bubsys_mcu_w (%08x) %d (%02x %02x %02x %02x)\n", m_maincpu->pc(), state, m_bubsys_control_ram[0], m_bubsys_control_ram[1], m_bubsys_control_ram[2], m_bubsys_control_ram[3]);
@@ -273,7 +273,7 @@ WRITE16_MEMBER(nemesis_state::bubsys_mcu_w)
 			logerror("\tCopy page %02x to shared ram\n", page);
 
 			const uint8_t *src = memregion("bubblememory")->base();
-			memcpy(m_bubsys_shared_ram + 0xf00/2, src + page * 0x90, 0x80);
+			memcpy(&m_bubsys_shared_ram[0xf00/2], src + page * 0x90, 0x80);
 
 			// The last 2 bytes of the block are loaded into the control register
 			m_bubsys_control_ram[0] = src[page * 0x90 + 0x80] | (src[page * 0x90 + 0x81]<<8);
@@ -292,19 +292,19 @@ WRITE16_MEMBER(nemesis_state::bubsys_mcu_w)
 	}
 }
 
-READ16_MEMBER(nemesis_state::gx400_sharedram_word_r)
+uint16_t nemesis_state::gx400_sharedram_word_r(offs_t offset)
 {
 	return m_gx400_shared_ram[offset];
 }
 
-WRITE16_MEMBER(nemesis_state::gx400_sharedram_word_w)
+void nemesis_state::gx400_sharedram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_gx400_shared_ram[offset] = data;
 }
 
 
-READ16_MEMBER(nemesis_state::konamigt_input_word_r)
+uint16_t nemesis_state::konamigt_input_word_r()
 {
 /*
     bit 0-7:   steering
@@ -350,25 +350,30 @@ uint8_t nemesis_state::selected_ip_r()
 }
 
 
-WRITE8_MEMBER(nemesis_state::nemesis_filter_w)
+void nemesis_state::nemesis_filter_w(offs_t offset, uint8_t data)
 {
 	int C1 = /* offset & 0x1000 ? 4700 : */ 0; // is this right? 4.7uF seems too large
 	int C2 = offset & 0x0800 ? 33 : 0;         // 0.033uF = 33 nF
-	m_filter1->filter_rc_set_RC(filter_rc_device::LOWPASS, (AY8910_INTERNAL_RESISTANCE + 12000) / 3, 0, 0, CAP_N(C1)); // unused?
-	m_filter2->filter_rc_set_RC(filter_rc_device::LOWPASS, AY8910_INTERNAL_RESISTANCE + 1000, 10000, 0, CAP_N(C2));
-	m_filter3->filter_rc_set_RC(filter_rc_device::LOWPASS, AY8910_INTERNAL_RESISTANCE + 1000, 10000, 0, CAP_N(C2));
-	m_filter4->filter_rc_set_RC(filter_rc_device::LOWPASS, AY8910_INTERNAL_RESISTANCE + 1000, 10000, 0, CAP_N(C2));
+	m_filter1->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, (AY8910_INTERNAL_RESISTANCE + 12000) / 3, 0, 0, CAP_N(C1)); // unused?
+	m_filter2->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, AY8910_INTERNAL_RESISTANCE + 1000, 10000, 0, CAP_N(C2));
+	m_filter3->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, AY8910_INTERNAL_RESISTANCE + 1000, 10000, 0, CAP_N(C2));
+	m_filter4->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, AY8910_INTERNAL_RESISTANCE + 1000, 10000, 0, CAP_N(C2));
 
 	// konamigt also uses bits 0x0018, what are they for?
 }
 
-WRITE8_MEMBER(nemesis_state::gx400_speech_start_w)
+void nemesis_state::gx400_speech_w(offs_t offset, uint8_t data)
 {
-	m_vlm->st(1);
-	m_vlm->st(0);
+	m_vlm->rst(BIT(offset, 4));
+	m_vlm->st(BIT(offset, 5));
+	// bits 3, 6 also used (one is OE for VLM data?)
+	// data is irrelevant for most writes
+
+	if (offset == 0)
+		m_vlm->data_w(data);
 }
 
-WRITE8_MEMBER(nemesis_state::salamand_speech_start_w)
+void nemesis_state::salamand_speech_start_w(uint8_t data)
 {
 	m_vlm->rst(BIT(data, 0));
 	m_vlm->st(BIT(data, 1));
@@ -393,7 +398,7 @@ uint8_t nemesis_state::nemesis_portA_r()
 	return res;
 }
 
-WRITE8_MEMBER(nemesis_state::city_sound_bank_w)
+void nemesis_state::city_sound_bank_w(uint8_t data)
 {
 	int bank_A = (data & 0x03);
 	int bank_B = ((data >> 2) & 0x03);
@@ -586,14 +591,13 @@ void nemesis_state::gx400_sound_map(address_map &map)
 	map(0x8000, 0x87ff).ram().share("voiceram");
 	map(0xa000, 0xafff).w(m_k005289, FUNC(k005289_device::ld1_w));
 	map(0xc000, 0xcfff).w(m_k005289, FUNC(k005289_device::ld2_w));
-	map(0xe000, 0xe000).w(m_vlm, FUNC(vlm5030_device::data_w));
+	map(0xe000, 0xe000).select(0x78).w(FUNC(nemesis_state::gx400_speech_w));
 	map(0xe001, 0xe001).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0xe003, 0xe003).w(m_k005289, FUNC(k005289_device::tg1_w));
 	map(0xe004, 0xe004).w(m_k005289, FUNC(k005289_device::tg2_w));
 	map(0xe005, 0xe005).w("ay2", FUNC(ay8910_device::address_w));
 	map(0xe006, 0xe006).w("ay1", FUNC(ay8910_device::address_w));
 	map(0xe007, 0xe007).select(0x1ff8).w(FUNC(nemesis_state::nemesis_filter_w));
-	map(0xe030, 0xe030).w(FUNC(nemesis_state::gx400_speech_start_w));
 	map(0xe086, 0xe086).r("ay1", FUNC(ay8910_device::data_r));
 	map(0xe106, 0xe106).w("ay1", FUNC(ay8910_device::data_w));
 	map(0xe205, 0xe205).r("ay2", FUNC(ay8910_device::data_r));
@@ -720,7 +724,7 @@ void nemesis_state::nyanpani_map(address_map &map)
 	map(0x311000, 0x311fff).ram();
 }
 
-READ8_MEMBER(nemesis_state::wd_r)
+uint8_t nemesis_state::wd_r()
 {
 	m_frame_counter ^= 1;
 	return m_frame_counter;
@@ -1545,19 +1549,11 @@ static INPUT_PORTS_START( bubsys )
 	/* "None" = coin slot B disabled */
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
-	PORT_DIPSETTING(    0x03, "3" )
-	PORT_DIPSETTING(    0x02, "4" )
-	PORT_DIPSETTING(    0x01, "5" )
-	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,5")
-	PORT_DIPSETTING(    0x18, "50k and every 100k" )
-	PORT_DIPSETTING(    0x10, "30k" )
-	PORT_DIPSETTING(    0x08, "50k" )
-	PORT_DIPSETTING(    0x00, "100k" )
+	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW2:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW2:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW2:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "SW2:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW2:5" )
 	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
@@ -1571,11 +1567,51 @@ static INPUT_PORTS_START( bubsys )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Players ) )      PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, "1" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW3:3" )
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( gradiusb )
+	PORT_INCLUDE( bubsys )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x00, "7" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPSETTING(    0x18, "20k and every 70k" )
+	PORT_DIPSETTING(    0x10, "30k and every 80k" )
+	PORT_DIPSETTING(    0x08, "20k only" )
+	PORT_DIPSETTING(    0x00, "30k only" )
+
+	PORT_MODIFY("TEST")
 	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" )      PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
-	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW3:3" )
-	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( twinbeeb )
+	PORT_INCLUDE( bubsys )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x03, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x00, "7" )
+	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPSETTING(    0x18, "20k 100k" )
+	PORT_DIPSETTING(    0x10, "30k 120k" )
+	PORT_DIPSETTING(    0x08, "40k 140k" )
+	PORT_DIPSETTING(    0x00, "50k 160k" )
 INPUT_PORTS_END
 
 /******************************************************************************/
@@ -1802,7 +1838,7 @@ void nemesis_state::gx400(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::gx400_sound_map);
 
 	ls259_device &outlatch(LS259(config, "outlatch"));
-	outlatch.q_out_cb<0>().set(FUNC(nemesis_state::coin1_lockout_w));;
+	outlatch.q_out_cb<0>().set(FUNC(nemesis_state::coin1_lockout_w));
 	outlatch.q_out_cb<1>().set(FUNC(nemesis_state::coin2_lockout_w));
 	outlatch.q_out_cb<2>().set(FUNC(nemesis_state::sound_irq_w));
 	outlatch.q_out_cb<7>().set(FUNC(nemesis_state::irq4_enable_w)); // ??
@@ -1932,7 +1968,7 @@ void nemesis_state::rf2_gx400(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::gx400_sound_map);
 
 	ls259_device &outlatch(LS259(config, "outlatch"));
-	outlatch.q_out_cb<0>().set(FUNC(nemesis_state::coin1_lockout_w));;
+	outlatch.q_out_cb<0>().set(FUNC(nemesis_state::coin1_lockout_w));
 	outlatch.q_out_cb<1>().set(FUNC(nemesis_state::coin2_lockout_w));
 	outlatch.q_out_cb<2>().set(FUNC(nemesis_state::sound_irq_w));
 	outlatch.q_out_cb<7>().set(FUNC(nemesis_state::irq4_enable_w)); // ??
@@ -2024,10 +2060,8 @@ void nemesis_state::salamand(machine_config &config)
 
 	K007232(config, m_k007232, 3579545);
 	m_k007232->port_write().set(FUNC(nemesis_state::volume_callback));
-	m_k007232->add_route(0, "lspeaker", 0.08);
-	m_k007232->add_route(0, "rspeaker", 0.08);
-	m_k007232->add_route(1, "lspeaker", 0.08);
-	m_k007232->add_route(1, "rspeaker", 0.08);
+	m_k007232->add_route(ALL_OUTPUTS, "lspeaker", 0.08);
+	m_k007232->add_route(ALL_OUTPUTS, "rspeaker", 0.08);
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
 //  ymsnd.irq_handler().set_inputline(m_audiocpu, 0); ... Interrupts _are_ generated, I wonder where they go
@@ -2065,10 +2099,8 @@ void nemesis_state::blkpnthr(machine_config &config)
 
 	K007232(config, m_k007232, 3579545);
 	m_k007232->port_write().set(FUNC(nemesis_state::volume_callback));
-	m_k007232->add_route(0, "lspeaker", 0.10);
-	m_k007232->add_route(0, "rspeaker", 0.10);
-	m_k007232->add_route(1, "lspeaker", 0.10);
-	m_k007232->add_route(1, "rspeaker", 0.10);
+	m_k007232->add_route(ALL_OUTPUTS, "lspeaker", 0.10);
+	m_k007232->add_route(ALL_OUTPUTS, "rspeaker", 0.10);
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
 //  ymsnd.irq_handler().set_inputline(m_audiocpu, 0); ... Interrupts _are_ generated, I wonder where they go
@@ -2102,26 +2134,20 @@ void nemesis_state::citybomb(machine_config &config)
 	m_palette->set_membits(8);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
 	K007232(config, m_k007232, 3579545);
 	m_k007232->port_write().set(FUNC(nemesis_state::volume_callback));
-	m_k007232->add_route(0, "lspeaker", 0.30);
-	m_k007232->add_route(0, "rspeaker", 0.30);
-	m_k007232->add_route(1, "lspeaker", 0.30);
-	m_k007232->add_route(1, "rspeaker", 0.30);
+	m_k007232->add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	ym3812_device &ym3812(YM3812(config, "ymsnd", 3579545));
 //  ym3812.irq_handler().set_inputline("audiocpu", 0); ... Interrupts _are_ generated, I wonder where they go
-	ym3812.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	ym3812.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	ym3812.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	k051649_device &k051649(K051649(config, "k051649", 3579545/2));
-	k051649.add_route(ALL_OUTPUTS, "lspeaker", 0.38);
-	k051649.add_route(ALL_OUTPUTS, "rspeaker", 0.38);
+	k051649_device &k051649(K051649(config, "k051649", 3579545));
+	k051649.add_route(ALL_OUTPUTS, "mono", 0.38);
 }
 
 void nemesis_state::nyanpani(machine_config &config)
@@ -2147,26 +2173,20 @@ void nemesis_state::nyanpani(machine_config &config)
 	m_palette->set_membits(8);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
 	K007232(config, m_k007232, 3579545);
 	m_k007232->port_write().set(FUNC(nemesis_state::volume_callback));
-	m_k007232->add_route(0, "lspeaker", 0.30);
-	m_k007232->add_route(0, "rspeaker", 0.30);
-	m_k007232->add_route(1, "lspeaker", 0.30);
-	m_k007232->add_route(1, "rspeaker", 0.30);
+	m_k007232->add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	ym3812_device &ym3812(YM3812(config, "ymsnd", 3579545));
 //  ym3812.irq_handler().set_inputline("audiocpu", 0); ... Interrupts _are_ generated, I wonder where they go
-	ym3812.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	ym3812.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	ym3812.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	k051649_device &k051649(K051649(config, "k051649", 3579545/2));
-	k051649.add_route(ALL_OUTPUTS, "lspeaker", 0.38);
-	k051649.add_route(ALL_OUTPUTS, "rspeaker", 0.38);
+	k051649_device &k051649(K051649(config, "k051649", 3579545));
+	k051649.add_route(ALL_OUTPUTS, "mono", 0.38);
 }
 
 void nemesis_state::hcrash(machine_config &config)
@@ -2212,10 +2232,8 @@ void nemesis_state::hcrash(machine_config &config)
 
 	K007232(config, m_k007232, 3579545);
 	m_k007232->port_write().set(FUNC(nemesis_state::volume_callback));
-	m_k007232->add_route(0, "lspeaker", 0.10);
-	m_k007232->add_route(0, "rspeaker", 0.10);
-	m_k007232->add_route(1, "lspeaker", 0.10);
-	m_k007232->add_route(1, "rspeaker", 0.10);
+	m_k007232->add_route(ALL_OUTPUTS, "lspeaker", 0.10);
+	m_k007232->add_route(ALL_OUTPUTS, "rspeaker", 0.10);
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
 //  ymsnd.irq_handler().set_inputline(m_audiocpu, 0); ... Interrupts _are_ generated, I wonder where they go
@@ -2734,7 +2752,7 @@ Notes:
       VSync - 60Hz
       HSync - 15.52kHz
 
-      Custom Chips - 0005289 (DIP42, wavetable sound chip), 0005297 (SDIP64)
+      Custom Chips - 0005289 (DIP42, wavetable sound chip), 0005297 (SDIP64, ULA)
 
 
 Bottom PCB
@@ -2872,8 +2890,8 @@ Default = *
 |        5 |OFF|ON |   |   |   |   |   |   |
 |        7 |ON |ON |   |   |   |   |   |   |
 |----------|---|---|---|---|---|---|---|---|
-|CABINET     TABLE*|OFF|   |   |   |   |   |
-|          UPRIGHT |ON |   |   |   |   |   |
+|CABINET   UPRIGHT*|OFF|   |   |   |   |   |
+|            TABLE |ON |   |   |   |   |   |
 |------------------|---|---|---|---|---|---|
 |BONUS 1ST/2ND         |   |   |   |   |   |
 |          20000/70000 |OFF|OFF|   |   |   |
@@ -3040,8 +3058,8 @@ ROM_START( twinbeeb )
 	ROM_LOAD16_WORD( "boot.bin", 0x000, 0x1e0, CRC(ee6e93d7) SHA1(7302c08a726a760f59d6837be8fd10bbd1f79da0) )
 
 	ROM_REGION( 0x806*0x90, "bubblememory", ROMREGION_ERASE00 )
-//	ROM_LOAD16_WORD_SWAP( "bubble_twinbeeb", 0x000, 0x48360, CRC(21599cf5) SHA1(7eb068e10134d5c66f7f90f6d6b265353b7bd8be) ) // re-encoded data
-	
+//  ROM_LOAD16_WORD_SWAP( "bubble_twinbeeb", 0x000, 0x48360, CRC(21599cf5) SHA1(7eb068e10134d5c66f7f90f6d6b265353b7bd8be) ) // re-encoded data
+
 	ROM_REGION( 0x806*0x80, "bubblememory_temp", 0 )
 	ROM_LOAD( "twinbee.bin", 0x00000, 0x40300, CRC(4d396a0a) SHA1(ee922a1bd7062c0fcf358f5079cca6424aadc975) )
 
@@ -3093,8 +3111,8 @@ void nemesis_state::bubsys_twinbeeb_init()
 
 	for (int i = 0; i < 0x806; i++)
 	{
-		uint16_t crc = 0;
-		
+		[[maybe_unused]] uint16_t crc = 0;
+
 		int sourcebase = i * 0x80;
 		int destbase = i * 0x90;
 
@@ -3121,9 +3139,9 @@ void nemesis_state::bubsys_twinbeeb_init()
 	bubsys_init();
 }
 
-GAME( 1985, bubsys,   0,         bubsys,    bubsys, nemesis_state, bubsys_init, ROT0,   "Konami", "Bubble System BIOS", MACHINE_IS_BIOS_ROOT )
-GAME( 1985, gradiusb, bubsys,    bubsys,    bubsys, nemesis_state, bubsys_init, ROT0,   "Konami", "Gradius (Bubble System)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1985, twinbeeb, bubsys,    bubsys,    bubsys, nemesis_state, bubsys_twinbeeb_init, ROT90,   "Konami", "TwinBee (Bubble System)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1985, bubsys,   0,         bubsys,    bubsys,   nemesis_state, bubsys_init, ROT0,   "Konami", "Bubble System BIOS", MACHINE_IS_BIOS_ROOT )
+GAME( 1985, gradiusb, bubsys,    bubsys,    gradiusb, nemesis_state, bubsys_init, ROT0,   "Konami", "Gradius (Bubble System)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1985, twinbeeb, bubsys,    bubsys,    twinbeeb, nemesis_state, bubsys_twinbeeb_init, ROT90,   "Konami", "TwinBee (Bubble System)", MACHINE_UNEMULATED_PROTECTION )
 // Bubble System RF2
 // Bubble System Galactic Warriors
 // Bubble System Attack Rush

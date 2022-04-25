@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    emupal.c
+    emupal.cpp
 
     Palette device.
 

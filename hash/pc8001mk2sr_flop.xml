@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="pc8001mk2sr_flop" description="NEC PC-8001mkIISR (N80SR BASIC) disk images">
+<!--
+
+TODO:
+- PC8001mk2SR was known running on the equivalent V1(L) BASIC of the bigger PC88 brother.
+  It's pretty much assured that anything marked as "needs V1 BASIC" in pc8801_flop.xml
+  actually belongs here (needs verification once we can boot this).
+
+Known list of SW released for the system:
+kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
+EGGY, Eggy, Bothtec, Jul 85, (cassette only?)
+らぷてっく, Laptick, dB-Soft, Feb 86, (floppy)
+パックランド, Pac-Land, Enix, Oct 85, (cassette/floppy)
+始皇帝, Shikotei, dB-Soft, Aug 86, (floppy)
+(*) Are all of those working on PC-8801V1 mode as well?
+
+-->
+
+<!-- Games -->
+
+	<software name="mappysr">
+		<description>Mappy (mkIISR)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="353200">
+				<rom name="mappy (mkiisr).d88" size="353200" crc="0152ccd0" sha1="e000b25a2ec4232fd2c62c4bf427270715977e3c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xanadusr">
+		<description>Xanadu (mkIISR)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="418960">
+				<rom name="xanadu (mkiisr) (disk a).d88" size="418960" crc="00e5127b" sha1="bbc366072a338deb48da8b460912bf9241689e3e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="415840">
+				<rom name="xanadu (mkiisr) (disk b).d88" size="415840" crc="b64f896a" sha1="2138091d56e3d9f6f3ff20df57eebf8552f488d8"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Operating Systems -->
+
+	<software name="n80srbas">
+		<description>N80SR BASIC system disk (PC-8037SR)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="353200">
+				<rom name="[os] n80sr basic system disk (pc-8037sr) (pc-8001mkiisr).d88" size="353200" crc="68cf9f52" sha1="298f01130e5d79e058f650975086bc8902da63db"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Compilations -->
+
+	<!-- TODO: verify this, each disk seems standalone (and Disk 2 is mkII not mkIISR) -->
+	<software name="pc8001mk">
+		<description>PC-8001mkIISR Game Pack (Compilation)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="[compilation] pc-8001mkiisr game pack (disk 1).d88" size="348848" crc="4711b6c0" sha1="31c406799d0f5fd13b9ea22010b93254fbf1ad61"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="353200">
+				<rom name="[compilation] pc-8001mkiisr game pack (disk 2).d88" size="353200" crc="ac5ccf8b" sha1="85e739e6124704b3e96e6e815ad0d9a25270b258"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="[compilation] pc-8001mkiisr game pack (disk 3).d88" size="348848" crc="cb8fef04" sha1="137cd4a7956e86434c22cf59e52c62262ccf5f55"/>
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

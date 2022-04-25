@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+
+<softwarelist name="basf7100" description="BASF 7100 floppy disks">
+
+	<software name="bos93">
+		<description>BOS 9.3</description>
+		<year>198?</year>
+		<publisher>BASF</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="819200">
+				<rom name="bos93.td0" size="99887" crc="8959f98a" sha1="5f81d4f1f1e1b5eaebf211c6a2738e895bcf1bec" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bkurs">
+		<description>BASIC-Kurs</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="819200">
+				<rom name="bkurs.td0" size="81863" crc="2cea78e6" sha1="9a8efff663d4467e8198593d85db7dfd298bd98c" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

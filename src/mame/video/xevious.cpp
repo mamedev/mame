@@ -140,7 +140,7 @@ TILE_GET_INFO_MEMBER(xevious_state::get_bg_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(xevious_state,xevious)
+void xevious_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(xevious_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(xevious_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
@@ -164,31 +164,31 @@ VIDEO_START_MEMBER(xevious_state,xevious)
 
 ***************************************************************************/
 
-WRITE8_MEMBER( xevious_state::xevious_fg_videoram_w )
+void xevious_state::xevious_fg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_xevious_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER( xevious_state::xevious_fg_colorram_w )
+void xevious_state::xevious_fg_colorram_w(offs_t offset, uint8_t data)
 {
 	m_xevious_fg_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER( xevious_state::xevious_bg_videoram_w )
+void xevious_state::xevious_bg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_xevious_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER( xevious_state::xevious_bg_colorram_w )
+void xevious_state::xevious_bg_colorram_w(offs_t offset, uint8_t data)
 {
 	m_xevious_bg_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER( xevious_state::xevious_vh_latch_w )
+void xevious_state::xevious_vh_latch_w(offs_t offset, uint8_t data)
 {
 	int reg;
 	int scroll = data + ((offset&0x01)<<8);   /* A0 -> D8 */
@@ -220,12 +220,12 @@ WRITE8_MEMBER( xevious_state::xevious_vh_latch_w )
 
 
 /* emulation for schematic 9B */
-WRITE8_MEMBER( xevious_state::xevious_bs_w )
+void xevious_state::xevious_bs_w(offs_t offset, uint8_t data)
 {
 	m_xevious_bs[offset & 1] = data;
 }
 
-READ8_MEMBER( xevious_state::xevious_bb_r )
+uint8_t xevious_state::xevious_bb_r(offs_t offset)
 {
 	uint8_t *rom2a = memregion("gfx4")->base();
 	uint8_t *rom2b = rom2a+0x1000;

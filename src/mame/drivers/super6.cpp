@@ -23,7 +23,7 @@ ToDo:
 #include "bus/rs232/rs232.h"
 //#include "bus/s100/s100.h"
 #include "includes/super6.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 //**************************************************************************
 //  MEMORY BANKING
@@ -371,7 +371,7 @@ void super6_state::io_write_byte(offs_t offset, uint8_t data)
 
 
 //-------------------------------------------------
-//  floppy_format_type floppy_formats
+//  floppy_formats
 //-------------------------------------------------
 
 static void super6_floppies(device_slot_interface &device)
@@ -473,8 +473,8 @@ void super6_state::super6(machine_config &config)
 	m_fdc->intrq_wr_callback().set(FUNC(super6_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(super6_state::fdc_drq_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy0, super6_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, super6_floppies, nullptr, floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy0, super6_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, super6_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	Z80DART(config, m_dart, 24_MHz_XTAL / 4);
 	m_dart->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));

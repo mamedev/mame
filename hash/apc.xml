@@ -21,7 +21,7 @@ license:CC0
 		<description>Program Dispatcher for CP/M(Ver 1.7)</description>
 		<year>1983</year>
 		<publisher>Metasoft Corporation</publisher>
-		<info name="Usage Notes" value="Needs CP/M to run" />
+		<info name="usage" value="Needs CP/M to run" />
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="247485">
 				<rom name="progdisp.imd" size="247485" crc="1439ffbc" sha1="f27c3c078c7845ac0a6f19d9922d9fd9a1fc6371" status="baddump"/>
@@ -175,7 +175,7 @@ license:CC0
 		<description>MultiPlan</description>
 		<year>1982</year>
 		<publisher>Microsoft</publisher>
-		<info name="Usage Notes" value="Needs MS-DOS" />
+		<info name="usage" value="Needs MS-DOS" />
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="125376">
 				<rom name="multplan.imd" size="125376" crc="e1a83ed0" sha1="847ec2c647574284bb45790bf3536cafa317ca5f"/>
@@ -221,7 +221,7 @@ license:CC0
 		<description>NEC APC Self Executng Demo</description>
 		<year>198?</year>
 		<publisher>NEC</publisher>
-		<info name="Usage Notes" value="Isn't bootable" />
+		<info name="usage" value="Isn't bootable" />
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="121913">
 				<rom name="necdemo.imd" size="121913" crc="bf278a5f" sha1="a576a7536117ce4201780eda0e7fa6008735d952" status="baddump"/>
@@ -381,8 +381,8 @@ license:CC0
 		<description>WordStar (Ver 3.30) for MS-DOS</description>
 		<year>1983</year>
 		<publisher>MicroPro International Corporation</publisher>
-		<info name="Serial No" value="XG4286NS" />
-		<info name="Usage Notes" value="Needs MS-DOS" />
+		<info name="serial" value="XG4286NS" />
+		<info name="usage" value="Needs MS-DOS" />
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="216341">
 				<rom name="wordstar.imd" size="216341" crc="ed0e792b" sha1="e5f713735046211ac79db132dcbf92dd8a7e27d6"/>

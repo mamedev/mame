@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -161,7 +161,7 @@ namespace bx
 		, m_size(_size)
 		, m_buffer(_buffer)
 	{
-		BX_CHECK(_control.available() >= _size, "%d >= %d", _control.available(), _size);
+		BX_ASSERT(_control.available() >= _size, "%d >= %d", _control.available(), _size);
 	}
 
 	template <typename ControlT>
@@ -210,7 +210,7 @@ namespace bx
 	{
 		uint32_t size = m_control.reserve(_size);
 		BX_UNUSED(size);
-		BX_CHECK(size == _size, "%d == %d", size, _size);
+		BX_ASSERT(size == _size, "%d == %d", size, _size);
 		m_write = m_control.m_current;
 		m_end = m_write+_size;
 	}

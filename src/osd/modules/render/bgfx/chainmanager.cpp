@@ -47,6 +47,7 @@ chain_manager::chain_manager(running_machine& machine, osd_options& options, tex
 	, m_slider_notifier(slider_notifier)
 	, m_screen_count(0)
 {
+	m_converters.clear();
 	refresh_available_chains();
 	parse_chain_selections(options.bgfx_screen_chains());
 	init_texture_converters();
@@ -60,11 +61,11 @@ chain_manager::~chain_manager()
 void chain_manager::init_texture_converters()
 {
 	m_converters.push_back(nullptr);
-	m_converters.push_back(m_effects.effect("misc/texconv_palette16"));
-	m_converters.push_back(m_effects.effect("misc/texconv_rgb32"));
+	m_converters.push_back(m_effects.get_or_load_effect(m_options, "misc/texconv_palette16"));
+	m_converters.push_back(m_effects.get_or_load_effect(m_options, "misc/texconv_rgb32"));
 	m_converters.push_back(nullptr);
-	m_converters.push_back(m_effects.effect("misc/texconv_yuy16"));
-	m_adjuster = m_effects.effect("misc/bcg_adjust");
+	m_converters.push_back(m_effects.get_or_load_effect(m_options, "misc/texconv_yuy16"));
+	m_adjuster = m_effects.get_or_load_effect(m_options, "misc/bcg_adjust");
 }
 
 void chain_manager::refresh_available_chains()
@@ -157,7 +158,7 @@ bgfx_chain* chain_manager::load_chain(std::string name, uint32_t screen_index)
 	bx::FileReader reader;
 	if (!bx::open(&reader, path.c_str()))
 	{
-		osd_printf_warning("Unable to open chain file %s, falling back to no post processing\n", path.c_str());
+		osd_printf_warning("Unable to open chain file %s, falling back to no post processing\n", path);
 		return nullptr;
 	}
 
@@ -176,8 +177,8 @@ bgfx_chain* chain_manager::load_chain(std::string name, uint32_t screen_index)
 	if (document.HasParseError())
 	{
 		std::string error(GetParseError_En(document.GetParseError()));
-		osd_printf_warning("Unable to parse chain %s. Errors returned:\n", path.c_str());
-		osd_printf_warning("%s\n", error.c_str());
+		osd_printf_warning("Unable to parse chain %s. Errors returned:\n", path);
+		osd_printf_warning("%s\n", error);
 		return nullptr;
 	}
 
@@ -185,7 +186,7 @@ bgfx_chain* chain_manager::load_chain(std::string name, uint32_t screen_index)
 
 	if (chain == nullptr)
 	{
-		osd_printf_warning("Unable to load chain %s, falling back to no post processing\n", path.c_str());
+		osd_printf_warning("Unable to load chain %s, falling back to no post processing\n", path);
 		return nullptr;
 	}
 
@@ -377,7 +378,7 @@ void chain_manager::update_screen_count(uint32_t screen_count)
 	}
 }
 
-int32_t chain_manager::slider_changed(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
+int32_t chain_manager::slider_changed(int id, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
 	{
@@ -392,7 +393,7 @@ int32_t chain_manager::slider_changed(running_machine &machine, void *arg, int i
 
 	if (str != nullptr)
 	{
-		*str = string_format("%s", m_available_chains[m_current_chain[id]].m_name.c_str());
+		*str = m_available_chains[m_current_chain[id]].m_name;
 	}
 
 	return m_current_chain[id];
@@ -405,27 +406,21 @@ void chain_manager::create_selection_slider(uint32_t screen_index)
 		return;
 	}
 
-	std::unique_ptr<slider_state> state = make_unique_clear<slider_state>();
+	int32_t minval = 0;
+	int32_t defval = m_current_chain[screen_index];
+	int32_t maxval = m_available_chains.size() - 1;
+	int32_t incval = 1;
 
-	state->minval = 0;
-	state->defval = m_current_chain[screen_index];
-	state->maxval = m_available_chains.size() - 1;
-	state->incval = 1;
+	std::string description = "Window " + std::to_string(m_window_index) + ", Screen " + std::to_string(screen_index) + " Effect:";
 
 	using namespace std::placeholders;
-	state->update = std::bind(&chain_manager::slider_changed, this, _1, _2, _3, _4, _5);
-	state->arg = this;
-	state->id = screen_index;
-	state->description = "Window " + std::to_string(m_window_index) + ", Screen " + std::to_string(screen_index) + " Effect:";
+	auto state = std::make_unique<slider_state>(std::move(description), minval, defval, maxval, incval,
+												std::bind(&chain_manager::slider_changed, this, screen_index, _1, _2));
 
-	ui::menu_item item;
-	item.text = state->description;
-	item.subtext = "";
-	item.flags = 0;
-	item.ref = state.get();
-	item.type = ui::menu_item_type::SLIDER;
-	m_selection_sliders.push_back(item);
-	m_core_sliders.push_back(std::move(state));
+	ui::menu_item item(ui::menu_item_type::SLIDER, state.get());
+	item.set_text(state->description);
+	m_selection_sliders.emplace_back(item);
+	m_core_sliders.emplace_back(std::move(state));
 }
 
 uint32_t chain_manager::update_screen_textures(uint32_t view, render_primitive *starting_prim, osd_window& window)
@@ -464,14 +459,16 @@ uint32_t chain_manager::update_screen_textures(uint32_t view, render_primitive *
 			}
 		}
 
-		bgfx::TextureFormat::Enum dst_format = bgfx::TextureFormat::RGBA8;
-		uint16_t pitch = tex_width;
+		bgfx::TextureFormat::Enum dst_format = bgfx::TextureFormat::BGRA8;
+		uint16_t pitch = prim.m_rowpixels;
+		int width_div_factor = 1;
+		int width_mul_factor = 1;
 		const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, prim.m_flags & PRIMFLAG_TEXFORMAT_MASK,
-			tex_width, tex_height, prim.m_rowpixels, prim.m_prim->texture.palette, prim.m_prim->texture.base, &pitch);
+			prim.m_rowpixels, tex_height, prim.m_prim->texture.palette, prim.m_prim->texture.base, pitch, width_div_factor, width_mul_factor);
 
 		if (texture == nullptr)
 		{
-			bgfx_texture *texture = new bgfx_texture(full_name, dst_format, tex_width, tex_height, mem, BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT, pitch);
+			bgfx_texture *texture = new bgfx_texture(full_name, dst_format, tex_width, tex_height, mem, BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT, pitch, prim.m_rowpixels, width_div_factor, width_mul_factor);
 			m_textures.add_provider(full_name, texture);
 
 			if (prim.m_prim->texture.palette)
@@ -684,7 +681,7 @@ std::vector<ui::menu_item> chain_manager::get_slider_list()
 				std::vector<ui::menu_item> input_sliders = input->get_slider_list();
 				for (ui::menu_item slider : input_sliders)
 				{
-					sliders.push_back(slider);
+					sliders.emplace_back(slider);
 				}
 			}
 		}
@@ -694,27 +691,19 @@ std::vector<ui::menu_item> chain_manager::get_slider_list()
 		{
 			slider_state* core_slider = slider->core_slider();
 
-			ui::menu_item item;
-			item.text = core_slider->description;
-			item.subtext = "";
-			item.flags = 0;
-			item.ref = core_slider;
-			item.type = ui::menu_item_type::SLIDER;
-			m_selection_sliders.push_back(item);
+			ui::menu_item item(ui::menu_item_type::SLIDER, core_slider);
+			item.set_text(core_slider->description);
+			m_selection_sliders.emplace_back(item);
 
-			sliders.push_back(item);
+			sliders.emplace_back(std::move(item));
 		}
 
 		if (chain_sliders.size() > 0)
 		{
-			ui::menu_item item;
-			item.text = MENU_SEPARATOR_ITEM;
-			item.subtext = "";
-			item.flags = 0;
-			item.ref = nullptr;
-			item.type = ui::menu_item_type::SEPARATOR;
+			ui::menu_item item(ui::menu_item_type::SEPARATOR);
+			item.set_text(MENU_SEPARATOR_ITEM);
 
-			sliders.push_back(item);
+			sliders.emplace_back(std::move(item));
 		}
 	}
 

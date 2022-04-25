@@ -6,10 +6,10 @@
 Fidelity Dame Sensory Challenger (DSC)
 
 Hardware notes:
+- PCB label: 510-1030A01
 - Z80A CPU @ 3.9MHz
 - 8KB ROM(MOS 2364), 1KB RAM(2*TMM314APL)
 - 4-digit 7seg panel, sensory board with 50 buttons
-- PCB label 510-1030A01
 
 Instead of chess, it's a checkers game for once (international rules).
 
@@ -23,12 +23,13 @@ TODO:
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
+#include "machine/clock.h"
 #include "machine/sensorboard.h"
-#include "machine/timer.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -43,7 +44,6 @@ public:
 	dsc_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_irq_on(*this, "irq_on"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
@@ -59,7 +59,6 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device<timer_device> m_irq_on;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
@@ -67,10 +66,6 @@ private:
 
 	// address maps
 	void main_map(address_map &map);
-
-	// periodic interrupts
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// I/O handlers
 	void update_display();
@@ -81,16 +76,12 @@ private:
 	void init_board(int state);
 	u8 read_board_row(u8 row);
 
-	u8 m_inp_mux;
-	u8 m_led_select;
+	u8 m_inp_mux = 0;
+	u8 m_led_select = 0;
 };
 
 void dsc_state::machine_start()
 {
-	// zerofill
-	m_inp_mux = 0;
-	m_led_select = 0;
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_select));
@@ -233,10 +224,9 @@ void dsc_state::dsc(machine_config &config)
 	Z80(config, m_maincpu, 3.9_MHz_XTAL); // 3.9MHz resonator
 	m_maincpu->set_addrmap(AS_PROGRAM, &dsc_state::main_map);
 
-	const attotime irq_period = attotime::from_hz(523); // from 555 timer (22nF, 120K, 2.7K)
-	TIMER(config, m_irq_on).configure_periodic(FUNC(dsc_state::irq_on<INPUT_LINE_IRQ0>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_usec(41)); // active for 41us
-	TIMER(config, "irq_off").configure_periodic(FUNC(dsc_state::irq_off<INPUT_LINE_IRQ0>), irq_period);
+	auto &irq_clock(CLOCK(config, "irq_clock", 523)); // from 555 timer (22nF, 120K, 2.7K)
+	irq_clock.set_pulse_width(attotime::from_usec(41)); // active for 41us
+	irq_clock.signal_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(FUNC(dsc_state::init_board));
@@ -252,7 +242,6 @@ void dsc_state::dsc(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 

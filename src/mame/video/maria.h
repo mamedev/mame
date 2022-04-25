@@ -32,25 +32,25 @@ protected:
 
 private:
 
-	int m_maria_palette[32];
-	int m_line_ram[2][160];
-	int m_active_buffer;
-	int m_write_mode;
-	unsigned int m_dll;
-	unsigned int m_dl;
-	int m_holey;
-	int m_offset;
-	int m_vblank;
-	int m_dmaon;
-	int m_dpp;
-	int m_wsync;
-	int m_color_kill;
-	int m_cwidth;
-	int m_bcntl;
-	int m_kangaroo;
-	int m_rm;
-	int m_nmi;
-	unsigned int m_charbase;
+	int m_maria_palette[32]{};
+	int m_line_ram[2][160]{};
+	int m_active_buffer = 0;
+	int m_write_mode = 0;
+	unsigned int m_dll = 0;
+	unsigned int m_dl = 0;
+	int m_holey = 0;
+	int m_offset = 0;
+	int m_vblank = 0;
+	int m_dmaon = 0;
+	int m_dpp = 0;
+	int m_wsync = 0;
+	int m_color_kill = 0;
+	int m_cwidth = 0;
+	int m_bcntl = 0;
+	int m_kangaroo = 0;
+	int m_rm = 0;
+	int m_nmi = 0;
+	unsigned int m_charbase = 0;
 	bitmap_ind16 m_bitmap;
 
 	void draw_scanline();

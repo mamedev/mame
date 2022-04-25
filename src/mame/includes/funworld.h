@@ -30,11 +30,13 @@ public:
 	void fw1stpal(machine_config &config);
 	void fw2ndpal(machine_config &config);
 	void saloon(machine_config &config);
+	void clubcard(machine_config &config);
 	void cuoreuno(machine_config &config);
 	void funquiz(machine_config &config);
 	void witchryl(machine_config &config);
 	void fw_brick_1(machine_config &config);
 	void fw_brick_2(machine_config &config);
+	void gratispk(machine_config &config);
 
 	void init_saloon();
 	void init_mongolnw();
@@ -43,6 +45,7 @@ public:
 	void init_dino4();
 	void init_ctunk();
 	void init_jolycdig();
+	void init_impera16();
 
 protected:
 	void funworld_videoram_w(offs_t offset, uint8_t data);
@@ -69,10 +72,12 @@ private:
 	uint8_t funquiz_ay8910_a_r();
 	uint8_t funquiz_ay8910_b_r();
 
+	void clubcard_map(address_map &map);
 	void cuoreuno_map(address_map &map);
 	void funquiz_map(address_map &map);
 	void funworld_map(address_map &map);
 	void fw_brick_map(address_map &map);
+	void gratispk_map(address_map &map);
 	void saloon_map(address_map &map);
 	void witchryl_map(address_map &map);
 

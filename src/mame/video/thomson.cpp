@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "includes/thomson.h"
 
+#include <algorithm>
 #include <cmath>
 
 //#define VERBOSE 1
@@ -30,11 +31,11 @@
 /****************** dynamic screen size *****************/
 
 
-int thomson_state::thom_update_screen_size()
+bool thomson_state::update_screen_size()
 {
 	const rectangle &visarea = m_screen->visible_area();
 	uint8_t p = m_io_vconfig->read();
-	int new_w, new_h, changed = 0;
+	bool changed = false;
 
 	switch ( p & 3 )
 	{
@@ -50,11 +51,11 @@ int thomson_state::thom_update_screen_size()
 	default: m_thom_hires = m_thom_hires_better; break; /* auto */
 	}
 
-	new_w = ( 320 + m_thom_bwidth * 2 ) * ( m_thom_hires + 1 ) - 1;
-	new_h = ( 200 + m_thom_bheight * 2 ) /** (m_thom_hires + 1 )*/ - 1;
+	int new_w = ( 320 + m_thom_bwidth * 2 ) * ( m_thom_hires + 1 ) - 1;
+	int new_h = ( 200 + m_thom_bheight * 2 ) /** (m_thom_hires + 1 )*/ - 1;
 	if ( ( visarea.max_x != new_w ) || ( visarea.max_y != new_h ) )
 	{
-		changed = 1;
+		changed = true;
 		m_screen->set_visible_area(0, new_w, 0, new_h );
 	}
 
@@ -171,7 +172,7 @@ TIMER_CALLBACK_MEMBER( thomson_state::thom_lightpen_step )
 	int step = param;
 
 	if ( m_thom_lightpen_cb )
-		(this->*m_thom_lightpen_cb)( step );
+		m_thom_lightpen_cb( step );
 
 	if ( step < m_thom_lightpen_nb )
 		m_thom_lightpen_timer->adjust(attotime::from_usec( 64 ), step + 1);
@@ -242,7 +243,7 @@ void thomson_state::thom_border_changed()
 		m_thom_border_l[ y + 1 ] = color;
 		m_thom_border_r[ y + 1 ] = color;
 	}
-	m_thom_vstate_dirty = 1;
+	m_thom_vstate_dirty = true;
 }
 
 
@@ -291,8 +292,8 @@ void thomson_state::thom_set_palette( unsigned index, uint16_t color )
 	m_thom_pal[ index ] = color;
 	if ( index == m_thom_border_index )
 		thom_border_changed();
-	m_thom_pal_changed = 1;
-	m_thom_vstate_dirty = 1;
+	m_thom_pal_changed = true;
+	m_thom_vstate_dirty = true;
 }
 
 
@@ -306,7 +307,7 @@ void thomson_state::thom_set_video_mode( unsigned mode )
 		LOG("thom_set_video_mode: %i at line %i, col %i\n", mode, thom_video_elapsed() / 64, thom_video_elapsed() % 64);
 		m_thom_vmode = mode;
 		thom_gplinfo_changed();
-		m_thom_vstate_dirty = 1;
+		m_thom_vstate_dirty = true;
 		m_thom_hires_better |= thom_mode_is_hires( mode );
 	}
 }
@@ -322,7 +323,7 @@ void thomson_state::thom_set_video_page( unsigned page )
 		LOG("thom_set_video_page: %i at line %i col %i\n", page, thom_video_elapsed() / 64, thom_video_elapsed() % 64);
 		m_thom_vpage = page;
 		thom_gplinfo_changed();
-		m_thom_vstate_dirty = 1;
+		m_thom_vstate_dirty = true;
 	}
 }
 
@@ -863,7 +864,7 @@ TIMER_CALLBACK_MEMBER( thomson_state::thom_scanline_start )
 					m_thom_last_pal, x, xx-x );
 			x = xx;
 		}
-		m_thom_vmem_dirty[y] = 0;
+		m_thom_vmem_dirty[y] = false;
 	}
 
 	/* prepare for next scanline */
@@ -888,8 +889,8 @@ TIMER_CALLBACK_MEMBER( thomson_state::thom_scanline_start )
 
 		if ( m_thom_pal_changed )
 		{
-			memcpy( m_thom_last_pal, m_thom_pal, 32 );
-			m_thom_pal_changed = 0;
+			std::copy_n(&m_thom_pal[0], 16, &m_thom_last_pal[0]);
+			m_thom_pal_changed = false;
 		}
 
 		m_thom_scanline_timer->adjust(attotime::from_usec(64), y + 1);
@@ -901,33 +902,11 @@ TIMER_CALLBACK_MEMBER( thomson_state::thom_scanline_start )
 /* -------------- misc --------------- */
 
 
-#define FLOP_STATE (m_thom_floppy_wcount ? 2 : m_thom_floppy_rcount ? 1 : 0)
-
-
-
 void thomson_state::thom_set_mode_point( int point )
 {
 	assert( point >= 0 && point <= 1 );
 	m_thom_mode_point = ( ! point ) * 0x2000;
 	m_vrambank->set_entry( ! point );
-}
-
-
-
-void thomson_state::thom_floppy_active( int write )
-{
-	int fold = FLOP_STATE, fnew;
-
-	/* stays up for a few frames */
-	if ( write )
-		m_thom_floppy_wcount = 25;
-	else
-		m_thom_floppy_rcount = 25;
-
-	/* update icon */
-	fnew = FLOP_STATE;
-	if ( fold != fnew )
-		m_floppy_led = fnew;
 }
 
 
@@ -1064,21 +1043,11 @@ WRITE_LINE_MEMBER(thomson_state::thom_vblank)
 	// rising edge
 	if (state)
 	{
-		int fnew, fold = FLOP_STATE;
 		int i;
 		uint16_t b = 0;
 		struct thom_vsignal l = thom_get_lightpen_vsignal( 0, -1, 0 );
 
 		LOG("%f thom: video eof called\n", machine().time().as_double());
-
-		/* floppy indicator count */
-		if ( m_thom_floppy_wcount )
-			m_thom_floppy_wcount--;
-		if ( m_thom_floppy_rcount )
-			m_thom_floppy_rcount--;
-		fnew = FLOP_STATE;
-		if ( fnew != fold )
-			m_floppy_led = fnew;
 
 		/* prepare state for next frame */
 		for ( i = 0; i <= THOM_TOTAL_HEIGHT; i++ )
@@ -1088,12 +1057,12 @@ WRITE_LINE_MEMBER(thomson_state::thom_vblank)
 			if ( m_thom_border_r[ i ] != -1 )
 				b = m_thom_border_r[ i ];
 		}
-		memset( m_thom_border_l, 0xff, sizeof( m_thom_border_l ) );
-		memset( m_thom_border_r, 0xff, sizeof( m_thom_border_r ) );
+		std::fill(std::begin(m_thom_border_l), std::end(m_thom_border_l), -1);
+		std::fill(std::begin(m_thom_border_r), std::end(m_thom_border_r), -1);
 		m_thom_border_l[ 0 ] = b;
 		m_thom_border_r[ 0 ] = b;
 		m_thom_vstate_last_dirty = m_thom_vstate_dirty;
-		m_thom_vstate_dirty = 0;
+		m_thom_vstate_dirty = false;
 
 		/* schedule first init signal */
 		m_thom_init_timer->adjust(attotime::from_usec( 64 * THOM_BORDER_HEIGHT + 7 ));
@@ -1110,8 +1079,8 @@ WRITE_LINE_MEMBER(thomson_state::thom_vblank)
 		m_thom_video_timer->adjust(attotime::zero);
 
 		/* update screen size according to user options */
-		if ( thom_update_screen_size() )
-			m_thom_vstate_dirty = 1;
+		if ( update_screen_size() )
+			m_thom_vstate_dirty = true;
 
 		/* hi-res automatic */
 		m_thom_hires_better = thom_mode_is_hires( m_thom_vmode );
@@ -1155,16 +1124,16 @@ static const uint16_t mo5_pal_init[16] =
 };
 
 
-VIDEO_START_MEMBER( thomson_state, thom )
+void thomson_state::video_start()
 {
 	LOG("thom: video start called\n");
 
 	/* scan-line state */
-	memset( m_thom_border_l, 0xff, sizeof( m_thom_border_l ) );
-	memset( m_thom_border_r, 0xff, sizeof( m_thom_border_r ) );
-	memset( m_thom_vbody, 0, sizeof( m_thom_vbody ) );
-	memset( m_thom_vmodepage, 0xffff, sizeof( m_thom_vmodepage ) );
-	memset( m_thom_vmem_dirty, 0, sizeof( m_thom_vmem_dirty ) );
+	std::fill(std::begin(m_thom_border_l), std::end(m_thom_border_l), -1);
+	std::fill(std::begin(m_thom_border_r), std::end(m_thom_border_r), -1);
+	std::fill(std::begin(m_thom_vbody), std::end(m_thom_vbody), 0);
+	std::fill(std::begin(m_thom_vmodepage), std::end(m_thom_vmodepage), -1);
+	std::fill(std::begin(m_thom_vmem_dirty), std::end(m_thom_vmem_dirty), false);
 	m_thom_border_l[ 0 ] = 0;
 	m_thom_border_r[ 0 ] = 0;
 	m_thom_vmodepage[ 0 ] = 0;
@@ -1172,8 +1141,8 @@ VIDEO_START_MEMBER( thomson_state, thom )
 	m_thom_vmode = 0;
 	m_thom_vpage = 0;
 	m_thom_border_index = 0;
-	m_thom_vstate_dirty = 1;
-	m_thom_vstate_last_dirty = 1;
+	m_thom_vstate_dirty = true;
+	m_thom_vstate_last_dirty = true;
 	save_pointer(NAME(m_thom_last_pal), sizeof(m_thom_last_pal));
 	save_pointer(NAME(m_thom_pal), sizeof(m_thom_pal));
 	save_pointer(NAME(m_thom_border_l), sizeof(m_thom_border_l));
@@ -1193,11 +1162,7 @@ VIDEO_START_MEMBER( thomson_state, thom )
 	save_item(NAME(m_thom_mode_point));
 	m_vrambank->set_entry( 0 );
 
-	m_thom_floppy_rcount = 0;
-	m_thom_floppy_wcount = 0;
-	save_item(NAME(m_thom_floppy_wcount));
-	save_item(NAME(m_thom_floppy_rcount));
-	m_floppy_led.resolve();
+	m_caps_led.resolve();
 
 	m_thom_video_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 
@@ -1211,6 +1176,10 @@ VIDEO_START_MEMBER( thomson_state, thom )
 	m_thom_init_cb = nullptr;
 	m_thom_init_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(thomson_state::thom_set_init),this));
 
+	m_thom_bwidth = 0;
+	m_thom_bheight = 0;
+	m_thom_hires = 0;
+	m_thom_hires_better = 0;
 	save_item(NAME(m_thom_bwidth));
 	save_item(NAME(m_thom_bheight));
 	save_item(NAME(m_thom_hires));
@@ -1221,8 +1190,8 @@ VIDEO_START_MEMBER( thomson_state, thom )
 /* sets the fixed palette (for MO5,TO7,TO7/70) and gamma correction */
 void thomson_state::thom_configure_palette(double gamma, const uint16_t* pal, palette_device& palette)
 {
-	memcpy(m_thom_last_pal, pal, 32);
-	memcpy(m_thom_pal, pal, 32);
+	std::copy_n(&pal[0], 16, &m_thom_last_pal[0]);
+	std::copy_n(&pal[0], 16, &m_thom_pal[0]);
 
 	for ( int i = 0; i < 4097; i++ )
 	{
@@ -1251,7 +1220,7 @@ void thomson_state::thom_palette(palette_device &palette)
 	thom_configure_palette(1.0 / 2.8, thom_pal_init, palette);
 }
 
-void thomson_state::mo5_palette(palette_device &palette)
+void mo5_state::mo5_palette(palette_device &palette)
 {
 	LOG("thom: MO5 palette init called\n");
 
@@ -1269,7 +1238,7 @@ void thomson_state::mo5_palette(palette_device &palette)
 
 
 /* write to video memory through addresses 0x4000-0x5fff */
-WRITE8_MEMBER( thomson_state::to7_vram_w )
+void thomson_state::to7_vram_w(offs_t offset, uint8_t data)
 {
 	assert( offset < 0x2000 );
 	/* force two topmost color bits to 1 */
@@ -1279,7 +1248,7 @@ WRITE8_MEMBER( thomson_state::to7_vram_w )
 		return;
 	m_thom_vram[ offset + m_thom_mode_point ] = data;
 	/* dirty whole scanline */
-	m_thom_vmem_dirty[ offset / 40 ] = 1;
+	m_thom_vmem_dirty[ offset / 40 ] = true;
 }
 
 
@@ -1308,14 +1277,14 @@ unsigned thomson_state::to7_lightpen_gpl ( int decx, int decy )
 
 /* write to video memory through addresses 0x4000-0x5fff (TO)
    or 0x0000-0x1fff (MO) */
-WRITE8_MEMBER( thomson_state::to770_vram_w )
+void thomson_state::to770_vram_w(offs_t offset, uint8_t data)
 {
 	assert( offset < 0x2000 );
 	if ( m_thom_vram[ offset + m_thom_mode_point ] == data )
 		return;
 	m_thom_vram[ offset + m_thom_mode_point ] = data;
 	/* dirty whole scanline */
-	m_thom_vmem_dirty[ offset / 40 ] = 1;
+	m_thom_vmem_dirty[ offset / 40 ] = true;
 }
 
 
@@ -1327,7 +1296,7 @@ WRITE8_MEMBER( thomson_state::to770_vram_w )
 
 /* write to video memory through system space (always page 1) */
 
-WRITE8_MEMBER( thomson_state::to8_sys_lo_w )
+void to9_state::to8_sys_lo_w(offs_t offset, uint8_t data)
 {
 	uint8_t* dst = m_thom_vram + offset + 0x6000;
 	assert( offset < 0x2000 );
@@ -1335,26 +1304,26 @@ WRITE8_MEMBER( thomson_state::to8_sys_lo_w )
 		return;
 	*dst = data;
 	/* dirty whole scanline */
-	m_thom_vmem_dirty[ offset / 40 ] = 1;
+	m_thom_vmem_dirty[ offset / 40 ] = true;
 }
 
 
 
-WRITE8_MEMBER( thomson_state::to8_sys_hi_w )
+void to9_state::to8_sys_hi_w(offs_t offset, uint8_t data)
 {
 	uint8_t* dst = m_thom_vram + offset + 0x4000;
 	assert( offset < 0x2000 );
 	if ( *dst == data ) return;
 	*dst = data;
 	/* dirty whole scanline */
-	m_thom_vmem_dirty[ offset / 40 ] = 1;
+	m_thom_vmem_dirty[ offset / 40 ] = true;
 }
 
 
 
 /* write to video memory through data space */
 
-WRITE8_MEMBER( thomson_state::to8_data_lo_w )
+void to9_state::to8_data_lo_w(offs_t offset, uint8_t data)
 {
 	uint8_t* dst = m_thom_vram + ( ( offset + 0x4000 * m_to8_data_vpage + 0x2000 ) & m_ram->mask() );
 	assert( offset < 0x2000 );
@@ -1364,12 +1333,12 @@ WRITE8_MEMBER( thomson_state::to8_data_lo_w )
 	/* dirty whole scanline */
 	if ( m_to8_data_vpage >= 4 )
 		return;
-	m_thom_vmem_dirty[ offset / 40 ] = 1;
+	m_thom_vmem_dirty[ offset / 40 ] = true;
 }
 
 
 
-WRITE8_MEMBER( thomson_state::to8_data_hi_w )
+void to9_state::to8_data_hi_w(offs_t offset, uint8_t data)
 {
 	uint8_t* dst = m_thom_vram + ( ( offset + 0x4000 * m_to8_data_vpage ) & m_ram->mask() );
 	assert( offset < 0x2000 );
@@ -1379,13 +1348,13 @@ WRITE8_MEMBER( thomson_state::to8_data_hi_w )
 	/* dirty whole scanline */
 	if ( m_to8_data_vpage >= 4 )
 		return;
-	m_thom_vmem_dirty[ offset / 40 ] = 1;
+	m_thom_vmem_dirty[ offset / 40 ] = true;
 }
 
 
 
 /* write to video memory page through cartridge addresses space */
-WRITE8_MEMBER( thomson_state::to8_vcart_w )
+void to9_state::to8_vcart_w(offs_t offset, uint8_t data)
 {
 	uint8_t* dst = m_thom_vram + ( ( offset + 0x4000 * m_to8_cart_vpage ) & m_ram->mask() );
 	assert( offset < 0x4000 );
@@ -1395,10 +1364,10 @@ WRITE8_MEMBER( thomson_state::to8_vcart_w )
 	/* dirty whole scanline */
 	if ( m_to8_cart_vpage >= 4  )
 		return;
-	m_thom_vmem_dirty[ (offset & 0x1fff) / 40 ] = 1;
+	m_thom_vmem_dirty[ (offset & 0x1fff) / 40 ] = true;
 }
 
-WRITE8_MEMBER( thomson_state::mo6_vcart_lo_w )
+void mo6_state::mo6_vcart_lo_w(offs_t offset, uint8_t data)
 {
 	uint8_t* dst = m_thom_vram + ( ( offset + 0x3000 + 0x4000 * m_to8_cart_vpage ) & m_ram->mask() );
 	assert( offset < 0x1000 );
@@ -1408,10 +1377,10 @@ WRITE8_MEMBER( thomson_state::mo6_vcart_lo_w )
 	/* dirty whole scanline */
 	if ( m_to8_cart_vpage >= 4  )
 		return;
-	m_thom_vmem_dirty[ (offset & 0x1fff) / 40 ] = 1;
+	m_thom_vmem_dirty[ (offset & 0x1fff) / 40 ] = true;
 }
 
-WRITE8_MEMBER( thomson_state::mo6_vcart_hi_w )
+void mo6_state::mo6_vcart_hi_w(offs_t offset, uint8_t data)
 {
 	uint8_t* dst = m_thom_vram + ( ( offset + 0x4000 * m_to8_cart_vpage ) & m_ram->mask() );
 	assert( offset < 0x3000 );
@@ -1421,5 +1390,5 @@ WRITE8_MEMBER( thomson_state::mo6_vcart_hi_w )
 	/* dirty whole scanline */
 	if ( m_to8_cart_vpage >= 4  )
 		return;
-	m_thom_vmem_dirty[ (offset & 0x1fff) / 40 ] = 1;
+	m_thom_vmem_dirty[ (offset & 0x1fff) / 40 ] = true;
 }

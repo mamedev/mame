@@ -39,6 +39,8 @@ void igs025_device::device_start()
 	m_kb_reg = 0;
 	m_kb_ptr = 0;
 	m_kb_swap = 0;
+	m_olds_bs = 0;
+	m_kb_cmd3 = 0;
 
 	m_execute_external.resolve();
 
@@ -48,19 +50,9 @@ void igs025_device::device_start()
 	save_item(NAME(m_kb_cmd));
 	save_item(NAME(m_kb_reg));
 	save_item(NAME(m_kb_ptr));
-
-
-
-
-	m_olds_bs = 0;
-	m_kb_cmd3 = 0;
-
-
+	save_item(NAME(m_kb_swap));
 	save_item(NAME(m_olds_bs));
 	save_item(NAME(m_kb_cmd3));
-
-
-
 }
 
 void igs025_device::device_reset()

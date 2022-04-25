@@ -24,15 +24,20 @@ public:
 		ST_T1C,
 		ST_PSG0,
 		ST_PSG1,
+		ST_VOL,
+		ST_DAC,
 		ST_DMS,
 		ST_DMD
 	};
 
 	st2204_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	auto dac_callback() { return m_dac_callback.bind(); }
+
 protected:
 	st2204_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor int_map);
 
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -51,6 +56,8 @@ protected:
 	virtual u8 st2xxx_lckr_mask() const override { return 0x1f; }
 	virtual u8 st2xxx_lpwm_mask() const override { return 0x3f; }
 	virtual unsigned st2xxx_lfr_clocks() const override;
+	virtual bool st2xxx_has_spi() const override { return true; }
+	virtual u8 st2xxx_uctr_mask() const override { return 0x0f; }
 	virtual u8 st2xxx_bctr_mask() const override { return 0x87; }
 
 	void common_map(address_map &map);
@@ -71,8 +78,11 @@ private:
 		u8 dread(u16 adr);
 		u8 dreadc(u16 adr);
 		void dwrite(u16 adr, u8 val);
+
+		u16 dmr;
 	};
 
+	u32 tclk_pres_div(u8 mode) const;
 	TIMER_CALLBACK_MEMBER(t0_interrupt);
 	TIMER_CALLBACK_MEMBER(t1_interrupt);
 	void timer_start_from_tclk(int t);
@@ -85,9 +95,18 @@ private:
 	void t1m_w(u8 data);
 	u8 t1c_r();
 	void t1c_w(u8 data);
+
+	TIMER_CALLBACK_MEMBER(psg_interrupt);
+	void psg_timer_reload();
+	u8 psg_r(offs_t offset);
 	void psg_w(offs_t offset, u8 data);
+	u8 psgc_r();
 	void psgc_w(u8 data);
+	u8 vol_r();
+	void vol_w(u8 data);
+	u8 dac_r();
 	void dac_w(u8 data);
+
 	u8 dmsl_r();
 	void dmsl_w(u8 data);
 	u8 dmsh_r();
@@ -98,6 +117,10 @@ private:
 	void dmdh_w(u8 data);
 	void dcntl_w(u8 data);
 	void dcnth_w(u8 data);
+	u8 dmrl_r();
+	void dmrl_w(u8 data);
+	u8 dmrh_r();
+	void dmrh_w(u8 data);
 
 	u8 pmem_r(offs_t offset);
 	void pmem_w(offs_t offset, u8 data);
@@ -106,12 +129,17 @@ private:
 
 	void int_map(address_map &map);
 
+	devcb_write8 m_dac_callback;
+
 	u8 m_tmode[2];
 	u8 m_tcntr[2];
 	u8 m_tload[2];
 	emu_timer *m_timer[2];
 	u16 m_psg[2];
 	u8 m_psgc;
+	u8 m_vol;
+	u8 m_dac;
+	emu_timer *m_psg_timer;
 	u16 m_dms;
 	u16 m_dmd;
 	u8 m_dcnth;

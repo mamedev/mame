@@ -41,8 +41,8 @@ public:
 	auto sda_r_callback() { return m_sda_r.bind(); }
 	auto sda_w_callback() { return m_sda_w.bind(); }
 
-	DECLARE_READ32_MEMBER( read );
-	DECLARE_WRITE32_MEMBER( write );
+	uint32_t read(offs_t offset);
+	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 protected:
 	// device-level overrides

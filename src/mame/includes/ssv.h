@@ -30,6 +30,7 @@ public:
 		m_scroll(*this, "scroll"),
 		m_irq_vectors(*this, "irq_vectors"),
 		m_input_sel(*this, "input_sel"),
+		m_srmp7_esbank(*this, "esbank_%u", 2U),
 		m_raster_interrupt_enabled(false),
 		m_io_key(*this, "KEY%u", 0U),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -61,6 +62,7 @@ public:
 	void init_ssv();
 	void init_ssv_tilescram();
 	void init_ssv_irq1();
+	void init_srmp7();
 	void init_jsk();
 	void init_pastelis();
 
@@ -74,39 +76,41 @@ protected:
 	required_shared_ptr<uint16_t> m_scroll;
 	required_shared_ptr<uint16_t> m_irq_vectors;
 	optional_shared_ptr<uint16_t> m_input_sel;
+	optional_memory_bank_array<2> m_srmp7_esbank;
 
-	int m_tile_code[16];
-	int m_enable_video;
-	int m_shadow_pen_mask;
-	int m_shadow_pen_shift;
-	uint8_t m_requested_int;
-	uint16_t m_irq_enable;
-	int m_interrupt_ultrax;
+	int m_tile_code[16]{};
+	int m_enable_video = 0;
+	int m_shadow_pen_mask = 0;
+	int m_shadow_pen_shift = 0;
+	uint8_t m_requested_int = 0;
+	uint16_t m_irq_enable = 0;
+	int m_interrupt_ultrax = 0;
 	bool m_raster_interrupt_enabled;
-	uint32_t m_latches[8];
+	uint32_t m_latches[8]{};
 
-	DECLARE_WRITE16_MEMBER(irq_ack_w);
-	DECLARE_WRITE16_MEMBER(irq_enable_w);
-	DECLARE_WRITE16_MEMBER(lockout_w);
-	DECLARE_WRITE16_MEMBER(lockout_inv_w);
-	DECLARE_READ16_MEMBER(dsp_dr_r);
-	DECLARE_WRITE16_MEMBER(dsp_dr_w);
-	DECLARE_READ16_MEMBER(dsp_r);
-	DECLARE_WRITE16_MEMBER(dsp_w);
-	DECLARE_READ16_MEMBER(drifto94_unknown_r);
-	DECLARE_READ16_MEMBER(hypreact_input_r);
-	DECLARE_READ16_MEMBER(mainram_r);
-	DECLARE_WRITE16_MEMBER(mainram_w);
-	DECLARE_READ16_MEMBER(srmp4_input_r);
-	DECLARE_READ16_MEMBER(srmp7_irqv_r);
-	DECLARE_WRITE16_MEMBER(srmp7_sound_bank_w);
-	DECLARE_READ16_MEMBER(srmp7_input_r);
-	DECLARE_READ32_MEMBER(latch32_r);
-	DECLARE_WRITE32_MEMBER(latch32_w);
-	DECLARE_READ16_MEMBER(latch16_r);
-	DECLARE_WRITE16_MEMBER(latch16_w);
-	DECLARE_READ16_MEMBER(vblank_r);
-	DECLARE_WRITE16_MEMBER(scroll_w);
+	void irq_ack_w(offs_t offset, uint16_t data);
+	void irq_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void lockout_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void lockout_inv_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t dsp_dr_r();
+	void dsp_dr_w(uint16_t data);
+	uint16_t dsp_r(offs_t offset);
+	[[maybe_unused]] uint16_t fake_r(offs_t offset);
+	void dsp_w(offs_t offset, uint16_t data);
+	uint16_t drifto94_unknown_r();
+	uint16_t hypreact_input_r();
+	uint16_t mainram_r(offs_t offset);
+	void mainram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t srmp4_input_r();
+	uint16_t srmp7_irqv_r();
+	void srmp7_sound_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t srmp7_input_r();
+	uint32_t latch32_r(offs_t offset);
+	void latch32_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint16_t latch16_r(offs_t offset);
+	void latch16_w(offs_t offset, uint16_t data);
+	uint16_t vblank_r();
+	void scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -144,6 +148,8 @@ protected:
 	void ryorioh_map(address_map &map);
 	void srmp4_map(address_map &map);
 	void srmp7_map(address_map &map);
+	void srmp7_es5506_bank2_map(address_map &map);
+	void srmp7_es5506_bank3_map(address_map &map);
 	void survarts_map(address_map &map);
 	void twineag2_map(address_map &map);
 	void ultrax_map(address_map &map);
@@ -176,8 +182,8 @@ protected:
 private:
 	DECLARE_WRITE_LINE_MEMBER(adc_int_w);
 
-	DECLARE_READ16_MEMBER(eeprom_r);
-	DECLARE_WRITE16_MEMBER(eeprom_w);
+	uint16_t eeprom_r();
+	void eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void gdfs_map(address_map &map);
 
@@ -191,7 +197,7 @@ private:
 	required_shared_ptr<uint16_t> m_tmapram;
 	required_shared_ptr<uint16_t> m_tmapscroll;
 
-	tilemap_t *m_tmap;
+	tilemap_t *m_tmap = nullptr;
 };
 
 class eaglshot_state : public ssv_state
@@ -239,10 +245,10 @@ public:
 	void init_sexy();
 
 private:
-	DECLARE_READ16_MEMBER(ballswitch_r);
+	uint16_t ballswitch_r();
 	uint8_t dial_r();
 	void dial_w(uint8_t data);
-	DECLARE_WRITE16_MEMBER(motor_w);
+	void motor_w(uint16_t data);
 
 	void sxyreact_map(address_map &map);
 

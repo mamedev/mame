@@ -4,15 +4,19 @@
 
     Sitronix ST2XXX LCD MCUs
 
-    This extended SoC family combines a 65C02 CPU core (including the
-    Rockwell bit opcodes) with a wide variety of on-chip peripherals.
-    Features common to all besides internal RAM and ROM are parallel
-    ports, internal timers, a multi-level interrupt controller, LCD
-    controllers (of varying degrees of sophistication), R/C/slow XTAL
-    clock generators, power management and PSG channels for speaker
-    output. Each MCU also has numerous pins dedicated to LCD segment
-    drivers, an external bus addressing several MB of off-chip
-    memory using multiple chip select signals, or both.
+    This extended SoC family combines a W65C02S 8-bit CPU core
+    (including the Rockwell bit opcodes) with a wide variety of on-
+    chip peripherals. Common features besides internal RAM and ROM are
+    parallel ports, internal timers, a vectored interrupt controller,
+    LCD controllers (of varying degrees of sophistication), R/C/slow
+    XTAL clock generators, power management and PSG channels for
+    speaker output. Each MCU also has numerous pins dedicated to LCD
+    segment drivers (ST20XX, ST2104, ST2108), an external bus capable
+    of addressing several MB of off-chip memory using multiple chip
+    select signals (ST2100, ST22XX), or both (ST25XX, ST26XX). The
+    later ST23XX series, targeted mostly at digital greeting card
+    applications, eliminated on-chip LCD control but retained other
+    typical ST2XXX features.
 
     On all ST2XXX MCUs but the smallest single-chip ST20XX models,
     4000–7FFF (nominally program memory) and 8000–FFFF (nominally
@@ -23,6 +27,9 @@
     switch 4000–7FFF to a different bank during interrupt service if
     the IRREN bit in the SYS register is set.
 
+    At some time between 2010 and 2012, Sitronix spun off all of its
+    SoC product line to mCore Technology Corporation.
+
 **********************************************************************/
 
 #include "emu.h"
@@ -31,11 +38,12 @@
 #define LOG_IRQ (1 << 1U)
 #define LOG_BT (1 << 2U)
 #define LOG_LCDC (1 << 3U)
+#define VERBOSE LOG_IRQ
 //#define VERBOSE (LOG_IRQ | LOG_BT | LOG_LCDC)
 #include "logmacro.h"
 
 st2xxx_device::st2xxx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal_map, int data_bits, bool has_banked_ram)
-	: r65c02_device(mconfig, type, tag, owner, clock)
+	: w65c02s_device(mconfig, type, tag, owner, clock)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, data_bits, 0)
 	, m_in_port_cb(*this)
 	, m_out_port_cb(*this)
@@ -57,6 +65,7 @@ st2xxx_device::st2xxx_device(const machine_config &mconfig, device_type type, co
 	, m_misc(0)
 	, m_ireq(0)
 	, m_iena(0)
+	, m_irq_level(0xff)
 	, m_lssa(0)
 	, m_lvpw(0)
 	, m_lxmax(0)
@@ -69,6 +78,13 @@ st2xxx_device::st2xxx_device(const machine_config &mconfig, device_type type, co
 	, m_lpwm(0)
 	, m_lcd_ireq(0)
 	, m_lcd_timer(nullptr)
+	, m_sctr(0)
+	, m_sckr(0)
+	, m_ssr(0)
+	, m_smod(0)
+	, m_uctr(0)
+	, m_usr(0)
+	, m_irctr(0)
 	, m_bctr(0)
 {
 	program_config.m_internal_map = std::move(internal_map);
@@ -158,11 +174,7 @@ void st2xxx_device::save_common_registers()
 		save_item(NAME(intf->prr));
 	}
 	if (m_drr_mask != 0)
-	{
 		save_item(NAME(intf->drr));
-		if (st2xxx_has_dma())
-			save_item(NAME(intf->dmr));
-	}
 	if (m_bt_mask != 0)
 	{
 		save_item(NAME(m_bten));
@@ -176,19 +188,34 @@ void st2xxx_device::save_common_registers()
 		save_item(NAME(m_misc));
 	save_item(NAME(m_ireq));
 	save_item(NAME(m_iena));
-	save_item(NAME(m_lssa));
-	save_item(NAME(m_lvpw));
-	save_item(NAME(m_lxmax));
-	save_item(NAME(m_lymax));
-	if (st2xxx_lpan_mask() != 0)
-		save_item(NAME(m_lpan));
-	save_item(NAME(m_lctr));
-	save_item(NAME(m_lckr));
-	save_item(NAME(m_lfra));
-	save_item(NAME(m_lac));
-	save_item(NAME(m_lpwm));
-	if (st2xxx_bctr_mask() != 0)
+	save_item(NAME(m_irq_level));
+	if (st2xxx_lctr_mask() != 0)
 	{
+		save_item(NAME(m_lssa));
+		save_item(NAME(m_lvpw));
+		save_item(NAME(m_lxmax));
+		save_item(NAME(m_lymax));
+		if (st2xxx_lpan_mask() != 0)
+			save_item(NAME(m_lpan));
+		save_item(NAME(m_lctr));
+		save_item(NAME(m_lckr));
+		save_item(NAME(m_lfra));
+		save_item(NAME(m_lac));
+		save_item(NAME(m_lpwm));
+	}
+	if (st2xxx_has_spi())
+	{
+		save_item(NAME(m_sctr));
+		save_item(NAME(m_sckr));
+		save_item(NAME(m_ssr));
+		if (st2xxx_spi_iis())
+			save_item(NAME(m_smod));
+	}
+	if (st2xxx_uctr_mask() != 0)
+	{
+		save_item(NAME(m_uctr));
+		save_item(NAME(m_usr));
+		save_item(NAME(m_irctr));
 		save_item(NAME(m_bctr));
 		save_item(NAME(m_brs));
 		save_item(NAME(m_bdiv));
@@ -214,7 +241,6 @@ void st2xxx_device::device_reset()
 	m.irr = 0;
 	m.prr = 0;
 	m.drr = 0;
-	m.dmr = 0;
 
 	// reset interrupt registers
 	m_ireq = 0;
@@ -245,28 +271,60 @@ void st2xxx_device::device_reset()
 	m_lpwm = 0;
 	m_lcd_timer->adjust(attotime::never);
 
+	// reset SPI
+	m_sctr = 0;
+	m_sckr = 0;
+	m_ssr = 0;
+	m_smod = 0;
+
 	// reset UART and BRG
+	m_uctr = 0;
+	m_usr = BIT(st2xxx_uctr_mask(), 4) ? 0x01 : 0;
+	m_irctr = 0;
 	m_bctr = 0;
 }
 
-u8 st2xxx_device::acknowledge_irq()
+u8 st2xxx_device::active_irq_level() const
 {
 	// IREQH interrupts have priority over IREQL interrupts
-	for (int pri = 0; pri < 16; pri++)
+	u16 ireq_active = swapendian_int16(m_ireq & m_iena);
+	if (ireq_active != 0)
+		return 31 - (8 ^ count_leading_zeros_32(ireq_active & -ireq_active));
+	else
+		return 0xff;
+}
+
+u8 st2xxx_device::read_vector(u16 adr)
+{
+	if (adr >= 0xfffe)
 	{
-		int level = pri ^ 8;
-		if (BIT(m_ireq & m_iena, level))
+		if (adr == 0xfffe)
 		{
-			LOGMASKED(LOG_IRQ, "%s interrupt acknowledged (PC = $%04X, vector = $%04X)\n",
-				st2xxx_irq_name(level),
+			set_irq_service(true);
+
+			// Make sure this doesn't change in between vector pull cycles
+			m_irq_level = irq_taken ? active_irq_level() : 0xff;
+		}
+
+		if (m_irq_level != 0xff)
+		{
+			adr -= (m_irq_level + 3) << 1;
+
+			LOGMASKED(LOG_IRQ, "Acknowledging %s interrupt (PC = $%04X, IREQ = $%04X, IENA = $%04X, vector pull from $%04X)\n",
+				st2xxx_irq_name(m_irq_level),
 				PPC,
-				0x7ff8 - (level << 1));
-			m_ireq &= ~(1 << level);
-			update_irq_state();
-			return level;
+				m_ireq,
+				m_iena,
+				adr & 0x7fff);
+
+			if (BIT(adr, 0))
+			{
+				m_ireq &= ~(1 << m_irq_level);
+				update_irq_state();
+			}
 		}
 	}
-	throw emu_fatalerror("ST2XXX: no IRQ to acknowledge!\n");
+	return downcast<mi_st2xxx &>(*mintf).read_vector(adr);
 }
 
 u8 st2xxx_device::pdata_r(offs_t offset)
@@ -419,19 +477,6 @@ void st2xxx_device::btclr_all_w(u8 data)
 		m_btsr = 0;
 }
 
-u32 st2xxx_device::tclk_pres_div(u8 mode) const
-{
-	assert(mode < 8);
-	if (mode == 0)
-		return 0x10000;
-	else if (mode < 4)
-		return 0x20000 >> (mode * 2);
-	else if (mode == 4)
-		return 0x100;
-	else
-		return 0x8000 >> (mode * 2);
-}
-
 u16 st2xxx_device::pres_count() const
 {
 	return (m_pres_base + ((m_prs & 0x60) == 0x40 ? attotime_to_cycles(machine().time() - m_pres_started) : 0));
@@ -561,28 +606,6 @@ void st2xxx_device::drrh_w(u8 data)
 {
 	u16 &drr = downcast<mi_st2xxx &>(*mintf).drr;
 	drr = ((u16(data) << 8) & m_drr_mask) | (drr & 0x00ff);
-}
-
-u8 st2xxx_device::dmrl_r()
-{
-	return downcast<mi_st2xxx &>(*mintf).dmr & 0xff;
-}
-
-void st2xxx_device::dmrl_w(u8 data)
-{
-	u16 &dmr = downcast<mi_st2xxx &>(*mintf).dmr;
-	dmr = (data & m_drr_mask) | (dmr & 0xff00);
-}
-
-u8 st2xxx_device::dmrh_r()
-{
-	return downcast<mi_st2xxx &>(*mintf).dmr >> 8;
-}
-
-void st2xxx_device::dmrh_w(u8 data)
-{
-	u16 &dmr = downcast<mi_st2xxx &>(*mintf).dmr;
-	dmr = ((u16(data) << 8) & m_drr_mask) | (dmr & 0x00ff);
 }
 
 u8 st2xxx_device::ireql_r()
@@ -758,7 +781,7 @@ void st2xxx_device::lfr_recalculate_period()
 
 u8 st2xxx_device::lac_r()
 {
-	return m_lac;
+	return m_lac | 0xe0;
 }
 
 void st2xxx_device::lac_w(u8 data)
@@ -768,7 +791,7 @@ void st2xxx_device::lac_w(u8 data)
 
 u8 st2xxx_device::lpwm_r()
 {
-	return m_lpwm;
+	return m_lpwm | ~st2xxx_lpwm_mask();
 }
 
 void st2xxx_device::lpwm_w(u8 data)
@@ -776,9 +799,99 @@ void st2xxx_device::lpwm_w(u8 data)
 	m_lpwm = data & st2xxx_lpwm_mask();
 }
 
+u8 st2xxx_device::sctr_r()
+{
+	return m_sctr;
+}
+
+void st2xxx_device::sctr_w(u8 data)
+{
+	// TXEMP on wakeup?
+	if (!BIT(m_sctr, 7) && BIT(data, 7))
+		m_ssr |= 0x20;
+
+	m_sctr = data;
+}
+
+u8 st2xxx_device::sckr_r()
+{
+	return m_sckr | 0x80;
+}
+
+void st2xxx_device::sckr_w(u8 data)
+{
+	m_sckr = data & 0x7f;
+}
+
+u8 st2xxx_device::ssr_r()
+{
+	return m_ssr | 0x88;
+}
+
+void st2xxx_device::ssr_w(u8 data)
+{
+	// Write any value to clear
+	m_ssr = 0;
+}
+
+u8 st2xxx_device::smod_r()
+{
+	return m_smod | 0xf0;
+}
+
+void st2xxx_device::smod_w(u8 data)
+{
+	m_smod = data & 0x0f;
+}
+
+u8 st2xxx_device::uctr_r()
+{
+	return m_uctr | ~st2xxx_uctr_mask();
+}
+
+void st2xxx_device::uctr_w(u8 data)
+{
+	m_uctr = data & st2xxx_uctr_mask();
+}
+
+u8 st2xxx_device::usr_r()
+{
+	return m_usr | 0x80;
+}
+
+void st2xxx_device::ustr_trg_w(u8 data)
+{
+	m_usr = (m_usr & 0x7a) | (data & 0x05);
+}
+
+void st2xxx_device::usr_clr_w(u8 data)
+{
+	m_usr &= ~data;
+}
+
+u8 st2xxx_device::irctr_r()
+{
+	return m_irctr | 0x3c;
+}
+
+void st2xxx_device::irctr_w(u8 data)
+{
+	m_irctr = data & 0xc7;
+}
+
+u8 st2xxx_device::udata_r()
+{
+	return 0;
+}
+
+void st2xxx_device::udata_w(u8 data)
+{
+	logerror("Writing %02X to UART transmitter (PC = %04X)\n", data, PPC);
+}
+
 u8 st2xxx_device::bctr_r()
 {
-	return m_bctr;
+	return m_bctr | ~st2xxx_bctr_mask();
 }
 
 void st2xxx_device::bctr_w(u8 data)
@@ -805,5 +918,3 @@ void st2xxx_device::bdiv_w(u8 data)
 {
 	m_bdiv = data;
 }
-
-#include "cpu/m6502/st2xxx.hxx"

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nathan Woods
 /*
-    video/dgn_beta.c
+    video/dgn_beta.cpp
 
 The Dragon Beta uses a 68B45 for it's display generation, this is used in the
 conventional way with a character generator ROM in the two text modes, which are
@@ -96,13 +96,13 @@ the access to the video memory is unclear to me at the moment.
 #define IsTextMode  (m_GCtrl & GCtrlChrGfx) ? 1 : 0                  // Is this text mode ?
 #define IsGfx16     ((~m_GCtrl & GCtrlChrGfx) && (~m_GCtrl & GCtrlControl)) ? 1 : 0   // is this 320x256x16bpp mode
 #define IsGfx2      ((m_GCtrl & GCtrlHiLo) && (~m_GCtrl & GCtrlFS)) ? 1 : 0       // Is this a 2 colour mode
-#define SWChar      (m_GCtrl & GCtrlSWChar)>>1                   // Swchar bit
+#define SWChar      BIT(m_GCtrl, GCtrlSWChar)                   // Swchar bit
 
 MC6845_UPDATE_ROW( dgn_beta_state::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t *videoram = m_videoram;
-	uint32_t  *p = &bitmap.pix32(y);
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint8_t const *const videoram = m_ram->pointer();
+	uint32_t  *p = &bitmap.pix(y);
 	int i;
 	if(IsTextMode)
 	{
@@ -120,7 +120,7 @@ MC6845_UPDATE_ROW( dgn_beta_state::crtc_update_row )
 			int FlashChar=(attr & 0x80) >> 7; // Flashing char
 
 			// underline is active for character set 0, on character row 9
-			int ULActive=(UnderLine && (ra==9) && ~SWChar);
+			int ULActive=(UnderLine && (ra==9) && !SWChar);
 
 			/* Invert foreground and background if flashing char and flash active */
 			int Invert=(FlashChar & m_FlashBit);

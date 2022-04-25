@@ -14,7 +14,7 @@
 #pragma once
 
 #include "bus/isa/isa.h"
-#include "softlist_dev.h"
+#include "imagedev/magtape.h"
 
 
 //**************************************************************************
@@ -23,7 +23,7 @@
 
 // ======================> sc499_ctape_image_device
 
-class sc499_ctape_image_device : public device_t, public device_image_interface
+class sc499_ctape_image_device : public microtape_image_device
 {
 public:
 	// construction/destruction
@@ -32,18 +32,12 @@ public:
 	// image-level overrides
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual iodevice_t image_type() const noexcept override { return IO_MAGTAPE; }
 
-	virtual bool is_readable()  const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return true; }
-	virtual bool is_creatable() const noexcept override { return true; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
-	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual bool support_command_line_image_creation() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "sc499_cass"; }
 	virtual const char *file_extensions() const noexcept override { return "act,ct"; }
-	virtual const char *custom_instance_name() const noexcept override { return "ctape"; }
-	virtual const char *custom_brief_instance_name() const noexcept override { return "ct"; }
+	virtual const char *image_type_name() const noexcept override { return "ctape"; }
+	virtual const char *image_brief_type_name() const noexcept override { return "ct"; }
 
 	uint8_t *read_block(int block_num);
 	void write_block(int block_num, uint8_t *ptr);
@@ -52,9 +46,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override { }
-
-	// device_image_interface implementation
-	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 
 	std::vector<uint8_t> m_ctape_data;
 };
@@ -75,7 +66,7 @@ private:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 

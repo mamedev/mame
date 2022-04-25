@@ -427,6 +427,7 @@ void cxhumax_state::cx_uart2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 					}
 				}
 			}
+			[[fallthrough]];
 		default:
 			COMBINE_DATA(&m_uart2_regs[offset]); break;
 	}
@@ -684,7 +685,7 @@ uint32_t cxhumax_state::cx_i2c1_r(offs_t offset)
 	switch(offset) {
 		case I2C_STAT_REG:
 			data |= m_i2cmem->read_sda()<<3;
-			// fall
+			[[fallthrough]];
 		default:
 			data |= m_i2c1_regs[offset]; break;
 	}
@@ -745,7 +746,7 @@ void cxhumax_state::cx_i2c1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		case I2C_STAT_REG:
 			/* The interrupt status bit may be cleared by writing (anything) to the status register, which also clears the acknowledge status. */
 			data&=~(I2C_WACK_BIT|I2C_INT_BIT);
-			// fall
+			[[fallthrough]];
 		default:
 			COMBINE_DATA(&m_i2c1_regs[offset]);
 	}
@@ -897,17 +898,14 @@ static inline uint32_t ycc_to_rgb(uint32_t ycc)
 
 uint32_t cxhumax_state::screen_update_cxhumax(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int i, j;
-
-
 	uint32_t osd_pointer = m_drm1_regs[DRM_OSD_PTR_REG];
 
 	if(osd_pointer)
 	{
-		uint32_t *ram = m_ram;
-		uint32_t *osd_header = &ram[osd_pointer/4];
-		uint8_t  *vbuf = (uint8_t*)(&ram[osd_header[3]/4]);
-		uint32_t *palette = &ram[osd_header[7]/4];
+		uint32_t const *ram = m_ram;
+		uint32_t const *osd_header = &ram[osd_pointer/4];
+		uint8_t  const *vbuf = (uint8_t*)(&ram[osd_header[3]/4]);
+		uint32_t const *palette = &ram[osd_header[7]/4];
 
 		uint32_t x_disp_start_and_width = osd_header[1];
 		uint32_t xdisp_width = (x_disp_start_and_width >> 16) & 0x1fff;
@@ -927,14 +925,14 @@ uint32_t cxhumax_state::screen_update_cxhumax(screen_device &screen, bitmap_rgb3
 	    uint32_t first_y = m_drm0_regs[DRM_ACTIVE_Y_REG] & 0xfff;
 	    uint32_t last_y = (m_drm0_regs[DRM_ACTIVE_Y_REG] >> 16) & 0xfff;*/
 
-		for (j=ydisp_start; j <= ydisp_last; j++)
+		for (int j=ydisp_start; j <= ydisp_last; j++)
 		{
-			uint32_t *bmp = &bitmap.pix32(j);
+			uint32_t *const bmp = &bitmap.pix(j);
 
-			for (i=xdisp_start; i <= (xdisp_start + xdisp_width); i++)
+			for (int i=xdisp_start; i <= (xdisp_start + xdisp_width); i++)
 			{
 				if ((i <= (xdisp_start + ximg_width)) && (j <= (ydisp_start + yimg_height))) {
-					bmp[i] = palette[vbuf[i+((j-ydisp_start)*ximg_width)]];
+					bmp[i] = palette[vbuf[i+((j-ydisp_start)*ximg_width)]]; // FIXME: need BYTE4_XOR_?E for endianness
 				} else {
 					bmp[i] = ycc_to_rgb(m_drm1_regs[DRM_BCKGND_REG]);
 				}
@@ -1021,6 +1019,7 @@ void cxhumax_state::machine_reset()
 	m_rommode_reg=0;
 	m_xoemask_reg=0;
 	memset(m_extdesc_regs,0,sizeof(m_extdesc_regs));
+	memset(m_drm1_regs,0,sizeof(m_drm1_regs));
 
 	m_pll_regs[SREG_MPG_0_INTFRAC_REG] = (0x1A << 25) /* integer */ | 0x5D1764 /* fraction */;
 	m_pll_regs[SREG_MPG_1_INTFRAC_REG] = (0x1A << 25) /* integer */ | 0x5D1764 /* fraction */;

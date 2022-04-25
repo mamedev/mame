@@ -178,6 +178,14 @@ INPUT_PORTS_START( jsa_i_ioports )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, atari_jsa_base_device, main_test_read_line) // self test
 INPUT_PORTS_END
 
+INPUT_PORTS_START( jsa_i_ioports_inverted_coins )
+	PORT_INCLUDE( jsa_i_ioports )
+
+	PORT_MODIFY("JSAI")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
+INPUT_PORTS_END
+
 INPUT_PORTS_START( jsa_ii_ioports )
 	PORT_START("JSAII")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -195,7 +203,7 @@ INPUT_PORTS_START( jsa_iii_ioports )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, atari_jsa_base_device, main_test_read_line) // self test
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", atari_sound_comm_device, sound_to_main_ready) // output buffer full
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", atari_sound_comm_device, main_to_sound_ready) // input buffer full
@@ -630,7 +638,8 @@ atari_jsa_i_device::atari_jsa_i_device(const machine_config &mconfig, const char
 		m_tms5220(*this, "tms"),
 		m_jsai(*this, "JSAI"),
 		m_pokey_volume(1.0),
-		m_tms5220_volume(1.0)
+		m_tms5220_volume(1.0),
+		m_inverted_coins(false)
 {
 }
 
@@ -800,7 +809,7 @@ void atari_jsa_i_device::device_add_mconfig(machine_config &config)
 
 ioport_constructor atari_jsa_i_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME( jsa_i_ioports );
+	return m_inverted_coins ? INPUT_PORTS_NAME( jsa_i_ioports_inverted_coins ) : INPUT_PORTS_NAME( jsa_i_ioports );
 }
 
 
@@ -979,7 +988,7 @@ uint8_t atari_jsa_iii_device::rdio_r()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-	// Fully populated JSA-III
+// Fully populated JSA-III
 void atari_jsa_iii_device::device_add_mconfig(machine_config &config)
 {
 	// basic machine hardware

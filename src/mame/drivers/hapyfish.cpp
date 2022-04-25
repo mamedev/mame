@@ -54,7 +54,6 @@
 #include "machine/s3c2440.h"
 #include "machine/smartmed.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -110,20 +109,20 @@ private:
 		I2C_WRITE
 	};
 
-	int m_i2c_sda_in;
-	int m_i2c_sda_out;
-	bool m_i2c_scl;
-	bool m_i2c_scl_pulse_started;
-	bool m_i2c_started;
-	i2c_mode m_i2c_mode;
-	uint8_t m_i2c_addr;
-	uint8_t m_i2c_addr_bits;
-	uint8_t m_i2c_data;
-	uint8_t m_i2c_data_bits;
+	int m_i2c_sda_in = 0;
+	int m_i2c_sda_out = 0;
+	bool m_i2c_scl = false;
+	bool m_i2c_scl_pulse_started = false;
+	bool m_i2c_started = false;
+	i2c_mode m_i2c_mode{};
+	uint8_t m_i2c_addr = 0;
+	uint8_t m_i2c_addr_bits = 0;
+	uint8_t m_i2c_data = 0;
+	uint8_t m_i2c_data_bits = 0;
 
-	bool m_nand_select;
+	bool m_nand_select = false;
 
-	uint8_t m_input_select;
+	uint8_t m_input_select = 0;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -530,9 +529,6 @@ void hapyfish_state::hapyfish(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 	UDA1341TS(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // uda1341ts.u12
 	UDA1341TS(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // uda1341ts.u12
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 
 	S3C2440(config, m_s3c2440, 12000000);
 	m_s3c2440->set_palette_tag("palette");

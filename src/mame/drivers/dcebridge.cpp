@@ -181,13 +181,13 @@ template <unsigned N> void dcebridge_state::cts(int state)
 			ioport_value const conf_local(m_conf[N]->read());
 			if ((conf_local & DTR_SOURCE_MASK) == DTR_SOURCE_CTS_LOCAL)
 				m_ports[N]->write_dtr(state);
-			if ((conf_local & RTS_SOURCE_MASK) == DTR_SOURCE_CTS_LOCAL)
+			if ((conf_local & RTS_SOURCE_MASK) == RTS_SOURCE_CTS_LOCAL)
 				m_ports[N]->write_rts(state);
 
 			ioport_value const conf_remote(m_conf[N ^ 1U]->read());
 			if ((conf_remote & DTR_SOURCE_MASK) == DTR_SOURCE_CTS_REMOTE)
 				m_ports[N ^ 1U]->write_dtr(state);
-			if ((conf_remote & RTS_SOURCE_MASK) == DTR_SOURCE_CTS_REMOTE)
+			if ((conf_remote & RTS_SOURCE_MASK) == RTS_SOURCE_CTS_REMOTE)
 				m_ports[N ^ 1U]->write_rts(state);
 		}
 	}
@@ -308,5 +308,5 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY    FULLNAME                 FLAGS
-SYST( 197?, dcebridge, 0,      0,      dcebridge, dcebridge, dcebridge_state, empty_init, "generic", "RS-232 DCE-DCE Bridge", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY      FULLNAME                 FLAGS
+SYST( 197?, dcebridge, 0,      0,      dcebridge, dcebridge, dcebridge_state, empty_init, "<generic>", "RS-232 DCE-DCE Bridge", MACHINE_NO_SOUND_HW )

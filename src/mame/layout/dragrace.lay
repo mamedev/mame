@@ -36,54 +36,54 @@ license:CC0
 	</element>
 
 
-<!-- NOTE: still need to add the RPM tachometers, -->
-<!-- but first figure out how they're hooked up -->
+	<!-- NOTE: still need to add the RPM tachometers, -->
+	<!-- but first figure out how they're hooked up -->
 
 	<view name="Color Overlay">
 		<screen index="0">
 			<bounds left="0" top="0" right="400" bottom="300" />
 		</screen>
 
-		<overlay element="road_overlay">
+		<element ref="road_overlay" blend="multiply">
 			<bounds left="0" top="0" right="400" bottom="300" />
-		</overlay>
+		</element>
 
-		<bezel element="circle_red">
+		<element ref="circle_red" blend="multiply">
 			<bounds x="24.5" y="168.5" width="24" height="24" />
-			<color alpha=".3" />
-		</bezel>
-		<bezel element="circle_green">
+		</element>
+		<element ref="circle_green" blend="multiply">
 			<bounds x="49.5" y="168.5" width="24" height="24" />
-			<color alpha=".3" />
-		</bezel>
-		<bezel element="circle_yellow">
+		</element>
+		<element ref="circle_yellow" blend="multiply">
 			<bounds x="74.5" y="168.5" width="24" height="24" />
-			<color alpha=".3" />
-		</bezel>
-		<bezel element="circle_yellow">
+		</element>
+		<element ref="circle_yellow" blend="multiply">
 			<bounds x="99.5" y="168.5" width="24" height="24" />
-			<color alpha=".3" />
-		</bezel>
-		<bezel element="circle_yellow">
+		</element>
+		<element ref="circle_yellow" blend="multiply">
 			<bounds x="124.5" y="168.5" width="24" height="24" />
-			<color alpha=".3" />
-		</bezel>
+		</element>
 
-		<overlay element="circle_red">
+		<element ref="circle_red" blend="add">
 			<bounds x="24.5" y="168.5" width="24" height="24" />
-		</overlay>
-		<overlay element="circle_green">
+			<color red=".3" green=".3" blue=".3" />
+		</element>
+		<element ref="circle_green" blend="add">
 			<bounds x="49.5" y="168.5" width="24" height="24" />
-		</overlay>
-		<overlay element="circle_yellow">
+			<color red=".3" green=".3" blue=".3" />
+		</element>
+		<element ref="circle_yellow" blend="add">
 			<bounds x="74.5" y="168.5" width="24" height="24" />
-		</overlay>
-		<overlay element="circle_yellow">
+			<color red=".3" green=".3" blue=".3" />
+		</element>
+		<element ref="circle_yellow" blend="add">
 			<bounds x="99.5" y="168.5" width="24" height="24" />
-		</overlay>
-		<overlay element="circle_yellow">
+			<color red=".3" green=".3" blue=".3" />
+		</element>
+		<element ref="circle_yellow" blend="add">
 			<bounds x="124.5" y="168.5" width="24" height="24" />
-		</overlay>
+			<color red=".3" green=".3" blue=".3" />
+		</element>
 
 	</view>
 </mamelayout>

@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 #include "emu.h"
 #include "includes/pc8401a.h"
-#include "rendlay.h"
+
 #include "pc8500.lh"
 
 /* PC-8401A */

@@ -4,6 +4,8 @@ license:CC0
 -->
 <mamelayout version="2">
 
+	<element name="empty" />
+
 	<element name="overlay">
 		<rect>
 			<color red="0.25" green="0.5" blue="1" />
@@ -104,93 +106,93 @@ license:CC0
 
 
 	<view name="Lamps and Color Overlay">
-		<bounds left="0" top="-90" right="400" bottom="300" />
-
 		<screen index="0">
 			<bounds left="0" top="0" right="400" bottom="300" />
 		</screen>
-		<element ref="overlay" blend="multiply">
-			<bounds left="0" top="0" right="400" bottom="300" />
-		</element>
 
-		<element name="EXP_LAMP_0" ref="explamp" blend="add">
-			<bounds x="20.1" y="66.8" width="35" height="17.7" />
-		</element>
-		<element name="EXP_LAMP_1" ref="explamp" blend="add">
-			<bounds x="66.5" y="66.8" width="35" height="17.7" />
-		</element>
-		<element name="EXP_LAMP_2" ref="explamp" blend="add">
-			<bounds x="112.9" y="66.8" width="35" height="17.7" />
-		</element>
-		<element name="EXP_LAMP_3" ref="explamp" blend="add">
-			<bounds x="159.3" y="66.8" width="35" height="17.7" />
-		</element>
-		<element name="EXP_LAMP_4" ref="explamp" blend="add">
-			<bounds x="205.7" y="66.8" width="35" height="17.7" />
-		</element>
-		<element name="EXP_LAMP_5" ref="explamp" blend="add">
-			<bounds x="252.1" y="66.8" width="35" height="17.7" />
-		</element>
-		<element name="EXP_LAMP_6" ref="explamp" blend="add">
-			<bounds x="298.5" y="66.8" width="35" height="17.7" />
-		</element>
-		<element name="EXP_LAMP_7" ref="explamp" blend="add">
-			<bounds x="344.9" y="66.8" width="35" height="17.7" />
-		</element>
-		<element name="EXP_LAMP_8" ref="explamp" blend="add">
-			<bounds x="20.1" y="28.3" width="35" height="17.7" />
-		</element>
-		<element name="EXP_LAMP_9" ref="explamp" blend="add">
-			<bounds x="66.5" y="28.3" width="35" height="17.7" />
-		</element>
-		<element name="EXP_LAMP_A" ref="explamp" blend="add">
-			<bounds x="112.9" y="28.3" width="35" height="17.7" />
-		</element>
-		<element name="EXP_LAMP_B" ref="explamp" blend="add">
-			<bounds x="159.3" y="28.3" width="35" height="17.7" />
-		</element>
-		<element name="EXP_LAMP_C" ref="explamp" blend="add">
-			<bounds x="205.7" y="28.3" width="35" height="17.7" />
-		</element>
-		<element name="EXP_LAMP_D" ref="explamp" blend="add">
-			<bounds x="252.1" y="28.3" width="35" height="17.7" />
-		</element>
-		<element name="EXP_LAMP_E" ref="explamp" blend="add">
-			<bounds x="298.5" y="28.3" width="35" height="17.7" />
-		</element>
-		<element name="EXP_LAMP_F" ref="explamp" blend="add">
-			<bounds x="344.9" y="28.3" width="35" height="17.7" />
-		</element>
+		<collection name="Overlay">
+			<element ref="overlay" blend="multiply">
+				<bounds left="0" top="0" right="400" bottom="300" />
+			</element>
+		</collection>
 
-		<element name="TORP_LAMP_4" ref="lamp_1">
-			<bounds x="117.5" y="-80" width="30" height="30" />
-		</element>
-		<element name="TORP_LAMP_3" ref="lamp_2">
-			<bounds x="162.5" y="-80" width="30" height="30" />
-		</element>
-		<element name="TORP_LAMP_2" ref="lamp_3">
-			<bounds x="207.5" y="-80" width="30" height="30" />
-		</element>
-		<element name="TORP_LAMP_1" ref="lamp_4">
-			<bounds x="252.5" y="-80" width="30" height="30" />
-		</element>
+		<collection name="Explosion Lamps">
+			<element name="EXP_LAMP_0" ref="explamp" blend="add">
+				<bounds x="20.1" y="66.8" width="35" height="17.7" />
+			</element>
+			<element name="EXP_LAMP_1" ref="explamp" blend="add">
+				<bounds x="66.5" y="66.8" width="35" height="17.7" />
+			</element>
+			<element name="EXP_LAMP_2" ref="explamp" blend="add">
+				<bounds x="112.9" y="66.8" width="35" height="17.7" />
+			</element>
+			<element name="EXP_LAMP_3" ref="explamp" blend="add">
+				<bounds x="159.3" y="66.8" width="35" height="17.7" />
+			</element>
+			<element name="EXP_LAMP_4" ref="explamp" blend="add">
+				<bounds x="205.7" y="66.8" width="35" height="17.7" />
+			</element>
+			<element name="EXP_LAMP_5" ref="explamp" blend="add">
+				<bounds x="252.1" y="66.8" width="35" height="17.7" />
+			</element>
+			<element name="EXP_LAMP_6" ref="explamp" blend="add">
+				<bounds x="298.5" y="66.8" width="35" height="17.7" />
+			</element>
+			<element name="EXP_LAMP_7" ref="explamp" blend="add">
+				<bounds x="344.9" y="66.8" width="35" height="17.7" />
+			</element>
+			<element name="EXP_LAMP_8" ref="explamp" blend="add">
+				<bounds x="20.1" y="28.3" width="35" height="17.7" />
+			</element>
+			<element name="EXP_LAMP_9" ref="explamp" blend="add">
+				<bounds x="66.5" y="28.3" width="35" height="17.7" />
+			</element>
+			<element name="EXP_LAMP_A" ref="explamp" blend="add">
+				<bounds x="112.9" y="28.3" width="35" height="17.7" />
+			</element>
+			<element name="EXP_LAMP_B" ref="explamp" blend="add">
+				<bounds x="159.3" y="28.3" width="35" height="17.7" />
+			</element>
+			<element name="EXP_LAMP_C" ref="explamp" blend="add">
+				<bounds x="205.7" y="28.3" width="35" height="17.7" />
+			</element>
+			<element name="EXP_LAMP_D" ref="explamp" blend="add">
+				<bounds x="252.1" y="28.3" width="35" height="17.7" />
+			</element>
+			<element name="EXP_LAMP_E" ref="explamp" blend="add">
+				<bounds x="298.5" y="28.3" width="35" height="17.7" />
+			</element>
+			<element name="EXP_LAMP_F" ref="explamp" blend="add">
+				<bounds x="344.9" y="28.3" width="35" height="17.7" />
+			</element>
+		</collection>
 
-		<element name="READY_LAMP" ref="lamp_ready">
-			<bounds x="117.5" y="-40" width="75" height="30" />
-		</element>
-		<element name="RELOAD_LAMP" ref="lamp_reload">
-			<bounds x="207.5" y="-40" width="75" height="30" />
-		</element>
+		<collection name="Torpedo Lamps">
+			<element ref="empty">
+				<bounds x="0" y="-90" width="400" height="90" />
+			</element>
 
-	</view>
+			<element name="TORP_LAMP_4" ref="lamp_1">
+				<bounds x="117.5" y="-80" width="30" height="30" />
+			</element>
+			<element name="TORP_LAMP_3" ref="lamp_2">
+				<bounds x="162.5" y="-80" width="30" height="30" />
+			</element>
+			<element name="TORP_LAMP_2" ref="lamp_3">
+				<bounds x="207.5" y="-80" width="30" height="30" />
+			</element>
+			<element name="TORP_LAMP_1" ref="lamp_4">
+				<bounds x="252.5" y="-80" width="30" height="30" />
+			</element>
 
-	<view name="Color Overlay">
-		<screen index="0">
-			<bounds left="0" top="0" right="400" bottom="300" />
-		</screen>
-		<element ref="overlay" blend="multiply">
-			<bounds left="0" top="0" right="400" bottom="300" />
-		</element>
+			<element name="READY_LAMP" ref="lamp_ready">
+				<bounds x="117.5" y="-40" width="75" height="30" />
+			</element>
+			<element name="RELOAD_LAMP" ref="lamp_reload">
+				<bounds x="207.5" y="-40" width="75" height="30" />
+			</element>
+		</collection>
+
 	</view>
 
 </mamelayout>

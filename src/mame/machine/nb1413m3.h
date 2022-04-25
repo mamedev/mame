@@ -174,13 +174,13 @@ public:
 	int m_busyctr;
 	int m_outcoin_flag;
 	int m_inputport;
-	int m_nb1413m3_type;
+	int m_nb1413m3_type = 0;
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 
@@ -194,7 +194,7 @@ private:
 	int m_gfxradr_h;
 	int m_gfxrombank;
 	int m_outcoin_enable;
-	emu_timer *m_timer_cb;
+	emu_timer *m_timer_cb = nullptr;
 	output_finder<> m_led;
 	TIMER_CALLBACK_MEMBER( timer_callback );
 };

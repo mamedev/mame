@@ -35,8 +35,8 @@ public:
 private:
 	virtual void machine_start() override;
 	DECLARE_WRITE_LINE_MEMBER(scanline_int_write_line);
-	DECLARE_READ16_MEMBER(special_port2_r);
-	DECLARE_WRITE16_MEMBER(latch_w);
+	uint16_t special_port2_r();
+	void latch_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield2_tile_info);
@@ -51,7 +51,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_extra;
 
-	uint8_t           m_alpha_tile_bank;
+	uint8_t           m_alpha_tile_bank = 0;
 
 	static const atari_motion_objects_config s_mob_config;
 };

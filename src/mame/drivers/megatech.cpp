@@ -78,17 +78,18 @@ Sonic Hedgehog 2           171-6215A   837-6963-62       610-0239-62         MPR
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/cxd1095.h"
-#include "rendlay.h"
 
 #include "includes/megadriv.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
-#include "softlist.h"
+#include "layout/generic.h"
 
 #define MASTER_CLOCK        53693100
 
 
+
+namespace {
 
 class mtech_state : public md_base_state
 {
@@ -105,6 +106,9 @@ public:
 		m_cart7(*this, "mt_slot7"),
 		m_cart8(*this, "mt_slot8"),
 		m_bioscpu(*this, "mtbios"),
+		m_pad(*this, "PAD%u", 1U),
+		m_alarm_sound(*this, "Alarm_sound"),
+		m_flash_screen(*this, "Flash_screen"),
 		m_region_maincpu(*this, "maincpu")
 	{ }
 
@@ -113,6 +117,10 @@ public:
 
 	void init_mt_crt();
 	void init_mt_slot();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 
@@ -137,7 +145,6 @@ private:
 	uint8_t sms_ioport_dd_r();
 	void mt_sms_standard_rom_bank_w(address_space &space, offs_t offset, uint8_t data);
 
-	DECLARE_MACHINE_RESET(megatech);
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, int gameno);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart1 ) { return load_cart(image, m_cart1, 0); }
@@ -183,6 +190,9 @@ private:
 	optional_device<generic_slot_device> m_cart7;
 	optional_device<generic_slot_device> m_cart8;
 	required_device<cpu_device>          m_bioscpu;
+	required_ioport_array<2>             m_pad;
+	output_finder<>                      m_alarm_sound;
+	output_finder<>                      m_flash_screen;
 	required_memory_region               m_region_maincpu;
 
 	memory_region *m_cart_reg[8];
@@ -330,14 +340,14 @@ uint8_t mtech_state::sms_ioport_dc_r()
 {
 	/* 2009-05 FP: would it be worth to give separate inputs to SMS? SMS has only 2 keys A,B (which are B,C on megadrive) */
 	/* bit 4: TL-A; bit 5: TR-A */
-	return (machine().root_device().ioport("PAD1")->read() & 0x3f) | ((machine().root_device().ioport("PAD2")->read() & 0x03) << 6);
+	return (m_pad[0]->read() & 0x3f) | ((m_pad[1]->read() & 0x03) << 6);
 }
 
 uint8_t mtech_state::sms_ioport_dd_r()
 {
 	/* 2009-05 FP: would it be worth to give separate inputs to SMS? SMS has only 2 keys A,B (which are B,C on megadrive) */
 	/* bit 2: TL-B; bit 3: TR-B; bit 4: RESET; bit 5: unused; bit 6: TH-A; bit 7: TH-B*/
-	return ((machine().root_device().ioport("PAD2")->read() & 0x3c) >> 2) | 0x10;
+	return ((m_pad[1]->read() & 0x3c) >> 2) | 0x10;
 }
 
 
@@ -406,12 +416,9 @@ void mtech_state::set_genz80_as_md()
 {
 	address_space &prg = m_z80snd->space(AS_PROGRAM);
 
-	prg.install_readwrite_bank(0x0000, 0x1fff, "bank1");
-	machine().root_device().membank("bank1")->set_base(m_genz80.z80_prgram.get());
-
 	prg.install_ram(0x0000, 0x1fff, m_genz80.z80_prgram.get());
 
-	prg.install_readwrite_handler(0x4000, 0x4003, read8sm_delegate(*m_ymsnd, FUNC(ym2612_device::read)), write8sm_delegate(*m_ymsnd, FUNC(ym2612_device::write)));
+	prg.install_readwrite_handler(0x4000, 0x4003, read8sm_delegate(*m_ymsnd, FUNC(ym_generic_device::read)), write8sm_delegate(*m_ymsnd, FUNC(ym_generic_device::write)));
 	prg.install_write_handler    (0x6000, 0x6000, write8smo_delegate(*this, FUNC(mtech_state::megadriv_z80_z80_bank_w)));
 	prg.install_write_handler    (0x6001, 0x6001, write8smo_delegate(*this, FUNC(mtech_state::megadriv_z80_z80_bank_w)));
 	prg.install_read_handler     (0x6100, 0x7eff, read8smo_delegate(*this, FUNC(mtech_state::megadriv_z80_unmapped_read)));
@@ -485,13 +492,13 @@ uint8_t mtech_state::bios_porte_r()
 
 void mtech_state::bios_portd_w(uint8_t data)
 {
-	output().set_value("Alarm_sound", BIT(data, 7));
+	m_alarm_sound = BIT(data, 7);
 	m_bios_ctrl_inputs = data & 0x04;  // Genesis/SMS input ports disable bit
 }
 
 void mtech_state::bios_porte_w(uint8_t data)
 {
-	output().set_value("Flash_screen", BIT(data, 1));
+	m_flash_screen = BIT(data, 1);
 }
 
 /* this sets 0x300000 which may indicate that the 68k can see the instruction rom
@@ -611,7 +618,7 @@ void mtech_state::init_mt_crt()
 	uint8_t* pin = memregion("sms_pin")->base();
 	init_mt_slot();
 
-	m_cart_is_genesis[0] = !pin[0] ? 1 : 0;;
+	m_cart_is_genesis[0] = !pin[0] ? 1 : 0;
 }
 
 
@@ -627,8 +634,8 @@ uint32_t mtech_state::screen_update_main(screen_device &screen, bitmap_rgb32 &bi
 		// when launching megatech + both sms and megadrive games, the following would be needed...
 		for (int y = 0; y < 224; y++)
 		{
-			uint32_t* lineptr = &bitmap.pix32(y);
-			uint32_t* srcptr =  &m_vdp->get_bitmap().pix32(y + sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT);
+			uint32_t* lineptr = &bitmap.pix(y);
+			uint32_t* srcptr =  &m_vdp->get_bitmap().pix(y + sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT);
 
 			for (int x = 0; x < sega315_5124_device::WIDTH; x++)
 				lineptr[x] = srcptr[x];
@@ -644,30 +651,40 @@ WRITE_LINE_MEMBER(mtech_state::screen_vblank_main)
 		screen_vblank_megadriv(state);
 }
 
-MACHINE_RESET_MEMBER(mtech_state, megatech)
+void mtech_state::machine_start()
+{
+	md_base_state::machine_start();
+
+	m_alarm_sound.resolve();
+	m_flash_screen.resolve();
+}
+
+void mtech_state::machine_reset()
 {
 	m_mt_bank_addr = 0;
-	MACHINE_RESET_CALL_MEMBER(megadriv);
+	md_base_state::machine_reset();
 
-	std::string region_tag;
+	for (int i = 0; i < 8; i++)
+		m_cart_reg[i] = nullptr;
+
 	if (m_cart1->get_rom_size() > 0)
-		m_cart_reg[0] = memregion(region_tag.assign(m_cart1->tag()).append(GENERIC_ROM_REGION_TAG));
+		m_cart_reg[0] = memregion(std::string(m_cart1->tag()) + GENERIC_ROM_REGION_TAG);
 	else
 		m_cart_reg[0] = memregion(":mt_slot1:cart");
 	if (m_cart2)
-		m_cart_reg[1] = memregion(region_tag.assign(m_cart2->tag()).append(GENERIC_ROM_REGION_TAG));
+		m_cart_reg[1] = memregion(std::string(m_cart2->tag()) + GENERIC_ROM_REGION_TAG);
 	if (m_cart3)
-		m_cart_reg[2] = memregion(region_tag.assign(m_cart3->tag()).append(GENERIC_ROM_REGION_TAG));
+		m_cart_reg[2] = memregion(std::string(m_cart3->tag()) + GENERIC_ROM_REGION_TAG);
 	if (m_cart4)
-		m_cart_reg[3] = memregion(region_tag.assign(m_cart4->tag()).append(GENERIC_ROM_REGION_TAG));
+		m_cart_reg[3] = memregion(std::string(m_cart4->tag()) + GENERIC_ROM_REGION_TAG);
 	if (m_cart5)
-		m_cart_reg[4] = memregion(region_tag.assign(m_cart5->tag()).append(GENERIC_ROM_REGION_TAG));
+		m_cart_reg[4] = memregion(std::string(m_cart5->tag()) + GENERIC_ROM_REGION_TAG);
 	if (m_cart6)
-		m_cart_reg[5] = memregion(region_tag.assign(m_cart6->tag()).append(GENERIC_ROM_REGION_TAG));
+		m_cart_reg[5] = memregion(std::string(m_cart6->tag()) + GENERIC_ROM_REGION_TAG);
 	if (m_cart7)
-		m_cart_reg[6] = memregion(region_tag.assign(m_cart7->tag()).append(GENERIC_ROM_REGION_TAG));
+		m_cart_reg[6] = memregion(std::string(m_cart7->tag()) + GENERIC_ROM_REGION_TAG);
 	if (m_cart8)
-		m_cart_reg[7] = memregion(region_tag.assign(m_cart8->tag()).append(GENERIC_ROM_REGION_TAG));
+		m_cart_reg[7] = memregion(std::string(m_cart8->tag()) + GENERIC_ROM_REGION_TAG);
 
 	switch_cart(0);
 }
@@ -701,8 +718,6 @@ void mtech_state::megatech(machine_config &config)
 	io2.out_portd_cb().set(FUNC(mtech_state::bios_portd_w));
 	io2.in_porte_cb().set(FUNC(mtech_state::bios_porte_r));
 	io2.out_porte_cb().set(FUNC(mtech_state::bios_porte_w));
-
-	MCFG_MACHINE_RESET_OVERRIDE(mtech_state, megatech)
 
 	config.set_default_layout(layout_dualhovu);
 
@@ -748,12 +763,12 @@ image_init_result mtech_state::load_cart(device_image_interface &image, generic_
 		return image_init_result::FAIL;
 	else
 	{
-		if (!core_stricmp("genesis", pcb_name))
+		if (!strcmp("genesis", pcb_name))
 		{
 			osd_printf_debug("cart%d is genesis\n", gameno + 1);
 			m_cart_is_genesis[gameno] = 1;
 		}
-		else if (!core_stricmp("sms", pcb_name))
+		else if (!strcmp("sms", pcb_name))
 		{
 			osd_printf_debug("cart%d is sms\n", gameno + 1);
 			m_cart_is_genesis[gameno] = 0;
@@ -1410,6 +1425,8 @@ ROM_START( mt_soni2 ) /* Sonic The Hedgehog 2 */
 
 	ROM_REGION( 0x01, "sms_pin", ROMREGION_ERASE00 )
 ROM_END
+
+} // Anonymous namespace
 
 
 

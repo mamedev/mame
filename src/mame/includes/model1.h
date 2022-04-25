@@ -50,6 +50,7 @@ public:
 		, m_tiles(*this, "tile")
 		, m_digits(*this, "digit%u", 0U)
 		, m_outs(*this, "out%u", 0U)
+		, m_throttle(*this, "THROTTLE")
 	{
 	}
 
@@ -64,13 +65,13 @@ public:
 
 	struct spoint_t
 	{
-		int32_t x, y;
+		int32_t x = 0, y = 0;
 	};
 
 	struct point_t
 	{
-		float x, y, z;
-		float xx, yy;
+		float x = 0, y = 0, z = 0;
+		float xx = 0, yy = 0;
 		spoint_t s;
 	};
 
@@ -97,61 +98,53 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
-
-	DECLARE_WRITE16_MEMBER(bank_w);
+	void bank_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(model1_interrupt);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
 	// TGP
-	DECLARE_READ16_MEMBER(fifoin_status_r);
+	u16 fifoin_status_r();
 
-	DECLARE_READ16_MEMBER(v60_copro_fifo_r);
-	DECLARE_WRITE16_MEMBER(v60_copro_fifo_w);
-	DECLARE_READ16_MEMBER(v60_copro_ram_adr_r);
-	DECLARE_WRITE16_MEMBER(v60_copro_ram_adr_w);
-	DECLARE_READ16_MEMBER(v60_copro_ram_r);
-	DECLARE_WRITE16_MEMBER(v60_copro_ram_w);
+	u16 v60_copro_fifo_r(offs_t offset);
+	void v60_copro_fifo_w(offs_t offset, u16 data);
+	u16 v60_copro_ram_adr_r();
+	void v60_copro_ram_adr_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 v60_copro_ram_r(offs_t offset);
+	void v60_copro_ram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER(copro_ram_r);
-	DECLARE_WRITE32_MEMBER(copro_ram_w);
-	DECLARE_READ32_MEMBER(copro_fifoin_pop);
-	DECLARE_WRITE32_MEMBER(copro_fifoout_push);
-
-	DECLARE_WRITE32_MEMBER(copro_sincos_w);
-	DECLARE_READ32_MEMBER(copro_sincos_r);
-	DECLARE_WRITE32_MEMBER(copro_inv_w);
-	DECLARE_READ32_MEMBER(copro_inv_r);
-	DECLARE_WRITE32_MEMBER(copro_isqrt_w);
-	DECLARE_READ32_MEMBER(copro_isqrt_r);
-	DECLARE_WRITE32_MEMBER(copro_atan_w);
-	DECLARE_READ32_MEMBER(copro_atan_r);
-	DECLARE_WRITE32_MEMBER(copro_data_w);
-	DECLARE_READ32_MEMBER(copro_data_r);
-	DECLARE_WRITE32_MEMBER(copro_ramadr_w);
-	DECLARE_READ32_MEMBER(copro_ramadr_r);
-	DECLARE_WRITE32_MEMBER(copro_ramdata_w);
-	DECLARE_READ32_MEMBER(copro_ramdata_r);
+	void copro_sincos_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 copro_sincos_r(offs_t offset);
+	void copro_inv_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 copro_inv_r(offs_t offset);
+	void copro_isqrt_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 copro_isqrt_r(offs_t offset);
+	void copro_atan_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 copro_atan_r();
+	void copro_data_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 copro_data_r(offs_t offset);
+	void copro_ramadr_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 copro_ramadr_r(offs_t offset);
+	void copro_ramdata_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 copro_ramdata_r(offs_t offset);
 
 	void copro_reset();
 
-	u32 m_copro_sincos_base;
-	u32 m_copro_inv_base;
-	u32 m_copro_isqrt_base;
-	u32 m_copro_atan_base[4];
-	u32 m_copro_data_base;
-	u32 m_copro_ram_adr[4];
+	u32 m_copro_sincos_base = 0;
+	u32 m_copro_inv_base = 0;
+	u32 m_copro_isqrt_base = 0;
+	u32 m_copro_atan_base[4]{};
+	u32 m_copro_data_base = 0;
+	u32 m_copro_ram_adr[4]{};
 
-	uint16_t m_r360_state;
+	uint16_t m_r360_state = 0;
 	uint8_t r360_r();
 	void r360_w(uint8_t data);
 
 	// Rendering
 	virtual void video_start() override;
-	DECLARE_READ16_MEMBER(model1_listctl_r);
-	DECLARE_WRITE16_MEMBER(model1_listctl_w);
+	u16 model1_listctl_r(offs_t offset);
+	void model1_listctl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	uint32_t screen_update_model1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_model1);
@@ -214,10 +207,10 @@ private:
 	// Machine
 	void irq_raise(int level);
 	void irq_init();
-	DECLARE_WRITE8_MEMBER(irq_control_w);
+	void irq_control_w(u8 data);
 
-	uint8_t m_irq_status;
-	int m_last_irq;
+	uint8_t m_irq_status = 0;
+	int m_last_irq = 0;
 
 	// Devices
 	required_device<v60_device> m_maincpu;          // V60
@@ -239,7 +232,7 @@ private:
 	required_shared_ptr<uint16_t> m_color_xlat;
 
 	// Sound
-	int m_sound_irq;
+	int m_sound_irq = 0;
 
 	// TGP FIFO
 	void    fifoout_push(uint32_t data);
@@ -248,7 +241,7 @@ private:
 	float   fifoin_pop_f();
 	uint16_t  ram_get_i();
 	float   ram_get_f();
-	u32 m_v60_copro_fifo_r, m_v60_copro_fifo_w;
+	u32 m_v60_copro_fifo_r = 0, m_v60_copro_fifo_w = 0;
 
 	// TGP
 	void    tgp_reset();
@@ -278,12 +271,12 @@ private:
 	quad_t      *m_quadpt;
 	std::unique_ptr<quad_t *[]> m_quadind;
 
-	uint16_t  m_v60_copro_ram_adr;
-	uint16_t  m_v60_copro_ram_latch[2];
+	uint16_t  m_v60_copro_ram_adr = 0;
+	uint16_t  m_v60_copro_ram_latch[2]{};
 	std::unique_ptr<uint32_t[]> m_copro_ram_data;
-	uint16_t  m_listctl[2];
-	uint16_t  *m_glist;
-	bool    m_render_done;
+	uint16_t  m_listctl[2]{};
+	uint16_t  *m_glist = nullptr;
+	bool    m_render_done = false;
 
 	std::unique_ptr<uint16_t[]> m_tgp_ram;
 	std::unique_ptr<uint32_t[]> m_poly_ram;
@@ -338,7 +331,7 @@ private:
 	clipper_t m_clipfn[4];
 
 	// run-time rendering
-	uint16_t* m_display_list_current;
+	uint16_t* m_display_list_current = nullptr;
 
 	optional_shared_ptr<uint16_t> m_paletteram16;
 	required_device<palette_device> m_palette;
@@ -347,7 +340,8 @@ private:
 	// I/O related
 	output_finder<2> m_digits;
 	output_finder<8> m_outs;
-	DECLARE_READ8_MEMBER(dpram_r);
+	optional_ioport m_throttle;
+	u8 dpram_r(offs_t offset);
 	void gen_outputs_w(uint8_t data);
 	void vf_outputs_w(uint8_t data);
 	void vr_outputs_w(uint8_t data);

@@ -127,7 +127,8 @@ private:
 		DEBUGGER_REG_BC,
 		DEBUGGER_REG_DE,
 		DEBUGGER_REG_HL,
-		DEBUGGER_REG_RB
+		DEBUGGER_REG_RB,
+		DEBUGGER_REG_SP
 	};
 
 	enum _conditions

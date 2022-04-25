@@ -59,7 +59,7 @@ arcadia_sound_device::arcadia_sound_device(const machine_config &mconfig, const 
 //-------------------------------------------------
 void arcadia_sound_device::device_start()
 {
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, UVI_PAL*OSAMP);
+	m_channel = stream_alloc(0, 1, UVI_PAL*OSAMP);
 	m_lfsr    = LFSR_INIT;
 	m_tval    = 1;
 	logerror("arcadia_sound start\n");
@@ -80,14 +80,14 @@ void arcadia_sound_device::device_reset()
 //  our sound stream
 //-------------------------------------------------
 
-void arcadia_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void arcadia_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	int i;
-	stream_sample_t *buffer = outputs[0];
+	auto &buffer = outputs[0];
 
-	for (i = 0; i < samples; i++, buffer++)
+	for (i = 0; i < buffer.samples(); i++)
 	{
-		*buffer = 0;
+		s32 result = 0;
 
 		//if minimal pitch ?
 		if (m_reg[1]){
@@ -97,17 +97,17 @@ void arcadia_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 
 				//tone only
 				case 1:
-					*buffer = m_volume * m_tval;
+					result = m_volume * m_tval;
 				break;
 
 				//noise only
 				case 2:
-					*buffer = m_volume * m_nval;
+					result = m_volume * m_nval;
 				break;
 
 				//tone AND noise (bitwise and)
 				case 3:
-					*buffer = m_volume * (m_tval & m_nval);
+					result = m_volume * (m_tval & m_nval);
 				break;
 			}
 
@@ -132,6 +132,7 @@ void arcadia_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 				m_pos = 0;
 			}
 		}
+		buffer.put_int(i, result, 32768);
 	}
 }
 

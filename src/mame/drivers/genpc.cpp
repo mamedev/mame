@@ -13,7 +13,8 @@
 #include "cpu/nec/nec.h"
 #include "cpu/i86/i86.h"
 #include "bus/pc_kbd/keyboards.h"
-#include "softlist.h"
+#include "bus/pc_kbd/pc_kbdc.h"
+#include "softlist_dev.h"
 
 class genpc_state : public driver_device
 {
@@ -63,10 +64,12 @@ void genpc_state::pcmda(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &genpc_state::pc8_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb"));
 	mb.set_cputag(m_maincpu);
 	mb.int_callback().set_inputline(m_maincpu, 0);
 	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	mb.kbdclk_callback().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
+	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 
 	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "mda", false); // FIXME: determine ISA bus clock
 	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "com", false);
@@ -76,13 +79,16 @@ void genpc_state::pcmda(machine_config &config)
 	ISA8_SLOT(config, "isa6", 0, "mb:isa", pc_isa8_cards, nullptr, false);
 
 	/* keyboard */
-	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));
+	kbd.out_clock_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_clock_w));
+	kbd.out_data_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_data_w));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
 
 	/* software lists */
 	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
+	SOFTWARE_LIST(config, "hdd_list").set_original("ibm5150_hdd");
 }
 
 void genpc_state::pcv20(machine_config &config)
@@ -267,6 +273,14 @@ ROM_START(pc)
 	// OSC: 28.6363, 18.4328.000 - ISA8: 6 - BIOS: PCBIOS 05017 / FARADAY'84'87 / 07017007 - on board: Floppy, ... (ser/par?)
 	ROM_SYSTEM_BIOS(44, "pac", "XT-Faraday PAC")
 	ROMX_LOAD( "xt-faraday_pac_32k.bin", 0x8000, 0x8000, CRC(d1edf110) SHA1(09570ef36dada08a6d3b97d17ad64814fe32d345), ROM_BIOS(44))
+	// 45: AMI XT BIOS
+	// 8088-BIOS (C) 1985,1986, AMI - (C)AMI, (1255-013189)
+	ROM_SYSTEM_BIOS(45, "amixt", "AMI XT BIOS")
+	ROMX_LOAD( "ami_8088_bios_31jan89.bin", 0xe000, 0x2000, CRC(0bcafd1f) SHA1(cb30f01c46dad83343999c609d6f82092e2e8f54), ROM_BIOS(45))
+	// 46: From a motherboard marked VIP M X M/10
+	// Phoenix ROM BIOS Ver 2.52
+	ROM_SYSTEM_BIOS(46, "vipmxm10", "VIP M X M/10")
+	ROMX_LOAD( "xt-vip-mxm-10.bin", 0x8000, 0x8000, CRC(6fd64a0a) SHA1(43808f758e9e92d8920e8c3590c3050ec68415aa), ROM_BIOS(46))
 ROM_END
 
 // BIOS versions specifically for NEC V20 CPUs, these don't run on plain 8088
@@ -278,6 +292,11 @@ ROM_START( pcv20 )
 	// 1: V20-BIOS Version 3.72 c't // (C) Peter Köhlmann 1987 => last known version is 3.82
 	ROM_SYSTEM_BIOS(1, "v372", "c't v3.72")
 	ROMX_LOAD( "v20xtbios.bin", 0xe000, 0x2000, CRC(b2dca2e4) SHA1(18b0cb90084723eae08cf6b27bfb3fec8e9fb11b), ROM_BIOS(1))
+	// 2: Chipset: Vopl TM 215 8750KK - M1101 / M78H012A / 7723 - CPU: NEC 8805F5 V20 D70108C-10
+	// OSC: 32.000000MHz, 14.31818, 16.000MHz
+	ROM_SYSTEM_BIOS(2, "v365", "c't v3.65")
+	ROMX_LOAD( "xt_ls-1720_u52.bin", 0xe000, 0x2000, CRC(7082371a) SHA1(9965dbae5fa4355bc6325ac27a9acc176cc454c3), ROM_BIOS(2))
+	// ROM_LOAD( "xt_ls-1720_u8.bin", 0x0000, 0x2000, CRC(aa1d3916) SHA1(bb1723fc637d5d8a9af82b2bdd9e3b11689f0cb9)))
 ROM_END
 
 

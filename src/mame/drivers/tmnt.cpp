@@ -4,10 +4,92 @@
 
 This driver contains several Konami 68000 based games. For the most part they
 run on incompatible boards, but since 90% of the work is done by the custom
-ICs emulated in video/konamiic.c, we can just as well keep them all
+ICs emulated in video/k0*.cpp, we can just as well keep them all
 together.
 
 driver by Nicola Salmoria
+
+***************************************************************************
+
+Teenage Mutant Ninja Turtles, Konami, 1989
+Hardware info by Guru
+
+PCB Layout
+----------
+
+GX963
+PWB351853A
+|------------------------------------------------------------------|
+|  MB3731         963A25.D5                 963A17.H4    963A15.K4 |
+|     VOL                                                          |
+|                                           963A18.H6    963A16.K6 |
+|                                 963A30.G7                        |
+|   007341                                 |--------|   |--------| |
+|   007341 4066                MCM2018     |KONAMI  |   |KONAMI  | |
+|          4066     640kHz                 |051960  |   |051937  | |
+|                           3.579545MHz    |        |   |        | |
+|      LM358  Y3014   |-------------|      |--------|   |--------| |
+|J  C324              |   007232    |                              |
+|A         963A26.C13 |-------------| 963E20.G13     007644 007644 |
+|M        C324        007340  007340           MB8464     MB8464   |
+|M  LM358      640kHz               D780C-1  963X21.J15  963X22.K15|
+|A         D7759C      MB8416                963X23.I17  963X24.K17|
+|                                           |-------------------|  |
+|          963A27.D18  YM2151     24MHz     |      68000        |  |
+|   051550                   963A31.G19     |-------------------|  |
+|                                                                  |
+|   052535(X3)                             |--------|   |--------| |
+|   005273(X10)               MCM2018      |KONAMI  |   |KONAMI  | |
+|                             MCM2018      |052109  |   |051962  | |
+|  CN4                                     |        |   |        | |
+|  CN3                                     |--------|   |--------| |
+|                                MB8464                            |
+|DIPSW1 DIPSW2 DIPSW3            MB8464     963A28.H27   963A29.K27|
+|------------------------------------------------------------------|
+Notes:
+       68000 - Motorola MC68000P8 CPU. Clock input 8.000MHz [24/3]
+     D780C-1 - NEC D780C-1 Z80-compatible CPU. Clock input 3.579545MHz
+      D7759C - NEC uPD7759C ADPCM Speech Synthesizer. Clock input 640kHz on pin 23
+      YM2151 - Yamaha YM2151 FM Operator Type-M (OPM) sound chip. Clock input 3.579545MHz
+       LM358 - Motorola LM358 Dual Operational Amplifier
+       Y3014 - Yamaha YM3014B Serial Input Floating D/A Converter. Clock input 320kHz [640/2] on pin 5
+        C324 - NEC uPC324 Quad Operational Amplifier (equivalent to LM324)
+      MB8464 - Fujitsu MB8464 8kBx8-bit SRAM
+     MCM2018 - Motorola MCM2018 2kBx8-bit SRAM
+      MB8416 - Fujitsu MB8416 2kBx8-bit SRAM
+      051550 - Custom ceramic module providing coin counter drivers, watchdog timer and master reset signal
+      MB3731 - Fujitsu MB3731 Audio Power Amplifier
+         VOL - 5K-ohm volume pot
+        4066 - Oki M4066 Quad Bilateral Switch
+      007340 - Konami custom resistor array pack
+      007341 - Konami custom resistor array pack
+      052535 - Konami custom resistor array pack
+      005273 - Konami custom resistor array pack
+      007232 - Konami custom PCM Controller/Sample Player. Clock input 3.579545MHz on pin 51
+      052109 - Konami custom Tilemap Generator \
+      051962 - Konami custom Tilemap Generator / paired together
+      051960 - Konami custom Sprite Generator \
+      051937 - Konami custom Sprite Generator / paired together
+      007644 - Konami custom (unknown purpose) DIP22 400mil-wide IC
+  963A27.D18 - 1Mbit 28-pin mask ROM (uPD7759 samples)
+  963A26.C13 - 1Mbit 28-pin mask ROM (007232 PCM samples)
+   963A25.D5 - 4Mbit 40-pin mask ROM (title theme sample for uPD7759)
+  963E20.G13 - 32kBx8-bit (27256) OTP EPROM (Z80 program)
+   963A17.H4 \
+   963A15.K4  \
+   963A18.H6  / 4Mbit 40-pin mask ROM (sprite data)
+   963A16.K6 /
+  963A28.H27 \
+  963A29.K27 / 4Mbit 40-pin mask ROM (tile data)
+  963A31.G19 - AMD27S21 Bi-polar PROM (priority encoder)
+   963A30.G7 - AMD27S21 Bi-polar PROM (sprite address decoder)
+    DIPDW1/2 - 8-position DIP switch
+      DIPSW3 - 4-position DIP switch
+       CN3/4 - 15-position connector for player 3 & 4 controls
+       HSync - 14.9626kHz
+       VSync - 59.1846Hz
+
+***************************************************************************
 
 Notes:
 - Golfing Greats has a peculiar way to know where the ball is laying: the
@@ -61,6 +143,7 @@ Updates:
 #include "includes/konamipt.h"
 
 #include "cpu/m68000/m68000.h"
+#include "cpu/m6805/m68705.h"
 #include "cpu/z80/z80.h"
 #include "machine/adc0804.h"
 #include "machine/eepromser.h"
@@ -70,13 +153,16 @@ Updates:
 #include "machine/rescap.h"
 #include "machine/watchdog.h"
 #include "sound/k054539.h"
+#include "sound/msm5205.h"
 #include "sound/okim6295.h"
 #include "sound/samples.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
+
 #include "speaker.h"
+#include "ymfm/src/ymfm.h" // decode_fp
 
 
-READ16_MEMBER(tmnt_state::k052109_word_noA12_r)
+uint16_t tmnt_state::k052109_word_noA12_r(offs_t offset)
 {
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
@@ -84,7 +170,7 @@ READ16_MEMBER(tmnt_state::k052109_word_noA12_r)
 	return m_k052109->word_r(offset);
 }
 
-WRITE16_MEMBER(tmnt_state::k052109_word_noA12_w)
+void tmnt_state::k052109_word_noA12_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
@@ -92,7 +178,7 @@ WRITE16_MEMBER(tmnt_state::k052109_word_noA12_w)
 	m_k052109->word_w(offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(tmnt_state::punkshot_k052109_word_w)
+void tmnt_state::punkshot_k052109_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* it seems that a word write is supposed to affect only the MSB. The */
 	/* "ROUND 1" text in punkshtj goes lost otherwise. */
@@ -102,19 +188,19 @@ WRITE16_MEMBER(tmnt_state::punkshot_k052109_word_w)
 		m_k052109->write(offset + 0x2000, data & 0xff);
 }
 
-WRITE16_MEMBER(tmnt_state::punkshot_k052109_word_noA12_w)
+void tmnt_state::punkshot_k052109_word_noA12_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
 	offset = ((offset & 0x3000) >> 1) | (offset & 0x07ff);
-	punkshot_k052109_word_w(space, offset, data, mem_mask);
+	punkshot_k052109_word_w(offset, data, mem_mask);
 }
 
 
 /* the interface with the 053245 is weird. The chip can address only 0x800 bytes */
 /* of RAM, but they put 0x4000 there. The CPU can access them all. Address lines */
 /* A1, A5 and A6 don't go to the 053245. */
-READ16_MEMBER(tmnt_state::k053245_scattered_word_r)
+uint16_t tmnt_state::k053245_scattered_word_r(offs_t offset)
 {
 	if (offset & 0x0031)
 		return m_spriteram[offset];
@@ -125,9 +211,9 @@ READ16_MEMBER(tmnt_state::k053245_scattered_word_r)
 	}
 }
 
-WRITE16_MEMBER(tmnt_state::k053245_scattered_word_w)
+void tmnt_state::k053245_scattered_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(m_spriteram + offset);
+	COMBINE_DATA(&m_spriteram[offset]);
 
 	if (!(offset & 0x0031))
 	{
@@ -136,14 +222,14 @@ WRITE16_MEMBER(tmnt_state::k053245_scattered_word_w)
 	}
 }
 
-READ16_MEMBER(tmnt_state::k053244_word_noA1_r)
+uint16_t tmnt_state::k053244_word_noA1_r(offs_t offset)
 {
 	offset &= ~1;   /* handle mirror address */
 
 	return m_k053245->k053244_r(offset + 1) | (m_k053245->k053244_r(offset) << 8);
 }
 
-WRITE16_MEMBER(tmnt_state::k053244_word_noA1_w)
+void tmnt_state::k053244_word_noA1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset &= ~1;   /* handle mirror address */
 
@@ -174,7 +260,7 @@ INTERRUPT_GEN_MEMBER(tmnt_state::lgtnfght_interrupt)
 		device.execute().set_input_line(M68K_IRQ_5, HOLD_LINE);
 }
 
-WRITE8_MEMBER(glfgreat_state::glfgreat_sound_w)
+void glfgreat_state::glfgreat_sound_w(offs_t offset, uint8_t data)
 {
 	m_k053260->main_write(offset, data);
 
@@ -183,23 +269,23 @@ WRITE8_MEMBER(glfgreat_state::glfgreat_sound_w)
 }
 
 
-WRITE16_MEMBER(prmrsocr_state::prmrsocr_sound_irq_w)
+void prmrsocr_state::prmrsocr_sound_irq_w(uint16_t data)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
-WRITE8_MEMBER(prmrsocr_state::prmrsocr_audio_bankswitch_w)
+void prmrsocr_state::prmrsocr_audio_bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 7);
 }
 
 
-READ8_MEMBER(tmnt_state::tmnt_sres_r)
+uint8_t tmnt_state::tmnt_sres_r()
 {
 	return m_tmnt_soundlatch;
 }
 
-WRITE8_MEMBER(tmnt_state::tmnt_sres_w)
+void tmnt_state::tmnt_sres_w(uint8_t data)
 {
 	/* bit 1 resets the UPD7795C sound chip */
 	m_upd7759->reset_w(data & 2);
@@ -208,49 +294,35 @@ WRITE8_MEMBER(tmnt_state::tmnt_sres_w)
 	if (data & 0x04)
 	{
 		if (!m_samples->playing(0))
-			m_samples->start_raw(0, m_sampledata, 0x40000, 20000);
+			m_samples->start_raw(0, m_sampledata, 0x40000, 640000 / 32);
 	}
 	else
 		m_samples->stop(0);
 	m_tmnt_soundlatch = data;
 }
 
-WRITE8_MEMBER(tmnt_state::tmnt_upd_start_w)
+void tmnt_state::tmnt_upd_start_w(uint8_t data)
 {
 	m_upd7759->start_w(data & 1);
 }
 
-READ8_MEMBER(tmnt_state::tmnt_upd_busy_r)
+uint8_t tmnt_state::tmnt_upd_busy_r()
 {
 	return m_upd7759->busy_r() ? 1 : 0;
 }
 
 SAMPLES_START_CB_MEMBER(tmnt_state::tmnt_decode_sample)
 {
-	int i;
+	// using MAME samples to HLE the title music
+	// to put it briefly, it's like this on the PCB:
+	// 640kHz XTAL -> 74161 and 3 74393 -> ROM address -> ROM output to 2 74166 -> YM3014
 	uint8_t *source = memregion("title")->base();
 
-	save_item(NAME(m_sampledata));
-
-	/*  Sound sample for TMNT.D05 is stored in the following mode (ym3012 format):
-	 *
-	 *  Bit 15-13:  Exponent (2 ^ x)
-	 *  Bit 12-3 :  Sound data (10 bit)
-	 *
-	 *  (Sound info courtesy of Dave <dave@finalburn.com>)
-	 */
-
-	for (i = 0; i < 0x40000; i++)
+	// sample data is encoded in Yamaha FP format
+	for (int i = 0; i < 0x40000; i++)
 	{
 		int val = source[2 * i] + source[2 * i + 1] * 256;
-		int expo = val >> 13;
-
-		val = (val >> 3) & (0x3ff); /* 10 bit, Max Amplitude 0x400 */
-		val -= 0x200;                   /* Centralize value */
-
-		val <<= (expo - 3);
-
-		m_sampledata[i] = val;
+		m_sampledata[i] = ymfm::decode_fp(val >> 3);
 	}
 }
 
@@ -265,7 +337,7 @@ void tmnt_state::sound_nmi_callback( int param )
 }
 #endif
 
-void tmnt_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void tmnt_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -277,7 +349,7 @@ void tmnt_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 	}
 }
 
-WRITE8_MEMBER(tmnt_state::sound_arm_nmi_w)
+void tmnt_state::sound_arm_nmi_w(uint8_t data)
 {
 //  sound_nmi_enabled = 1;
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -285,7 +357,7 @@ WRITE8_MEMBER(tmnt_state::sound_arm_nmi_w)
 }
 
 
-READ16_MEMBER(tmnt_state::punkshot_kludge_r)
+uint16_t tmnt_state::punkshot_kludge_r()
 {
 	/* I don't know what's going on here; at one point, the code reads location */
 	/* 0xffffff, and returning 0 causes the game to mess up - locking up in a */
@@ -296,7 +368,7 @@ READ16_MEMBER(tmnt_state::punkshot_kludge_r)
 
 
 /* protection simulation derived from a bootleg */
-READ16_MEMBER(tmnt_state::ssriders_protection_r)
+uint16_t tmnt_state::ssriders_protection_r(address_space &space)
 {
 	int data = space.read_word(0x105a0a);
 	int cmd = space.read_word(0x1058fc);
@@ -339,7 +411,7 @@ READ16_MEMBER(tmnt_state::ssriders_protection_r)
 	}
 }
 
-WRITE16_MEMBER(tmnt_state::ssriders_protection_w)
+void tmnt_state::ssriders_protection_w(address_space &space, offs_t offset, uint16_t data)
 {
 	if (offset == 1)
 	{
@@ -371,7 +443,7 @@ WRITE16_MEMBER(tmnt_state::ssriders_protection_w)
 
 ***************************************************************************/
 
-READ16_MEMBER(tmnt_state::blswhstl_coin_r)
+uint16_t tmnt_state::blswhstl_coin_r()
 {
 	int res;
 
@@ -383,7 +455,7 @@ READ16_MEMBER(tmnt_state::blswhstl_coin_r)
 	return res ^ m_toggle;
 }
 
-READ16_MEMBER(tmnt_state::ssriders_eeprom_r)
+uint16_t tmnt_state::ssriders_eeprom_r()
 {
 	int res;
 
@@ -397,7 +469,7 @@ READ16_MEMBER(tmnt_state::ssriders_eeprom_r)
 	return res ^ m_toggle;
 }
 
-READ16_MEMBER(tmnt_state::sunsetbl_eeprom_r)
+uint16_t tmnt_state::sunsetbl_eeprom_r()
 {
 	int res;
 
@@ -411,7 +483,7 @@ READ16_MEMBER(tmnt_state::sunsetbl_eeprom_r)
 	return res ^ m_toggle;
 }
 
-WRITE16_MEMBER(tmnt_state::blswhstl_eeprom_w)
+void tmnt_state::blswhstl_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -422,7 +494,7 @@ WRITE16_MEMBER(tmnt_state::blswhstl_eeprom_w)
 	}
 }
 
-READ16_MEMBER(tmnt_state::thndrx2_eeprom_r)
+uint16_t tmnt_state::thndrx2_eeprom_r()
 {
 	int res;
 
@@ -430,12 +502,12 @@ READ16_MEMBER(tmnt_state::thndrx2_eeprom_r)
 	/* bit 1 is EEPROM ready */
 	/* bit 3 is VBLANK (???) */
 	/* bit 7 is service button */
-	res = ioport("P2/EEPROM")->read();
+	res = ioport("P2_EEPROM")->read();
 	m_toggle ^= 0x0800;
 	return (res ^ m_toggle);
 }
 
-WRITE16_MEMBER(tmnt_state::thndrx2_eeprom_w)
+void tmnt_state::thndrx2_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -454,11 +526,11 @@ WRITE16_MEMBER(tmnt_state::thndrx2_eeprom_w)
 	}
 }
 
-WRITE16_MEMBER(prmrsocr_state::prmrsocr_eeprom_w)
+void prmrsocr_state::prmrsocr_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		prmrsocr_122000_w(space, offset, data, mem_mask);
+		prmrsocr_122000_w(offset, data, mem_mask);
 	}
 
 	if (ACCESSING_BITS_8_15)
@@ -470,7 +542,7 @@ WRITE16_MEMBER(prmrsocr_state::prmrsocr_eeprom_w)
 	}
 }
 
-WRITE8_MEMBER(tmnt_state::cuebrick_nvbank_w)
+void tmnt_state::cuebrick_nvbank_w(uint8_t data)
 {
 	membank("nvrambank")->set_entry(data);
 }
@@ -546,10 +618,10 @@ void tmnt_state::punkshot_main_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x080000, 0x083fff).ram(); /* main RAM */
 	map(0x090000, 0x090fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x0a0000, 0x0a0001).portr("DSW1/DSW2");
-	map(0x0a0002, 0x0a0003).portr("COINS/DSW3");
-	map(0x0a0004, 0x0a0005).portr("P3/P4");
-	map(0x0a0006, 0x0a0007).portr("P1/P2");
+	map(0x0a0000, 0x0a0001).portr("DSW1_DSW2");
+	map(0x0a0002, 0x0a0003).portr("COINS_DSW3");
+	map(0x0a0004, 0x0a0005).portr("P3_P4");
+	map(0x0a0006, 0x0a0007).portr("P1_P2");
 	map(0x0a0020, 0x0a0021).w(FUNC(tmnt_state::punkshot_0a0020_w));
 	map(0x0a0040, 0x0a0043).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
 	map(0x0a0060, 0x0a007f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
@@ -580,7 +652,7 @@ void tmnt_state::lgtnfght_main_map(address_map &map)
 	map(0x100000, 0x107fff).rw(FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
 }
 
-WRITE16_MEMBER(tmnt_state::ssriders_soundkludge_w)
+void tmnt_state::ssriders_soundkludge_w(uint16_t dat)
 {
 	/* I think this is more than just a trigger */
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
@@ -593,7 +665,7 @@ void tmnt_state::blswhstl_main_map(address_map &map)
 	map(0x204000, 0x207fff).ram(); /* main RAM */
 	map(0x300000, 0x303fff).rw(FUNC(tmnt_state::k053245_scattered_word_r), FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x500000, 0x50003f).rw(m_k054000, FUNC(k054000_device::read), FUNC(k054000_device::write)).umask16(0x00ff);
+	map(0x500000, 0x50003f).m(m_k054000, FUNC(k054000_device::map)).umask16(0x00ff);
 	map(0x680000, 0x68001f).rw(FUNC(tmnt_state::k053244_word_noA1_r), FUNC(tmnt_state::k053244_word_noA1_w));
 	map(0x700000, 0x700001).portr("P1");
 	map(0x700002, 0x700003).portr("P2");
@@ -607,17 +679,15 @@ void tmnt_state::blswhstl_main_map(address_map &map)
 	map(0x780700, 0x78071f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 }
 
-WRITE16_MEMBER(glfgreat_state::k053251_glfgreat_w)
+void glfgreat_state::k053251_glfgreat_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int i;
-
 	if (ACCESSING_BITS_8_15)
 	{
 		m_k053251->write(offset, (data >> 8) & 0xff);
 
 		/* FIXME: in the old code k052109 tilemaps were tilemaps 2,3,4 for k053251
 		and got marked as dirty in the write above... how was the original hardware working?!? */
-		for (i = 0; i < 3; i++)
+		for (int i = 0; i < 3; i++)
 		{
 			if (m_k053251->get_tmap_dirty(2 + i))
 			{
@@ -644,10 +714,10 @@ void glfgreat_state::glfgreat_main_map(address_map &map)
 	map(0x114000, 0x11401f).rw(m_k053245, FUNC(k05324x_device::k053244_r), FUNC(k05324x_device::k053244_w)).umask16(0x00ff);    /* duplicate! */
 	map(0x118000, 0x11801f).w(m_k053936, FUNC(k053936_device::ctrl_w));
 	map(0x11c000, 0x11c01f).w(m_k053251, FUNC(k053251_device::write)).umask16(0xff00);
-	map(0x120000, 0x120001).portr("P1/P2");
-	map(0x120002, 0x120003).portr("P3/P4");
-	map(0x120004, 0x120005).portr("COINS/DSW3");
-	map(0x120006, 0x120007).portr("DSW1/DSW2");
+	map(0x120000, 0x120001).portr("P1_P2");
+	map(0x120002, 0x120003).portr("P3_P4");
+	map(0x120004, 0x120005).portr("COINS_DSW3");
+	map(0x120006, 0x120007).portr("DSW1_DSW2");
 	map(0x121000, 0x121001).r(FUNC(glfgreat_state::glfgreat_ball_r));   /* returns the color of the center pixel of the roz layer */
 	map(0x122000, 0x122001).w(FUNC(glfgreat_state::glfgreat_122000_w));
 	map(0x123000, 0x123000).rw("adc", FUNC(adc0804_device::read), FUNC(adc0804_device::write));
@@ -668,8 +738,8 @@ void prmrsocr_state::prmrsocr_main_map(address_map &map)
 	map(0x114000, 0x11401f).rw(m_k053245, FUNC(k05324x_device::k053244_r), FUNC(k05324x_device::k053244_w)).umask16(0x00ff);    /* duplicate! */
 	map(0x118000, 0x11801f).w(m_k053936, FUNC(k053936_device::ctrl_w));
 	map(0x11c000, 0x11c01f).w(m_k053251, FUNC(k053251_device::write)).umask16(0xff00);
-	map(0x120000, 0x120001).portr("P1/COINS");
-	map(0x120002, 0x120003).portr("P2/EEPROM");
+	map(0x120000, 0x120001).portr("P1_COINS");
+	map(0x120002, 0x120003).portr("P2_EEPROM");
 	map(0x121000, 0x12101f).m("k054321", FUNC(k054321_device::main_map)).umask16(0x00ff);
 	map(0x122000, 0x122001).w(FUNC(prmrsocr_state::prmrsocr_eeprom_w));    /* EEPROM + video control */
 	map(0x123000, 0x123001).w(FUNC(prmrsocr_state::prmrsocr_sound_irq_w));
@@ -691,7 +761,7 @@ inline uint32_t tmnt_state::tmnt2_get_word( uint32_t addr )
 	return 0;
 }
 
-void tmnt_state::tmnt2_put_word( address_space &space, uint32_t addr, uint16_t data )
+void tmnt_state::tmnt2_put_word( uint32_t addr, uint16_t data )
 {
 	uint32_t offs;
 	if (addr >= 0x180000 / 2 && addr <= 0x183fff / 2)
@@ -708,7 +778,7 @@ void tmnt_state::tmnt2_put_word( address_space &space, uint32_t addr, uint16_t d
 		m_sunset_104000[addr - 0x104000 / 2] = data;
 }
 
-WRITE16_MEMBER(tmnt_state::tmnt2_1c0800_w)
+void tmnt_state::tmnt2_1c0800_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t src_addr, dst_addr, mod_addr, attr1, code, attr2, cbase, cmod, color;
 	int xoffs, yoffs, xmod, ymod, zmod, xzoom, yzoom, i;
@@ -716,7 +786,7 @@ WRITE16_MEMBER(tmnt_state::tmnt2_1c0800_w)
 	uint16_t src[4], mod[24];
 	uint8_t keepaspect, xlock, ylock, zlock;
 
-	COMBINE_DATA(m_tmnt2_1c0800 + offset);
+	COMBINE_DATA(&m_tmnt2_1c0800[offset]);
 
 	if (offset != 0x18/2 || !ACCESSING_BITS_8_15)
 		return;
@@ -821,14 +891,14 @@ WRITE16_MEMBER(tmnt_state::tmnt2_1c0800_w)
 	xoffs += xmod;
 	yoffs += ymod;
 
-	tmnt2_put_word(space, dst_addr +  0, attr1);
-	tmnt2_put_word(space, dst_addr +  2, code);
-	tmnt2_put_word(space, dst_addr +  4, (uint32_t)yoffs);
-	tmnt2_put_word(space, dst_addr +  6, (uint32_t)xoffs);
-	tmnt2_put_word(space, dst_addr + 12, attr2 | color);
+	tmnt2_put_word(dst_addr +  0, attr1);
+	tmnt2_put_word(dst_addr +  2, code);
+	tmnt2_put_word(dst_addr +  4, (uint32_t)yoffs);
+	tmnt2_put_word(dst_addr +  6, (uint32_t)xoffs);
+	tmnt2_put_word(dst_addr + 12, attr2 | color);
 }
 #else // for reference; do not remove
-WRITE16_MEMBER(tmnt_state::tmnt2_1c0800_w)
+void tmnt_state::tmnt2_1c0800_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_tmnt2_1c0800 + offset);
 	if (offset == 0x0008 && (m_tmnt2_1c0800[0x8] & 0xff00) == 0x8200)
@@ -917,7 +987,7 @@ logerror("copy command %04x sprite %08x data %08x: %04x%04x %04x%04x  modifiers 
 
 void tmnt_state::tmnt2_main_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom().share("tmnt2_rom");
+	map(0x000000, 0x0fffff).rom();
 	map(0x104000, 0x107fff).ram().share("sunset_104000");   /* main RAM */
 	map(0x140000, 0x140fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x180000, 0x183fff).ram().w(FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");   // k053245_scattered_word_r
@@ -999,9 +1069,9 @@ void tmnt_state::thndrx2_main_map(address_map &map)
 	map(0x200000, 0x200fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x300000, 0x30001f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x400000, 0x400003).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
-	map(0x500000, 0x50003f).rw(m_k054000, FUNC(k054000_device::read), FUNC(k054000_device::write)).umask16(0x00ff);
+	map(0x500000, 0x50003f).m(m_k054000, FUNC(k054000_device::map)).umask16(0x00ff);
 	map(0x500100, 0x500101).w(FUNC(tmnt_state::thndrx2_eeprom_w));
-	map(0x500200, 0x500201).portr("P1/COINS");
+	map(0x500200, 0x500201).portr("P1_COINS");
 	map(0x500202, 0x500203).r(FUNC(tmnt_state::thndrx2_eeprom_r));
 	map(0x500300, 0x500301).nopw();    /* watchdog reset? irq enable? */
 	map(0x600000, 0x607fff).rw(FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
@@ -1027,6 +1097,20 @@ void tmnt_state::tmnt_audio_map(address_map &map)
 	map(0x9000, 0x9000).rw(FUNC(tmnt_state::tmnt_sres_r), FUNC(tmnt_state::tmnt_sres_w)); /* title music & UPD7759C reset */
 	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0xb000, 0xb00d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write));
+	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xd000, 0xd000).w(m_upd7759, FUNC(upd7759_device::port_w));
+	map(0xe000, 0xe000).w(FUNC(tmnt_state::tmnt_upd_start_w));
+	map(0xf000, 0xf000).r(FUNC(tmnt_state::tmnt_upd_busy_r));
+}
+
+
+void tmnt_state::tmntucbl_audio_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x9000, 0x9000).rw(FUNC(tmnt_state::tmnt_sres_r), FUNC(tmnt_state::tmnt_sres_w)); /* title music & UPD7759C reset */
+	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	// TODO: MC68705R3P + Oki M5205
 	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xd000, 0xd000).w(m_upd7759, FUNC(upd7759_device::port_w));
 	map(0xe000, 0xe000).w(FUNC(tmnt_state::tmnt_upd_start_w));
@@ -1330,7 +1414,7 @@ static INPUT_PORTS_START( tmnt2p )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( punkshtj ) // Japan 2 Players
-	PORT_START("DSW1/DSW2")
+	PORT_START("DSW1_DSW2")
 	KONAMI_COINAGE_LOC(DEF_STR( Free_Play ), "No Coin B", SW1)
 	PORT_DIPUNUSED_DIPLOC( 0x0100, IP_ACTIVE_LOW, "SW2:1" ) // manual says "not used", but doesn't "should be kept OFF"
 	PORT_DIPUNUSED_DIPLOC( 0x0200, IP_ACTIVE_LOW, "SW2:2" ) // manual says "not used", but doesn't "should be kept OFF"
@@ -1349,7 +1433,7 @@ static INPUT_PORTS_START( punkshtj ) // Japan 2 Players
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START("COINS/DSW3")
+	PORT_START("COINS_DSW3")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1371,18 +1455,18 @@ static INPUT_PORTS_START( punkshtj ) // Japan 2 Players
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START("P1/P2")
+	PORT_START("P1_P2")
 	KONAMI16_LSB( 1, IPT_UNKNOWN, IPT_UNKNOWN )
 	KONAMI16_MSB( 2, IPT_UNKNOWN, IPT_UNKNOWN )
 
-	PORT_START("P3/P4")
+	PORT_START("P3_P4")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( punkshtj4 ) // FICTITIOUS Japan 4 Players
 	PORT_INCLUDE( punkshtj )
 
-	PORT_MODIFY("COINS/DSW3")
+	PORT_MODIFY("COINS_DSW3")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE2 )
@@ -1391,13 +1475,13 @@ static INPUT_PORTS_START( punkshtj4 ) // FICTITIOUS Japan 4 Players
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_MODIFY("P3/P4")
+	PORT_MODIFY("P3_P4")
 	KONAMI16_LSB( 3, IPT_UNKNOWN, IPT_UNKNOWN )
 	KONAMI16_MSB( 4, IPT_UNKNOWN, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( punksht_us_coinage )
-	PORT_MODIFY("DSW1/DSW2")
+	PORT_MODIFY("DSW1_DSW2")
 	PORT_DIPNAME( 0x000f, 0x000f, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 4C_1C ) )
@@ -1431,7 +1515,7 @@ static INPUT_PORTS_START( punkshot ) // US 4 Players set1
 	PORT_INCLUDE( punkshtj4 )
 	PORT_INCLUDE( punksht_us_coinage )
 
-	PORT_MODIFY("DSW1/DSW2")
+	PORT_MODIFY("DSW1_DSW2")
 	PORT_DIPNAME( 0x0300, 0x0300, "Energy" ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0300, "30" )
 	PORT_DIPSETTING(      0x0200, "40" )
@@ -1453,7 +1537,7 @@ static INPUT_PORTS_START( punksht2 ) // US 2 Players set2
 	PORT_INCLUDE( punkshtj )
 	PORT_INCLUDE( punksht_us_coinage )
 
-	PORT_MODIFY("DSW1/DSW2")
+	PORT_MODIFY("DSW1_DSW2")
 	PORT_DIPNAME( 0x0300, 0x0300, "Energy" ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0300, "40" )
 	PORT_DIPSETTING(      0x0200, "50" )
@@ -1568,7 +1652,7 @@ static INPUT_PORTS_START( blswhstl )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( glfgreat )
-	PORT_START("DSW1/DSW2")
+	PORT_START("DSW1_DSW2")
 	KONAMI_COINAGE_LOC(DEF_STR( Free_Play ), "No Coin B", SW1)
 	/* "No Coin B" = coins produce sound, but no effect on coin counter */
 	PORT_DIPNAME( 0x0300, 0x0100, "Players/Controllers" ) PORT_DIPLOCATION("SW2:1,2")
@@ -1593,7 +1677,7 @@ static INPUT_PORTS_START( glfgreat )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START("COINS/DSW3")
+	PORT_START("COINS_DSW3")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -1615,12 +1699,12 @@ static INPUT_PORTS_START( glfgreat )
 	PORT_SERVICE_DIPLOC( 0x4000, IP_ACTIVE_LOW, "SW3:3" )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW3:4" ) // manual says "not used"
 
-	PORT_START("P1/P2")
+	PORT_START("P1_P2")
 	KONAMI16_LSB_40( 1, IPT_BUTTON3 )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", adc0804_device, intr_r) // shown in service mode DIP SW1:9, SW2:9 and SW3:5
 	KONAMI16_MSB( 2, IPT_BUTTON3, IPT_UNUSED ) PORT_PLAYER(2)
 
-	PORT_START("P3/P4")
+	PORT_START("P3_P4")
 	KONAMI16_LSB( 3, IPT_BUTTON3, IPT_UNUSED ) PORT_PLAYER(3)
 	KONAMI16_MSB( 4, IPT_BUTTON3, IPT_UNUSED ) PORT_PLAYER(4)
 
@@ -1641,7 +1725,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( glfgreatu )
 	PORT_INCLUDE( glfgreat )
 
-	PORT_MODIFY("DSW1/DSW2")
+	PORT_MODIFY("DSW1_DSW2")
 	PORT_DIPNAME( 0x1800, 0x1000, "Initial/Maximum Credit" ) PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(      0x1800, "2/2" )
 	PORT_DIPSETTING(      0x1000, "2/3" )
@@ -1652,7 +1736,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( glfgreatj )
 	PORT_INCLUDE( glfgreatu )
 
-	PORT_MODIFY("DSW1/DSW2")
+	PORT_MODIFY("DSW1_DSW2")
 	PORT_DIPNAME( 0x0300, 0x0100, "Players/Controllers" ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0300, "2/1" ) // Upright
 	PORT_DIPSETTING(      0x0200, "2/2" ) // Upright
@@ -1662,7 +1746,7 @@ static INPUT_PORTS_START( glfgreatj )
 	// I/O test in service mode actually returns same mapping as World/US revs
 	// for accuracy we actually map these like the Jp flyer claims
 	// (where stance button is on top of the ball shaped controller)
-	PORT_MODIFY("P1/P2")
+	PORT_MODIFY("P1_P2")
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Stance Select Button")
@@ -1678,7 +1762,7 @@ static INPUT_PORTS_START( glfgreatj )
 	PORT_BIT(  0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Right Direction Button")
 	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 Club Select Button")
 
-	PORT_MODIFY("P3/P4")
+	PORT_MODIFY("P3_P4")
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("P3 Stance Select Button")
@@ -1840,7 +1924,7 @@ static INPUT_PORTS_START( qgakumon )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( thndrx2 )
-	PORT_START("P1/COINS")
+	PORT_START("P1_COINS")
 	KONAMI16_LSB( 1, IPT_UNKNOWN, IPT_START1 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1851,7 +1935,7 @@ static INPUT_PORTS_START( thndrx2 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("P2/EEPROM")
+	PORT_START("P2_EEPROM")
 	KONAMI16_LSB( 2, IPT_UNKNOWN, IPT_START2 )
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
@@ -1869,7 +1953,7 @@ static INPUT_PORTS_START( thndrx2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( prmrsocr )
-	PORT_START("P1/COINS")
+	PORT_START("P1_COINS")
 	KONAMI16_LSB( 1, IPT_UNKNOWN, IPT_START1 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x0200, IP_ACTIVE_LOW )
@@ -1882,7 +1966,7 @@ static INPUT_PORTS_START( prmrsocr )
 	PORT_DIPUNUSED_DIPLOC( 0x4000, IP_ACTIVE_LOW, "SW:3" ) // manual says "not used"
 	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW:4" ) // manual says "not used"
 
-	PORT_START("P2/EEPROM")
+	PORT_START("P2_EEPROM")
 	KONAMI16_LSB( 2, IPT_UNKNOWN, IPT_START2 )
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
@@ -2097,7 +2181,20 @@ void tmnt_state::tmnt(machine_config &config)
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(1); /* 1 channel for the title music */
 	m_samples->set_samples_start_callback(FUNC(tmnt_state::tmnt_decode_sample));
-	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.5);
+}
+
+void tmnt_state::tmntucbl(machine_config &config)
+{
+	tmnt(config);
+
+	m_audiocpu->set_addrmap(AS_PROGRAM, &tmnt_state::tmntucbl_audio_map);
+
+	M68705R3(config, "mcu", XTAL(4'000'000)).set_disable(); // not dumped
+
+	MSM5205(config, "msm", 384'000).add_route(ALL_OUTPUTS, "mono", 0.5); // TODO: hook up, frequency unknown
+
+	config.device_remove("k007232");
 }
 
 void tmnt_state::punkshot(machine_config &config)
@@ -2261,20 +2358,8 @@ void tmnt_state::blswhstl(machine_config &config)
 
 
 
-static const gfx_layout zoomlayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4,
-			9*4, 8*4, 11*4, 10*4, 13*4, 12*4, 15*4, 14*4 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-			8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	16*64
-};
 static GFXDECODE_START( gfx_glfgreat )
-	GFXDECODE_ENTRY( "zoom", 0, zoomlayout, 0x400, 16 )
+	GFXDECODE_ENTRY( "zoom", 0, gfx_16x16x4_packed_lsb, 0x400, 16 )
 GFXDECODE_END
 
 void glfgreat_state::glfgreat(machine_config &config)
@@ -2543,6 +2628,8 @@ void tmnt_state::sunsetbl(machine_config &config)
 	m_palette->enable_shadows();
 	m_palette->enable_hilights();
 
+	MCFG_VIDEO_START_OVERRIDE(tmnt_state,lgtnfght)
+
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen(nullptr);
@@ -2602,18 +2689,18 @@ void tmnt_state::thndrx2(machine_config &config)
 	m_k051960->set_sprite_callback(FUNC(tmnt_state::thndrx2_sprite_callback));
 
 	K053251(config, m_k053251, 0);
-
 	K054000(config, m_k054000, 0);
 
 	/* sound hardware */
+	// NB: game defaults in mono
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
+	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 0.25).add_route(1, "rspeaker", 0.25);
 
 	K053260(config, m_k053260, XTAL(3'579'545));
-	m_k053260->add_route(0, "lspeaker", 0.75);
-	m_k053260->add_route(1, "rspeaker", 0.75);
+	m_k053260->add_route(0, "lspeaker", 0.50);
+	m_k053260->add_route(1, "rspeaker", 0.50);
 }
 
 
@@ -2860,6 +2947,63 @@ ROM_START( tmntuc )
 
 	ROM_REGION( 0x80000, "title", 0 )   /* 512k for the title music sample */
 	ROM_LOAD( "963a25.d5",      0x00000, 0x80000, CRC(fca078c7) SHA1(3e1124d72c9db4cb11d8de6c44b7aeca967f44e1) )
+ROM_END
+
+ROM_START( tmntucbl ) // bootleg board with Konami customs. Only the K007232 is substituted by an Oki M5205. There`s also an MC68705R3P lodged between the title song ROMs and the Oki ROMs. Function unknown (possibly driving the Oki?).
+	ROM_REGION( 0x60000, "maincpu", 0 ) // same as the original version H
+	ROM_LOAD16_BYTE( "ic215", 0x00000, 0x20000, CRC(718086e1) SHA1(6fd07a36195521be101782a05a9ecbcc5aaebbbd) )
+	ROM_LOAD16_BYTE( "ic216", 0x00001, 0x20000, CRC(2f7d66e1) SHA1(53bd51458609662066b696f3edd19075e883bcde) )
+	ROM_LOAD16_BYTE( "ic217", 0x40000, 0x10000, CRC(1944641e) SHA1(6664dbd9856d3d579a63c6537feef9a6e9bd09c5) )
+	ROM_LOAD16_BYTE( "ic218", 0x40001, 0x10000, CRC(50ce5512) SHA1(641bf4d60a64f23cd3b52af983565dc6b38037c1) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "ic233", 0x0000, 0x8000, CRC(de119176) SHA1(afd5c25b9c606132263d90c705d6d4c71e28776c) ) // very slightly adapted to run the Oki (or MC68705R3P?) instead of the K007232
+
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "mc68705r3p", 0x0000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x100000, "k052109", 0 ) // same as the original, just smaller ROMs on a daughter board
+	ROM_LOAD32_BYTE( "9",  0x00000, 0x20000, CRC(bd5df35c) SHA1(b0db3be16f3e18487834b0c877780cc440ca5292) )
+	ROM_LOAD32_BYTE( "11", 0x00001, 0x20000, CRC(e26301ce) SHA1(fe34a9ee19d0e15b9d804d75117bcf12853070c4) )
+	ROM_LOAD32_BYTE( "21", 0x00002, 0x20000, CRC(db335bb4) SHA1(ae222df7a1b31821f3ee0288ed6f5d9ebd99ba44) )
+	ROM_LOAD32_BYTE( "23", 0x00003, 0x20000, CRC(d1d5efae) SHA1(c14429ebbbb356df3164df41763aa9f52e67a01a) )
+	ROM_LOAD32_BYTE( "10", 0x80000, 0x20000, CRC(b9d026fe) SHA1(6b6b9c531042a25d152754a807ee822bdc4c35cd) )
+	ROM_LOAD32_BYTE( "12", 0x80001, 0x20000, CRC(82eb6dae) SHA1(4d1e97be2d811bbbd8ec2ec5e6464f1e3208d97e) )
+	ROM_LOAD32_BYTE( "22", 0x80002, 0x20000, CRC(f8f59c01) SHA1(afd16b355271c350e2b75b7f48c0dad5b7d4fd34) )
+	ROM_LOAD32_BYTE( "24", 0x80003, 0x20000, CRC(e7068b0d) SHA1(4efe28768adb80e03fe1edd667822fa739e9437e) )
+
+	ROM_REGION( 0x200000, "k051960", 0 ) // same as the original, just smaller ROMs on a daughter board
+	ROM_LOAD32_BYTE( "1",  0x000000, 0x20000, CRC(eabb0238) SHA1(396ca9192e1d7921109897ef7906b93467473f62) )
+	ROM_LOAD32_BYTE( "5",  0x000001, 0x20000, CRC(9330c763) SHA1(38b4808736d37bfb139add8746aabc6da83e6cc6) )
+	ROM_LOAD32_BYTE( "13", 0x000002, 0x20000, CRC(9ab1eede) SHA1(9d1720e0cce374a390a38d00d54d35d3c80d1d8d) )
+	ROM_LOAD32_BYTE( "17", 0x000003, 0x20000, CRC(9592f27f) SHA1(a19edef177f0feae8c29748d94d878ae4f172a9d) )
+	ROM_LOAD32_BYTE( "2",  0x080000, 0x20000, CRC(4ba802e3) SHA1(5a5286087559846d06ed38e2fa93f64c1050787f) )
+	ROM_LOAD32_BYTE( "6",  0x080001, 0x20000, CRC(641ea298) SHA1(f5ded36fd4779d987d9ef7c171191856813664b5) )
+	ROM_LOAD32_BYTE( "14", 0x080002, 0x20000, CRC(777235a5) SHA1(8cd75c55b283a19c54b2007633b7d16878dd2773) )
+	ROM_LOAD32_BYTE( "18", 0x080003, 0x20000, CRC(41c0c28c) SHA1(b5464024ba63eac1150542ea888ce3bea2932769) )
+	ROM_LOAD32_BYTE( "3",  0x100000, 0x20000, CRC(159b5858) SHA1(e431f9d945ec0c21385ba9390ce350437f022191) )
+	ROM_LOAD32_BYTE( "7",  0x100001, 0x20000, CRC(45a1bea8) SHA1(d90824afbda6af5cc86ca74aadd275c07d28f5e1) )
+	ROM_LOAD32_BYTE( "15", 0x100002, 0x20000, CRC(748e66f9) SHA1(109cde6be2a25dae898092bca13b680d1665fc85) )
+	ROM_LOAD32_BYTE( "19", 0x100003, 0x20000, CRC(9e6dd23b) SHA1(7c7080a9435a35f62b8203167b8d514e8a47b5b4) )
+	ROM_LOAD32_BYTE( "4",  0x180000, 0x20000, CRC(7dde75ee) SHA1(1e4a85dd108218a8f7761724aecd6ef2f2af0a6e) )
+	ROM_LOAD32_BYTE( "8",  0x180001, 0x20000, CRC(6337e146) SHA1(938aafbb60fd390b5c5c1bc93e9233b90a723e1b) )
+	ROM_LOAD32_BYTE( "16", 0x180002, 0x20000, CRC(287f8d80) SHA1(7ea7b83662c0ef2af65f6c6b474ae4176ff6d71e) )
+	ROM_LOAD32_BYTE( "20", 0x180003, 0x20000, CRC(bb675176) SHA1(8a106b1778101dbd900c287712cd53826791f0db) )
+
+	ROM_REGION( 0x200, "proms", 0 ) // not dumped for this set, but probably identical
+	ROM_LOAD( "963a30.g7",  0x000, 0x100, CRC(abd82680) SHA1(945a71e6ec65202f13209b45d45b616372d6c0f5) )
+	ROM_LOAD( "963a31.g19", 0x100, 0x100, CRC(f8004a1c) SHA1(ed6694b8eebfe0238b50ebd05007d519f6e57b1b) )
+
+	ROM_REGION( 0x20000, "msm", 0 )
+	ROM_LOAD( "ic252", 0x00000, 0x10000, CRC(cb916429) SHA1(41eff6e15890b45b5ea3b8cc3367891d87c3bf09) )
+	ROM_LOAD( "ic253", 0x10000, 0x10000, CRC(c2d3b2c1) SHA1(d4d66cbfbbf5d3396aafedda99bfa2b06fafbf24) )
+
+	ROM_REGION( 0x20000, "upd", 0 )
+	ROM_LOAD( "ic285", 0x00000, 0x20000, CRC(2dfd674b) SHA1(bbec5896c70056964fbc972a84bd5b0dfc6af257) ) // same as the original
+
+	ROM_REGION( 0x80000, "title", 0 )   // why only the odd bytes? though the song seems to play fine as is..
+	ROM_LOAD16_BYTE( "ic275", 0x00001, 0x20000, CRC(a021c0be) SHA1(f44ea6c56b8fae7aeff120ee6c2ca924086654be) ) // ic275               963a25.d5    [odd 1/2]  IDENTICAL
+	ROM_LOAD16_BYTE( "ic274", 0x40001, 0x20000, CRC(9ff5f250) SHA1(53b75ca910c645ebb55002d70e3e1abd15db6d41) ) // ic274               963a25.d5    [odd 2/2]  IDENTICAL
 ROM_END
 
 ROM_START( tmht )
@@ -4312,26 +4456,37 @@ void tmnt_state::init_cuebrick()
 	save_item(NAME(m_cuebrick_nvram));
 }
 
+void tmnt_state::init_thndrx2()
+{
+	u16 *ROM = (u16 *)memregion("maincpu")->base();
+
+	// cfr. notes in k054000 device
+	// this makes 11C / 12C to return bad (for ROM checksum)
+	// but goes on instead of halting for 14D (the protection chip device)
+	ROM[0x16c0 / 2] = 0x4e71;
+}
+
 //    YEAR  NAME         PARENT    MACHINE   INPUT      STATE       INIT      MONITOR COMPANY    FULLNAME,FLAGS
 GAME( 1989, cuebrick,    0,        cuebrick, cuebrick,  tmnt_state, init_cuebrick,ROT0,  "Konami",  "Cue Brick (World, version D)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, mia,         0,        mia,      mia,       tmnt_state, init_mia,    ROT0,   "Konami",  "M.I.A. - Missing in Action (version T)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mia2,        mia,      mia,      mia,       tmnt_state, init_mia,    ROT0,   "Konami",  "M.I.A. - Missing in Action (version S)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, tmnt,        0,        tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (World 4 Players, version X)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmntu,       tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version R)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmntua,      tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version N)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmntub,      tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version J)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmntuc,      tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version H)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmht,        tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 4 Players, version F)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmhta,       tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 4 Players, version S)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmhtb,       tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 4 Players, version ?)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1990, tmntj,       tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Japan 4 Players, version 2)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmnta,       tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Asia 4 Players, version ?)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmht2p,      tmnt,     tmnt,     tmnt2p,    tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 2 Players, version U)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmht2pa,     tmnt,     tmnt,     tmnt2p,    tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 2 Players, version ?)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1990, tmnt2pj,     tmnt,     tmnt,     tmnt2p,    tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Japan 2 Players, version 1)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmnt2po,     tmnt,     tmnt,     tmnt2p,    tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Oceania 2 Players, version ?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmnt,        0,        tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (World 4 Players, version X)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmntu,       tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version R)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmntua,      tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version N)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmntub,      tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version J)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmntuc,      tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version H)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmntucbl,    tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "bootleg", "Teenage Mutant Ninja Turtles (bootleg, US 4 Players, version H)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Needs MC68705R3P / Oki M5205 hook up
+GAME( 1989, tmht,        tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 4 Players, version F)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmhta,       tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 4 Players, version S)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmhtb,       tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 4 Players, version ?)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1990, tmntj,       tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Japan 4 Players, version 2)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmnta,       tmnt,     tmnt,     tmnt,      tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Asia 4 Players, version ?)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmht2p,      tmnt,     tmnt,     tmnt2p,    tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 2 Players, version U)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmht2pa,     tmnt,     tmnt,     tmnt2p,    tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 2 Players, version ?)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1990, tmnt2pj,     tmnt,     tmnt,     tmnt2p,    tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Japan 2 Players, version 1)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmnt2po,     tmnt,     tmnt,     tmnt2p,    tmnt_state, init_tmnt,   ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Oceania 2 Players, version ?)",     MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, punkshot,    0,        punkshot, punkshot,  tmnt_state, empty_init,  ROT0,   "Konami",  "Punk Shot (US 4 Players)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1990, punkshot2,   punkshot, punkshot, punksht2,  tmnt_state, empty_init,  ROT0,   "Konami",  "Punk Shot (US 2 Players)",    MACHINE_SUPPORTS_SAVE )
@@ -4376,9 +4531,9 @@ GAME( 1991, ssridersjbd, ssriders, ssriders, ssriders,  tmnt_state, empty_init, 
 GAME( 1991, ssridersb,   ssriders, sunsetbl, sunsetbl,  tmnt_state, empty_init,  ROT0,   "bootleg", "Sunset Riders (bootleg 4 Players ver ADD)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, ssriders2,   ssriders, sunsetbl, sunsetbl,  tmnt_state, empty_init,  ROT0,   "bootleg", "Sunset Riders 2 (bootleg 4 Players ver ADD)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, thndrx2,     0,        thndrx2,  thndrx2,   tmnt_state, empty_init,  ROT0,   "Konami",  "Thunder Cross II (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, thndrx2a,    thndrx2,  thndrx2,  thndrx2,   tmnt_state, empty_init,  ROT0,   "Konami",  "Thunder Cross II (Asia)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1991, thndrx2j,    thndrx2,  thndrx2,  thndrx2,   tmnt_state, empty_init,  ROT0,   "Konami",  "Thunder Cross II (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, thndrx2,     0,        thndrx2,  thndrx2,   tmnt_state, init_thndrx2,  ROT0, "Konami",  "Thunder Cross II (World)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // Fails k054000 unit tests, cfr. driver_init & device
+GAME( 1991, thndrx2a,    thndrx2,  thndrx2,  thndrx2,   tmnt_state, init_thndrx2,  ROT0, "Konami",  "Thunder Cross II (Asia)",  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // ^
+GAME( 1991, thndrx2j,    thndrx2,  thndrx2,  thndrx2,   tmnt_state, init_thndrx2,  ROT0, "Konami",  "Thunder Cross II (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // ^
 
 GAME( 1993, prmrsocr,    0,        prmrsocr, prmrsocr, prmrsocr_state, empty_init, ROT0, "Konami",  "Premier Soccer (ver EAB)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, prmrsocrj,   prmrsocr, prmrsocr, prmrsocr, prmrsocr_state, empty_init, ROT0, "Konami",  "Premier Soccer (ver JAB)", MACHINE_SUPPORTS_SAVE )

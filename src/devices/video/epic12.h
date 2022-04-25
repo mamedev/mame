@@ -53,8 +53,8 @@ public:
 	void install_handlers(int addr1, int addr2);
 
 	// thread safe mode, with no delays & shadow ram copy
-	DECLARE_READ32_MEMBER(blitter_r);
-	DECLARE_WRITE32_MEMBER(blitter_w);
+	u32 blitter_r(offs_t offset, u32 mem_mask = ~0);
+	void blitter_w(address_space &space, offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 m_gfx_addr_shadowcopy;
 	u32 m_gfx_scroll_0_x_shadowcopy, m_gfx_scroll_0_y_shadowcopy;
 	u32 m_gfx_scroll_1_x_shadowcopy, m_gfx_scroll_1_y_shadowcopy;
@@ -67,17 +67,32 @@ public:
 	inline void gfx_draw(offs_t *addr);
 	void gfx_exec(void);
 	u32 gfx_ready_r();
-	DECLARE_WRITE32_MEMBER(gfx_exec_w);
+	void gfx_exec_w(address_space &space, offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	// for thread unsafe mode with blitter delays, no shadow copy of RAM
-	DECLARE_READ32_MEMBER(blitter_r_unsafe);
-	DECLARE_WRITE32_MEMBER(blitter_w_unsafe);
+	u32 blitter_r_unsafe(offs_t offset, u32 mem_mask = ~0);
+	void blitter_w_unsafe(address_space &space, offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 gfx_ready_r_unsafe();
 	void gfx_exec_w_unsafe(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void gfx_exec_unsafe(void);
 	static void *blit_request_callback_unsafe(void *param, int threadid);
 
 protected:
+	// The firmware versions
+	enum {
+		// Used by ibara & mushisama
+		FW_A, // Byte checksum 03
+
+		// Used by espgal2
+		FW_B, // Byte checksum 3e
+
+		// Used by espgal2a, mushitama and mushisamb
+		FW_C, // Byte checksum f9
+
+		// Used by everything else
+		FW_D, // Byte checksum e1
+	};
+
 	struct clr_t
 	{
 		// clr_t to r5g5b5
@@ -820,6 +835,12 @@ protected:
 	// blit timing
 	emu_timer *m_blitter_delay_timer;
 	int m_blitter_busy;
+
+	// fpga firmware
+	std::vector<u8> m_firmware;
+	int m_firmware_pos;
+	u8 m_firmware_port;
+	int m_firmware_version;
 
 	// debug vram viewer
 #ifdef DEBUG_VRAM_VIEWER

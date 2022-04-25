@@ -29,19 +29,19 @@ public:
 	void set_info(const char *intc, int eri, int rxi, int txi, int tei);
 	void set_external_clock_period(const attotime &_period);
 
-	DECLARE_WRITE8_MEMBER(smr_w);
-	DECLARE_READ8_MEMBER(smr_r);
-	DECLARE_WRITE8_MEMBER(brr_w);
-	DECLARE_READ8_MEMBER(brr_r);
-	DECLARE_WRITE8_MEMBER(scr_w);
-	DECLARE_READ8_MEMBER(scr_r);
-	DECLARE_WRITE8_MEMBER(tdr_w);
-	DECLARE_READ8_MEMBER(tdr_r);
-	DECLARE_WRITE8_MEMBER(ssr_w);
-	DECLARE_READ8_MEMBER(ssr_r);
-	DECLARE_READ8_MEMBER(rdr_r);
-	DECLARE_WRITE8_MEMBER(scmr_w);
-	DECLARE_READ8_MEMBER(scmr_r);
+	void smr_w(uint8_t data);
+	uint8_t smr_r();
+	void brr_w(uint8_t data);
+	uint8_t brr_r();
+	void scr_w(uint8_t data);
+	uint8_t scr_r();
+	void tdr_w(uint8_t data);
+	uint8_t tdr_r();
+	void ssr_w(uint8_t data);
+	uint8_t ssr_r();
+	uint8_t rdr_r();
+	void scmr_w(uint8_t data);
+	uint8_t scmr_r();
 
 	DECLARE_WRITE_LINE_MEMBER(rx_w);
 	DECLARE_WRITE_LINE_MEMBER(clk_w);
@@ -122,7 +122,7 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void clock_start(int mode);
 	void clock_stop(int mode);

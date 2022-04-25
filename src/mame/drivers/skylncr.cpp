@@ -75,7 +75,7 @@
   '---------------------------------------'
 
   Pressing BOOKKEEPING key again, you can find 2 screens showing
-  all statistics and the whole historial by winning hand.
+  all statistics and the whole history by winning hand.
 
   Press START (key 1) to exit the mode.
 
@@ -113,7 +113,7 @@
   TODO:
 
   - Proper M5M82C255 device emulation.
-  - Colors: Find the palette in Sonik Fighter.
+  - Colors: Find the palette in the Z Games' sets.
 
 ***************************************************************************************************/
 
@@ -132,7 +132,8 @@
 #include <algorithm>
 
 
-#define MASTER_CLOCK        XTAL(12'000'000)  /* confirmed */
+namespace {
+
 #define HOPPER_PULSE        50 // guessed
 
 
@@ -150,7 +151,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_hopper(*this, "hopper"),
-		m_lamps(*this, "lamp%u", 1U)
+		m_lamps(*this, "lamp%u", 1U),
+		m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
 
 	void neraidou(machine_config &config);
@@ -158,15 +160,20 @@ public:
 	void bdream97(machine_config &config);
 	void skylncr(machine_config &config);
 	void mbutrfly(machine_config &config);
+	void olymp(machine_config &config);
 
+	void init_leadera();
 	void init_mbutrfly() { save_item(NAME(m_mbutrfly_prot)); }
 	void init_miaction();
+	void init_olymp();
 	void init_sonikfig();
+	void init_speedway();
+	void init_superb2k();
 
 	READ_LINE_MEMBER(mbutrfly_prot_r);
 
 protected:
-	virtual void machine_start() override { m_lamps.resolve(); save_item(NAME(m_nmi_enable)); }
+	virtual void machine_start() override;
 	virtual void video_start() override;
 
 private:
@@ -176,7 +183,8 @@ private:
 	template<uint8_t Which> void reeltileshigh_w(offs_t offset, uint8_t data);
 	template<uint8_t Which> void reelscroll_w(offs_t offset, uint8_t data);
 	void coin_w(uint8_t data);
-	uint8_t ret_ff();
+	uint8_t ret_ff() { return 0xff; }
+	[[maybe_unused]] uint8_t ret_00() { return 0x00; }
 	void nmi_enable_w(uint8_t data);
 	void mbutrfly_prot_w(uint8_t data);
 	uint8_t bdream97_opcode_r(offs_t offset);
@@ -186,26 +194,28 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
 	void bdream97_opcode_map(address_map &map);
+	void olymp_opcode_map(address_map &map);
 	void io_map_mbutrfly(address_map &map);
 	void io_map_skylncr(address_map &map);
 	void mem_map(address_map &map);
 	void ramdac2_map(address_map &map);
 	void ramdac_map(address_map &map);
 
-	tilemap_t *m_tmap;
+	tilemap_t *m_tmap = nullptr;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr_array<uint8_t, 4> m_reeltiles_ram;
 	required_shared_ptr_array<uint8_t, 4> m_reeltileshigh_ram;
-	tilemap_t *m_reel_tilemap[4];
+	tilemap_t *m_reel_tilemap[4]{};
 	required_shared_ptr_array<uint8_t, 4> m_reelscroll;
-	uint8_t m_nmi_enable;
-	bool m_mbutrfly_prot;
+	uint8_t m_nmi_enable = 0;
+	bool m_mbutrfly_prot = false;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<ticket_dispenser_device> m_hopper;
 	output_finder<7> m_lamps;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 };
 
 
@@ -241,6 +251,15 @@ TILE_GET_INFO_MEMBER(skylncr_state::get_reel_tile_info)
 	tileinfo.set(1, Which == 0 ? code & 0x7fff : code, pal^1, TILE_FLIPYX( 0 ));
 }
 
+
+void skylncr_state::machine_start()
+{
+	m_lamps.resolve();
+
+	save_item(NAME(m_nmi_enable));
+
+	m_nmi_enable = 0;
+}
 
 void skylncr_state::video_start()
 {
@@ -320,18 +339,6 @@ void skylncr_state::coin_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(0, data & 0x04);
 	m_hopper->motor_w(data & 0x20);
 }
-
-uint8_t skylncr_state::ret_ff()
-{
-	return 0xff;
-}
-
-#ifdef UNUSED_FUNCTION
-uint8_t skylncr_state::ret_00()
-{
-	return 0x00;
-}
-#endif
 
 void skylncr_state::nmi_enable_w(uint8_t data)
 {
@@ -431,6 +438,10 @@ void skylncr_state::bdream97_opcode_map(address_map &map)
 	map(0x0000, 0xffff).r(FUNC(skylncr_state::bdream97_opcode_r));
 }
 
+void skylncr_state::olymp_opcode_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom().share(m_decrypted_opcodes);
+}
 
 void skylncr_state::ramdac_map(address_map &map)
 {
@@ -1501,7 +1512,147 @@ static INPUT_PORTS_START( sonikfig )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )  // OK
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( score5 ) // TODO: verify inputs when game works (copied from sonikfig for now), dips are taken from manual so presumed correct
+	PORT_START("IN1")   // $00 (PPI0 port A)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_D) PORT_NAME("IN1-02")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_F) PORT_NAME("IN1-08")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_G) PORT_NAME("IN1-20")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_H) PORT_NAME("IN1-40")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_J) PORT_NAME("IN1-80")
 
+	PORT_START("IN2")   // $01 (PPI0 port B)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_K) PORT_NAME("IN2-02")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_LOW) PORT_NAME("Down/Low") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_L) PORT_NAME("IN2-08")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1) PORT_NAME("Start")  // OK
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_T) PORT_NAME("Reset #2") // Behaves like a reset, only when attract DSW is off...
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_Y) PORT_NAME("IN2-40")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_U) PORT_NAME("IN2-80")
+
+	PORT_START("IN3")   // $11 (PPI1 port B)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)     // OK
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)     // OK
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2)     // OK
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )              // OK
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH) PORT_NAME("Up/High") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_I) PORT_NAME("IN3-40")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) PORT_NAME("Take Score")
+
+	PORT_START("IN4")   // $12 (PPI1 port C)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_1_PAD) PORT_NAME("IN4-01")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset #1")  // OK
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Stats")
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )   // Settings OK
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_2_PAD) PORT_NAME("IN4-10")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_3_PAD) PORT_NAME("IN4-20")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_4_PAD) PORT_NAME("IN4-40")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+
+	PORT_START("DSW1")  // $02 (PPI0 port C)
+	PORT_DIPNAME( 0x07, 0x07, "Percent" ) PORT_DIPLOCATION("DSW1:1,2,3")
+	PORT_DIPSETTING(    0x07, "55%" )
+	PORT_DIPSETTING(    0x06, "60%" )
+	PORT_DIPSETTING(    0x05, "65%" )
+	PORT_DIPSETTING(    0x04, "70%" )
+	PORT_DIPSETTING(    0x03, "75%" )
+	PORT_DIPSETTING(    0x02, "80%" )
+	PORT_DIPSETTING(    0x01, "85%" )
+	PORT_DIPSETTING(    0x00, "90%" )
+	PORT_DIPNAME( 0x08, 0x08, "Break" ) PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Speed" ) PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x10, "Slow" )
+	PORT_DIPSETTING(    0x00, "Fast" )
+	PORT_DIPNAME( 0xe0, 0xe0, "Payout" ) PORT_DIPLOCATION("DSW1:6,7,8")
+	PORT_DIPSETTING(    0xe0, "1" )
+	PORT_DIPSETTING(    0xc0, "2" )
+	PORT_DIPSETTING(    0xa0, "5" )
+	PORT_DIPSETTING(    0x80, "7" )
+	PORT_DIPSETTING(    0x60, "9" )
+	PORT_DIPSETTING(    0x40, "12" )
+	PORT_DIPSETTING(    0x20, "15" )
+	PORT_DIPSETTING(    0x00, "20" )
+
+	PORT_START("DSW2")  // $10 (PPI1 port A)
+	PORT_DIPNAME( 0x01, 0x01, "Win Mode" ) PORT_DIPLOCATION("DSW2:1")
+	PORT_DIPSETTING(    0x01, "Line" )
+	PORT_DIPSETTING(    0x00, "Square" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("DSW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x04, 0x04, "Double-Up" ) PORT_DIPLOCATION("DSW2:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x08, 0x08, "Control" ) PORT_DIPLOCATION("DSW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, "Res." ) PORT_DIPLOCATION("DSW2:5,6")
+	PORT_DIPSETTING(    0x30, DEF_STR (Off) )
+	PORT_DIPSETTING(    0x20, "10%" )
+	PORT_DIPSETTING(    0x10, "20%" )
+	PORT_DIPSETTING(    0x00, "30%" )
+	PORT_DIPNAME( 0x40, 0x40, "Bonus" ) PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPSETTING(    0x40, "100" )
+	PORT_DIPSETTING(    0x00, "200" )
+	PORT_DIPNAME( 0x80, 0x80, "Cycle Bonus" ) PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPSETTING(    0x80, "1" )
+	PORT_DIPSETTING(    0x00, "2" )
+
+	PORT_START("DSW3")  // AY8910 port A
+	PORT_DIPNAME( 0x01, 0x01, "Limit" ) PORT_DIPLOCATION("DSW3:1")
+	PORT_DIPSETTING(    0x01, "300" )
+	PORT_DIPSETTING(    0x00, "500" )
+	PORT_DIPNAME( 0x06, 0x06, "Limit In" )
+	PORT_DIPSETTING(    0x06, DEF_STR( Off ) ) PORT_DIPLOCATION("DSW3:2,3")
+	PORT_DIPSETTING(    0x04, "10" )
+	PORT_DIPSETTING(    0x02, "20" )
+	PORT_DIPSETTING(    0x00, "30" )
+	PORT_DIPNAME( 0x18, 0x18, "Min Bet" ) PORT_DIPLOCATION("DSW3:4,5")
+	PORT_DIPSETTING(    0x18, "1" )
+	PORT_DIPSETTING(    0x10, "5" )
+	PORT_DIPSETTING(    0x08, "9" )
+	PORT_DIPSETTING(    0x00, "12" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) ) PORT_DIPLOCATION("DSW3:6") // marked as reserved and off in manual
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) ) PORT_DIPLOCATION("DSW3:7") // marked as reserved and off in manual
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "Memo Safe" ) PORT_DIPLOCATION("DSW3:8") // marked as on in manual
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW4")  // AY8910 port B
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSW4:1,2,3")
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x06, "1 Coin / 10 Credits" )
+	PORT_DIPSETTING(    0x05, "1 Coin / 20 Credits" )
+	PORT_DIPSETTING(    0x04, "1 Coin / 50 Credits" )
+	PORT_DIPSETTING(    0x03, "1 Coin / 100 Credits" )
+	PORT_DIPSETTING(    0x02, "1 Coin / 200 Credits" )
+	PORT_DIPSETTING(    0x01, "1 Coin / 500 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Coin / 1000 Credits" )
+	PORT_DIPNAME( 0x38, 0x38, "Key In" ) PORT_DIPLOCATION("DSW4:4,5,6")
+	PORT_DIPSETTING(    0x38, "1 Pulse / 5 Credits" )
+	PORT_DIPSETTING(    0x30, "1 Pulse / 10 Credits" )
+	PORT_DIPSETTING(    0x28, "1 Pulse / 20 Credits" )
+	PORT_DIPSETTING(    0x20, "1 Pulse / 50 Credits" )
+	PORT_DIPSETTING(    0x18, "1 Pulse / 100 Credits" )
+	PORT_DIPSETTING(    0x10, "1 Pulse / 200 Credits" )
+	PORT_DIPSETTING(    0x08, "1 Pulse / 500 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Pulse / 1000 Credits" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Key Out" ) PORT_DIPLOCATION("DSW4:7,8")
+	PORT_DIPSETTING(    0xc0, "1" )
+	PORT_DIPSETTING(    0x80, "5" )
+	PORT_DIPSETTING(    0x40, "10" )
+	PORT_DIPSETTING(    0x00, "100" )
+INPUT_PORTS_END
 
 // It runs in IM 0, thus needs an opcode on the data bus
 INTERRUPT_GEN_MEMBER(skylncr_state::vblank_interrupt)
@@ -1517,7 +1668,7 @@ INTERRUPT_GEN_MEMBER(skylncr_state::vblank_interrupt)
 void skylncr_state::skylncr(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, MASTER_CLOCK/4);
+	Z80(config, m_maincpu, 12_MHz_XTAL/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &skylncr_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &skylncr_state::io_map_skylncr);
 	m_maincpu->set_vblank_int("screen", FUNC(skylncr_state::vblank_interrupt));
@@ -1558,7 +1709,7 @@ void skylncr_state::skylncr(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &aysnd(AY8910(config, "aysnd", MASTER_CLOCK/8));
+	ay8910_device &aysnd(AY8910(config, "aysnd", 12_MHz_XTAL/8));
 	aysnd.port_a_read_callback().set_ioport("DSW3");
 	aysnd.port_b_read_callback().set_ioport("DSW4");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -1597,6 +1748,15 @@ void skylncr_state::bdream97(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &skylncr_state::bdream97_opcode_map);
 
 	m_gfxdecode->set_info(gfx_bdream97);
+}
+
+
+void skylncr_state::olymp(machine_config &config)
+{
+	skylncr(config);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_OPCODES, &skylncr_state::olymp_opcode_map);
 }
 
 
@@ -1757,6 +1917,23 @@ ROM_START( leader )
 	ROM_LOAD16_BYTE( "leadergfx2.dmp21", 0x00001, 0x20000, CRC(57b9d159) SHA1(ee98aea160653d55017bd893cc253d23c7b1faf4) )
 	ROM_LOAD16_BYTE( "leadergfx2.dmp12", 0x40000, 0x20000, CRC(91e73bf9) SHA1(90a9c1119ae05bbd66a4d3c2266ec02cc53969bd) )
 	ROM_LOAD16_BYTE( "leadergfx2.dmp22", 0x40001, 0x20000, CRC(04cc0118) SHA1(016ccbe7daf8c4676830aadcc906a64e2826d11a) )
+ROM_END
+
+ROM_START( leadera ) // this has the same GFX ROMs as butrfly, with different program
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "leader 2ka.bin",  0x00000, 0x10000, CRC(2664db55) SHA1(de4c07a8ba8fab772441395b6d05272ee54d9614) ) // on sub board with Altera EPM7032
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "u29", 0x00000, 0x20000, CRC(2ff775ea) SHA1(2219c75cbac2969485607446ab116587bdee7278) )
+	ROM_LOAD16_BYTE( "u31", 0x00001, 0x20000, CRC(029d2214) SHA1(cf8256157db0b297ed457b3da6b6517907128843) )
+	ROM_LOAD16_BYTE( "u33", 0x40000, 0x20000, CRC(37bad677) SHA1(c077f0c07b097b376a01e5637446e4c4f82d9e28) )
+	ROM_LOAD16_BYTE( "u35", 0x40001, 0x20000, CRC(d14c7713) SHA1(c229ef64f3b0a04ff8e27bc56cff6a55ca34b80c) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "u52", 0x00000, 0x20000, CRC(15051537) SHA1(086c38c05c605f297a7bc470eb51763a7648e72c) )
+	ROM_LOAD16_BYTE( "u54", 0x00001, 0x20000, CRC(8e34d029) SHA1(ae316f2f34768938a07d62db110ce59d2751abaa) )
+	ROM_LOAD16_BYTE( "u56", 0x40000, 0x20000, CRC(a53daaef) SHA1(7b88bb986bd5e47576163d6999f8770c720c5bfc) )
+	ROM_LOAD16_BYTE( "u58", 0x40001, 0x20000, CRC(21ca47f8) SHA1(b192be06a2eb817776309580dc64fd76772a8d50) )
 ROM_END
 
 /*
@@ -1928,6 +2105,104 @@ ROM_START( sonikfig )
 	ROM_LOAD16_BYTE( "8__am27c100.u58", 0x40001, 0x20000, CRC(b02ed0ce) SHA1(ec8ab64210a1b10cdba5ee179e46fc8d6a1a67b6) )
 ROM_END
 
+/*
+PCB marked 'ROLLA REV. 1' and 'CTE 001 94V-0 0205'
+
+1 Winbond W77E58P on a small sub board (beefed up 8052 with undumped internal EPROM)
+1 ispLSI 1016E
+1 JFC 95101 (AY8910 compatible)
+4 8-dip banks
+1 24.00 MHz XTAL (on the daughterboard)
+
+Has Random Games in GFX, possibly pointing to superb2k (same producer) also using a 8052 derived CPU under the epoxy block
+*/
+
+ROM_START( rolla )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "545a", 0x0000, 0x8000, NO_DUMP ) // internal flash EPROM, security bit set
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "4w s1.u29", 0x00000, 0x20000, CRC(8b02800e) SHA1(22ae265e8d0bca403be4b4a82b43c526d9407dcf) )
+	ROM_LOAD16_BYTE( "4w s2.u31", 0x00001, 0x20000, CRC(efa631ca) SHA1(c924277c64fc20e0d841be8fd1e2a4718dd229f1) )
+	ROM_LOAD16_BYTE( "4w s3.u33", 0x40000, 0x20000, CRC(8fdc2d33) SHA1(61cc36caf52487ac863dbec1c40f3ef93e57a505) )
+	ROM_LOAD16_BYTE( "4w s4.u35", 0x40001, 0x20000, CRC(9e86abfa) SHA1(fe7e8222051810fd5e0a584967764d71d99bf8fe) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "4w g1.u52", 0x00000, 0x20000, CRC(88036f9e) SHA1(fa93bce2c6eccf70ee23fdd320ee56dcdb6d99e3) )
+	ROM_LOAD16_BYTE( "4w g2.u54", 0x00001, 0x20000, CRC(0142ba31) SHA1(e9aed07f112f68fb598bbc841666d5516479b06c) )
+	ROM_LOAD16_BYTE( "4w g3.u56", 0x40000, 0x20000, CRC(4324d5c0) SHA1(9c57385eda6a069e455b8cd9fb45db90f1966ecf) )
+	ROM_LOAD16_BYTE( "4w g4.u58", 0x40001, 0x20000, CRC(1cce85f1) SHA1(f35709b29a13917fe3c69240b4ab03aa6bdc3a3b) )
+ROM_END
+
+// this runs on a Rolla PCB with a Z80 + logic on a daughterboard
+ROM_START( score5 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "27c512_suboard.bin", 0x00000, 0x10000, CRC(a0670df0) SHA1(66c7f990141411c71978ec4500ea5a92264576e0) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "1_am27c100.u29", 0x00000, 0x20000, CRC(42b03f90) SHA1(490ca43284e58931b8334ddeae3242cfd0a7a700) )
+	ROM_LOAD16_BYTE( "2_am27c100.u31", 0x00001, 0x20000, CRC(12ab7866) SHA1(5d608a9d569b5a7ebd2cb0cf2b2c95463c421c87) )
+	ROM_LOAD16_BYTE( "3_am27c100.u33", 0x40000, 0x20000, CRC(ffb88d0a) SHA1(b14147c96d81e5838bccf3c3df08fc26b3e917ad) )
+	ROM_LOAD16_BYTE( "4_am27c100.u35", 0x40001, 0x20000, CRC(91176aac) SHA1(18aab2578f4db1f04fb0570be685aa28a511d099) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "5_am27c100.u52", 0x00000, 0x20000, CRC(d4d8e699) SHA1(5ba9e8c634fde06e55362f47fbd49503a9da2ed3) )
+	ROM_LOAD16_BYTE( "6_am27c100.u54", 0x00001, 0x20000, CRC(59631eaf) SHA1(a7f8dfc6737e6db6be8311e054f1e07b65792a93) )
+	ROM_LOAD16_BYTE( "7_am27c100.u56", 0x40000, 0x20000, CRC(801881a4) SHA1(fe0914db7d178c6d689682cb6e2af4ba782eaf8e) )
+	ROM_LOAD16_BYTE( "8_am27c100.u58", 0x40001, 0x20000, CRC(db20c424) SHA1(537c3b4dfb532473955042a58d204aebf60e950e) )
+ROM_END
+
+// this runs on a Rolla PCB with an unverified CPU enclosed in an epoxy block. GFX ROMs are half sized if compared to all the other supported sets.
+ROM_START( superb2k )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "v5.u9", 0x00000, 0x10000, CRC(dbbc3062) SHA1(fd020571a610ea60ef207fd709e737506bf9300a) ) // ROM was outside the epoxy block
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "u29", 0x00000, 0x10000, CRC(b876a2a4) SHA1(e52020b71cf8e98f8d5f5caf98ec3bb2a0cd09f8) )
+	ROM_LOAD16_BYTE( "u31", 0x00001, 0x10000, CRC(ab994cab) SHA1(7f50534a4c875049c8e80ec734ff4c5343f40d96) )
+	ROM_LOAD16_BYTE( "u33", 0x40000, 0x10000, CRC(bbe554d4) SHA1(18b59b25d59f94a06ed59908b7d03f1adda8d90e) )
+	ROM_LOAD16_BYTE( "u35", 0x40001, 0x10000, CRC(bbef9385) SHA1(f8aa5787ef6c510617c847a231c7e4cf59d7003f) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "u52", 0x00000, 0x10000, CRC(b0bb947a) SHA1(6822dd82b9be72b47ecaa412de4e070b372be170) )
+	ROM_LOAD16_BYTE( "u54", 0x00001, 0x10000, CRC(065aa631) SHA1(ae5e8a952bd0a6b052ab7636240e0ebc495f09aa) )
+	ROM_LOAD16_BYTE( "u56", 0x40000, 0x10000, CRC(b9121b69) SHA1(9a46444a63977d45392c6513550d132e5d2da365) )
+	ROM_LOAD16_BYTE( "u58", 0x40001, 0x10000, CRC(0a7023aa) SHA1(2efdb4ad2acd90fff39144e08b012e39b571a682) )
+ROM_END
+
+ROM_START( olymp )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "v1.bin", 0x00000, 0x10000, CRC(3b49a550) SHA1(b3add0affba091eb6e1ad9a680de41226885fcec) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "u29", 0x00000, 0x20000, CRC(26a83503) SHA1(84ed7b0c2552f2c7b4ef9b5b4f0303b9183a3a26) )
+	ROM_LOAD16_BYTE( "u31", 0x00001, 0x20000, CRC(fe5bde82) SHA1(0925d230b4773eeb8caf5e12a4c30ac8607ae358) )
+	ROM_LOAD16_BYTE( "u33", 0x40000, 0x20000, CRC(a33209f7) SHA1(f43cab5c78bb6a63c9633ba85a84c8ba1e2b1d2b) )
+	ROM_LOAD16_BYTE( "u35", 0x40001, 0x20000, CRC(2f665877) SHA1(8eb779a87319e04f28ccc8165fdef7ac643b3602) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "u52", 0x00000, 0x20000, CRC(17f77640) SHA1(570407e6fe282ad3a96ad43c8ff36a06ddb43579) )
+	ROM_LOAD16_BYTE( "u54", 0x00001, 0x20000, CRC(c626aa6c) SHA1(145e35fe687a8b028d7fbdc08ce608ebdbe3fb46) )
+	ROM_LOAD16_BYTE( "u56", 0x40000, 0x20000, CRC(312d1dda) SHA1(88b6214fff700698093591cdce052f36b2a4014f) )
+	ROM_LOAD16_BYTE( "u58", 0x40001, 0x20000, CRC(f939f3f0) SHA1(0a089f78ca66d1e660cb854bbf5b0eb38e317a19) )
+ROM_END
+
+ROM_START( speedway ) // runs on a Rolla PCB with small sub board with main CPU, ROM and Altera EPM. Hack of Leader, extremely similar and still has Leader strings.
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "v3.bin", 0x00000, 0x10000, CRC(ef777180) SHA1(f1a554677543082eb7df2e204d0d4c987b7c6bbb) ) //TMS 27C512
+
+	ROM_REGION( 0x80000, "gfx1", 0 ) // all HN27C301AG
+	ROM_LOAD16_BYTE( "1.u29", 0x00000, 0x20000, CRC(72e001fe) SHA1(dbb02f8425c175d5ee401754e6c11ce4d429e621) )
+	ROM_LOAD16_BYTE( "2.u31", 0x00001, 0x20000, CRC(a491bdcf) SHA1(793faa829de50f67a44541136b66407ee9744971) )
+	ROM_LOAD16_BYTE( "3.u33", 0x40000, 0x20000, CRC(935fc941) SHA1(12e5f7fea932a86298928b70b342e0825a3caca1) )
+	ROM_LOAD16_BYTE( "4.u35", 0x40001, 0x20000, CRC(aa8164ce) SHA1(027fa9743ad9d80bd86e59d684180f75dc6d60a0) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 ) // all HN27C301AG. Still has Bordun and Butterfly GFX in here.
+	ROM_LOAD16_BYTE( "5.u52", 0x00000, 0x20000, CRC(df984dbc) SHA1(7ea27465f9fd537fbdc1e13ca5842f656cbc2897) )
+	ROM_LOAD16_BYTE( "6.u54", 0x00001, 0x20000, CRC(37fbdc4d) SHA1(8db83c43e7c43c2da5a39b86edff416c35fa275e) )
+	ROM_LOAD16_BYTE( "7.u56", 0x40000, 0x20000, CRC(328f7912) SHA1(7f05217a18cfb316972cf96711276205e8098ee6) )
+	ROM_LOAD16_BYTE( "8.u58", 0x40001, 0x20000, CRC(b93b221f) SHA1(efd6962a0f5e150c60d258fea116d726228dc39c) )
+ROM_END
 
 /**********************************
 *           Driver Init           *
@@ -2002,6 +2277,104 @@ void skylncr_state::init_miaction()
 	}
 }
 
+void skylncr_state::init_olymp() // very weird, needs to be checked / finished, putting RAM in the 0xac00-0xac3f range gets in game
+{
+	uint8_t *const ROM = memregion("maincpu")->base();
+
+	for (int x = 0x0000; x < 0x0007; x++) // this range doesn't seem encrypted
+		m_decrypted_opcodes[x] = ROM[x];
+
+	for (int x = 0x0007; x < 0x6500; x++) // in this range both data and opcodes appear to be xor'ed 0x40
+	{
+		ROM[x] ^= 0x40;
+		m_decrypted_opcodes[x] = ROM[x];
+	}
+
+	for (int x = 0x6500; x < 0x10000; x++) // in this range data seems untouched and opcodes appear to be xor'ed 0x18
+		m_decrypted_opcodes[x] = ROM[x] ^ 0x18;
+}
+
+void skylncr_state::init_superb2k() // TODO: very preliminary, just enough to read some strings
+{
+	uint8_t *const rom = memregion("maincpu")->base();
+	std::vector<uint8_t> buffer(0x10000);
+
+	memcpy(&buffer[0], rom, 0x10000);
+
+	// descramble addresses. At a first glance, swaps seem to change if address line bits 13 or 14 are set (possibly 15 too, but not verified yet)
+	// the scrambled address line bits appear to be 1, 3, 6, 9 and 12
+	// it's possible XORs and data lines swaps are involved, too, at least for opcodes
+	for (int i = 0x00000; i < 0x10000; i++)
+	{
+		switch (i & 0x6000)
+		{
+			case 0x0000: rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4,  3, 2,  1, 0)]; break; // TODO: everything
+			case 0x2000: rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13,  1, 11, 10, 9, 8, 7, 3, 5, 4, 12, 2,  6, 0)]; break; // TODO: 0x200 blocks are good (see 0x3e00-0x3fff), rest to be determined
+			case 0x4000: rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13,  1, 11, 10, 3, 8, 7, 6, 5, 4,  9, 2, 12, 0)]; break; // TODO: 0x40 blocks are good, there's still at least a wrong swap (see 0x5200-0x52ff)
+			case 0x6000: rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13,  3, 11, 10, 1, 8, 7, 9, 5, 4, 12, 2,  6, 0)]; break; // TODO: 0x20 blocks are good (see 0x7fa0-0x7fbf)
+		}
+	}
+}
+
+void skylncr_state::init_speedway() // TODO: complete this. These XORs and ranges have been derived by comparing this dump with leader, of which it's clearly a hack.
+{
+	uint8_t *const ROM = memregion("maincpu")->base();
+
+	for (int x = 0x0000; x < 0x10000; x++)
+		m_decrypted_opcodes[x] = ROM[x];
+
+	for (int x = 0x000d; x < 0x5000; x++)
+	{
+		ROM[x] = ROM[x] ^ 0x41;
+		m_decrypted_opcodes[x] = ROM[x];
+	}
+
+	for (int x = 0x5000; x < 0x53c2; x++)
+		m_decrypted_opcodes[x] = ROM[x] ^ 0x12;
+
+	for (int x = 0x5400; x < 0x8000; x++)
+	{
+		ROM[x] = ROM[x] ^ 0x41;
+		m_decrypted_opcodes[x] = ROM[x];
+	}
+
+	for (int x = 0xc000; x < 0xc300; x++)
+	{
+		ROM[x] = ROM[x] ^ 0x08;
+		m_decrypted_opcodes[x] = ROM[x];
+	}
+
+	for (int x = 0xc300; x < 0xc368; x++)
+		m_decrypted_opcodes[x] = ROM[x] ^ 0x12;
+
+	for (int x = 0xf690; x < 0xf74f; x++)
+		m_decrypted_opcodes[x] = ROM[x] ^ 0x12;
+
+	for (int x = 0xf74f; x < 0x10000; x++)
+	{
+		ROM[x] = ROM[x] ^ 0x08;
+		m_decrypted_opcodes[x] = ROM[x];
+	}
+}
+
+void skylncr_state::init_leadera()
+{
+	uint8_t *const ROM = memregion("maincpu")->base();
+
+	for (int x = 0x000d; x < 0x4000; x++)
+		ROM[x] ^= 0x08;
+
+	for (int x = 0x4000; x < 0x8000; x++)
+		ROM[x] ^= 0x10;
+
+	for (int x = 0xc000; x < 0x10000; x++)
+		ROM[x] ^= 0x40;
+
+	ROM[0x762a] = ROM[0x762b] = 0x00; // TODO: some minor protection? bypass for now
+}
+
+} // Anonymous namespace
+
 
 /****************************************************
 *                  Game Drivers                     *
@@ -2013,10 +2386,16 @@ GAME( 1995, butrfly,   0,        skylncr,  skylncr,  skylncr_state,  empty_init,
 GAME( 1999, mbutrfly,  0,        mbutrfly, mbutrfly, skylncr_state,  init_mbutrfly, ROT0, "Bordun International", "Magical Butterfly (version U350C, protected)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1995, madzoo,    0,        skylncr,  skylncr,  skylncr_state,  empty_init,    ROT0, "Bordun International", "Mad Zoo (version U450C)",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1995, leader,    0,        skylncr,  leader,   skylncr_state,  empty_init,    ROT0, "bootleg",              "Leader (version Z 2E, Greece)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1995, leadera,   leader,   skylncr,  leader,   skylncr_state,  init_leadera,  ROT0, "bootleg",              "Leader (version Z 2F, Greece)",                  MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // Needs correct protection emulation instead of ROM patch
+GAME( 199?, speedway,  0,        olymp,    leader,   skylncr_state,  init_speedway, ROT0, "hack (Drivers)",       "Speedway",                                       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // Incomplete decryption (?)
 GAME( 199?, gallag50,  0,        skylncr,  gallag50, skylncr_state,  empty_init,    ROT0, "bootleg",              "Gallag Video Game / Petalouda (Butterfly, x50)", MACHINE_SUPPORTS_SAVE )
 GAME( 199?, neraidou,  0,        neraidou, neraidou, skylncr_state,  empty_init,    ROT0, "bootleg",              "Neraidoula",                                     MACHINE_SUPPORTS_SAVE )
 GAME( 199?, miaction,  0,        skylncr,  skylncr,  skylncr_state,  init_miaction, ROT0, "Vegas",                "Missing In Action",                              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 199?, tigerslt,  0,        skylncr,  skylncr,  skylncr_state,  init_miaction, ROT0, "bootleg",              "Tiger (slot)",                                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE  )
 GAME( 199?, sstar97,   0,        sstar97,  sstar97,  skylncr_state,  empty_init,    ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1995, bdream97,  0,        bdream97, skylncr,  skylncr_state,  empty_init,    ROT0, "bootleg (KKK)",        "Hudie Meng 97",                                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2000?,olymp,     0,        olymp,    skylncr,  skylncr_state,  init_olymp,    ROT0, "Z Games",              "Olympus (Z Games, version 10)",                  MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // Still has Bordun International 1992 strings
 GAME( 2000, sonikfig,  0,        skylncr,  sonikfig, skylncr_state,  init_sonikfig, ROT0, "Z Games",              "Sonik Fighter (version 02, encrypted)",          MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, rolla,     0,        skylncr,  skylncr,  skylncr_state,  empty_init,    ROT0, "Random Games",         "unknown 'Rolla' slot machine",                   MACHINE_IS_SKELETON ) // internal CPU ROM not dumped
+GAME( 2000?,score5,    0,        skylncr,  score5,   skylncr_state,  init_sonikfig, ROT0, "Z Games",              "Score 5",                                        MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // game runs but screen is completely black due to palette mishandling
+GAME( 2000?,superb2k,  0,        skylncr,  skylncr,  skylncr_state,  init_superb2k, ROT0, "Random Games",         "Super Butterfly 2000",                           MACHINE_IS_SKELETON ) // encrypted / different CPU type ?

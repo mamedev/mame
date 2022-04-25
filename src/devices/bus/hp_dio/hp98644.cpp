@@ -15,10 +15,9 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE_NS(HPDIO_98644, bus::hp_dio, dio16_98644_device, "dio98644", "HP98644A Asynchronous Serial Interface")
+DEFINE_DEVICE_TYPE(HPDIO_98644, bus::hp_dio::dio16_98644_device, "dio98644", "HP98644A Asynchronous Serial Interface")
 
-namespace bus {
-	namespace hp_dio {
+namespace bus::hp_dio {
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -58,8 +57,12 @@ dio16_98644_device::dio16_98644_device(const machine_config &mconfig, const char
 dio16_98644_device::dio16_98644_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_dio16_card_interface(mconfig, *this),
-	m_uart(*this, INS8250_TAG),
-	m_switches{*this, "switches"}
+	m_uart{*this, INS8250_TAG},
+	m_switches{*this, "switches"},
+	m_installed_io{false},
+	m_control{0},
+	m_loopback{false},
+	m_data{0}
 {
 }
 
@@ -161,13 +164,15 @@ void dio16_98644_device::device_reset()
 		dio().install_memory(
 				0x600000 + (code * 0x10000),
 				0x6007ff + (code * 0x10000),
-				read16_delegate(*this, FUNC(dio16_98644_device::io_r)),
-				write16_delegate(*this, FUNC(dio16_98644_device::io_w)));
+				read16sm_delegate(*this, FUNC(dio16_98644_device::io_r)),
+				write16sm_delegate(*this, FUNC(dio16_98644_device::io_w)));
 		m_installed_io = true;
 	}
+	m_data = 0;
+	m_control = 0;
 }
 
-READ16_MEMBER(dio16_98644_device::io_r)
+uint16_t dio16_98644_device::io_r(offs_t offset)
 {
 	uint16_t ret = 0xffff;
 
@@ -204,7 +209,7 @@ READ16_MEMBER(dio16_98644_device::io_r)
 	return ret;
 }
 
-WRITE16_MEMBER(dio16_98644_device::io_w)
+void dio16_98644_device::io_w(offs_t offset, uint16_t data)
 {
 	if (offset == 0x0c)
 		m_loopback = (data & 0x10) ? true : false;
@@ -236,4 +241,3 @@ WRITE16_MEMBER(dio16_98644_device::io_w)
 }
 
 } // namespace bus::hp_dio
-} // namespace bus

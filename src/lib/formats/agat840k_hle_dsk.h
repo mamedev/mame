@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "flopimg.h"
+#include "flopimg_legacy.h"
 #include "formats/basicdsk.h"
 
 LEGACY_FLOPPY_OPTIONS_EXTERN(agat840k_hle);

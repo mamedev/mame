@@ -2,7 +2,7 @@
 // impl/executor.hpp
 // ~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,11 +16,12 @@
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
 #include "asio/detail/config.hpp"
+
+#if !defined(ASIO_NO_TS_EXECUTORS)
+
 #include "asio/detail/atomic_count.hpp"
-#include "asio/detail/executor_op.hpp"
 #include "asio/detail/global.hpp"
 #include "asio/detail/memory.hpp"
-#include "asio/detail/recycling_allocator.hpp"
 #include "asio/executor.hpp"
 #include "asio/system_executor.hpp"
 
@@ -30,109 +31,13 @@ namespace asio {
 
 #if !defined(GENERATING_DOCUMENTATION)
 
-#if defined(ASIO_HAS_MOVE)
-
-// Lightweight, move-only function object wrapper.
-class executor::function
-{
-public:
-  template <typename F, typename Alloc>
-  explicit function(F f, const Alloc& a)
-  {
-    // Construct an allocator to be used for the operation.
-    typedef typename detail::get_recycling_allocator<Alloc>::type alloc_type;
-    alloc_type allocator(detail::get_recycling_allocator<Alloc>::get(a));
-
-    // Allocate and construct an operation to wrap the function.
-    typedef detail::executor_op<F, alloc_type> op;
-    typename op::ptr p = { allocator, 0, 0 };
-    p.v = p.a.allocate(1);
-    op_ = new (p.v) op(f, allocator);
-    p.v = 0;
-  }
-
-  function(function&& other)
-    : op_(other.op_)
-  {
-    other.op_ = 0;
-  }
-
-  ~function()
-  {
-    if (op_)
-      op_->destroy();
-  }
-
-  void operator()()
-  {
-    if (op_)
-    {
-      detail::scheduler_operation* op = op_;
-      op_ = 0;
-      op->complete(this, asio::error_code(), 0);
-    }
-  }
-
-private:
-  detail::scheduler_operation* op_;
-};
-
-#else // defined(ASIO_HAS_MOVE)
-
-// Not so lightweight, copyable function object wrapper.
-class executor::function
-{
-public:
-  template <typename F, typename Alloc>
-  explicit function(const F& f, const Alloc&)
-    : impl_(new impl<F>(f))
-  {
-  }
-
-  void operator()()
-  {
-    impl_->invoke_(impl_.get());
-  }
-
-private:
-  // Base class for polymorphic function implementations.
-  struct impl_base
-  {
-    void (*invoke_)(impl_base*);
-  };
-
-  // Polymorphic function implementation.
-  template <typename F>
-  struct impl : impl_base
-  {
-    impl(const F& f)
-      : function_(f)
-    {
-      invoke_ = &function::invoke<F>;
-    }
-
-    F function_;
-  };
-
-  // Helper to invoke a function.
-  template <typename F>
-  static void invoke(impl_base* i)
-  {
-    static_cast<impl<F>*>(i)->function_();
-  }
-
-  detail::shared_ptr<impl_base> impl_;
-};
-
-#endif // defined(ASIO_HAS_MOVE)
-
-// Default polymorphic allocator implementation.
+// Default polymorphic executor implementation.
 template <typename Executor, typename Allocator>
 class executor::impl
   : public executor::impl_base
 {
 public:
-  typedef typename Allocator::template rebind<impl>::other allocator_type;
+  typedef ASIO_REBIND_ALLOC(Allocator, impl) allocator_type;
 
   static impl_base* create(const Executor& e, Allocator a = Allocator())
   {
@@ -152,13 +57,13 @@ public:
 
   impl_base* clone() const ASIO_NOEXCEPT
   {
-    ++ref_count_;
+    detail::ref_count_up(ref_count_);
     return const_cast<impl_base*>(static_cast<const impl_base*>(this));
   }
 
   void destroy() ASIO_NOEXCEPT
   {
-    if (--ref_count_ == 0)
+    if (detail::ref_count_down(ref_count_))
     {
       allocator_type alloc(allocator_);
       impl* p = this;
@@ -250,7 +155,7 @@ private:
   };
 };
 
-// Polymorphic allocator specialisation for system_executor.
+// Polymorphic executor specialisation for system_executor.
 template <typename Allocator>
 class executor::impl<system_executor, Allocator>
   : public executor::impl_base
@@ -293,17 +198,20 @@ public:
 
   void dispatch(ASIO_MOVE_ARG(function) f)
   {
-    executor_.dispatch(ASIO_MOVE_CAST(function)(f), allocator_);
+    executor_.dispatch(ASIO_MOVE_CAST(function)(f),
+        std::allocator<void>());
   }
 
   void post(ASIO_MOVE_ARG(function) f)
   {
-    executor_.post(ASIO_MOVE_CAST(function)(f), allocator_);
+    executor_.post(ASIO_MOVE_CAST(function)(f),
+        std::allocator<void>());
   }
 
   void defer(ASIO_MOVE_ARG(function) f)
   {
-    executor_.defer(ASIO_MOVE_CAST(function)(f), allocator_);
+    executor_.defer(ASIO_MOVE_CAST(function)(f),
+        std::allocator<void>());
   }
 
   type_id_result_type target_type() const ASIO_NOEXCEPT
@@ -328,7 +236,6 @@ public:
 
 private:
   system_executor executor_;
-  Allocator allocator_;
 };
 
 template <typename Executor>
@@ -387,5 +294,7 @@ const Executor* executor::target() const ASIO_NOEXCEPT
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"
+
+#endif // !defined(ASIO_NO_TS_EXECUTORS)
 
 #endif // ASIO_IMPL_EXECUTOR_HPP

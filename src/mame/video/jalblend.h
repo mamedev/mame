@@ -28,8 +28,8 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	template<class _BitmapClass>
-	void drawgfx_common(palette_device &palette,_BitmapClass &dest_bmp,const rectangle &clip,gfx_element *gfx,
+	template<class BitmapClass>
+	void drawgfx_common(palette_device &palette,BitmapClass &dest_bmp,const rectangle &clip,gfx_element *gfx,
 							u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy,
 							u8 transparent_color);
 };

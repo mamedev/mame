@@ -29,6 +29,7 @@ Forgotten Worlds (USA, B-Board 88618B-2, Rev. AA)                  88618B-2   LW
 Forgotten Worlds (USA, B-Board 88618B-2, Rev. C)                   88618B-2   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
 Forgotten Worlds (USA, B-Board 88618B-2, Rev. E)                   88618B-2   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
 Forgotten Worlds (USA, B-Board 88621B-2, Rev. C)                   88621B-2   LW621            LWIO  None         CPS-B-01  DL-0411-10001  N/A
+Forgotten Worlds (Japan)                                           88618B-2   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
 Lost Worlds (Japan Old Ver.)                                       88618B-2   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
 Lost Worlds (Japan)                                                88618B-2   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
 
@@ -1528,6 +1529,26 @@ static const struct gfx_range mapper_CP1B1F_table[] =
 	{ 0 }
 };
 
+#define mapper_CP1B1F_boot   { 0x10000, 0x10000, 0, 0 }, mapper_CP1B1F_boot_table
+static const struct gfx_range mapper_CP1B1F_boot_table[] =
+{
+	// verified from PAL dump:
+	//         pin 15 (ROMs 1-4,7-10 /oe)
+	// bank0 = pin 16 (ROMs 1,7  /ce)
+	//         pin 18 (ROMs 3,9  /ce)
+	// bank1 = pin 17 (ROMs 2,8  /ce)
+	//         pin 19 (ROMs 4,10 /ce)
+	// An a19 line is available on pin 13 for 32MBit roms (pin 44 of the EPROM) but is unused.
+	// pin 14 is fixed high in 16Mbit mode and is driven by gfx_chnl (CPS B-21 pin 108) if 32Mbit mode is selected
+
+	/* type                                                                  start   end     bank */
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x00000, 0x07fff, 0 },
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x10000, 0x17fff, 0 },
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x08000, 0x0ffff, 1 },
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x18000, 0x1ffff, 1 },
+	{ 0 }
+};
+
 
 /* unverified, no dump */
 #define mapper_sfzch    { 0x20000, 0, 0, 0 }, mapper_sfzch_table
@@ -1674,6 +1695,26 @@ static const struct gfx_range mapper_pokonyan_table[] =
 	{ 0 }
 };
 
+// pang3b4, PAL16V8@1A
+#define mapper_pang3b4   { 0x8000, 0x8000, 0, 0 }, mapper_pang3b4_table
+static const struct gfx_range mapper_pang3b4_table[] =
+{
+	// verified from PAL dump:
+	// bank0 = pin 14 (ROMs 2,4,6,8,10,12,14,16)
+	// bank1 = pin 12 (ROMs 1,3,5,7,9,11,13,15)
+	// pins 13,15,16,17,18,19 are always enabled
+
+	/* type            start   end     bank */
+	{ GFXTYPE_SPRITES, 0x0000, 0x7fff, 0 },
+	{ GFXTYPE_SCROLL2, 0x0000, 0x7fff, 0 },
+
+	{ GFXTYPE_SPRITES, 0x8000, 0xffff, 1 },
+	{ GFXTYPE_SCROLL1, 0x8000, 0xffff, 1 },
+	{ GFXTYPE_SCROLL2, 0x8000, 0xffff, 1 },
+	{ GFXTYPE_SCROLL3, 0x8000, 0xffff, 1 },
+	{ 0 }
+};
+
 // a game without an entry here defaults to cps2 mapper (eg. some games in fcrash.cpp)
 static const struct CPS1config cps1_config_table[]=
 {
@@ -1685,6 +1726,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"forgottnuc",  CPS_B_01,     mapper_LWCHR },
 	{"forgottnua",  CPS_B_01,     mapper_LWCHR },
 	{"forgottnuaa", CPS_B_01,     mapper_LWCHR },
+	{"forgottnj",   CPS_B_01,     mapper_LWCHR },
 	{"lostwrld",    CPS_B_01,     mapper_LWCHR },
 	{"lostwrldo",   CPS_B_01,     mapper_LWCHR },
 	{"ghouls",      CPS_B_01,     mapper_DM620 },
@@ -1852,6 +1894,10 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2mdta",     CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2mdtb",     CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2ceb",      CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
+	{"sf2ceb2",     CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
+	{"sf2ceb3",     CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
+	{"sf2ceb4",     CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
+	{"sf2ceb5",     CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2b",        CPS_B_17,     mapper_STF29,  0x36, 0, 0, 1 },
 	{"sf2b2",       CPS_B_17,     mapper_STF29,  0x36, 0, 0, 1 },
 	{"sf2ceupl",    HACK_B_1,     mapper_S9263B, 0x36, 0, 0, 1 },
@@ -1861,6 +1907,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2cems6b",   HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
 	{"sf2cems6c",   HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
 	{"sf2re",       HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
+	{"sf2mkot",     CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"varth",       CPS_B_04,     mapper_VA24B },   /* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */
 	{"varthb",      CPS_B_04,     mapper_VA63B, 0, 0, 0, 0x0F },
 	{"varthb2",     HACK_B_3,     mapper_sfzch, 0, 0, 0, 0x80 },  // unknown gal, other varth mappers don't work (game looks for sprites in >0x8000 unmapped region)
@@ -1917,6 +1964,8 @@ static const struct CPS1config cps1_config_table[]=
 	{"pang3b",      CPS_B_21_DEF, mapper_CP1B1F },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
 	{"pang3b2",     CPS_B_21_DEF, mapper_CP1B1F },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
 	{"pang3b3",     CPS_B_17,     mapper_CP1B1F },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
+	{"pang3b4",     CPS_B_21_DEF, mapper_pang3b4 },
+	{"pang3b5",     CPS_B_21_DEF, mapper_CP1B1F_boot },   /* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
 	{"ganbare",     CPS_B_21_DEF, mapper_GBPR2 },
 	{"gulunpa",     CPS_B_21_DEF, mapper_gulunpa }, // wrong
 
@@ -3142,8 +3191,7 @@ void cps2_state::cps2_render_sprites( screen_device &screen, bitmap_ind16 &bitma
 
 void cps_state::cps1_render_stars( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	int offs;
-	uint8_t *stars_rom = m_region_stars->base();
+	uint8_t const *const stars_rom = m_region_stars->base();
 
 	if (!stars_rom && (m_stars_enabled[0] || m_stars_enabled[1]))
 	{
@@ -3155,10 +3203,10 @@ void cps_state::cps1_render_stars( screen_device &screen, bitmap_ind16 &bitmap, 
 
 	if (m_stars_enabled[0])
 	{
-		for (offs = 0; offs < m_stars_rom_size / 2; offs++)
+		for (int offs = 0; offs < m_stars_rom_size / 2; offs++)
 		{
 			int col = stars_rom[8 * offs + 4];
-			if (col != 0x0f)
+			if ((col & 0x1f) != 0x0f)
 			{
 				int sx = (offs / 256) * 32;
 				int sy = (offs % 256);
@@ -3170,20 +3218,21 @@ void cps_state::cps1_render_stars( screen_device &screen, bitmap_ind16 &bitmap, 
 					sy = 256 - sy;
 				}
 
-				col = ((col & 0xe0) >> 1) + (screen.frame_number() / 16 & 0x0f);
+				int cnt = (screen.frame_number() / 16) % ((col & 0x80) ? 15 : 16);
+				col = ((col & 0xe0) >> 1) + cnt;
 
 				if (cliprect.contains(sx, sy))
-					bitmap.pix16(sy, sx) = 0xa00 + col;
+					bitmap.pix(sy, sx) = 0xa00 + col;
 			}
 		}
 	}
 
 	if (m_stars_enabled[1])
 	{
-		for (offs = 0; offs < m_stars_rom_size / 2; offs++)
+		for (int offs = 0; offs < m_stars_rom_size / 2; offs++)
 		{
 			int col = stars_rom[8*offs];
-			if (col != 0x0f)
+			if ((col & 0x1f) != 0x0f)
 			{
 				int sx = (offs / 256) * 32;
 				int sy = (offs % 256);
@@ -3195,10 +3244,11 @@ void cps_state::cps1_render_stars( screen_device &screen, bitmap_ind16 &bitmap, 
 					sy = 256 - sy;
 				}
 
-				col = ((col & 0xe0) >> 1) + (screen.frame_number() / 16 & 0x0f);
+				int cnt = (screen.frame_number() / 16) % ((col & 0x80) ? 15 : 16);
+				col = ((col & 0xe0) >> 1) + cnt;
 
 				if (cliprect.contains(sx, sy))
-					bitmap.pix16(sy, sx) = 0x800 + col;
+					bitmap.pix(sy, sx) = 0x800 + col;
 			}
 		}
 	}
@@ -3246,10 +3296,10 @@ void cps_state::render_layers(screen_device &screen, bitmap_ind16 &bitmap, const
 {
 	/* Draw layers (0 = sprites, 1-3 = tilemaps) */
 	int layercontrol = m_cps_b_regs[m_game_config->layer_control / 2];
-	int l0 = (layercontrol >> 0x06) & 03;
-	int l1 = (layercontrol >> 0x08) & 03;
-	int l2 = (layercontrol >> 0x0a) & 03;
-	int l3 = (layercontrol >> 0x0c) & 03;
+	int l0 = (layercontrol >> 0x06) & 0x03;
+	int l1 = (layercontrol >> 0x08) & 0x03;
+	int l2 = (layercontrol >> 0x0a) & 0x03;
+	int l3 = (layercontrol >> 0x0c) & 0x03;
 	screen.priority().fill(0, cliprect);
 
 	if (BIT(m_game_config->bootleg_kludge, 7))
@@ -3277,10 +3327,10 @@ void cps2_state::render_layers(screen_device &screen, bitmap_ind16 &bitmap, cons
 {
 	/* Draw layers (0 = sprites, 1-3 = tilemaps) */
 	int layercontrol = m_cps_b_regs[m_game_config->layer_control / 2];
-	int l0 = (layercontrol >> 0x06) & 03;
-	int l1 = (layercontrol >> 0x08) & 03;
-	int l2 = (layercontrol >> 0x0a) & 03;
-	int l3 = (layercontrol >> 0x0c) & 03;
+	int l0 = (layercontrol >> 0x06) & 0x03;
+	int l1 = (layercontrol >> 0x08) & 0x03;
+	int l2 = (layercontrol >> 0x0a) & 0x03;
+	int l3 = (layercontrol >> 0x0c) & 0x03;
 	screen.priority().fill(0, cliprect);
 
 	int primasks[8], i;

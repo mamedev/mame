@@ -137,47 +137,46 @@ license:CC0
 
 		<!-- player 1 is right -->
 
-		<bezel name="lamp3" element="lamp_1">
+		<element name="lamp3" ref="lamp_1">
 			<bounds x="225" y="310" width="30" height="30" />
-		</bezel>
-		<bezel name="lamp4" element="lamp_2">
+		</element>
+		<element name="lamp4" ref="lamp_2">
 			<bounds x="270" y="310" width="30" height="30" />
-		</bezel>
-		<bezel name="lamp5" element="lamp_3">
+		</element>
+		<element name="lamp5" ref="lamp_3">
 			<bounds x="315" y="310" width="30" height="30" />
-		</bezel>
-		<bezel name="lamp6" element="lamp_4">
+		</element>
+		<element name="lamp6" ref="lamp_4">
 			<bounds x="360" y="310" width="30" height="30" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp2" element="lamp_ready">
+		<element name="lamp2" ref="lamp_ready">
 			<bounds x="225" y="350" width="75" height="30" />
-		</bezel>
-		<bezel name="lamp1" element="lamp_reload">
+		</element>
+		<element name="lamp1" ref="lamp_reload">
 			<bounds x="315" y="350" width="75" height="30" />
-		</bezel>
+		</element>
 
 		<!-- player 2 is left -->
 
-		<bezel name="lamp10" element="lamp_1">
+		<element name="lamp10" ref="lamp_1">
 			<bounds x="10" y="310" width="30" height="30" />
-		</bezel>
-		<bezel name="lamp11" element="lamp_2">
+		</element>
+		<element name="lamp11" ref="lamp_2">
 			<bounds x="55" y="310" width="30" height="30" />
-		</bezel>
-		<bezel name="lamp12" element="lamp_3">
+		</element>
+		<element name="lamp12" ref="lamp_3">
 			<bounds x="100" y="310" width="30" height="30" />
-		</bezel>
-		<bezel name="lamp13" element="lamp_4">
+		</element>
+		<element name="lamp13" ref="lamp_4">
 			<bounds x="145" y="310" width="30" height="30" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp9" element="lamp_ready">
+		<element name="lamp9" ref="lamp_ready">
 			<bounds x="10" y="350" width="75" height="30" />
-		</bezel>
-		<bezel name="lamp8" element="lamp_reload">
+		</element>
+		<element name="lamp8" ref="lamp_reload">
 			<bounds x="100" y="350" width="75" height="30" />
-		</bezel>
-
+		</element>
 	</view>
 </mamelayout>

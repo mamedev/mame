@@ -24,7 +24,7 @@
 
 // ======================> vtech_floppy_controller_device
 
-class vtech_floppy_controller_device : public device_t, public device_vtech_memexp_interface
+class vtech_floppy_controller_device : public vtech_memexp_device
 {
 public:
 	// construction/destruction
@@ -36,8 +36,15 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	virtual void mem_map(address_map &map) override;
+	virtual void io_map(address_map &map) override;
+
 private:
-	void map(address_map &map);
+	required_device<vtech_memexp_slot_device> m_memexp;
+	required_device<floppy_connector> m_floppy0, m_floppy1;
+	floppy_image_device *m_floppy;
+
+	static void floppy_formats(format_registration &fr);
 
 	void latch_w(uint8_t data);
 	uint8_t shifter_r();
@@ -47,10 +54,6 @@ private:
 	void index_callback(floppy_image_device *floppy, int state);
 	void update_latching_inverter();
 	void flush_writes(bool keep_margin = false);
-
-	required_device<vtech_memexp_slot_device> m_memexp;
-	required_device<floppy_connector> m_floppy0, m_floppy1;
-	floppy_image_device *m_floppy;
 
 	uint8_t m_latch, m_shifter;
 	bool m_latching_inverter;

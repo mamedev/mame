@@ -33,7 +33,7 @@ dai_sound_device::dai_sound_device(const machine_config &mconfig, const char *ta
 
 void dai_sound_device::device_start()
 {
-	m_mixer_channel = machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate());
+	m_mixer_channel = stream_alloc(0, 2, machine().sample_rate());
 }
 
 //-------------------------------------------------
@@ -119,23 +119,23 @@ WRITE_LINE_MEMBER(dai_sound_device::set_input_ch2)
 //  our sound stream
 //-------------------------------------------------
 
-void dai_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void dai_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *sample_left = outputs[0];
-	stream_sample_t *sample_right = outputs[1];
+	auto &sample_left = outputs[0];
+	auto &sample_right = outputs[1];
 
 	int16_t channel_0_signal = m_dai_input[0] ? s_osc_volume_table[m_osc_volume[0]] : -s_osc_volume_table[m_osc_volume[0]];
 	int16_t channel_1_signal = m_dai_input[1] ? s_osc_volume_table[m_osc_volume[1]] : -s_osc_volume_table[m_osc_volume[1]];
 	int16_t channel_2_signal = m_dai_input[2] ? s_osc_volume_table[m_osc_volume[2]] : -s_osc_volume_table[m_osc_volume[2]];
 
-	while (samples--)
+	for (int sampindex = 0; sampindex < sample_left.samples(); sampindex++)
 	{
 		int16_t noise = machine().rand()&0x01 ? s_noise_volume_table[m_noise_volume] : -s_noise_volume_table[m_noise_volume];
 
 		/* channel 0 + channel 1 + noise */
-		*sample_left++ = channel_0_signal + channel_1_signal + noise;
+		sample_left.put_int(sampindex, channel_0_signal + channel_1_signal + noise, 32768);
 
 		/* channel 1 + channel 2 + noise */
-		*sample_right++ = channel_1_signal + channel_2_signal + noise;
+		sample_right.put_int(sampindex, channel_1_signal + channel_2_signal + noise, 32768);
 	}
 }

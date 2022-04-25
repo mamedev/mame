@@ -185,7 +185,7 @@ void philips_22vp931_device::device_reset()
 //  device
 //-------------------------------------------------
 
-void philips_22vp931_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void philips_22vp931_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -233,7 +233,7 @@ void philips_22vp931_device::device_timer(emu_timer &timer, device_timer_id id, 
 			m_fromcontroller_pending = true;
 
 			// track the commands for debugging purposes
-			if (m_cmdcount < ARRAY_LENGTH(m_cmdbuf))
+			if (m_cmdcount < std::size(m_cmdbuf))
 			{
 				m_cmdbuf[m_cmdcount++ % 3] = param;
 				if (LOG_COMMANDS && m_cmdcount % 3 == 0)
@@ -265,7 +265,7 @@ void philips_22vp931_device::device_timer(emu_timer &timer, device_timer_id id, 
 
 		// pass everything else onto the parent
 		default:
-			laserdisc_device::device_timer(timer, id, param, ptr);
+			laserdisc_device::device_timer(timer, id, param);
 			break;
 	}
 }

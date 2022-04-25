@@ -9,14 +9,21 @@
 #include "emu.h"
 #include "includes/tx0.h"
 
-#include "cpu/pdp1/tx0.h"
+#include "imagedev/magtape.h"
+#include "imagedev/papertape.h"
+
 #include "video/crt.h"
 #include "screen.h"
+#include "softlist_dev.h"
 
 
 /*
-    driver init function
+
+TODO:
+- due to no known software, it is unknown if this system is capable of running anything.
+
 */
+
 void tx0_state::init_tx0()
 {
 	static const unsigned char fontdata6x8[tx0_fontdata_size] =
@@ -354,25 +361,18 @@ void tx0_state::machine_start()
     perforated tape handling
 */
 
-class tx0_readtape_image_device :   public device_t,
-									public device_image_interface
+class tx0_readtape_image_device : public paper_tape_reader_device
 {
 public:
 	// construction/destruction
 	tx0_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const noexcept override { return IO_PUNCHTAPE; }
-
-	virtual bool is_readable()  const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return false; }
-	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
-	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "tap,rim"; }
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
+	virtual const char *image_interface() const noexcept override { return "tx0_ptp"; }
 
 protected:
 	// device-level overrides
@@ -385,30 +385,22 @@ private:
 DEFINE_DEVICE_TYPE(TX0_READTAPE, tx0_readtape_image_device, "tx0_readtape_image", "TX0 Tape Reader")
 
 tx0_readtape_image_device::tx0_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TX0_READTAPE, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	: paper_tape_reader_device(mconfig, TX0_READTAPE, tag, owner, clock)
 	, m_tx0(*this, DEVICE_SELF_OWNER)
 {
 }
 
-class tx0_punchtape_image_device :  public device_t,
-									public device_image_interface
+class tx0_punchtape_image_device : public paper_tape_punch_device
 {
 public:
 	// construction/destruction
 	tx0_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const noexcept override { return IO_PUNCHTAPE; }
-
-	virtual bool is_readable()  const noexcept override { return false; }
-	virtual bool is_writeable() const noexcept override { return true; }
-	virtual bool is_creatable() const noexcept override { return true; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
-	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "tap,rim"; }
 
 	virtual image_init_result call_load() override;
+	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 
 protected:
@@ -422,8 +414,7 @@ private:
 DEFINE_DEVICE_TYPE(TX0_PUNCHTAPE, tx0_punchtape_image_device, "tx0_punchtape_image", "TX0 Tape Puncher")
 
 tx0_punchtape_image_device::tx0_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TX0_PUNCHTAPE, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	: paper_tape_punch_device(mconfig, TX0_PUNCHTAPE, tag, owner, clock)
 	, m_tx0(*this, DEVICE_SELF_OWNER)
 {
 }
@@ -437,14 +428,14 @@ public:
 	tx0_printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const noexcept override { return IO_PRINTER; }
-
 	virtual bool is_readable()  const noexcept override { return false; }
 	virtual bool is_writeable() const noexcept override { return true; }
 	virtual bool is_creatable() const noexcept override { return true; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual bool support_command_line_image_creation() const noexcept override { return true; }
 	virtual const char *file_extensions() const noexcept override { return "typ"; }
+	virtual const char *image_type_name() const noexcept override { return "printout"; }
+	virtual const char *image_brief_type_name() const noexcept override { return "prin"; }
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
@@ -466,21 +457,13 @@ tx0_printer_image_device::tx0_printer_image_device(const machine_config &mconfig
 {
 }
 
-class tx0_magtape_image_device :    public device_t,
-									public device_image_interface
+class tx0_magtape_image_device : public magtape_image_device
 {
 public:
 	// construction/destruction
 	tx0_magtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const noexcept override { return IO_MAGTAPE; }
-
-	virtual bool is_readable()  const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return true; }
-	virtual bool is_creatable() const noexcept override { return true; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
-	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "tap"; }
 
 	virtual image_init_result call_load() override;
@@ -497,8 +480,7 @@ private:
 DEFINE_DEVICE_TYPE(TX0_MAGTAPE, tx0_magtape_image_device, "tx0_magtape_image", "TX0 Magnetic Tape")
 
 tx0_magtape_image_device::tx0_magtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TX0_MAGTAPE, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	: magtape_image_device(mconfig, TX0_MAGTAPE, tag, owner, clock)
 	, m_tx0(*this, DEVICE_SELF_OWNER)
 {
 }
@@ -510,27 +492,30 @@ tx0_magtape_image_device::tx0_magtape_image_device(const machine_config &mconfig
 */
 image_init_result tx0_readtape_image_device::call_load()
 {
-	/* reader unit */
-	m_tx0->m_tape_reader.fd = this;
+	if (m_tx0)
+	{
+		/* reader unit */
+		m_tx0->m_tape_reader.fd = this;
 
-	/* start motor */
-	m_tx0->m_tape_reader.motor_on = 1;
+		/* start motor */
+		m_tx0->m_tape_reader.motor_on = 1;
 
 		/* restart reader IO when necessary */
 		/* note that this function may be called before tx0_init_machine, therefore
 		before tape_reader.timer is allocated.  It does not matter, as the clutch is never
 		down at power-up, but we must not call timer_enable with a nullptr parameter! */
 
-	if (m_tx0->m_tape_reader.timer)
-	{
-		if (m_tx0->m_tape_reader.motor_on && m_tx0->m_tape_reader.rcl)
+		if (m_tx0->m_tape_reader.timer)
 		{
-			/* delay is approximately 1/400s */
-			m_tx0->m_tape_reader.timer->adjust(attotime::from_usec(2500));
-		}
-		else
-		{
-			m_tx0->m_tape_reader.timer->enable(0);
+			if (m_tx0->m_tape_reader.motor_on && m_tx0->m_tape_reader.rcl)
+			{
+				/* delay is approximately 1/400s */
+				m_tx0->m_tape_reader.timer->adjust(attotime::from_usec(2500));
+			}
+			else
+			{
+				m_tx0->m_tape_reader.timer->enable(0);
+			}
 		}
 	}
 
@@ -540,13 +525,16 @@ image_init_result tx0_readtape_image_device::call_load()
 void tx0_readtape_image_device::call_unload()
 {
 	/* reader unit */
-	m_tx0->m_tape_reader.fd = nullptr;
+	if (m_tx0)
+	{
+		m_tx0->m_tape_reader.fd = nullptr;
 
-	/* stop motor */
-	m_tx0->m_tape_reader.motor_on = 0;
+		/* stop motor */
+		m_tx0->m_tape_reader.motor_on = 0;
 
-	if (m_tx0->m_tape_reader.timer)
-		m_tx0->m_tape_reader.timer->enable(0);
+		if (m_tx0->m_tape_reader.timer)
+			m_tx0->m_tape_reader.timer->enable(0);
+	}
 }
 
 /*
@@ -566,7 +554,10 @@ int tx0_state::tape_read(uint8_t *reply)
 void tx0_state::tape_write(uint8_t data)
 {
 	if (m_tape_puncher.fd)
+	{
+		data |= 0200;
 		m_tape_puncher.fd->fwrite(& data, 1);
+	}
 }
 
 /*
@@ -643,15 +634,22 @@ TIMER_CALLBACK_MEMBER(tx0_state::reader_callback)
 image_init_result tx0_punchtape_image_device::call_load()
 {
 	/* punch unit */
-	m_tx0->m_tape_puncher.fd = this;
+	if (m_tx0)
+		m_tx0->m_tape_puncher.fd = this;
 
 	return image_init_result::PASS;
+}
+
+image_init_result tx0_punchtape_image_device::call_create(int format_type, util::option_resolution *format_options)
+{
+	return call_load();
 }
 
 void tx0_punchtape_image_device::call_unload()
 {
 	/* punch unit */
-	m_tx0->m_tape_puncher.fd = nullptr;
+	if (m_tx0)
+		m_tx0->m_tape_puncher.fd = nullptr;
 }
 
 TIMER_CALLBACK_MEMBER(tx0_state::puncher_callback)
@@ -719,14 +717,16 @@ WRITE_LINE_MEMBER( tx0_state::tx0_io_p7h )
 image_init_result tx0_printer_image_device::call_load()
 {
 	/* open file */
-	m_tx0->m_typewriter.fd = this;
+	if (m_tx0)
+		m_tx0->m_typewriter.fd = this;
 
 	return image_init_result::PASS;
 }
 
 void tx0_printer_image_device::call_unload()
 {
-	m_tx0->m_typewriter.fd = nullptr;
+	if (m_tx0)
+		m_tx0->m_typewriter.fd = nullptr;
 }
 
 /*
@@ -736,7 +736,7 @@ void tx0_state::typewriter_out(uint8_t data)
 {
 	tx0_typewriter_drawchar(data);
 	if (m_typewriter.fd)
-		m_typewriter.fd->fwrite(& data, 1);
+		m_typewriter.fd->fwrite(&data, 1);
 }
 
 /*
@@ -758,7 +758,7 @@ WRITE_LINE_MEMBER( tx0_state::tx0_io_prt )
 	/* read current AC */
 	ac = m_maincpu->state_int(TX0_AC);
 	/* shuffle and print 6-bit word */
-	ch = ((ac & 0100000) >> 15) | ((ac & 0010000) >> 11) | ((ac & 0001000) >> 7) | ((ac & 0000100) >> 3) | ((ac & 0000010) << 1) | ((ac & 0000001) << 5);
+	ch = bitswap<6>(ac, 15, 12, 9, 6, 3, 0);
 	typewriter_out(ch);
 
 	m_typewriter.prt_timer->adjust(attotime::from_msec(100));
@@ -855,18 +855,21 @@ void tx0_magtape_image_device::device_start()
 */
 image_init_result tx0_magtape_image_device::call_load()
 {
-	m_tx0->m_magtape.img = this;
-
-	m_tx0->m_magtape.irg_pos = MTIRGP_END;
-
-	/* restart IO when necessary */
-	/* note that this function may be called before tx0_init_machine, therefore
-	before magtape.timer is allocated.  We must not call timer_enable with a
-	nullptr parameter! */
-	if (m_tx0->m_magtape.timer)
+	if (m_tx0)
 	{
-		if (m_tx0->m_magtape.state == MTS_SELECTING)
-			m_tx0->schedule_select();
+		m_tx0->m_magtape.img = this;
+
+		m_tx0->m_magtape.irg_pos = tx0_state::MTIRGP_END;
+
+		/* restart IO when necessary */
+		/* note that this function may be called before tx0_init_machine, therefore
+		before magtape.timer is allocated.  We must not call timer_enable with a
+		nullptr parameter! */
+		if (m_tx0->m_magtape.timer)
+		{
+			if (m_tx0->m_magtape.state == tx0_state::MTS_SELECTING)
+				m_tx0->schedule_select();
+		}
 	}
 
 	return image_init_result::PASS;
@@ -874,18 +877,21 @@ image_init_result tx0_magtape_image_device::call_load()
 
 void tx0_magtape_image_device::call_unload()
 {
-	m_tx0->m_magtape.img = nullptr;
-
-	if (m_tx0->m_magtape.timer)
+	if (m_tx0)
 	{
-		if (m_tx0->m_magtape.state == MTS_SELECTING)
-			/* I/O has not actually started, we can cancel the selection */
-			m_tx0->m_tape_reader.timer->enable(0);
-		if ((m_tx0->m_magtape.state == MTS_SELECTED) || ((m_tx0->m_magtape.state == MTS_SELECTING) && (m_tx0->m_magtape.command == 2)))
-		{   /* unit has become unavailable */
-			m_tx0->m_magtape.state = MTS_UNSELECTING;
-			m_tx0->m_maincpu->set_state_int(TX0_PF, m_tx0->m_maincpu->state_int(TX0_PF) | PF_RWC);
-			m_tx0->schedule_unselect();
+		m_tx0->m_magtape.img = nullptr;
+
+		if (m_tx0->m_magtape.timer)
+		{
+			if (m_tx0->m_magtape.state == tx0_state::MTS_SELECTING)
+				/* I/O has not actually started, we can cancel the selection */
+				m_tx0->m_tape_reader.timer->enable(0);
+			if ((m_tx0->m_magtape.state == tx0_state::MTS_SELECTED) || ((m_tx0->m_magtape.state == tx0_state::MTS_SELECTING) && (m_tx0->m_magtape.command == 2)))
+			{   /* unit has become unavailable */
+				m_tx0->m_magtape.state = tx0_state::MTS_UNSELECTING;
+				m_tx0->m_maincpu->set_state_int(TX0_PF, m_tx0->m_maincpu->state_int(TX0_PF) | PF_RWC);
+				m_tx0->schedule_unselect();
+			}
 		}
 	}
 }
@@ -899,7 +905,7 @@ void tx0_state::magtape_callback()
 	{
 	case MTS_UNSELECTING:
 		m_magtape.state = MTS_UNSELECTED;
-
+		[[fallthrough]];
 	case MTS_UNSELECTED:
 		if (m_magtape.sel_pending)
 		{
@@ -960,7 +966,7 @@ void tx0_state::magtape_callback()
 			}
 			break;
 		}
-
+		[[fallthrough]];
 	case MTS_SELECTED:
 		switch (m_magtape.command)
 		{
@@ -1254,7 +1260,7 @@ void tx0_state::magtape_callback()
 				{
 					m_magtape.u.write.state = MTWTS_STATE1;
 				}
-
+				[[fallthrough]];
 			case MTWTS_STATE1:
 				if (m_magtape.u.write.counter)
 				{
@@ -1282,7 +1288,7 @@ void tx0_state::magtape_callback()
 						m_magtape.u.write.counter = 3;
 					}
 				}
-
+				[[fallthrough]];
 			case MTWTS_STATE2:
 				if (m_magtape.u.write.counter != 0)
 				{
@@ -1420,9 +1426,7 @@ void tx0_state::tx0_keyboard()
 				;
 			charcode = (i << 4) + j;
 			/* shuffle and insert data into LR */
-			/* BTW, I am not sure how the char code is combined with the
-			previous LR */
-			lr = (1 << 17) | ((charcode & 040) << 10) | ((charcode & 020) << 8) | ((charcode & 010) << 6) | ((charcode & 004) << 4) | ((charcode & 002) << 2) | ((charcode & 001) << 1);
+			lr = (1 << 17) | (charcode << 11) | m_maincpu->state_int(TX0_LR);
 			/* write modified LR */
 			m_maincpu->set_state_int(TX0_LR, lr);
 			tx0_typewriter_drawchar(charcode); /* we want to echo input */
@@ -1578,6 +1582,33 @@ void tx0_state::tx0_64kw(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tx0);
 	PALETTE(config, m_palette, FUNC(tx0_state::tx0_palette), total_colors_needed + sizeof(tx0_pens), total_colors_needed);
+
+	SOFTWARE_LIST(config, "ptp_list").set_original("tx0_ptp").set_filter("64,OLDCODE");
+}
+
+void tx0_state::tx0_8kwo(machine_config &config)
+{
+	tx0_64kw(config);
+
+	/* basic machine hardware */
+	/* TX0 CPU @ approx. 167 kHz (no master clock, but the memory cycle time is
+	approximately 6usec) */
+	TX0_8KW_OLD(config.replace(), m_maincpu, 166667);
+	m_maincpu->cpy().set(FUNC(tx0_state::tx0_io_cpy));
+	m_maincpu->r1l().set(FUNC(tx0_state::tx0_io_r1l));
+	m_maincpu->dis().set(FUNC(tx0_state::tx0_io_dis));
+	m_maincpu->r3l().set(FUNC(tx0_state::tx0_io_r3l));
+	m_maincpu->prt().set(FUNC(tx0_state::tx0_io_prt));
+	m_maincpu->rsv().set_nop();
+	m_maincpu->p6h().set(FUNC(tx0_state::tx0_io_p6h));
+	m_maincpu->p7h().set(FUNC(tx0_state::tx0_io_p7h));
+	m_maincpu->sel().set(FUNC(tx0_state::tx0_sel));
+	m_maincpu->res().set(FUNC(tx0_state::tx0_io_reset_callback));
+	m_maincpu->set_addrmap(AS_PROGRAM, &tx0_state::tx0_8kw_map);
+	/* dummy interrupt: handles input */
+	m_maincpu->set_vblank_int("screen", FUNC(tx0_state::tx0_interrupt));
+
+	SOFTWARE_LIST(config.replace(), "ptp_list").set_original("tx0_ptp").set_filter("8,OLDCODE");
 }
 
 void tx0_state::tx0_8kw(machine_config &config)
@@ -1587,23 +1618,35 @@ void tx0_state::tx0_8kw(machine_config &config)
 	/* basic machine hardware */
 	/* TX0 CPU @ approx. 167 kHz (no master clock, but the memory cycle time is
 	approximately 6usec) */
+	TX0_8KW(config.replace(), m_maincpu, 166667);
+	m_maincpu->cpy().set(FUNC(tx0_state::tx0_io_cpy));
+	m_maincpu->r1l().set(FUNC(tx0_state::tx0_io_r1l));
+	m_maincpu->dis().set(FUNC(tx0_state::tx0_io_dis));
+	m_maincpu->r3l().set(FUNC(tx0_state::tx0_io_r3l));
+	m_maincpu->prt().set(FUNC(tx0_state::tx0_io_prt));
+	m_maincpu->rsv().set_nop();
+	m_maincpu->p6h().set(FUNC(tx0_state::tx0_io_p6h));
+	m_maincpu->p7h().set(FUNC(tx0_state::tx0_io_p7h));
+	m_maincpu->sel().set(FUNC(tx0_state::tx0_sel));
+	m_maincpu->res().set(FUNC(tx0_state::tx0_io_reset_callback));
 	m_maincpu->set_addrmap(AS_PROGRAM, &tx0_state::tx0_8kw_map);
+	/* dummy interrupt: handles input */
+	m_maincpu->set_vblank_int("screen", FUNC(tx0_state::tx0_interrupt));
+
+	SOFTWARE_LIST(config.replace(), "ptp_list").set_original("tx0_ptp").set_filter("8,NEWCODE");
 }
 
 ROM_START(tx0_64kw)
-	/*CPU memory space*/
-	ROM_REGION(0x10000 * sizeof(uint32_t),"maincpu",ROMREGION_ERASEFF)
-		/* Note this computer has no ROM... */
+	ROM_REGION(tx0_fontdata_size, "gfx1", ROMREGION_ERASEFF)
+		/* space filled with our font */
+ROM_END
 
+ROM_START(tx0_8kwo)
 	ROM_REGION(tx0_fontdata_size, "gfx1", ROMREGION_ERASEFF)
 		/* space filled with our font */
 ROM_END
 
 ROM_START(tx0_8kw)
-	/*CPU memory space*/
-	ROM_REGION(0x2000 * sizeof(uint32_t),"maincpu",ROMREGION_ERASEFF)
-		/* Note this computer has no ROM... */
-
 	ROM_REGION(tx0_fontdata_size, "gfx1", ROMREGION_ERASEFF)
 		/* space filled with our font */
 ROM_END
@@ -1614,6 +1657,7 @@ ROM_END
 
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT  STATE      INIT      COMPANY  FULLNAME                                         FLAGS
-COMP( 1956, tx0_64kw, 0,        0,      tx0_64kw, tx0,   tx0_state, init_tx0, "MIT",   "TX-0 original demonstrator (64 kWords of RAM)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
-COMP( 1962, tx0_8kw,  tx0_64kw, 0,      tx0_8kw,  tx0,   tx0_state, init_tx0, "MIT",   "TX-0 upgraded system (8 kWords of RAM)",        MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT  STATE      INIT      COMPANY  FULLNAME                                                  FLAGS
+COMP( 1956, tx0_64kw, tx0_8kw,  0,      tx0_64kw, tx0,   tx0_state, init_tx0, "MIT",   "TX-0 original demonstrator (64 kWords of RAM)",          MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
+COMP( 1959, tx0_8kwo, tx0_8kw,  0,      tx0_8kwo, tx0,   tx0_state, init_tx0, "MIT",   "TX-0 upgraded system (8 kWords of RAM, old order code)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
+COMP( 1962, tx0_8kw,  0,        0,      tx0_8kw,  tx0,   tx0_state, init_tx0, "MIT",   "TX-0 upgraded system (8 kWords of RAM, new order code)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)

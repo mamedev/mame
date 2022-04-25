@@ -9,7 +9,7 @@ Bull (Originally R2E) Micral 80-22G
 http://www.ti99.com/exelvision/website/index.php?page=r2e-micral-8022-g
 
 This expensive, futuristic-looking design featured a motherboard and slots,
-much like an ancient pc. The known chip complement is:
+much like an ancient PC. The known chip complement is:
 Z80A, 4MHz; 64KB RAM, 2KB BIOS ROM, 256x4 prom (7611);
 CRT8002, TMS9937 (=CRT5037), 4KB video RAM, 256x4 prom (7611);
 2x 5.25 inch floppy drives, one ST506 5MB hard drive;
@@ -56,16 +56,20 @@ https://www.esocop.org/docs/Questar.pdf
 *********************************************************************************/
 
 #include "emu.h"
+
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "video/tms9927.h"
+#include "machine/ay31015.h"
+#include "machine/clock.h"
 //#include "sound/beep.h"
+#include "video/tms9927.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-#include "machine/ay31015.h"
-#include "machine/clock.h"
-#include "bus/rs232/rs232.h"
 
+
+namespace {
 
 class micral_state : public driver_device
 {
@@ -97,11 +101,11 @@ private:
 	void mem_kbd(address_map &map);
 	void mem_map(address_map &map);
 
-	u16 s_curpos;
-	u8 s_command;
-	u8 s_data;
+	u16 s_curpos = 0U;
+	u8 s_command = 0U;
+	u8 s_data = 0U;
 	std::unique_ptr<u8[]> m_vram;
-	memory_passthrough_handler *m_rom_shadow_tap;
+	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;
@@ -323,21 +327,20 @@ INPUT_PORTS_END
 
 uint32_t micral_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,ma=0,x;
+	uint16_t sy=0,ma=0;
 
-	for (y = 0; y < 24; y++)
+	for (uint8_t y = 0; y < 24; y++)
 	{
-		for (ra = 0; ra < 10; ra++)
+		for (uint8_t ra = 0; ra < 10; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
-			for (x = 0; x < 80; x++)
+			for (uint16_t x = 0; x < 80; x++)
 			{
-				gfx = 0;
+				uint8_t gfx = 0;
 				if (ra < 9)
 				{
-					chr = m_vram[x+ma];
+					uint8_t chr = m_vram[x+ma];
 					gfx = m_p_chargen[(chr<<4) | ra ];
 					if (((s_curpos & 0xff)==x) && ((s_curpos >> 8)==y))
 						gfx ^= 0xff;
@@ -374,20 +377,22 @@ void micral_state::machine_reset()
 
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_rom(0x0000, 0x07ff, m_rom);   // do it here for F3
-	m_rom_shadow_tap = program.install_read_tap(0xf800, 0xffff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
-	{
-		if (!machine().side_effects_disabled())
-		{
-			// delete this tap
-			m_rom_shadow_tap->remove();
+	m_rom_shadow_tap.remove();
+	m_rom_shadow_tap = program.install_read_tap(
+			0xf800, 0xffff,
+			"rom_shadow_r",
+			[this] (offs_t offset, u8 &data, u8 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					// delete this tap
+					m_rom_shadow_tap.remove();
 
-			// reinstall ram over the rom shadow
-			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
-		}
-
-		// return the original data
-		return data;
-	});
+					// reinstall RAM over the ROM shadow
+					m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
+				}
+			},
+			&m_rom_shadow_tap);
 }
 
 void micral_state::machine_start()
@@ -464,6 +469,8 @@ ROM_START( questarm )
 	ROM_REGION( 0x2000, "chargen", 0 )
 	ROM_LOAD( "c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
 ROM_END
+
+} // anonymous namespace
 
 /* Driver */
 

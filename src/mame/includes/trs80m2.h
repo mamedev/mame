@@ -58,7 +58,7 @@ public:
 		m_kb(*this, TRS80M2_KEYBOARD_TAG),
 		m_rom(*this, Z80_TAG),
 		m_char_rom(*this, MC6845_TAG),
-		m_video_ram(*this, "video_ram")
+		m_video_ram(*this, "video_ram", 0x800, ENDIANNESS_LITTLE)
 	{
 	}
 
@@ -68,14 +68,14 @@ public:
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
-	DECLARE_WRITE8_MEMBER( drvslt_w );
-	DECLARE_WRITE8_MEMBER( rom_enable_w );
-	DECLARE_READ8_MEMBER( keyboard_r );
-	DECLARE_READ8_MEMBER( rtc_r );
-	DECLARE_READ8_MEMBER( nmi_r );
-	DECLARE_WRITE8_MEMBER( nmi_w );
-	DECLARE_READ8_MEMBER( fdc_r );
-	DECLARE_WRITE8_MEMBER( fdc_w );
+	void drvslt_w(uint8_t data);
+	void rom_enable_w(uint8_t data);
+	uint8_t keyboard_r();
+	uint8_t rtc_r();
+	uint8_t nmi_r();
+	void nmi_w(uint8_t data);
+	uint8_t fdc_r(offs_t offset);
+	void fdc_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( de_w );
 	DECLARE_WRITE_LINE_MEMBER( vsync_w );
 	uint8_t pio_pa_r();
@@ -120,7 +120,7 @@ protected:
 	required_device<trs80m2_keyboard_device> m_kb;
 	required_memory_region m_rom;
 	required_memory_region m_char_rom;
-	optional_shared_ptr<uint8_t> m_video_ram;
+	memory_share_creator<uint8_t> m_video_ram;
 
 	// memory state
 	int m_boot_rom;
@@ -157,8 +157,8 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER( ual_w );
-	DECLARE_WRITE8_MEMBER( tcl_w );
+	void ual_w(uint8_t data);
+	void tcl_w(uint8_t data);
 
 	void trs80m16(machine_config &config);
 	void m16_z80_io(address_map &map);
@@ -168,7 +168,7 @@ protected:
 	required_device<cpu_device> m_subcpu;
 	required_device<am9519_device> m_uic;
 
-	uint16_t m_ual;
+	uint16_t m_ual = 0;
 	uint8_t m_limit[2];
 	uint8_t m_offset[2];
 };

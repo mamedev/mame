@@ -111,9 +111,9 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_workram;
 
-	tilemap_t   *m_text_tilemap;
-	tilemap_t   *m_starfield_tilemap;
-	uint8_t       m_regs[0x28];
+	tilemap_t   *m_text_tilemap = nullptr;
+	tilemap_t   *m_starfield_tilemap = nullptr;
+	uint8_t       m_regs[0x28]{};
 
 	void hardware_w(offs_t offset, uint8_t data);
 	void vidram_w(offs_t offset, uint8_t data);
@@ -171,7 +171,7 @@ static void draw_circle_line(bitmap_ind16 &bitmap, int x, int y, int l, int colo
 {
 	if (y >= 0 && y <= bitmap.height() - 1)
 	{
-		uint16_t* pLine = &bitmap.pix16(y);
+		uint16_t *const pLine = &bitmap.pix(y);
 
 		int h1 = x - l;
 		int h2 = x + l;

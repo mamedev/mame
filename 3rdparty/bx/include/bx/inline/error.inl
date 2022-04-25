@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -22,7 +22,7 @@ namespace bx
 
 	inline void Error::setError(ErrorResult _errorResult, const StringView& _msg)
 	{
-		BX_CHECK(0 != _errorResult.code, "Invalid ErrorResult passed to setError!");
+		BX_ASSERT(0 != _errorResult.code, "Invalid ErrorResult passed to setError!");
 
 		if (!isOk() )
 		{
@@ -59,15 +59,38 @@ namespace bx
 		return _rhs.code != m_code;
 	}
 
-	inline ErrorScope::ErrorScope(Error* _err)
+	inline ErrorScope::ErrorScope(Error* _err, const StringView& _name)
 		: m_err(_err)
+		, m_name(_name)
 	{
-		BX_CHECK(NULL != _err, "_err can't be NULL");
+		BX_ASSERT(NULL != _err, "_err can't be NULL");
 	}
 
 	inline ErrorScope::~ErrorScope()
 	{
-		BX_CHECK(m_err->isOk(), "Error: %d", m_err->get().code);
+		if (m_name.isEmpty() )
+		{
+			BX_ASSERT(m_err->isOk(), "Error: 0x%08x `%.*s`"
+				, m_err->get().code
+				, m_err->getMessage().getLength()
+				, m_err->getMessage().getPtr()
+				);
+		}
+		else
+		{
+			BX_ASSERT(m_err->isOk(), "Error: %.*s - 0x%08x `%.*s`"
+				, m_name.getLength()
+				, m_name.getPtr()
+				, m_err->get().code
+				, m_err->getMessage().getLength()
+				, m_err->getMessage().getPtr()
+				);
+		}
+	}
+
+	inline const StringView& ErrorScope::getName() const
+	{
+		return m_name;
 	}
 
 } // namespace bx

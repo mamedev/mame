@@ -127,24 +127,13 @@
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/sol_cas.h"
 
 
-struct cass_data_t {
-	struct {
-		int length;     /* time cassette level is at input.level */
-		int level;      /* cassette level */
-		int bit;        /* bit being read */
-	} input;
-	struct {
-		int length;     /* time cassette level is at output.level */
-		int level;      /* cassette level */
-		int bit;        /* bit to output */
-	} output;
-};
+namespace {
 
 class sol20_state : public driver_device
 {
@@ -180,6 +169,20 @@ private:
 		TIMER_SOL20_CASSETTE_TC,
 	};
 
+	struct cass_data_t
+	{
+		struct {
+			int length = 0;     /* time cassette level is at input.level */
+			int level = 0;      /* cassette level */
+			int bit = 0;        /* bit being read */
+		} input;
+		struct {
+			int length = 0;     /* time cassette level is at output.level */
+			int level = 0;      /* cassette level */
+			int bit = 0;        /* bit to output */
+		} output;
+	};
+
 	u8 sol20_f8_r();
 	u8 sol20_fa_r();
 	u8 sol20_fc_r();
@@ -195,17 +198,17 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	u8 m_sol20_fa;
-	u8 m_sol20_fc;
-	u8 m_sol20_fe;
-	u8 m_framecnt;
+	u8 m_sol20_fa = 0U;
+	u8 m_sol20_fc = 0U;
+	u8 m_sol20_fe = 0U;
+	u8 m_framecnt = 0U;
 	cass_data_t m_cass_data;
-	emu_timer *m_cassette_timer;
+	emu_timer *m_cassette_timer = nullptr;
 	cassette_image_device *cassette_device_image();
-	memory_passthrough_handler *m_rom_shadow_tap;
+	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<i8080a_cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;
@@ -240,12 +243,12 @@ cassette_image_device *sol20_state::cassette_device_image()
 }
 
 
-void sol20_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void sol20_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_SOL20_CASSETTE_TC:
-		sol20_cassette_tc(ptr, param);
+		sol20_cassette_tc(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in sol20_state::device_timer");
@@ -469,10 +472,10 @@ void sol20_state::io_map(address_map &map)
 /* Input ports */
 static INPUT_PORTS_START( sol20 )
 	PORT_START("ARROWS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DOWN)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_UP)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("S1")
@@ -625,20 +628,22 @@ void sol20_state::machine_reset()
 	// Boot tap
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_rom(0x0000, 0x07ff, m_rom);   // do it here for F3
-	m_rom_shadow_tap = program.install_read_tap(0xc000, 0xc7ff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
-	{
-		if (!machine().side_effects_disabled())
-		{
-			// delete this tap
-			m_rom_shadow_tap->remove();
+	m_rom_shadow_tap.remove();
+	m_rom_shadow_tap = program.install_read_tap(
+			0xc000, 0xc7ff,
+			"rom_shadow_r",
+			[this] (offs_t offset, u8 &data, u8 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					// delete this tap
+					m_rom_shadow_tap.remove();
 
-			// reinstall ram over the rom shadow
-			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
-		}
-
-		// return the original data
-		return data;
-	});
+					// reinstall RAM over the ROM shadow
+					m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
+				}
+			},
+			&m_rom_shadow_tap);
 }
 
 
@@ -650,8 +655,7 @@ u32 sol20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 // any character with bit 7 set will blink. With DPMON, do DA C000 C2FF to see what happens
 	u16 which = (m_iop_config->read() & 2) << 10;
 	u8 s1 = m_iop_s1->read();
-	u8 y,ra,chr,gfx;
-	u16 sy=0,ma,x,inv;
+	u16 sy=0;
 	u8 polarity = (s1 & 8) ? 0xff : 0;
 
 	bool cursor_inv = false;
@@ -660,18 +664,18 @@ u32 sol20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 	m_framecnt++;
 
-	ma = m_sol20_fe << 6; // scroll register
+	u16 ma = m_sol20_fe << 6; // scroll register
 
-	for (y = 0; y < 16; y++)
+	for (u8 y = 0; y < 16; y++)
 	{
-		for (ra = 0; ra < 13; ra++)
+		for (u8 ra = 0; ra < 13; ra++)
 		{
-			u16 *p = &bitmap.pix16(sy++);
+			u16 *p = &bitmap.pix(sy++);
 
-			for (x = ma; x < ma + 64; x++)
+			for (u16 x = ma; x < ma + 64; x++)
 			{
-				inv = polarity;
-				chr = m_vram[x & 0x3ff];
+				u16 inv = polarity;
+				u8 chr = m_vram[x & 0x3ff];
 
 				// cursor
 				if (BIT(chr, 7) && cursor_inv)
@@ -679,10 +683,10 @@ u32 sol20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 				chr &= 0x7f;
 
+				u8 gfx;
 				if ((ra == 0) || ((s1 & 4) && (chr < 0x20)))
 					gfx = inv;
-				else
-				if ((chr==0x2C) || (chr==0x3B) || (chr==0x67) || (chr==0x6A) || (chr==0x70) || (chr==0x71) || (chr==0x79))
+				else if ((chr==0x2C) || (chr==0x3B) || (chr==0x67) || (chr==0x6A) || (chr==0x70) || (chr==0x71) || (chr==0x79))
 				{
 					if (ra < 4)
 						gfx = inv;
@@ -821,6 +825,8 @@ ROM_START( sol20 )
 	ROM_REGION( 0x100, "keyboard", 0 )
 	ROM_LOAD( "8574.u18", 0x000, 0x100, NO_DUMP ) // 256x4 bipolar PROM or mask ROM; second half unused
 ROM_END
+
+} // anonymous namespace
 
 /* Driver */
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                             FULLNAME                    FLAGS

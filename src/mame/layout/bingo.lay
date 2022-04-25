@@ -69,20 +69,20 @@ license:CC0
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
 
-		<bezel name="lamp6" element="changecard">
+		<element name="lamp6" ref="changecard">
 			<bounds x="0.82" y="3.13" width="0.72" height="0.24" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp4" element="start">
+		<element name="lamp4" ref="start">
 			<bounds x="1.64" y="3.13" width="0.72" height="0.24" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp5" element="changegame">
+		<element name="lamp5" ref="changegame">
 			<bounds x="2.46" y="3.13" width="0.72" height="0.24" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp3" element="ante">
+		<element name="lamp3" ref="ante">
 			<bounds x="3.38" y="3.13" width="0.52" height="0.24" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -22,20 +22,12 @@ namespace bx
 	{
 	}
 
-	inline bool isAligned(const void* _ptr, size_t _align)
-	{
-		union { const void* ptr; uintptr_t addr; } un;
-		un.ptr = _ptr;
-		return 0 == (un.addr & (_align-1) );
-	}
-
 	inline void* alignPtr(void* _ptr, size_t _extra, size_t _align)
 	{
 		union { void* ptr; uintptr_t addr; } un;
 		un.ptr = _ptr;
 		uintptr_t unaligned = un.addr + _extra; // space for header
-		uintptr_t mask = _align-1;
-		uintptr_t aligned = BX_ALIGN_MASK(unaligned, mask);
+		uintptr_t aligned = bx::alignUp(unaligned, int32_t(_align) );
 		un.addr = aligned;
 		return un.ptr;
 	}

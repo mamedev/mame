@@ -29,11 +29,10 @@ Year + Game                 By      Board      Hardware
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "sound/3526intf.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
+#include "sound/ymopl.h"
 #include "speaker.h"
 
 
@@ -45,7 +44,7 @@ Year + Game                 By      Board      Hardware
 
 ***************************************************************************/
 
-WRITE16_MEMBER(suna16_state::soundlatch_w)
+void suna16_state::soundlatch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -55,7 +54,7 @@ WRITE16_MEMBER(suna16_state::soundlatch_w)
 }
 
 
-WRITE16_MEMBER(suna16_state::bssoccer_leds_w)
+void suna16_state::bssoccer_leds_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -69,7 +68,7 @@ WRITE16_MEMBER(suna16_state::bssoccer_leds_w)
 }
 
 
-WRITE16_MEMBER(suna16_state::uballoon_leds_w)
+void suna16_state::uballoon_leds_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -81,7 +80,7 @@ WRITE16_MEMBER(suna16_state::uballoon_leds_w)
 }
 
 
-WRITE16_MEMBER(suna16_state::bestbest_coin_w)
+void suna16_state::bestbest_coin_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -115,7 +114,7 @@ void suna16_state::bssoccer_map(address_map &map)
                                 Ultra Balloon
 ***************************************************************************/
 
-READ8_MEMBER(suna16_state::uballoon_prot_r)
+uint8_t suna16_state::uballoon_prot_r(offs_t offset)
 {
 	uint8_t ret = 0;
 
@@ -138,7 +137,7 @@ READ8_MEMBER(suna16_state::uballoon_prot_r)
 	return ret;
 }
 
-WRITE8_MEMBER(suna16_state::uballoon_prot_w)
+void suna16_state::uballoon_prot_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -192,12 +191,12 @@ void suna16_state::sunaq_map(address_map &map)
                             Best Of Best
 ***************************************************************************/
 
-READ8_MEMBER(suna16_state::bestbest_prot_r)
+uint8_t suna16_state::bestbest_prot_r()
 {
 	return m_prot;
 }
 
-WRITE8_MEMBER(suna16_state::bestbest_prot_w)
+void suna16_state::bestbest_prot_w(uint8_t data)
 {
 	switch (data)
 	{
@@ -315,16 +314,23 @@ MACHINE_START_MEMBER(suna16_state, bssoccer)
 	m_bank2->configure_entries(0, 8, memregion("pcm2")->base() + 0x1000, 0x10000);
 }
 
+MACHINE_START_MEMBER(suna16_state, sunaq)
+{
+	m_leds.resolve();
+
+	m_bank1->configure_entries(0, 8, memregion("pcm1")->base() + 0x1000, 0x10000);
+}
+
 /* Bank Switching */
 
-WRITE8_MEMBER(suna16_state::bssoccer_pcm_1_bankswitch_w)
+void suna16_state::bssoccer_pcm_1_bankswitch_w(uint8_t data)
 {
 	const int bank = data & 7;
 	if (bank & ~7)  logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", m_pcm1->pc(), data);
 	m_bank1->set_entry(bank);
 }
 
-WRITE8_MEMBER(suna16_state::bssoccer_pcm_2_bankswitch_w)
+void suna16_state::bssoccer_pcm_2_bankswitch_w(uint8_t data)
 {
 	const int bank = data & 7;
 	if (bank & ~7)  logerror("CPU#3 PC %06X - ROM bank unknown bits: %02X\n", m_pcm2->pc(), data);
@@ -374,7 +380,7 @@ void suna16_state::bssoccer_pcm_2_io_map(address_map &map)
 
 /* Bank Switching */
 
-WRITE8_MEMBER(suna16_state::uballoon_pcm_1_bankswitch_w)
+void suna16_state::uballoon_pcm_1_bankswitch_w(uint8_t data)
 {
 	const int bank = data & 1;
 	if (bank & ~1)  logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", m_pcm1->pc(), data);
@@ -409,8 +415,7 @@ MACHINE_START_MEMBER(suna16_state,uballoon)
 
 MACHINE_RESET_MEMBER(suna16_state,uballoon)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	uballoon_pcm_1_bankswitch_w(space, 0, 0);
+	uballoon_pcm_1_bankswitch_w(0);
 }
 
 
@@ -866,15 +871,6 @@ void suna16_state::bssoccer(machine_config &config)
 	DAC_4BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.2); // unknown DAC
 	DAC_4BIT_R2R(config, "ldac2", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.2); // unknown DAC
 	DAC_4BIT_R2R(config, "rdac2", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.2); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "ldac2", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "ldac2", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac2", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "rdac2", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -928,11 +924,6 @@ void suna16_state::uballoon(machine_config &config)
 
 	DAC_4BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
 	DAC_4BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -958,8 +949,7 @@ void suna16_state::sunaq(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	MCFG_MACHINE_START_OVERRIDE(suna16_state,uballoon)
-	MCFG_MACHINE_RESET_OVERRIDE(suna16_state,uballoon)
+	MCFG_MACHINE_START_OVERRIDE(suna16_state, sunaq)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -986,11 +976,6 @@ void suna16_state::sunaq(machine_config &config)
 
 	DAC_4BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
 	DAC_4BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -1056,15 +1041,6 @@ void suna16_state::bestbest(machine_config &config)
 	DAC_4BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.2); // unknown DAC
 	DAC_4BIT_R2R(config, "ldac2", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.2); // unknown DAC
 	DAC_4BIT_R2R(config, "rdac2", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.2); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "ldac2", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "ldac2", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac2", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "rdac2", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 /***************************************************************************
@@ -1385,7 +1361,7 @@ ROM_START( bestbest )
 	ROM_LOAD16_BYTE( "12.bin", 0x300001, 0x80000, CRC(ca7c8176) SHA1(1ec99db3e0840b4647d6ccdf6fda118fa9ad4f42) )
 
 	ROM_REGION( 0x200, "proms", 0 ) // ?
-	ROM_LOAD( "82s129.5", 0x000, 0x100, CRC(10bfcebb) SHA1(ae8708db7d3a8984f16e876867ecdbb4445e3378) )  // FIXED BITS (0000xx0x0000xxxx)
+	ROM_LOAD( "82s129.5", 0x000, 0x100, CRC(10bfcebb) SHA1(ae8708db7d3a8984f16e876867ecdbb4445e3378) )  // FIXED BITS (0000xx0x0000xxxx), same as the one for starfigh in suna8.cpp
 	ROM_LOAD( "82s129.6", 0x100, 0x100, CRC(10bfcebb) SHA1(ae8708db7d3a8984f16e876867ecdbb4445e3378) )  // identical to 82s129.5
 ROM_END
 

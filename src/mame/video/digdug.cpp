@@ -139,7 +139,7 @@ TILE_GET_INFO_MEMBER(digdug_state::tx_get_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(digdug_state,digdug)
+void digdug_state::video_start()
 {
 	m_bg_select = 0;
 	m_tx_color_mode = 0;

@@ -25,7 +25,6 @@
 
  ***********************************************************************************************************/
 
-
 #include "emu.h"
 #include "sega8_slot.h"
 
@@ -119,7 +118,7 @@ void device_sega8_cart_interface::ram_alloc(uint32_t size)
 
 sega8_cart_slot_device::sega8_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_card)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	, device_cartrom_image_interface(mconfig, *this)
 	, device_single_card_slot_interface<device_sega8_cart_interface>(mconfig, *this)
 	, m_type(SEGA8_BASE_ROM)
 	, m_is_card(is_card)
@@ -224,6 +223,7 @@ static const sega8_slot slot_list[] =
 	{ SEGA8_NEMESIS, "nemesis" },
 	{ SEGA8_JANGGUN, "janggun" },
 	{ SEGA8_KOREAN, "korean" },
+	{ SEGA8_KOREAN_188IN1, "korean_188in1" },
 	{ SEGA8_KOREAN_NOBANK, "korean_nb" },
 	{ SEGA8_OTHELLO, "othello" },
 	{ SEGA8_CASTLE, "castle" },
@@ -233,14 +233,15 @@ static const sega8_slot slot_list[] =
 	{ SEGA8_DAHJEE_TYPEB, "dahjee_typeb" },
 	{ SEGA8_SEOJIN, "seojin" },
 	{ SEGA8_MULTICART, "multicart" },
-	{ SEGA8_MEGACART, "megacart" }
+	{ SEGA8_MEGACART, "megacart" },
+	{ SEGA8_X_TERMINATOR, "xterminator" }
 };
 
 static int sega8_get_pcb_id(const char *slot)
 {
 	for (auto & elem : slot_list)
 	{
-		if (!core_stricmp(elem.slot_option, slot))
+		if (!strcmp(elem.slot_option, slot))
 			return elem.pcb_id;
 	}
 
@@ -358,6 +359,12 @@ void sega8_cart_slot_device::setup_ram()
 			m_cart->ram_alloc(0x10000);
 			m_cart->set_has_battery(false);
 		}
+		else if (m_type == SEGA8_X_TERMINATOR)
+		{
+			// X-Terminator seems to have 8192 bytes of RAM
+			// Unknown if the RAM is battery backed
+			m_cart->ram_alloc(0x2000);
+		}
 		else
 		{
 			// for generic carts loaded from fullpath we have no way to know exactly if there was RAM,
@@ -391,7 +398,7 @@ image_init_result sega8_cart_slot_device::call_load()
 
 		if (m_is_card && len > 0x8000)
 		{
-			seterror(IMAGE_ERROR_UNSPECIFIED, "Attempted loading a card larger than 32KB");
+			seterror(image_error::INVALIDIMAGE, "Attempted loading a card larger than 32KB");
 			return image_init_result::FAIL;
 		}
 
@@ -647,6 +654,8 @@ int sega8_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len) cons
 	if (len == 0x400000)
 		type = SEGA8_MEGACART;
 
+	if (len == 0x2000)
+		type = SEGA8_X_TERMINATOR;
 
 	return type;
 }
@@ -658,18 +667,17 @@ std::string sega8_cart_slot_device::get_default_card_software(get_default_card_s
 {
 	if (hook.image_file())
 	{
-		const char *slot_string;
-		uint32_t len = hook.image_file()->size(), offset = 0;
+		uint64_t len;
+		hook.image_file()->length(len); // FIXME: check error return, guard against excessively large files
 		std::vector<uint8_t> rom(len);
-		int type;
 
-		hook.image_file()->read(&rom[0], len);
+		size_t actual;
+		hook.image_file()->read(&rom[0], len, actual); // FIXME: check error return or read returning short
 
-		if ((len % 0x4000) == 512)
-			offset = 512;
+		uint32_t const offset = ((len % 0x4000) == 512) ? 512 : 0;
 
-		type = get_cart_type(&rom[offset], len - offset);
-		slot_string = sega8_get_slot(type);
+		int const type = get_cart_type(&rom[offset], len - offset);
+		char const *const slot_string = sega8_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
 
@@ -909,6 +917,7 @@ void sg1000mk3_cart(device_slot_interface &device)
 	device.option_add_internal("janggun",  SEGA8_ROM_JANGGUN);
 	device.option_add_internal("hicom",  SEGA8_ROM_HICOM);
 	device.option_add_internal("korean",  SEGA8_ROM_KOREAN);
+	device.option_add_internal("korean_188in1",  SEGA8_ROM_KOREAN_188);
 	device.option_add_internal("korean_nb",  SEGA8_ROM_KOREAN_NB);
 	device.option_add_internal("seojin",  SEGA8_ROM_SEOJIN);
 	device.option_add_internal("othello",  SEGA8_ROM_OTHELLO);
@@ -930,6 +939,7 @@ void sms_cart(device_slot_interface &device)
 	device.option_add_internal("janggun",  SEGA8_ROM_JANGGUN);
 	device.option_add_internal("hicom",  SEGA8_ROM_HICOM);
 	device.option_add_internal("korean",  SEGA8_ROM_KOREAN);
+	device.option_add_internal("korean_188in1",  SEGA8_ROM_KOREAN_188);
 	device.option_add_internal("korean_nb",  SEGA8_ROM_KOREAN_NB);
 }
 
@@ -939,4 +949,5 @@ void gg_cart(device_slot_interface &device)
 	device.option_add_internal("eeprom",  SEGA8_ROM_EEPROM);
 	device.option_add_internal("codemasters",  SEGA8_ROM_CODEMASTERS);
 	device.option_add_internal("mgear",  SEGA8_ROM_MGEAR);
+	device.option_add_internal("xterminator", SEGA8_ROM_X_TERMINATOR);
 }

@@ -124,10 +124,11 @@ u32 namconb1_state::screen_update_namconb1(screen_device &screen, bitmap_ind16 &
 	/* compute window for custom screen blanking */
 	rectangle clip;
 	//004a 016a 0021 0101 0144 0020 (nebulas ray)
-	clip.min_x = m_c116->get_reg(0) - 0x4a;
-	clip.max_x = m_c116->get_reg(1) - 0x4a - 1;
-	clip.min_y = m_c116->get_reg(2) - 0x21;
-	clip.max_y = m_c116->get_reg(3) - 0x21 - 1;
+	clip.min_x = int16_t(m_c116->get_reg(0)) - 0x4a;
+	clip.max_x = int16_t(m_c116->get_reg(1)) - 0x4a - 1;
+	clip.min_y = int16_t(m_c116->get_reg(2)) - 0x21;
+	clip.max_y = int16_t(m_c116->get_reg(3)) - 0x21 - 1;
+
 	/* intersect with master clip rectangle */
 	clip &= cliprect;
 
@@ -154,7 +155,7 @@ void namconb1_state::video_start()
 
 /****************************************************************************************************/
 
-WRITE32_MEMBER(namconb1_state::rozbank32_w)
+void namconb1_state::rozbank32_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	u32 old_data = m_rozbank32[offset];
 	COMBINE_DATA(&m_rozbank32[offset]);

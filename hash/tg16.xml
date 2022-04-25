@@ -666,6 +666,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="airzonkp" cloneof="airzonk">
+		<description>PC Denjin - Pankic Cyborgs (Air Zonk prototype)</description>
+		<year>1992</year>
+		<publisher>Hudson</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="air zonk (prototype).pce" size="524288" crc="4f8299c8" sha1="eb2a75daab0c22a397d448c2daa8a52aac3fb612" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pgolf">
 		<description>Power Golf</description>
 		<year>1989</year>
@@ -926,6 +937,17 @@ license:CC0
 		<part name="cart" interface="tg16_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="turrican (usa).pce" size="262144" crc="eb045edf" sha1="a5830c0d5cd94e3c6f33e1799bb123857400b1bc" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tvbasebl">
+		<description>TV Sports Baseball (prototype)</description>
+		<year>1991</year>
+		<publisher>NEC</publisher>
+		<part name="cart" interface="tg16_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="tv sports baseball (prototype).pce" size="524288" crc="b6b38d61" sha1="b37e446f0bf62c582c82f32dc3f2fc080acf2cbc" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

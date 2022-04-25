@@ -18,7 +18,7 @@ DEFINE_DEVICE_TYPE(DW_FDC, dw_fdc_device, "dw_fdc", "IBM Displaywriter Floppy")
 
 ROM_START( dw_fdc )
 	ROM_REGION(0x800, "mcu", 0)
-	ROM_LOAD("4430030_FLP_8041.BIN", 0x0000, 0x400, CRC(2bb96799) SHA1(e30b0f2d790197f290858eab74ad5e151ded78c3))
+	ROM_LOAD("4430030_flp_8041.bin", 0x0000, 0x400, CRC(2bb96799) SHA1(e30b0f2d790197f290858eab74ad5e151ded78c3))
 ROM_END
 
 
@@ -69,7 +69,7 @@ void dw_fdc_device::device_reset()
 	m_p1 = m_p2 = m_t0 = m_t1 = 0;
 }
 
-void dw_fdc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void dw_fdc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }

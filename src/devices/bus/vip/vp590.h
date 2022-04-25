@@ -50,7 +50,7 @@ private:
 	DECLARE_READ_LINE_MEMBER( gd_r );
 
 	required_device<cdp1862_device> m_cgc;
-	optional_shared_ptr<uint8_t> m_color_ram;
+	memory_share_creator<uint8_t> m_color_ram;
 	required_ioport m_j1;
 	required_ioport m_j2;
 

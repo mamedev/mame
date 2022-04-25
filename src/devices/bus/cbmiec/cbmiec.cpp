@@ -338,7 +338,7 @@ void cbm_iec_device::device_stop()
 
 void cbm_iec_device::add_device(cbm_iec_slot_device *slot, device_t *target)
 {
-	auto entry = global_alloc(daisy_entry(target));
+	auto entry = new daisy_entry(target);
 
 	entry->m_interface->m_slot = slot;
 	entry->m_interface->m_bus = this;

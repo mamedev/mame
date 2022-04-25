@@ -2,20 +2,19 @@
 // copyright-holders:Robbbert, AJR
 /***************************************************************************
 
-    BEEHIVE Micro B Series
+BEEHIVE Micro B Series
 
-    25/05/2009 Skeleton driver [Robbbert]
+2009-05-25 Skeleton driver [Robbbert]
+2011-04-25 Added partial keyboard.
+2011-06-26 Added modifier keys.
 
-    This is a series of conventional computer terminals using a serial link.
-    DM3270 is a clone of the IBM3276-2.
+This is a series of conventional computer terminals using a serial link.
+DM3270 is a clone of the IBM3276-2.
 
-    The character gen rom is not dumped. Using the one from 'c10'
-    for the moment.
+The character gen rom is not dumped. Using the one from 'c10'
+ for the moment.
 
-    System beeps if ^G or ^Z pressed. Pressing ^Q is the same as Enter.
-
-    25/04/2011 Added partial keyboard.
-    26/06/2011 Added modifier keys.
+System beeps if ^G or ^Z pressed. Pressing ^Q is the same as Enter.
 
 ****************************************************************************/
 
@@ -32,6 +31,7 @@
 #include "screen.h"
 #include "speaker.h"
 
+namespace {
 
 class microb_state : public driver_device
 {
@@ -72,7 +72,7 @@ private:
 	required_device_array<rs232_port_device, 2> m_rs232;
 	required_ioport_array<16> m_io_keyboard;
 
-	u8 m_keyline;
+	u8 m_keyline = 0U;
 };
 
 WRITE_LINE_MEMBER(microb_state::dmac_hrq_w)
@@ -211,8 +211,8 @@ static INPUT_PORTS_START( microb )
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3pad")   PORT_CODE(KEYCODE_3_PAD)
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc")    PORT_CODE(KEYCODE_ESC)
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Show/Hide Status")
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Down")   PORT_CODE(KEYCODE_DOWN)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP)
+		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Down")   PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0pad")   PORT_CODE(KEYCODE_0_PAD)
 
 	PORT_START("X9")
@@ -223,10 +223,10 @@ static INPUT_PORTS_START( microb )
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Cursor Blink On/Off")
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED) // carriage return
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left")   PORT_CODE(KEYCODE_LEFT)
+		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left")   PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 
 	PORT_START("X10")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right")  PORT_CODE(KEYCODE_RIGHT)
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right")  PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Space")  PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("XMIT")   PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -285,9 +285,9 @@ I8275_DRAW_CHARACTER_MEMBER(microb_state::draw_character)
 		dots ^= 0xff;
 
 	// HLGT is active on status line
-	rgb_t fg = hlgt ? rgb_t(0xc0, 0xc0, 0xc0) : rgb_t::white();
+	rgb_t const fg = hlgt ? rgb_t(0xc0, 0xc0, 0xc0) : rgb_t::white();
 
-	u32 *pix = &bitmap.pix32(y, x);
+	u32 *pix = &bitmap.pix(y, x);
 	for (int i = 0; i < 8; i++)
 	{
 		*pix++ = BIT(dots, 7) ? fg : rgb_t::black();
@@ -313,13 +313,11 @@ void microb_state::microb(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_raw(1'620'000 * 8, 800, 0, 640, 324, 0, 300);
+	//screen.set_raw(1'620'000 * 8, 800, 0, 640, 270, 0, 250);
 	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));
-	screen.set_size(640, 250);
-	screen.set_visarea(0, 639, 0, 249);
 
-	i8275_device &crtc(I8275(config, "crtc", 1'944'000)); // calculated for 60 Hz operation
+	i8275_device &crtc(I8275(config, "crtc", 1'620'000));
 	crtc.set_screen("screen");
 	crtc.set_character_width(8);
 	crtc.set_display_callback(FUNC(microb_state::draw_character));
@@ -336,14 +334,14 @@ void microb_state::microb(machine_config &config)
 
 	pit8253_device &pit1(PIT8253(config, "pit1"));
 	pit1.set_clk<2>(1'536'000);
-	pit1.out_handler<2>().set(m_usart[0], FUNC(i8251_device::write_rxc));
+	pit1.out_handler<2>().set(m_usart[1], FUNC(i8251_device::write_rxc));
 
 	pit8253_device &pit2(PIT8253(config, "pit2"));
 	pit2.set_clk<0>(1'536'000);
 	pit2.set_clk<1>(1'536'000);
 	pit2.set_clk<2>(1'536'000);
 	pit2.out_handler<0>().set(m_usart[0], FUNC(i8251_device::write_txc));
-	pit2.out_handler<1>().set(m_usart[1], FUNC(i8251_device::write_rxc));
+	pit2.out_handler<1>().set(m_usart[0], FUNC(i8251_device::write_rxc));
 	pit2.out_handler<2>().set(m_usart[1], FUNC(i8251_device::write_txc));
 
 	SPEAKER(config, "mono").front_center();
@@ -386,7 +384,7 @@ ROM_START( dm3270 )
 	ROM_LOAD( "c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
 ROM_END
 
-/* Driver */
+} // Anonymous namespace
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE INPU    CLASS         INIT        COMPANY                  FULLNAME                               FLAGS
 COMP( 1982, dm3270, 0,      0,      microb, microb, microb_state, empty_init, "Beehive International", "DM3270 Control Unit Display Station", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

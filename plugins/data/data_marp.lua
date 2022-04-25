@@ -9,8 +9,8 @@ local function init()
 	local fh
 	local file = "scores3.htm"
 
-	for path in mame_manager:ui():options().entries.historypath:value():gmatch("([^;]+)") do
-		filepath = lfs.env_replace(path) .. "/" .. file
+	for path in mame_manager.ui.options.entries.historypath:value():gmatch("([^;]+)") do
+		filepath = emu.subst_env(path) .. "/" .. file
 		fh = io.open(filepath, "r")
 		if fh then
 			break
@@ -133,7 +133,7 @@ function dat.check(set, softlist)
 		info = "#j2\n" .. stmt:get_value(0)
 	end
 	stmt:finalize()
-	return info and _("MARPScore") or nil
+	return info and _p("plugin-data", "MARPScore") or nil
 end
 
 function dat.get()

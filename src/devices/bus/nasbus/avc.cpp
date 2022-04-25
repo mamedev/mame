@@ -120,7 +120,7 @@ MC6845_UPDATE_ROW( nascom_avc_device::crtc_update_row )
 		}
 
 		// plot the pixel
-		bitmap.pix32(y, x) = m_palette->pen_color((b << 2) | (g << 1) | (r << 0));
+		bitmap.pix(y, x) = m_palette->pen_color((b << 2) | (g << 1) | (r << 0));
 	}
 }
 

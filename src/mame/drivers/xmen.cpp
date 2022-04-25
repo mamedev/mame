@@ -8,13 +8,19 @@ driver by Nicola Salmoria
 
 notes:
 
-the way the double screen works in xmen6p is not fully understood
+The way the double screen works in xmen6p is not fully understood.
 
-the board only has one of each gfx chip, the only additional chip not found
+One of the screens probably has a buffer to delay it by 1 frame. If you
+hardcode buffering to the right screen, the intro is synced correctly,
+but in-game is not. Buffer the left screen and then in-game is correct,
+but the intro is not.
+
+The board only has one of each gfx chip, the only additional chip not found
 on the 2/4p board is 053253.  This chip is also on Run n Gun which is
-likewise a 2 screen game
+likewise a 2 screen game.
 
 ***************************************************************************/
+
 #include "emu.h"
 #include "includes/xmen.h"
 #include "includes/konamipt.h"
@@ -23,10 +29,11 @@ likewise a 2 screen game
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "speaker.h"
+
+#include "layout/generic.h"
 
 
 /***************************************************************************
@@ -35,7 +42,7 @@ likewise a 2 screen game
 
 ***************************************************************************/
 
-WRITE16_MEMBER(xmen_state::eeprom_w)
+void xmen_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%06x: write %04x to 108000\n", m_maincpu->pc(),data);
 	if (ACCESSING_BITS_0_7)
@@ -46,8 +53,11 @@ WRITE16_MEMBER(xmen_state::eeprom_w)
 		/* bit 2 is data */
 		/* bit 3 is clock (active high) */
 		/* bit 4 is cs (active low) */
-		/* bit 5 is enabled in IRQ3, disabled in IRQ5 (sprite DMA start?) */
 		ioport("EEPROMOUT")->write(data, 0xff);
+
+		/* bit 5 is enabled in IRQ3, disabled in IRQ5 (sprite DMA start?) */
+		/* bit 7 used in xmen6p to select other tilemap bank (see halfway level 5) */
+		m_xmen6p_tilemap_select = BIT(data, 7);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
@@ -56,14 +66,14 @@ WRITE16_MEMBER(xmen_state::eeprom_w)
 		/* bit 9 = enable char ROM reading through the video RAM */
 		/* bit 10 = sound irq, but with some kind of hold */
 		m_k052109->set_rmrd_line((data & 0x0200) ? ASSERT_LINE : CLEAR_LINE);
-		if(data & 0x4) {
+		if(data & 0x400) {
 			logerror("tick!\n");
 			m_audiocpu->set_input_line(0, HOLD_LINE);
 		}
 	}
 }
 
-WRITE16_MEMBER(xmen_state::xmen_18fa00_w)
+void xmen_state::xmen_18fa00_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7)
 	{
@@ -72,7 +82,7 @@ WRITE16_MEMBER(xmen_state::xmen_18fa00_w)
 	}
 }
 
-WRITE8_MEMBER(xmen_state::sound_bankswitch_w)
+void xmen_state::sound_bankswitch_w(uint8_t data)
 {
 	m_z80bank->set_entry(data & 0x07);
 }
@@ -114,9 +124,9 @@ void xmen_state::_6p_main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x080000, 0x0fffff).rom();
-	map(0x100000, 0x100fff).ram().share("spriteramleft");   /* sprites (screen 1) */
+	map(0x100000, 0x100fff).ram().share("spriteram0"); // left screen
 	map(0x101000, 0x101fff).ram();
-	map(0x102000, 0x102fff).ram().share("spriteramright");  /* sprites (screen 2) */
+	map(0x102000, 0x102fff).ram().share("spriteram1"); // right screen
 	map(0x103000, 0x103fff).ram();     /* 6p - a buffer? */
 	map(0x104000, 0x104fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x108000, 0x108001).w(FUNC(xmen_state::eeprom_w));
@@ -130,7 +140,7 @@ void xmen_state::_6p_main_map(address_map &map)
 	map(0x10a00c, 0x10a00d).r(m_k053246, FUNC(k053247_device::k053246_r)); /* sprites */
 	map(0x110000, 0x113fff).ram();     /* main RAM */
 /*  map(0x18c000, 0x197fff).w("k052109", FUNC(k052109_device:write)).umask16(0x00ff).share("tilemapleft"); */
-	map(0x18c000, 0x197fff).ram().share("tilemapleft"); /* left tilemap (p1,p2,p3 counters) */
+	map(0x18c000, 0x197fff).ram().share("tilemap0"); // left screen
 	map(0x18fa00, 0x18fa01).w(FUNC(xmen_state::xmen_18fa00_w));
 /*
     map(0x1ac000, 0x1af7ff).readonly();
@@ -142,7 +152,7 @@ void xmen_state::_6p_main_map(address_map &map)
     map(0x1b4000, 0x1b77ff).readonly();
     map(0x1b4000, 0x1b77ff).writeonly();
 */
-	map(0x1ac000, 0x1b7fff).ram().share("tilemapright"); /* right tilemap */
+	map(0x1ac000, 0x1b7fff).ram().share("tilemap1"); // right screen
 
 	/* what are the regions below buffers? (used by hw or software?) */
 /*
@@ -152,7 +162,7 @@ void xmen_state::_6p_main_map(address_map &map)
     map(0x1d0000, 0x1d37ff).readonly();
     map(0x1d0000, 0x1d37ff).writeonly();
 */
-	map(0x1cc000, 0x1d7fff).ram(); /* tilemap ? */
+	map(0x1cc000, 0x1d7fff).ram().share("tilemap2"); // left screen
 
 	/* whats the stuff below, buffers? */
 /*
@@ -163,7 +173,7 @@ void xmen_state::_6p_main_map(address_map &map)
     map(0x1f4000, 0x1f77ff).readonly();
     map(0x1f4000, 0x1f77ff).writeonly();
 */
-	map(0x1ec000, 0x1f7fff).ram(); /* tilemap ? */
+	map(0x1ec000, 0x1f7fff).ram().share("tilemap3"); // right screen
 }
 
 
@@ -270,13 +280,12 @@ void xmen_state::machine_start()
 	save_item(NAME(m_layer_colorbase));
 	save_item(NAME(m_layerpri));
 	save_item(NAME(m_vblank_irq_mask));
+	save_item(NAME(m_xmen6p_tilemap_select));
 }
 
 void xmen_state::machine_reset()
 {
-	int i;
-
-	for (i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		m_layerpri[i] = 0;
 		m_layer_colorbase[i] = 0;
@@ -295,7 +304,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(xmen_state::xmen_scanline)
 
 	if(scanline == 0) // sprite DMA irq?
 		m_maincpu->set_input_line(5, HOLD_LINE);
-
 }
 
 void xmen_state::xmen(machine_config &config)
@@ -882,7 +890,7 @@ Second "version" letter denotes cabinet type:
 A = 2 players, 2 coin slots, can set coin/credit by coin slot, COINs common/independent (when independent, premium start & continue values can be set), FREE PLAY option, requires start buttons
 B = 4 players, 4 coin slots, can set premium start & continue value, with or without start buttons
 C = 6 players, 6 coin slots, can set premium start & continue value, no support for START buttons, 2 monitors
-D = 4 players, 4 coin slots, 4 seperate service coins, can set premium start & continue value, with or without start buttons
+D = 4 players, 4 coin slots, 4 separate service coins, can set premium start & continue value, with or without start buttons
 E = 4 players, 2 coin slots, can set coin/credit by coin slot, FREE PLAY option, requires start buttons
 
 */

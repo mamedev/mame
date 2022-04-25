@@ -101,7 +101,7 @@ void lvpoker_state::machine_reset()
 	m_result = 0;
 }
 
-WRITE8_MEMBER(lvpoker_state::control_port_2_w)
+void lvpoker_state::control_port_2_w(uint8_t data)
 {
 	switch (data)
 	{
@@ -117,7 +117,7 @@ WRITE8_MEMBER(lvpoker_state::control_port_2_w)
 	}
 }
 
-WRITE8_MEMBER(lvpoker_state::control_port_2a_w)
+void lvpoker_state::control_port_2a_w(uint8_t data)
 {
 	switch (data)
 	{
@@ -133,7 +133,7 @@ WRITE8_MEMBER(lvpoker_state::control_port_2a_w)
 	}
 }
 
-READ8_MEMBER(lvpoker_state::payout_r)
+uint8_t lvpoker_state::payout_r()
 {
 	m_result = ioport("IN2")->read();
 

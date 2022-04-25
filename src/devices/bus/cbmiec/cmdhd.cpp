@@ -78,8 +78,8 @@ void cmd_hd_device::device_add_mconfig(machine_config &config)
 	M6502(config, m_maincpu, 2000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cmd_hd_device::mem_map);
 
-	VIA6522(config, M6522_1_TAG, 2000000);
-	VIA6522(config, M6522_2_TAG, 2000000);
+	MOS6522(config, M6522_1_TAG, 2000000);
+	MOS6522(config, M6522_2_TAG, 2000000);
 	I8255A(config, I8255A_TAG, 0);
 	RTC72421(config, RTC72421A_TAG, XTAL(32'768));
 
@@ -168,7 +168,7 @@ void cmd_hd_device::cbm_iec_reset(int state)
 //  led_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( cmd_hd_device::led_w )
+void cmd_hd_device::led_w(uint8_t data)
 {
 	/*
 

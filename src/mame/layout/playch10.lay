@@ -11,21 +11,21 @@ license:CC0
 
 	<view name="Single Screen">
 		<bounds x="0" y="0" width="40" height="35" />
-		<bezel name="digit_3" element="digit">
-			<bounds x="25" y="0.6" width="2" height="3.2" />
-		</bezel>
-		<bezel name="digit_2" element="digit">
-			<bounds x="27.5" y="0.6" width="2" height="3.2" />
-		</bezel>
-		<bezel name="digit_1" element="digit">
-			<bounds x="30" y="0.6" width="2" height="3.2" />
-		</bezel>
-		<bezel name="digit_0" element="digit">
-			<bounds x="32.5" y="0.6" width="2" height="3.2" />
-		</bezel>
 		<screen index="0">
 			<bounds left="0" top="5" right="40" bottom="35" />
 		</screen>
+		<element name="digit_3" ref="digit">
+			<bounds x="25" y="0.6" width="2" height="3.2" />
+		</element>
+		<element name="digit_2" ref="digit">
+			<bounds x="27.5" y="0.6" width="2" height="3.2" />
+		</element>
+		<element name="digit_1" ref="digit">
+			<bounds x="30" y="0.6" width="2" height="3.2" />
+		</element>
+		<element name="digit_0" ref="digit">
+			<bounds x="32.5" y="0.6" width="2" height="3.2" />
+		</element>
 	</view>
 
 	<view name="Dual Under-Over">

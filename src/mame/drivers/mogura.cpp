@@ -7,7 +7,6 @@
 
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -37,7 +36,7 @@ private:
 	required_shared_ptr<uint8_t> m_tileram;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	tilemap_t *m_tilemap;
+	tilemap_t *m_tilemap = nullptr;
 	void mogura_tileram_w(offs_t offset, uint8_t data);
 	void mogura_dac_w(uint8_t data);
 	void mogura_gfxram_w(offs_t offset, uint8_t data);
@@ -234,9 +233,6 @@ void mogura_state::mogura(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 	DAC_4BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
 	DAC_4BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

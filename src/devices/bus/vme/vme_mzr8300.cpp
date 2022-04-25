@@ -168,7 +168,6 @@ vme_mzr8300_card_device::vme_mzr8300_card_device(const machine_config &mconfig, 
 void vme_mzr8300_card_device::device_start()
 {
 	LOG("%s %s\n", tag(), FUNCNAME);
-	set_vme_device();
 
 	/* Setup r/w handlers for first SIO in A16 */
 	uint32_t base = 0xFF0000;
@@ -197,12 +196,12 @@ void vme_mzr8300_card_device::device_reset()
 }
 
 #if 0
-READ8_MEMBER (vme_mzr8300_card_device::read8){
+uint8_t vme_mzr8300_card_device::read8(offs_t offset){
 	LOG("%s()\n", FUNCNAME);
 	return (uint8_t) 0;
 }
 
-WRITE8_MEMBER (vme_mzr8300_card_device::write8){
+void vme_mzr8300_card_device::write8(offs_t offset, uint8_t data){
 	LOG("%s()\n", FUNCNAME);
 }
 #endif

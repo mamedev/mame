@@ -93,10 +93,10 @@ protected:
 	optional_shared_ptr<uint8_t> m_spriteram2;
 
 	// internal state
-	uint8_t m_irq_mask;
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_gfx_bank;
-	uint8_t m_palette_bank;
+	uint8_t m_irq_mask = 0U;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_gfx_bank = 0U;
+	uint8_t m_palette_bank = 0U;
 };
 
 class exctsccr_state : public champbas_state
@@ -112,6 +112,7 @@ public:
 
 	void exctsccr(machine_config &config);
 	void exctsccrb(machine_config &config);
+	void exctscc2(machine_config &config);
 
 protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(exctsccr_sound_irq);
@@ -129,6 +130,7 @@ protected:
 	void exctsccrb_map(address_map &map);
 	void exctsccr_sound_map(address_map &map);
 	void exctsccr_sound_io_map(address_map &map);
+	void exctscc2_sound_io_map(address_map &map);
 
 private:
 	required_device<cpu_device> m_audiocpu;

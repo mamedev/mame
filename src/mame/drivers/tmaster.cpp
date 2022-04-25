@@ -17,7 +17,6 @@ To Do:
  - Coin optics
  - Correct sound banking
  - Proper protection emulation in tm4k and later games
- - Find cause and fix hang in Solitaire Erotic (all Touchmaster version hang in this game)
 
 To be dumped and added:
 
@@ -154,9 +153,9 @@ private:
 	required_device<microtouch_device> m_microtouch;
 	required_device<mc68681_device> m_duart;
 
-	int m_okibank;
+	int m_okibank = 0;
 
-	uint8_t m_rtc_ram[8];
+	uint8_t m_rtc_ram[8]{};
 };
 
 WRITE_LINE_MEMBER(tmaster_state::blitter_irq_callback)
@@ -270,7 +269,7 @@ READ_LINE_MEMBER(tmaster_state::read_rand)
 void tmaster_state::tmaster_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
-	map(0x200000, 0x27ffff).ram();
+	map(0x200000, 0x20ffff).mirror(0x70000).ram();
 	map(0x280000, 0x28ffef).ram().share("nvram");
 	map(0x28fff0, 0x28ffff).rw(FUNC(tmaster_state::rtc_r), FUNC(tmaster_state::rtc_w));
 
@@ -558,8 +557,8 @@ ROM_END
 
 ROM_START( tm2kspeval ) /* NOT FOR RELEASE / FOR EVALUATION - still requires credits - Defaults to Spanish but English can be selected */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // 68000 Code
-	ROM_LOAD16_BYTE( "touch_master_2000_spain_451_4.xx3.u51", 0x000000, 0x080000, CRC(ba51f4dd) SHA1(bcdf6acbe6546a562e74178d4f9cdb0e167baee2) ) /* Ver: 4.XX3 Spanish 6-26-97 - Evaluation Only (yes, it's actually 451 and not U51) */
-	ROM_LOAD16_BYTE( "touch_master_2000_spain_452_4.xx3.u52", 0x000001, 0x080000, CRC(6ca86264) SHA1(2fb04b8d4bd0a51653ca80e1af7fedab5aebb9dd) ) /* Ver: 4.XX3 Spanish 6-26-97 - Evaluation Only (yes, it's actually 452 and not U52) */
+	ROM_LOAD16_BYTE( "touch_master_2000_span_451_4.xx3.u51", 0x000000, 0x080000, CRC(ba51f4dd) SHA1(bcdf6acbe6546a562e74178d4f9cdb0e167baee2) ) /* Ver: 4.XX3 Spanish 6-26-97 - Evaluation Only (yes, it's actually 451 and not U51) */
+	ROM_LOAD16_BYTE( "touch_master_2000_span_452_4.xx3.u52", 0x000001, 0x080000, CRC(6ca86264) SHA1(2fb04b8d4bd0a51653ca80e1af7fedab5aebb9dd) ) /* Ver: 4.XX3 Spanish 6-26-97 - Evaluation Only (yes, it's actually 452 and not U52) */
 
 	ROM_REGION( 0x400000, "blitter", ROMREGION_ERASE )  // Blitter gfx
 	ROM_LOAD16_BYTE( "touch_master_2000_u38_4.x.u38", 0x100000, 0x080000, CRC(22bb6cc5) SHA1(fc6cfd4e1e6e1455d648a7b63f2c8e37cdfe86d6) ) /* All 4 graphic roms marked as Rev 4.X */

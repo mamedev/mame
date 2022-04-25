@@ -73,16 +73,16 @@ void abc800c_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 				if (color)
 				{
-					bool black = bitmap.pix32(y, x) == rgb_t::black();
+					bool black = bitmap.pix(y, x) == rgb_t::black();
 					bool opaque = !BIT(fgctl, 3);
 
 					if (black || opaque)
 					{
-						bitmap.pix32(y, x) = pen[color];
-						bitmap.pix32(y, x + 1) = pen[color];
+						bitmap.pix(y, x) = pen[color];
+						bitmap.pix(y, x + 1) = pen[color];
 
-						bitmap.pix32(y + 1, x) = pen[color];
-						bitmap.pix32(y + 1, x + 1) = pen[color];
+						bitmap.pix(y + 1, x) = pen[color];
+						bitmap.pix(y + 1, x + 1) = pen[color];
 					}
 				}
 
@@ -200,8 +200,8 @@ void abc800m_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				uint16_t fgctl_addr = ((m_fgctl & 0x7f) << 2) | ((data >> 6) & 0x03);
 				int color = (m_fgctl_prom->base()[fgctl_addr] & 0x07) ? 1 : 0;
 
-				bitmap.pix32(y, x++) = pen[color];
-				bitmap.pix32(y, x++) = pen[color];
+				bitmap.pix(y, x++) = pen[color];
+				bitmap.pix(y, x++) = pen[color];
 
 				data <<= 2;
 			}
@@ -241,7 +241,7 @@ MC6845_UPDATE_ROW( abc800m_state::abc800m_update_row )
 
 			if (BIT(data, 7) && de)
 			{
-				bitmap.pix32(y, x) = fgpen;
+				bitmap.pix(y, x) = fgpen;
 			}
 
 			data <<= 1;
@@ -274,10 +274,6 @@ uint32_t abc800m_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 void abc800_state::video_start()
 {
-	// allocate memory
-	m_char_ram.allocate(m_char_ram_size);
-	m_video_ram.allocate(ABC800_VIDEO_RAM_SIZE);
-
 	// register for state saving
 	save_item(NAME(m_hrs));
 	save_item(NAME(m_fgctl));

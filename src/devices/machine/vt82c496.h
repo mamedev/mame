@@ -37,6 +37,26 @@ private:
 	address_space* m_space;
 	required_device<ram_device> m_ram;
 	required_region_ptr<uint32_t> m_rom;
+	memory_bank_creator m_bios_c0_r;
+	memory_bank_creator m_bios_c4_r;
+	memory_bank_creator m_bios_c8_r;
+	memory_bank_creator m_bios_cc_r;
+	memory_bank_creator m_bios_d0_r;
+	memory_bank_creator m_bios_d4_r;
+	memory_bank_creator m_bios_d8_r;
+	memory_bank_creator m_bios_dc_r;
+	memory_bank_creator m_bios_e0_r;
+	memory_bank_creator m_bios_f0_r;
+	memory_bank_creator m_bios_c0_w;
+	memory_bank_creator m_bios_c4_w;
+	memory_bank_creator m_bios_c8_w;
+	memory_bank_creator m_bios_cc_w;
+	memory_bank_creator m_bios_d0_w;
+	memory_bank_creator m_bios_d4_w;
+	memory_bank_creator m_bios_d8_w;
+	memory_bank_creator m_bios_dc_w;
+	memory_bank_creator m_bios_e0_w;
+	memory_bank_creator m_bios_f0_w;
 
 	uint8_t m_reg[0x100];
 	uint8_t m_reg_select;

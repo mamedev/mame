@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -41,7 +41,7 @@ namespace bx
 		gettimeofday(&now, 0);
 		int64_t i64 = now.tv_sec*INT64_C(1000000) + now.tv_usec;
 #else
-		BX_CHECK(false, "Not implemented!");
+		BX_ASSERT(false, "Not implemented!");
 		int64_t i64 = UINT64_MAX;
 #endif // BX_PLATFORM_
 		return i64;

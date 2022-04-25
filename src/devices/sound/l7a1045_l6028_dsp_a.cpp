@@ -116,29 +116,23 @@ l7a1045_sound_device::l7a1045_sound_device(const machine_config &mconfig, const 
 
 void l7a1045_sound_device::device_start()
 {
-	/* Allocate the stream */
+	// assumes it can make an address mask with m_rom.length() - 1
+	assert(!(m_rom.length() & (m_rom.length() - 1)));
+
+	// Allocate the stream
 	m_stream = stream_alloc(0, 2, 66150); //clock() / 384);
 
-	for (int voice = 0; voice < 32; voice++)
-	{
-		save_item(NAME(m_voice[voice].start), voice);
-		save_item(NAME(m_voice[voice].end), voice);
-		save_item(NAME(m_voice[voice].mode), voice);
-		save_item(NAME(m_voice[voice].pos), voice);
-		save_item(NAME(m_voice[voice].frac), voice);
-		save_item(NAME(m_voice[voice].l_volume), voice);
-		save_item(NAME(m_voice[voice].r_volume), voice);
-	}
+	save_item(STRUCT_MEMBER(m_voice, start));
+	save_item(STRUCT_MEMBER(m_voice, end));
+	save_item(STRUCT_MEMBER(m_voice, mode));
+	save_item(STRUCT_MEMBER(m_voice, pos));
+	save_item(STRUCT_MEMBER(m_voice, frac));
+	save_item(STRUCT_MEMBER(m_voice, l_volume));
+	save_item(STRUCT_MEMBER(m_voice, r_volume));
 	save_item(NAME(m_key));
 	save_item(NAME(m_audiochannel));
 	save_item(NAME(m_audioregister));
-	for (int reg = 0; reg < 0x10; reg++)
-	{
-		for (int voice = 0; voice < 0x20; voice++)
-		{
-			save_item(NAME(m_audiodat[reg][voice].dat), (reg << 8) | voice);
-		}
-	}
+	save_item(STRUCT_MEMBER(m_audiodat, dat));
 }
 
 
@@ -146,11 +140,11 @@ void l7a1045_sound_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void l7a1045_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void l7a1045_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	/* Clear the buffers */
-	memset(outputs[0], 0, samples*sizeof(*outputs[0]));
-	memset(outputs[1], 0, samples*sizeof(*outputs[1]));
+	outputs[0].fill(0);
+	outputs[1].fill(0);
 
 	for (int i = 0; i < 32; i++)
 	{
@@ -165,7 +159,7 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 			uint32_t pos = vptr->pos;
 			uint32_t frac = vptr->frac;
 
-			for (int j = 0; j < samples; j++)
+			for (int j = 0; j < outputs[0].samples(); j++)
 			{
 				int32_t sample;
 				uint8_t data;
@@ -188,12 +182,12 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 				}
 
 
-				data = m_rom[(start + pos) & m_rom.mask()];
-				sample = ((int8_t)(data & 0xfc)) << (3 - (data & 3));
+				data = m_rom[(start + pos) & (m_rom.length() - 1)];
+				sample = int8_t(data & 0xfc) << (3 - (data & 3));
 				frac += step;
 
-				outputs[0][j] += ((sample * vptr->l_volume) >> 9);
-				outputs[1][j] += ((sample * vptr->r_volume) >> 9);
+				outputs[0].add_int(j, sample * vptr->l_volume, 32768 * 512);
+				outputs[1].add_int(j, sample * vptr->r_volume, 32768 * 512);
 			}
 
 			vptr->pos = pos;
@@ -277,7 +271,7 @@ void l7a1045_sound_device::sound_data_w(offs_t offset, uint16_t data)
 
 			//logerror("%s: channel %d start = %08x\n", tag(), m_audiochannel, vptr->start);
 
-			vptr->start &= m_rom.mask();
+			vptr->start &= m_rom.length() - 1;
 
 			// if voice isn't active, clear the pos on start writes (required for DMA tests on MPC3000)
 			if (!(m_key & (1 << m_audiochannel)))
@@ -297,8 +291,7 @@ void l7a1045_sound_device::sound_data_w(offs_t offset, uint16_t data)
 				vptr->end += vptr->start;
 				vptr->mode = false;
 				// hopefully it'll never happen? Maybe assert here?
-				vptr->end &= m_rom.mask();
-
+				vptr->end &= m_rom.length() - 1;
 			}
 			else // absolute
 			{
@@ -307,7 +300,7 @@ void l7a1045_sound_device::sound_data_w(offs_t offset, uint16_t data)
 				vptr->end |= (m_audiodat[m_audioregister][m_audiochannel].dat[0] & 0xf000) >> (12);
 				vptr->mode = true;
 
-				vptr->end &= m_rom.mask();
+				vptr->end &= m_rom.length() - 1;
 			}
 			//logerror("%s: channel %d end = %08x\n", tag(), m_audiochannel, vptr->start);
 			break;

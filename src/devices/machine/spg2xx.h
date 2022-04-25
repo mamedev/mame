@@ -110,7 +110,7 @@ protected:
 	devcb_read16 m_portb_in;
 	devcb_read16 m_portc_in;
 
-	devcb_read16::array<2> m_adc_in;
+	devcb_read16::array<4> m_adc_in;
 
 	devcb_read16 m_guny_in;
 	devcb_read16 m_gunx_in;
@@ -122,8 +122,6 @@ protected:
 	devcb_write_line m_spi_tx;
 
 	devcb_write8 m_chip_sel;
-
-	emu_timer *m_screenpos_timer;
 
 	uint8_t m_fiq_vector;
 
@@ -142,7 +140,7 @@ protected:
 	template <size_t Line> uint16_t adc_r() { return m_adc_in[Line](); }
 
 	void eepromx_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0) { m_i2c_w(offset, data, mem_mask); }
-	uint8_t eepromx_r() { return m_i2c_r(); };
+	uint8_t eepromx_r() { return m_i2c_r(); }
 
 	void uart_tx_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0) { m_uart_tx(offset, data, mem_mask); }
 	DECLARE_WRITE_LINE_MEMBER(spi_tx_w) { m_spi_tx(state); }

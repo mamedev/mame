@@ -35,7 +35,7 @@
 #include "bus/isa/sc499.h"
 #include "bus/isa/3c505.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 
 #define APOLLO_IRQ_VECTOR 0xa0
 #define APOLLO_IRQ_PTM 0
@@ -91,9 +91,9 @@ INPUT_PORTS_START( apollo_config )
 		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
 		PORT_CONFSETTING(APOLLO_CONF_GERMAN_KBD, DEF_STR ( On ) )
 
-		PORT_CONFNAME(APOLLO_CONF_20_YEARS_AGO, APOLLO_CONF_20_YEARS_AGO, "20 Years Ago ...")
+		PORT_CONFNAME(APOLLO_CONF_30_YEARS_AGO, APOLLO_CONF_30_YEARS_AGO, "30 Years Ago ...")
 		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
-		PORT_CONFSETTING(APOLLO_CONF_20_YEARS_AGO, DEF_STR ( On ) )
+		PORT_CONFSETTING(APOLLO_CONF_30_YEARS_AGO, DEF_STR ( On ) )
 
 		PORT_CONFNAME(APOLLO_CONF_25_YEARS_AGO, APOLLO_CONF_25_YEARS_AGO, "25 Years Ago ...")
 		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
@@ -266,14 +266,10 @@ void apollo_state::apollo_csr_control_register_w(offs_t offset, uint16_t data, u
 
 	COMBINE_DATA(&cpu_control_register);
 
-	output().set_value("internal_led_1", (cpu_control_register >> 15) & 1);
-	output().set_value("internal_led_2", (cpu_control_register >> 14) & 1);
-	output().set_value("internal_led_3", (cpu_control_register >> 13) & 1);
-	output().set_value("internal_led_4", (cpu_control_register >> 12) & 1);
-	output().set_value("external_led_a", (cpu_control_register >> 11) & 1);
-	output().set_value("external_led_b", (cpu_control_register >> 10) & 1);
-	output().set_value("external_led_c", (cpu_control_register >> 9) & 1);
-	output().set_value("external_led_d", (cpu_control_register >> 8) & 1);
+	for (int i = 0; i < 4; i++)
+		m_internal_leds[i] = BIT(cpu_control_register, 15 - i);
+	for (int i = 0; i < 4; i++)
+		m_external_leds[i] = BIT(cpu_control_register, 11 - i);
 
 	leds = ((cpu_control_register >> 8) & 0xff) ^ 0xff;
 
@@ -1172,7 +1168,6 @@ void apollo_state::apollo(machine_config &config)
 static DEVICE_INPUT_DEFAULTS_START( apollo_terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
@@ -1203,6 +1198,9 @@ MACHINE_START_MEMBER(apollo_state,apollo)
 
 	m_dma_channel = -1;
 	m_cur_eop = false;
+
+	m_internal_leds.resolve();
+	m_external_leds.resolve();
 }
 
 MACHINE_RESET_MEMBER(apollo_state,apollo)
@@ -1220,15 +1218,15 @@ MACHINE_RESET_MEMBER(apollo_state,apollo)
 		year += 75;
 		apollo_rtc_w(9, year);
 	}
-	else if (year < 20 && apollo_config(APOLLO_CONF_20_YEARS_AGO))
+	else if (year < 30 && apollo_config(APOLLO_CONF_30_YEARS_AGO))
 	{
-		year += 80;
+		year += 70;
 		apollo_rtc_w(9, year);
 	}
-	else if (year >= 80 && !apollo_config(APOLLO_CONF_20_YEARS_AGO)
+	else if (year >= 70 && !apollo_config(APOLLO_CONF_30_YEARS_AGO)
 			&& !apollo_config(APOLLO_CONF_25_YEARS_AGO))
 	{
-		year -= 80;
+		year -= 70;
 		apollo_rtc_w(9, year);
 	}
 
@@ -1309,10 +1307,10 @@ void apollo_stdio_device::device_reset()
 }
 
 void apollo_stdio_device::device_timer(emu_timer &timer, device_timer_id id,
-		int param, void *ptr)
+		int param)
 {
 //  FIXME?
-//  device_serial_interface::device_timer(timer, id, param, ptr);
+//  device_serial_interface::device_timer(timer, id, param);
 }
 
 void apollo_stdio_device::rcv_complete() // Rx completed receiving byte

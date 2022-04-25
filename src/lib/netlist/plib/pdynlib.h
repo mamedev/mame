@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Couriersud
 
 #ifndef PDYNLIB_H_
@@ -31,6 +31,7 @@ namespace plib {
 		template <typename T>
 		T getsym(const pstring &name) const noexcept
 		{
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 			return reinterpret_cast<T>(getsym_p(name));
 		}
 

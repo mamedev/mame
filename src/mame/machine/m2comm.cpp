@@ -632,7 +632,7 @@ int m2comm_device::read_frame(int dataSize)
 
 	// try to read a message
 	std::uint32_t recv = 0;
-	osd_file::error filerr = m_line_rx->read(m_buffer0, 0, dataSize, recv);
+	std::error_condition filerr = m_line_rx->read(m_buffer0, 0, dataSize, recv);
 	if (recv > 0)
 	{
 		// check if message complete
@@ -653,14 +653,14 @@ int m2comm_device::read_frame(int dataSize)
 					togo -= recv;
 					offset += recv;
 				}
-				else if (filerr == osd_file::error::NONE && recv == 0)
+				else if (!filerr && recv == 0)
 				{
 					togo = 0;
 				}
 			}
 		}
 	}
-	else if (filerr == osd_file::error::NONE && recv == 0)
+	else if (!filerr && recv == 0)
 	{
 		if (m_linkalive == 0x01)
 		{
@@ -687,11 +687,11 @@ void m2comm_device::send_frame(int dataSize){
 	if (!m_line_tx)
 		return;
 
-	osd_file::error filerr;
+	std::error_condition filerr;
 	std::uint32_t written;
 
 	filerr = m_line_tx->write(&m_buffer0, 0, dataSize, written);
-	if (filerr != osd_file::error::NONE)
+	if (filerr)
 	{
 		if (m_linkalive == 0x01)
 		{

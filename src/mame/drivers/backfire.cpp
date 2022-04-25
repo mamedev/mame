@@ -23,7 +23,7 @@
 #include "video/deco16ic.h"
 #include "video/decospr.h"
 #include "emupal.h"
-#include "rendlay.h"
+#include "layout/generic.h"
 #include "screen.h"
 #include "speaker.h"
 

@@ -7,10 +7,8 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/atarigen.h"
-#include "video/atarimo.h"
 #include "includes/blstroid.h"
+#include "cpu/m68000/m68000.h"
 
 
 
@@ -70,7 +68,7 @@ const atari_motion_objects_config blstroid_state::s_mob_config =
 	0                  /* resulting value to indicate "special" */
 };
 
-VIDEO_START_MEMBER(blstroid_state,blstroid)
+void blstroid_state::video_start()
 {
 	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
 	m_irq_on_timer = timer_alloc(TIMER_IRQ_ON);
@@ -88,7 +86,7 @@ VIDEO_START_MEMBER(blstroid_state,blstroid)
  *
  *************************************/
 
-void blstroid_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void blstroid_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -101,7 +99,7 @@ void blstroid_state::device_timer(emu_timer &timer, device_timer_id id, int para
 			m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
 			break;
 		default:
-			atarigen_state::device_timer(timer, id, param, ptr);
+			atarigen_state::device_timer(timer, id, param);
 			break;
 	}
 }
@@ -154,8 +152,8 @@ uint32_t blstroid_state::screen_update_blstroid(screen_device &screen, bitmap_in
 	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->top(); y <= rect->bottom(); y++)
 		{
-			uint16_t *mo = &mobitmap.pix16(y);
-			uint16_t *pf = &bitmap.pix16(y);
+			uint16_t const *const mo = &mobitmap.pix(y);
+			uint16_t *const pf = &bitmap.pix(y);
 			for (int x = rect->left(); x <= rect->right(); x++)
 				if (mo[x] != 0xffff)
 				{
@@ -163,7 +161,7 @@ uint32_t blstroid_state::screen_update_blstroid(screen_device &screen, bitmap_in
 
 					    priority address = HPPPMMMM
 					*/
-					int priaddr = ((pf[x] & 8) << 4) | (pf[x] & 0x70) | ((mo[x] & 0xf0) >> 4);
+					int const priaddr = ((pf[x] & 8) << 4) | (pf[x] & 0x70) | ((mo[x] & 0xf0) >> 4);
 					if (m_priorityram[priaddr] & 1)
 						pf[x] = mo[x];
 				}

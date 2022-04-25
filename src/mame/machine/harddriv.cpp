@@ -37,7 +37,8 @@
 void harddriv_state::device_start()
 {
 	m_lamps.resolve();
-	//atarigen_state::machine_start();
+	m_sel.resolve();
+	m_wheel.resolve();
 
 	/* predetermine memory regions */
 	m_adsp_pgm_memory_word = (uint16_t *)(reinterpret_cast<uint8_t *>(m_adsp_pgm_memory.target()) + 1);
@@ -47,14 +48,10 @@ void harddriv_state::device_start()
 }
 
 
-void  harddriv_state::device_reset()
+void harddriv_state::device_reset()
 {
-	/* generic reset */
-	//atarigen_state::machine_reset();
-	if (m_slapstic_device.found()) m_slapstic_device->slapstic_reset();
-
 	/* halt several of the DSPs to start */
-	if (m_adsp.found()) m_adsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	m_adsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	if (m_dsp32.found()) m_dsp32->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
 	m_last_gsp_shiftreg = 0;
@@ -364,24 +361,24 @@ void harddriv_state::hd68k_wr1_write(offs_t offset, uint16_t data)
 		data = data >> 8;
 		switch (m_sel_select)
 		{
-			case 1: /* SEL1 */
-				m_sel1_data = data;
-				machine().output().set_value("SEL1", m_sel1_data);
+		case 1: /* SEL1 */
+			m_sel1_data = data;
+			m_sel[0] = m_sel1_data;
 			break;
 
-			case 2: /* SEL2 */
-				m_sel2_data = data;
-				machine().output().set_value("SEL2", m_sel2_data);
+		case 2: /* SEL2 */
+			m_sel2_data = data;
+			m_sel[1] = m_sel2_data;
 			break;
 
-			case 3: /* SEL3 */
-				m_sel3_data = data;
-				machine().output().set_value("SEL3", m_sel3_data);
+		case 3: /* SEL3 */
+			m_sel3_data = data;
+			m_sel[2] = m_sel3_data;
 			break;
 
-			case 4: /* SEL4 */
-				m_sel4_data = data;
-				machine().output().set_value("SEL4", m_sel4_data);
+		case 4: /* SEL4 */
+			m_sel4_data = data;
+			m_sel[3] = m_sel4_data;
 			break;
 		}
 	} else {
@@ -394,7 +391,7 @@ void harddriv_state::hd68k_wr2_write(offs_t offset, uint16_t data)
 {
 	if (offset == 0) {
 		// logerror("Steering Wheel Latch = %02X\n", data);
-		machine().output().set_value("wheel", data >> 8);
+		m_wheel = data >> 8;
 	} else {
 		logerror("/WR2(%04X)=%02X\n", offset, data);
 	}
@@ -429,8 +426,7 @@ void harddriv_state::hd68k_nwr_w(offs_t offset, uint16_t data)
 			break;
 		case 6: /* /GSPRES */
 			logerror("Write to /GSPRES(%d)\n", data);
-			if (m_gsp.found())
-				m_gsp->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+			m_gsp->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 			break;
 		case 7: /* /MSPRES */
 			logerror("Write to /MSPRES(%d)\n", data);
@@ -1699,26 +1695,6 @@ void harddriv_state::hddspcom_control_w(offs_t offset, uint16_t data)
 
 /*************************************
  *
- *  Race Drivin' slapstic handling
- *
- *************************************/
-
-void harddriv_state::rd68k_slapstic_w(address_space &space, offs_t offset, uint16_t data)
-{
-	m_slapstic_device->slapstic_tweak(space, offset & 0x3fff);
-}
-
-
-uint16_t harddriv_state::rd68k_slapstic_r(address_space &space, offs_t offset)
-{
-	int bank = m_slapstic_device->slapstic_tweak(space, offset & 0x3fff) * 0x4000;
-	return m_m68k_slapstic_base[bank + (offset & 0x3fff)];
-}
-
-
-
-/*************************************
- *
  *  Steel Talons SLOOP handling
  *
  *************************************/
@@ -1759,7 +1735,7 @@ void harddriv_state::st68k_sloop_w(offs_t offset, uint16_t data)
 uint16_t harddriv_state::st68k_sloop_r(offs_t offset)
 {
 	int bank = st68k_sloop_tweak(offset) * 0x4000;
-	return m_m68k_slapstic_base[bank + (offset & 0x3fff)];
+	return m_m68k_sloop_base[bank + (offset & 0x3fff)];
 }
 
 
@@ -1824,7 +1800,7 @@ void harddriv_state::st68k_protosloop_w(offs_t offset, uint16_t data)
 uint16_t harddriv_state::st68k_protosloop_r(offs_t offset)
 {
 	int bank = st68k_protosloop_tweak(offset) * 0x4000;
-	return m_m68k_slapstic_base[bank + (offset & 0x3fff)];
+	return m_m68k_sloop_base[bank + (offset & 0x3fff)];
 }
 
 

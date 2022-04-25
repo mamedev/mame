@@ -35,6 +35,8 @@
 #include "machine/terminal.h"
 
 
+namespace {
+
 class chaos_state : public driver_device
 {
 public:
@@ -47,6 +49,10 @@ public:
 
 	void chaos(machine_config &config);
 
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+
 private:
 	u8 port1e_r();
 	void port1f_w(u8 data);
@@ -56,8 +62,7 @@ private:
 	void data_map(address_map &map);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-	u8 m_term_data;
-	virtual void machine_reset() override;
+	u8 m_term_data = 0U;
 	required_device<generic_terminal_device> m_terminal;
 	required_shared_ptr<u8> m_p_ram;
 	required_device<cpu_device> m_maincpu;
@@ -140,6 +145,13 @@ void chaos_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
+void chaos_state::machine_start()
+{
+	save_item(NAME(m_term_data));
+
+	m_term_data = 0;
+}
+
 void chaos_state::machine_reset()
 {
 	// copy the roms into ram
@@ -163,14 +175,17 @@ void chaos_state::chaos(machine_config &config)
 
 /* ROM definition */
 ROM_START( chaos )
-	ROM_REGION( 0x4000, "roms", ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, "roms", 0 )
 	ROM_LOAD( "chaos.001", 0x0000, 0x1000, CRC(3b433e72) SHA1(5b487337d71253d0e64e123f405da9eaf20e87ac))
 	ROM_LOAD( "chaos.002", 0x1000, 0x1000, CRC(8b0b487f) SHA1(0d167cf3004a81c87446f2f1464e3debfa7284fe))
 	ROM_LOAD( "chaos.003", 0x2000, 0x1000, CRC(5880db81) SHA1(29b8f1b03c83953f66464ad1fbbfe2e019637ce1))
 	ROM_LOAD( "chaos.004", 0x3000, 0x1000, CRC(5d6839d6) SHA1(237f52f0780ac2e29d57bf06d0f7a982eb523084))
 ROM_END
 
+} // Anonymous namespace
+
+
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY          FULLNAME   FLAGS
-COMP( 1983, chaos, 0,      0,      chaos,   chaos, chaos_state, empty_init, "David Greaves", "Chaos 2", MACHINE_NO_SOUND_HW )
+COMP( 1983, chaos, 0,      0,      chaos,   chaos, chaos_state, empty_init, "David Greaves", "Chaos 2", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

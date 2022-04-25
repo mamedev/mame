@@ -146,8 +146,6 @@
 #include "e132xs.h"
 #include "e132xsfe.h"
 
-#include "debugger.h"
-
 #include "32xsdefs.h"
 
 //#define VERBOSE 1
@@ -215,6 +213,7 @@ hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *
 	, m_cache_dirty(0)
 	, m_entry(nullptr)
 	, m_nocode(nullptr)
+	, m_interrupt_checks(nullptr)
 	, m_out_of_cycles(nullptr)
 	, m_mem_read8(nullptr)
 	, m_mem_write8(nullptr)
@@ -226,6 +225,7 @@ hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *
 	, m_io_write32(nullptr)
 	, m_enable_drc(false)
 {
+	std::fill(std::begin(m_exception), std::end(m_exception), nullptr);
 }
 
 hyperstone_device::~hyperstone_device()

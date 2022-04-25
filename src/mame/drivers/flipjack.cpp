@@ -173,8 +173,8 @@ MC6845_UPDATE_ROW(flipjack_state::update_row)
 {
 	const bool flip = !BIT(m_layer, 0);
 	const uint16_t row_base = ((ma & 0x03e0) << 3 | (ra & 7) << 5) ^ (flip ? 0x1fff : 0);
-	uint32_t *const pbegin = &bitmap.pix32(y);
-	uint32_t *const pend = &bitmap.pix32(y, x_count * 8);
+	uint32_t *const pbegin = &bitmap.pix(y);
+	uint32_t *const pend = &bitmap.pix(y, x_count * 8);
 
 	std::fill(pbegin, pend, rgb_t::black());
 

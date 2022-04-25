@@ -262,7 +262,7 @@ void gaplus_base_state::starfield_render(bitmap_ind16 &bitmap)
 
 		if (x >= 0 && x < width && y >= 0 && y < height)
 		{
-			bitmap.pix16(y, x) = m_stars[i].col;
+			bitmap.pix(y, x) = m_stars[i].col;
 		}
 	}
 }
@@ -373,7 +373,7 @@ WRITE_LINE_MEMBER(gaplus_base_state::screen_vblank)/* update starfields */
 					/* scroll down (speed 2) */
 					stars[i].x += SPEED_2;
 				break;
-				
+
 				case 0x80:
 					/* scroll up (speed 1) */
 					stars[i].x -= SPEED_1;

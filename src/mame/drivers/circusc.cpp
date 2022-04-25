@@ -61,7 +61,6 @@ This bug is due to 380_r02.6h, it differs from 380_q02.6h by 2 bytes, at
 #include "machine/konami1.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
-#include "sound/volt_reg.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -383,9 +382,7 @@ void circusc_state::circusc(machine_config &config)
 
 	SN76496(config, m_sn_2, XTAL(14'318'181)/8).add_route(0, "fltdisc", 1.0, 1);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(0, "fltdisc", 1.0, 2); // ls374.7g + r44+r45+r47+r48+r50+r56+r57+r58+r59 (20k) + r46+r49+r51+r52+r53+r54+r55 (10k) + upc324.3h
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	DAC_8BIT_R2R(config, "dac", 0).set_output_range(0, 1).add_route(0, "fltdisc", 1.0, 2); // ls374.7g + r44+r45+r47+r48+r50+r56+r57+r58+r59 (20k) + r46+r49+r51+r52+r53+r54+r55 (10k) + upc324.3h
 
 	DISCRETE(config, m_discrete, circusc_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
 }

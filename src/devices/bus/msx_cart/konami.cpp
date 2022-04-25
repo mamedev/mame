@@ -3,7 +3,6 @@
 #include "emu.h"
 #include "konami.h"
 
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -149,7 +148,7 @@ void msx_cart_konami_scc_device::device_add_mconfig(machine_config &config)
 {
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
 	SPEAKER(config, "mono").front_center();
-	K051649(config, m_k051649, XTAL(10'738'635)/3/2).add_route(ALL_OUTPUTS, "mono", 0.15);
+	K051649(config, m_k051649, XTAL(10'738'635)/3).add_route(ALL_OUTPUTS, "mono", 0.15);
 }
 
 
@@ -489,9 +488,6 @@ void msx_cart_synthesizer_device::device_add_mconfig(machine_config &config)
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.1); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -563,7 +559,7 @@ void msx_cart_konami_sound_device::device_add_mconfig(machine_config &config)
 {
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
 	SPEAKER(config, "mono").front_center();
-	K051649(config, m_k052539, XTAL(10'738'635)/3/2).add_route(ALL_OUTPUTS, "mono", 0.15);
+	K051649(config, m_k052539, XTAL(10'738'635)/3).add_route(ALL_OUTPUTS, "mono", 0.15);
 }
 
 

@@ -29,9 +29,11 @@ e05a30_device::e05a30_device(const machine_config &mconfig, const char *tag, dev
 	m_write_centronics_perror(*this),
 	m_write_centronics_fault(*this),
 	m_write_centronics_select(*this),
+	m_write_cpu_reset(*this),
+	m_write_ready_led(*this),
 	m_printhead(0),
 	m_pf_stepper(0),
-	m_cr_stepper(0), m_centronics_data(0), m_centronics_busy(0), m_centronics_nack(0), m_centronics_strobe(0), m_centronics_data_latch(0), m_centronics_data_latched(0)
+	m_cr_stepper(0), m_centronics_data(0), m_centronics_busy(0), m_centronics_nack(0), m_centronics_init(1), m_centronics_strobe(0), m_centronics_data_latch(0), m_centronics_data_latched(0)
 {
 }
 
@@ -51,11 +53,14 @@ void e05a30_device::device_start()
 	m_write_centronics_perror.resolve_safe();
 	m_write_centronics_fault.resolve_safe();
 	m_write_centronics_select.resolve_safe();
+	m_write_cpu_reset.resolve_safe();
+	m_write_ready_led.resolve_safe();
 
 	/* register for state saving */
 	save_item(NAME(m_printhead));
 	save_item(NAME(m_pf_stepper));
 	save_item(NAME(m_cr_stepper));
+	save_item(NAME(m_c000_shift_register));
 }
 
 //-------------------------------------------------
@@ -71,6 +76,7 @@ void e05a30_device::device_reset()
 	/* centronics init */
 	m_centronics_nack = false;
 	m_centronics_busy = false;
+	m_write_ready_led(get_ready_led());
 	m_write_centronics_ack   (!m_centronics_nack);
 	m_write_centronics_busy  ( m_centronics_busy);
 	m_write_centronics_perror(false);
@@ -151,10 +157,23 @@ WRITE_LINE_MEMBER( e05a30_device::centronics_input_strobe )
 
 		m_centronics_data_latched = true;
 		m_centronics_busy         = true;
+		m_write_ready_led(get_ready_led());
 		m_write_centronics_busy(m_centronics_busy);
 	}
 
 	m_centronics_strobe = state;
+}
+
+
+WRITE_LINE_MEMBER( e05a30_device::centronics_input_init )
+{
+	if (m_centronics_init == 1 && state == 0) // when init goes low, do a reset cycle
+	{
+		m_write_cpu_reset(0);
+		m_write_cpu_reset(1);
+		device_reset(); // this will trigger an NMI after 0.9 seconds
+	}
+	m_centronics_init = state;
 }
 
 
@@ -167,16 +186,36 @@ void e05a30_device::write(offs_t offset, uint8_t data)
 	LOG("%s: e05a30_w([0xC0%02x]): %02x\n", machine().describe_context(), offset, data);
 
 	switch (offset) {
+		/* The documentation on the e05a30 in the LX-810/850 Technical Manual
+		 * is incomplete. There are instances of writing 0 to c000, so it is a guess
+		 * that writing to c000 will clear the shift register. */
+	case 0x00:
+		m_c000_shift_register = 0;
+		break;
+		/* A similar Epson Gate Array, the e05a03 has a 24 bit shift
+		 * register documented in the LX-800 Technical Manual (p.48).
+		 * It is a guess that c001,c002, and c003 are the high, middle, and low bytes
+		 * of a 24 bit shift register. */
+	case 0x01:
+	case 0x02:
+	case 0x03:
+		m_c000_shift_register &= ~(uint32_t (0xff) << ((3-offset)*8));
+		m_c000_shift_register |=  (uint32_t (data) << ((3-offset)*8));
+		break;
 	case 0x04:
 		m_centronics_nack = BIT(data,5);
 		m_centronics_busy = BIT(data,0);
+		m_write_ready_led(get_ready_led());
 		/* The ActionPrinter 2000 firmware might overwrite the busy signal at
 		 * address 20AB if the host depends only on the busy signal and
 		 * doesn't wait for the ack pulse. To avoid skipping input data, we
 		 * assume the busy signal cannot be reset while the data hasn't been
 		 * read. */
 		if (m_centronics_data_latched)
+		{
 			m_centronics_busy = true;
+			m_write_ready_led(get_ready_led());
+		}
 		m_write_centronics_ack (!m_centronics_nack);
 		m_write_centronics_busy( m_centronics_busy);
 		break;
@@ -197,6 +236,12 @@ uint8_t e05a30_device::read(offs_t offset)
 	LOG("%s: e05a30_r([0xC0%02x]): ", machine().describe_context(), offset);
 
 	switch (offset) {
+	case 0x00:
+		result = BIT(m_c000_shift_register, 23) << 7;
+		if (!machine().side_effects_disabled()) {
+			m_c000_shift_register = (m_c000_shift_register << 1) & 0xffffff;
+		}
+		break;
 	case 0x02:
 		result = m_centronics_data_latched << 7;
 		break;

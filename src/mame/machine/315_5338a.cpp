@@ -57,6 +57,7 @@ void sega_315_5338a_device::device_start()
 	save_item(NAME(m_port_config));
 	save_item(NAME(m_serial_output));
 	save_item(NAME(m_address));
+	save_item(NAME(m_cmd));
 }
 
 
@@ -88,6 +89,9 @@ uint8_t sega_315_5338a_device::read(offs_t offset)
 
 	// serial data read back?
 	case 0x0a: data = m_serial_output; break;
+
+	// command read back?
+	case 0x0b: data = m_cmd; break;
 
 	// serial data input
 	case 0x0c: data = m_read_cb(m_address); break;
@@ -122,8 +126,10 @@ void sega_315_5338a_device::write(offs_t offset, uint8_t data)
 	case 0x05:
 	case 0x06:
 		m_port_value[offset] = data;
-		if (BIT(m_port_config, offset) == 0)
-			m_out_port_cb[offset](data);
+
+		// always output, even if set to input?
+		// needed for bingoct sound
+		m_out_port_cb[offset](data);
 		break;
 
 	// port direction register (0 = output, 1 = input)
@@ -141,6 +147,7 @@ void sega_315_5338a_device::write(offs_t offset, uint8_t data)
 
 	// command register
 	case 0x09:
+		m_cmd = data;
 		switch (data)
 		{
 		case 0x00:
@@ -152,11 +159,22 @@ void sega_315_5338a_device::write(offs_t offset, uint8_t data)
 		case 0x07:
 			m_write_cb(m_address, m_serial_output, 0xff);
 			break;
+		case 0x70:
+		case 0x71:
+		case 0x72:
+		case 0x73:
+		case 0x74:
+		case 0x75:
+		case 0x76:
+		case 0x77:
+			m_write_cb(data & 0x07, m_serial_output, 0xff);
+			break;
 		case 0x87:
 			// sent after setting up the address and when wanting to receive serial data
 			break;
 		default:
 			logerror("Unknown command: %02x\n", data);
+			break;
 		}
 		break;
 

@@ -35,11 +35,9 @@ TODO:
 
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
-#include "sound/3812intf.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
-#include "rendlay.h"
+#include "sound/ymopl.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -144,7 +142,7 @@ void nbmj8688_state::bikkuri_map(address_map &map)
 	map(0xf800, 0xffff).rom();
 }
 
-READ8_MEMBER(nbmj8688_state::ff_r)
+uint8_t nbmj8688_state::ff_r()
 {
 	/* possibly because of a bug, reads from port 0xd0 must return 0xff
 	   otherwise apparel doesn't clear the background when you insert a coin */
@@ -187,7 +185,7 @@ void nbmj8688_state::bikkuri_io_map(address_map &map)
 	map(0xe0, 0xe0).w(FUNC(nbmj8688_state::secolove_romsel_w));
 }
 
-WRITE8_MEMBER(nbmj8688_state::barline_output_w)
+void nbmj8688_state::barline_output_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x80);
 	machine().bookkeeping().coin_counter_w(0, data & 0x02);
@@ -2579,9 +2577,6 @@ void nbmj8688_state::NBMJDRV_4096(machine_config &config)
 	psg.add_route(ALL_OUTPUTS, "speaker", 0.35);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void nbmj8688_state::NBMJDRV_256(machine_config &config)
@@ -2692,7 +2687,6 @@ void nbmj8688_state::barline(machine_config &config)
 	YM3812(config.replace(), "psg", 20000000/8).add_route(ALL_OUTPUTS, "speaker", 0.35);
 
 	config.device_remove("dac");
-	config.device_remove("vref");
 }
 
 void nbmj8688_state::mbmj_p16bit(machine_config &config)
@@ -2767,9 +2761,6 @@ void nbmj8688_state::mbmj_p16bit_LCD(machine_config &config)
 	psg.add_route(ALL_OUTPUTS, "speaker", 0.35);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void nbmj8688_state::bijokkoy(machine_config &config)

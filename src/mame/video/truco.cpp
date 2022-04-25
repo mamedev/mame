@@ -2,7 +2,7 @@
 // copyright-holders:Ernesto Corvi, Roberto Fresca
 /***************************************************************************
 
-  video.c
+  Truco-Tron
 
   Functions to emulate the video hardware of the machine.
 
@@ -28,7 +28,7 @@ void truco_state::truco_palette(palette_device &palette) const
 			b >>= 1;
 		}
 
-		palette.set_pen_color(i,rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -42,7 +42,7 @@ uint32_t truco_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 		{
 			int const pixel = (videoram[x >> 1] >> ((x & 1) ? 0 : 4)) & 0x0f;
 
-			bitmap.pix32(y, x) = m_palette->pen(pixel);
+			bitmap.pix(y, x) = m_palette->pen(pixel);
 		}
 
 		videoram += 0x80;

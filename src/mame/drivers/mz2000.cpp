@@ -31,7 +31,7 @@
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/2d_dsk.h"
@@ -79,7 +79,7 @@ public:
 	void mz80b(machine_config &config);
 
 private:
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	required_device<cassette_image_device> m_cass;
 
@@ -183,8 +183,8 @@ uint32_t mz2000_state::screen_update_mz2000(screen_device &screen, bitmap_ind16 
 				pen |= ((gvram[count+0xc000] >> (xi)) & 1) ? 4 : 0; //G
 				pen &= m_gvram_mask;
 
-				bitmap.pix16(y*2+0, x+xi) = m_palette->pen(pen);
-				bitmap.pix16(y*2+1, x+xi) = m_palette->pen(pen);
+				bitmap.pix(y*2+0, x+xi) = m_palette->pen(pen);
+				bitmap.pix(y*2+1, x+xi) = m_palette->pen(pen);
 			}
 			count++;
 		}
@@ -224,27 +224,27 @@ uint32_t mz2000_state::screen_update_mz2000(screen_device &screen, bitmap_ind16 
 						{
 							if(m_width80 == 0)
 							{
-								bitmap.pix16(res_y, res_x*2+0) = m_palette->pen(pen);
-								bitmap.pix16(res_y, res_x*2+1) = m_palette->pen(pen);
+								bitmap.pix(res_y, res_x*2+0) = m_palette->pen(pen);
+								bitmap.pix(res_y, res_x*2+1) = m_palette->pen(pen);
 							}
 							else
 							{
-								bitmap.pix16(res_y, res_x) = m_palette->pen(pen);
+								bitmap.pix(res_y, res_x) = m_palette->pen(pen);
 							}
 						}
 						else
 						{
 							if(m_width80 == 0)
 							{
-								bitmap.pix16(res_y*2+0, res_x*2+0) = m_palette->pen(pen);
-								bitmap.pix16(res_y*2+0, res_x*2+1) = m_palette->pen(pen);
-								bitmap.pix16(res_y*2+1, res_x*2+0) = m_palette->pen(pen);
-								bitmap.pix16(res_y*2+1, res_x*2+1) = m_palette->pen(pen);
+								bitmap.pix(res_y*2+0, res_x*2+0) = m_palette->pen(pen);
+								bitmap.pix(res_y*2+0, res_x*2+1) = m_palette->pen(pen);
+								bitmap.pix(res_y*2+1, res_x*2+0) = m_palette->pen(pen);
+								bitmap.pix(res_y*2+1, res_x*2+1) = m_palette->pen(pen);
 							}
 							else
 							{
-								bitmap.pix16(res_y*2+0, res_x) = m_palette->pen(pen);
-								bitmap.pix16(res_y*2+1, res_x) = m_palette->pen(pen);
+								bitmap.pix(res_y*2+0, res_x) = m_palette->pen(pen);
+								bitmap.pix(res_y*2+1, res_x) = m_palette->pen(pen);
 							}
 						}
 					}
@@ -865,9 +865,11 @@ uint8_t mz2000_state::mz2000_pio1_porta_r()
 }
 
 
-FLOPPY_FORMATS_MEMBER( mz2000_state::floppy_formats )
-	FLOPPY_2D_FORMAT
-FLOPPY_FORMATS_END
+void mz2000_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_2D_FORMAT);
+}
 
 static void mz2000_floppies(device_slot_interface &device)
 {
@@ -884,7 +886,7 @@ void mz2000_state::mz2000(machine_config &config)
 
 	i8255_device &ppi(I8255(config, "i8255_0"));
 	ppi.in_pa_callback().set(FUNC(mz2000_state::mz2000_porta_r));
-	ppi.out_pa_callback().set(FUNC(mz2000_state::mz2000_porta_w));;
+	ppi.out_pa_callback().set(FUNC(mz2000_state::mz2000_porta_w));
 	ppi.in_pb_callback().set(FUNC(mz2000_state::mz2000_portb_r));
 	ppi.out_pb_callback().set(FUNC(mz2000_state::mz2000_portb_w));
 	ppi.in_pc_callback().set(FUNC(mz2000_state::mz2000_portc_r));
@@ -951,8 +953,6 @@ ROM_START( mz80b )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x10000, "wram", ROMREGION_ERASE00 )
-	//ROM_LOAD( "vosque2000.mzt",0x0000, 0x80, CRC(1) SHA1(1))
-	//ROM_CONTINUE( 0x0000, 0x7f80 )
 
 	ROM_REGION( 0x1000, "tvram", ROMREGION_ERASE00 )
 
@@ -969,8 +969,6 @@ ROM_START( mz2000 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x10000, "wram", ROMREGION_ERASE00 )
-	//ROM_LOAD( "vosque2000.mzt",0x0000, 0x80, CRC(1) SHA1(1))
-	//ROM_CONTINUE( 0x0000, 0x7f80 )
 
 	ROM_REGION( 0x1000, "tvram", ROMREGION_ERASE00 )
 
@@ -990,8 +988,6 @@ ROM_START( mz2200 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x10000, "wram", ROMREGION_ERASE00 )
-	//ROM_LOAD( "vosque2000.mzt",0x0000, 0x80, CRC(1) SHA1(1))
-	//ROM_CONTINUE( 0x0000, 0x7f80 )
 
 	ROM_REGION( 0x1000, "tvram", ROMREGION_ERASE00 )
 

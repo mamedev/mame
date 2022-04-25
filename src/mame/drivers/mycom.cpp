@@ -82,6 +82,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_rom(*this, "maincpu")
 		, m_ram(*this, "mainram")
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
 		, m_ppi0(*this, "ppi8255_0")
 		, m_ppi1(*this, "ppi8255_1")
 		, m_ppi2(*this, "ppi8255_2")
@@ -116,17 +118,18 @@ private:
 	void mycom_map(address_map &map);
 
 	std::unique_ptr<u8[]> m_vram;
-	u8 m_port0a;
-	u8 m_keyb_press;
-	u8 m_sn_we;
-	u16 m_i_videoram;
-	bool m_keyb_press_flag;
-	bool m_upper_sw, m_lower_sw;
+	u8 m_port0a = 0U;
+	u8 m_keyb_press = 0U;
+	u8 m_sn_we = 0U;
+	u16 m_i_videoram = 0U;
+	bool m_keyb_press_flag = 0;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;
+	required_memory_bank    m_bank1;
+	required_memory_bank    m_bank2;
 	required_device<i8255_device> m_ppi0;
 	required_device<i8255_device> m_ppi1;
 	required_device<i8255_device> m_ppi2;
@@ -145,20 +148,17 @@ private:
 
 MC6845_UPDATE_ROW( mycom_state::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	u8 chr,gfx=0,z;
-	u16 mem,x;
-	u32 *p = &bitmap.pix32(y);
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	u32 *p = &bitmap.pix(y);
 
 	if (m_port0a & 0x40)
 	{
-		for (x = 0; x < x_count; x++)                   // lores pixels
+		for (u16 x = 0; x < x_count; x++)                   // lores pixels
 		{
-			u8 dbit=1;
-			if (x == cursor_x) dbit=0;
-			mem = (ma + x) & 0x7ff;
-			chr = m_vram[mem];
-			z = ra / 3;
+			u8 dbit = (x == cursor_x) ? 0 : 1;
+			u16 mem = (ma + x) & 0x7ff;
+			u8 chr = m_vram[mem];
+			u8 z = ra / 3;
 			*p++ = palette[BIT( chr, z ) ? dbit: dbit^1];
 			*p++ = palette[BIT( chr, z ) ? dbit: dbit^1];
 			*p++ = palette[BIT( chr, z ) ? dbit: dbit^1];
@@ -172,16 +172,16 @@ MC6845_UPDATE_ROW( mycom_state::crtc_update_row )
 	}
 	else
 	{
-		for (x = 0; x < x_count; x++)                   // text
+		for (u16 x = 0; x < x_count; x++)                   // text
 		{
-			u8 inv=0;
-			if (x == cursor_x) inv=0xff;
-			mem = (ma + x) & 0x7ff;
+			u8 inv = (x == cursor_x) ? 0xff : 0;
+			u16 mem = (ma + x) & 0x7ff;
+			u8 gfx;
 			if (ra > 7)
 				gfx = inv;  // some blank spacing lines
 			else
 			{
-				chr = m_vram[mem];
+				u8 chr = m_vram[mem];
 				gfx = m_p_chargen[(chr<<3) | ra] ^ inv;
 			}
 
@@ -202,10 +202,10 @@ void mycom_state::port00_w(u8 data)
 {
 	switch(data)
 	{
-		case 0x00: m_lower_sw = 1; break;   // rom
-		case 0x01: m_lower_sw = 0; break;   // ram
-		case 0x02: m_upper_sw = 1; break;   // rom
-		case 0x03: m_upper_sw = 0; break;   // ram
+		case 0x00: m_bank1->set_entry(1); break;   // rom
+		case 0x01: m_bank1->set_entry(0); break;   // ram
+		case 0x02: m_bank2->set_entry(1); break;   // rom
+		case 0x03: m_bank2->set_entry(0); break;   // ram
 	}
 }
 
@@ -223,8 +223,8 @@ void mycom_state::mycom_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xffff).ram().share("mainram");
-	map(0x0000, 0x0fff).lr8(NAME([this] (offs_t offset) { if(m_lower_sw) return m_rom[offset]; else return m_ram[offset]; }));
-	map(0xc000, 0xffff).lr8(NAME([this] (offs_t offset) { if(m_upper_sw) return m_rom[offset]; else return m_ram[offset | 0xc000]; }));
+	map(0x0000, 0x0fff).bankr("bank1");
+	map(0xc000, 0xffff).bankr("bank2");
 }
 
 void mycom_state::mycom_io(address_map &map)
@@ -492,19 +492,21 @@ void mycom_state::machine_start()
 {
 	m_vram = make_unique_clear<u8[]>(0x0800);
 	save_pointer(NAME(m_vram), 0x0800);
+	m_bank1->configure_entry(0, m_ram);
+	m_bank1->configure_entry(1, m_rom);
+	m_bank2->configure_entry(0, m_ram+0xc000);
+	m_bank2->configure_entry(1, m_rom);
 	save_item(NAME(m_port0a));
 	save_item(NAME(m_i_videoram));
 	save_item(NAME(m_keyb_press));
 	save_item(NAME(m_keyb_press_flag));
 	save_item(NAME(m_sn_we));
-	save_item(NAME(m_upper_sw));
-	save_item(NAME(m_lower_sw));
 }
 
 void mycom_state::machine_reset()
 {
-	m_lower_sw = 1;
-	m_upper_sw = 1;
+	m_bank1->set_entry(1);
+	m_bank2->set_entry(1);
 	m_port0a = 0;
 }
 
@@ -558,8 +560,8 @@ void mycom_state::mycom(machine_config &config)
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	FD1771(config, m_fdc, 16_MHz_XTAL / 16);
-	FLOPPY_CONNECTOR(config, "fdc:0", mycom_floppies, "525sd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", mycom_floppies, "525sd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", mycom_floppies, "525sd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", mycom_floppies, "525sd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	TIMER(config, "keyboard_timer").configure_periodic(FUNC(mycom_state::mycom_kbd), attotime::from_hz(20));
 }

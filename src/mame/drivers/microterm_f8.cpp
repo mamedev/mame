@@ -78,13 +78,13 @@ private:
 	required_ioport_array<3> m_dsw;
 	required_ioport m_jumpers;
 
-	u8 m_port00;
-	u8 m_keylatch;
-	u8 m_attrlatch;
-	u8 m_scroll;
+	u8 m_port00 = 0;
+	u8 m_keylatch = 0;
+	u8 m_attrlatch = 0;
+	u8 m_scroll = 0;
 	std::unique_ptr<u16[]> m_vram;
 
-	emu_timer *m_baud_clock;
+	emu_timer *m_baud_clock = nullptr;
 };
 
 void microterm_f8_state::machine_start()
@@ -162,7 +162,7 @@ u32 microterm_f8_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 			bool dot = (!BIT(ch, 8) && allow_underline) || ((BIT(ch, 10) || blink_on) && BIT(chdata, 8 - (x % 9)));
 			if ((BIT(ch, 7) && cursor_on) == BIT(ch, 9))
 				dot = !dot;
-			bitmap.pix32(y, x) = dot ? rgb_t::white() : rgb_t::black();
+			bitmap.pix(y, x) = dot ? rgb_t::white() : rgb_t::black();
 		}
 
 		y++;

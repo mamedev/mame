@@ -8,6 +8,7 @@
 #include "cpu/rsp/rsp.h"
 #include "cpu/mips/mips3.h"
 #include "sound/dmadac.h"
+#include "video/n64.h"
 
 /*----------- driver state -----------*/
 
@@ -38,11 +39,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_n64);
 
 	// Getters
-	n64_rdp* rdp() { return m_rdp; }
+	n64_rdp* rdp() { return m_rdp.get(); }
 	uint32_t* rdram() { return m_rdram; }
 	uint32_t* sram() { return m_sram; }
-	uint32_t* rsp_imem() { return m_rsp_imem; }
-	uint32_t* rsp_dmem() { return m_rsp_dmem; }
 
 protected:
 	required_device<mips3_device> m_vr4300;
@@ -56,7 +55,7 @@ protected:
 	required_device<n64_periphs> m_rcp_periphs;
 
 	/* video-related */
-	n64_rdp *m_rdp;
+	std::unique_ptr<n64_rdp> m_rdp;
 };
 
 /*----------- devices -----------*/
@@ -65,9 +64,9 @@ protected:
 
 struct n64_savable_data_t
 {
-	uint8_t sram[0x20000];
-	uint8_t eeprom[2048];
-	uint8_t mempak[2][0x8000];
+	uint8_t sram[0x20000]{};
+	uint8_t eeprom[2048]{};
+	uint8_t mempak[2][0x8000]{};
 };
 
 class n64_periphs : public device_t,
@@ -76,36 +75,36 @@ class n64_periphs : public device_t,
 private:
 	struct AUDIO_DMA
 	{
-		uint32_t address;
-		uint32_t length;
+		uint32_t address = 0;
+		uint32_t length = 0;
 	};
 
 public:
 	// construction/destruction
 	n64_periphs(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ32_MEMBER( is64_r );
-	DECLARE_WRITE32_MEMBER( is64_w );
-	DECLARE_READ32_MEMBER( open_r );
-	DECLARE_WRITE32_MEMBER( open_w );
-	DECLARE_READ32_MEMBER( rdram_reg_r );
-	DECLARE_WRITE32_MEMBER( rdram_reg_w );
-	DECLARE_READ32_MEMBER( mi_reg_r );
-	DECLARE_WRITE32_MEMBER( mi_reg_w );
-	DECLARE_READ32_MEMBER( vi_reg_r );
-	DECLARE_WRITE32_MEMBER( vi_reg_w );
-	DECLARE_READ32_MEMBER( ai_reg_r );
-	DECLARE_WRITE32_MEMBER( ai_reg_w );
-	DECLARE_READ32_MEMBER( pi_reg_r );
-	DECLARE_WRITE32_MEMBER( pi_reg_w );
-	DECLARE_READ32_MEMBER( ri_reg_r );
-	DECLARE_WRITE32_MEMBER( ri_reg_w );
-	DECLARE_READ32_MEMBER( si_reg_r );
-	DECLARE_WRITE32_MEMBER( si_reg_w );
-	DECLARE_READ32_MEMBER( dd_reg_r );
-	DECLARE_WRITE32_MEMBER( dd_reg_w );
-	DECLARE_READ32_MEMBER( pif_ram_r );
-	DECLARE_WRITE32_MEMBER( pif_ram_w );
+	uint32_t is64_r(offs_t offset);
+	void is64_w(offs_t offset, uint32_t data);
+	uint32_t open_r(offs_t offset);
+	void open_w(uint32_t data);
+	uint32_t rdram_reg_r(offs_t offset, uint32_t mem_mask = ~0);
+	void rdram_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t mi_reg_r(offs_t offset, uint32_t mem_mask = ~0);
+	void mi_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t vi_reg_r(offs_t offset, uint32_t mem_mask = ~0);
+	void vi_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t ai_reg_r(offs_t offset, uint32_t mem_mask = ~0);
+	void ai_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t pi_reg_r(offs_t offset, uint32_t mem_mask = ~0);
+	void pi_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t ri_reg_r(offs_t offset, uint32_t mem_mask = ~0);
+	void ri_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t si_reg_r(offs_t offset);
+	void si_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t dd_reg_r(offs_t offset);
+	void dd_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t pif_ram_r(offs_t offset, uint32_t mem_mask = ~0);
+	void pif_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	TIMER_CALLBACK_MEMBER(reset_timer_callback);
 	TIMER_CALLBACK_MEMBER(vi_scanline_callback);
 	TIMER_CALLBACK_MEMBER(dp_delay_callback);
@@ -128,40 +127,40 @@ public:
 	void video_update(bitmap_rgb32 &bitmap);
 
 	// Video Interface (VI) registers
-	uint32_t vi_width;
-	uint32_t vi_origin;
-	uint32_t vi_control;
-	uint32_t vi_blank;
-	uint32_t vi_hstart;
-	uint32_t vi_vstart;
-	uint32_t vi_xscale;
-	uint32_t vi_yscale;
-	uint32_t vi_burst;
-	uint32_t vi_vsync;
-	uint32_t vi_hsync;
-	uint32_t vi_leap;
-	uint32_t vi_intr;
-	uint32_t vi_vburst;
-	uint8_t field;
+	uint32_t vi_width = 0;
+	uint32_t vi_origin = 0;
+	uint32_t vi_control = 0;
+	uint32_t vi_blank = 0;
+	uint32_t vi_hstart = 0;
+	uint32_t vi_vstart = 0;
+	uint32_t vi_xscale = 0;
+	uint32_t vi_yscale = 0;
+	uint32_t vi_burst = 0;
+	uint32_t vi_vsync = 0;
+	uint32_t vi_hsync = 0;
+	uint32_t vi_leap = 0;
+	uint32_t vi_intr = 0;
+	uint32_t vi_vburst = 0;
+	uint8_t field = 0;
 
-	/* nvram-specific for MESS */
-	device_t *m_nvram_image;
+	// nvram-specific for the console
+	device_t *m_nvram_image = nullptr;
 
 	n64_savable_data_t m_save_data;
 
-	uint32_t cart_length;
+	uint32_t cart_length = 0;
 
-	bool dd_present;
-	bool disk_present;
-	bool cart_present;
+	bool dd_present = false;
+	bool disk_present = false;
+	bool cart_present = false;
 
 	// Mouse X2/Y2 for delta position
-	int mouse_x2[4];
-	int mouse_y2[4];
+	int mouse_x2[4]{};
+	int mouse_y2[4]{};
 
 	void poll_reset_button(bool button);
 
-	uint32_t dp_clock;
+	uint32_t dp_clock = 0;
 
 protected:
 	// device-level overrides
@@ -169,68 +168,70 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	n64_state* m_n64;
-	address_space *m_mem_map;
+	n64_state* m_n64 = nullptr;
+	address_space *m_mem_map = nullptr;
 	required_device<mips3_device> m_vr4300;
 	required_device<rsp_device> m_rsp;
+	required_shared_ptr<uint32_t> m_rsp_imem;
+	required_shared_ptr<uint32_t> m_rsp_dmem;
 
-	uint32_t *m_rdram;
-	uint32_t *m_sram;
-	uint32_t *m_rsp_imem;
-	uint32_t *m_rsp_dmem;
+	uint32_t *m_rdram = nullptr;
+	uint32_t *m_sram = nullptr;
 
 	void clear_rcp_interrupt(int interrupt);
 
-	bool reset_held;
-	emu_timer *reset_timer;
-	emu_timer *dp_delay_timer;
+	bool reset_held = false;
+	emu_timer *reset_timer = nullptr;
+	emu_timer *dp_delay_timer = nullptr;
 
-	uint8_t is64_buffer[0x10000];
+	uint8_t is64_buffer[0x10000]{};
 
 	// Video interface (VI) registers and functions
-	emu_timer *vi_scanline_timer;
+	emu_timer *vi_scanline_timer = nullptr;
 
 	// Audio Interface (AI) registers and functions
 	void ai_dma();
 	AUDIO_DMA *ai_fifo_get_top();
 	void ai_fifo_push(uint32_t address, uint32_t length);
 	void ai_fifo_pop();
-	bool ai_delayed_carry;
+	bool ai_delayed_carry = false;
 
 	required_device_array<dmadac_sound_device, 2> ai_dac;
-	uint32_t ai_dram_addr;
-	uint32_t ai_len;
-	uint32_t ai_control;
-	int ai_dacrate;
-	int ai_bitrate;
-	uint32_t ai_status;
+	uint32_t ai_dram_addr = 0;
+	uint32_t ai_len = 0;
+	uint32_t ai_control = 0;
+	int ai_dacrate = 0;
+	int ai_bitrate = 0;
+	uint32_t ai_status = 0;
 
-	emu_timer *ai_timer;
+	emu_timer *ai_timer = nullptr;
 
-	AUDIO_DMA ai_fifo[AUDIO_DMA_DEPTH];
-	int ai_fifo_wpos;
-	int ai_fifo_rpos;
-	int ai_fifo_num;
+	AUDIO_DMA ai_fifo[AUDIO_DMA_DEPTH]{};
+	int ai_fifo_wpos = 0;
+	int ai_fifo_rpos = 0;
+	int ai_fifo_num = 0;
 
 	// Memory Interface (MI) registers
-	uint32_t mi_version;
-	uint32_t mi_interrupt;
-	uint32_t mi_intr_mask;
-	uint32_t mi_mode;
+	uint32_t mi_version = 0;
+	uint32_t mi_interrupt = 0;
+	uint32_t mi_intr_mask = 0;
+	uint32_t mi_mode = 0;
 
 	// RDRAM Interface (RI) registers
-	uint32_t rdram_regs[10];
-	uint32_t ri_regs[8];
+	uint32_t rdram_regs[10]{};
+	uint32_t ri_regs[8]{};
 
 	// RSP Interface (SP) registers
 	void sp_dma(int direction);
 
-	uint32_t sp_mem_addr;
-	uint32_t sp_dram_addr;
-	int sp_dma_length;
-	int sp_dma_count;
-	int sp_dma_skip;
-	uint32_t sp_semaphore;
+	uint32_t sp_mem_addr = 0;
+	uint32_t sp_dram_addr = 0;
+	uint32_t sp_mem_addr_start = 0;
+	uint32_t sp_dram_addr_start = 0;
+	int sp_dma_length = 0;
+	int sp_dma_count = 0;
+	int sp_dma_skip = 0;
+	uint32_t sp_semaphore = 0;
 
 	// Disk Drive (DD) registers and functions
 	void dd_set_zone_and_track_offset();
@@ -238,62 +239,62 @@ private:
 	void dd_write_sector();
 	void dd_read_sector();
 	void dd_read_C2();
-	uint32_t dd_buffer[256];
-	uint32_t dd_sector_data[64];
-	uint32_t dd_ram_seq_data[16];
-	uint32_t dd_data_reg;
-	uint32_t dd_status_reg;
-	uint32_t dd_track_reg;
-	uint32_t dd_buf_status_reg;
-	uint32_t dd_sector_err_reg;
-	uint32_t dd_seq_status_reg;
-	uint32_t dd_seq_ctrl_reg;
-	uint32_t dd_sector_reg;
-	uint32_t dd_reset_reg;
-	uint32_t dd_current_reg;
-	bool dd_bm_reset_held;
-	bool dd_write;
-	uint8_t dd_int;
-	uint8_t dd_start_block;
-	uint8_t dd_start_sector;
-	uint8_t dd_sectors_per_block;
-	uint8_t dd_sector_size;
-	uint8_t dd_zone;
-	uint32_t dd_track_offset;
+	uint32_t dd_buffer[256]{};
+	uint32_t dd_sector_data[64]{};
+	uint32_t dd_ram_seq_data[16]{};
+	uint32_t dd_data_reg = 0;
+	uint32_t dd_status_reg = 0;
+	uint32_t dd_track_reg = 0;
+	uint32_t dd_buf_status_reg = 0;
+	uint32_t dd_sector_err_reg = 0;
+	uint32_t dd_seq_status_reg = 0;
+	uint32_t dd_seq_ctrl_reg = 0;
+	uint32_t dd_sector_reg = 0;
+	uint32_t dd_reset_reg = 0;
+	uint32_t dd_current_reg = 0;
+	bool dd_bm_reset_held = false;
+	bool dd_write = 0;
+	uint8_t dd_int = 0;
+	uint8_t dd_start_block = 0;
+	uint8_t dd_start_sector = 0;
+	uint8_t dd_sectors_per_block = 0;
+	uint8_t dd_sector_size = 0;
+	uint8_t dd_zone = 0;
+	uint32_t dd_track_offset = 0;
 
 	// Peripheral Interface (PI) registers and functions
-	emu_timer *pi_dma_timer;
-	uint32_t pi_dram_addr;
-	uint32_t pi_cart_addr;
-	uint32_t pi_rd_len;
-	uint32_t pi_wr_len;
-	uint32_t pi_status;
-	uint32_t pi_bsd_dom1_lat;
-	uint32_t pi_bsd_dom1_pwd;
-	uint32_t pi_bsd_dom1_pgs;
-	uint32_t pi_bsd_dom1_rls;
-	uint32_t pi_bsd_dom2_lat;
-	uint32_t pi_bsd_dom2_pwd;
-	uint32_t pi_bsd_dom2_pgs;
-	uint32_t pi_bsd_dom2_rls;
-	uint32_t pi_dma_dir;
+	emu_timer *pi_dma_timer = nullptr;
+	uint32_t pi_dram_addr = 0;
+	uint32_t pi_cart_addr = 0;
+	uint32_t pi_rd_len = 0;
+	uint32_t pi_wr_len = 0;
+	uint32_t pi_status = 0;
+	uint32_t pi_bsd_dom1_lat = 0;
+	uint32_t pi_bsd_dom1_pwd = 0;
+	uint32_t pi_bsd_dom1_pgs = 0;
+	uint32_t pi_bsd_dom1_rls = 0;
+	uint32_t pi_bsd_dom2_lat = 0;
+	uint32_t pi_bsd_dom2_pwd = 0;
+	uint32_t pi_bsd_dom2_pgs = 0;
+	uint32_t pi_bsd_dom2_rls = 0;
+	uint32_t pi_dma_dir = 0;
 
 	// Serial Interface (SI) registers and functions
-	emu_timer *si_dma_timer;
+	emu_timer *si_dma_timer = nullptr;
 	void pif_dma(int direction);
 	void handle_pif();
 	int pif_channel_handle_command(int channel, int slength, uint8_t *sdata, int rlength, uint8_t *rdata);
 	uint8_t calc_mempak_crc(uint8_t *buffer, int length);
-	uint8_t pif_ram[0x40];
-	uint8_t pif_cmd[0x40];
-	uint32_t si_dram_addr;
-	uint32_t si_pif_addr;
-	uint32_t si_pif_addr_rd64b;
-	uint32_t si_pif_addr_wr64b;
-	uint32_t si_status_val;
-	uint32_t si_dma_dir;
-	uint32_t cic_status;
-	int cic_type;
+	uint8_t pif_ram[0x40]{};
+	uint8_t pif_cmd[0x40]{};
+	uint32_t si_dram_addr = 0;
+	uint32_t si_pif_addr = 0;
+	uint32_t si_pif_addr_rd64b = 0;
+	uint32_t si_pif_addr_wr64b = 0;
+	uint32_t si_status_val = 0;
+	uint32_t si_dma_dir = 0;
+	uint32_t cic_status = 0;
+	int cic_type = 0;
 
 	n64_savable_data_t savable_data;
 
@@ -301,11 +302,11 @@ private:
 	void vi_recalculate_resolution();
 	void video_update16(bitmap_rgb32 &bitmap);
 	void video_update32(bitmap_rgb32 &bitmap);
-	uint8_t random_seed;        // %HACK%, adds 19 each time it's read and is more or less random
+	uint8_t random_seed = 0x55;        // %HACK%, adds 19 each time it's read and is more or less random
 	uint8_t get_random() { return random_seed += 0x13; }
 
-	int32_t m_gamma_table[256];
-	int32_t m_gamma_dither_table[0x4000];
+	int32_t m_gamma_table[256]{};
+	int32_t m_gamma_dither_table[0x4000]{};
 
 };
 

@@ -69,7 +69,7 @@ zooming might be wrong
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/vs9209.h"
-#include "sound/2610intf.h"
+#include "sound/ymopn.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -84,7 +84,7 @@ void taotaido_state::machine_start()
 }
 
 
-READ16_MEMBER(taotaido_state::pending_command_r)
+uint16_t taotaido_state::pending_command_r()
 {
 	/* Only bit 0 is tested */
 	return m_soundlatch->pending_r();
@@ -111,7 +111,7 @@ void taotaido_state::main_map(address_map &map)
 	map(0xffff00, 0xffff0f).w(FUNC(taotaido_state::tileregs_w));
 	map(0xffff10, 0xffff11).nopw();                        // unknown
 	map(0xffff20, 0xffff21).nopw();                        // unknown - flip screen related
-	map(0xffff40, 0xffff47).w(FUNC(taotaido_state::spritebank_w)).share("spritebank");
+	map(0xffff40, 0xffff47).w(FUNC(taotaido_state::spritebank_w));
 	map(0xffffc1, 0xffffc1).w(m_soundlatch, FUNC(generic_latch_8_device::write));        // seems right
 	map(0xffffe0, 0xffffe1).r(FUNC(taotaido_state::pending_command_r)); // guess - seems to be needed for all the sounds to work
 }
@@ -119,7 +119,7 @@ void taotaido_state::main_map(address_map &map)
 /* sound cpu - same as aerofgt */
 
 
-WRITE8_MEMBER(taotaido_state::sh_bankswitch_w)
+void taotaido_state::sh_bankswitch_w(uint8_t data)
 {
 	m_soundbank->set_entry(data & 0x03);
 }
@@ -328,22 +328,9 @@ static INPUT_PORTS_START( taotaido6 )
 INPUT_PORTS_END
 
 
-static const gfx_layout layout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4,
-			9*4, 8*4, 11*4, 10*4, 13*4, 12*4, 15*4, 14*4 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-			8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8
-};
-
 static GFXDECODE_START( gfx_taotaido )
-	GFXDECODE_ENTRY( "gfx1", 0, layout,  0x000, 256  ) /* sprites */
-	GFXDECODE_ENTRY( "gfx2", 0, layout,  0x300, 256  ) /* bg tiles */
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_16x16x4_packed_lsb,  0x000, 256  ) /* sprites */
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_16x16x4_packed_lsb,  0x300, 256  ) /* bg tiles */
 GFXDECODE_END
 
 
@@ -417,11 +404,11 @@ ROM_START( taotaido )
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* z80 Code */
 	ROM_LOAD( "3-u113.bin", 0x000000, 0x20000, CRC(a167c4e4) SHA1(d32184e7040935cd440d4d82c66491b710ec87a8) )
 
-	ROM_REGION( 0x100000, "ymsnd.deltat", 0 ) /* sound samples */
-	ROM_LOAD( "u104.bin",     0x000000, 0x100000, CRC(e89387a9) SHA1(1deeee056af367d1a5aa0722dd3d6c68a82d0489) )
-
-	ROM_REGION( 0x200000, "ymsnd", 0 ) /* sound samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* sound samples */
 	ROM_LOAD( "u127.bin",     0x00000, 0x200000, CRC(0cf0cb23) SHA1(a87e7159db2fa0d50446cbf45ec9fbf585b8f396) )
+
+	ROM_REGION( 0x100000, "ymsnd:adpcmb", 0 ) /* sound samples */
+	ROM_LOAD( "u104.bin",     0x000000, 0x100000, CRC(e89387a9) SHA1(1deeee056af367d1a5aa0722dd3d6c68a82d0489) )
 
 	ROM_REGION( 0x600000, "gfx1", 0 ) /* Sprites */
 	ROM_LOAD( "u86.bin", 0x000000, 0x200000, CRC(908e251e) SHA1(5a135787f3263bfb195f8fd1e814c580d840531f) )
@@ -440,11 +427,11 @@ ROM_START( taotaidoa )
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* z80 Code */
 	ROM_LOAD( "3-u113.bin", 0x000000, 0x20000, CRC(a167c4e4) SHA1(d32184e7040935cd440d4d82c66491b710ec87a8) )
 
-	ROM_REGION( 0x100000, "ymsnd.deltat", 0 ) /* sound samples */
-	ROM_LOAD( "u104.bin",     0x000000, 0x100000, CRC(e89387a9) SHA1(1deeee056af367d1a5aa0722dd3d6c68a82d0489) )
-
-	ROM_REGION( 0x200000, "ymsnd", 0 ) /* sound samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* sound samples */
 	ROM_LOAD( "u127.bin",     0x00000, 0x200000, CRC(0cf0cb23) SHA1(a87e7159db2fa0d50446cbf45ec9fbf585b8f396) )
+
+	ROM_REGION( 0x100000, "ymsnd:adpcmb", 0 ) /* sound samples */
+	ROM_LOAD( "u104.bin",     0x000000, 0x100000, CRC(e89387a9) SHA1(1deeee056af367d1a5aa0722dd3d6c68a82d0489) )
 
 	ROM_REGION( 0x600000, "gfx1", 0 ) /* Sprites */
 	ROM_LOAD( "u86.bin", 0x000000, 0x200000, CRC(908e251e) SHA1(5a135787f3263bfb195f8fd1e814c580d840531f) )
@@ -463,11 +450,11 @@ ROM_START( taotaido3 )
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* z80 Code */
 	ROM_LOAD( "3-u113.bin", 0x000000, 0x20000, CRC(a167c4e4) SHA1(d32184e7040935cd440d4d82c66491b710ec87a8) )
 
-	ROM_REGION( 0x100000, "ymsnd.deltat", 0 ) /* sound samples */
-	ROM_LOAD( "u104.bin",     0x000000, 0x100000, CRC(e89387a9) SHA1(1deeee056af367d1a5aa0722dd3d6c68a82d0489) )
-
-	ROM_REGION( 0x200000, "ymsnd", 0 ) /* sound samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* sound samples */
 	ROM_LOAD( "u127.bin",     0x00000, 0x200000, CRC(0cf0cb23) SHA1(a87e7159db2fa0d50446cbf45ec9fbf585b8f396) )
+
+	ROM_REGION( 0x100000, "ymsnd:adpcmb", 0 ) /* sound samples */
+	ROM_LOAD( "u104.bin",     0x000000, 0x100000, CRC(e89387a9) SHA1(1deeee056af367d1a5aa0722dd3d6c68a82d0489) )
 
 	ROM_REGION( 0x600000, "gfx1", 0 ) /* Sprites */
 	ROM_LOAD( "u86.bin", 0x000000, 0x200000, CRC(908e251e) SHA1(5a135787f3263bfb195f8fd1e814c580d840531f) )

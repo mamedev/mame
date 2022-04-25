@@ -82,12 +82,12 @@ private:
 	required_region_ptr<u8> m_chargen;
 	required_shared_ptr_array<u8, 2> m_videoram;
 
-	u8 m_cur_attr;
-	u8 m_last_row_attr;
-	u8 m_row_buffer_char;
-	bool m_font2;
-	bool m_rev_prot;
-	bool m_is_132;
+	u8 m_cur_attr = 0U;
+	u8 m_last_row_attr = 0U;
+	u8 m_row_buffer_char = 0U;
+	bool m_font2 = false;
+	bool m_rev_prot = false;
+	bool m_is_132 = false;
 };
 
 void wy50_state::machine_start()
@@ -158,11 +158,11 @@ SCN2672_DRAW_CHARACTER_MEMBER(wy50_state::draw_character)
 	const rgb_t fg = BIT(m_cur_attr, 0) || (prot && !m_rev_prot) ? rgb_t(0xc0, 0xc0, 0xc0) : rgb_t::white();
 	for (int i = 0; i < 9; i++)
 	{
-		bitmap.pix32(y, x++) = BIT(dots, 9) ? fg : rgb_t::black();
+		bitmap.pix(y, x++) = BIT(dots, 9) ? fg : rgb_t::black();
 		dots <<= 1;
 	}
 	if (!m_is_132)
-		bitmap.pix32(y, x++) = BIT(dots, 9) ? fg : rgb_t::black();
+		bitmap.pix(y, x++) = BIT(dots, 9) ? fg : rgb_t::black();
 }
 
 WRITE_LINE_MEMBER(wy50_state::mbc_attr_clock_w)

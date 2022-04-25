@@ -16,7 +16,6 @@
 
 #pragma once
 
-#include "device.h"
 #include "cpu/pps4/pps4.h"
 
 

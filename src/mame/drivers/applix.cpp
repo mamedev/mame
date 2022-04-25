@@ -47,11 +47,11 @@
 #include "machine/wd_fdc.h"
 #include "machine/z80scc.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/mc6845.h"
 
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/applix_dsk.h"
@@ -109,8 +109,8 @@ public:
 
 private:
 	virtual void machine_reset() override;
-	virtual void video_start() override;
-	u8 applix_inputs_r();
+	virtual void machine_start() override;
+	u16 applix_inputs_r();
 	void palette_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void analog_latch_w(u16 data);
 	void dac_latch_w(u16 data);
@@ -134,7 +134,7 @@ private:
 	u16 fdc_stat_r(offs_t offset);
 	void fdc_data_w(u16 data);
 	void fdc_cmd_w(u16 data);
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 	u8 internal_data_read(offs_t offset);
 	void internal_data_write(offs_t offset, u8 data);
 	u8 p1_read();
@@ -149,35 +149,35 @@ private:
 	MC6845_BEGIN_UPDATE(crtc_update_border);
 	void applix_palette(palette_device &palette) const;
 
-	u8 m_video_latch;
-	u8 m_pa;
-	u8 m_palette_latch[4];
+	u8 m_video_latch = 0U;
+	u8 m_pa = 0U;
+	u8 m_palette_latch[4]{};
 	required_shared_ptr<u16> m_base;
 
-	void applix_mem(address_map &map);
+	void main_mem(address_map &map);
 	void keytronic_pc3270_io(address_map &map);
 	void keytronic_pc3270_program(address_map &map);
-	void subcpu_io(address_map &map);
-	void subcpu_mem(address_map &map);
+	void sub_io(address_map &map);
+	void sub_mem(address_map &map);
 
-	u8 m_pb;
-	u8 m_analog_latch;
-	u8 m_dac_latch;
-	u8 m_port08;
-	u8 m_data_to_fdc;
-	u8 m_data_from_fdc;
-	bool m_data;
-	bool m_data_or_cmd;
-	bool m_buffer_empty;
-	bool m_fdc_cmd;
-	u8 m_clock_count;
-	bool m_cp;
-	u8   m_p1;
-	u8   m_p1_data;
-	u8   m_p2;
-	u8   m_p3;
-	u16  m_last_write_addr;
-	u8 m_cass_data[4];
+	u8 m_pb = 0U;
+	u8 m_analog_latch = 0U;
+	u8 m_dac_latch = 0U;
+	u8 m_port08 = 0U;
+	u8 m_data_to_fdc = 0U;
+	u8 m_data_from_fdc = 0U;
+	bool m_data = 0;
+	bool m_data_or_cmd = 0;
+	bool m_buffer_empty = 0;
+	bool m_fdc_cmd = 0;
+	u8 m_clock_count = 0U;
+	bool m_cp = 0;
+	u8   m_p1 = 0U;
+	u8   m_p1_data = 0U;
+	u8   m_p2 = 0U;
+	u8   m_p3 = 0U;
+	u16  m_last_write_addr = 0U;
+	u8 m_cass_data[4]{};
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<via6522_device> m_via;
@@ -272,7 +272,7 @@ d1   = cassette in
 d2,3 = joystick in
 d4-7 = SW2 dipswitch block
 */
-u8 applix_state::applix_inputs_r()
+u16 applix_state::applix_inputs_r()
 {
 	return m_io_dsw->read() | m_cass_data[2];
 }
@@ -454,7 +454,7 @@ void applix_state::fdc_cmd_w(u16 data)
 	m_data_or_cmd = 1;
 }
 
-void applix_state::applix_mem(address_map &map)
+void applix_state::main_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xffffff);
@@ -463,7 +463,7 @@ void applix_state::applix_mem(address_map &map)
 	map(0x500000, 0x51ffff).rom().region("maincpu", 0);
 	map(0x600000, 0x60007f).w(FUNC(applix_state::palette_w));
 	map(0x600080, 0x6000ff).w(FUNC(applix_state::dac_latch_w));
-	map(0x600100, 0x60017f).w(FUNC(applix_state::video_latch_w)); //video latch (=border colour, high nibble; video base, low nibble) (odd)
+	map(0x600100, 0x60017f).w(FUNC(applix_state::video_latch_w)); //video latch (=border colour, high nybble; video base, low nybble) (odd)
 	map(0x600180, 0x6001ff).w(FUNC(applix_state::analog_latch_w));
 	map(0x700000, 0x700007).mirror(0x78).rw("scc", FUNC(scc8530_device::ab_dc_r), FUNC(scc8530_device::ab_dc_w)).umask16(0xff00).cswidth(16);
 	map(0x700080, 0x7000ff).r(FUNC(applix_state::applix_inputs_r));
@@ -480,14 +480,14 @@ void applix_state::applix_mem(address_map &map)
 	//FFFFC0, FFFFFF  disk controller board
 }
 
-void applix_state::subcpu_mem(address_map &map)
+void applix_state::sub_mem(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x7fff).ram();
 	map(0x8000, 0xffff).bankrw("bank1");
 }
 
-void applix_state::subcpu_io(address_map &map)
+void applix_state::sub_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x07).r(FUNC(applix_state::port00_r)); //PORTR
@@ -517,22 +517,22 @@ void applix_state::keytronic_pc3270_io(address_map &map)
 /* Input ports */
 static INPUT_PORTS_START( applix )
 	PORT_START( "K0f" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_5)                                PORT_CHAR('5')                      /* 06 */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_4)                                PORT_CHAR('4')                      /* 05 */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_T)                                PORT_CHAR('T')                      /* 14 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_R)                                PORT_CHAR('R')                      /* 13 */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_G)                                PORT_CHAR('G')                      /* 22 */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_F)                                PORT_CHAR('F')                      /* 21 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_5)                                PORT_CHAR('5') PORT_CHAR('%')       /* 06 */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_4)                                PORT_CHAR('4') PORT_CHAR('$')       /* 05 */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_T)                                PORT_CHAR('t') PORT_CHAR('T')       /* 14 */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_R)                                PORT_CHAR('r') PORT_CHAR('R')       /* 13 */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_G)                                PORT_CHAR('g') PORT_CHAR('G')       /* 22 */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_F)                                PORT_CHAR('f') PORT_CHAR('F')       /* 21 */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )                                                       PORT_NAME("F7 (IRMA)")              /* 41 */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )                                                       PORT_NAME("?6a?")                   /* 6a */
 
 	PORT_START( "K30_0" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_N)                                PORT_CHAR('N')                      /* 31 */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_M)                                PORT_CHAR('M')                      /* 32 */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_B)                                PORT_CHAR('B')                      /* 30 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_V)                                PORT_CHAR('V')                      /* 2f */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_C)                                PORT_CHAR('C')                      /* 2e */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_COMMA)                            PORT_CHAR(',')                      /* 33 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_N)                                PORT_CHAR('n') PORT_CHAR('N')       /* 31 */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_M)                                PORT_CHAR('m') PORT_CHAR('M')       /* 32 */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_B)                                PORT_CHAR('b') PORT_CHAR('B')       /* 30 */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_V)                                PORT_CHAR('v') PORT_CHAR('V')       /* 2f */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_C)                                PORT_CHAR('c') PORT_CHAR('C')       /* 2e */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_COMMA)                            PORT_CHAR(',') PORT_CHAR('<')       /* 33 */
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "K30_1" )
@@ -546,31 +546,31 @@ static INPUT_PORTS_START( applix )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )                                                       PORT_NAME("F8 (IRMA)")              /* 42 */
 
 	PORT_START( "K31_0" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_6)                                PORT_CHAR('6')                      /* 07 */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_7)                                PORT_CHAR('7')                      /* 08 */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_Y)                                PORT_CHAR('Y')                      /* 15 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_U)                                PORT_CHAR('U')                      /* 16 */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_H)                                PORT_CHAR('H')                      /* 23 */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_J)                                PORT_CHAR('J')                      /* 24 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_6)                                PORT_CHAR('6') PORT_CHAR('^')       /* 07 */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_7)                                PORT_CHAR('7') PORT_CHAR('&')       /* 08 */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_Y)                                PORT_CHAR('y') PORT_CHAR('Y')       /* 15 */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_U)                                PORT_CHAR('u') PORT_CHAR('U')       /* 16 */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_H)                                PORT_CHAR('h') PORT_CHAR('H')       /* 23 */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_J)                                PORT_CHAR('j') PORT_CHAR('J')       /* 24 */
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "K31_1" )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_F7)                               PORT_CHAR(UCHAR_MAMEKEY(F7))        /* 37 */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_F8)                               PORT_CHAR(UCHAR_MAMEKEY(F8))        /* 5f */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_LSHIFT)                           PORT_NAME("LShift")                 /* 2a */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_LSHIFT)       PORT_NAME("LShift") PORT_CHAR(UCHAR_SHIFT_1)            /* 2a */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )                                                       PORT_NAME("<")                      /* 70 */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_Z)                                PORT_CHAR('Z')                      /* 2c */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_X)                                PORT_CHAR('X')                      /* 2d */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_Z)                                PORT_CHAR('z') PORT_CHAR('Z')       /* 2c */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_X)                                PORT_CHAR('x') PORT_CHAR('X')       /* 2d */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )                                                       PORT_NAME("?6c?")                   /* 6c */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )                                                       PORT_NAME("F9 (IRMA)")              /* 43 */
 
 	PORT_START( "K32_0" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_9)                                PORT_CHAR('9')                      /* 0a */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_8)                                PORT_CHAR('8')                      /* 09 */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_O)                                PORT_CHAR('O')                      /* 18 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_I)                                PORT_CHAR('I')                      /* 17 */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_L)                                PORT_CHAR('L')                      /* 26 */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_K)                                PORT_CHAR('K')                      /* 25 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_9)                                PORT_CHAR('9') PORT_CHAR('(')       /* 0a */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_8)                                PORT_CHAR('8') PORT_CHAR('*')       /* 09 */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_O)                                PORT_CHAR('o') PORT_CHAR('O')       /* 18 */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_I)                                PORT_CHAR('i') PORT_CHAR('I')       /* 17 */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_L)                                PORT_CHAR('l') PORT_CHAR('L')       /* 26 */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_K)                                PORT_CHAR('k') PORT_CHAR('K')       /* 25 */
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "K32_1" )
@@ -592,40 +592,40 @@ static INPUT_PORTS_START( applix )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "K33_1" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_1)                                PORT_CHAR('1')                      /* 02 */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_TILDE)                            PORT_CHAR('`')                      /* 29 */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_Q)                                PORT_CHAR('Q')                      /* 10 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_1)                                PORT_CHAR('1') PORT_CHAR('!')       /* 02 */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_TILDE)                            PORT_CHAR('`') PORT_CHAR('~')       /* 29 */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_Q)                                PORT_CHAR('q') PORT_CHAR('Q')       /* 10 */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_TAB)                              PORT_CHAR(9)                        /* 0f */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_A)                                PORT_CHAR('A')                      /* 1e */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_A)                                PORT_CHAR('a') PORT_CHAR('A')       /* 1e */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_CAPSLOCK)                         PORT_NAME("Caps")                   /* 3a */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )                                                       PORT_NAME("?68?")                   /* 68 */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )                                                       PORT_NAME("F5 (IRMA)")              /* 3f */
 
 	PORT_START( "K34_0" )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_SLASH)                            PORT_CHAR('/')                      /* 35 */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_SLASH)                            PORT_CHAR('/') PORT_CHAR('?')       /* 35 */
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_RSHIFT)                           PORT_CHAR(UCHAR_MAMEKEY(RSHIFT))    /* 36 */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )                                                       PORT_NAME("Left")                   /* 56 */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_STOP)                             PORT_CHAR('.')                      /* 34 */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_STOP)                             PORT_CHAR('.') PORT_CHAR('>')       /* 34 */
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "K34_1" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_2)                                PORT_CHAR('2')                      /* 02 */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_3)                                PORT_CHAR('3')                      /* 03 */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_W)                                PORT_CHAR('W')                      /* 11 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_E)                                PORT_CHAR('E')                      /* 12 */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_S)                                PORT_CHAR('S')                      /* 1f */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_D)                                PORT_CHAR('D')                      /* 20 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_2)                                PORT_CHAR('2') PORT_CHAR('@')       /* 02 */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_3)                                PORT_CHAR('3') PORT_CHAR('#')       /* 03 */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_W)                                PORT_CHAR('w') PORT_CHAR('W')       /* 11 */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_E)                                PORT_CHAR('e') PORT_CHAR('E')       /* 12 */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_S)                                PORT_CHAR('s') PORT_CHAR('S')       /* 1f */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_D)                                PORT_CHAR('d') PORT_CHAR('D')       /* 20 */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )                                                       PORT_NAME("?67?")                   /* 67 */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )                                                       PORT_NAME("F4 (IRMA)")              /* 3e */
 
 	PORT_START( "K35_0" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_0)                                PORT_CHAR('0')                      /* 0b */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_MINUS)                            PORT_CHAR('-')                      /* 0c */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_P)                                PORT_CHAR('P')                      /* 19 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_OPENBRACE)                        PORT_CHAR('[')                      /* 1a */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_COLON)                            PORT_CHAR(';')                      /* 27 */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_QUOTE)                            PORT_CHAR('\'')                     /* 28 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_0)                                PORT_CHAR('0') PORT_CHAR(')')       /* 0b */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_MINUS)                            PORT_CHAR('-') PORT_CHAR('_')       /* 0c */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_P)                                PORT_CHAR('p') PORT_CHAR('P')       /* 19 */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_OPENBRACE)                        PORT_CHAR('[') PORT_CHAR('{')       /* 1a */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_COLON)                            PORT_CHAR(';') PORT_CHAR(':')       /* 27 */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_QUOTE)                            PORT_CHAR('\'') PORT_CHAR('"')      /* 28 */
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "K35_1" )
@@ -635,10 +635,10 @@ static INPUT_PORTS_START( applix )
 
 	PORT_START( "K36_0" )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_BACKSPACE)                        PORT_CHAR(8)                        /* 0e */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_EQUALS)                           PORT_CHAR('=')                      /* 0d */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_EQUALS)                           PORT_CHAR('=') PORT_CHAR('+')       /* 0d */
 	PORT_BIT( 0x14, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_ENTER)                            PORT_CHAR(13)                       /* 1c */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_BACKSLASH)                        PORT_CHAR('\\')                     /* 2b */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_CLOSEBRACE)                       PORT_CHAR(']')                      /* 1b */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_BACKSLASH)                        PORT_CHAR('\\') PORT_CHAR('|')      /* 2b */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE(KEYCODE_CLOSEBRACE)                       PORT_CHAR(']') PORT_CHAR('}')       /* 1b */
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "K36_1" )
@@ -749,9 +749,11 @@ void applix_state::machine_reset()
 	m_maincpu->reset();
 }
 
-FLOPPY_FORMATS_MEMBER( applix_state::floppy_formats )
-	FLOPPY_APPLIX_FORMAT
-FLOPPY_FORMATS_END
+void applix_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_APPLIX_FORMAT);
+}
 
 static void applix_floppies(device_slot_interface &device)
 {
@@ -784,8 +786,31 @@ void applix_state::applix_palette(palette_device &palette) const
 }
 
 
-void applix_state::video_start()
+void applix_state::machine_start()
 {
+	std::fill(std::begin(m_palette_latch), std::end(m_palette_latch), 0);
+
+	save_item(NAME(m_video_latch));
+	save_item(NAME(m_pa));
+	save_item(NAME(m_palette_latch));
+	save_item(NAME(m_pb));
+	save_item(NAME(m_analog_latch));
+	save_item(NAME(m_dac_latch));
+	save_item(NAME(m_port08));
+	save_item(NAME(m_data_to_fdc));
+	save_item(NAME(m_data_from_fdc));
+	save_item(NAME(m_data));
+	save_item(NAME(m_data_or_cmd));
+	save_item(NAME(m_buffer_empty));
+	save_item(NAME(m_fdc_cmd));
+	save_item(NAME(m_clock_count));
+	save_item(NAME(m_cp));
+	save_item(NAME(m_p1));
+	save_item(NAME(m_p1_data));
+	save_item(NAME(m_p2));
+	save_item(NAME(m_p3));
+	save_item(NAME(m_last_write_addr));
+	save_item(NAME(m_cass_data));
 }
 
 MC6845_UPDATE_ROW( applix_state::crtc_update_row )
@@ -797,7 +822,7 @@ MC6845_UPDATE_ROW( applix_state::crtc_update_row )
 	// The 6845 cursor signal is not used at all.
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	u32 const vidbase = (m_video_latch & 15) << 14 | (ra & 7) << 12;
-	u32 *p = &bitmap.pix32(y + vbp, hbp);
+	u32 *p = &bitmap.pix(y + vbp, hbp);
 
 	for (u16 x = 0; x < x_count; x++)
 	{
@@ -857,11 +882,11 @@ void applix_state::applix(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 30_MHz_XTAL / 4); // MC68000-P10 @ 7.5 MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &applix_state::applix_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &applix_state::main_mem);
 
 	z80_device &subcpu(Z80(config, "subcpu", 16_MHz_XTAL / 2)); // Z80H
-	subcpu.set_addrmap(AS_PROGRAM, &applix_state::subcpu_mem);
-	subcpu.set_addrmap(AS_IO, &applix_state::subcpu_io);
+	subcpu.set_addrmap(AS_PROGRAM, &applix_state::sub_mem);
+	subcpu.set_addrmap(AS_IO, &applix_state::sub_io);
 
 	i8051_device &kbdcpu(I8051(config, "kbdcpu", 11060250));
 	kbdcpu.set_addrmap(AS_PROGRAM, &applix_state::keytronic_pc3270_program);
@@ -887,9 +912,6 @@ void applix_state::applix(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 	DAC0800(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // 74ls374.u20 + dac0800.u21 + 4052.u23
 	DAC0800(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // 74ls374.u20 + dac0800.u21 + 4052.u23
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT).add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT).add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* Devices */
 	MC6845(config, m_crtc, 30_MHz_XTAL / 16); // MC6545 @ 1.875 MHz
@@ -900,7 +922,7 @@ void applix_state::applix(machine_config &config)
 	m_crtc->set_begin_update_callback(FUNC(applix_state::crtc_update_border));
 	m_crtc->out_vsync_callback().set(FUNC(applix_state::vsync_w));
 
-	VIA6522(config, m_via, 30_MHz_XTAL / 4 / 10); // VIA uses 68000 E clock
+	MOS6522(config, m_via, 30_MHz_XTAL / 4 / 10); // VIA uses 68000 E clock
 	m_via->readpb_handler().set(FUNC(applix_state::applix_pb_r));
 	// in CB1 kbd clk
 	// in CA2 vsync
@@ -991,7 +1013,7 @@ void applix_state::init_applix()
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY           FULLNAME       FLAGS
-COMP( 1986, applix, 0,      0,      applix,  applix, applix_state, init_applix, "Applix Pty Ltd", "Applix 1616", 0 )
+COMP( 1986, applix, 0,      0,      applix,  applix, applix_state, init_applix, "Applix Pty Ltd", "Applix 1616", MACHINE_SUPPORTS_SAVE )
 
 
 
@@ -1000,14 +1022,14 @@ COMP( 1986, applix, 0,      0,      applix,  applix, applix_state, init_applix, 
 u8 applix_state::internal_data_read(offs_t offset)
 {
 	m_via->write_cb2( BIT(offset, 8) ); // data
-	bool cp = !BIT(offset, 9);
+	bool cp = !BIT(offset, 9);  // clock pulses //TODO tidy this up with real flipflops
 	if (cp != m_cp)
 	{
 		m_cp = cp;
 		if (cp)
 			m_clock_count++;
 	}
-	if (m_clock_count > 2)
+	if (m_clock_count > 1)
 		m_via->write_cb1( cp );
 
 	return 0xff;

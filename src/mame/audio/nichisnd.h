@@ -12,9 +12,8 @@
 #pragma once
 
 #include "cpu/z80/tmpz84c011.h"
-#include "sound/3812intf.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
+#include "sound/ymopl.h"
 #include "speaker.h"
 #include "machine/gen_latch.h"
 
@@ -47,6 +46,7 @@ protected:
 private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_region_ptr<uint8_t> m_sound_rom;
+	required_memory_bank m_soundbank;
 
 	void soundlatch_clear_w(uint8_t data);
 	void soundbank_w(uint8_t data);

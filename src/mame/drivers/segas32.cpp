@@ -541,12 +541,11 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 #include "machine/msm6253.h"
 #include "machine/upd4701.h"
 #include "machine/315_5296.h"
-#include "sound/2612intf.h"
 #include "sound/rf5c68.h"
-
-#include "rendlay.h"
+#include "sound/ymopn.h"
 #include "speaker.h"
 
+#include "layout/generic.h"
 #include "radr.lh"
 
 /*
@@ -566,10 +565,10 @@ segas32_state::segas32_state(const machine_config &mconfig, device_type type, co
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_z80_shared_ram(*this,"z80_shared_ram")
 	, m_system32_workram(*this,"workram")
-	, m_videoram(*this,"videoram", 0)
-	, m_spriteram(*this,"spriteram", 0)
+	, m_videoram(*this,"videoram", 0x20000, ENDIANNESS_LITTLE)
+	, m_spriteram(*this,"spriteram", 0x20000, ENDIANNESS_LITTLE)
 	, m_soundram(*this, "soundram")
-	, m_paletteram(*this,"paletteram.%u", 0, uint8_t(0))
+	, m_paletteram(*this,"paletteram.%u", 0U, 0x10000U, ENDIANNESS_LITTLE)
 	, m_maincpu(*this, "maincpu")
 	, m_soundcpu(*this, "soundcpu")
 	, m_multipcm(*this, "sega")
@@ -654,6 +653,8 @@ void sega_multi32_analog_state::device_start()
 {
 	sega_multi32_state::device_start();
 	m_analog_bank = 0;
+
+	save_item(NAME(m_analog_bank));
 }
 
 void segas32_state::device_reset()
@@ -714,7 +715,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(segas32_state::signal_v60_irq_callback)
 }
 
 
-READ8_MEMBER(segas32_state::int_control_r)
+uint8_t segas32_state::int_control_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -732,7 +733,7 @@ READ8_MEMBER(segas32_state::int_control_r)
 }
 
 
-WRITE8_MEMBER(segas32_state::int_control_w)
+void segas32_state::int_control_w(offs_t offset, uint8_t data)
 {
 	int duration;
 
@@ -876,12 +877,12 @@ WRITE_LINE_MEMBER(segas32_state::display_enable_w)
  *
  *************************************/
 
-WRITE16_MEMBER(segas32_state::random_number_w)
+void segas32_state::random_number_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  osd_printf_debug("%06X:random_seed_w(%04X) = %04X & %04X\n", m_maincpu->pc(), offset*2, data, mem_mask);
 }
 
-READ16_MEMBER(segas32_state::random_number_r)
+uint16_t segas32_state::random_number_r()
 {
 	return machine().rand();
 }
@@ -893,13 +894,13 @@ READ16_MEMBER(segas32_state::random_number_r)
  *
  *************************************/
 
-READ8_MEMBER(segas32_state::shared_ram_r)
+uint8_t segas32_state::shared_ram_r(offs_t offset)
 {
 	return m_z80_shared_ram[offset];
 }
 
 
-WRITE8_MEMBER(segas32_state::shared_ram_w)
+void segas32_state::shared_ram_w(offs_t offset, uint8_t data)
 {
 	m_z80_shared_ram[offset] = data;
 }
@@ -950,7 +951,7 @@ void segas32_state::clear_sound_irq(int which)
 }
 
 
-WRITE8_MEMBER(segas32_state::sound_int_control_lo_w)
+void segas32_state::sound_int_control_lo_w(offs_t offset, uint8_t data)
 {
 	/* odd offsets are interrupt acks */
 	if (offset & 1)
@@ -965,7 +966,7 @@ WRITE8_MEMBER(segas32_state::sound_int_control_lo_w)
 }
 
 
-WRITE8_MEMBER(segas32_state::sound_int_control_hi_w)
+void segas32_state::sound_int_control_hi_w(offs_t offset, uint8_t data)
 {
 	m_sound_irq_control[offset] = data;
 	update_sound_irq_state();
@@ -987,28 +988,28 @@ WRITE_LINE_MEMBER(segas32_state::ym3438_irq_handler)
  *
  *************************************/
 
-WRITE8_MEMBER(segas32_state::sound_bank_lo_w)
+void segas32_state::sound_bank_lo_w(uint8_t data)
 {
 	m_sound_bank = (m_sound_bank & ~0x3f) | (data & 0x3f);
 	m_soundrom_bank->set_entry(m_sound_bank);
 }
 
 
-WRITE8_MEMBER(segas32_state::sound_bank_hi_w)
+void segas32_state::sound_bank_hi_w(uint8_t data)
 {
 	m_sound_bank = (m_sound_bank & 0x3f) | ((data & 0x04) << 4) | ((data & 0x03) << 7);
 	m_soundrom_bank->set_entry(m_sound_bank);
 }
 
 
-WRITE8_MEMBER(segas32_state::multipcm_bank_w)
+void segas32_state::multipcm_bank_w(uint8_t data)
 {
 	m_multipcm_bank_hi->set_entry((data >> 3) & 7);
 	m_multipcm_bank_lo->set_entry(data & 7);
 }
 
 
-WRITE8_MEMBER(segas32_state::scross_bank_w)
+void segas32_state::scross_bank_w(uint8_t data)
 {
 	m_multipcm_bank_hi->set_entry(data & 7);
 	m_multipcm_bank_lo->set_entry(data & 7);
@@ -1021,13 +1022,13 @@ WRITE8_MEMBER(segas32_state::scross_bank_w)
  *
  *************************************/
 
-READ8_MEMBER(segas32_state::sound_dummy_r)
+uint8_t segas32_state::sound_dummy_r()
 {
 	return m_sound_dummy_value;
 }
 
 
-WRITE8_MEMBER(segas32_state::sound_dummy_w)
+void segas32_state::sound_dummy_w(uint8_t data)
 {
 	m_sound_dummy_value = data;
 }
@@ -1077,7 +1078,7 @@ inline void segas32_state::update_color(int offset, uint16_t data)
  *************************************/
 
 template<int Which>
-READ16_MEMBER(segas32_state::paletteram_r)
+uint16_t segas32_state::paletteram_r(offs_t offset)
 {
 	int convert;
 
@@ -1095,7 +1096,7 @@ READ16_MEMBER(segas32_state::paletteram_r)
 }
 
 template<int Which>
-WRITE16_MEMBER(segas32_state::paletteram_w)
+void segas32_state::paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t value;
 	int convert;
@@ -1138,13 +1139,13 @@ WRITE16_MEMBER(segas32_state::paletteram_w)
  *************************************/
 
 template<int Which>
-READ16_MEMBER(segas32_state::mixer_r)
+uint16_t segas32_state::mixer_r(offs_t offset)
 {
 	return m_mixer_control[Which][offset];
 }
 
 template<int Which>
-WRITE16_MEMBER(segas32_state::mixer_w)
+void segas32_state::mixer_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mixer_control[Which][offset]);
 }
@@ -1161,10 +1162,10 @@ void segas32_state::system32_map(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).rom();
 	map(0x200000, 0x20ffff).mirror(0x0f0000).ram().share("workram");
-	map(0x300000, 0x31ffff).mirror(0x0e0000).rw(FUNC(segas32_state::videoram_r), FUNC(segas32_state::videoram_w)).share("videoram");
-	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(FUNC(segas32_state::spriteram_r), FUNC(segas32_state::spriteram_w)).share("spriteram");
+	map(0x300000, 0x31ffff).mirror(0x0e0000).rw(FUNC(segas32_state::videoram_r), FUNC(segas32_state::videoram_w));
+	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(FUNC(segas32_state::spriteram_r), FUNC(segas32_state::spriteram_w));
 	map(0x500000, 0x50000f).mirror(0x0ffff0).rw(FUNC(segas32_state::sprite_control_r), FUNC(segas32_state::sprite_control_w)).umask16(0x00ff);
-	map(0x600000, 0x60ffff).mirror(0x0e0000).rw(FUNC(segas32_state::paletteram_r<0>), FUNC(segas32_state::paletteram_w<0>)).share("paletteram.0");
+	map(0x600000, 0x60ffff).mirror(0x0e0000).rw(FUNC(segas32_state::paletteram_r<0>), FUNC(segas32_state::paletteram_w<0>));
 	map(0x610000, 0x61007f).mirror(0x0eff80).rw(FUNC(segas32_state::mixer_r<0>), FUNC(segas32_state::mixer_w<0>));
 	map(0x700000, 0x701fff).mirror(0x0fe000).rw(FUNC(segas32_state::shared_ram_r), FUNC(segas32_state::shared_ram_w));
 	map(0x800000, 0x800fff).rw("s32comm", FUNC(s32comm_device::share_r), FUNC(s32comm_device::share_w)).umask16(0x00ff);
@@ -1184,12 +1185,12 @@ void segas32_state::multi32_map(address_map &map)
 	map.global_mask(0xffffff);
 	map(0x000000, 0x1fffff).rom();
 	map(0x200000, 0x21ffff).mirror(0x0e0000).ram();
-	map(0x300000, 0x31ffff).mirror(0x0e0000).rw(FUNC(segas32_state::videoram_r), FUNC(segas32_state::videoram_w)).share("videoram");
-	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(FUNC(segas32_state::spriteram_r), FUNC(segas32_state::spriteram_w)).share("spriteram");
+	map(0x300000, 0x31ffff).mirror(0x0e0000).rw(FUNC(segas32_state::videoram_r), FUNC(segas32_state::videoram_w));
+	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(FUNC(segas32_state::spriteram_r), FUNC(segas32_state::spriteram_w));
 	map(0x500000, 0x50000f).mirror(0x0ffff0).rw(FUNC(segas32_state::sprite_control_r), FUNC(segas32_state::sprite_control_w)).umask32(0x00ff00ff);
-	map(0x600000, 0x60ffff).mirror(0x060000).rw(FUNC(segas32_state::paletteram_r<0>), FUNC(segas32_state::paletteram_w<0>)).share("paletteram.0");
+	map(0x600000, 0x60ffff).mirror(0x060000).rw(FUNC(segas32_state::paletteram_r<0>), FUNC(segas32_state::paletteram_w<0>));
 	map(0x610000, 0x61007f).mirror(0x06ff80).rw(FUNC(segas32_state::mixer_r<0>), FUNC(segas32_state::mixer_w<0>));
-	map(0x680000, 0x68ffff).mirror(0x060000).rw(FUNC(segas32_state::paletteram_r<1>), FUNC(segas32_state::paletteram_w<1>)).share("paletteram.1");
+	map(0x680000, 0x68ffff).mirror(0x060000).rw(FUNC(segas32_state::paletteram_r<1>), FUNC(segas32_state::paletteram_w<1>));
 	map(0x690000, 0x69007f).mirror(0x06ff80).rw(FUNC(segas32_state::mixer_r<1>), FUNC(segas32_state::mixer_w<1>));
 	map(0x700000, 0x701fff).mirror(0x0fe000).rw(FUNC(segas32_state::shared_ram_r), FUNC(segas32_state::shared_ram_w));
 	map(0x800000, 0x800fff).rw("s32comm", FUNC(s32comm_device::share_r), FUNC(s32comm_device::share_w)).umask32(0x00ff00ff);
@@ -2069,6 +2070,11 @@ static INPUT_PORTS_START( slipstrm )
 	PORT_MODIFY("mainpcb:SERVICE12_A")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 
+	PORT_MODIFY("mainpcb:SERVICE34_A")
+	PORT_DIPNAME( 0x04, 0x04, "Freeze Frame" ) PORT_DIPLOCATION("SW1:3") // Undocumented feature?
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
 	PORT_START("mainpcb:ANALOG1")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 
@@ -2096,22 +2102,22 @@ static INPUT_PORTS_START( sonic )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START3 )
 
 	PORT_START("mainpcb:TRACKX1")
-	PORT_BIT( 0xfff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_RESET PORT_REVERSE PORT_PLAYER(1)
+	PORT_BIT( 0xfff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(1)
 
 	PORT_START("mainpcb:TRACKY1")
-	PORT_BIT( 0xfff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(1)
+	PORT_BIT( 0xfff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(1)
 
 	PORT_START("mainpcb:TRACKX2")
-	PORT_BIT( 0xfff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_RESET PORT_REVERSE PORT_PLAYER(2)
+	PORT_BIT( 0xfff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(2)
 
 	PORT_START("mainpcb:TRACKY2")
-	PORT_BIT( 0xfff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(2)
+	PORT_BIT( 0xfff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(2)
 
 	PORT_START("mainpcb:TRACKX3")
-	PORT_BIT( 0xfff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_RESET PORT_REVERSE PORT_PLAYER(3)
+	PORT_BIT( 0xfff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(3)
 
 	PORT_START("mainpcb:TRACKY3")
-	PORT_BIT( 0xfff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(3)
+	PORT_BIT( 0xfff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(3)
 INPUT_PORTS_END
 
 
@@ -2625,7 +2631,7 @@ void sega_multi32_state::device_add_mconfig(machine_config &config)
 	ymsnd.add_route(1, "lspeaker", 0.40);
 	ymsnd.add_route(0, "rspeaker", 0.40);
 
-	MULTIPCM(config, m_multipcm, MASTER_CLOCK/4);
+	MULTIPCM(config, m_multipcm, MULTI32_CLOCK/4);
 	m_multipcm->set_addrmap(0, &sega_multi32_state::multipcm_map);
 	m_multipcm->add_route(1, "lspeaker", 1.0);
 	m_multipcm->add_route(0, "rspeaker", 1.0);
@@ -2679,7 +2685,7 @@ ioport_value sega_multi32_analog_state::in3_analog_read()
 	return m_analog_ports[m_analog_bank * 4 + 3].read_safe(0);
 }
 
-WRITE8_MEMBER(sega_multi32_analog_state::analog_bank_w)
+void sega_multi32_analog_state::analog_bank_w(uint8_t data)
 {
 	m_analog_bank = data & 1;
 }
@@ -5205,6 +5211,7 @@ ROM_END
 
     Sega Game ID codes:
      Game: 833-10851 J. LEAGUE 1994
+ROM board: 834-10852 J.LEAGUE
 
 */
 ROM_START( jleague )
@@ -5707,12 +5714,15 @@ void segas32_state::init_alien3()
 void segas32_state::init_arescue(int m_hasdsp)
 {
 	segas32_common_init();
-	if (m_hasdsp) m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa00007, read16_delegate(*this, FUNC(segas32_state::arescue_dsp_r)), write16_delegate(*this, FUNC(segas32_state::arescue_dsp_w)));
+	if (m_hasdsp) m_maincpu->space(AS_PROGRAM).install_read_handler(0xa00000, 0xa00007, read16sm_delegate(*this, FUNC(segas32_state::arescue_dsp_r)));
+	if (m_hasdsp) m_maincpu->space(AS_PROGRAM).install_write_handler(0xa00000, 0xa00007, write16s_delegate(*this, FUNC(segas32_state::arescue_dsp_w)));
 
 	for (auto & elem : m_arescue_dsp_io)
 		elem = 0x00;
 
 	m_sw1_output = &segas32_state::arescue_sw1_output;
+
+	save_item(NAME(m_arescue_dsp_io));
 }
 
 
@@ -5728,8 +5738,10 @@ void segas32_state::init_brival()
 
 	/* install protection handlers */
 	m_system32_protram = std::make_unique<uint16_t[]>(0x1000/2);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20ba00, 0x20ba07, read16_delegate(*this, FUNC(segas32_state::brival_protection_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa00000, 0xa00fff, write16_delegate(*this, FUNC(segas32_state::brival_protection_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20ba00, 0x20ba07, read16s_delegate(*this, FUNC(segas32_state::brival_protection_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa00000, 0xa00fff, write16sm_delegate(*this, FUNC(segas32_state::brival_protection_w)));
+
+	save_pointer(NAME(m_system32_protram), 0x1000/2);
 }
 
 
@@ -5738,7 +5750,7 @@ void segas32_state::init_darkedge()
 	segas32_common_init();
 
 	/* install protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa7ffff, read16_delegate(*this, FUNC(segas32_state::darkedge_protection_r)), write16_delegate(*this, FUNC(segas32_state::darkedge_protection_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa7ffff, read16s_delegate(*this, FUNC(segas32_state::darkedge_protection_r)), write16s_delegate(*this, FUNC(segas32_state::darkedge_protection_w)));
 	m_system32_prot_vblank = &segas32_state::darkedge_fd1149_vblank;
 }
 
@@ -5748,7 +5760,8 @@ void segas32_state::init_dbzvrvs()
 	segas32_common_init();
 
 	/* install protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa7ffff, read16_delegate(*this, FUNC(segas32_state::dbzvrvs_protection_r)), write16_delegate(*this, FUNC(segas32_state::dbzvrvs_protection_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa00000, 0xa7ffff, read16smo_delegate(*this, FUNC(segas32_state::dbzvrvs_protection_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa00000, 0xa7ffff, write16mo_delegate(*this, FUNC(segas32_state::dbzvrvs_protection_w)));
 	// 0x810000 to 0x8107ff = link RAM? probably not a dual cabinet, though...
 }
 
@@ -5849,7 +5862,7 @@ void segas32_state::init_radr()
 void segas32_state::init_scross()
 {
 	segas32_common_init();
-	m_soundcpu->space(AS_PROGRAM).install_write_handler(0xb0, 0xbf, write8_delegate(*this, FUNC(segas32_state::scross_bank_w)));
+	m_soundcpu->space(AS_PROGRAM).install_write_handler(0xb0, 0xbf, write8smo_delegate(*this, FUNC(segas32_state::scross_bank_w)));
 
 	m_sw1_output = &segas32_state::scross_sw1_output;
 	m_sw2_output = &segas32_state::scross_sw2_output;
@@ -5869,7 +5882,7 @@ void segas32_state::init_sonic()
 	segas32_common_init();
 
 	/* install protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20E5C4, 0x20E5C5, write16_delegate(*this, FUNC(segas32_state::sonic_level_load_protection)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20E5C4, 0x20E5C5, write16s_delegate(*this, FUNC(segas32_state::sonic_level_load_protection)));
 }
 
 

@@ -85,6 +85,8 @@
 #define WIM                 m_wim
 #define TBR                 m_tbr
 
+#define NWINDOWS            m_nwindows
+
 #define OP_NS   (op & 0xc0000000)
 
 #define OP      (op >> 30)
@@ -142,7 +144,7 @@
 #define RDREG   *m_regs[RD]
 #define RS1REG  *m_regs[RS1]
 #define RS2REG  *m_regs[RS2]
-#define SET_RDREG(x)    do { if(RD) { RDREG = (x); } } while (0)
+#define SET_RDREG(x)    do { if(RDBITS) { RDREG = (x); } } while (0)
 #define ADDRESS (USEIMM ? (RS1REG + SIMM13) : (RS1REG + RS2REG))
 
 #define PC      m_pc
@@ -200,6 +202,7 @@
 #define OP3_UMULCC  26
 #define OP3_SMULCC  27
 #define OP3_SUBXCC  28
+#define OP3_DIVSCC  29
 #define OP3_UDIVCC  30
 #define OP3_SDIVCC  31
 #define OP3_TADDCC  32
@@ -214,6 +217,7 @@
 #define OP3_RDPSR   41
 #define OP3_RDWIM   42
 #define OP3_RDTBR   43
+#define OP3_SCAN    44
 #define OP3_WRASR   48
 #define OP3_WRPSR   49
 #define OP3_WRWIM   50

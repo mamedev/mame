@@ -90,18 +90,18 @@ private:
 	output_finder<2> m_leds;
 
 	/* EPROM state */
-	int m_eprom_oe;
-	int m_eprom_ce;
-	uint16_t m_eprom_addr;
-	uint8_t m_eprom_data;
-	uint8_t m_old_data;
-	std::vector<uint8_t> m_eprom_rom;
+	int m_eprom_oe = 0;
+	int m_eprom_ce = 0;
+	uint16_t m_eprom_addr = 0;
+	uint8_t m_eprom_data = 0;
+	uint8_t m_old_data = 0;
+	std::vector<uint8_t> m_eprom_rom{};
 
 	/* display state */
-	uint8_t m_ls145_p;
-	uint8_t m_segment;
+	uint8_t m_ls145_p = 0;
+	uint8_t m_segment = 0;
 
-	emu_timer *m_led_refresh_timer;
+	emu_timer *m_led_refresh_timer = nullptr;
 };
 
 
@@ -297,7 +297,7 @@ DEVICE_IMAGE_LOAD_MEMBER(beta_state::load_beta_eprom)
 
 	if (size != 0x800)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 		return image_init_result::FAIL;
 	}
 

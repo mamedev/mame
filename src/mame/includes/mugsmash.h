@@ -30,8 +30,8 @@ private:
 	required_shared_ptr<uint16_t> m_regs2;
 	required_shared_ptr<uint16_t> m_spriteram;
 
-	tilemap_t *m_tilemap1;
-	tilemap_t *m_tilemap2;
+	tilemap_t *m_tilemap1 = nullptr;
+	tilemap_t *m_tilemap2 = nullptr;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -39,10 +39,10 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE16_MEMBER(mugsmash_reg2_w);
-	DECLARE_WRITE16_MEMBER(mugsmash_videoram1_w);
-	DECLARE_WRITE16_MEMBER(mugsmash_videoram2_w);
-	DECLARE_WRITE16_MEMBER(mugsmash_reg_w);
+	void mugsmash_reg2_w(offs_t offset, uint16_t data);
+	void mugsmash_videoram1_w(offs_t offset, uint16_t data);
+	void mugsmash_videoram2_w(offs_t offset, uint16_t data);
+	void mugsmash_reg_w(offs_t offset, uint16_t data);
 	TILE_GET_INFO_MEMBER(get_mugsmash_tile_info1);
 	TILE_GET_INFO_MEMBER(get_mugsmash_tile_info2);
 	virtual void machine_start() override;

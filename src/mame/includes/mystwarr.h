@@ -19,61 +19,64 @@ public:
 		konamigx_state(mconfig, type, tag),
 		m_k054321(*this, "k054321"),
 		m_gx_workram(*this, "gx_workram"),
-		m_spriteram(*this, "spriteram")
+		m_spriteram(*this, "spriteram"),
+		m_okibank(*this, "okibank")
 	{ }
 
 	void martchmp(machine_config &config);
 	void mystwarr(machine_config &config);
 	void dadandrn(machine_config &config);
 	void viostorm(machine_config &config);
+	void viostormbl(machine_config &config);
 	void gaiapols(machine_config &config);
 	void metamrph(machine_config &config);
 
 private:
-	required_device<k054321_device> m_k054321;
+	optional_device<k054321_device> m_k054321;
 	required_shared_ptr<uint16_t> m_gx_workram;
 	optional_shared_ptr<uint16_t> m_spriteram;
+	optional_memory_bank m_okibank; // for viostormabbl
 	std::unique_ptr<uint8_t[]> m_decoded;
 
-	uint8_t m_mw_irq_control;
-	int m_cur_sound_region;
-	int m_layer_colorbase[6];
-	int m_oinprion;
-	int m_cbparam;
-	int m_sprite_colorbase;
-	int m_sub1_colorbase;
-	int m_last_psac_colorbase;
-	int m_gametype;
-	int m_roz_enable;
-	int m_roz_rombank;
-	tilemap_t *m_ult_936_tilemap;
-	uint16_t m_clip;
+	uint8_t m_mw_irq_control = 0;
+	int m_cur_sound_region = 0;
+	int m_layer_colorbase[6]{};
+	int m_oinprion = 0;
+	int m_cbparam = 0;
+	int m_sprite_colorbase = 0;
+	int m_sub1_colorbase = 0;
+	int m_last_psac_colorbase = 0;
+	int m_gametype = 0;
+	int m_roz_enable = 0;
+	int m_roz_rombank = 0;
+	tilemap_t *m_ult_936_tilemap = nullptr;
+	uint16_t m_clip = 0;
 
-	uint8_t m_sound_ctrl;
-	uint8_t m_sound_nmi_clk;
+	uint8_t m_sound_ctrl = 0;
+	uint8_t m_sound_nmi_clk = 0;
 
-	DECLARE_READ16_MEMBER(eeprom_r);
-	DECLARE_WRITE16_MEMBER(mweeprom_w);
-	DECLARE_READ16_MEMBER(dddeeprom_r);
-	DECLARE_WRITE16_MEMBER(mmeeprom_w);
-	DECLARE_WRITE16_MEMBER(sound_irq_w);
-	DECLARE_WRITE16_MEMBER(irq_ack_w);
-	DECLARE_READ16_MEMBER(k053247_scattered_word_r);
-	DECLARE_WRITE16_MEMBER(k053247_scattered_word_w);
-	DECLARE_READ16_MEMBER(k053247_martchmp_word_r);
-	DECLARE_WRITE16_MEMBER(k053247_martchmp_word_w);
-	DECLARE_WRITE16_MEMBER(mceeprom_w);
-	DECLARE_READ16_MEMBER(mccontrol_r);
-	DECLARE_WRITE16_MEMBER(mccontrol_w);
-	DECLARE_WRITE8_MEMBER(sound_ctrl_w);
+	uint16_t eeprom_r(offs_t offset, uint16_t mem_mask = ~0);
+	void mweeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t dddeeprom_r(offs_t offset, uint16_t mem_mask = ~0);
+	void mmeeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sound_irq_w(uint16_t data);
+	void irq_ack_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t k053247_scattered_word_r(offs_t offset);
+	void k053247_scattered_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t k053247_martchmp_word_r(offs_t offset);
+	void k053247_martchmp_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void mceeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t mccontrol_r();
+	void mccontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sound_ctrl_w(uint8_t data);
 
-	DECLARE_WRITE16_MEMBER(ddd_053936_enable_w);
-	DECLARE_WRITE16_MEMBER(ddd_053936_clip_w);
-	DECLARE_READ16_MEMBER(gai_053936_tilerom_0_r);
-	DECLARE_READ16_MEMBER(ddd_053936_tilerom_0_r);
-	DECLARE_READ16_MEMBER(ddd_053936_tilerom_1_r);
-	DECLARE_READ16_MEMBER(gai_053936_tilerom_2_r);
-	DECLARE_READ16_MEMBER(ddd_053936_tilerom_2_r);
+	void ddd_053936_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void ddd_053936_clip_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t gai_053936_tilerom_0_r(offs_t offset);
+	uint16_t ddd_053936_tilerom_0_r(offs_t offset);
+	uint16_t ddd_053936_tilerom_1_r(offs_t offset);
+	uint16_t gai_053936_tilerom_2_r(offs_t offset);
+	uint16_t ddd_053936_tilerom_2_r(offs_t offset);
 	TILE_GET_INFO_MEMBER(get_gai_936_tile_info);
 	TILE_GET_INFO_MEMBER(get_ult_936_tile_info);
 	DECLARE_MACHINE_START(mystwarr);
@@ -81,6 +84,7 @@ private:
 	DECLARE_VIDEO_START(mystwarr);
 	DECLARE_MACHINE_RESET(viostorm);
 	DECLARE_VIDEO_START(viostorm);
+	DECLARE_MACHINE_START(viostormbl);
 	DECLARE_MACHINE_RESET(metamrph);
 	DECLARE_VIDEO_START(metamrph);
 	DECLARE_MACHINE_RESET(dadandrn);
@@ -113,5 +117,7 @@ private:
 	void metamrph_map(address_map &map);
 	void mystwarr_map(address_map &map);
 	void mystwarr_sound_map(address_map &map);
+	void oki_map(address_map &map); // for viostormabbl
 	void viostorm_map(address_map &map);
+	void viostormbl_map(address_map &map);
 };

@@ -13,7 +13,7 @@
 
 #pragma once
 
-#include "softlist_dev.h"
+#include "imagedev/cartrom.h"
 
 
 /***************************************************************************
@@ -31,7 +31,7 @@ class device_cococart_interface;
 
 class cococart_slot_device final : public device_t,
 								public device_single_card_slot_interface<device_cococart_interface>,
-								public device_image_interface
+								public device_cartrom_image_interface
 {
 public:
 	// output lines on the CoCo cartridge slot
@@ -69,18 +69,11 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
-
-	virtual bool is_readable()  const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return false; }
-	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "coco_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "ccc,rom"; }
@@ -129,7 +122,7 @@ private:
 	coco_cartridge_line         m_nmi_line;
 	coco_cartridge_line         m_halt_line;
 public:
-	devcb_write_line        m_cart_callback;
+	devcb_write_line            m_cart_callback;
 	devcb_write_line            m_nmi_callback;
 	devcb_write_line            m_halt_callback;
 private:
@@ -137,9 +130,10 @@ private:
 	device_cococart_interface   *m_cart;
 
 	// methods
-	void set_line(const char *line_name, coco_cartridge_line &line, line_value value);
+	void set_line(line ln, coco_cartridge_line &line, line_value value);
 	void set_line_timer(coco_cartridge_line &line, line_value value);
 	void twiddle_line_if_q(coco_cartridge_line &line);
+public:
 	static const char *line_value_string(line_value value);
 };
 
@@ -224,5 +218,14 @@ private:
 	cococart_slot_device *           m_owning_slot;
 	device_cococart_host_interface * m_host;
 };
+
+// methods for configuring CoCo slot devices (the expansion cart
+// itself, as well as slots on the Multi-Pak)
+void coco_cart_add_basic_devices(device_slot_interface &device);
+void coco_cart_add_fdcs(device_slot_interface &device);
+void coco_cart_add_multi_pak(device_slot_interface &device);
+void dragon_cart_add_basic_devices(device_slot_interface &device);
+void dragon_cart_add_fdcs(device_slot_interface &device);
+void dragon_cart_add_multi_pak(device_slot_interface &device);
 
 #endif // MAME_BUS_COCO_COCOCART_H

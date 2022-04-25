@@ -294,11 +294,11 @@ static const discrete_op_amp_filt_info dkong_sallen_key_info =
 #define DKONG_CUSTOM_V          DISCRETE_INPUT(7)
 
 DISCRETE_CLASS_STEP_RESET(dkong_custom_mixer, 1,
-	double m_i_in1[2];
-	double m_r_in[2];
-	double m_r_total[2];
-	double m_exp[2];
-	double m_out_v;
+	double m_i_in1[2]{ 0.0 };
+	double m_r_in[2]{ 0.0 };
+	double m_r_total[2]{ 0.0 };
+	double m_exp[2]{ 0.0 };
+	double m_out_v = 0;
 );
 
 DISCRETE_STEP( dkong_custom_mixer )
@@ -1233,7 +1233,7 @@ uint8_t dkong_state::dkong_tune_r(offs_t offset)
 
 	if ( page & 0x40 )
 	{
-		return (m_ls175_3d->read(0) & 0x0F) | (dkong_voice_status_r() << 4);
+		return (m_ls175_3d->read(0) & 0x0f) | (dkong_voice_status_r() << 4);
 	}
 	else
 	{
@@ -1292,7 +1292,7 @@ void dkong_state::radarscp1_sound_io_map(address_map &map)
 
 void dkong_state::dkong3_sound1_map(address_map &map)
 {
-	map(0x0000, 0x01ff).ram();
+	map(0x0000, 0x07ff).ram();
 	map(0x4016, 0x4016).r("latch1", FUNC(latch8_device::read));       /* overwrite default */
 	map(0x4017, 0x4017).r("latch2", FUNC(latch8_device::read));
 	map(0xe000, 0xffff).rom();
@@ -1300,7 +1300,7 @@ void dkong_state::dkong3_sound1_map(address_map &map)
 
 void dkong_state::dkong3_sound2_map(address_map &map)
 {
-	map(0x0000, 0x01ff).ram();
+	map(0x0000, 0x07ff).ram();
 	map(0x4016, 0x4016).r("latch3", FUNC(latch8_device::read));       /* overwrite default */
 	map(0xe000, 0xffff).rom();
 }
@@ -1343,13 +1343,13 @@ void dkong_state::dkong2b_audio(machine_config &config)
 	m_soundcpu->bus_in_cb().set(FUNC(dkong_state::dkong_tune_r));
 	m_soundcpu->bus_out_cb().set(FUNC(dkong_state::dkong_voice_w));
 	m_soundcpu->p1_out_cb().set(FUNC(dkong_state::dkong_p1_w)); // only write to dac
-	m_soundcpu->p2_in_cb().set("virtual_p2", FUNC(latch8_device::read));
-	m_soundcpu->p2_out_cb().set("virtual_p2", FUNC(latch8_device::write));
-	m_soundcpu->t0_in_cb().set("ls259.6h", FUNC(latch8_device::bit5_q_r));
-	m_soundcpu->t1_in_cb().set("ls259.6h", FUNC(latch8_device::bit4_q_r));
+	m_soundcpu->p2_in_cb().set(m_dev_vp2, FUNC(latch8_device::read));
+	m_soundcpu->p2_out_cb().set(m_dev_vp2, FUNC(latch8_device::write));
+	m_soundcpu->t0_in_cb().set(m_dev_6h, FUNC(latch8_device::bit5_q_r));
+	m_soundcpu->t1_in_cb().set(m_dev_6h, FUNC(latch8_device::bit4_q_r));
 
 	SPEAKER(config, "mono").front_center();
-	DISCRETE(config, "discrete", dkong2b_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+	DISCRETE(config, "discrete", dkong2b_discrete).add_route(ALL_OUTPUTS, "mono", 0.9);
 }
 
 void dkong_state::radarscp_audio(machine_config &config)
@@ -1401,11 +1401,11 @@ void dkong_state::dkongjr_audio(machine_config &config)
 	latch8_device &dev_5h(LATCH8(config, "ls259.5h"));
 	dev_5h.write_cb<1>().set("discrete", FUNC(discrete_device::write_line<DS_SOUND9_INP>));
 
-	latch8_device &dev_4h(LATCH8(config, "ls259.4h"));
+	LATCH8(config, "ls259.4h");
 
 	LATCH8(config, m_dev_vp2);      /* virtual latch for port B */
 	m_dev_vp2->set_xorvalue(0x70);  /* all signals are inverted */
-	m_dev_vp2->read_cb<6>().set(dev_4h, FUNC(latch8_device::bit1_r));
+	m_dev_vp2->read_cb<6>().set("ls259.4h", FUNC(latch8_device::bit1_r));
 	m_dev_vp2->read_cb<5>().set(m_dev_6h, FUNC(latch8_device::bit3_r));
 	m_dev_vp2->read_cb<4>().set(m_dev_6h, FUNC(latch8_device::bit6_r));
 	m_dev_vp2->write_cb<7>().set("discrete", FUNC(discrete_device::write_line<DS_DISCHARGE_INV>));
@@ -1414,14 +1414,14 @@ void dkong_state::dkongjr_audio(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &dkong_state::dkong_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &dkong_state::dkongjr_sound_io_map);
 	m_soundcpu->p1_out_cb().set(FUNC(dkong_state::dkong_p1_w)); // only write to dac
-	m_soundcpu->p2_in_cb().set("virtual_p2", FUNC(latch8_device::read));
-	m_soundcpu->p2_out_cb().set("virtual_p2", FUNC(latch8_device::write));
-	m_soundcpu->t0_in_cb().set("ls259.6h", FUNC(latch8_device::bit5_q_r));
-	m_soundcpu->t1_in_cb().set("ls259.6h", FUNC(latch8_device::bit4_q_r));
+	m_soundcpu->p2_in_cb().set(m_dev_vp2, FUNC(latch8_device::read));
+	m_soundcpu->p2_out_cb().set(m_dev_vp2, FUNC(latch8_device::write));
+	m_soundcpu->t0_in_cb().set(m_dev_6h, FUNC(latch8_device::bit5_q_r));
+	m_soundcpu->t1_in_cb().set(m_dev_6h, FUNC(latch8_device::bit4_q_r));
 
 	SPEAKER(config, "mono").front_center();
 
-	DISCRETE(config, "discrete", dkongjr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+	DISCRETE(config, "discrete", dkongjr_discrete).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 void dkong_state::dkong3_audio(machine_config &config)

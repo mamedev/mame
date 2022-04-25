@@ -9,13 +9,18 @@ typedef device_delegate<int (uint16_t code, uint8_t color)> gfxbank_cb_delegate;
 
 #define SETA001_SPRITE_GFXBANK_CB_MEMBER(_name) int _name(uint16_t code, uint8_t color)
 
-class seta001_device : public device_t
+class seta001_device : public device_t, public device_gfx_interface
 {
 public:
 	seta001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T> seta001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&palette_tag, const gfx_decode_entry *gfxinfo)
+		: seta001_device(mconfig, tag, owner, clock)
+	{
+		set_info(gfxinfo);
+		set_palette(std::forward<T>(palette_tag));
+	}
 
 	// configuration
-	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 	template <typename... T> void set_gfxbank_callback(T &&... args) { m_gfxbank_cb.set(std::forward<T>(args)...); }
 
 	void spritebgflag_w8(uint8_t data);
@@ -43,16 +48,16 @@ public:
 	void tnzs_eof();
 
 	// position kludges for seta.cpp & srmp2.cpp
-	void set_fg_xoffsets(int flip, int noflip) { m_fg_flipxoffs = flip; m_fg_noflipxoffs = noflip; };
-	void set_fg_yoffsets(int flip, int noflip) { m_fg_flipyoffs = flip; m_fg_noflipyoffs = noflip; };
-	void set_bg_yoffsets(int flip, int noflip) { m_bg_flipyoffs = flip; m_bg_noflipyoffs = noflip; };
-	void set_bg_xoffsets(int flip, int noflip) { m_bg_flipxoffs = flip; m_bg_noflipxoffs = noflip; };
+	void set_fg_xoffsets(int flip, int noflip) { m_fg_flipxoffs = flip; m_fg_noflipxoffs = noflip; }
+	void set_fg_yoffsets(int flip, int noflip) { m_fg_flipyoffs = flip; m_fg_noflipyoffs = noflip; }
+	void set_bg_yoffsets(int flip, int noflip) { m_bg_flipyoffs = flip; m_bg_noflipyoffs = noflip; }
+	void set_bg_xoffsets(int flip, int noflip) { m_bg_flipxoffs = flip; m_bg_noflipxoffs = noflip; }
 
-	void set_colorbase(int base) { m_colorbase = base; };
-	void set_spritelimit(int limit) { m_spritelimit = limit; };
-	void set_transpen(int pen) { m_transpen = pen; };
+	void set_colorbase(int base) { m_colorbase = base; }
+	void set_spritelimit(int limit) { m_spritelimit = limit; }
+	void set_transpen(int pen) { m_transpen = pen; }
 
-	int is_flipped() { return ((m_spritectrl[ 0 ] & 0x40) >> 6); };
+	int is_flipped() { return ((m_spritectrl[ 0 ] & 0x40) >> 6); }
 
 protected:
 	virtual void device_start() override;
@@ -61,7 +66,6 @@ protected:
 private:
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size);
 	void draw_foreground(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size);
-	required_device<gfxdecode_device> m_gfxdecode;
 
 	gfxbank_cb_delegate m_gfxbank_cb;
 
@@ -75,7 +79,7 @@ private:
 	int m_transpen;
 
 	// live state
-	uint8_t m_bgflag;
+	uint8_t m_bgflag = 0;
 	uint8_t m_spritectrl[4];
 	std::unique_ptr<uint8_t[]> m_spriteylow;
 	std::unique_ptr<uint8_t[]> m_spritecodelow; // tnzs.cpp stuff only uses half?

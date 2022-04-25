@@ -63,27 +63,27 @@ private:
 	required_shared_ptr_array<uint16_t, 4> m_scroll_x;
 	required_shared_ptr_array<uint16_t, 4> m_scroll_y;
 
-	uint8_t m_old;
-	uint8_t m_aliencha_dip_sel;
-	uint16_t m_priority;
-	int m_whitescreen;
-	lordgun_gun_data m_gun[2];
-	tilemap_t *m_tilemap[4];
-	std::unique_ptr<bitmap_ind16> m_bitmaps[5];
+	uint8_t m_old = 0U;
+	uint8_t m_aliencha_dip_sel = 0U;
+	uint16_t m_priority = 0U;
+	int m_whitescreen = 0;
+	lordgun_gun_data m_gun[2]{};
+	tilemap_t *m_tilemap[4]{};
+	std::unique_ptr<bitmap_ind16> m_bitmaps[5]{};
 
-	uint16_t m_protection_data;
-	DECLARE_WRITE16_MEMBER(lordgun_protection_w);
-	DECLARE_READ16_MEMBER(lordgun_protection_r);
-	DECLARE_WRITE16_MEMBER(aliencha_protection_w);
-	DECLARE_READ16_MEMBER(aliencha_protection_r);
+	uint16_t m_protection_data = 0U;
+	void lordgun_protection_w(offs_t offset, uint16_t data);
+	uint16_t lordgun_protection_r(offs_t offset);
+	void aliencha_protection_w(offs_t offset, uint16_t data);
+	uint16_t aliencha_protection_r(offs_t offset);
 
-	DECLARE_WRITE16_MEMBER(priority_w);
-	DECLARE_READ16_MEMBER(lordgun_gun_0_x_r);
-	DECLARE_READ16_MEMBER(lordgun_gun_0_y_r);
-	DECLARE_READ16_MEMBER(lordgun_gun_1_x_r);
-	DECLARE_READ16_MEMBER(lordgun_gun_1_y_r);
-	DECLARE_WRITE16_MEMBER(soundlatch_w);
-	template<int Layer> DECLARE_WRITE16_MEMBER(vram_w);
+	void priority_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t lordgun_gun_0_x_r();
+	uint16_t lordgun_gun_0_y_r();
+	uint16_t lordgun_gun_1_x_r();
+	uint16_t lordgun_gun_1_y_r();
+	void soundlatch_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	template<int Layer> void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void fake_w(uint8_t data);
 	void fake2_w(uint8_t data);
 	void lordgun_eeprom_w(uint8_t data);

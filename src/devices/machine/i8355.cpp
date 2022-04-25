@@ -93,7 +93,7 @@ i8355_device::i8355_device(const machine_config &mconfig, const char *tag, devic
 		m_out_pa_cb(*this),
 		m_in_pb_cb(*this),
 		m_out_pb_cb(*this),
-		m_rom(*this, DEVICE_SELF, 0x800)
+		m_rom(*this, DEVICE_SELF)
 {
 }
 

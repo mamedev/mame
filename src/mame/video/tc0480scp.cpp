@@ -623,15 +623,12 @@ void tc0480scp_device::bg01_draw(screen_device &screen, bitmap_ind16 &bitmap, co
 	}
 	else    /* zoom */
 	{
-		u16 *dst16, *src16;
-		u8 *tsrc;
 		u16 scanline[512];
 		u32 sx;
-		bitmap_ind16 &srcbitmap = m_tilemap[layer][m_dblwidth]->pixmap();
+		const bitmap_ind16 &srcbitmap = m_tilemap[layer][m_dblwidth]->pixmap();
 		bitmap_ind8 &flagsbitmap = m_tilemap[layer][m_dblwidth]->flagsmap();
 		int flip = m_pri_reg & 0x40;
-		int y_index, src_y_index, row_index;
-		int x_index, x_step;
+		int y_index;
 
 		u16 screen_width = 512; //cliprect.width();
 		u16 min_y = cliprect.min_y;
@@ -660,20 +657,20 @@ void tc0480scp_device::bg01_draw(screen_device &screen, bitmap_ind16 &bitmap, co
 
 		for (int y = min_y; y <= max_y; y++)
 		{
-			src_y_index = (y_index >> 16) & 0x1ff;
+			int src_y_index = (y_index >> 16) & 0x1ff;
 
 			/* row areas are the same in flipscreen, so we must read in reverse */
-			row_index = src_y_index;
+			int row_index = src_y_index;
 			if (flip)
 				row_index = 0x1ff - row_index;
 
-			x_index = sx - ((m_bgscroll_ram[layer][row_index] << 16)) - ((m_bgscroll_ram[layer][row_index + 0x800] << 8) & 0xffff);
+			int x_index = sx - ((m_bgscroll_ram[layer][row_index] << 16)) - ((m_bgscroll_ram[layer][row_index + 0x800] << 8) & 0xffff);
 
-			src16 = &srcbitmap.pix16(src_y_index);
-			tsrc = &flagsbitmap.pix8(src_y_index);
-			dst16 = scanline;
+			const u16 *src16 = &srcbitmap.pix(src_y_index);
+			const u8 *tsrc = &flagsbitmap.pix(src_y_index);
+			u16 *dst16 = scanline;
 
-			x_step = zoomx;
+			int x_step = zoomx;
 
 			if (flags & TILEMAP_DRAW_OPAQUE)
 			{
@@ -744,10 +741,8 @@ void tc0480scp_device::bg23_draw(screen_device &screen, bitmap_ind16 &bitmap, co
 	bitmap_ind16 &srcbitmap = m_tilemap[layer][m_dblwidth]->pixmap();
 	bitmap_ind8 &flagsbitmap = m_tilemap[layer][m_dblwidth]->flagsmap();
 
-	u16 *dst16, *src16;
-	u8 *tsrc;
-	int y_index, src_y_index, row_index, row_zoom;
-	int sx, x_index, x_step;
+	int y_index;
+	int sx;
 	u32 zoomx, zoomy;
 	u16 scanline[512];
 	int flipscreen = m_pri_reg & 0x40;
@@ -786,29 +781,31 @@ void tc0480scp_device::bg23_draw(screen_device &screen, bitmap_ind16 &bitmap, co
 
 	for (int y = min_y; y <= max_y; y++)
 	{
+		int src_y_index;
 		if (!flipscreen)
 			src_y_index = ((y_index>>16) + m_bgcolumn_ram[layer][(y - m_y_offset) & 0x1ff]) & 0x1ff;
 		else    /* colscroll area is back to front in flipscreen */
 			src_y_index = ((y_index>>16) + m_bgcolumn_ram[layer][0x1ff - ((y - m_y_offset) & 0x1ff)]) & 0x1ff;
 
 		/* row areas are the same in flipscreen, so we must read in reverse */
-		row_index = src_y_index;
+		int row_index = src_y_index;
 		if (flipscreen)
 			row_index = 0x1ff - row_index;
 
+		int row_zoom;
 		if (m_pri_reg & (layer - 1))   /* bit0 enables for BG2, bit1 for BG3 */
 			row_zoom = m_rowzoom_ram[layer][row_index];
 		else
 			row_zoom = 0;
 
-		x_index = sx - ((m_bgscroll_ram[layer][row_index] << 16)) - ((m_bgscroll_ram[layer][row_index + 0x800] << 8) & 0xffff);
+		int x_index = sx - ((m_bgscroll_ram[layer][row_index] << 16)) - ((m_bgscroll_ram[layer][row_index + 0x800] << 8) & 0xffff);
 
 		/* flawed calc ?? */
 		x_index -= (m_x_offset - 0x1f + layer * 4) * ((row_zoom & 0xff) << 8);
 
 /* We used to kludge 270 multiply factor, before adjusting x_index instead */
 
-		x_step = zoomx;
+		int x_step = zoomx;
 		if (row_zoom)   /* need to reduce x_step */
 		{
 			if (!(row_zoom & 0xff00))
@@ -817,9 +814,9 @@ void tc0480scp_device::bg23_draw(screen_device &screen, bitmap_ind16 &bitmap, co
 				x_step -= (((row_zoom & 0xff) * 256) & 0xffff);
 		}
 
-		src16 = &srcbitmap.pix16(src_y_index);
-		tsrc = &flagsbitmap.pix8(src_y_index);
-		dst16 = scanline;
+		const u16 *src16 = &srcbitmap.pix(src_y_index);
+		const u8 *tsrc = &flagsbitmap.pix(src_y_index);
+		u16 *dst16 = scanline;
 
 		if (flags & TILEMAP_DRAW_OPAQUE)
 		{

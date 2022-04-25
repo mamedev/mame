@@ -31,7 +31,7 @@
 #include "includes/tiki100.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -92,14 +92,14 @@ void tiki100_state::mrq_w(offs_t offset, uint8_t data)
 	m_exp->mrq_w(offset, data);
 }
 
-READ8_MEMBER( tiki100_state::iorq_r )
+uint8_t tiki100_state::iorq_r(offs_t offset)
 {
 	uint8_t data = m_exp->iorq_r(offset, 0xff);
 
 	switch ((offset & 0xff) >> 2)
 	{
 	case 0x00: // KEYS
-		data = keyboard_r(space, 0);
+		data = keyboard_r();
 		break;
 
 	case 0x01: // SERS
@@ -131,14 +131,14 @@ READ8_MEMBER( tiki100_state::iorq_r )
 	return data;
 }
 
-WRITE8_MEMBER( tiki100_state::iorq_w )
+void tiki100_state::iorq_w(offs_t offset, uint8_t data)
 {
 	m_exp->iorq_w(offset, data);
 
 	switch ((offset & 0xff) >> 2)
 	{
 	case 0x00: // KEYS
-		keyboard_w(space, 0, data);
+		keyboard_w(data);
 		break;
 
 	case 0x01: // SERS
@@ -150,7 +150,7 @@ WRITE8_MEMBER( tiki100_state::iorq_w )
 		break;
 
 	case 0x03: // VIPB
-		video_mode_w(space, 0, data);
+		video_mode_w(data);
 		break;
 
 	case 0x04: // FLOP
@@ -161,7 +161,7 @@ WRITE8_MEMBER( tiki100_state::iorq_w )
 		switch (offset & 0x03)
 		{
 		case 0: case 1:
-			palette_w(space, 0, data);
+			palette_w(data);
 			break;
 
 		case 2:
@@ -179,14 +179,14 @@ WRITE8_MEMBER( tiki100_state::iorq_w )
 		break;
 
 	case 0x07: // SYL
-		system_w(space, 0, data);
+		system_w(data);
 		break;
 	}
 }
 
 /* Read/Write Handlers */
 
-READ8_MEMBER( tiki100_state::keyboard_r )
+uint8_t tiki100_state::keyboard_r()
 {
 	uint8_t data = 0xff;
 
@@ -196,17 +196,17 @@ READ8_MEMBER( tiki100_state::keyboard_r )
 	}
 
 	m_keylatch++;
-	if (m_keylatch == 16) m_keylatch = 0;	// Column selected by a 4-bit counter
+	if (m_keylatch == 16) m_keylatch = 0;   // Column selected by a 4-bit counter
 
 	return data;
 }
 
-WRITE8_MEMBER( tiki100_state::keyboard_w )
+void tiki100_state::keyboard_w(uint8_t data)
 {
 	m_keylatch = 0;
 }
 
-WRITE8_MEMBER( tiki100_state::video_mode_w )
+void tiki100_state::video_mode_w(uint8_t data)
 {
 	/*
 
@@ -226,7 +226,7 @@ WRITE8_MEMBER( tiki100_state::video_mode_w )
 	m_mode = data;
 }
 
-WRITE8_MEMBER( tiki100_state::palette_w )
+void tiki100_state::palette_w(uint8_t data)
 {
 	/*
 
@@ -246,7 +246,7 @@ WRITE8_MEMBER( tiki100_state::palette_w )
 	m_palette_val = data;
 }
 
-WRITE8_MEMBER( tiki100_state::system_w )
+void tiki100_state::system_w(uint8_t data)
 {
 	/*
 
@@ -493,13 +493,13 @@ uint32_t tiki100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	//
 	//
 
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
 	for (int vaddr = cliprect.min_y; vaddr <= cliprect.max_y; vaddr++)
 	{
 		// This is at the start of a line
 		int haddr = (cliprect.min_x>>4);
-		int haddr_end = (cliprect.max_x>>4);
+		int const haddr_end = (cliprect.max_x>>4);
 		for (; haddr <= haddr_end; haddr++)
 		{
 			// This is at the start of a 16-dot cluster. Changes in m_scroll and m_video_ram come into effect here.
@@ -521,7 +521,7 @@ uint32_t tiki100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 					//
 					m_current_pixel = data&0x0F;
 				}
-				bitmap.pix32(vaddr, (haddr<<4) + dot) = palette[m_current_pixel&0x0F];
+				bitmap.pix(vaddr, (haddr<<4) + dot) = palette[m_current_pixel&0x0F];
 
 				// This will run the dot-shifter and add the TEST-pattern to the upper bits (usually hidden by palette).
 				data = (data>>1)|((haddr&0x02)<<14);
@@ -632,9 +632,11 @@ WRITE_LINE_MEMBER( tiki100_state::bar2_w )
 
 /* FD1797 Interface */
 
-FLOPPY_FORMATS_MEMBER( tiki100_state::floppy_formats )
-	FLOPPY_TIKI100_FORMAT
-FLOPPY_FORMATS_END
+void tiki100_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_TIKI100_FORMAT);
+}
 
 static void tiki100_floppies(device_slot_interface &device)
 {
@@ -681,9 +683,6 @@ void tiki100_state::machine_start()
 {
 	m_leds.resolve();
 
-	/* allocate video RAM */
-	m_video_ram.allocate(TIKI100_VIDEORAM_SIZE);
-
 	/* register for state saving */
 	save_item(NAME(m_rome));
 	save_item(NAME(m_vire));
@@ -699,9 +698,7 @@ void tiki100_state::machine_start()
 
 void tiki100_state::machine_reset()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	system_w(space, 0, 0);
+	system_w(0);
 
 	m_st = m_st_io->read();
 }

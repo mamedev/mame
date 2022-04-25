@@ -40,7 +40,6 @@
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -71,22 +70,22 @@ public:
 	required_shared_ptr<uint8_t> m_videoram2;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	tilemap_t  *m_fg_tilemap;
-	int      m_bg_bank;
-	int      m_bg_color_bank;
-	int      m_flipscreen;
-	int      m_scrolly;
-	int      m_scrolly_hi;
-	int      m_scrollx;
-	int      m_scrollx_hi;
-	int      m_rotation_x;
-	int      m_rotation_sign;
-	int      m_disable_roz;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	tilemap_t  *m_fg_tilemap = nullptr;
+	int      m_bg_bank = 0;
+	int      m_bg_color_bank = 0;
+	int      m_flipscreen = 0;
+	int      m_scrolly = 0;
+	int      m_scrolly_hi = 0;
+	int      m_scrollx = 0;
+	int      m_scrollx_hi = 0;
+	int      m_rotation_x = 0;
+	int      m_rotation_sign = 0;
+	int      m_disable_roz = 0;
 
 	/* misc */
-	int      m_nmimask; // zerotrgt only
-	bool     m_sub_nmimask; // counter steer only
+	int      m_nmimask = 0; // zerotrgt only
+	bool     m_sub_nmimask = false; // counter steer only
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -1023,9 +1022,6 @@ void cntsteer_state::cntsteer(machine_config &config)
 	YM2149(config, "ay2", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // labeled DAC-08CQ
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void cntsteer_state::zerotrgt(machine_config &config)

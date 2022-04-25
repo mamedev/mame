@@ -121,136 +121,118 @@ license:CC0
 			<bounds x="30" y="0" width="~scr0width~" height="~scr0height~" />
 		</screen>
 
-		<bezel name="driveled0" element="driveled">
+		<element name="driveled0" ref="driveled">
 			<bounds x="15" y="3" width="10" height="10" />
-		</bezel>
-		<bezel name="driveled1" element="driveled">
+		</element>
+		<element name="driveled1" ref="driveled">
 			<bounds x="15" y="18" width="10" height="10" />
-		</bezel>
-		<bezel name="driveled2" element="driveled">
+		</element>
+		<element name="driveled2" ref="driveled">
 			<bounds x="15" y="33" width="10" height="10" />
-		</bezel>
-		<bezel name="driveled3" element="driveled">
+		</element>
+		<element name="driveled3" ref="driveled">
 			<bounds x="15" y="46" width="10" height="10" />
-		</bezel>
+		</element>
 
-		<bezel name="led1" element="sysled">
+		<element name="led1" ref="sysled">
 			<bounds x="15" y="76" width="10" height="10" />
-		</bezel>
-		<bezel name="led2" element="sysled">
+		</element>
+		<element name="led2" ref="sysled">
 			<bounds x="15" y="96" width="10" height="10" />
-		</bezel>
-		<bezel name="led3" element="sysled">
+		</element>
+		<element name="led3" ref="sysled">
 			<bounds x="15" y="116" width="10" height="10" />
-		</bezel>
-		<bezel name="led4" element="sysled">
+		</element>
+		<element name="led4" ref="sysled">
 			<bounds x="15" y="136" width="10" height="10" />
-		</bezel>
-		<bezel name="led5" element="sysled">
+		</element>
+		<element name="led5" ref="sysled">
 			<bounds x="15" y="156" width="10" height="10" />
-		</bezel>
-		<bezel name="led6" element="sysled">
+		</element>
+		<element name="led6" ref="sysled">
 			<bounds x="15" y="176" width="10" height="10" />
-		</bezel>
-		<bezel name="led7" element="sysled">
+		</element>
+		<element name="led7" ref="sysled">
 			<bounds x="15" y="196" width="10" height="10" />
-		</bezel>
+		</element>
 
-		<bezel name="led_hold" element="greenkbd">
+		<element name="led_hold" ref="greenkbd">
 			<bounds x="15" y="226" width="10" height="10" />
-		</bezel>
-		<bezel name="led_lock" element="greenkbd">
+		</element>
+		<element name="led_lock" ref="greenkbd">
 			<bounds x="15" y="246" width="10" height="10" />
-		</bezel>
-		<bezel name="led_compose" element="greenkbd">
+		</element>
+		<element name="led_compose" ref="greenkbd">
 			<bounds x="15" y="265" width="10" height="10" />
-		</bezel>
-		<bezel name="led_wait" element="greenkbd">
+		</element>
+		<element name="led_wait" ref="greenkbd">
 			<bounds x="15" y="285" width="10" height="10" />
-		</bezel>
+		</element>
 
-		<bezel name="label20" element="DRIVE0">
+		<element name="label20" ref="DRIVE0">
 			<bounds x="0" y="0" width="15" height="16" />
-		</bezel>
-		<bezel name="label21" element="DRIVE1">
+		</element>
+		<element name="label21" ref="DRIVE1">
 			<bounds x="0" y="14" width="15" height="16" />
-		</bezel>
-		<bezel name="label22" element="DRIVE2">
+		</element>
+		<element name="label22" ref="DRIVE2">
 			<bounds x="0" y="29" width="15" height="16" />
-		</bezel>
-		<bezel name="label23" element="DRIVE3">
+		</element>
+		<element name="label23" ref="DRIVE3">
 			<bounds x="0" y="43" width="15" height="16" />
-		</bezel>
+		</element>
 
-		<bezel name="label1" element="l1sysled0">
+		<element name="label1" ref="l1sysled0">
 			<bounds x="0" y="73" width="15" height="16" />
-		</bezel>
-		<bezel name="label2" element="l2">
+		</element>
+		<element name="label2" ref="l2">
 			<bounds x="0" y="93" width="15" height="16" />
-		</bezel>
-		<bezel name="label3" element="l3">
+		</element>
+		<element name="label3" ref="l3">
 			<bounds x="0" y="113" width="15" height="16" />
-		</bezel>
-		<bezel name="label4" element="l4">
+		</element>
+		<element name="label4" ref="l4">
 			<bounds x="0" y="133" width="15" height="16" />
-		</bezel>
-		<bezel name="label5" element="l5">
+		</element>
+		<element name="label5" ref="l5">
 			<bounds x="0" y="153" width="15" height="16" />
-		</bezel>
-		<bezel name="label6" element="l6">
+		</element>
+		<element name="label6" ref="l6">
 			<bounds x="0" y="173" width="15" height="16" />
-		</bezel>
-		<bezel name="label7" element="l7">
+		</element>
+		<element name="label7" ref="l7">
 			<bounds x="0" y="193" width="15" height="16" />
-		</bezel>
-		<bezel name="label8" element="l8_hold">
+		</element>
+		<element name="label8" ref="l8_hold">
 			<bounds x="0" y="222" width="15" height="16" />
-		</bezel>
-		<bezel name="label9" element="l9_lock">
+		</element>
+		<element name="label9" ref="l9_lock">
 			<bounds x="0" y="242" width="15" height="16" />
-		</bezel>
-		<bezel name="label10" element="l10_comp">
+		</element>
+		<element name="label10" ref="l10_comp">
 			<bounds x="0" y="262" width="15" height="16" />
-		</bezel>
-		<bezel name="label11" element="l11_wait">
+		</element>
+		<element name="label11" ref="l11_wait">
 			<bounds x="0" y="282" width="15" height="16" />
-		</bezel>
+		</element>
 
-		<bezel name="digit0" element="digit">
+		<element name="digit0" ref="digit">
 			<bounds x="0" y="320" width="14" height="20" />
-		</bezel>
-		<bezel name="digit1" element="digit">
+		</element>
+		<element name="digit1" ref="digit">
 			<bounds x="15" y="320" width="14" height="20" />
-		</bezel>
+		</element>
 	</view>
 
 	<view name="Text Only">
 		<screen index="0">
-			<bounds x="30" y="0" width="~scr0width~" height="~scr0height~" />
+			<bounds x="0" y="0" width="~scr0width~" height="~scr0height~" />
 		</screen>
 	</view>
 
 	<view name="Graphics Only">
 		<screen index="1">
 			<bounds x="0" y="0" width="~scr1width~" height="~scr1height~" />
-		</screen>
-	</view>
-
-	<view name="Dual Side-by-Side">
-		<screen index="0">
-			<bounds x="0" y="0" width="~scr0width~" height="~scr0height~" />
-		</screen>
-		<screen index="1">
-			<bounds x="~scr0width~" y="0" width="~scr1width~" height="~scr1height~" />
-		</screen>
-	</view>
-
-	<view name="Dual Over-Under">
-		<screen index="0">
-			<bounds x="30" y="0" width="~scr0width~" height="~scr0height~" />
-		</screen>
-		<screen index="1">
-			<bounds x="30" y="~scr0height~" width="~scr1width~" height="~scr1height~" />
 		</screen>
 	</view>
 </mamelayout>

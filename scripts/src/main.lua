@@ -40,17 +40,6 @@ end
 			"GLESv2",
 			"SDL2",
 		}
-	configuration { "pnacl" }
-		kind "ConsoleApp"
-		targetextension ".pexe"
-		links {
-			"ppapi",
-			"ppapi_gles2",
-			"pthread",
-		}
-
-	configuration { "winstore*" }
-		kind "WindowedApp"
 
 	configuration {  }
 
@@ -68,67 +57,13 @@ end
 			}
 	end
 
-	configuration { "winstore*" }
-		-- Windows Required Files
-		files {
-			-- Manifest file
-			MAME_DIR .. "scripts/resources/uwp/Package.appxmanifest",
-		}
-
-	configuration { "winstore*" }
-		files {
-			MAME_DIR .. "scripts/resources/uwp/assets/*.png"
-		}
-		configuration "**/scripts/resources/uwp/assets/*.png"
-			flags { "DeploymentContent" }
-
-	-- Effects and Shaders
-	configuration { "winstore*" }
-		files {
-			MAME_DIR .. "artwork/*",
-			MAME_DIR .. "artwork/**/*",
-			MAME_DIR .. "bgfx/*",
-			MAME_DIR .. "bgfx/**/*",
-			MAME_DIR .. "hash/*",
-			MAME_DIR .. "language/*",
-			MAME_DIR .. "language/**/*",
-			MAME_DIR .. "plugins/*",
-			MAME_DIR .. "plugins/**/*",
-		}
-		configuration "**/*"
-			flags { "DeploymentContent" }
-
-	configuration { "x64", "Release" }
-		targetsuffix "64"
-		if _OPTIONS["PROFILE"] then
-			targetsuffix "64p"
-		end
-
-	configuration { "x64", "Debug" }
-		targetsuffix "64d"
-		if _OPTIONS["PROFILE"] then
-			targetsuffix "64dp"
-		end
-
-	configuration { "x32", "Release" }
+	configuration { "Release" }
 		targetsuffix ""
 		if _OPTIONS["PROFILE"] then
 			targetsuffix "p"
 		end
 
-	configuration { "x32", "Debug" }
-		targetsuffix "d"
-		if _OPTIONS["PROFILE"] then
-			targetsuffix "dp"
-		end
-
-	configuration { "Native", "Release" }
-		targetsuffix ""
-		if _OPTIONS["PROFILE"] then
-			targetsuffix "p"
-		end
-
-	configuration { "Native", "Debug" }
+	configuration { "Debug" }
 		targetsuffix "d"
 		if _OPTIONS["PROFILE"] then
 			targetsuffix "dp"
@@ -137,51 +72,8 @@ end
 	configuration { "mingw*" or "vs20*" }
 		targetextension ".exe"
 
-	configuration { "rpi" }
-		targetextension ""
-
 	configuration { "asmjs" }
-		targetextension ".bc"
-		if os.getenv("EMSCRIPTEN") then
-			local emccopts = ""
-				.. " -O" .. _OPTIONS["OPTIMIZE"]
-				.. " -s USE_SDL=2"
-				.. " -s USE_SDL_TTF=2"
-				.. " --memory-init-file 0"
-				.. " -s ALLOW_MEMORY_GROWTH=0"
-				.. " -s TOTAL_MEMORY=268435456"
-				.. " -s DISABLE_EXCEPTION_CATCHING=2"
-				.. " -s EXCEPTION_CATCHING_WHITELIST=\"['__ZN15running_machine17start_all_devicesEv','__ZN12cli_frontend7executeEiPPc','__ZN8chd_file11open_commonEb','__ZN8chd_file13read_metadataEjjRNSt3__212basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE','__ZN8chd_file13read_metadataEjjRNSt3__26vectorIhNS0_9allocatorIhEEEE']\""
-				.. " -s EXPORTED_FUNCTIONS=\"['_main', '_malloc', '__ZN15running_machine30emscripten_get_running_machineEv', '__ZN15running_machine17emscripten_get_uiEv', '__ZN15running_machine20emscripten_get_soundEv', '__ZN15mame_ui_manager12set_show_fpsEb', '__ZNK15mame_ui_manager8show_fpsEv', '__ZN13sound_manager4muteEbh', '_SDL_PauseAudio', '_SDL_SendKeyboardKey', '__ZN15running_machine15emscripten_saveEPKc', '__ZN15running_machine15emscripten_loadEPKc', '__ZN15running_machine21emscripten_hard_resetEv', '__ZN15running_machine21emscripten_soft_resetEv', '__ZN15running_machine15emscripten_exitEv']\""
-				.. " -s EXTRA_EXPORTED_RUNTIME_METHODS=\"['cwrap']\""
-				.. " -s ERROR_ON_UNDEFINED_SYMBOLS=0"
-				.. " --pre-js " .. _MAKE.esc(MAME_DIR) .. "src/osd/modules/sound/js_sound.js"
-				.. " --post-js " .. _MAKE.esc(MAME_DIR) .. "scripts/resources/emscripten/emscripten_post.js"
-				.. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/chains@bgfx/chains"
-				.. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/effects@bgfx/effects"
-				.. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/shaders/essl@bgfx/shaders/essl"
-				.. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "artwork/bgfx@artwork/bgfx"
-				.. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "artwork/slot-mask.png@artwork/slot-mask.png"
-
-			if _OPTIONS["SYMBOLS"]~=nil and _OPTIONS["SYMBOLS"]~="0" then
-				emccopts = emccopts
-					.. " -g" .. _OPTIONS["SYMLEVEL"]
-					.. " -s DEMANGLE_SUPPORT=1"
-			end
-
-			if _OPTIONS["WEBASSEMBLY"] then
-				emccopts = emccopts
-					.. " -s WASM=" .. _OPTIONS["WEBASSEMBLY"]
-			end
-
-			if _OPTIONS["ARCHOPTS"] then
-				emccopts = emccopts .. " " .. _OPTIONS["ARCHOPTS"]
-			end
-
-			postbuildcommands {
-				os.getenv("EMSCRIPTEN") .. "/emcc " .. emccopts .. " $(TARGET) -o " .. _MAKE.esc(MAME_DIR) .. _OPTIONS["target"] .. _OPTIONS["subtarget"] .. ".js",
-			}
-		end
+		targetextension ".html"
 
 	configuration { }
 
@@ -200,12 +92,6 @@ end
 			end
 			if _OPTIONS["PLATFORM"]=="arm64" then
 				targetdir(MAME_DIR .. "android-project/app/src/main/libs/arm64-v8a")
-			end
-			if _OPTIONS["PLATFORM"]=="mips" then
-				targetdir(MAME_DIR .. "android-project/app/src/main/libs/mips")
-			end
-			if _OPTIONS["PLATFORM"]=="mips64" then
-				targetdir(MAME_DIR .. "android-project/app/src/main/libs/mips64")
 			end
 			if _OPTIONS["PLATFORM"]=="x86" then
 				targetdir(MAME_DIR .. "android-project/app/src/main/libs/x86")
@@ -259,20 +145,21 @@ end
 		"softfloat",
 		"softfloat3",
 		"wdlfft",
+		"ymfm",
 		ext_lib("jpeg"),
 		"7z",
+	}
+if not _OPTIONS["FORCE_DRC_C_BACKEND"] then
+	links {
 		"asmjit",
 	}
+end
 if (STANDALONE~=true) then
 	links {
 		ext_lib("lua"),
 		"lualibs",
-	}
-if (_OPTIONS["osd"] ~= "uwp") then
-	links {
 		"linenoise",
 	}
-end
 end
 	links {
 		ext_lib("zlib"),
@@ -418,13 +305,6 @@ if (STANDALONE~=true) then
 		}
 
 	configuration { "vs20*" }
-		prebuildcommands {
-			"mkdir \"" .. path.translate(GEN_DIR  .. "resource/","\\") .. "\" 2>NUL",
-			"@echo Emitting ".. rctarget .. "vers.rc...",
-			PYTHON .. " \"" .. path.translate(MAME_DIR .. "scripts/build/verinfo.py","\\") .. "\" -r -b " .. rctarget .. " \"" .. path.translate(GEN_DIR .. "version.cpp","\\") .. "\" > \"" .. path.translate(GEN_DIR  .. "resource/" .. rctarget .. "vers.rc", "\\") .. "\"" ,
-		}
-
-	configuration { "vsllvm" }
 		prebuildcommands {
 			"mkdir \"" .. path.translate(GEN_DIR  .. "resource/","\\") .. "\" 2>NUL",
 			"@echo Emitting ".. rctarget .. "vers.rc...",

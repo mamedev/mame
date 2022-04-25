@@ -49,19 +49,19 @@ void pirates_state::video_start()
 
 
 
-WRITE16_MEMBER(pirates_state::tx_tileram_w)
+void pirates_state::tx_tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_tx_tileram+offset);
 	m_tx_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_MEMBER(pirates_state::fg_tileram_w)
+void pirates_state::fg_tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_fg_tileram+offset);
 	m_fg_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_MEMBER(pirates_state::bg_tileram_w)
+void pirates_state::bg_tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_bg_tileram+offset);
 	m_bg_tilemap->mark_tile_dirty(offset/2);

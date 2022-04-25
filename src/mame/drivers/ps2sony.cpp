@@ -280,18 +280,18 @@ protected:
 	required_shared_ptr<uint64_t>   m_vu1_dmem;
 	required_region_ptr<uint32_t>   m_bios;
 
-	uint32_t m_unk_f430_reg;
-	uint32_t m_unk_f440_counter;
-	uint32_t m_unk_f440_reg;
-	uint32_t m_unk_f440_ret;
+	uint32_t m_unk_f430_reg = 0;
+	uint32_t m_unk_f440_counter = 0;
+	uint32_t m_unk_f440_reg = 0;
+	uint32_t m_unk_f440_ret = 0;
 
-	uint32_t m_ipu_ctrl;
-	uint64_t m_ipu_in_fifo[0x1000];
-	uint64_t m_ipu_in_fifo_index;
-	uint64_t m_ipu_out_fifo[0x1000];
-	uint64_t m_ipu_out_fifo_index;
+	uint32_t m_ipu_ctrl = 0;
+	uint64_t m_ipu_in_fifo[0x1000]{};
+	uint64_t m_ipu_in_fifo_index = 0;
+	uint64_t m_ipu_out_fifo[0x1000]{};
+	uint64_t m_ipu_out_fifo_index = 0;
 
-	emu_timer *m_vblank_timer;
+	emu_timer *m_vblank_timer = nullptr;
 };
 
 /**************************************
@@ -691,7 +691,7 @@ void ps2sony_state::mem_map(address_map &map)
 	map(0x10005000, 0x1000500f).mirror(0xff0).rw(m_vu1, FUNC(sonyvu1_device::vif_r), FUNC(sonyvu1_device::vif_w));
 	map(0x10006000, 0x1000600f).mirror(0xff0).rw(FUNC(ps2sony_state::gif_fifo_r), FUNC(ps2sony_state::gif_fifo_w));
 	map(0x10007000, 0x1000701f).mirror(0xfe0).rw(FUNC(ps2sony_state::ipu_fifo_r), FUNC(ps2sony_state::ipu_fifo_w));
-	map(0x10008000, 0x1000dfff).rw(m_dmac, FUNC(ps2_dmac_device::channel_r), FUNC(ps2_dmac_device::channel_w)).umask64(0x00000000ffffffff);;
+	map(0x10008000, 0x1000dfff).rw(m_dmac, FUNC(ps2_dmac_device::channel_r), FUNC(ps2_dmac_device::channel_w)).umask64(0x00000000ffffffff);
 	map(0x1000e000, 0x1000efff).rw(m_dmac, FUNC(ps2_dmac_device::read), FUNC(ps2_dmac_device::write)).umask64(0x00000000ffffffff);
 	map(0x1000f000, 0x1000f017).rw(m_intc, FUNC(ps2_intc_device::read), FUNC(ps2_intc_device::write)).umask64(0x00000000ffffffff);
 	map(0x1000f130, 0x1000f137).nopr();
@@ -914,6 +914,12 @@ ROM_START( ps2 )
 	ROMX_LOAD( "scph_bios_v12_rus_200.bin", 0x000000, 0x400000, CRC(92aa71a2) SHA1(cce6fac0f7e682ad167e1e828b2d53192c3d5051), ROM_BIOS(59) )
 	ROM_SYSTEM_BIOS( 60, "unknown6", "Unknown6" )
 	ROMX_LOAD( "scph_bios_v15_jap_220.bin", 0x000000, 0x400000, CRC(493c1e58) SHA1(d9a7537fa463fcdd3e270af14a93731736cafc4a), ROM_BIOS(60) )
+
+	// These came from Guru
+	ROM_SYSTEM_BIOS( 61, "scph50000_j2", "SCPH-50000 (Version 5.0 08/22/03 J)" )
+	ROMX_LOAD( "ps2-0190j-20030822.bin", 0x000000, 0x400000, CRC(79d60546) SHA1(0ea98a25a32145dda514de2f0d4bfbbd806bd00c), ROM_BIOS(61) )
+	ROM_SYSTEM_BIOS( 62, "scph70002_a", "SCPH-70002/SCPH-75002 (Version 5.0 06/14/04 A)" )
+	ROMX_LOAD( "ps2-0200a-20040614_alt.bin", 0x000000, 0x400000, CRC(3e0aa788) SHA1(597841bfea6e334f5ec4116299091ae2ed3da479), ROM_BIOS(62) )
 ROM_END
 
 CONS( 2000, ps2, 0, 0, ps2sony, ps2sony, ps2sony_state, empty_init, "Sony", "PlayStation 2", MACHINE_IS_SKELETON )

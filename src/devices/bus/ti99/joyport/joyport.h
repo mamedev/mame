@@ -22,7 +22,7 @@
 
 #pragma once
 
-namespace bus { namespace ti99 { namespace joyport {
+namespace bus::ti99::joyport {
 
 enum
 {
@@ -30,6 +30,8 @@ enum
 	MOUSE,
 	HANDSET
 };
+
+#define TI_JOYPORT_TAG     "joyport"
 
 class joyport_device;
 
@@ -82,7 +84,7 @@ private:
 	device_ti99_joyport_interface*    m_connected;
 };
 
-} } } // end namespace bus::ti99::joyport
+} // end namespace bus::ti99::joyport
 
 DECLARE_DEVICE_TYPE_NS(TI99_JOYPORT, bus::ti99::joyport, joyport_device)
 

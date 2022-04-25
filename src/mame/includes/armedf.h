@@ -25,7 +25,7 @@ public:
 		, m_palette(*this, "palette")
 		, m_spriteram(*this, "spriteram")
 		, m_soundlatch(*this, "soundlatch")
-		, m_text_videoram(*this, "text_videoram", 0)
+		, m_text_videoram(*this, "text_videoram", 0x1000, ENDIANNESS_BIG)
 		, m_spr_pal_clut(*this, "spr_pal_clut")
 		, m_fg_videoram(*this, "fg_videoram")
 		, m_bg_videoram(*this, "bg_videoram")
@@ -66,26 +66,26 @@ protected:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	// memory pointers
-	required_shared_ptr<u8> m_text_videoram;
+	memory_share_creator<u8> m_text_videoram;
 	required_shared_ptr<u16> m_spr_pal_clut;
 	required_shared_ptr<u16> m_fg_videoram;
 	required_shared_ptr<u16> m_bg_videoram;
 	u16 m_legion_cmd[4]; // legionjb only!
 
 	// video-related
-	tilemap_t  *m_bg_tilemap;
-	tilemap_t  *m_fg_tilemap;
-	tilemap_t  *m_tx_tilemap;
-	u16   m_scroll_msb;
-	u16   m_vreg;
-	u16   m_fg_scrollx;
-	u16   m_fg_scrolly;
-	u16   m_bg_scrollx;
-	u16   m_bg_scrolly;
-	int   m_scroll_type;
-	int   m_sprite_offy;
-	int   m_old_mcu_mode;
-	int   m_waiting_msb;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	tilemap_t  *m_fg_tilemap = nullptr;
+	tilemap_t  *m_tx_tilemap = nullptr;
+	u16   m_scroll_msb = 0;
+	u16   m_vreg = 0;
+	u16   m_fg_scrollx = 0;
+	u16   m_fg_scrolly = 0;
+	u16   m_bg_scrollx = 0;
+	u16   m_bg_scrolly = 0;
+	int   m_scroll_type = 0;
+	int   m_sprite_offy = 0;
+	int   m_old_mcu_mode = 0;
+	int   m_waiting_msb = 0;
 
 	// read/write handlers
 	void terraf_io_w(offs_t offset, u16 data, u16 mem_mask);

@@ -9,19 +9,18 @@
 
 #pragma once
 
-#include "bus/ti99/ti99defs.h"
 #include "cartridges.h"
 
-namespace bus { namespace ti99 { namespace gromport {
+namespace bus::ti99::gromport {
 
 class ti99_single_cart_conn_device : public cartridge_connector_device
 {
 public:
 	ti99_single_cart_conn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8Z_MEMBER(readz) override;
+	void readz(offs_t offset, uint8_t *value) override;
 	void write(offs_t offset, uint8_t data) override;
-	DECLARE_READ8Z_MEMBER(crureadz) override;
+	void crureadz(offs_t offset, uint8_t *value) override;
 	void cruwrite(offs_t offset, uint8_t data) override;
 	DECLARE_WRITE_LINE_MEMBER(romgq_line) override;
 	void set_gromlines(line_state mline, line_state moline, line_state gsq) override;
@@ -37,7 +36,8 @@ protected:
 private:
 	ti99_cartridge_device *m_cartridge;
 };
-} } } // end namespace bus::ti99::gromport
+
+} // end namespace bus::ti99::gromport
 
 DECLARE_DEVICE_TYPE_NS(TI99_GROMPORT_SINGLE, bus::ti99::gromport, ti99_single_cart_conn_device)
 

@@ -34,6 +34,16 @@ RAM switch
 - Basic will work with 8K or 16K.
 
 
+The monitor
+-----------
+From Basic, do CALL 28672 to enter the monitor - you get a * prompt. Commands:
+D nnnn  - display memory
+G nnnn  - goto an address
+M nnnn  - modify memory
+Type the command letter, then all 4 digits, no need to hit Enter.
+To exit back to Basic, do G 8894 (Basic has no prompt).
+
+
 Status of cart-based games
 --------------------------
 backgammon - works, needs offset of 0x120, bottom line is coming from 0x3E0, should be 0x380
@@ -84,9 +94,11 @@ ToDo:
 #include "bus/apf/rom.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
 
 class apf_state : public driver_device
 {
@@ -105,13 +117,17 @@ public:
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
-		, m_joy(*this, "joy.%u", 0)
-		, m_key(*this, "key.%u", 0)
+		, m_joy(*this, "joy.%u", 0U)
+		, m_key(*this, "key.%u", 0U)
 		, m_p_videoram(*this, "videoram")
 	{ }
 
 	void apfm1000(machine_config &config);
 	void apfimag(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	uint8_t videoram_r(offs_t offset);
@@ -128,14 +144,12 @@ private:
 	void apfimag_map(address_map &map);
 	void apfm1000_map(address_map &map);
 
-	uint8_t m_latch;
-	uint8_t m_keyboard_data;
-	uint8_t m_pad_data;
-	uint8_t m_portb;
-	bool m_ca2;
-	bool m_has_cart_ram;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	uint8_t m_latch = 0U;
+	uint8_t m_keyboard_data = 0U;
+	uint8_t m_pad_data = 0U;
+	uint8_t m_portb = 0U;
+	bool m_ca2 = 0;
+	bool m_has_cart_ram = 0;
 	required_device<m6800_cpu_device> m_maincpu;
 	optional_device<ram_device> m_ram;
 	required_device<mc6847_base_device> m_crtc;
@@ -263,6 +277,15 @@ void apf_state::machine_start()
 
 		m_cart->save_ram();
 	}
+
+	save_item(NAME(m_latch));
+	save_item(NAME(m_keyboard_data));
+	save_item(NAME(m_pad_data));
+	save_item(NAME(m_portb));
+	save_item(NAME(m_ca2));
+	save_item(NAME(m_has_cart_ram));
+
+	m_latch = 0;
 }
 
 
@@ -574,8 +597,8 @@ void apf_state::apfimag(machine_config &config)
 	m_cass->set_interface("apf_cass");
 
 	FD1771(config, m_fdc, 1000000); // guess
-	FLOPPY_CONNECTOR(config, "fdc:0", apf_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", apf_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", apf_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", apf_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	SOFTWARE_LIST(config, "cass_list").set_original("apfimag_cass");
 }
@@ -605,6 +628,9 @@ ROM_END
 // old rom, has a bad byte at 0087.
 //ROMX_LOAD("apf_4000.rom", 0x0000, 0x0800, CRC(2a331a33) SHA1(387b90882cd0b66c192d9cbaa3bec250f897e4f1), ROM_BIOS(0) )
 
+} // Anonymous namespace
+
+
 /***************************************************************************
 
   Game driver(s)
@@ -612,5 +638,5 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS      INIT        COMPANY                 FULLNAME
-COMP( 1979, apfimag,  apfm1000, 0,      apfimag,  apfimag,  apf_state, empty_init, "APF Electronics Inc.", "APF Imagination Machine", 0 )
-CONS( 1978, apfm1000, 0,        0,      apfm1000, apfm1000, apf_state, empty_init, "APF Electronics Inc.", "APF M-1000", 0 )
+COMP( 1979, apfimag,  apfm1000, 0,      apfimag,  apfimag,  apf_state, empty_init, "APF Electronics Inc.", "APF Imagination Machine", MACHINE_SUPPORTS_SAVE )
+CONS( 1978, apfm1000, 0,        0,      apfm1000, apfm1000, apf_state, empty_init, "APF Electronics Inc.", "APF M-1000", MACHINE_SUPPORTS_SAVE )

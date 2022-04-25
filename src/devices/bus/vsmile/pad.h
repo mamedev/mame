@@ -16,7 +16,16 @@
 class vsmile_pad_device : public vsmile_ctrl_device_base
 {
 public:
-	enum stale_inputs : uint8_t
+	// construction/destruction
+	vsmile_pad_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0U);
+	virtual ~vsmile_pad_device();
+
+	// input handlers
+	DECLARE_INPUT_CHANGED_MEMBER(pad_joy_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(pad_color_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(pad_button_changed);
+
+	enum stale_pad_inputs : uint16_t
 	{
 		STALE_NONE          = 0U,
 		STALE_LEFT_RIGHT    = 1U << 0,
@@ -32,16 +41,9 @@ public:
 		STALE_ALL           = STALE_JOY | STALE_COLORS | STALE_BUTTONS
 	};
 
-	// construction/destruction
-	vsmile_pad_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0U);
-	virtual ~vsmile_pad_device();
-
-	// input handlers
-	DECLARE_INPUT_CHANGED_MEMBER(pad_joy_changed);
-	DECLARE_INPUT_CHANGED_MEMBER(pad_color_changed);
-	DECLARE_INPUT_CHANGED_MEMBER(pad_button_changed);
-
 protected:
+	vsmile_pad_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock = 0U);
+
 	// device_t implementation
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
@@ -51,20 +53,23 @@ protected:
 	virtual void tx_timeout() override;
 	virtual void rx_complete(uint8_t data, bool cts) override;
 
-private:
-	void uart_tx_fifo_push(uint8_t data);
+	uint16_t stale_all() { return STALE_ALL; }
 
-	TIMER_CALLBACK_MEMBER(handle_idle);
+	void uart_tx_fifo_push(uint8_t data);
 
 	required_ioport m_io_joy;
 	required_ioport m_io_colors;
 	required_ioport m_io_buttons;
 
+	uint16_t m_sent_joy, m_sent_colors, m_sent_buttons;
+
+	uint16_t m_stale;
+	bool m_active;
 	emu_timer *m_idle_timer;
 
-	uint8_t m_sent_joy, m_sent_colors, m_sent_buttons;
-	stale_inputs m_stale;
-	bool m_active;
+private:
+	TIMER_CALLBACK_MEMBER(handle_idle);
+
 	uint8_t m_ctrl_probe_history[2];
 };
 

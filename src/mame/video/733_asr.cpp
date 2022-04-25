@@ -207,7 +207,7 @@ void asr733_device::linefeed()
 	assert(asr_window_offset_y + asr_window_height <= m_bitmap->height());
 	for (int y=asr_window_offset_y; y<asr_window_offset_y+asr_window_height-asr_scroll_step; y++)
 	{
-		std::copy_n(&m_bitmap->pix16(y+asr_scroll_step, asr_window_offset_x), asr_window_width, buf);
+		std::copy_n(&m_bitmap->pix(y+asr_scroll_step, asr_window_offset_x), asr_window_width, buf);
 		draw_scanline8(*m_bitmap, asr_window_offset_x, y, asr_window_width, buf, palette().pens());
 	}
 
@@ -407,7 +407,7 @@ void asr733_device::refresh(bitmap_ind16 &bitmap, int x, int y)
 /*
     Time callbacks
 */
-void asr733_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void asr733_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	check_keyboard();
 	m_lineint_line(ASSERT_LINE);

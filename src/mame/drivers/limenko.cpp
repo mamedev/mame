@@ -54,6 +54,7 @@ public:
 		, m_spriteram(*this, "spriteram")
 		, m_videoreg(*this, "videoreg")
 		, m_gfx_region(*this, "gfx")
+		, m_qs1000_bank(*this, "qs1000_bank")
 	{
 	}
 
@@ -87,14 +88,16 @@ private:
 	required_shared_ptr<u32> m_videoreg;
 	required_region_ptr<u8> m_gfx_region;
 
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_md_tilemap;
-	tilemap_t *m_fg_tilemap;
+	memory_bank_creator m_qs1000_bank;
 
-	int m_spriteram_bit;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_md_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+
+	int m_spriteram_bit = 0;
 	bitmap_ind16 m_sprites_bitmap;
 	bitmap_ind8 m_sprites_bitmap_pri;
-	int m_prev_sprites_count;
+	int m_prev_sprites_count = 0;
 
 	void coincounter_w(u32 data);
 	void bg_videoram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
@@ -132,8 +135,8 @@ private:
 	uint8_t audiocpu_p3_r();
 	void audiocpu_p3_w(uint8_t data);
 
-	uint8_t m_audiocpu_p1;
-	uint8_t m_audiocpu_p3;
+	uint8_t m_audiocpu_p1 = 0;
+	uint8_t m_audiocpu_p3 = 0;
 };
 
 /*****************************************************************************************************
@@ -200,7 +203,7 @@ void limenko_state::qs1000_p3_w(u8 data)
 	// ...x .... - ?
 	// ..x. .... - /IRQ clear
 
-	membank("qs1000:bank")->set_entry(data & 0x07);
+	m_qs1000_bank->set_entry(data & 0x07);
 
 	if (!BIT(data, 5))
 		m_soundlatch->acknowledge_w();
@@ -375,9 +378,9 @@ void limenko_state::draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &c
 	{ // skip if inner loop doesn't draw anything
 		for (int y = sy; y < ey; y++)
 		{
-			const u8 *source = source_base + y_index * width;
-			u16 *dest = &dest_bmp.pix16(y);
-			u8 *pri = &m_sprites_bitmap_pri.pix8(y);
+			u8 const *const source = source_base + y_index * width;
+			u16 *const dest = &dest_bmp.pix(y);
+			u8 *const pri = &m_sprites_bitmap_pri.pix(y);
 			int x_index = x_index_base;
 			for (int x = sx; x < ex; x++)
 			{
@@ -452,10 +455,10 @@ void limenko_state::copy_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &sprites_bit
 {
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		u16 *source = &sprites_bitmap.pix16(y);
-		u16 *dest = &bitmap.pix16(y);
-		u8 *dest_pri = &priority_bitmap.pix8(y);
-		u8 *source_pri = &m_sprites_bitmap_pri.pix8(y);
+		u16 const *const source = &sprites_bitmap.pix(y);
+		u16 *const dest = &bitmap.pix(y);
+		u8 const *const dest_pri = &priority_bitmap.pix(y);
+		u8 const *const source_pri = &m_sprites_bitmap_pri.pix(y);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
@@ -1071,8 +1074,8 @@ u32 limenko_state::spotty_speedup_r()
 void limenko_state::init_common()
 {
 	// Set up the QS1000 program ROM banking, taking care not to overlap the internal RAM
-	m_qs1000->cpu().space(AS_IO).install_read_bank(0x0100, 0xffff, "bank");
-	membank("qs1000:bank")->configure_entries(0, 8, memregion("qs1000:cpu")->base()+0x100, 0x10000);
+	m_qs1000->cpu().space(AS_IO).install_read_bank(0x0100, 0xffff, m_qs1000_bank);
+	m_qs1000_bank->configure_entries(0, 8, memregion("qs1000:cpu")->base()+0x100, 0x10000);
 
 	m_spriteram_bit = 1;
 }

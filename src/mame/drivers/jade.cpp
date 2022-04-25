@@ -99,4 +99,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                   FULLNAME                                                            FLAGS
-COMP( 1983, jade, 0,      0,      jade,    jade,  jade_state, empty_init, "Jade Computer Products", "unknown S-100 computer with Serial/Parallel/Interrupt Controller", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1983, jade, 0,      0,      jade,    jade,  jade_state, empty_init, "Jade Computer Products", "unknown S-100 computer with Serial/Parallel/Interrupt Controller", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

@@ -19,7 +19,7 @@
     Double Block
     Duck Shoot
     Erase
-    Fonz                                                           94789-P                   IC86.86 IC87.87 PR-09.49 PR-08.50
+    Fonz                                                             94789-P                   IC86.86 IC87.87 PR-09.49 PR-08.50
     Galaxy War
     Goal Kick
     Heavyweight Champ
@@ -33,7 +33,7 @@
     Pong-Tron II
     Pro Monaco GP
     Pro Racer
-    Road Race
+    Road Race                                                        94540Y-P
     Rock'n Bark
     Secret Base
     Secret War

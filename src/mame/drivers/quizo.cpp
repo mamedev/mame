@@ -104,10 +104,10 @@ uint32_t quizo_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 			uint8_t data2 = m_vram[y * 80 + x + 0x4000];
 
 			// draw 4 pixels
-			bitmap.pix32(y, x * 4 + 0) = m_palette->pen((BIT(data2, 7) << 3) | (BIT(data2, 3) << 2) | (BIT(data1, 7) << 1) | BIT(data1, 3));
-			bitmap.pix32(y, x * 4 + 1) = m_palette->pen((BIT(data2, 6) << 3) | (BIT(data2, 2) << 2) | (BIT(data1, 6) << 1) | BIT(data1, 2));
-			bitmap.pix32(y, x * 4 + 2) = m_palette->pen((BIT(data2, 5) << 3) | (BIT(data2, 1) << 2) | (BIT(data1, 5) << 1) | BIT(data1, 1));
-			bitmap.pix32(y, x * 4 + 3) = m_palette->pen((BIT(data2, 4) << 3) | (BIT(data2, 0) << 2) | (BIT(data1, 4) << 1) | BIT(data1, 0));
+			bitmap.pix(y, x * 4 + 0) = m_palette->pen((BIT(data2, 7) << 3) | (BIT(data2, 3) << 2) | (BIT(data1, 7) << 1) | BIT(data1, 3));
+			bitmap.pix(y, x * 4 + 1) = m_palette->pen((BIT(data2, 6) << 3) | (BIT(data2, 2) << 2) | (BIT(data1, 6) << 1) | BIT(data1, 2));
+			bitmap.pix(y, x * 4 + 2) = m_palette->pen((BIT(data2, 5) << 3) | (BIT(data2, 1) << 2) | (BIT(data1, 5) << 1) | BIT(data1, 1));
+			bitmap.pix(y, x * 4 + 3) = m_palette->pen((BIT(data2, 4) << 3) | (BIT(data2, 0) << 2) | (BIT(data1, 4) << 1) | BIT(data1, 0));
 		}
 	}
 

@@ -54,9 +54,9 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 
 	/* misc */
-	emu_timer *m_analog_timer_1, *m_analog_timer_2;
-	uint8_t m_input_port_select;
-	uint8_t m_analog_port_val;
+	emu_timer *m_analog_timer_1 = nullptr, *m_analog_timer_2 = nullptr;
+	uint8_t m_input_port_select = 0;
+	uint8_t m_analog_port_val = 0;
 
 	required_device<cpu_device> m_maincpu;
 };
@@ -196,7 +196,7 @@ uint32_t clayshoo_state::screen_update_clayshoo(screen_device &screen, bitmap_rg
 		for (i = 0; i < 8; i++)
 		{
 			pen_t pen = (data & 0x80) ? rgb_t::white() : rgb_t::black();
-			bitmap.pix32(y, x) = pen;
+			bitmap.pix(y, x) = pen;
 
 			data = data << 1;
 			x = x + 1;

@@ -29,7 +29,7 @@ void coco12_state::device_start()
 
 void coco12_state::configure_sam()
 {
-	offs_t ramsize = m_ram->size() - 1;
+	offs_t ramsize = m_ram->size();
 	m_sam->space(0).install_ram(0, ramsize - 1, m_ram->pointer());
 	if (ramsize < 65536)
 		m_sam->space(0).nop_readwrite(ramsize, 0xffff);

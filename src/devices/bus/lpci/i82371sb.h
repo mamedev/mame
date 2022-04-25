@@ -50,8 +50,8 @@ protected:
 	uint32_t pci_usb_r(device_t *busdevice, int offset, uint32_t mem_mask);
 	void pci_usb_w(device_t *busdevice, int offset, uint32_t data, uint32_t mem_mask);
 private:
-	DECLARE_READ8_MEMBER(read_apmcapms);
-	DECLARE_WRITE8_MEMBER(write_apmcapms);
+	uint8_t read_apmcapms(offs_t offset);
+	void write_apmcapms(offs_t offset, uint8_t data);
 
 	void map_busmaster_dma();
 	void update_smireq_line();

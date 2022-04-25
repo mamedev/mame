@@ -48,17 +48,13 @@
 
 uint32_t avalnche_state::screen_update_avalnche(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	offs_t offs;
-
-	for (offs = 0; offs < m_videoram.bytes(); offs++)
+	for (offs_t offs = 0; offs < m_videoram.bytes(); offs++)
 	{
-		int i;
-
 		uint8_t x = offs << 3;
-		int y = offs >> 5;
+		int const y = offs >> 5;
 		uint8_t data = m_videoram[offs];
 
-		for (i = 0; i < 8; i++)
+		for (int i = 0; i < 8; i++)
 		{
 			pen_t pen;
 
@@ -67,10 +63,10 @@ uint32_t avalnche_state::screen_update_avalnche(screen_device &screen, bitmap_rg
 			else
 				pen = (data & 0x80) ? rgb_t::black() : rgb_t::white();
 
-			bitmap.pix32(y, x) = pen;
+			bitmap.pix(y, x) = pen;
 
-			data = data << 1;
-			x = x + 1;
+			data <<= 1;
+			x++;
 		}
 	}
 

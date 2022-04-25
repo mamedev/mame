@@ -59,7 +59,7 @@ private:
 	uint8_t pio_portb_r();
 	void pio_portb_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(polyplay_characterram_w);
+	void polyplay_characterram_w(offs_t offset, uint8_t data);
 	void polyplay_palette(palette_device &palette) const;
 	uint32_t screen_update_polyplay(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void polyplay_io_zre(address_map &map);
@@ -79,8 +79,8 @@ private:
 	required_device<palette_device> m_palette;
 
 	/* audio */
-	uint8_t m_flipflop1;
-	uint8_t m_flipflop2;
+	uint8_t m_flipflop1 = 0;
+	uint8_t m_flipflop2 = 0;
 	required_device<speaker_sound_device> m_speaker1;
 	required_device<speaker_sound_device> m_speaker2;
 	output_finder<4> m_lamps;

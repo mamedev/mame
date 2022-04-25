@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Andrew Gardner, Vas Crabb
 /*********************************************************************
 
-    dvwpoints.c
+    dvwpoints.cpp
 
     Watchpoint debugger view.
 
@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "dvwpoints.h"
+
 #include "points.h"
 
 #include <algorithm>
@@ -139,7 +140,7 @@ void debug_view_watchpoints::enumerate_sources()
 	m_source_list.clear();
 
 	// iterate over devices with disassembly interfaces
-	for (device_disasm_interface &dasm : disasm_interface_iterator(machine().root_device()))
+	for (device_disasm_interface &dasm : disasm_interface_enumerator(machine().root_device()))
 	{
 		m_source_list.emplace_back(
 				std::make_unique<debug_view_source>(
@@ -239,7 +240,7 @@ void debug_view_watchpoints::view_update()
 	gather_watchpoints();
 
 	// Set the view region so the scroll bars update
-	m_total.x = tableBreaks[ARRAY_LENGTH(tableBreaks) - 1];
+	m_total.x = tableBreaks[std::size(tableBreaks) - 1];
 	m_total.y = m_buffer.size() + 1;
 	if (m_total.y < 10)
 		m_total.y = 10;
@@ -247,7 +248,7 @@ void debug_view_watchpoints::view_update()
 	// Draw
 	debug_view_char     *dest = &m_viewdata[0];
 	util::ovectorstream linebuf;
-	linebuf.reserve(ARRAY_LENGTH(tableBreaks) - 1);
+	linebuf.reserve(std::size(tableBreaks) - 1);
 
 	// Header
 	if (m_visible.y > 0)

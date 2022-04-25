@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Couriersud
 
 ///
@@ -10,8 +10,9 @@
 
 #include "nltypes.h"
 #include "plib/palloc.h"
+#include "plib/pmempool.h"
+#include "plib/psource.h"
 #include "plib/ptypes.h"
-#include "plib/putil.h"
 
 #include <tuple>
 #include <utility>
@@ -38,8 +39,6 @@
 	factory::constructor_ptr_t decl_ ## p_alias = NETLIB_NAME(p_alias ## _c);
 
 namespace netlist {
-	class core_device_t;
-	class netlist_state_t;
 
 namespace factory {
 
@@ -124,20 +123,21 @@ namespace factory {
 		{ }
 
 
-	    template <std::size_t... Is>
-	    dev_uptr make_device(device_arena &pool,
-	    	    			netlist_state_t &anetlist,
-	    	    			const pstring &name, std::tuple<Args...>& args, std::index_sequence<Is...>)
-	    {
-	    	return pool.make_unique<C>(anetlist, name, std::forward<Args>(std::get<Is>(args))...);
-	    }
+		template <std::size_t... Is>
+		dev_uptr make_device(device_arena &pool,
+							netlist_state_t &anetlist,
+							const pstring &name, std::tuple<Args...>& args, std::index_sequence<Is...>)
+		{
+			return plib::make_unique<C>(pool, anetlist, name, std::forward<Args>(std::get<Is>(args))...);
+			//return anetlist.make_pool_object<C>(anetlist, name, std::forward<Args>(std::get<Is>(args))...);
+		}
 
-	    dev_uptr make_device(device_arena &pool,
-	    			netlist_state_t &anetlist,
-	    			const pstring &name, std::tuple<Args...>& args)
-	    {
-	        return make_device(pool, anetlist, name, args, std::index_sequence_for<Args...>{});
-	    }
+		dev_uptr make_device(device_arena &pool,
+					netlist_state_t &anetlist,
+					const pstring &name, std::tuple<Args...>& args)
+		{
+			return make_device(pool, anetlist, name, args, std::index_sequence_for<Args...>{});
+		}
 
 		dev_uptr make_device(device_arena &pool,
 			netlist_state_t &anetlist,
@@ -149,7 +149,7 @@ namespace factory {
 
 		static uptr create(const pstring &name, properties &&props, Args&&... args)
 		{
-			return host_arena::make_unique<device_element_t<C, Args...>>(name,
+			return plib::make_unique<device_element_t<C, Args...>, host_arena>(name,
 				std::move(props), std::forward<Args>(args)...);
 		}
 	private:
@@ -181,6 +181,7 @@ namespace factory {
 			return dynamic_cast<device_element_t<C> *>(f) != nullptr;
 		}
 
+		bool exists(const pstring &name) const noexcept;
 	private:
 		log_type &m_log;
 	};
@@ -194,7 +195,7 @@ namespace factory {
 	template <typename T>
 	element_t::uptr constructor_t(const pstring &name, properties &&props)
 	{
-		return host_arena::make_unique<device_element_t<T>>(name, std::move(props));
+		return plib::make_unique<device_element_t<T>, host_arena>(name, std::move(props));
 	}
 
 	// -----------------------------------------------------------------------------

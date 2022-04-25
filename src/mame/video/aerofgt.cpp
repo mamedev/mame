@@ -77,6 +77,8 @@ VIDEO_START_MEMBER(aerofgt_state,pspikes)
 	/* no bg2 in this game */
 
 	m_sprite_gfx = 1;
+	m_spikes91_lookup = 0;
+	m_charpalettebank = 0;
 
 	aerofgt_register_state_globals();
 	save_item(NAME(m_spikes91_lookup));
@@ -640,17 +642,15 @@ void aerofgt_state::aerfboot_draw_sprites( screen_device &screen, bitmap_ind16 &
 // BOOTLEG
 void aerofgt_state::wbbc97_draw_bitmap( bitmap_rgb32 &bitmap )
 {
-	int x, y, count;
-
-	count = 16; // weird, the bitmap doesn't start at 0?
-	for (y = 0; y < 256; y++)
-		for (x = 0; x < 512; x++)
+	int count = 16; // weird, the bitmap doesn't start at 0?
+	for (int y = 0; y < 256; y++)
+		for (int x = 0; x < 512; x++)
 		{
 			int color = m_bitmapram[count] >> 1;
 
 			/* data is GRB; convert to RGB */
 			rgb_t pen = rgb_t(pal5bit((color & 0x3e0) >> 5), pal5bit((color & 0x7c00) >> 10), pal5bit(color & 0x1f));
-			bitmap.pix32(y, (10 + x - m_rasterram[(y & 0x7f)]) & 0x1ff) = pen;
+			bitmap.pix(y, (10 + x - m_rasterram[(y & 0x7f)]) & 0x1ff) = pen;
 
 			count++;
 			count &= 0x1ffff;
@@ -660,11 +660,9 @@ void aerofgt_state::wbbc97_draw_bitmap( bitmap_rgb32 &bitmap )
 // BOOTLEG
 uint32_t aerofgt_state::screen_update_pspikesb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i, scrolly;
-
 	m_tilemap[0]->set_scroll_rows(256);
-	scrolly = m_scrolly[0];
-	for (i = 0; i < 256; i++)
+	int scrolly = m_scrolly[0];
+	for (int i = 0; i < 256; i++)
 		m_tilemap[0]->set_scrollx((i + scrolly) & 0xff, m_rasterram[i] + 22);
 	m_tilemap[0]->set_scrolly(0, scrolly);
 

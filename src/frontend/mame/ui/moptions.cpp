@@ -21,8 +21,8 @@ const options_entry ui_options::s_option_entries[] =
 {
 	// search path options
 	{ nullptr,                              nullptr,                       OPTION_HEADER,  "UI SEARCH PATH OPTIONS" },
-	{ OPTION_HISTORY_PATH,                  "history;dats;.",              OPTION_STRING,  "path to history files" },
-	{ OPTION_CATEGORYINI_PATH,              "folders",                     OPTION_STRING,  "path to catagory ini files" },
+	{ OPTION_HISTORY_PATH,                  "history;dats;.",              OPTION_STRING,  "path to system/software info files" },
+	{ OPTION_CATEGORYINI_PATH,              "folders",                     OPTION_STRING,  "path to category ini files" },
 	{ OPTION_CABINETS_PATH,                 "cabinets;cabdevs",            OPTION_STRING,  "path to cabinets / devices image" },
 	{ OPTION_CPANELS_PATH,                  "cpanel",                      OPTION_STRING,  "path to control panel image" },
 	{ OPTION_PCBS_PATH,                     "pcb",                         OPTION_STRING,  "path to pcbs image" },
@@ -44,8 +44,10 @@ const options_entry ui_options::s_option_entries[] =
 
 	// misc options
 	{ nullptr,                              nullptr,    OPTION_HEADER,      "UI MISC OPTIONS" },
-	{ OPTION_REMEMBER_LAST,                 "1",        OPTION_BOOLEAN,     "reselect in main menu last played game" },
-	{ OPTION_ENLARGE_SNAPS,                 "1",        OPTION_BOOLEAN,     "enlarge arts (snapshot, title, etc...) in right panel (keeping aspect ratio)" },
+	{ OPTION_SYSTEM_NAMES,                  "",         OPTION_STRING,      "translated system names file" },
+	{ OPTION_SKIP_WARNINGS,                 "0",        OPTION_BOOLEAN,     "display fewer repeated warnings about imperfect emulation" },
+	{ OPTION_REMEMBER_LAST,                 "1",        OPTION_BOOLEAN,     "initially select last used system in main menu" },
+	{ OPTION_ENLARGE_SNAPS,                 "1",        OPTION_BOOLEAN,     "enlarge artwork (snapshot, title, etc.) in right panel (keeping aspect ratio)" },
 	{ OPTION_FORCED4X3,                     "1",        OPTION_BOOLEAN,     "force the appearance of the snapshot in the list software to 4:3" },
 	{ OPTION_USE_BACKGROUND,                "1",        OPTION_BOOLEAN,     "enable background image in main view" },
 	{ OPTION_SKIP_BIOS_MENU,                "0",        OPTION_BOOLEAN,     "skip bios submenu, start with configured or default" },
@@ -55,10 +57,11 @@ const options_entry ui_options::s_option_entries[] =
 	{ OPTION_LAST_USED_MACHINE,             "",         OPTION_STRING,      "latest used machine" },
 	{ OPTION_INFO_AUTO_AUDIT,               "0",        OPTION_BOOLEAN,     "enable auto audit in the general info panel" },
 	{ OPTION_HIDE_ROMLESS,                  "1",        OPTION_BOOLEAN,     "hide romless machine from available list" },
+	{ OPTION_UNTHROTTLE_MUTE ";utm",        "0",        OPTION_BOOLEAN,     "mute audio when running unthrottled" },
 
 	// UI options
 	{ nullptr,                              nullptr,        OPTION_HEADER,      "UI OPTIONS" },
-	{ OPTION_INFOS_SIZE "(0.05-1.00)",      "0.75",         OPTION_FLOAT,       "UI right panel infos text size (0.05 - 1.00)" },
+	{ OPTION_INFOS_SIZE "(0.20-1.00)",      "0.75",         OPTION_FLOAT,       "UI right panel infos text size (0.20 - 1.00)" },
 	{ OPTION_FONT_ROWS "(25-40)",           "30",           OPTION_INTEGER,     "UI font lines per screen (25 - 40)" },
 	{ OPTION_HIDE_PANELS "(0-3)",           "0",            OPTION_INTEGER,     "UI hide left/right panel in main view (0 = Show all, 1 = hide left, 2 = hide right, 3 = hide both" },
 	{ OPTION_UI_BORDER_COLOR,               "ffffffff",     OPTION_STRING,      "UI border color (ARGB)" },

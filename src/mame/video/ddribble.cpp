@@ -2,7 +2,7 @@
 // copyright-holders:Manuel Abadia
 /***************************************************************************
 
-  video.c
+  ddribble.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -12,7 +12,7 @@
 #include "includes/ddribble.h"
 
 
-void ddribble_state::ddribble_palette(palette_device &palette) const
+void ddribble_state::palette(palette_device &palette) const
 {
 	uint8_t const *const color_prom = memregion("proms")->base();
 
@@ -32,15 +32,15 @@ void ddribble_state::K005885_0_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
-		case 0x03:  /* char bank selection for set 1 */
+		case 0x03:  // char bank selection for set 1
 			if ((data & 0x03) != m_charbank[0])
 			{
 				m_charbank[0] = data & 0x03;
 				m_fg_tilemap->mark_all_dirty();
 			}
 			break;
-		case 0x04:  /* IRQ control, flipscreen */
-			m_int_enable_0 = data & 0x02;
+		case 0x04:  // IRQ control, flipscreen
+			m_int_enable[0] = data & 0x02;
 			break;
 	}
 	m_vregs[0][offset] = data;
@@ -50,15 +50,15 @@ void ddribble_state::K005885_1_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
-		case 0x03:  /* char bank selection for set 2 */
+		case 0x03:  // char bank selection for set 2
 			if ((data & 0x03) != m_charbank[1])
 			{
 				m_charbank[1] = data & 0x03;
 				m_bg_tilemap->mark_all_dirty();
 			}
 			break;
-		case 0x04:  /* IRQ control, flipscreen */
-			m_int_enable_1 = data & 0x02;
+		case 0x04:  // IRQ control, flipscreen
+			m_int_enable[1] = data & 0x02;
 			break;
 	}
 	m_vregs[1][offset] = data;
@@ -72,8 +72,8 @@ void ddribble_state::K005885_1_w(offs_t offset, uint8_t data)
 
 TILEMAP_MAPPER_MEMBER(ddribble_state::tilemap_scan)
 {
-	/* logical (col,row) -> memory offset */
-	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 6);    /* skip 0x400 */
+	// logical (col,row) -> memory offset
+	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 6);    // skip 0x400
 }
 
 TILE_GET_INFO_MEMBER(ddribble_state::get_fg_tile_info)
@@ -116,13 +116,13 @@ void ddribble_state::video_start()
 
 ***************************************************************************/
 
-void ddribble_state::ddribble_fg_videoram_w(offs_t offset, uint8_t data)
+void ddribble_state::fg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0xbff);
 }
 
-void ddribble_state::ddribble_bg_videoram_w(offs_t offset, uint8_t data)
+void ddribble_state::bg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0xbff);
@@ -150,20 +150,20 @@ byte #4:    attributes
 
 ***************************************************************************/
 
-void ddribble_state::draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* source, int lenght, int gfxset, int flipscreen )
+void ddribble_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* source, int lenght, int gfxset, int flipscreen)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(gfxset);
 	const uint8_t *finish = source + lenght;
 
 	while (source < finish)
 	{
-		int number = source[0] | ((source[1] & 0x07) << 8); /* sprite number */
-		int attr = source[4];                               /* attributes */
-		int sx = source[3] | ((attr & 0x01) << 8);          /* vertical position */
-		int sy = source[2];                                 /* horizontal position */
-		int flipx = attr & 0x20;                            /* flip x */
-		int flipy = attr & 0x40;                            /* flip y */
-		int color = (source[1] & 0xf0) >> 4;                /* color */
+		int number = source[0] | ((source[1] & 0x07) << 8); // sprite number
+		int attr = source[4];                               // attributes
+		int sx = source[3] | ((attr & 0x01) << 8);          // vertical position
+		int sy = source[2];                                 // horizontal position
+		int flipx = attr & 0x20;                            // flip x
+		int flipy = attr & 0x40;                            // flip y
+		int color = (source[1] & 0xf0) >> 4;                // color
 		int width, height;
 
 		if (flipscreen)
@@ -174,7 +174,7 @@ void ddribble_state::draw_sprites(  bitmap_ind16 &bitmap, const rectangle &clipr
 			sy = 240 - sy;
 
 			if ((attr & 0x1c) == 0x10)
-			{   /* ???. needed for some sprites in flipped mode */
+			{   // ???. needed for some sprites in flipped mode
 				sx -= 0x10;
 				sy -= 0x10;
 			}
@@ -182,35 +182,34 @@ void ddribble_state::draw_sprites(  bitmap_ind16 &bitmap, const rectangle &clipr
 
 		switch (attr & 0x1c)
 		{
-			case 0x10:  /* 32x32 */
+			case 0x10:  // 32x32
 				width = height = 2; number &= (~3); break;
-			case 0x08:  /* 16x32 */
+			case 0x08:  // 16x32
 				width = 1; height = 2; number &= (~2); break;
-			case 0x04:  /* 32x16 */
+			case 0x04:  // 32x16
 				width = 2; height = 1; number &= (~1); break;
-			/* the hardware allow more sprite sizes, but ddribble doesn't use them */
-			default:    /* 16x16 */
+			// the hardware allows more sprite sizes, but ddribble doesn't use them
+			default:    // 16x16
 				width = height = 1; break;
 		}
 
 		{
 			static const int x_offset[2] = { 0x00, 0x01 };
 			static const int y_offset[2] = { 0x00, 0x02 };
-			int x, y, ex, ey;
 
-			for (y = 0; y < height; y++)
+			for (int y = 0; y < height; y++)
 			{
-				for (x = 0; x < width; x++)
+				for (int x = 0; x < width; x++)
 				{
-					ex = flipx ? (width - 1 - x) : x;
-					ey = flipy ? (height - 1 - y) : y;
+					int ex = flipx ? (width - 1 - x) : x;
+					int ey = flipy ? (height - 1 - y) : y;
 
 
-						gfx->transpen(bitmap,cliprect,
-						(number)+x_offset[ex]+y_offset[ey],
+						gfx->transpen(bitmap, cliprect,
+						(number) + x_offset[ex] + y_offset[ey],
 						color,
 						flipx, flipy,
-						sx+x*16,sy+y*16, 0);
+						sx + x * 16, sy + y * 16, 0);
 				}
 			}
 		}
@@ -224,20 +223,20 @@ void ddribble_state::draw_sprites(  bitmap_ind16 &bitmap, const rectangle &clipr
 
 ***************************************************************************/
 
-uint32_t ddribble_state::screen_update_ddribble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ddribble_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_fg_tilemap->set_flip((m_vregs[0][4] & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	m_bg_tilemap->set_flip((m_vregs[1][4] & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	/* set scroll registers */
+	// set scroll registers
 	m_fg_tilemap->set_scrollx(0, m_vregs[0][1] | ((m_vregs[0][2] & 0x01) << 8));
 	m_bg_tilemap->set_scrollx(0, m_vregs[1][1] | ((m_vregs[1][2] & 0x01) << 8));
 	m_fg_tilemap->set_scrolly(0, m_vregs[0][0]);
 	m_bg_tilemap->set_scrolly(0, m_vregs[1][0]);
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	draw_sprites(bitmap, cliprect, m_spriteram_1, 0x07d, 2, m_vregs[0][4] & 0x08);
-	draw_sprites(bitmap, cliprect, m_spriteram_2, 0x140, 3, m_vregs[1][4] & 0x08);
+	draw_sprites(bitmap, cliprect, m_spriteram[0], 0x07d, 2, m_vregs[0][4] & 0x08);
+	draw_sprites(bitmap, cliprect, m_spriteram[1], 0x140, 3, m_vregs[1][4] & 0x08);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

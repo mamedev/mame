@@ -144,9 +144,9 @@ static const discrete_mixer_desc skyraid_mixer =
 #define SKYRAID_MISSLE_CUSTOM_C         DISCRETE_INPUT(4)
 
 DISCRETE_CLASS_STEP_RESET(skyraid_missle_custom_charge, 2,
-		double m_v_charge[2];
-		double m_v_cap;
-		double m_exp[2];
+		double m_v_charge[2]{ 0.0 };
+		double m_v_cap = 0.0;
+		double m_exp[2]{ 0.0 };
 );
 
 /* the high charge is clamped by the diode to 0.7V above the 5V line */
@@ -154,7 +154,7 @@ DISCRETE_CLASS_STEP_RESET(skyraid_missle_custom_charge, 2,
 
 DISCRETE_STEP( skyraid_missle_custom_charge )
 {
-	int in_1 = (SKYRAID_MISSLE_CUSTOM_IN1 == 0) ? 0 : 1;
+	int const in_1 = (SKYRAID_MISSLE_CUSTOM_IN1 == 0) ? 0 : 1;
 
 	/* charge/discharge cap */
 	m_v_cap += (m_v_charge[in_1] - m_v_cap) * m_exp[in_1];
@@ -285,7 +285,7 @@ DISCRETE_SOUND_START( skyraid_discrete )
 DISCRETE_SOUND_END
 
 
-WRITE8_MEMBER(skyraid_state::skyraid_sound_w)
+void skyraid_state::skyraid_sound_w(uint8_t data)
 {
 	/* BIT0 => PLANE SWEEP */
 	/* BIT1 => MISSILE     */

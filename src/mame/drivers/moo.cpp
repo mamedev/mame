@@ -121,21 +121,21 @@ Bucky:
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
-#include "sound/ym2151.h"
-#include "sound/okim6295.h"
 #include "sound/k054539.h"
+#include "sound/okim6295.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
 
 #define MOO_DEBUG 0
 #define MOO_DMADELAY (100)
 
 
-READ16_MEMBER(moo_state::control2_r)
+uint16_t moo_state::control2_r()
 {
 	return m_cur_control2;
 }
 
-WRITE16_MEMBER(moo_state::control2_w)
+void moo_state::control2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* bit 0  is data */
 	/* bit 1  is cs (active low) */
@@ -221,12 +221,12 @@ INTERRUPT_GEN_MEMBER(moo_state::moobl_interrupt)
 	device.execute().set_input_line(5, HOLD_LINE);
 }
 
-WRITE16_MEMBER(moo_state::sound_irq_w)
+void moo_state::sound_irq_w(uint16_t data)
 {
 	m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE8_MEMBER(moo_state::sound_bankswitch_w)
+void moo_state::sound_bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_base(memregion("soundcpu")->base() + 0x10000 + (data&0xf)*0x4000);
 }
@@ -236,7 +236,7 @@ WRITE8_MEMBER(moo_state::sound_bankswitch_w)
 
 /* the interface with the 053247 is weird. The chip can address only 0x1000 bytes */
 /* of RAM, but they put 0x10000 there. The CPU can access them all. */
-READ16_MEMBER(moo_state::k053247_scattered_word_r)
+uint16_t moo_state::k053247_scattered_word_r(offs_t offset, uint16_t mem_mask)
 {
 	if (offset & 0x0078)
 		return m_spriteram[offset];
@@ -247,7 +247,7 @@ READ16_MEMBER(moo_state::k053247_scattered_word_r)
 	}
 }
 
-WRITE16_MEMBER(moo_state::k053247_scattered_word_w)
+void moo_state::k053247_scattered_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset & 0x0078)
 		COMBINE_DATA(m_spriteram + offset);
@@ -262,7 +262,7 @@ WRITE16_MEMBER(moo_state::k053247_scattered_word_w)
 #endif
 
 
-WRITE16_MEMBER(moo_state::moo_prot_w)
+void moo_state::moo_prot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t src1, src2, dst, length, a, b, res;
 
@@ -292,7 +292,7 @@ WRITE16_MEMBER(moo_state::moo_prot_w)
 }
 
 
-WRITE16_MEMBER(moo_state::moobl_oki_bank_w)
+void moo_state::moobl_oki_bank_w(uint16_t data)
 {
 	logerror("%x to OKI bank\n", data);
 
@@ -343,7 +343,7 @@ void moo_state::moobl_map(address_map &map)
 	map(0x0c4000, 0x0c4001).r(m_k053246, FUNC(k053247_device::k053246_r));
 	map(0x0ca000, 0x0ca01f).w(m_k054338, FUNC(k054338_device::word_w));       /* K054338 alpha blending engine */
 	map(0x0cc000, 0x0cc01f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
-	map(0x0d0000, 0x0d001f).writeonly();                   /* CCU regs (ignored) */
+	map(0x0d0000, 0x0d001f).nopw();                   /* CCU regs (ignored) */
 	map(0x0d6ffc, 0x0d6ffd).w(FUNC(moo_state::moobl_oki_bank_w));
 	map(0x0d6fff, 0x0d6fff).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x0d8000, 0x0d8007).w(m_k056832, FUNC(k056832_device::b_word_w));     /* VSCCS regs */
@@ -374,7 +374,7 @@ void moo_state::bucky_map(address_map &map)
 	map(0x0cc000, 0x0cc01f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x0ce000, 0x0ce01f).w(FUNC(moo_state::moo_prot_w));
 	map(0x0d0000, 0x0d001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff);                  /* CCU regs (ignored) */
-	map(0x0d2000, 0x0d20ff).rw("k054000", FUNC(k054000_device::read), FUNC(k054000_device::write)).umask16(0x00ff);
+	map(0x0d2000, 0x0d203f).m("k054000", FUNC(k054000_device::map)).umask16(0x00ff);
 	map(0x0d4000, 0x0d4001).w(FUNC(moo_state::sound_irq_w));
 	map(0x0d6000, 0x0d601f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
 	map(0x0d8000, 0x0d8007).w(m_k056832, FUNC(k056832_device::b_word_w));        /* VSCCS regs */

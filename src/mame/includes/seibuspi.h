@@ -8,6 +8,7 @@
 
 #include "machine/eepromser.h"
 #include "machine/7200fifo.h"
+#include "machine/intelfsh.h"
 #include "sound/okim6295.h"
 #include "emupal.h"
 #include "tilemap.h"
@@ -29,6 +30,9 @@ public:
 		, m_key(*this, "KEY.%u", 0)
 		, m_special(*this, "SPECIAL")
 		, m_z80_bank(*this, "z80_bank")
+		, m_soundflash1(*this, "soundflash1")
+		, m_soundflash2(*this, "soundflash2")
+		, m_soundflash1_region(*this, "soundflash1")
 	{ }
 
 	void sys386f(machine_config &config);
@@ -75,37 +79,41 @@ protected:
 
 	optional_memory_bank m_z80_bank;
 
-	int m_z80_prg_transfer_pos;
-	int m_z80_lastbank;
-	u8 m_sb_coin_latch;
-	u8 m_ejsakura_input_port;
-	tilemap_t *m_text_layer;
-	tilemap_t *m_back_layer;
-	tilemap_t *m_midl_layer;
-	tilemap_t *m_fore_layer;
-	u32 m_video_dma_length;
-	u32 m_video_dma_address;
-	u16 m_layer_enable;
-	u16 m_layer_bank;
-	u8 m_rf2_layer_bank;
-	u16 m_scrollram[6];
-	bool m_rowscroll_enable;
-	int m_midl_layer_offset;
-	int m_fore_layer_offset;
-	int m_text_layer_offset;
-	int m_fore_layer_d13;
-	int m_back_layer_d14;
-	int m_midl_layer_d14;
-	int m_fore_layer_d14;
+	optional_device<intel_e28f008sa_device> m_soundflash1, m_soundflash2;
+
+	optional_region_ptr<u8> m_soundflash1_region;
+
+	int m_z80_prg_transfer_pos = 0;
+	int m_z80_lastbank = 0;
+	u8 m_sb_coin_latch = 0;
+	u8 m_ejsakura_input_port = 0;
+	tilemap_t *m_text_layer = nullptr;
+	tilemap_t *m_back_layer = nullptr;
+	tilemap_t *m_midl_layer = nullptr;
+	tilemap_t *m_fore_layer = nullptr;
+	u32 m_video_dma_length = 0;
+	u32 m_video_dma_address = 0;
+	u16 m_layer_enable = 0;
+	u16 m_layer_bank = 0;
+	u8 m_rf2_layer_bank = 0;
+	u16 m_scrollram[6]{};
+	bool m_rowscroll_enable = false;
+	int m_midl_layer_offset = 0;
+	int m_fore_layer_offset = 0;
+	int m_text_layer_offset = 0;
+	int m_fore_layer_d13 = 0;
+	int m_back_layer_d14 = 0;
+	int m_midl_layer_d14 = 0;
+	int m_fore_layer_d14 = 0;
 	std::unique_ptr<u32[]> m_tilemap_ram;
 	std::unique_ptr<u32[]> m_palette_ram;
 	std::unique_ptr<u32[]> m_sprite_ram;
-	u32 m_tilemap_ram_size;
-	u32 m_palette_ram_size;
-	u32 m_sprite_ram_size;
-	u32 m_bg_fore_layer_position;
-	u8 m_alpha_table[0x2000];
-	int m_sprite_bpp;
+	u32 m_tilemap_ram_size = 0;
+	u32 m_palette_ram_size = 0;
+	u32 m_sprite_ram_size = 0;
+	u32 m_bg_fore_layer_position = 0;
+	u8 m_alpha_table[0x2000]{};
+	int m_sprite_bpp = 0;
 
 	void tile_decrypt_key_w(u16 data);
 	void spi_layer_bank_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -132,14 +140,15 @@ protected:
 	void spi_layerbanks_eeprom_w(u8 data);
 	void oki_bank_w(u8 data);
 
-	DECLARE_READ32_MEMBER(senkyu_speedup_r);
-	DECLARE_READ32_MEMBER(senkyua_speedup_r);
-	DECLARE_READ32_MEMBER(batlball_speedup_r);
-	DECLARE_READ32_MEMBER(rdft_speedup_r);
-	DECLARE_READ32_MEMBER(viprp1_speedup_r);
-	DECLARE_READ32_MEMBER(viprp1o_speedup_r);
-	DECLARE_READ32_MEMBER(rf2_speedup_r);
-	DECLARE_READ32_MEMBER(rfjet_speedup_r);
+	u32 senkyu_speedup_r();
+	u32 senkyua_speedup_r();
+	u32 batlball_speedup_r();
+	u32 rdft_speedup_r();
+	u32 viprp1_speedup_r();
+	u32 viprp1o_speedup_r();
+	u32 ejanhs_speedup_r();
+	u32 rf2_speedup_r();
+	u32 rfjet_speedup_r();
 
 	DECLARE_WRITE_LINE_MEMBER(ymf_irqhandler);
 

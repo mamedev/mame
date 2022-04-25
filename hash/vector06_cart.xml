@@ -9,9 +9,10 @@ license:CC0
 		<description>ROMDISK</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Hold down one of F2 (Retex text editor), F3 (Basic), F4 (Monitor), F5 (HW Test) and hit F11. Now hit F12." />
 		<part name="cart" interface="vector06_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="vector.bin" size="16384" crc="e533bd83" sha1="624470b3f232131723a41d50455dca1a2ca0a0c0" offset="0" />
+				<rom name="vector.bin" size="16384" crc="e533bd83" sha1="624470b3f232131723a41d50455dca1a2ca0a0c0"/>
 			</dataarea>
 		</part>
 	</software>

@@ -189,7 +189,7 @@ Cisco Heat.
 #include "machine/jalcrpt.h"
 #include "machine/nvram.h"
 #include "sound/okim6295.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
 
 #include "cischeat.lh"
@@ -223,12 +223,12 @@ void cischeat_state::leds_out_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void cischeat_state::bigrun_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).rom();                                                                 // ROM
+	map(0x000000, 0x07ffff).rom();                                                  // ROM
 	map(0x080000, 0x080001).portr("IN1").w(FUNC(cischeat_state::leds_out_w));       // Coins
 	map(0x080002, 0x080003).portr("IN2").w(FUNC(cischeat_state::unknown_out_w));    // Buttons
 	map(0x080004, 0x080005).portr("IN3").w(FUNC(cischeat_state::motor_out_w));      // Motor Limit Switches
 	map(0x080006, 0x080007).portr("IN4").w(FUNC(cischeat_state::wheel_out_w));      // DSW 1 & 2
-	map(0x080008, 0x080009).r(m_soundlatch2, FUNC(generic_latch_16_device::read));   // From sound cpu
+	map(0x080008, 0x080009).r(m_soundlatch2, FUNC(generic_latch_16_device::read));  // From sound cpu
 	map(0x08000a, 0x08000b).w(m_soundlatch, FUNC(generic_latch_16_device::write));  // To sound cpu
 	map(0x08000c, 0x08000d).nopw();            // ??
 	map(0x080010, 0x080011).rw(FUNC(cischeat_state::bigrun_ip_select_r), FUNC(cischeat_state::ip_select_w));
@@ -236,9 +236,9 @@ void cischeat_state::bigrun_map(address_map &map)
 	map(0x082000, 0x082005).rw("scroll0", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x082008, 0x08200d).rw("scroll1", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x082100, 0x082105).rw("scroll2", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
-	map(0x082108, 0x082109).noprw();                 // ? written with 0 only
-	map(0x082200, 0x082201).portr("IN5");    // DSW 3 (4 bits)
-	map(0x082208, 0x082209).noprw();                 // watchdog reset
+	map(0x082108, 0x082109).noprw();                    // ? written with 0 only
+	map(0x082200, 0x082201).portr("IN5");               // DSW 3 (4 bits)
+	map(0x082208, 0x082209).noprw();                    // watchdog reset
 	map(0x082308, 0x082309).w(FUNC(cischeat_state::cischeat_comms_w));
 	map(0x082400, 0x082401).w(FUNC(cischeat_state::active_layers_w));
 
@@ -252,13 +252,13 @@ void cischeat_state::bigrun_map(address_map &map)
 
 	/* Only writes to the first 0x40000 bytes affect the tilemaps:             */
 	/* either these games support larger tilemaps or have more ram than needed */
-	map(0x090000, 0x093fff).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");     // Scroll ram 0
-	map(0x094000, 0x097fff).ram().w("scroll1", FUNC(megasys1_tilemap_device::write)).share("scroll1");     // Scroll ram 1
-	map(0x098000, 0x09bfff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");     // Scroll ram 2
+	map(0x090000, 0x093fff).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");  // Scroll ram 0
+	map(0x094000, 0x097fff).ram().w("scroll1", FUNC(megasys1_tilemap_device::write)).share("scroll1");  // Scroll ram 1
+	map(0x098000, 0x09bfff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");  // Scroll ram 2
 
-	map(0x09c000, 0x09ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");            // Palettes
-	map(0x0f0000, 0x0fffff).ram().share("ram");                                         // RAM
-	map(0x100000, 0x13ffff).rom().region("user1", 0);                                                        // ROM
+	map(0x09c000, 0x09ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");         // Palettes
+	map(0x0f0000, 0x0fffff).ram().share("ram");                                                         // RAM
+	map(0x100000, 0x13ffff).rom().region("user1", 0);                                                   // ROM
 }
 
 
@@ -310,13 +310,13 @@ void cischeat_state::cischeat_map(address_map &map)
 
 	/* Only writes to the first 0x40000 bytes affect the tilemaps:             */
 	/* either these games support larger tilemaps or have more ram than needed */
-	map(0x0a0000, 0x0a7fff).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");     // Scroll ram 0
-	map(0x0a8000, 0x0affff).ram().w("scroll1", FUNC(megasys1_tilemap_device::write)).share("scroll1");     // Scroll ram 1
-	map(0x0b0000, 0x0b7fff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");     // Scroll ram 2
-	map(0x0b8000, 0x0bffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");              // Palettes
+	map(0x0a0000, 0x0a7fff).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");  // Scroll ram 0
+	map(0x0a8000, 0x0affff).ram().w("scroll1", FUNC(megasys1_tilemap_device::write)).share("scroll1");  // Scroll ram 1
+	map(0x0b0000, 0x0b7fff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");  // Scroll ram 2
+	map(0x0b8000, 0x0bffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");         // Palettes
 
-	map(0x0f0000, 0x0fffff).ram().share("ram");                                             // RAM
-	map(0x100000, 0x17ffff).rom().region("user1", 0);                                                            // ROM
+	map(0x0f0000, 0x0fffff).ram().share("ram");                                                         // RAM
+	map(0x100000, 0x17ffff).rom().region("user1", 0);                                                   // ROM
 }
 
 
@@ -626,6 +626,24 @@ void cischeat_state::scudhamm_map(address_map &map)
 
 /**************************************************************************
                             Arm Champs II
+
+The Arm Champs II start-up arm movement and info
+---------------------------------------------------------------------
+At power-on, the arm moves left, then right then to center and stops.
+The center position is 0000.
+Note when the arm is at 0000 (center) the center limit switch is not
+on. It comes on when the arm is moved just off center (+-0002 or greater
+away from center) and stays on as long as the arm is not on
+0001-0000-FFFF (both left and right side). When the arm hits the
+left/right limit, both center and that left or right limit switch is on.
+
+Full movement to left limit switch is 0000-0040 (0x41h) and full right
+limit switch movement is 0000-FFC2 (0x3eh). Obviously the pot and arm
+are not 100% accurate and there's a small amount of slop between the
+arm shaft / motor mechanism and the pot.
+The limit switches are triggered just before the full movement.
+For the purpose of MAME emulation it can be rounded off so both sides
+move +- 0x40h.
 **************************************************************************/
 
 uint16_t armchamp2_state::motor_status_r()
@@ -690,7 +708,7 @@ void armchamp2_state::armchmp2_map(address_map &map)
 	map(0x100000, 0x100001).portr("IN2").w(FUNC(armchamp2_state::scudhamm_oki_bank_w));
 	map(0x100004, 0x100005).portr("DSW"); // DSW
 	map(0x100008, 0x100009).portr("IN0").w(FUNC(armchamp2_state::output_w));
-	map(0x10000d, 0x10000d).rw("adc", FUNC(adc0804_device::read), FUNC(adc0804_device::write)); 
+	map(0x10000d, 0x10000d).rw("adc", FUNC(adc0804_device::read), FUNC(adc0804_device::write));
 	map(0x100010, 0x100011).rw(FUNC(armchamp2_state::motor_status_r), FUNC(armchamp2_state::motor_command_w));
 	// same hookup as acommand, most notably the "Arm Champs II" voice sample on title screen playbacks on oki1 mirror
 	map(0x100014, 0x100017).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
@@ -874,18 +892,18 @@ void captflag_state::oki2_map(address_map &map)
 
 void cischeat_state::bigrun_map2(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom();                                                 // ROM
-	map(0x040000, 0x047fff).ram().share("share1");                              // Shared RAM (with Main CPU)
-	map(0x080000, 0x0807ff).ram().share("roadram.0");   // Road RAM
-	map(0x0c0000, 0x0c3fff).ram();                                                 // RAM
+	map(0x000000, 0x03ffff).rom();                          // ROM
+	map(0x040000, 0x043fff).ram().share("share1");          // Shared RAM (with Main CPU)
+	map(0x080000, 0x0807ff).ram().share("roadram.0");       // Road RAM
+	map(0x0c0000, 0x0c3fff).ram();                          // RAM
 }
 
 void cischeat_state::bigrun_map3(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom();                                                 // ROM
-	map(0x040000, 0x047fff).ram().share("share2");                              // Shared RAM (with Main CPU)
-	map(0x080000, 0x0807ff).ram().share("roadram.1");   // Road RAM
-	map(0x0c0000, 0x0c3fff).ram();                                                 // RAM
+	map(0x000000, 0x03ffff).rom();                          // ROM
+	map(0x040000, 0x043fff).ram().share("share2");          // Shared RAM (with Main CPU)
+	map(0x080000, 0x0807ff).ram().share("roadram.1");       // Road RAM
+	map(0x0c0000, 0x0c3fff).ram();                          // RAM
 }
 
 
@@ -895,22 +913,22 @@ void cischeat_state::bigrun_map3(address_map &map)
 
 void cischeat_state::cischeat_map2(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom();                                                 // ROM
-	map(0x040000, 0x047fff).ram().share("share1");                              // Shared RAM (with Main CPU)
-	map(0x080000, 0x0807ff).ram().share("roadram.0");   // Road RAM
-	map(0x0c0000, 0x0c3fff).ram();                                                 // RAM
-	map(0x100000, 0x100001).nopw();                                            // watchdog
-	map(0x200000, 0x23ffff).rom().region("cpu2", 0x40000);                                       // ROM
+	map(0x000000, 0x03ffff).rom();                          // ROM
+	map(0x040000, 0x047fff).ram().share("share1");          // Shared RAM (with Main CPU)
+	map(0x080000, 0x0807ff).ram().share("roadram.0");       // Road RAM
+	map(0x0c0000, 0x0c3fff).ram();                          // RAM
+	map(0x100000, 0x100001).nopw();                         // watchdog
+	map(0x200000, 0x23ffff).rom().region("cpu2", 0x40000);  // ROM
 }
 
 void cischeat_state::cischeat_map3(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom();                                                 // ROM
-	map(0x040000, 0x047fff).ram().share("share2");                              // Shared RAM (with Main CPU)
-	map(0x080000, 0x0807ff).ram().share("roadram.1");   // Road RAM
-	map(0x0c0000, 0x0c3fff).ram();                                                 // RAM
-	map(0x100000, 0x100001).nopw();                                            // watchdog
-	map(0x200000, 0x23ffff).rom().region("cpu3", 0x40000);                                       // ROM
+	map(0x000000, 0x03ffff).rom();                          // ROM
+	map(0x040000, 0x047fff).ram().share("share2");          // Shared RAM (with Main CPU)
+	map(0x080000, 0x0807ff).ram().share("roadram.1");       // Road RAM
+	map(0x0c0000, 0x0c3fff).ram();                          // RAM
+	map(0x100000, 0x100001).nopw();                         // watchdog
+	map(0x200000, 0x23ffff).rom().region("cpu3", 0x40000);  // ROM
 }
 
 
@@ -921,20 +939,20 @@ void cischeat_state::cischeat_map3(address_map &map)
 
 void cischeat_state::f1gpstar_map2(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom();                                                 // ROM
-	map(0x080000, 0x0807ff).ram().share("share1");                              // Shared RAM (with Main CPU)
+	map(0x000000, 0x03ffff).rom();                          // ROM
+	map(0x080000, 0x087fff).ram().share("share1");          // Shared RAM (with Main CPU)
 	map(0x100000, 0x1007ff).ram().share("roadram.0");   // Road RAM
-	map(0x180000, 0x183fff).ram();                                                 // RAM
-	map(0x200000, 0x200001).nopw();                                            // watchdog
+	map(0x180000, 0x183fff).ram();                          // RAM
+	map(0x200000, 0x200001).nopw();                         // watchdog
 }
 
 void cischeat_state::f1gpstar_map3(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom();                                                 // ROM
-	map(0x080000, 0x0807ff).ram().share("share2");                              // Shared RAM (with Main CPU)
-	map(0x100000, 0x1007ff).ram().share("roadram.1");   // Road RAM
-	map(0x180000, 0x183fff).ram();                                                 // RAM
-	map(0x200000, 0x200001).nopw();                                            // watchdog
+	map(0x000000, 0x03ffff).rom();                          // ROM
+	map(0x080000, 0x087fff).ram().share("share2");          // Shared RAM (with Main CPU)
+	map(0x100000, 0x1007ff).ram().share("roadram.1");       // Road RAM
+	map(0x180000, 0x183fff).ram();                          // RAM
+	map(0x200000, 0x200001).nopw();                         // watchdog
 }
 
 
@@ -2108,7 +2126,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::scudhamm_scanline)
 	if(scanline == 240) // vblank-out irq
 		m_maincpu->set_input_line(4, HOLD_LINE);
 
-	if(scanline == 16) // clears a flag, sprite end DMA? 
+	if(scanline == 16) // clears a flag, sprite end DMA?
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
@@ -2129,10 +2147,10 @@ void cischeat_state::scudhamm(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	// measured values for Arm Champs II: VSync: 59.1784Hz, HSync: 15082.0 kHz
 	m_screen->set_raw(XTAL(12'000'000)/2,396,0,256,256,16,240);
-//	m_screen->set_refresh_hz(30); //TODO: wrong!
-//	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500 * 3) /* not accurate */);
-//	m_screen->set_size(256, 256);
-//	m_screen->set_visarea(0, 256-1, 0 +16, 256-1 -16);
+//  m_screen->set_refresh_hz(30); //TODO: wrong!
+//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500 * 3) /* not accurate */);
+//  m_screen->set_size(256, 256);
+//  m_screen->set_visarea(0, 256-1, 0 +16, 256-1 -16);
 	m_screen->set_screen_update(FUNC(cischeat_state::screen_update_scudhamm));
 	m_screen->set_palette(m_palette);
 
@@ -2433,6 +2451,24 @@ ROM_START( bigrun )
 	ROM_LOAD( "br8951b.21",  0x000000, 0x020000, CRC(59b9c26b) SHA1(09fea3b77b045d9c1ed62bf53efa8b5242a33a10) ) // x00xxxxxxxxxxxxx, mask=0001e0
 	ROM_LOAD( "br8951b.22",  0x000000, 0x020000, CRC(c112a803) SHA1(224a2ed690b78caef266958a93524211ff4a8e70) ) // x00xxxxxxxxxxxxx
 	ROM_LOAD( "br8951b.23",  0x000000, 0x010000, CRC(b9474fec) SHA1(f1f0eab014e8f52572484b83f56189e0ff6f2b0d) ) // 000xxxxxxxxxxxxx
+
+	ROM_REGION( 0xa00, "main_pcb_proms", 0 )
+	ROM_LOAD( "pr88004p.10.12e", 0x000, 0x800, CRC(f178bcce) SHA1(00657f3d1a9fe69337583a9b67a4f16b26c7d2c4) ) // N82S185AN
+	ROM_LOAD( "pr88004q.11.8m",  0x800, 0x200, CRC(9327dc37) SHA1(cfe7b144cdcd76170d47f1c4e0f72b6d4fca0c8d) ) // N82S147AN
+
+	ROM_REGION( 0x1500, "object_pcb_proms", 0 )
+	ROM_LOAD( "pr88004r.24.8l", 0x0000, 0x0800, CRC(354fc081) SHA1(6c1fffc9a458050ba79d16e1ef7775ff5f444ec4) ) // N82S185AN
+	ROM_LOAD( "pr88004s.25.8k", 0x0800, 0x0800, CRC(2a4f9241) SHA1(8e9ff7e1bd31de81ca963d92b5532b8874c1f0ba) ) // N82S185AN
+	ROM_LOAD( "pr88004t.26.2x", 0x1000, 0x0200, CRC(1aad16b2) SHA1(af28396a64ca70187a2d4a900b6298cd8c053218) ) // N82S147AN
+	ROM_LOAD( "pr88004u.27.3y", 0x1200, 0x0200, CRC(213874b2) SHA1(8fea5bdecfd508e9cb25cfc966c9f0b3feb4463a) ) // N82S147AN
+	ROM_LOAD( "pr88004w.28.9v", 0x1400, 0x0100, CRC(3d648467) SHA1(bf8dbaa2176c801f7370313425c87f0eefe8a3a4) ) // N82S135N
+
+	ROM_REGION( 0x100, "road_pcb_prom", 0 )
+	ROM_LOAD( "pr88004x.21.3j", 0x000, 0x100, CRC(19976c09) SHA1(3f2fa1e26ed290aa2f6396154ddf9cdb47484253) ) // N82S129AN
+
+	ROM_REGION( 0x200, "io_pcb_proms", 0 )
+	ROM_LOAD( "pr88004y.9.9l",   0x000, 0x100, CRC(baf5e02c) SHA1(f06a6a095f78bd1b9d32420c4b072f08511bc8ff) ) // N82S129AN
+	ROM_LOAD( "pr88004z.10.10l", 0x100, 0x100, CRC(3103c792) SHA1(b7f6afcb8f0754a56f88c9f4665a6f6976daf98b) ) // N82S129AN
 ROM_END
 
 ROM_START( bigrunu )
@@ -2500,6 +2536,24 @@ ROM_START( bigrunu )
 	ROM_LOAD( "br8951b.21",  0x000000, 0x020000, CRC(59b9c26b) SHA1(09fea3b77b045d9c1ed62bf53efa8b5242a33a10) ) // x00xxxxxxxxxxxxx, mask=0001e0
 	ROM_LOAD( "br8951b.22",  0x000000, 0x020000, CRC(c112a803) SHA1(224a2ed690b78caef266958a93524211ff4a8e70) ) // x00xxxxxxxxxxxxx
 	ROM_LOAD( "br8951b.23",  0x000000, 0x010000, CRC(b9474fec) SHA1(f1f0eab014e8f52572484b83f56189e0ff6f2b0d) ) // 000xxxxxxxxxxxxx
+
+	ROM_REGION( 0xa00, "main_pcb_proms", 0 )
+	ROM_LOAD( "pr88004p.10.12e", 0x000, 0x800, CRC(f178bcce) SHA1(00657f3d1a9fe69337583a9b67a4f16b26c7d2c4) ) // N82S185AN
+	ROM_LOAD( "pr88004q.11.8m",  0x800, 0x200, CRC(9327dc37) SHA1(cfe7b144cdcd76170d47f1c4e0f72b6d4fca0c8d) ) // N82S147AN
+
+	ROM_REGION( 0x1500, "object_pcb_proms", 0 )
+	ROM_LOAD( "pr88004r.24.8l", 0x0000, 0x0800, CRC(354fc081) SHA1(6c1fffc9a458050ba79d16e1ef7775ff5f444ec4) ) // N82S185AN
+	ROM_LOAD( "pr88004s.25.8k", 0x0800, 0x0800, CRC(2a4f9241) SHA1(8e9ff7e1bd31de81ca963d92b5532b8874c1f0ba) ) // N82S185AN
+	ROM_LOAD( "pr88004t.26.2x", 0x1000, 0x0200, CRC(1aad16b2) SHA1(af28396a64ca70187a2d4a900b6298cd8c053218) ) // N82S147AN
+	ROM_LOAD( "pr88004u.27.3y", 0x1200, 0x0200, CRC(213874b2) SHA1(8fea5bdecfd508e9cb25cfc966c9f0b3feb4463a) ) // N82S147AN
+	ROM_LOAD( "pr88004w.28.9v", 0x1400, 0x0100, CRC(3d648467) SHA1(bf8dbaa2176c801f7370313425c87f0eefe8a3a4) ) // N82S135N
+
+	ROM_REGION( 0x100, "road_pcb_prom", 0 )
+	ROM_LOAD( "pr88004x.21.3j", 0x000, 0x100, CRC(19976c09) SHA1(3f2fa1e26ed290aa2f6396154ddf9cdb47484253) ) // N82S129AN
+
+	ROM_REGION( 0x200, "io_pcb_proms", 0 )
+	ROM_LOAD( "pr88004y.9.9l",   0x000, 0x100, CRC(baf5e02c) SHA1(f06a6a095f78bd1b9d32420c4b072f08511bc8ff) ) // N82S129AN
+	ROM_LOAD( "pr88004z.10.10l", 0x100, 0x100, CRC(3103c792) SHA1(b7f6afcb8f0754a56f88c9f4665a6f6976daf98b) ) // N82S129AN
 ROM_END
 
 void cischeat_state::init_bigrun()

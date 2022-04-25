@@ -96,29 +96,29 @@ license:CC0
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
-		<bezel name="pr8210_standby" element="standby">
+		<element name="pr8210_standby" ref="standby">
 			<bounds x="0" y="3.1" width="0.4" height="0.1" />
-		</bezel>
-		<bezel name="pr8210_clv" element="clv">
+		</element>
+		<element name="pr8210_clv" ref="clv">
 			<bounds x="0.5" y="3.1" width="0.4" height="0.1" />
-		</bezel>
-		<bezel name="pr8210_cav" element="cav">
+		</element>
+		<element name="pr8210_cav" ref="cav">
 			<bounds x="1.0" y="3.1" width="0.4" height="0.1" />
-		</bezel>
-		<bezel name="pr8210_audio1" element="audio1">
+		</element>
+		<element name="pr8210_audio1" ref="audio1">
 			<bounds x="1.5" y="3.1" width="0.4" height="0.1" />
-		</bezel>
-		<bezel name="pr8210_audio2" element="audio2">
+		</element>
+		<element name="pr8210_audio2" ref="audio2">
 			<bounds x="2.0" y="3.1" width="0.4" height="0.1" />
-		</bezel>
-		<bezel name="pr8210_led1" element="led1">
+		</element>
+		<element name="pr8210_led1" ref="led1">
 			<bounds x="2.5" y="3.1" width="0.4" height="0.1" />
-		</bezel>
-		<bezel name="pr8210_led2" element="led2">
+		</element>
+		<element name="pr8210_led2" ref="led2">
 			<bounds x="3.0" y="3.1" width="0.4" height="0.1" />
-		</bezel>
-		<bezel name="pr8210_led3" element="led3">
+		</element>
+		<element name="pr8210_led3" ref="led3">
 			<bounds x="3.5" y="3.1" width="0.4" height="0.1" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

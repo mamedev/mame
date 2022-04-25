@@ -191,7 +191,7 @@ void pioneer_ldv1000_device::device_reset()
 //  device
 //-------------------------------------------------
 
-void pioneer_ldv1000_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pioneer_ldv1000_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -251,7 +251,7 @@ void pioneer_ldv1000_device::device_timer(emu_timer &timer, device_timer_id id, 
 
 		// pass everything else onto the parent
 		default:
-			laserdisc_device::device_timer(timer, id, param, ptr);
+			laserdisc_device::device_timer(timer, id, param);
 			break;
 	}
 }
@@ -392,7 +392,7 @@ uint8_t pioneer_ldv1000_device::z80_decoder_display_port_r(offs_t offset)
 		if (m_portselect == 4)
 		{
 			m_vbiready = false;
-			result = m_vbi[m_vbiindex++ % ARRAY_LENGTH(m_vbi)];
+			result = m_vbi[m_vbiindex++ % std::size(m_vbi)];
 		}
 	}
 	return result;

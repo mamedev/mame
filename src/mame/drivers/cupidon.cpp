@@ -29,25 +29,23 @@ public:
 			m_gfxram(*this, "gfxram")
 	{ }
 
+	void init_cupidon();
+	void init_funnyfm();
+
+	void cupidon(machine_config &config);
+	void cupidon_map(address_map &map);
+
+protected:
 	// devices
 	required_device<m68340_cpu_device> m_maincpu;
 	required_shared_ptr<uint32_t> m_gfxram;
 
 	uint32_t screen_update_cupidon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void init_cupidon();
-	void init_funnyfm();
-
 	uint32_t cupidon_return_ffffffff()
 	{
 		return -1; // or it hits an illegal opcode (sleep on the 68340?)
-	};
-
-		void cupidon(machine_config &config);
-		void cupidon_map(address_map &map);
-protected:
-
-
+	}
 };
 
 uint32_t cupidon_state::screen_update_cupidon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -60,7 +58,7 @@ uint32_t cupidon_state::screen_update_cupidon(screen_device &screen, bitmap_ind1
 		{
 			for (int y=0;y<16;y++)
 			{
-				uint16_t* destline = &bitmap.pix16(ytile*16 + y);
+				uint16_t *const destline = &bitmap.pix(ytile*16 + y);
 
 				for (int x=0;x<8;x++)
 				{

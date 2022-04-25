@@ -83,7 +83,6 @@ Side 2 = 0x8F7DDD (or 0x880000 | ( 0x77 << 12 ) | 0x0DDD)
 #include "video/tms9928a.h"
 #include "machine/nvram.h"
 
-#include "render.h"
 #include "speaker.h"
 
 
@@ -128,7 +127,7 @@ private:
 	int m_port_bank;
 	uint32_t m_philips_code;
 
-	emu_timer *m_irq_timer;
+	emu_timer *m_irq_timer = nullptr;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_device> m_discrete;

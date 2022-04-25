@@ -60,7 +60,6 @@
 #include "emu.h"
 #include "tms32010.h"
 #include "32010dsm.h"
-#include "debugger.h"
 
 
 
@@ -869,8 +868,6 @@ void tms32010_device::device_start()
 
 	state_add(STATE_GENPC, "GENPC", m_PC).formatstr("%04X").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_PREVPC).formatstr("%04X").noshow();
-	/* This is actually not a stack pointer, but the stack contents */
-	state_add(STATE_GENSP, "GENSP", m_STACK[3]).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS",  m_STR).formatstr("%16s").noshow();
 
 	set_icountptr(m_icount);

@@ -51,7 +51,7 @@ private:
 
 MC6845_UPDATE_ROW(itt1700_state::update_row)
 {
-	u32 *px = &bitmap.pix32(y);
+	u32 *px = &bitmap.pix(y);
 	u16 page = 0x800;
 
 	for (int i = 0; i < x_count; i++)

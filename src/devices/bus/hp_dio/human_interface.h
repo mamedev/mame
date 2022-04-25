@@ -14,8 +14,9 @@
 #include "bus/hp_hil/hp_hil.h"
 #include "bus/hp_hil/hil_devices.h"
 #include "bus/ieee488/ieee488.h"
-namespace bus {
-	namespace hp_dio {
+
+namespace bus::hp_dio {
+
 class human_interface_device :
 	public device_t,
 	public device_dio16_card_interface
@@ -41,8 +42,8 @@ private:
 	uint8_t iocpu_test0_r();
 
 	/* GPIB */
-	DECLARE_READ8_MEMBER(gpib_r);
-	DECLARE_WRITE8_MEMBER(gpib_w);
+	uint8_t gpib_r(offs_t offset);
+	void gpib_w(offs_t offset, uint8_t data);
 	void ieee488_dio_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(gpib_irq);
@@ -96,7 +97,7 @@ private:
 	uint8_t m_ppoll_mask;
 };
 
-} } // namespace bus::hp_dio
+} // namespace bus::hp_dio
 
 // device type definition
 DECLARE_DEVICE_TYPE_NS(HPDIO_HUMAN_INTERFACE, bus::hp_dio, human_interface_device)

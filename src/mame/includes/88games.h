@@ -37,10 +37,10 @@ public:
 
 private:
 	/* video-related */
-	int          m_k88games_priority;
-	int          m_videobank;
-	int          m_zoomreadroms;
-	int          m_speech_chip;
+	int          m_k88games_priority = 0;
+	int          m_videobank = 0;
+	int          m_zoomreadroms = 0;
+	int          m_speech_chip = 0;
 
 	/* devices */
 	required_device<konami_cpu_device> m_maincpu;

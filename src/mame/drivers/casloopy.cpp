@@ -81,9 +81,8 @@ Notes:
                     like a V60. The BIOS is tied directly to it.
       RH-7500     - Casio RH-7500 5C315 (QFP208). This is the graphics generator chip.
       RH-7501     - Casio RH-7501 5C350 (QFP64). This is probably the sound chip.
-      SH7021      - Hitachi HD6437021TE20 SuperH RISC Engine SH-2A CPU with 32k internal maskROM (TQFP100)
-                    The internal ROM (BIOS1) is not dumped. A SH-2A software programming manual is available here...
-                    http://documentation.renesas.com/eng/products/mpumcu/rej09b0051_sh2a.pdf
+      SH7021      - Hitachi HD6437021TE20 SuperH RISC Engine SH-1 CPU with 32k internal maskROM (TQFP100)
+                    The internal ROM (BIOS1) is not dumped.
       CXA1645M    - Sony CXA1645M RGB Encoder (RGB -> Composite Video) (SOIC24)
       A1603C      - NEC uPA1603C Compound Field Effect Power Transistor Array (DIP16)
       HM514260    - Hitachi HM514260 256k x 16 DRAM (SOJ40)
@@ -155,7 +154,7 @@ PCB 'Z545-1 A240570-1'
 #include "bus/generic/carts.h"
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 class casloopy_state : public driver_device
@@ -192,8 +191,8 @@ private:
 	std::unique_ptr<uint16_t[]> m_paletteram;
 	std::unique_ptr<uint8_t[]> m_vram;
 	std::unique_ptr<uint8_t[]> m_bitmap_vram;
-	uint16_t sh7021_regs[0x100];
-	int m_gfx_index;
+	uint16_t sh7021_regs[0x100]{};
+	int m_gfx_index = 0;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint16_t vregs_r(offs_t offset);
@@ -256,7 +255,6 @@ void casloopy_state::video_start()
 uint32_t casloopy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(m_gfx_index);
-	int x,y;
 	int count;
 
 	static int test;
@@ -280,9 +278,9 @@ uint32_t casloopy_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	#endif
 
 	count = test;
-	for (y=0;y<32;y++)
+	for (int y=0;y<32;y++)
 	{
-		for (x=0;x<32;x++)
+		for (int x=0;x<32;x++)
 		{
 			uint16_t tile = (m_vram[count+1])|(m_vram[count]<<8);
 
@@ -296,15 +294,13 @@ uint32_t casloopy_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	count = test;
 
-	for (y=cliprect.top(); y<cliprect.bottom(); y++) // FIXME: off-by-one?
+	for (int y=cliprect.top(); y<cliprect.bottom(); y++) // FIXME: off-by-one?
 	{
-		for(x=0;x<256;x++)
+		for(int x=0;x<256;x++)
 		{
-			uint8_t pix;
-
-			pix = m_bitmap_vram[count];
+			uint8_t pix = m_bitmap_vram[count];
 			if(pix)
-				bitmap.pix16(y, x) = pix + 0x100;
+				bitmap.pix(y, x) = pix + 0x100;
 
 			count++;
 		}
@@ -431,7 +427,7 @@ void casloopy_state::casloopy_map(address_map &map)
 //  map(0x05ffff00, 0x05ffffff).rw(FUNC(casloopy_state::sh7021_r), FUNC(casloopy_state::sh7021_w));
 //  map(0x05ffff00, 0x05ffffff) - SH7021 internal i/o
 	map(0x06000000, 0x062fffff).r(m_cart, FUNC(generic_cartslot_device::read32_rom));
-	map(0x07000000, 0x070003ff).ram().share("oram");// on-chip RAM, actually at 0xf000000 (1 kb)
+	//map(0x07000000, 0x070003ff).ram();// area 7 (CS7), NOT on-chip RAM mirror
 	map(0x09000000, 0x0907ffff).ram().share("wram");
 	map(0x0e000000, 0x0e2fffff).r(m_cart, FUNC(generic_cartslot_device::read32_rom));
 	map(0x0f000000, 0x0f0003ff).ram().share("oram");

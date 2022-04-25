@@ -10,15 +10,6 @@
 
 ***************************************************************************/
 
-#include <cstdio>
-#include <cstring>
-#include <cctype>
-#include <cstdlib>
-#include <ctime>
-#include <cassert>
-
-#include "corestr.h"
-
 #include "formats/a26_cas.h"
 #include "formats/ace_tap.h"
 #include "formats/adam_cas.h"
@@ -38,6 +29,7 @@
 #include "formats/mz_cas.h"
 #include "formats/orao_cas.h"
 #include "formats/oric_tap.h"
+#include "formats/p2000t_cas.h"
 #include "formats/p6001_cas.h"
 #include "formats/phc25_cas.h"
 #include "formats/pmd_cas.h"
@@ -60,10 +52,22 @@
 #include "formats/x1_tap.h"
 #include "formats/zx81_p.h"
 
+#include "corestr.h"
+#include "ioprocs.h"
+#include "osdcomm.h"
+
+#include <cassert>
+#include <cctype>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
+
+
 struct SupportedCassetteFormats
 {
 	const char *name;
-	const struct CassetteFormat * const *formats;
+	const cassette_image::Format * const *formats;
 	const char *desc;
 };
 
@@ -90,6 +94,7 @@ const struct SupportedCassetteFormats formats[] = {
 	{"mz", mz700_cassette_formats              ,"Sharp MZ-700"},
 	{"orao", orao_cassette_formats             ,"PEL Varazdin Orao"},
 	{"oric", oric_cassette_formats             ,"Tangerine Oric"},
+	{"p2000t", p2000t_cassette_formats         ,"Philips P2000T"},
 	{"pc6001", pc6001_cassette_formats         ,"NEC PC-6001"},
 	{"phc25", phc25_cassette_formats           ,"Sanyo PHC-25"},
 	{"pmd85", pmd85_cassette_formats           ,"Tesla PMD-85"},
@@ -157,9 +162,8 @@ int CLIB_DECL main(int argc, char *argv[])
 {
 	int i;
 	int found =0;
-	const struct CassetteFormat * const *selected_formats = nullptr;
-	cassette_image *cassette;
-	FILE *f;
+	const cassette_image::Format * const *selected_formats = nullptr;
+	cassette_image::ptr cassette;
 
 	if (argc > 1)
 	{
@@ -185,21 +189,26 @@ int CLIB_DECL main(int argc, char *argv[])
 					return -1;
 				}
 
-				f = fopen(argv[3], "rb");
+				FILE *f = fopen(argv[3], "rb");
 				if (!f) {
 					fprintf(stderr, "File %s not found.\n",argv[3]);
 					return -1;
 				}
 
-				if (cassette_open_choices(f, &stdio_ioprocs, get_extension(argv[3]), selected_formats, CASSETTE_FLAG_READONLY, &cassette) != cassette_image::error::SUCCESS)  {
-					fprintf(stderr, "Invalid format of input file.\n");
-					fclose(f);
+				auto io = util::stdio_read_write(f, 0x00);
+				f = nullptr;
+				if (!io) {
+					fprintf(stderr, "Out of memory.\n");
 					return -1;
 				}
 
-				cassette_dump(cassette,argv[4]);
-				cassette_close(cassette);
-				fclose(f);
+				if (cassette_image::open_choices(std::move(io), get_extension(argv[3]), selected_formats, cassette_image::FLAG_READONLY, cassette) != cassette_image::error::SUCCESS)  {
+					fprintf(stderr, "Invalid format of input file.\n");
+					return -1;
+				}
+
+				cassette->dump(argv[4]);
+				cassette.reset();
 				goto theend;
 			}
 		}

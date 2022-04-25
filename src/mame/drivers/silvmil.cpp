@@ -28,7 +28,7 @@ Very likely to be 'whatever crystals we had on hand which were close enough for 
 #include "cpu/m68000/m68000.h"
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "video/decospr.h"
 #include "emupal.h"
 #include "screen.h"
@@ -67,10 +67,10 @@ private:
 	required_shared_ptr<u16> m_spriteram;
 
 	/* video-related */
-	tilemap_t   *m_bg_layer;
-	tilemap_t   *m_fg_layer;
-	int         m_tilebank[4];
-	int         m_whichbank;
+	tilemap_t   *m_bg_layer = nullptr;
+	tilemap_t   *m_fg_layer = nullptr;
+	int         m_tilebank[4]{};
+	int         m_whichbank = 0;
 
 	void tilebank_w(u16 data);
 	void tilebank1_w(u16 data);

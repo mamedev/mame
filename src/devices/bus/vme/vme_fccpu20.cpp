@@ -246,7 +246,6 @@ void vme_fccpu20_device::cpu20_mem(address_map &map)
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
@@ -439,12 +438,15 @@ vme_fccpu21yb_card_device::vme_fccpu21yb_card_device(const machine_config &mconf
 	LOG("%s %s\n", tag, FUNCNAME);
 }
 
+enum
+{
+	TIMER_ID_BUS_GRANT
+};
+
 /* Start it up */
 void vme_fccpu20_device::device_start()
 {
 	LOG("%s\n", FUNCNAME);
-
-	set_vme_device();
 
 	save_pointer (NAME (m_sysrom), sizeof(m_sysrom));
 	save_pointer (NAME (m_sysram), sizeof(m_sysram));
@@ -463,26 +465,21 @@ void vme_fccpu20_device::device_start()
 	m_vme->install_device(base + 2, base + 3, // Channel B - Control
 			read8_delegate(*subdevice<z80sio_device>("pit"), FUNC(z80sio_device::cb_r)), write8_delegate(*subdevice<z80sio_device>("pit"), FUNC(z80sio_device::cb_w)), 0x00ff);
 #endif
+	m_arbiter_start = timer_alloc(TIMER_ID_BUS_GRANT);
 }
-
-enum
-{
-	TIMER_ID_BUS_GRANT
-};
 
 void vme_fccpu20_device::device_reset()
 {
 	LOG("%s\n", FUNCNAME);
 
 	/* We need to delay the static bus grant signal until we have it from the VME interface or MAME supports bus arbitration */
-	m_arbiter_start = timer_alloc(TIMER_ID_BUS_GRANT);
 	m_arbiter_start->adjust(attotime::from_msec(10), TIMER_ID_BUS_GRANT, attotime::never);
 }
 
 //-------------------------------------------------
 //  device_timer - handler timer events
 //-------------------------------------------------
-void vme_fccpu20_device::device_timer (emu_timer &timer, device_timer_id id, int32_t param, void *ptr)
+void vme_fccpu20_device::device_timer (emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{
@@ -496,17 +493,17 @@ void vme_fccpu20_device::device_timer (emu_timer &timer, device_timer_id id, int
 }
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0xff800000 to 0x0 at reset*/
-READ32_MEMBER (vme_fccpu20_device::bootvect_r)
+uint32_t vme_fccpu20_device::bootvect_r(offs_t offset)
 {
 	LOG("%s\n", FUNCNAME);
 	return m_sysrom[offset];
 }
 
-WRITE32_MEMBER (vme_fccpu20_device::bootvect_w)
+void vme_fccpu20_device::bootvect_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOG("%s\n", FUNCNAME);
-	m_sysram[offset % ARRAY_LENGTH(m_sysram)] &= ~mem_mask;
-	m_sysram[offset % ARRAY_LENGTH(m_sysram)] |= (data & mem_mask);
+	m_sysram[offset % std::size(m_sysram)] &= ~mem_mask;
+	m_sysram[offset % std::size(m_sysram)] |= (data & mem_mask);
 	m_sysrom = &m_sysram[0]; // redirect all upcoming accesses to masking RAM until reset.
 }
 

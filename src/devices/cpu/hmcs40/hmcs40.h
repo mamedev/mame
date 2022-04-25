@@ -82,8 +82,8 @@ class hmcs40_cpu_device : public cpu_device
 {
 public:
 	// max 8 4-bit R ports
-	template <std::size_t Bit> auto read_r() { return m_read_r[Bit].bind(); }
-	template <std::size_t Bit> auto write_r() { return m_write_r[Bit].bind(); }
+	template <std::size_t N> auto read_r() { return m_read_r[N].bind(); }
+	template <std::size_t N> auto write_r() { return m_write_r[N].bind(); }
 
 	// 16-bit discrete
 	auto read_d() { return m_read_d.bind(); }
@@ -134,6 +134,9 @@ protected:
 	address_space *m_program;
 	address_space *m_data;
 
+	int m_icount;
+	int m_state_count;
+
 	int m_pcwidth;      // Program Counter bit-width
 	int m_prgwidth;
 	int m_datawidth;
@@ -151,7 +154,6 @@ protected:
 	int m_eint_line;    // which input_line caused an interrupt
 	int m_halt;         // internal HLT state
 	u8 m_prescaler;     // internal timer prescaler
-	int m_icount;
 
 	u16 m_pc;           // Program Counter
 	u16 m_prev_pc;

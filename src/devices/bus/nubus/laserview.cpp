@@ -88,10 +88,10 @@ void nubus_laserview_device::device_start()
 //  printf("[laserview %p] slotspace = %x\n", this, slotspace);
 
 	m_vram.resize(VRAM_SIZE);
-	install_bank(slotspace, slotspace+VRAM_SIZE-1, "bank_laserview", &m_vram[0]);
-	install_bank(slotspace+0x900000, slotspace+0x900000+VRAM_SIZE-1, "bank_laserview2", &m_vram[0]);
+	install_bank(slotspace, slotspace+VRAM_SIZE-1, &m_vram[0]);
+	install_bank(slotspace+0x900000, slotspace+0x900000+VRAM_SIZE-1, &m_vram[0]);
 
-	nubus().install_device(slotspace+0xB0000, slotspace+0xBFFFF, read32_delegate(*this, FUNC(nubus_laserview_device::regs_r)), write32_delegate(*this, FUNC(nubus_laserview_device::regs_w)));
+	nubus().install_device(slotspace+0xB0000, slotspace+0xBFFFF, read32s_delegate(*this, FUNC(nubus_laserview_device::regs_r)), write32s_delegate(*this, FUNC(nubus_laserview_device::regs_w)));
 }
 
 //-------------------------------------------------
@@ -117,37 +117,33 @@ void nubus_laserview_device::device_reset()
 
 uint32_t nubus_laserview_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint32_t *scanline;
-	int x, y;
-	uint8_t pixels;
-
 	if (!m_vbl_disable)
 	{
 		raise_slot_irq();
 	}
 
-	for (y = 0; y < 600; y++)
+	for (int y = 0; y < 600; y++)
 	{
-		scanline = &bitmap.pix32(y);
-		for (x = 0; x < 832/8; x++)
+		uint32_t *scanline = &bitmap.pix(y);
+		for (int x = 0; x < 832/8; x++)
 		{
-			pixels = m_vram[(y * 104) + (BYTE4_XOR_BE(x)) + 0x20];
+			uint8_t const pixels = m_vram[(y * 104) + (BYTE4_XOR_BE(x)) + 0x20];
 
-			*scanline++ = m_palette[(pixels>>7)&1];
-			*scanline++ = m_palette[(pixels>>6)&1];
-			*scanline++ = m_palette[(pixels>>5)&1];
-			*scanline++ = m_palette[(pixels>>4)&1];
-			*scanline++ = m_palette[(pixels>>3)&1];
-			*scanline++ = m_palette[(pixels>>2)&1];
-			*scanline++ = m_palette[(pixels>>1)&1];
-			*scanline++ = m_palette[(pixels&1)];
+			*scanline++ = m_palette[BIT(pixels, 7)];
+			*scanline++ = m_palette[BIT(pixels, 6)];
+			*scanline++ = m_palette[BIT(pixels, 5)];
+			*scanline++ = m_palette[BIT(pixels, 4)];
+			*scanline++ = m_palette[BIT(pixels, 3)];
+			*scanline++ = m_palette[BIT(pixels, 2)];
+			*scanline++ = m_palette[BIT(pixels, 1)];
+			*scanline++ = m_palette[BIT(pixels, 0)];
 		}
 	}
 
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_laserview_device::regs_w )
+void nubus_laserview_device::regs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("%08x to regs @ %x mask %08x\n", data, offset, mem_mask);
 
@@ -172,7 +168,7 @@ WRITE32_MEMBER( nubus_laserview_device::regs_w )
 
 }
 
-READ32_MEMBER( nubus_laserview_device::regs_r )
+uint32_t nubus_laserview_device::regs_r(offs_t offset, uint32_t mem_mask)
 {
 	//f (offset != 0x3fc1) printf("Read regs_r @ %x mask %08x\n", offset, mem_mask);
 

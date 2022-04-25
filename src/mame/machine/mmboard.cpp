@@ -23,22 +23,22 @@ DEFINE_DEVICE_TYPE(MEPHISTO_BUTTONS_BOARD, mephisto_buttons_board_device, "mbboa
 //  constructor
 //-------------------------------------------------
 
-mephisto_board_device::mephisto_board_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+mephisto_board_device::mephisto_board_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_board(*this, "board")
 	, m_led_pwm(*this, "led_pwm")
-	, m_sensordelay(attotime::from_msec(150))
 	, m_led_out(*this, "led%u", 0U)
+	, m_sensordelay(attotime::from_msec(150))
 	, m_disable_leds(false)
 {
 }
 
-mephisto_sensors_board_device::mephisto_sensors_board_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mephisto_sensors_board_device::mephisto_sensors_board_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: mephisto_board_device(mconfig, MEPHISTO_SENSORS_BOARD, tag, owner, clock)
 {
 }
 
-mephisto_buttons_board_device::mephisto_buttons_board_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mephisto_buttons_board_device::mephisto_buttons_board_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: mephisto_board_device(mconfig, MEPHISTO_BUTTONS_BOARD, tag, owner, clock)
 {
 }
@@ -76,6 +76,9 @@ void mephisto_board_device::device_start()
 {
 	m_led_out.resolve();
 
+	m_mux = 0xff;
+	m_led_data = 0;
+
 	save_item(NAME(m_mux));
 	save_item(NAME(m_led_data));
 
@@ -99,15 +102,15 @@ void mephisto_board_device::device_reset()
 //  I/O handlers
 //-------------------------------------------------
 
-void mephisto_board_device::refresh_leds_w(offs_t offset, uint8_t data)
+void mephisto_board_device::refresh_leds_w(offs_t offset, u8 data)
 {
 	if (!m_disable_leds)
 		m_led_out[(offset >> 6 & 7) | (offset & 7) << 3] = data;
 }
 
-uint8_t mephisto_board_device::input_r()
+u8 mephisto_board_device::input_r()
 {
-	uint8_t data = 0xff;
+	u8 data = 0xff;
 
 	for (int i = 0; i < 8; i++)
 		if (!BIT(m_mux, i))
@@ -116,18 +119,18 @@ uint8_t mephisto_board_device::input_r()
 	return data;
 }
 
-uint8_t mephisto_board_device::mux_r()
+u8 mephisto_board_device::mux_r()
 {
 	return m_mux;
 }
 
-void mephisto_board_device::mux_w(uint8_t data)
+void mephisto_board_device::mux_w(u8 data)
 {
 	m_mux = data;
 	update_led_pwm();
 }
 
-void mephisto_board_device::led_w(uint8_t data)
+void mephisto_board_device::led_w(u8 data)
 {
 	m_led_data = data;
 	update_led_pwm();

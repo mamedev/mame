@@ -73,7 +73,7 @@ Notes:
 //  pia_r - trampoline for PIA odd/even access
 //-------------------------------------------------
 
-READ8_MEMBER( ob68k1a_state::pia_r )
+uint8_t ob68k1a_state::pia_r(offs_t offset)
 {
 	if (offset) {
 		return m_pia1->read(0);
@@ -87,7 +87,7 @@ READ8_MEMBER( ob68k1a_state::pia_r )
 //  pia_w - trampoline for PIA odd/even access
 //-------------------------------------------------
 
-WRITE8_MEMBER( ob68k1a_state::pia_w )
+void ob68k1a_state::pia_w(offs_t offset, uint8_t data)
 {
 	if (offset) {
 		m_pia1->write(0,data);

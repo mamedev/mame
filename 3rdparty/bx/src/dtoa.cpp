@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -74,8 +74,8 @@ namespace bx
 
 		DiyFp operator-(const DiyFp& rhs) const
 		{
-			BX_CHECK(e == rhs.e, "");
-			BX_CHECK(f >= rhs.f, "");
+			BX_ASSERT(e == rhs.e, "");
+			BX_ASSERT(f >= rhs.f, "");
 			return DiyFp(f - rhs.f, e);
 		}
 
@@ -224,7 +224,7 @@ namespace bx
 		uint32_t index = static_cast<uint32_t>( (k >> 3) + 1);
 		*K = -(-348 + static_cast<int32_t>(index << 3) );	// decimal exponent no need lookup table
 
-		BX_CHECK(index < sizeof(s_kCachedPowers_F) / sizeof(s_kCachedPowers_F[0]), "");
+		BX_ASSERT(index < sizeof(s_kCachedPowers_F) / sizeof(s_kCachedPowers_F[0]), "");
 		return DiyFp(s_kCachedPowers_F[index], s_kCachedPowers_E[index]);
 	}
 

@@ -1527,8 +1527,8 @@ void atarigx2_state::atarigx2(machine_config &config)
 	ATARI_JSA_IIIS(config, m_jsa, 0);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_5);
 	m_jsa->test_read_cb().set_ioport("SERVICE").bit(6);
-	m_jsa->add_route(0, "lspeaker", 1.0);
-	m_jsa->add_route(1, "rspeaker", 1.0);
+	m_jsa->add_route(0, "lspeaker", 0.7);
+	m_jsa->add_route(1, "rspeaker", 0.7);
 }
 
 void atarigx2_state::atarigx2_0x200(machine_config &config)

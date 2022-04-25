@@ -2,14 +2,23 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0
+
+Most programs are unsupported due to a .tap loading problem.
+
+Program type O = LMEM""
+Program type B = LOAD""
+
+To Do: sort out the duplicate 'spaceinv' and 'crtanje' programs.
+
 -->
 
 <softwarelist name="orao" description="PEL Varazdin Orao cassettes">
 
-	<software name="6502step">
+	<software name="6502step" supported="no">
 		<description>6502 Step (v1.0)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="4099">
 				<rom name="6502step.tap" size="4099" crc="18b959be" sha1="9ded3c41aa3d56bc057a8db4ce5d562695723e37"/>
@@ -17,10 +26,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ajnc">
+	<software name="ajnc" supported="no">
 		<description>Ajnc</description>
 		<year>19??</year>
 		<publisher>PEL Soft</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="17806">
 				<rom name="ajnc.tap" size="17806" crc="de341625" sha1="ea157993ea1c70e5f22cb4cf0e8cb1c7acd034da"/>
@@ -28,10 +38,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="avion">
+	<software name="avion" supported="no">
 		<description>Avion</description>
 		<year>1986</year>
 		<publisher>Emil Herceg - Igor Kos</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="6798">
 				<rom name="avion.tap" size="6798" crc="eb4143a9" sha1="c350137a5c6084d8990b9b0856329f5b94aa338f"/>
@@ -39,10 +50,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="bdash">
+	<software name="bdash" supported="no">
 		<description>Boulder Dash</description>
 		<year>19??</year>
 		<publisher>Nenad Mihailovic - Mihajlo Dapjas</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play. When load finishes, press Enter, then G. Movement: 1,Q,[,]" />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="17998">
 				<rom name="boulderdash.tap" size="17998" crc="11ab14ed" sha1="4a7541bdcba4f03538c3659ad9c1bb36b6d34263"/>
@@ -50,10 +62,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="breakout">
+	<software name="breakout" supported="no">
 		<description>Breakout</description>
 		<year>19??</year>
 		<publisher>Stan Rimox Software</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="18992">
 				<rom name="breakout.tap" size="18992" crc="7737b9af" sha1="9d9a9e5b06ede99cb7326bab980d7f5a85ba0723"/>
@@ -61,10 +74,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="brojke">
+	<software name="brojke" supported="no">
 		<description>Brojke</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="4035">
 				<rom name="brojke.tap" size="4035" crc="f46a50c8" sha1="edf486d95df1935effa01f77a36d36c0a24829f8"/>
@@ -72,10 +86,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="crtanje">
+	<software name="crtanje" supported="no">
 		<description>Crtanje</description>
 		<year>1987</year>
 		<publisher>Suzy Soft</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="4698">
 				<rom name="crtanje.tap" size="4698" crc="30ef56cb" sha1="7a77d75da0a0b34639b987e0d5cf14d7859d80c6"/>
@@ -83,10 +98,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="crvic">
-		<description>Crvic</description>
+	<software name="crvic" supported="no">
+		<description>Crvic (Snake)</description>
 		<year>1986</year>
 		<publisher>PEL Soft</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play. When load finishes, press Enter, then G. Movement: Q,A,O,P" />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="14050">
 				<rom name="crvic.tap" size="14050" crc="6feb9576" sha1="f9f31884a3899731350a2931818b5945afba0bae"/>
@@ -94,10 +110,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="microrac">
+	<software name="microrac" supported="no">
 		<description>Mikroracunalo Orao</description>
 		<year>1988</year>
 		<publisher>PEL Varazdin</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="31432">
 				<rom name="demo1.tap" size="31432" crc="9e7ba4ec" sha1="3a0c5c8412383a5cd676394308637a8a54238475"/>
@@ -114,6 +131,7 @@ license:CC0
 		<description>Demo Grafika</description>
 		<year>1985</year>
 		<publisher>KMI Borovo</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="22996">
 				<rom name="demografika.tap" size="22996" crc="1a3f6740" sha1="aeca6893a530b27a0428f33d40fb10c683f450fb"/>
@@ -121,10 +139,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="eagle">
-		<description>Eagle</description>
+	<software name="eagle" supported="no">
+		<description>Eagle (Defender)</description>
 		<year>1986</year>
 		<publisher>KMI Borovo</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="9132">
 				<rom name="eagle.tap" size="9132" crc="b3a8886c" sha1="80409c7ca7fe3fa70e4133a96f4f04c9806d6c5d"/>
@@ -132,10 +151,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="jugador">
+	<software name="jugador" supported="no">
 		<description>Jugador</description>
 		<year>19??</year>
 		<publisher>Mario Vuletic</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="4932">
 				<rom name="jugador.tap" size="4932" crc="a42f9cdf" sha1="adbf785606b093925eae1c42d1bb6611372c8f89"/>
@@ -143,10 +163,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="jumpjack">
+	<software name="jumpjack" supported="no">
 		<description>Jumping Jack</description>
 		<year>1986</year>
 		<publisher>KMI Borovo</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="9133">
 				<rom name="jumpingjack.tap" size="9133" crc="2bb70986" sha1="269820989ab16c73594abeb6935736c08e07b5f3"/>
@@ -154,10 +175,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="karate">
+	<software name="karate" supported="no">
 		<description>Internacional Karate</description>
 		<year>19??</year>
 		<publisher>KMI Borovo</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="25106">
 				<rom name="karate.tap" size="25106" crc="021024a0" sha1="90620ceafe258c7bbec195670b629426bf32b82c"/>
@@ -165,10 +187,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="kuki">
-		<description>Kuki</description>
+	<software name="kuki" supported="no">
+		<description>Kuki (Cook)</description>
 		<year>1986</year>
 		<publisher>KMI Borovo</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="9998">
 				<rom name="kuki.tap" size="9998" crc="90cddb34" sha1="211de24d98205f1b8dde0057f5294a7fb569483c"/>
@@ -176,10 +199,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="kvadrat">
-		<description>Magicni Kvadrat</description>
+	<software name="kvadrat" supported="no">
+		<description>Magicni Kvadrat (Magic Square)</description>
 		<year>1985</year>
 		<publisher>Mario Ranogajec - Boris Korpar</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="17078">
 				<rom name="kvadrat.tap" size="17078" crc="9ee09595" sha1="9ac6e8046765b6656f27046955eeea3672c4509c"/>
@@ -187,10 +211,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="labirint">
+	<software name="labirint" supported="no">
 		<description>Labirint</description>
 		<year>1985</year>
 		<publisher>Bibi Soft</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="5698">
 				<rom name="labirint.tap" size="5698" crc="864f7643" sha1="6201f6dfa20178ca782ac1cde73364d0c5f5ce64"/>
@@ -198,10 +223,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="labirinm">
+	<software name="labirinm" supported="no"><!-- Bad load in block 24 -->
 		<description>Labirint M</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="BC then LOAD&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="15237">
 				<rom name="labirintm.tap" size="15237" crc="9e0790cf" sha1="89706cf82798956410facce1613c54a4c898979f"/>
@@ -213,6 +239,7 @@ license:CC0
 		<description>Manic Miner</description>
 		<year>19??</year>
 		<publisher>Nenad Mihailovic</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play. Movement: [,],Q" />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="18001">
 				<rom name="manicminer.tap" size="18001" crc="27380ee9" sha1="b37abeb1df684a1ae3b5bd19795ac90e69853176"/>
@@ -220,10 +247,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="matchfis">
+	<software name="matchfis" supported="no">
 		<description>Match Fishing</description>
 		<year>1986</year>
 		<publisher>KMI Borovo</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="23228">
 				<rom name="matchfishing.tap" size="23228" crc="fa01ad6c" sha1="88a3af7de00440910212aeb6f5360b32fc9062a1"/>
@@ -231,10 +259,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="memo">
+	<software name="memo" supported="no">
 		<description>Memo</description>
 		<year>19??</year>
 		<publisher>PEL Soft</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="16500">
 				<rom name="memopel.tap" size="16500" crc="128ffc0b" sha1="60daee51376dd59b5623a0072cd842ecd5db7257"/>
@@ -242,10 +271,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="memoa" cloneof="memo">
+	<software name="memoa" cloneof="memo" supported="no">
 		<description>Memo (No Loading Screen)</description>
 		<year>19??</year>
 		<publisher>PEL Soft</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="10198">
 				<rom name="memononame.tap" size="10198" crc="1166e752" sha1="f17f7917ccf8399ef2231cc26be1e9056a3b0a86"/>
@@ -253,10 +283,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="nevid">
+	<software name="nevid" supported="no">
 		<description>Nevidljivi</description>
 		<year>1987</year>
 		<publisher>Suzy Soft</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="4198">
 				<rom name="nevidljivi.tap" size="4198" crc="513373fb" sha1="56bd74d57bafe8eccaeba5ac7d5ac6bae3412403"/>
@@ -264,10 +295,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="obelix">
+	<software name="obelix" supported="no">
 		<description>Obelix</description>
 		<year>19??</year>
 		<publisher>KMI Borovo</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="8639">
 				<rom name="obelix.tap" size="8639" crc="f79019d1" sha1="0de7854d67905fcc476838fba064924c27bbef4b"/>
@@ -275,10 +307,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="othello">
+	<software name="othello" supported="no"><!-- Bad load in block 30 -->
 		<description>Othello</description>
 		<year>1985</year>
 		<publisher>Sasa Ivkovic</publisher>
+		<info name="usage" value="BC then LOAD&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="18828">
 				<rom name="othello.tap" size="18828" crc="d488a8e3" sha1="a35d5b56882b07c10f98b011d6aa0006a1578452"/>
@@ -286,10 +319,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="pacman">
+	<software name="pacman" supported="no"><!-- Bad load in block 23 -->
 		<description>Pac-Man</description>
 		<year>19??</year>
 		<publisher>Sasa Ivkovic</publisher>
+		<info name="usage" value="BC then LOAD&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="30114">
 				<rom name="pacman.tap" size="30114" crc="3a6479ea" sha1="b1cbde718d491b4324d9ed13e70e7df0c108f398"/>
@@ -301,6 +335,7 @@ license:CC0
 		<description>Pcelica Maja</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="16998">
 				<rom name="pcelicamaja.tap" size="16998" crc="e1add5c2" sha1="fcaca49c82855c5fe493bb4741c7e855b1bd1402"/>
@@ -308,10 +343,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="podsjet">
+	<software name="podsjet" supported="no">
 		<description>Podsjetnik</description>
 		<year>1987</year>
 		<publisher>Suzy Soft</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="10515">
 				<rom name="podsjetnik.tap" size="10515" crc="ea6c2bb4" sha1="fef66d98d23b1b2f675e3d0ed45ccb53829250da"/>
@@ -319,10 +355,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="pomorska">
+	<software name="pomorska" supported="no">
 		<description>Pomorska Bitka</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="9608">
 				<rom name="pomorskabitka.tap" size="9608" crc="8c5dda11" sha1="d25fbedf844ce43ee2eb0cb32546c3abcc9111c0"/>
@@ -330,10 +367,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="porno">
+	<software name="porno" supported="no">
 		<description>Porno</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="3179">
 				<rom name="porno.tap" size="3179" crc="212bb659" sha1="ab422b4548d279a6961e77499f33b602eaacdd0b"/>
@@ -341,10 +379,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="reversi">
+	<software name="reversi" supported="no">
 		<description>Reversi</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="5950">
 				<rom name="reversi.tap" size="5950" crc="3964ff16" sha1="2a735bc3ab917c8b2f16d012318aed9f8aa62a52"/>
@@ -352,10 +391,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="figchess">
+	<software name="figchess" supported="no">
 		<description>Figure Chess</description>
 		<year>1986</year>
 		<publisher>KMI Borovo</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="19745">
 				<rom name="sah.tap" size="19745" crc="02513ff4" sha1="29586a75f9a6ef7b9bb0f370b5eb7f9a00dee37a"/>
@@ -363,10 +403,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="sintetiz">
+	<software name="sintetiz" supported="no">
 		<description>Sintetizator Zvuka</description>
 		<year>1987</year>
 		<publisher>Suzy Soft</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="3422">
 				<rom name="sintetizatorzvuka.tap" size="3422" crc="26da3240" sha1="96b4ec2a5b521e27e4fcc91081126aa274ab9230"/>
@@ -374,10 +415,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="sokoban">
+	<software name="sokoban" supported="no">
 		<description>Sokoban</description>
 		<year>19??</year>
 		<publisher>J.P.</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="13829">
 				<rom name="sokoban.tap" size="13829" crc="ffcf7e0c" sha1="12c435c68b2203b68f29c2450740b958e16e0405"/>
@@ -385,10 +427,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="spaceinv">
+	<software name="spaceinv" supported="no">
 		<description>Space Invaders</description>
 		<year>19??</year>
 		<publisher>PEL Soft</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="21150">
 				<rom name="spaceinvaders.tap" size="21150" crc="31230e8b" sha1="8021e562130d2b11eb916f3623e65794d93b2a93"/>
@@ -396,10 +439,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="stripajn">
+	<software name="stripajn" supported="no">
 		<description>Strip Ajnc</description>
 		<year>1985</year>
 		<publisher>Z. Bistrovic</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="8750">
 				<rom name="stripajnc.tap" size="8750" crc="68032c11" sha1="3a49a90b7915491eecdec149a5cfb2f90e1a03da"/>
@@ -407,10 +451,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="stripgam">
+	<software name="stripgam" supported="no">
 		<description>Strip Game Ainc</description>
 		<year>19??</year>
 		<publisher>KMI Borovo</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="31615">
 				<rom name="stripgameainc.tap" size="31615" crc="03e38de8" sha1="c5df30d030f44f19182c86fcb6448116f7f92be1"/>
@@ -418,10 +463,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tornjev">
-		<description>Tornjevi</description>
+	<software name="tornjev" supported="no">
+		<description>Tornjevi (Tower of Hanoi)</description>
 		<year>19??</year>
 		<publisher>Tom</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="3966">
 				<rom name="tornjevi.tap" size="3966" crc="38d905d7" sha1="2b21e99b9e847a5bde4acadc03b62ca2e628c93d"/>
@@ -429,10 +475,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ukletidv">
+	<software name="ukletidv" supported="no">
 		<description>Ukleti Dvorac</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="12398">
 				<rom name="ukletidvorac.tap" size="12398" crc="850123a7" sha1="d867f072832e8c6dd87fe4bbda14cbb720e9ca25"/>
@@ -441,9 +488,10 @@ license:CC0
 	</software>
 
 	<software name="zid">
-		<description>Zid</description>
+		<description>Zid (Breakout)</description>
 		<year>1985</year>
 		<publisher>PEL Zabavni Programi</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="11345">
 				<rom name="zid.tap" size="11345" crc="c7524e54" sha1="4ee43911a7c49899d2ef7e89308ab3213d1cedac"/>
@@ -451,13 +499,194 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="znakovi">
+	<software name="znakovi" supported="no">
 		<description>Znakovi</description>
 		<year>1987</year>
 		<publisher>Suzy Soft</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
 		<part name="cass1" interface="orao_cass">
 			<dataarea name="cass" size="4618">
 				<rom name="znakovi.tap" size="4618" crc="a834c22e" sha1="49340c62aa1f1109f610e95878eb75de24916928"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bioritam">
+		<description>Bioritam</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
+		<part name="cass1" interface="orao_cass">
+			<dataarea name="cass" size="0x186a">
+				<rom name="bioritam.tap" size="0x186a" crc="8782c7ca" sha1="e6cd1094c798f2bc9754ded73bd4d4401c353d63"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crtanje2" supported="no">
+		<description>Crtanje (Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
+		<part name="cass1" interface="orao_cass">
+			<dataarea name="cass" size="0x1272">
+				<rom name="crtanje.tap" size="0x1272" crc="03c4d654" sha1="53fedd0a8dc9e5f9a371d704bcdcbc58f66c8770"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geografija">
+		<description>Geografija</description>
+		<year>19??</year>
+		<publisher>KMI Borovo</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
+		<part name="cass1" interface="orao_cass">
+			<dataarea name="cass" size="0x6e76">
+				<rom name="geografija.tap" size="0x6e76" crc="96495ea2" sha1="e9db89f9d0df5e61129b75359b2431e88b9d5e28"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kalkulator" supported="no">
+		<description>Kalkulator</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="BC then LOAD&quot;&quot;, then Play." />
+		<part name="cass1" interface="orao_cass">
+			<dataarea name="cass" size="0x076b">
+				<rom name="kalkulator.tap" size="0x076b" crc="7ebdd425" sha1="95d5ae11344fc3289f47961f098f05ba08881ff3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="konverzija" supported="no">
+		<description>Konverzija</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
+		<part name="cass1" interface="orao_cass">
+			<dataarea name="cass" size="0x16ed">
+				<rom name="konverzija.tap" size="0x16ed" crc="007148a6" sha1="68b1ca8afe6f717dc125f02543b13cdd94799ad7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megafruit" supported="no">
+		<description>Mega Fruit</description>
+		<year>19??</year>
+		<publisher>KMI Borovo</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
+		<part name="cass1" interface="orao_cass">
+			<dataarea name="cass" size="0x4620">
+				<rom name="mega_fruit.tap" size="0x4620" crc="090dcb52" sha1="f2543e9351d31caa356708826a9ab79aa6340e60"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minedout">
+		<description>Mined Out</description>
+		<year>19??</year>
+		<publisher>KMI Borovo</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
+		<part name="cass1" interface="orao_cass">
+			<dataarea name="cass" size="0x2519">
+				<rom name="mined_out.tap" size="0x2519" crc="026cefb5" sha1="b0077154fb203e8706ebd1cd03393d5f1fd61b07"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monster" supported="no">
+		<description>Monster Copy 2</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
+		<part name="cass1" interface="orao_cass">
+			<dataarea name="cass" size="0x0e10">
+				<rom name="monster_copy_2.tap" size="0x0e10" crc="04570105" sha1="ec0b82321358904b464a36551de36fe743cb929b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="orijentacija" supported="no">
+		<description>Orijentacija Kompasom</description>
+		<year>1986</year>
+		<publisher>Obrazovni Software</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
+		<part name="cass1" interface="orao_cass">
+			<dataarea name="cass" size="0x82e9">
+				<rom name="orijentacija_kompasom.tap" size="0x82e9" crc="a09c4f20" sha1="658dd5817d9e616cfe9499019c23c3df1df36e45"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ottomotor">
+		<description>Otto Motor</description>
+		<year>19??</year>
+		<publisher>PEL Soft</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
+		<part name="cass1" interface="orao_cass">
+			<dataarea name="cass" size="0x873c">
+				<rom name="otto_motor.tap" size="0x873c" crc="ffe8a8c8" sha1="2ea3249108b81fd7ecf52f656938677f1793e7ca"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rocky">
+		<description>Rocky</description>
+		<year>19??</year>
+		<publisher>KMI Borovo</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
+		<part name="cass1" interface="orao_cass">
+			<dataarea name="cass" size="0x8aca">
+				<rom name="rocky.tap" size="0x8aca" crc="38bed1e6" sha1="9337188b93eef94d6371b5d8cfb543bf5533e2b5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spaceinv2">
+		<description>Space Invaders (Alt)</description>
+		<year>19??</year>
+		<publisher>PEL Soft</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
+		<part name="cass1" interface="orao_cass">
+			<dataarea name="cass" size="0x529e">
+				<rom name="spaceinv.tap" size="0x529e" crc="affc806a" sha1="1cc9d75f2964d36ca2555617e03e7fdb86d6dde5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="teksted" supported="no">
+		<description>Teksted v1.03</description>
+		<year>19??</year>
+		<publisher>KMI Borovo</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
+		<part name="cass1" interface="orao_cass">
+			<dataarea name="cass" size="0x2f38">
+				<rom name="teksted_103.tap" size="0x2f38" crc="9845ac75" sha1="0895498334197856ad01aefec47d08cd21c34618"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="westbank">
+		<description>Westbank</description>
+		<year>1986</year>
+		<publisher>KMI Borovo</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
+		<part name="cass1" interface="orao_cass">
+			<dataarea name="cass" size="0x92cf">
+				<rom name="westbank.tap" size="0x92cf" crc="d1f654c1" sha1="acaa3ed49f9eead082ebcce0be050f973485faad"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zodiac">
+		<description>Zodiac Strip</description>
+		<year>1987</year>
+		<publisher>KMI Borovo</publisher>
+		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
+		<part name="cass1" interface="orao_cass">
+			<dataarea name="cass" size="0x81ce">
+				<rom name="zodiac_strip.tap" size="0x81ce" crc="7fef3e46" sha1="2ea926dd63e95239fbdad031ab72ab7118b9e5b6"/>
 			</dataarea>
 		</part>
 	</software>

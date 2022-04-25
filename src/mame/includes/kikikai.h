@@ -4,7 +4,7 @@
 #include "cpu/m6805/m68705.h"
 #include "cpu/m6800/m6801.h"
 
-#include "sound/2203intf.h"
+#include "sound/ymopn.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -41,29 +41,31 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	IRQ_CALLBACK_MEMBER(mcram_vect_r);
+
 private:
 	/* memory pointers */
 	required_shared_ptr<u8> m_mainram;
 
 	/* video-related */
-	int      m_charbank;
+	int      m_charbank = 0;
 
 	/* devices */
 	optional_device<cpu_device>         m_subcpu;   // kicknrun / mexico86 only
-	optional_device<cpu_device>         m_mcu;
+	optional_device<m6801_cpu_device>   m_mcu;
 	required_device<ym2203_device>      m_ymsnd;
 	required_device<gfxdecode_device>   m_gfxdecode;
 	required_device<palette_device>     m_palette;
 
 	/* queue */
-	//u8 m_queue[64];
-	//int m_qfront;
-	//int m_qstate;
-	DECLARE_WRITE8_MEMBER(kicknrun_sub_output_w);
-	virtual  DECLARE_WRITE8_MEMBER(main_f008_w);
+	//u8 m_queue[64]{};
+	//int m_qfront = 0;
+	//int m_qstate = 0;
+	void kicknrun_sub_output_w(uint8_t data);
+	virtual void main_f008_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(main_bankswitch_w);
-	DECLARE_READ8_MEMBER(kiki_ym2203_r);
+	void main_bankswitch_w(uint8_t data);
+	uint8_t kiki_ym2203_r(offs_t offset);
 
 	virtual INTERRUPT_GEN_MEMBER(kikikai_interrupt);
 
@@ -73,35 +75,17 @@ private:
 	void mcu_map(address_map& map);
 
 	/* Kiki KaiKai / Kick 'n Run MCU */
-	uint8_t    m_ddr1;
-	uint8_t    m_ddr2;
-	uint8_t    m_ddr3;
-	uint8_t    m_ddr4;
-	uint8_t    m_port1_in;
-	uint8_t    m_port2_in;
-	uint8_t    m_port3_in;
-	uint8_t    m_port4_in;
-	uint8_t    m_port1_out;
-	uint8_t    m_port2_out;
-	uint8_t    m_port3_out;
-	uint8_t    m_port4_out;
+	uint8_t    m_port3_in = 0U;
+	uint8_t    m_port1_out = 0U;
+	uint8_t    m_port2_out = 0U;
+	uint8_t    m_port3_out = 0U;
+	uint8_t    m_port4_out = 0U;
 
-	DECLARE_READ8_MEMBER(kikikai_mcu_ddr1_r);
-	DECLARE_WRITE8_MEMBER(kikikai_mcu_ddr1_w);
-	DECLARE_READ8_MEMBER(kikikai_mcu_ddr2_r);
-	DECLARE_WRITE8_MEMBER(kikikai_mcu_ddr2_w);
-	DECLARE_READ8_MEMBER(kikikai_mcu_ddr3_r);
-	DECLARE_WRITE8_MEMBER(kikikai_mcu_ddr3_w);
-	DECLARE_READ8_MEMBER(kikikai_mcu_ddr4_r);
-	DECLARE_WRITE8_MEMBER(kikikai_mcu_ddr4_w);
-	DECLARE_READ8_MEMBER(kikikai_mcu_port1_r);
-	DECLARE_WRITE8_MEMBER(kikikai_mcu_port1_w);
-	DECLARE_READ8_MEMBER(kikikai_mcu_port2_r);
-	DECLARE_WRITE8_MEMBER(kikikai_mcu_port2_w);
-	DECLARE_READ8_MEMBER(kikikai_mcu_port3_r);
-	DECLARE_WRITE8_MEMBER(kikikai_mcu_port3_w);
-	DECLARE_READ8_MEMBER(kikikai_mcu_port4_r);
-	DECLARE_WRITE8_MEMBER(kikikai_mcu_port4_w);
+	void kikikai_mcu_port1_w(uint8_t data);
+	void kikikai_mcu_port2_w(uint8_t data);
+	uint8_t kikikai_mcu_port3_r();
+	void kikikai_mcu_port3_w(uint8_t data);
+	void kikikai_mcu_port4_w(uint8_t data);
 };
 
 class mexico86_state : public kikikai_state
@@ -121,7 +105,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	virtual DECLARE_WRITE8_MEMBER(main_f008_w) override;
+	virtual void main_f008_w(uint8_t data) override;
 
 	INTERRUPT_GEN_MEMBER(mexico86_m68705_interrupt);
 	void mexico86_68705_port_a_w(u8 data);
@@ -131,10 +115,10 @@ private:
 
 	/* mcu */
 	/* mexico86 68705 protection */
-	u8       m_port_a_out;
-	u8       m_port_b_out;
-	int      m_address;
-	u8       m_latch;
+	u8       m_port_a_out = 0U;
+	u8       m_port_b_out = 0U;
+	int      m_address = 0;
+	u8       m_latch = 0U;
 
 };
 
@@ -153,15 +137,15 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	virtual DECLARE_WRITE8_MEMBER(main_f008_w) override;
+	virtual void main_f008_w(uint8_t data) override;
 
 	virtual INTERRUPT_GEN_MEMBER(kikikai_interrupt) override;
 
 	void mcu_simulate(  );
 
 	/* kikikai mcu simulation */
-	int      m_kikikai_simulated_mcu_running;
-	int      m_kikikai_simulated_mcu_initialised;
-	bool     m_coin_last[2];
-	u8       m_coin_fract;
+	int      m_kikikai_simulated_mcu_running = 0;
+	int      m_kikikai_simulated_mcu_initialised = 0;
+	bool     m_coin_last[2]{};
+	u8       m_coin_fract = 0U;
 };

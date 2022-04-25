@@ -26,7 +26,7 @@ public:
 	atarigt_state(const machine_config &mconfig, device_type type, const char *tag) :
 		atarigen_state(mconfig, type, tag),
 		m_palette(*this, "palette"),
-		m_colorram(*this, "colorram", 32),
+		m_colorram(*this, "colorram", 0x80000, ENDIANNESS_BIG),
 		m_adc(*this, "adc"),
 		m_playfield_tilemap(*this, "playfield"),
 		m_alpha_tilemap(*this, "alpha"),
@@ -38,9 +38,24 @@ public:
 		m_cage(*this, "cage")
 	{ }
 
-	bool           m_is_primrage;
+	void atarigt(machine_config &config);
+	void atarigt_stereo(machine_config &config);
+	void tmek(machine_config &config);
+	void primrage20(machine_config &config);
+	void primrage(machine_config &config);
+
+	void init_primrage();
+	void init_tmek();
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
+
+	bool           m_is_primrage = false;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<uint16_t> m_colorram;
+	memory_share_creator<uint16_t> m_colorram;
 
 	optional_device<adc0808_device> m_adc;
 
@@ -52,29 +67,29 @@ public:
 	optional_ioport m_coin_io;
 	optional_ioport m_fake_io;
 
-	bool            m_scanline_int_state;
-	bool            m_video_int_state;
+	bool            m_scanline_int_state = false;
+	bool            m_video_int_state = false;
 
 	bitmap_ind16    m_pf_bitmap;
 	bitmap_ind16    m_an_bitmap;
 
-	uint8_t           m_playfield_tile_bank;
-	uint8_t           m_playfield_color_bank;
-	uint16_t          m_playfield_xscroll;
-	uint16_t          m_playfield_yscroll;
+	uint8_t           m_playfield_tile_bank = 0;
+	uint8_t           m_playfield_color_bank = 0;
+	uint16_t          m_playfield_xscroll = 0;
+	uint16_t          m_playfield_yscroll = 0;
 
-	uint32_t          m_tram_checksum;
+	uint32_t          m_tram_checksum = 0;
 
 	required_shared_ptr<uint32_t> m_mo_command;
-	optional_device<atari_cage_device> m_cage;
+	required_device<atari_cage_device> m_cage;
 
 	void            (atarigt_state::*m_protection_w)(address_space &space, offs_t offset, uint16_t data);
 	void            (atarigt_state::*m_protection_r)(address_space &space, offs_t offset, uint16_t *data);
 
-	bool            m_ignore_writes;
-	offs_t          m_protaddr[ADDRSEQ_COUNT];
-	uint8_t           m_protmode;
-	uint16_t          m_protresult;
+	bool            m_ignore_writes = false;
+	offs_t          m_protaddr[ADDRSEQ_COUNT]{};
+	uint8_t           m_protmode = 0;
+	uint16_t          m_protresult = 0;
 	std::unique_ptr<uint8_t[]> m_protdata;
 
 	INTERRUPT_GEN_MEMBER(scanline_int_gen);
@@ -96,22 +111,15 @@ public:
 
 	void cage_irq_callback(uint8_t data);
 
-	void atarigt_colorram_w(offs_t address, uint16_t data, uint16_t mem_mask);
-	uint16_t atarigt_colorram_r(offs_t address);
-	void init_primrage();
-	void init_tmek();
+	void colorram_w(offs_t address, uint16_t data, uint16_t mem_mask);
+	uint16_t colorram_r(offs_t address);
+
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
-	TILEMAP_MAPPER_MEMBER(atarigt_playfield_scan);
-	virtual void machine_start() override;
-	DECLARE_VIDEO_START(atarigt);
+	TILEMAP_MAPPER_MEMBER(playfield_scan);
 	uint32_t screen_update_atarigt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void atarigt(machine_config &config);
-	void tmek(machine_config &config);
-	void primrage20(machine_config &config);
-	void primrage(machine_config &config);
 	void main_map(address_map &map);
-private:
+
 	void tmek_update_mode(offs_t offset);
 	void tmek_protection_w(address_space &space, offs_t offset, uint16_t data);
 	void tmek_protection_r(address_space &space, offs_t offset, uint16_t *data);

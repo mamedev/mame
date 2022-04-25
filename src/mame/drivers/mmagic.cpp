@@ -229,15 +229,15 @@ uint32_t mmagic_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 			{
 				uint8_t gfx = m_tiles[(code << 4) + tx];
 
-				bitmap.pix32(y * 12 + tx, x * 8 + 0) = BIT(gfx, 4) ? rgb_t::black() : m_palette->pen_color(color);
-				bitmap.pix32(y * 12 + tx, x * 8 + 1) = BIT(gfx, 5) ? rgb_t::black() : m_palette->pen_color(color);
-				bitmap.pix32(y * 12 + tx, x * 8 + 2) = BIT(gfx, 6) ? rgb_t::black() : m_palette->pen_color(color);
-				bitmap.pix32(y * 12 + tx, x * 8 + 3) = BIT(gfx, 7) ? rgb_t::black() : m_palette->pen_color(color);
+				bitmap.pix(y * 12 + tx, x * 8 + 0) = BIT(gfx, 4) ? rgb_t::black() : m_palette->pen_color(color);
+				bitmap.pix(y * 12 + tx, x * 8 + 1) = BIT(gfx, 5) ? rgb_t::black() : m_palette->pen_color(color);
+				bitmap.pix(y * 12 + tx, x * 8 + 2) = BIT(gfx, 6) ? rgb_t::black() : m_palette->pen_color(color);
+				bitmap.pix(y * 12 + tx, x * 8 + 3) = BIT(gfx, 7) ? rgb_t::black() : m_palette->pen_color(color);
 
-				bitmap.pix32(y * 12 + tx, x * 8 + 4) = BIT(gfx, 0) ? rgb_t::black() : m_palette->pen_color(color);
-				bitmap.pix32(y * 12 + tx, x * 8 + 5) = BIT(gfx, 1) ? rgb_t::black() : m_palette->pen_color(color);
-				bitmap.pix32(y * 12 + tx, x * 8 + 6) = BIT(gfx, 2) ? rgb_t::black() : m_palette->pen_color(color);
-				bitmap.pix32(y * 12 + tx, x * 8 + 7) = BIT(gfx, 3) ? rgb_t::black() : m_palette->pen_color(color);
+				bitmap.pix(y * 12 + tx, x * 8 + 4) = BIT(gfx, 0) ? rgb_t::black() : m_palette->pen_color(color);
+				bitmap.pix(y * 12 + tx, x * 8 + 5) = BIT(gfx, 1) ? rgb_t::black() : m_palette->pen_color(color);
+				bitmap.pix(y * 12 + tx, x * 8 + 6) = BIT(gfx, 2) ? rgb_t::black() : m_palette->pen_color(color);
+				bitmap.pix(y * 12 + tx, x * 8 + 7) = BIT(gfx, 3) ? rgb_t::black() : m_palette->pen_color(color);
 			}
 		}
 	}

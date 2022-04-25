@@ -35,9 +35,38 @@
 #include "byte8251.h"
 
 #include "bus/rs232/rs232.h"
+#include "machine/i8251.h"
+#include "machine/mm5307.h"
 
-// device type definition
-DEFINE_DEVICE_TYPE(A2BUS_BYTE8251, a2bus_byte8251_device, "a2bus_byte8251", "BYTE Serial Interface (8251 based)")
+
+namespace {
+
+class a2bus_byte8251_device : public device_t, public device_a2bus_card_interface
+{
+public:
+	// construction/destruction
+	a2bus_byte8251_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	DECLARE_INPUT_CHANGED_MEMBER(rate_changed);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	// device_a2bus_card_interface overrides
+	virtual u8 read_c0nx(u8 offset) override;
+	virtual void write_c0nx(u8 offset, u8 data) override;
+	virtual bool take_c800() override { return false; }
+
+private:
+	// object finders
+	required_device<i8251_device> m_usart;
+	required_device<mm5307_device> m_brg;
+	required_ioport m_switches;
+};
 
 a2bus_byte8251_device::a2bus_byte8251_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, A2BUS_BYTE8251, tag, owner, clock)
@@ -112,3 +141,9 @@ void a2bus_byte8251_device::device_add_mconfig(machine_config &config)
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_usart, FUNC(i8251_device::write_rxd));
 }
+
+} // aonymous namespace
+
+
+// device type definition
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_BYTE8251, device_a2bus_card_interface, a2bus_byte8251_device, "a2bus_byte8251", "BYTE Serial Interface (8251 based)")

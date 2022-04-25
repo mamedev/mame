@@ -10,9 +10,10 @@
 
 #pragma once
 
+#include "imagedev/harddriv.h"
 
-class x68k_hdc_image_device :   public device_t,
-								public device_image_interface
+
+class x68k_hdc_image_device : public harddisk_image_base_device
 {
 	enum class sasi_phase : u8
 	{
@@ -97,16 +98,9 @@ public:
 	x68k_hdc_image_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const noexcept override { return IO_HARDDISK; }
-
-	virtual bool is_readable()  const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return true; }
-	virtual bool is_creatable() const noexcept override { return true; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
-	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "hdf"; }
-	virtual const char *custom_instance_name() const noexcept override { return "sasihd"; }
-	virtual const char *custom_brief_instance_name() const noexcept override { return "sasi"; }
+	virtual const char *image_type_name() const noexcept override { return "sasihd"; }
+	virtual const char *image_brief_type_name() const noexcept override { return "sasi"; }
 	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 
 	void hdc_w(offs_t offset, u16 data);
@@ -119,17 +113,17 @@ protected:
 private:
 	TIMER_CALLBACK_MEMBER(req_timer_callback);
 
-	sasi_phase m_phase;
-	u8 m_status_port;  // read at 0xe96003
-	u8 m_status;       // status phase output
-	u8 m_command[10];
-	u8 m_sense[4];
-	u16 m_command_byte_count;
-	u16 m_command_byte_total;
-	u8 m_current_command;
-	u16 m_transfer_byte_count;
-	u16 m_transfer_byte_total;
-	emu_timer *m_req_timer;
+	sasi_phase m_phase{};
+	u8 m_status_port = 0;  // read at 0xe96003
+	u8 m_status = 0;       // status phase output
+	u8 m_command[10]{};
+	u8 m_sense[4]{};
+	u16 m_command_byte_count = 0;
+	u16 m_command_byte_total = 0;
+	u8 m_current_command = 0;
+	u16 m_transfer_byte_count = 0;
+	u16 m_transfer_byte_total = 0;
+	emu_timer *m_req_timer = nullptr;
 };
 
 // device type definition

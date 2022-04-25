@@ -268,7 +268,7 @@ Namco System 21 Video Hardware
 #include "video/namco_c355spr.h"
 #include "video/namcos21_3d.h"
 #include "sound/c140.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "emupal.h"
 
 #define ENABLE_LOGGING      0
@@ -304,6 +304,10 @@ public:
 	void starblad(machine_config &config);
 
 	void init_solvalou();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -348,9 +352,6 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(yield_hack);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void configure_c68_namcos21(machine_config &config);
@@ -371,7 +372,7 @@ uint32_t namcos21_c67_state::screen_update(screen_device &screen, bitmap_ind16 &
 	int pri;
 	bitmap.fill(0xff, cliprect );
 	screen.priority().fill(0, cliprect);
-	m_c355spr->get_sprites(cliprect); // TODO : buffered?
+	m_c355spr->build_sprite_list_and_render_sprites(cliprect); // TODO : buffered?
 
 	m_c355spr->draw(screen, bitmap, cliprect, 2 );
 
@@ -761,6 +762,7 @@ void namcos21_c67_state::machine_start()
 	for (int i = 0; i < 0x10; i++)
 		m_audiobank->configure_entry(i, memregion("audiocpu")->base() + (i % max) * 0x4000);
 
+	save_item(NAME(m_video_enable));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(namcos21_c67_state::screen_scanline)
@@ -812,7 +814,7 @@ void namcos21_c67_state::namcos21(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// TODO: basic parameters to get 60.606060 Hz, x2 is for interlace
-	m_screen->set_raw(49.152_MHz_XTAL / 2, 768, 0, 496, 264*2, 0, 480);
+	m_screen->set_raw(49.152_MHz_XTAL / 4 * 2, 768, 0, 496, 264*2, 0, 480);
 	m_screen->set_screen_update(FUNC(namcos21_c67_state::screen_update));
 	m_screen->set_palette(m_palette);
 

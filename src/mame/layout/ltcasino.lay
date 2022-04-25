@@ -36,29 +36,33 @@ Simple layout for Little Casino (monochrome)
 		</rect>
 	</element>
 	<view name="Buttons">
-		<backdrop element="background">
-			<bounds x="0" y="0" width="640" height="580" />
-		</backdrop>
+		<collection name="Control Panel">
+			<element ref="background">
+				<bounds x="0" y="480" width="640" height="100" />
+			</element>
+			<element name="button_0" ref="button" inputtag="Q" inputmask="0x01">
+				<bounds x="80" y="505" width="70" height="35" />
+			</element>
+			<element name="button_1" ref="button" inputtag="Q" inputmask="0x02">
+				<bounds x="180" y="505" width="70" height="35" />
+			</element>
+			<element name="button_2" ref="button" inputtag="Q" inputmask="0x04">
+				<bounds x="280" y="505" width="70" height="35" />
+			</element>
+			<element name="button_3" ref="button" inputtag="Q" inputmask="0x08">
+				<bounds x="380" y="505" width="70" height="35" />
+			</element>
+			<element name="button_4" ref="button" inputtag="Q" inputmask="0x10">
+				<bounds x="480" y="505" width="70" height="35" />
+			</element>
+		</collection>
 		<screen index="0">
 			<bounds left="0" top="0" right="640" bottom="480" />
 		</screen>
-		<overlay name="overlay" element="overlay">
-			<bounds x="0" y="0" width="640" height="480" />
-		</overlay>
-		<cpanel name="button_0" element="button" inputtag="Q" inputmask="0x01">
-			<bounds x="80" y="505" width="70" height="35" />
-		</cpanel>
-		<cpanel name="button_1" element="button" inputtag="Q" inputmask="0x02">
-			<bounds x="180" y="505" width="70" height="35" />
-		</cpanel>
-		<cpanel name="button_2" element="button" inputtag="Q" inputmask="0x04">
-			<bounds x="280" y="505" width="70" height="35" />
-		</cpanel>
-		<cpanel name="button_3" element="button" inputtag="Q" inputmask="0x08">
-			<bounds x="380" y="505" width="70" height="35" />
-		</cpanel>
-		<cpanel name="button_4" element="button" inputtag="Q" inputmask="0x10">
-			<bounds x="480" y="505" width="70" height="35" />
-		</cpanel>
+		<collection name="Overlay">
+			<element name="overlay" ref="overlay" blend="multiply">
+				<bounds x="0" y="0" width="640" height="480" />
+			</element>
+		</collection>
 	</view>
 </mamelayout>

@@ -38,7 +38,7 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
-READ16_MEMBER( mc68340_timer_module_device::read )
+uint16_t mc68340_timer_module_device::read(offs_t offset, uint16_t mem_mask)
 {
 	LOGSETUP("%s\n", FUNCNAME);
 
@@ -100,7 +100,7 @@ READ16_MEMBER( mc68340_timer_module_device::read )
 	return val;
 }
 
-WRITE16_MEMBER( mc68340_timer_module_device::write )
+void mc68340_timer_module_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOGSETUP("\n%s\n", FUNCNAME);
 	LOGSETUP(" * Timer%d Reg %02x [%02x] <- %02x - %s\n",  m_cpu->get_timer_index(this) + 1, (offset * 2), offset, data,

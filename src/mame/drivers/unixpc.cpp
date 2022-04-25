@@ -23,7 +23,6 @@
 #include "imagedev/harddriv.h"
 #include "machine/6850acia.h"
 #include "machine/74259.h"
-#include "machine/bankdev.h"
 #include "machine/input_merger.h"
 #include "machine/output_latch.h"
 #include "machine/ram.h"
@@ -41,6 +40,8 @@
     DRIVER STATE
 ***************************************************************************/
 
+namespace {
+
 class unixpc_state : public driver_device
 {
 public:
@@ -55,7 +56,7 @@ public:
 		m_floppy(*this, "wd2797:0:525dd"),
 		m_hdc(*this, "hdc"),
 		m_hdr0(*this, "hdc:0"),
-		m_ramrombank(*this, "ramrombank"),
+		m_ramromview(*this, "ramromview"),
 		m_mapram(*this, "mapram"),
 		m_videoram(*this, "videoram")
 	{ }
@@ -91,7 +92,6 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(wd1010_intrq_w);
 
-	void ramrombank_map(address_map &map);
 	void unixpc_mem(address_map &map);
 
 private:
@@ -104,17 +104,17 @@ private:
 	required_device<floppy_image_device> m_floppy;
 	required_device<wd1010_device> m_hdc;
 	required_device<harddisk_image_device> m_hdr0;
-	required_device<address_map_bank_device> m_ramrombank;
+	memory_view m_ramromview;
 
 	required_shared_ptr<uint16_t> m_mapram;
 	required_shared_ptr<uint16_t> m_videoram;
 
-	uint16_t *m_ramptr;
-	uint32_t m_ramsize;
-	uint16_t m_diskdmasize;
-	uint32_t m_diskdmaptr;
-	bool m_fdc_intrq;
-	bool m_hdc_intrq;
+	uint16_t *m_ramptr = nullptr;
+	uint32_t m_ramsize = 0;
+	uint16_t m_diskdmasize = 0;
+	uint32_t m_diskdmaptr = 0;
+	bool m_fdc_intrq = false;
+	bool m_hdc_intrq = false;
 };
 
 
@@ -129,7 +129,7 @@ void unixpc_state::gcr_w(offs_t offset, uint16_t data)
 
 WRITE_LINE_MEMBER(unixpc_state::romlmap_w)
 {
-	m_ramrombank->set_bank(state ? 1 : 0);
+	m_ramromview.select(state ? 1 : 0);
 }
 
 uint16_t unixpc_state::ram_mmu_r(offs_t offset)
@@ -260,7 +260,8 @@ void unixpc_state::disk_control_w(uint8_t data)
 {
 	logerror("disk_control_w: %02x\n", data);
 
-	// TODO: bits 0-2 = head select
+	// bits 0-2 = head select
+	m_hdc->head_w(BIT(data, 0, 2));
 
 	m_hdc->drdy_w(BIT(data, 3) && m_hdr0->exists());
 
@@ -309,7 +310,7 @@ uint32_t unixpc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	for (int y = 0; y < 348; y++)
 		for (int x = 0; x < 720/16; x++)
 			for (int b = 0; b < 16; b++)
-				bitmap.pix16(y, x * 16 + b) = BIT(m_videoram[y * (720/16) + x], b);
+				bitmap.pix(y, x * 16 + b) = BIT(m_videoram[y * (720/16) + x], b);
 
 	return 0;
 }
@@ -321,7 +322,9 @@ uint32_t unixpc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 void unixpc_state::unixpc_mem(address_map &map)
 {
-	map(0x000000, 0x3fffff).m(m_ramrombank, FUNC(address_map_bank_device::amap16));
+	map(0x000000, 0x3fffff).view(m_ramromview);
+	m_ramromview[0](0x000000, 0x3fffff).rom().region("bootrom", 0);
+	m_ramromview[1](0x000000, 0x3fffff).rw(FUNC(unixpc_state::ram_mmu_r), FUNC(unixpc_state::ram_mmu_w));
 	map(0x400000, 0x4007ff).ram().share("mapram");
 	map(0x410000, 0x410001).r(FUNC(unixpc_state::gsr_r));
 	map(0x420000, 0x427fff).ram().share("videoram");
@@ -341,12 +344,6 @@ void unixpc_state::unixpc_mem(address_map &map)
 	map(0xe50000, 0xe50007).rw("mpsc", FUNC(upd7201_device::cd_ba_r), FUNC(upd7201_device::cd_ba_w)).umask16(0x00ff);
 	map(0xe70000, 0xe70003).rw("kbc", FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
 	map(0x800000, 0x803fff).mirror(0x7fc000).rom().region("bootrom", 0);
-}
-
-void unixpc_state::ramrombank_map(address_map &map)
-{
-	map(0x000000, 0x3fffff).rom().region("bootrom", 0);
-	map(0x400000, 0x7fffff).rw(FUNC(unixpc_state::ram_mmu_r), FUNC(unixpc_state::ram_mmu_w));
 }
 
 /***************************************************************************
@@ -407,14 +404,11 @@ void unixpc_state::unixpc(machine_config &config)
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("1M").set_extra_options("2M");
 
-	// RAM/ROM bank
-	ADDRESS_MAP_BANK(config, "ramrombank").set_map(&unixpc_state::ramrombank_map).set_options(ENDIANNESS_BIG, 16, 32, 0x400000);
-
 	// floppy
 	WD2797(config, m_wd2797, 40_MHz_XTAL / 40); // 1PCK (CPU clock) divided by custom DMA chip
 	m_wd2797->intrq_wr_callback().set(FUNC(unixpc_state::wd2797_intrq_w));
 	m_wd2797->drq_wr_callback().set(FUNC(unixpc_state::wd2797_drq_w));
-	FLOPPY_CONNECTOR(config, "wd2797:0", unixpc_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd2797:0", unixpc_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 
 	WD1010(config, m_hdc, 40_MHz_XTAL / 8);
 	m_hdc->out_intrq_callback().set(FUNC(unixpc_state::wd1010_intrq_w));
@@ -454,6 +448,7 @@ ROM_START( 3b1 )
 	ROM_LOAD16_BYTE("72-00616.14c", 0x000001, 0x002000, CRC(c61f7ae0) SHA1(ab3ac29935a2a587a083c4d175a5376badd39058))
 ROM_END
 
+} // anonymous namespace
 
 /***************************************************************************
     GAME DRIVERS

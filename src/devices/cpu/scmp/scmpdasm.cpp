@@ -23,69 +23,65 @@ offs_t scmp_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 	uint8_t ptr = op & 3;
 
 	if (BIT(op,7)) {
-		// two bytes instructions
+		// two-byte instructions
 		char as[10];
-		char aspr[10];
-		uint8_t arg = params.r8(pc); pc++;
+		uint8_t arg = params.r8(pc++);
 		if (arg==0x80) {
 			sprintf(as,"E");
+		} else if (arg & 0x80) {
+			sprintf(as,"-$%02x",0x100-arg);
 		} else {
-			if (arg & 0x80) {
-				sprintf(as,"-$%02x",0x100-arg);
-			} else {
-				sprintf(as,"+$%02x",arg);
-			}
+			sprintf(as,"+$%02x",arg);
 		}
-		sprintf(aspr,"%s(%d)",as,ptr);
 
 		switch (op)
 		{
 			// Memory Reference Instructions
 			case 0xc0 : util::stream_format(stream, "ld %s",as); break;
 			case 0xc1 : case 0xc2 : case 0xc3 :
-						util::stream_format(stream, "ld %s",aspr);break;
+						util::stream_format(stream, "ld %s(%d)",as,ptr);break;
 			case 0xc5 : case 0xc6 : case 0xc7 :
-						util::stream_format(stream, "ld @%s",aspr); break;
+						util::stream_format(stream, "ld @%s(%d)",as,ptr); break;
 			case 0xc8 : util::stream_format(stream, "st %s",as); break;
 			case 0xc9 : case 0xca : case 0xcb :
-						util::stream_format(stream, "st %s",aspr);break;
+						util::stream_format(stream, "st %s(%d)",as,ptr);break;
 			case 0xcd : case 0xce : case 0xcf :
-						util::stream_format(stream, "st @%s",aspr); break;
+						util::stream_format(stream, "st @%s(%d)",as,ptr); break;
 			case 0xd0 : util::stream_format(stream, "and %s",as); break;
 			case 0xd1 : case 0xd2 : case 0xd3 :
-						util::stream_format(stream, "and %s",aspr);break;
+						util::stream_format(stream, "and %s(%d)",as,ptr);break;
 			case 0xd5 : case 0xd6 : case 0xd7 :
-						util::stream_format(stream, "and @%s",aspr); break;
+						util::stream_format(stream, "and @%s(%d)",as,ptr); break;
 			case 0xd8 : util::stream_format(stream, "or %s",as); break;
 			case 0xd9 : case 0xda : case 0xdb :
-						util::stream_format(stream, "or %s",aspr);break;
+						util::stream_format(stream, "or %s(%d)",as,ptr);break;
 			case 0xdd : case 0xde : case 0xdf :
-						util::stream_format(stream, "or @%s",aspr); break;
+						util::stream_format(stream, "or @%s(%d)",as,ptr); break;
 			case 0xe0 : util::stream_format(stream, "xor %s",as); break;
 			case 0xe1 : case 0xe2 : case 0xe3 :
-						util::stream_format(stream, "xor %s",aspr);break;
+						util::stream_format(stream, "xor %s(%d)",as,ptr);break;
 			case 0xe5 : case 0xe6 : case 0xe7 :
-						util::stream_format(stream, "xor @%s",aspr); break;
+						util::stream_format(stream, "xor @%s(%d)",as,ptr); break;
 			case 0xe8 : util::stream_format(stream, "dad %s",as); break;
 			case 0xe9 : case 0xea : case 0xeb :
-						util::stream_format(stream, "dad %s",aspr);break;
+						util::stream_format(stream, "dad %s(%d)",as,ptr);break;
 			case 0xed : case 0xee : case 0xef :
-						util::stream_format(stream, "dad @%s",aspr); break;
+						util::stream_format(stream, "dad @%s(%d)",as,ptr); break;
 			case 0xf0 : util::stream_format(stream, "add %s",as); break;
 			case 0xf1 : case 0xf2 : case 0xf3 :
-						util::stream_format(stream, "add %s",aspr);break;
+						util::stream_format(stream, "add %s(%d)",as,ptr);break;
 			case 0xf5 : case 0xf6 : case 0xf7 :
-						util::stream_format(stream, "add @%s",aspr); break;
+						util::stream_format(stream, "add @%s(%d)",as,ptr); break;
 			case 0xf8 : util::stream_format(stream, "cad %s",as); break;
 			case 0xf9 : case 0xfa : case 0xfb :
-						util::stream_format(stream, "cad %s",aspr);break;
+						util::stream_format(stream, "cad %s(%d)",as,ptr);break;
 			case 0xfd : case 0xfe : case 0xff :
-						util::stream_format(stream, "cad @%s",aspr); break;
+						util::stream_format(stream, "cad @%s(%d)",as,ptr); break;
 			// Memory Increment/Decrement Instructions
 			case 0xa8 : case 0xa9 : case 0xaa : case 0xab :
-						util::stream_format(stream, "ild %s",aspr); break;
+						util::stream_format(stream, "ild %s(%d)",as,ptr); break;
 			case 0xb8 : case 0xb9 : case 0xba : case 0xbb :
-						util::stream_format(stream, "dld %s",aspr); break;
+						util::stream_format(stream, "dld %s(%d)",as,ptr); break;
 			// Immediate Instructions
 			case 0xc4 : util::stream_format(stream, "ldi $%02x",arg); break;
 			case 0xd4 : util::stream_format(stream, "ani $%02x",arg); break;
@@ -97,16 +93,16 @@ offs_t scmp_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 			// Transfer Instructions
 			case 0x90 : util::stream_format(stream, "jmp %s",as);break;
 			case 0x91 : case 0x92 : case 0x93 :
-						util::stream_format(stream, "jmp %s",aspr);break;
+						util::stream_format(stream, "jmp %s(%d)",as,ptr);break;
 			case 0x94 : util::stream_format(stream, "jp %s",as); break;
 			case 0x95 : case 0x96 : case 0x97 :
-						util::stream_format(stream, "jp %s",aspr); break;
+						util::stream_format(stream, "jp %s(%d)",as,ptr); break;
 			case 0x98 : util::stream_format(stream, "jz %s",as); break;
 			case 0x99 : case 0x9a : case 0x9b :
-						util::stream_format(stream, "jz %s",aspr); break;
+						util::stream_format(stream, "jz %s(%d)",as,ptr); break;
 			case 0x9c : util::stream_format(stream, "jnz %s",as); break;
 			case 0x9d : case 0x9e : case 0x9f :
-						util::stream_format(stream, "jnz %s",aspr); break;
+						util::stream_format(stream, "jnz %s(%d)",as,ptr); break;
 			// Double-Byte Miscellaneous Instructions
 			case 0x8f:  util::stream_format(stream, "dly $%02x",arg); break;
 			// Others are illegal

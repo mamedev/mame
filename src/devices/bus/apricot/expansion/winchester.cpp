@@ -170,6 +170,7 @@ WRITE_LINE_MEMBER( apricot_winchester_device::head_w )
 {
 	m_head = (m_head & ~(1 << N)) | (state << N);
 	LOGREGS("Select head: %d\n", m_head);
+	m_hdc->head_w(m_head);
 }
 
 template<int N>

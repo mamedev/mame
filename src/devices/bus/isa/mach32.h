@@ -23,14 +23,14 @@ public:
 	// construction/destruction
 	mach32_8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER(mach32_chipid_r) { return m_chip_ID; }
-	DECLARE_READ16_MEMBER(mach32_mem_boundary_r) { return m_membounds; }
-	DECLARE_WRITE16_MEMBER(mach32_mem_boundary_w) { m_membounds = data; if(data & 0x10) logerror("ATI: Unimplemented memory boundary activated."); }
-	DECLARE_WRITE16_MEMBER(mach32_ge_ext_config_w);
+	uint16_t mach32_chipid_r() { return m_chip_ID; }
+	uint16_t mach32_mem_boundary_r() { return m_membounds; }
+	void mach32_mem_boundary_w(uint16_t data) { m_membounds = data; if(data & 0x10) logerror("ATI: Unimplemented memory boundary activated."); }
+	void mach32_ge_ext_config_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER(mach32_config1_r);
-	DECLARE_WRITE16_MEMBER(mach32_horz_overscan_w) {}  // TODO
-	DECLARE_READ16_MEMBER(mach32_ext_ge_r) { return 0x0000; }  // TODO
+	uint16_t mach32_config1_r();
+	void mach32_horz_overscan_w(uint16_t data) {}  // TODO
+	uint16_t mach32_ext_ge_r() { return 0x0000; }  // TODO
 
 	bool has_display_mode_changed() { if(display_mode_change) { display_mode_change = false; return true; } else return false; }
 
@@ -57,103 +57,107 @@ public:
 	required_device<mach32_8514a_device> m_8514a;  // provides accelerated 2D drawing, derived from the Mach8 device
 
 	// map 8514/A functions to 8514/A module
-	DECLARE_READ16_MEMBER(mach8_ec0_r) { return m_8514a->mach8_ec0_r(space,offset,mem_mask); }
-	DECLARE_WRITE16_MEMBER(mach8_ec0_w) { m_8514a->mach8_ec0_w(space,offset,data,mem_mask); }
-	DECLARE_READ16_MEMBER(mach8_ec1_r) { return m_8514a->mach8_ec1_r(space,offset,mem_mask); }
-	DECLARE_WRITE16_MEMBER(mach8_ec1_w) { m_8514a->mach8_ec1_w(space,offset,data,mem_mask); }
-	DECLARE_READ16_MEMBER(mach8_ec2_r) { return m_8514a->mach8_ec2_r(space,offset,mem_mask); }
-	DECLARE_WRITE16_MEMBER(mach8_ec2_w) { m_8514a->mach8_ec2_w(space,offset,data,mem_mask); }
-	DECLARE_READ16_MEMBER(mach8_ec3_r) { return m_8514a->mach8_ec3_r(space,offset,mem_mask); }
-	DECLARE_WRITE16_MEMBER(mach8_ec3_w) { m_8514a->mach8_ec3_w(space,offset,data,mem_mask); }
-	DECLARE_READ16_MEMBER(mach8_ext_fifo_r) { return m_8514a->mach8_ext_fifo_r(space,offset,mem_mask); }
-	DECLARE_WRITE16_MEMBER(mach8_linedraw_index_w) { m_8514a->mach8_linedraw_index_w(space,offset,data,mem_mask); }
-	DECLARE_READ16_MEMBER(mach8_bresenham_count_r) { return m_8514a->mach8_bresenham_count_r(space,offset,mem_mask); }
-	DECLARE_WRITE16_MEMBER(mach8_bresenham_count_w) { m_8514a->mach8_bresenham_count_w(space,offset,data,mem_mask); }
-	DECLARE_WRITE16_MEMBER(mach8_linedraw_w) { m_8514a->mach8_linedraw_w(space,offset,data,mem_mask); }
-	DECLARE_READ16_MEMBER(mach8_linedraw_r) { return m_8514a->mach8_linedraw_r(space,offset,mem_mask); }
-	DECLARE_READ16_MEMBER(mach8_scratch0_r) { return m_8514a->mach8_scratch0_r(space,offset,mem_mask); }
-	DECLARE_WRITE16_MEMBER(mach8_scratch0_w) { m_8514a->mach8_scratch0_w(space,offset,data,mem_mask); }
-	DECLARE_READ16_MEMBER(mach8_scratch1_r) { return m_8514a->mach8_scratch1_r(space,offset,mem_mask); }
-	DECLARE_WRITE16_MEMBER(mach8_scratch1_w) { m_8514a->mach8_scratch1_w(space,offset,data,mem_mask); }
-	DECLARE_WRITE16_MEMBER(mach8_crt_pitch_w) { m_8514a->mach8_crt_pitch_w(space,offset,data,mem_mask); }
-	DECLARE_READ16_MEMBER(mach8_config1_r) { return m_8514a->mach8_config1_r(space,offset,mem_mask); }
-	DECLARE_READ16_MEMBER(mach8_config2_r) { return m_8514a->mach8_config2_r(space,offset,mem_mask); }
-	DECLARE_READ16_MEMBER(mach8_sourcex_r) { return m_8514a->mach8_sourcex_r(space,offset,mem_mask); }
-	DECLARE_READ16_MEMBER(mach8_sourcey_r) { return m_8514a->mach8_sourcey_r(space,offset,mem_mask); }
-	DECLARE_WRITE16_MEMBER(mach8_ext_leftscissor_w) { m_8514a->mach8_ext_leftscissor_w(space,offset,data,mem_mask); }
-	DECLARE_WRITE16_MEMBER(mach8_ext_topscissor_w) { m_8514a->mach8_ext_topscissor_w(space,offset,data,mem_mask); }
-	DECLARE_WRITE16_MEMBER(mach8_ge_offset_l_w) { m_8514a->mach8_ge_offset_l_w(space,offset,data,mem_mask); }
-	DECLARE_WRITE16_MEMBER(mach8_ge_offset_h_w) { m_8514a->mach8_ge_offset_h_w(space,offset,data,mem_mask); }
-	DECLARE_WRITE16_MEMBER(mach8_scan_x_w) { m_8514a->mach8_scan_x_w(space,offset,data,mem_mask); }
-	DECLARE_WRITE16_MEMBER(mach8_dp_config_w) { m_8514a->mach8_dp_config_w(space,offset,data,mem_mask); }
-	DECLARE_WRITE16_MEMBER(mach8_ge_pitch_w) { m_8514a->mach8_ge_pitch_w(space,offset,data,mem_mask); }
-	DECLARE_READ16_MEMBER(mach8_ge_ext_config_r) { return m_8514a->mach8_ge_ext_config_r(space,offset,mem_mask); }
-	DECLARE_WRITE16_MEMBER(mach8_patt_data_w) { m_8514a->mach8_patt_data_w(space,offset,data,mem_mask); }
+	uint16_t mach8_ec0_r() { return m_8514a->mach8_ec0_r(); }
+	void mach8_ec0_w(uint16_t data) { m_8514a->mach8_ec0_w(data); }
+	uint16_t mach8_ec1_r() { return m_8514a->mach8_ec1_r(); }
+	void mach8_ec1_w(uint16_t data) { m_8514a->mach8_ec1_w(data); }
+	uint16_t mach8_ec2_r() { return m_8514a->mach8_ec2_r(); }
+	void mach8_ec2_w(uint16_t data) { m_8514a->mach8_ec2_w(data); }
+	uint16_t mach8_ec3_r() { return m_8514a->mach8_ec3_r(); }
+	void mach8_ec3_w(uint16_t data) { m_8514a->mach8_ec3_w(data); }
+	uint16_t mach8_ext_fifo_r() { return m_8514a->mach8_ext_fifo_r(); }
+	void mach8_linedraw_index_w(uint16_t data) { m_8514a->mach8_linedraw_index_w(data); }
+	uint16_t mach8_bresenham_count_r() { return m_8514a->mach8_bresenham_count_r(); }
+	void mach8_bresenham_count_w(uint16_t data) { m_8514a->mach8_bresenham_count_w(data); }
+	void mach8_linedraw_w(uint16_t data) { m_8514a->mach8_linedraw_w(data); }
+	uint16_t mach8_linedraw_r() { return m_8514a->mach8_linedraw_r(); }
+	uint16_t mach8_scratch0_r() { return m_8514a->mach8_scratch0_r(); }
+	void mach8_scratch0_w(uint16_t data) { m_8514a->mach8_scratch0_w(data); }
+	uint16_t mach8_scratch1_r() { return m_8514a->mach8_scratch1_r(); }
+	void mach8_scratch1_w(uint16_t data) { m_8514a->mach8_scratch1_w(data); }
+	void mach8_crt_pitch_w(uint16_t data) { m_8514a->mach8_crt_pitch_w(data); }
+	uint16_t mach8_config1_r() { return m_8514a->mach8_config1_r(); }
+	uint16_t mach8_config2_smo_r() { return m_8514a->mach8_config2_r(); }
+	uint16_t mach8_config2_sm_r(offs_t offset) { return m_8514a->mach8_config2_r(); }
+	uint16_t mach8_sourcex_r() { return m_8514a->mach8_sourcex_r(); }
+	uint16_t mach8_sourcey_r() { return m_8514a->mach8_sourcey_r(); }
+	void mach8_ext_leftscissor_w(uint16_t data) { m_8514a->mach8_ext_leftscissor_w(data); }
+	void mach8_ext_topscissor_w(uint16_t data) { m_8514a->mach8_ext_topscissor_w(data); }
+	void mach8_ge_offset_l_w(uint16_t data) { m_8514a->mach8_ge_offset_l_w(data); }
+	void mach8_ge_offset_h_w(uint16_t data) { m_8514a->mach8_ge_offset_h_w(data); }
+	void mach8_scan_x_w(uint16_t data) { m_8514a->mach8_scan_x_w(data); }
+	void mach8_dp_config_w(uint16_t data) { m_8514a->mach8_dp_config_w(data); }
+	void mach8_ge_pitch_w(uint16_t data) { m_8514a->mach8_ge_pitch_w(data); }
+	uint16_t mach8_ge_ext_config_r() { return m_8514a->mach8_ge_ext_config_r(); }
+	void mach8_patt_data_w(uint16_t data) { m_8514a->mach8_patt_data_w(data); }
 
-	DECLARE_READ16_MEMBER(ibm8514_vtotal_r) { return m_8514a->ibm8514_vtotal_r(space,offset,mem_mask); }
-	DECLARE_WRITE16_MEMBER(ibm8514_vtotal_w) { m_8514a->ibm8514_vtotal_w(space,offset,data,mem_mask); }
-	DECLARE_READ16_MEMBER(ibm8514_htotal_r) { return m_8514a->ibm8514_htotal_r(space,offset,mem_mask); }
+	uint16_t ibm8514_vtotal_r() { return m_8514a->ibm8514_vtotal_r(); }
+	void ibm8514_vtotal_w(uint16_t data) { m_8514a->ibm8514_vtotal_w(data); }
+	uint16_t ibm8514_htotal_r() { return m_8514a->ibm8514_htotal_r(); }
 	void ibm8514_htotal_w(offs_t offset, uint8_t data) { m_8514a->ibm8514_htotal_w(offset,data); }
-	DECLARE_READ16_MEMBER(ibm8514_vdisp_r) { return m_8514a->ibm8514_vdisp_r(space,offset,mem_mask); }
-	DECLARE_WRITE16_MEMBER(ibm8514_vdisp_w) { m_8514a->ibm8514_vdisp_w(space,offset,data,mem_mask); }
-	DECLARE_READ16_MEMBER(ibm8514_vsync_r) { return m_8514a->ibm8514_vsync_r(space,offset,mem_mask); }
-	DECLARE_WRITE16_MEMBER(ibm8514_vsync_w) { m_8514a->ibm8514_vsync_w(space,offset,data,mem_mask); }
-	DECLARE_READ16_MEMBER(ibm8514_substatus_r) { return m_8514a->ibm8514_substatus_r(space,offset,mem_mask); }
-	DECLARE_WRITE16_MEMBER(ibm8514_subcontrol_w) { m_8514a->ibm8514_subcontrol_w(space,offset,data,mem_mask); }
-	DECLARE_READ16_MEMBER(ibm8514_subcontrol_r) { return m_8514a->ibm8514_subcontrol_r(space,offset,mem_mask); }
-	DECLARE_READ16_MEMBER(ibm8514_currentx_r) { return m_8514a->ibm8514_currentx_r(space,offset,mem_mask); }
-	DECLARE_WRITE16_MEMBER(ibm8514_currentx_w) { m_8514a->ibm8514_currentx_w(space,offset,data,mem_mask); }
-	DECLARE_READ16_MEMBER(ibm8514_currenty_r) { return m_8514a->ibm8514_currenty_r(space,offset,mem_mask); }
-	DECLARE_WRITE16_MEMBER(ibm8514_currenty_w) { m_8514a->ibm8514_currenty_w(space,offset,data,mem_mask); }
-	DECLARE_READ16_MEMBER(ibm8514_desty_r) { return m_8514a->ibm8514_desty_r(space,offset,mem_mask); }
-	DECLARE_WRITE16_MEMBER(ibm8514_desty_w) { m_8514a->ibm8514_desty_w(space,offset,data,mem_mask); }
-	DECLARE_READ16_MEMBER(ibm8514_destx_r) { return m_8514a->ibm8514_destx_r(space,offset,mem_mask); }
-	DECLARE_WRITE16_MEMBER(ibm8514_destx_w) { m_8514a->ibm8514_destx_w(space,offset,data,mem_mask); }
-	DECLARE_READ16_MEMBER(ibm8514_line_error_r) { return m_8514a->ibm8514_line_error_r(space,offset,mem_mask); }
-	DECLARE_WRITE16_MEMBER(ibm8514_line_error_w) { m_8514a->ibm8514_line_error_w(space,offset,data,mem_mask); }
-	DECLARE_READ16_MEMBER(ibm8514_width_r) { return m_8514a->ibm8514_width_r(space,offset,mem_mask); }
-	DECLARE_WRITE16_MEMBER(ibm8514_width_w) { m_8514a->ibm8514_width_w(space,offset,data,mem_mask); }
-	DECLARE_READ16_MEMBER(ibm8514_gpstatus_r) { return m_8514a->ibm8514_gpstatus_r(space,offset,mem_mask); }
-	DECLARE_WRITE16_MEMBER(ibm8514_cmd_w) { m_8514a->ibm8514_cmd_w(space,offset,data,mem_mask); }
-	DECLARE_READ16_MEMBER(ibm8514_ssv_r) { return m_8514a->ibm8514_ssv_r(space,offset,mem_mask); }
-	DECLARE_WRITE16_MEMBER(ibm8514_ssv_w) { m_8514a->ibm8514_ssv_w(space,offset,data,mem_mask); }
-	DECLARE_READ16_MEMBER(ibm8514_fgcolour_r) { return m_8514a->ibm8514_fgcolour_r(space,offset,mem_mask); }
-	DECLARE_WRITE16_MEMBER(ibm8514_fgcolour_w) { m_8514a->ibm8514_fgcolour_w(space,offset,data,mem_mask); }
-	DECLARE_READ16_MEMBER(ibm8514_bgcolour_r) { return m_8514a->ibm8514_bgcolour_r(space,offset,mem_mask); }
-	DECLARE_WRITE16_MEMBER(ibm8514_bgcolour_w) { m_8514a->ibm8514_bgcolour_w(space,offset,data,mem_mask); }
-	DECLARE_READ16_MEMBER(ibm8514_read_mask_r) { return m_8514a->ibm8514_read_mask_r(space,offset,mem_mask); }
-	DECLARE_WRITE16_MEMBER(ibm8514_read_mask_w) { m_8514a->ibm8514_read_mask_w(space,offset,data,mem_mask); }
-	DECLARE_READ16_MEMBER(ibm8514_write_mask_r) { return m_8514a->ibm8514_write_mask_r(space,offset,mem_mask); }
-	DECLARE_WRITE16_MEMBER(ibm8514_write_mask_w) { m_8514a->ibm8514_write_mask_w(space,offset,data,mem_mask); }
-	DECLARE_READ16_MEMBER(ibm8514_backmix_r) { return m_8514a->ibm8514_backmix_r(space,offset,mem_mask); }
-	DECLARE_WRITE16_MEMBER(ibm8514_backmix_w) { m_8514a->ibm8514_backmix_w(space,offset,data,mem_mask); }
-	DECLARE_READ16_MEMBER(ibm8514_foremix_r) { return m_8514a->ibm8514_foremix_r(space,offset,mem_mask); }
-	DECLARE_WRITE16_MEMBER(ibm8514_foremix_w) { m_8514a->ibm8514_foremix_w(space,offset,data,mem_mask); }
-	DECLARE_READ16_MEMBER(ibm8514_multifunc_r) { return m_8514a->ibm8514_multifunc_r(space,offset,mem_mask); }
-	DECLARE_WRITE16_MEMBER(ibm8514_multifunc_w) { m_8514a->ibm8514_multifunc_w(space,offset,data,mem_mask); }
-	DECLARE_READ16_MEMBER(ibm8514_pixel_xfer_r) { return m_8514a->ibm8514_pixel_xfer_r(space,offset,mem_mask); }
-	DECLARE_WRITE16_MEMBER(mach8_pixel_xfer_w) { m_8514a->mach8_pixel_xfer_w(space,offset,data,mem_mask); }
-	DECLARE_WRITE16_MEMBER(mach8_advfunc_w) { m_8514a->mach8_advfunc_w(space,offset,data,mem_mask); }
+	uint16_t ibm8514_vdisp_r() { return m_8514a->ibm8514_vdisp_r(); }
+	void ibm8514_vdisp_w(uint16_t data) { m_8514a->ibm8514_vdisp_w(data); }
+	uint16_t ibm8514_vsync_r() { return m_8514a->ibm8514_vsync_r(); }
+	void ibm8514_vsync_w(uint16_t data) { m_8514a->ibm8514_vsync_w(data); }
+	uint16_t ibm8514_substatus_r() { return m_8514a->ibm8514_substatus_r(); }
+	void ibm8514_subcontrol_w(uint16_t data) { m_8514a->ibm8514_subcontrol_w(data); }
+	uint16_t ibm8514_subcontrol_r() { return m_8514a->ibm8514_subcontrol_r(); }
+	uint16_t ibm8514_currentx_r() { return m_8514a->ibm8514_currentx_r(); }
+	void ibm8514_currentx_w(uint16_t data) { m_8514a->ibm8514_currentx_w(data); }
+	uint16_t ibm8514_currenty_r() { return m_8514a->ibm8514_currenty_r(); }
+	void ibm8514_currenty_w(uint16_t data) { m_8514a->ibm8514_currenty_w(data); }
+	uint16_t ibm8514_desty_r() { return m_8514a->ibm8514_desty_r(); }
+	void ibm8514_desty_w(uint16_t data) { m_8514a->ibm8514_desty_w(data); }
+	uint16_t ibm8514_destx_r() { return m_8514a->ibm8514_destx_r(); }
+	void ibm8514_destx_w(uint16_t data) { m_8514a->ibm8514_destx_w(data); }
+	uint16_t ibm8514_line_error_r() { return m_8514a->ibm8514_line_error_r(); }
+	void ibm8514_line_error_w(uint16_t data) { m_8514a->ibm8514_line_error_w(data); }
+	uint16_t ibm8514_width_r() { return m_8514a->ibm8514_width_r(); }
+	void ibm8514_width_w(uint16_t data) { m_8514a->ibm8514_width_w(data); }
+	uint16_t ibm8514_gpstatus_r() { return m_8514a->ibm8514_gpstatus_r(); }
+	void ibm8514_cmd_w(uint16_t data) { m_8514a->ibm8514_cmd_w(data); }
+	uint16_t ibm8514_ssv_r() { return m_8514a->ibm8514_ssv_r(); }
+	void ibm8514_ssv_w(uint16_t data) { m_8514a->ibm8514_ssv_w(data); }
+	uint16_t ibm8514_fgcolour_r() { return m_8514a->ibm8514_fgcolour_r(); }
+	void ibm8514_fgcolour_w(uint16_t data) { m_8514a->ibm8514_fgcolour_w(data); }
+	uint16_t ibm8514_bgcolour_r() { return m_8514a->ibm8514_bgcolour_r(); }
+	void ibm8514_bgcolour_w(uint16_t data) { m_8514a->ibm8514_bgcolour_w(data); }
+	uint16_t ibm8514_read_mask_r() { return m_8514a->ibm8514_read_mask_r(); }
+	void ibm8514_read_mask_w(uint16_t data) { m_8514a->ibm8514_read_mask_w(data); }
+	uint16_t ibm8514_write_mask_r() { return m_8514a->ibm8514_write_mask_r(); }
+	void ibm8514_write_mask_w(uint16_t data) { m_8514a->ibm8514_write_mask_w(data); }
+	uint16_t ibm8514_backmix_r() { return m_8514a->ibm8514_backmix_r(); }
+	void ibm8514_backmix_w(uint16_t data) { m_8514a->ibm8514_backmix_w(data); }
+	uint16_t ibm8514_foremix_r() { return m_8514a->ibm8514_foremix_r(); }
+	void ibm8514_foremix_w(uint16_t data) { m_8514a->ibm8514_foremix_w(data); }
+	uint16_t ibm8514_multifunc_r() { return m_8514a->ibm8514_multifunc_r(); }
+	void ibm8514_multifunc_w(uint16_t data) { m_8514a->ibm8514_multifunc_w(data); }
+	uint16_t ibm8514_pixel_xfer_r(offs_t offset) { return m_8514a->ibm8514_pixel_xfer_r(offset); }
+	void mach8_pixel_xfer_w(offs_t offset, uint16_t data) { m_8514a->mach8_pixel_xfer_w(offset, data); }
+	void mach8_advfunc_w(uint16_t data) { m_8514a->mach8_advfunc_w(data); }
 
-	DECLARE_READ16_MEMBER(mach32_chipid_r) { return m_8514a->mach32_chipid_r(space,offset,mem_mask);  }
-	DECLARE_READ16_MEMBER(mach8_clksel_r) { return m_8514a->mach8_clksel_r(space,offset,mem_mask); }
-	DECLARE_WRITE16_MEMBER(mach8_clksel_w) { m_8514a->mach8_clksel_w(space,offset,data,mem_mask); }  // read only on the mach8
-	DECLARE_READ16_MEMBER(mach32_mem_boundary_r) { return m_8514a->mach32_mem_boundary_r(space,offset,mem_mask); }
-	DECLARE_WRITE16_MEMBER(mach32_mem_boundary_w) { m_8514a->mach32_mem_boundary_w(space,offset,data,mem_mask); }  // read only on the mach8
+	uint16_t mach32_chipid_r() { return m_8514a->mach32_chipid_r(); }
+	uint16_t mach8_clksel_r() { return m_8514a->mach8_clksel_r(); }
+	void mach8_clksel_w(uint16_t data) { m_8514a->mach8_clksel_w(data); }  // read only on the mach8
+	uint16_t mach32_mem_boundary_r() { return m_8514a->mach32_mem_boundary_r(); }
+	void mach32_mem_boundary_w(uint16_t data) { m_8514a->mach32_mem_boundary_w(data); }  // read only on the mach8
 	uint8_t mach32_status_r(offs_t offset) { return m_8514a->ibm8514_status_r(offset); }
-	DECLARE_READ16_MEMBER(mach32_config1_r) { return m_8514a->mach32_config1_r(space,offset,mem_mask); }
-	DECLARE_WRITE16_MEMBER(mach32_horz_overscan_w) { m_8514a->mach32_horz_overscan_w(space,offset,data,mem_mask); }
-	DECLARE_WRITE16_MEMBER(mach32_ge_ext_config_w) { m_8514a->mach32_ge_ext_config_w(space,offset,data,mem_mask); ati_define_video_mode(); }
-	DECLARE_READ16_MEMBER(mach32_ext_ge_r) { return m_8514a->mach32_ext_ge_r(space,offset,mem_mask); }
-	DECLARE_READ16_MEMBER(mach32_readonly_r) { return 0; }
-	DECLARE_WRITE16_MEMBER(mach32_cursor_pos_h);
-	DECLARE_WRITE16_MEMBER(mach32_cursor_pos_v);
-	DECLARE_WRITE16_MEMBER(mach32_cursor_colour_b_w);
-	DECLARE_WRITE16_MEMBER(mach32_cursor_colour_0_w);
-	DECLARE_WRITE16_MEMBER(mach32_cursor_colour_1_w);
-	DECLARE_WRITE16_MEMBER(mach32_cursor_l_w);
-	DECLARE_WRITE16_MEMBER(mach32_cursor_h_w);
-	DECLARE_WRITE16_MEMBER(mach32_cursor_offset_w);
+	uint16_t mach32_config1_smo_r() { return m_8514a->mach32_config1_r(); }
+	uint16_t mach32_config1_sm_r(offs_t offset) { return m_8514a->mach32_config1_r(); }
+	void mach32_horz_overscan_w(uint16_t data) { m_8514a->mach32_horz_overscan_w(data); }
+	void mach32_ge_ext_config_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_8514a->mach32_ge_ext_config_w(offset, data, mem_mask); ati_define_video_mode(); }
+	uint16_t mach32_ext_ge_r() { return m_8514a->mach32_ext_ge_r(); }
+	uint16_t mach32_readonly_s_r(offs_t offset, uint16_t mem_mask) { return 0; }
+	uint16_t mach32_readonly_sm_r(offs_t offset) { return 0; }
+	uint16_t mach32_readonly_smo_r() { return 0; }
+	void mach32_cursor_pos_h(offs_t offset, uint16_t data);
+	void mach32_cursor_pos_v(offs_t offset, uint16_t data);
+	void mach32_cursor_colour_b_w(offs_t offset, uint16_t data);
+	void mach32_cursor_colour_0_w(offs_t offset, uint16_t data);
+	void mach32_cursor_colour_1_w(offs_t offset, uint16_t data);
+	void mach32_cursor_l_w(offs_t offset, uint16_t data);
+	void mach32_cursor_h_w(offs_t offset, uint16_t data);
+	void mach32_cursor_offset_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 protected:
 	mach32_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -206,8 +210,8 @@ public:
 	// construction/destruction
 	mach64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE16_MEMBER(mach64_config1_w) { }  // why does the mach64 BIOS write to these, they are read only on the mach32 and earlier
-	DECLARE_WRITE16_MEMBER(mach64_config2_w) { }
+	void mach64_config1_w(uint16_t data) { }  // why does the mach64 BIOS write to these, they are read only on the mach32 and earlier
+	void mach64_config2_w(uint16_t data) { }
 
 protected:
 	mach64_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

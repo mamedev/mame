@@ -7,7 +7,6 @@
 
  ***********************************************************************************************************/
 
-
 #include "emu.h"
 #include "slot.h"
 
@@ -74,7 +73,7 @@ void device_channelf_cart_interface::ram_alloc(uint32_t size)
 //-------------------------------------------------
 channelf_cart_slot_device::channelf_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CHANF_CART_SLOT, tag, owner, clock),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_channelf_cart_interface>(mconfig, *this),
 	m_type(CF_CHESS), m_cart(nullptr)
 {
@@ -124,7 +123,7 @@ static int chanf_get_pcb_id(const char *slot)
 {
 	for (auto & elem : slot_list)
 	{
-		if (!core_stricmp(elem.slot_option, slot))
+		if (!strcmp(elem.slot_option, slot))
 			return elem.pcb_id;
 	}
 
@@ -197,16 +196,16 @@ std::string channelf_cart_slot_device::get_default_card_software(get_default_car
 {
 	if (hook.image_file())
 	{
-		const char *slot_string;
-		uint32_t len = hook.image_file()->size();
-		int type;
+		uint64_t len;
+		hook.image_file()->length(len); // FIXME: check error return
 
+		int type;
 		if (len == 0x40000)
 			type = CF_MULTI;
 		else
 			type = CF_CHESS;    // is there any way to detect the other carts from fullpath?
 
-		slot_string = chanf_get_slot(type);
+		char const *const slot_string = chanf_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
 

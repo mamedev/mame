@@ -1,12 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Gordon Jefferyes, Nigel Barnes
 /******************************************************************************
+
     BBC Model B
-
-    MESS Driver By:
-
-    Gordon Jefferyes
-    mess_bbc@romvault.com
 
     This is the first go around at converting the BBC code over to using
     mames built in mc6845, there are a number of features now incorrect
@@ -143,12 +139,12 @@ void bbc_state::video_ula_w(offs_t offset, uint8_t data)
 	{
 	case 0:
 		/* Video ULA control register
-			 b7     Master cursor size
-			 b6-b5  Width of cursor in bytes
-			 b4     6845 clock rate select
-			 b3-b2  Number of characters per line
-			 b1     Teletext/Normal select
-			 b0     Flash colour select
+		     b7     Master cursor size
+		     b6-b5  Width of cursor in bytes
+		     b4     6845 clock rate select
+		     b3-b2  Number of characters per line
+		     b1     Teletext/Normal select
+		     b0     Flash colour select
 		*/
 
 		/* flash colour select has changed */
@@ -308,7 +304,7 @@ MC6845_UPDATE_ROW( bbc_state::crtc_update_row )
 
 				int col = m_trom->get_rgb() ^ ((x_pos == cursor_x) ? 7 : 0);
 
-				bitmap.pix32(y, (x_pos*m_pixels_per_byte) + pixelno) = de ? palette[col] : rgb_t::black();
+				bitmap.pix(y, (x_pos*m_pixels_per_byte) + pixelno) = de ? palette[col] : rgb_t::black();
 			}
 		}
 	}
@@ -320,11 +316,11 @@ MC6845_UPDATE_ROW( bbc_state::crtc_update_row )
 
 			for (int pixelno = 0; pixelno < m_pixels_per_byte; pixelno++)
 			{
-				int col = !(ra & 0x08) ? m_vula_palette_lookup[m_pixel_bits[data]] : 7;
+				int col = !(ra & 0x08) ? m_vula_palette_lookup[m_pixel_bits[data]] : 0;
 
 				col ^= ((cursor_x != -1 && x_pos >= cursor_x && x_pos < (cursor_x + m_cursor_size)) ? 7 : 0);
 
-				bitmap.pix32(y, (x_pos*m_pixels_per_byte) + pixelno) = de ? palette[col] : rgb_t::black();
+				bitmap.pix(y, (x_pos*m_pixels_per_byte) + pixelno) = de ? palette[col] : rgb_t::black();
 				data = (data << 1) | 1;
 			}
 		}
@@ -383,6 +379,18 @@ void bbc_state::video_start()
 	set_pixel_lookup();
 
 	m_video_ram = m_ram->pointer();
+
+	// register save states
+	save_item(NAME(m_vula_ctrl));
+	save_item(NAME(m_vula_palette));
+	save_item(NAME(m_vula_palette_lookup));
+	save_item(STRUCT_MEMBER(m_vnula, palette_mode));
+	save_item(STRUCT_MEMBER(m_vnula, horiz_offset));
+	save_item(STRUCT_MEMBER(m_vnula, left_blank));
+	save_item(STRUCT_MEMBER(m_vnula, disable));
+	save_item(STRUCT_MEMBER(m_vnula, flash));
+	save_item(STRUCT_MEMBER(m_vnula, palette_byte));
+	save_item(STRUCT_MEMBER(m_vnula, palette_write));
 }
 
 void bbc_state::video_reset()

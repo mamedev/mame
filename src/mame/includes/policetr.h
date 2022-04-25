@@ -54,15 +54,15 @@ protected:
 
 	void ramdac_map(address_map& map);
 
-	DECLARE_WRITE32_MEMBER(control_w);
-	DECLARE_WRITE32_MEMBER(speedup_w);
+	void control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void speedup_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE32_MEMBER(bsmt2000_reg_w);
-	DECLARE_WRITE32_MEMBER(bsmt2000_data_w);
-	DECLARE_READ8_MEMBER(bsmt2000_data_r);
+	void bsmt2000_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void bsmt2000_data_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t bsmt2000_data_r(offs_t offset);
 
-	DECLARE_WRITE32_MEMBER(video_w);
-	DECLARE_READ32_MEMBER(video_r);
+	void video_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t video_r();
 	DECLARE_WRITE_LINE_MEMBER(vblank);
 	void render_display_list(offs_t offset);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -92,22 +92,22 @@ protected:
 	required_ioport_array<2> m_gun_x_io;
 	required_ioport_array<2> m_gun_y_io;
 
-	uint32_t m_control_data;
-	uint32_t m_bsmt_data_bank;
-	uint32_t m_bsmt_data_offset;
-	uint32_t *m_speedup_data;
-	uint64_t m_last_cycles;
-	uint32_t m_loop_count;
+	uint32_t m_control_data = 0;
+	uint32_t m_bsmt_data_bank = 0;
+	uint32_t m_bsmt_data_offset = 0;
+	uint32_t *m_speedup_data = nullptr;
+	uint64_t m_last_cycles = 0;
+	uint32_t m_loop_count = 0;
 	offs_t m_speedup_pc;
 	offs_t m_speedup_addr;
 	rectangle m_render_clip;
 	std::unique_ptr<bitmap_ind8> m_dstbitmap;
-	uint16_t m_src_xoffs;
-	uint16_t m_src_yoffs;
-	uint16_t m_dst_xoffs;
-	uint16_t m_dst_yoffs;
-	uint8_t m_video_latch;
-	uint32_t m_srcbitmap_height_mask;
+	uint16_t m_src_xoffs = 0;
+	uint16_t m_src_yoffs = 0;
+	uint16_t m_dst_xoffs = 0;
+	uint16_t m_dst_yoffs = 0;
+	uint8_t m_video_latch = 0;
+	uint32_t m_srcbitmap_height_mask = 0;
 
 	static constexpr uint32_t SRCBITMAP_WIDTH = 4096;
 	static constexpr uint32_t SRCBITMAP_WIDTH_MASK = SRCBITMAP_WIDTH - 1;

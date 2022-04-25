@@ -2,9 +2,9 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-        Digital Microsystems DMS-5000
+Digital Microsystems DMS-5000
 
-        11/01/2010 Skeleton driver.
+2010-01-11 Skeleton driver.
 
 ****************************************************************************/
 
@@ -30,11 +30,9 @@ public:
 private:
 	uint8_t status_r(offs_t offset);
 	void brightness_w(uint8_t data);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	uint32_t screen_update_dms5000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void dms5000_io(address_map &map);
-	void dms5000_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -60,15 +58,15 @@ void dms5000_state::brightness_w(uint8_t data)
 {
 }
 
-void dms5000_state::dms5000_mem(address_map &map)
+void dms5000_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000, 0x1ffff).ram();
 	map(0x40000, 0x4ffff).ram();
-	map(0xfc000, 0xfffff).rom().region("user1", 0);
+	map(0xfc000, 0xfffff).rom().region("maincpu", 0);
 }
 
-void dms5000_state::dms5000_io(address_map &map)
+void dms5000_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x20, 0x2f).r(FUNC(dms5000_state::status_r)).umask16(0xff00);
@@ -81,14 +79,6 @@ static INPUT_PORTS_START( dms5000 )
 INPUT_PORTS_END
 
 
-void dms5000_state::machine_reset()
-{
-}
-
-void dms5000_state::video_start()
-{
-}
-
 uint32_t dms5000_state::screen_update_dms5000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
@@ -98,8 +88,8 @@ void dms5000_state::dms5000(machine_config &config)
 {
 	/* basic machine hardware */
 	I8086(config, m_maincpu, XTAL(9'830'400));
-	m_maincpu->set_addrmap(AS_PROGRAM, &dms5000_state::dms5000_mem);
-	m_maincpu->set_addrmap(AS_IO, &dms5000_state::dms5000_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dms5000_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &dms5000_state::io_map);
 
 	LS259(config, "cntlatch", 0); // V34
 
@@ -117,7 +107,7 @@ void dms5000_state::dms5000(machine_config &config)
 
 /* ROM definition */
 ROM_START( dms5000 )
-	ROM_REGION16_LE( 0x4000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x4000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "dms-5000_54-8673o.bin", 0x0001, 0x2000, CRC(dce9823e) SHA1(d36ab87d2e6f5e9f02d59a6a7724ad3ce2428a2f))
 	ROM_LOAD16_BYTE( "dms-5000_54-8672e.bin", 0x0000, 0x2000, CRC(94d64c06) SHA1(be5a53da7bb29a5fa9ac31efe550d5d6ff8b77cd))
 ROM_END
@@ -125,4 +115,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY                 FULLNAME    FLAGS */
-COMP( 1982, dms5000, 0,      0,      dms5000, dms5000, dms5000_state, empty_init, "Digital Microsystems", "DMS-5000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1982, dms5000, 0,      0,      dms5000, dms5000, dms5000_state, empty_init, "Digital Microsystems", "DMS-5000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -42,7 +42,7 @@ Notes:
       EPM7032 - Altera EPM7032LC44-15T CPLD (PLCC44)
      CXK58257 - Sony CXK58257 32k x8 SRAM (SOP28)
     KM428C256 - Samsung Semiconductor KM428C256 256k x8 Dual Port DRAM (SOJ40)
-     ULKN2003 - Toshiba ULN2003 High Voltage High Current Darlington Transistor Array comprising 7 NPN Darlinton pairs (DIP16)
+     ULKN2003 - Toshiba ULN2003 High Voltage High Current Darlington Transistor Array comprising 7 NPN Darlington pairs (DIP16)
       HM86171 - Hualon Microelectronics HMC HM86171 VGA 256 colour RAMDAC (DIP28)
       3V_BATT - 3 Volt Coin Battery. This is tied to the CXK58257 SRAM. It appears to be used as an EEPROM, as the game
                 has on-board settings in test mode and there's no DIPs and no EEPROM.
@@ -62,6 +62,9 @@ Notes:
                 V106.U16 - MX27C4000 4MBit DIP32 EPROM; Main Program
                 V100.U7  - ST M27C801 8MBit DIP32 EPROM; Audio Samples?
 
+    TODO:
+     - Game speed seems to be completely wrong, timers and player movement too fast?
+
 *********************************************************************************************************************/
 
 #include "emu.h"
@@ -71,6 +74,8 @@ Notes:
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
 
 class lastfght_state : public driver_device
 {
@@ -85,6 +90,11 @@ public:
 	void lastfght(machine_config &config);
 
 	void init_lastfght();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	/* memory */
@@ -110,33 +120,29 @@ private:
 	void lastfght_map(address_map &map);
 	void ramdac_map(address_map &map);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
 	/* video-related */
 	bitmap_ind16 m_bitmap[2];
-	int m_dest;
-	int m_hi;
-	int m_sx;
-	int m_sx1;
-	int m_dsx;
-	int m_sy;
-	int m_sy1;
-	int m_dsy;
-	int m_sp;
-	int m_sr;
-	int m_x;
-	int m_y;
-	int m_w;
-	int m_h;
+	int m_dest = 0;
+	int m_hi = 0;
+	int m_sx = 0;
+	int m_sx1 = 0;
+	int m_dsx = 0;
+	int m_sy = 0;
+	int m_sy1 = 0;
+	int m_dsy = 0;
+	int m_sp = 0;
+	int m_sr = 0;
+	int m_x = 0;
+	int m_y = 0;
+	int m_w = 0;
+	int m_h = 0;
 #ifdef MAME_DEBUG
-	unsigned m_base;
-	int m_view_roms;
+	unsigned m_base = 0;
+	int m_view_roms = 0;
 #endif
 
 	/* misc */
-	uint16_t m_c00006;
+	uint16_t m_c00006 = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -165,9 +171,7 @@ uint32_t lastfght_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 #ifdef MAME_DEBUG
 #if 1
 	// gfx roms viewer (toggle with enter, use pgup/down to browse)
-	int x, y, count = 0;
-	uint8_t *gfxdata = memregion("gfx1")->base();
-	uint8_t data;
+	uint8_t const *const gfxdata = memregion("gfx1")->base();
 
 	if (machine().input().code_pressed_once(KEYCODE_ENTER)) m_view_roms ^= 1;
 	if (m_view_roms)
@@ -176,15 +180,15 @@ uint32_t lastfght_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		if (machine().input().code_pressed_once(KEYCODE_PGUP))  m_base -= 512 * 256;
 		m_base %= memregion("gfx1")->bytes();
 
-		count = m_base;
+		int count = m_base;
 
 		bitmap.fill(m_palette->black_pen(), cliprect );
-		for (y = 0 ; y < 256; y++)
+		for (int y = 0 ; y < 256; y++)
 		{
-			for (x = 0; x < 512; x++)
+			for (int x = 0; x < 512; x++)
 			{
-				data = (((count & 0xf) == 0) && ((count & 0x1e00) == 0)) ? m_palette->white_pen() : gfxdata[count];   // white grid or data
-				bitmap.pix16(y, x) = data;
+				uint8_t data = (((count & 0xf) == 0) && ((count & 0x1e00) == 0)) ? m_palette->white_pen() : gfxdata[count];   // white grid or data
+				bitmap.pix(y, x) = data;
 				count++;
 			}
 		}
@@ -317,7 +321,6 @@ void lastfght_state::blit_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		int x, y, addr;
 		uint8_t *gfxdata = memregion( "gfx1" )->base();
 		bitmap_ind16 &dest = m_bitmap[m_dest];
 
@@ -330,18 +333,18 @@ void lastfght_state::blit_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 				data >> 8);
 #endif
 
-		for (y = 0; y <= m_h; y++)
+		for (int y = 0; y <= m_h; y++)
 		{
-			for (x = 0; x <= m_w; x++)
+			for (int x = 0; x <= m_w; x++)
 			{
-				addr = (((m_sx + m_sx1 + m_dsx * x) >> 6) & 0x1ff) +
+				int addr = (((m_sx + m_sx1 + m_dsx * x) >> 6) & 0x1ff) +
 							(((m_sy + m_sy1 + m_dsy * y) >> 6) & 0xff) * 0x200 +
 							m_sp * 0x200 * 0x100 + m_sr * 0x200000;
 
 				data = gfxdata[addr];
 
 				if (data && (m_x + x >= 0) && (m_x + x < 512) && (m_y + y >= 0) && (m_y + y < 256))
-					dest.pix16(m_y + y, m_x + x) = data;
+					dest.pix(m_y + y, m_x + x) = data;
 			}
 		}
 	}
@@ -606,4 +609,7 @@ void lastfght_state::init_lastfght()
 	rom[0x01b86 / 2] = 0x5670;
 }
 
-GAME( 2000, lastfght, 0, lastfght, lastfght, lastfght_state, init_lastfght, ROT0, "Subsino", "Last Fighting", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+} // Anonymous namespace
+
+
+GAME( 2000, lastfght, 0, lastfght, lastfght, lastfght_state, init_lastfght, ROT0, "Subsino", "Last Fighting", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -935,7 +935,7 @@ WRITE_LINE_MEMBER(apollo_state::apollo_reset_instr_callback)
 		m_graphics->reset();
 		m_keyboard->reset();
 #ifdef APOLLO_XXL
-		machine().device(APOLLO_STDIO_TAG )->reset();
+		m_sio2->reset();
 #endif
 	}
 }

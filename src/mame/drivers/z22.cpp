@@ -77,7 +77,7 @@ void z22_state::machine_reset()
 
 MC6845_UPDATE_ROW(z22_state::update_row)
 {
-	u32 *pix = &bitmap.pix32(y);
+	u32 *pix = &bitmap.pix(y);
 
 	for (unsigned x = 0; x < x_count; x++)
 	{

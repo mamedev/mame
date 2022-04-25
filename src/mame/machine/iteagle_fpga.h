@@ -24,9 +24,9 @@ public:
 	void write_data(uint8_t data, int channel);
 	uint8_t read_data(int channel);
 	void write_rx_str(int channel, std::string resp);
-	std::string get_tx_str(int channel) { return m_serial_tx[channel]; };
-	void clear_tx_str(int channel) { m_serial_tx[channel].clear(); };
-	bool check_interrupt() { return (m_rr_regs[0][3] != 0); };
+	std::string get_tx_str(int channel) { return m_serial_tx[channel]; }
+	void clear_tx_str(int channel) { m_serial_tx[channel].clear(); }
+	bool check_interrupt() { return (m_rr_regs[0][3] != 0); }
 private:
 	uint8_t m_rr_regs[2][16];
 	uint8_t m_wr_regs[2][16];
@@ -64,7 +64,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
@@ -135,7 +135,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	address_space *m_memory_space;
+	address_space *m_memory_space = nullptr;
 	uint16_t m_sw_version;
 	uint8_t m_hw_version;
 

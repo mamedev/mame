@@ -35,13 +35,11 @@ private:
 	uint8_t sensors2_r();
 	void lamp_w(uint8_t data);
 	void coin_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(vram_fg_w);
-	DECLARE_WRITE8_MEMBER(vram_bg_w);
+	void vram_fg_w(offs_t offset, uint8_t data);
+	void vram_bg_w(offs_t offset, uint8_t data);
 	void scroll_x_w(uint8_t data);
 	void scroll_y_w(uint8_t data);
 	void gfxbank_w(uint8_t data);
-
-	INTERRUPT_GEN_MEMBER(vblank_interrupt);
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -65,10 +63,10 @@ private:
 	output_finder<> m_lamp;
 
 	/* video-related */
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
-	uint8_t m_gfxbank;
-	uint8_t m_scrollx;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	uint8_t m_gfxbank = 0U;
+	uint8_t m_scrollx = 0U;
 };
 
 #endif // MAME_INCLUDES_KOPUNCH_H

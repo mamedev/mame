@@ -35,16 +35,16 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
+#include "v25.h"
+#include "necdasm.h"
 
 typedef uint8_t BOOLEAN;
 typedef uint8_t BYTE;
 typedef uint16_t WORD;
 typedef uint32_t DWORD;
 
-#include "v25.h"
-#include "v25priv.h"
-#include "necdasm.h"
+#include "v25priv.ipp"
+
 
 DEFINE_DEVICE_TYPE(V25, v25_device, "v25", "NEC V25")
 DEFINE_DEVICE_TYPE(V35, v35_device, "v35", "NEC V35")
@@ -668,7 +668,6 @@ void v25_common_device::device_start()
 
 	state_add( STATE_GENPC, "GENPC", m_debugger_temp).callexport().noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_debugger_temp).callexport().noshow();
-	state_add( STATE_GENSP, "GENSP", m_debugger_temp).callimport().callexport().noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%16s").noshow();
 
 	set_icountptr(m_icount);
@@ -735,10 +734,6 @@ void v25_common_device::state_export(const device_state_entry &entry)
 
 		case STATE_GENPCBASE:
 			m_debugger_temp = (Sreg(PS)<<4) + m_prev_ip;
-			break;
-
-		case STATE_GENSP:
-			m_debugger_temp = (Sreg(SS)<<4) + Wreg(SP);
 			break;
 	}
 }

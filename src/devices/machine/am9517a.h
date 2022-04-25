@@ -61,6 +61,10 @@ public:
 	template <unsigned C> auto out_iow_callback() { return m_out_iow_cb[C].bind(); }
 	template <unsigned C> auto out_dack_callback() { return m_out_dack_cb[C].bind(); }
 
+	// define initial (inactive) state of DREQ inputs
+	void dreq_active_low() { assert(!configured()); m_status = 0xf0; }
+	void dreq_active_high() { assert(!configured()); m_status = 0; }
+
 	virtual uint8_t read(offs_t offset);
 	virtual void write(offs_t offset, uint8_t data);
 
@@ -116,7 +120,9 @@ protected:
 	uint8_t m_request;
 
 private:
-	void dma_request(int channel, int state);
+	void dma_request(int channel, bool state);
+	void mask_channel(int channel, bool state);
+	void set_mask_register(uint8_t mask);
 	inline bool is_request_active(int channel);
 	inline bool is_software_request_active(int channel);
 	inline void set_hreq(int state);

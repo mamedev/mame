@@ -23,5 +23,6 @@ int main(void)
     check(strlen((char*) output) == 6, "incorrect output length");
     check(!memcmp(correct, output, 7), "incorrect output data");
     free(output);
+    printf("map_custom tests SUCCEEDED.\n");
     return 0;
 }

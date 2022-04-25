@@ -141,7 +141,7 @@ public:
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	static const device_timer_id TIMER_IOWQ = 0;
 
@@ -253,7 +253,7 @@ void hazl1500_state::machine_reset()
 	m_kbd_status_latch = 0;
 }
 
-void hazl1500_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void hazl1500_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_cpu_iowq->write(1);
 	m_cpu_ba4->write(1);
@@ -269,11 +269,10 @@ uint32_t hazl1500_state::screen_update_hazl1500(screen_device &screen, bitmap_rg
 	m_last_hpos = 0;
 	m_last_vpos = 0;
 
-	uint32_t pixindex = 0;
 	for (int y = 0; y < SCREEN_VTOTAL; y++)
 	{
-		uint32_t *scanline = &bitmap.pix32(y);
-		pixindex = y * SCREEN_HTOTAL;
+		uint32_t *scanline = &bitmap.pix(y);
+		uint32_t pixindex = y * SCREEN_HTOTAL;
 		for (int x = 0; x < SCREEN_HTOTAL; x++)
 			//*scanline++ = 0xff000000 | (uint8_t(m_screen_buf[pixindex++] * 0.5) * 0x010101);
 			*scanline++ = 0xff000000 | (uint8_t(m_screen_buf[pixindex++] * 63.0) * 0x010101);

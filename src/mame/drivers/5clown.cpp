@@ -500,11 +500,11 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 
-	uint8_t m_main_latch_d800;
-	uint8_t m_snd_latch_0800;
-	uint8_t m_snd_latch_0a02;
-	uint8_t m_ay8910_addr;
-	int m_mux_data;
+	uint8_t m_main_latch_d800 = 0;
+	uint8_t m_snd_latch_0800 = 0;
+	uint8_t m_snd_latch_0a02 = 0;
+	uint8_t m_ay8910_addr = 0;
+	int m_mux_data = 0;
 
 	void cpu_c048_w(uint8_t data);
 	void cpu_d800_w(uint8_t data);
@@ -527,6 +527,9 @@ private:
 
 void _5clown_state::machine_start()
 {
+	// assumes it can make an address mask with m_videoram.length() - 1
+	assert(!(m_videoram.length() & (m_videoram.length() - 1)));
+
 	m_main_latch_d800 = m_snd_latch_0800 = m_snd_latch_0a02 = m_ay8910_addr = m_mux_data = 0;
 
 	save_item(NAME(m_main_latch_d800));
@@ -553,12 +556,12 @@ MC6845_UPDATE_ROW(_5clown_state::update_row)
     x--- ----   Extra color for 7's.
 */
 
-	uint32_t *pix = &bitmap.pix32(y);
+	uint32_t *pix = &bitmap.pix(y);
 	ra &= 0x07;
 
 	for (int x = 0; x < x_count; x++)
 	{
-		int tile_index = (x + ma) & m_videoram.mask();
+		int tile_index = (x + ma) & (m_videoram.length() - 1);
 		int attr = m_colorram[tile_index];
 		int code = ((attr & 0x01) << 8) | ((attr & 0x40) << 2) | m_videoram[tile_index];    /* bit 8 for extended char set */
 		int bank = (attr & 0x02) >> 1;                                                  /* bit 1 switch the gfx banks */
@@ -758,18 +761,18 @@ void _5clown_state::fclown_map(address_map &map)
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().share("videoram");   /* Init'ed at $2042 */
-	map(0x1800, 0x1bff).ram().share("colorram");   /* Init'ed at $2054 */
-	map(0x2000, 0x7fff).rom();                 /* ROM space */
+	map(0x1000, 0x13ff).ram().share(m_videoram);   // Init'ed at $2042
+	map(0x1800, 0x1bff).ram().share(m_colorram);   // Init'ed at $2054
+	map(0x2000, 0x7fff).rom();                     // ROM space
 
 	map(0xc048, 0xc048).w(FUNC(_5clown_state::cpu_c048_w));
 	map(0xd800, 0xd800).w(FUNC(_5clown_state::cpu_d800_w));
 
-	map(0xc400, 0xc400).portr("SW1");    /* DIP Switches bank */
-	map(0xcc00, 0xcc00).portr("SW2");    /* DIP Switches bank */
-	map(0xd400, 0xd400).portr("SW3");    /* Second DIP Switches bank */
+	map(0xc400, 0xc400).portr("SW1");              // DIP Switches bank
+	map(0xcc00, 0xcc00).portr("SW2");              // DIP Switches bank
+	map(0xd400, 0xd400).portr("SW3");              // Second DIP Switches bank
 
-	map(0xe000, 0xffff).rom();                 /* ROM space */
+	map(0xe000, 0xffff).rom();                     // ROM space
 }
 
 /*
@@ -846,7 +849,7 @@ void _5clown_state::fcaudio_map(address_map &map)
 static INPUT_PORTS_START( fclown )
 	/* Multiplexed - 4x5bits */
 	PORT_START("IN0-0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_BET )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )    PORT_NAME("Record")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )    PORT_NAME("Start")

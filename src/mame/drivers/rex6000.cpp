@@ -168,7 +168,7 @@ public:
 private:
 	int oz_wzd_extract_tag(const std::vector<uint8_t> &data, const char *tag, char *dest_buf);
 
-	uint16_t m_kb_mask;
+	uint16_t m_kb_mask = 0;
 };
 
 
@@ -623,7 +623,7 @@ void oz750_state::machine_reset()
 
 uint32_t rex6000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t lcd_bank = MAKE_BANK(m_lcd_base[0], m_lcd_base[1]);
+	uint16_t const lcd_bank = MAKE_BANK(m_lcd_base[0], m_lcd_base[1]);
 
 	if (m_lcd_enabled)
 	{
@@ -634,7 +634,7 @@ uint32_t rex6000_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 				for (int b=0; b<8; b++)
 				{
-					bitmap.pix16(y, (x * 8) + b) = BIT(data, 7);
+					bitmap.pix(y, (x * 8) + b) = BIT(data, 7);
 					data <<= 1;
 				}
 			}
@@ -649,7 +649,7 @@ uint32_t rex6000_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 uint32_t oz750_state::screen_update_oz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t lcd_bank = MAKE_BANK(m_lcd_base[0], m_lcd_base[1]);
+	uint16_t const lcd_bank = MAKE_BANK(m_lcd_base[0], m_lcd_base[1]);
 
 	if (m_lcd_enabled && m_power_on)
 	{
@@ -660,7 +660,7 @@ uint32_t oz750_state::screen_update_oz(screen_device &screen, bitmap_ind16 &bitm
 
 				for (int b=0; b<8; b++)
 				{
-					bitmap.pix16(y, (x * 8) + b) = BIT(data, 0);
+					bitmap.pix(y, (x * 8) + b) = BIT(data, 0);
 					data >>= 1;
 				}
 			}
@@ -947,10 +947,10 @@ void rex6000_state::rex6000(machine_config &config)
 	by the flash emulation and I have split every bank into a separate
 	device in order to have similar behavior.
 	*/
-	FUJITSU_29DL16X(config, m_flash0a); //bank 0 of first flash
-	FUJITSU_29DL16X(config, m_flash0b); //bank 1 of first flash
-	FUJITSU_29DL16X(config, m_flash1a); //bank 0 of second flash
-	FUJITSU_29DL16X(config, m_flash1b); //bank 1 of second flash
+	FUJITSU_29DL164BD(config, m_flash0a); //bank 0 of first flash
+	FUJITSU_29DL164BD(config, m_flash0b); //bank 1 of first flash
+	FUJITSU_29DL164BD(config, m_flash1a); //bank 0 of second flash
+	FUJITSU_29DL164BD(config, m_flash1b); //bank 1 of second flash
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("32K");

@@ -63,7 +63,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	void nexus3d_map(address_map &map);
 
-	uint32_t m_intpend, m_intmask, m_intlevel;
+	uint32_t m_intpend = 0, m_intmask = 0, m_intlevel = 0;
 	uint32_t int_pending_r();
 	void int_ack_w(uint32_t data);
 	uint32_t int_level_r();
@@ -80,12 +80,12 @@ private:
 	void timer_status_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t timer_count_r();
 	void timer_count_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t m_timer_status;
-	uint32_t m_timer_count;
-	emu_timer  *m_timer;
+	uint32_t m_timer_status = 0;
+	uint32_t m_timer_count = 0;
+	emu_timer  *m_timer = nullptr;
 	TIMER_CALLBACK_MEMBER(timercb);
-	bool m_timer_irq;
-	bool m_timer_result;
+	bool m_timer_irq = false;
+	bool m_timer_result = false;
 
 	uint32_t crtc_vblank_r();
 };
@@ -97,14 +97,14 @@ void nexus3d_state::video_start()
 
 uint32_t nexus3d_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t *fbram = reinterpret_cast<uint16_t *>(m_fbram.target());
-	const int width = 640;
+	uint16_t const *const fbram = reinterpret_cast<uint16_t *>(m_fbram.target());
+	int const width = 640;
 
-	uint16_t *visible = fbram + (m_screen->frame_number() & 1) * (0x96000/2);
+	uint16_t const *const visible = fbram + (m_screen->frame_number() & 1) * (0x96000/2);
 
 	uint32_t const dx = cliprect.left();
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
-		std::copy_n(&visible[(y * width) + dx], width, &bitmap.pix16(y, dx));
+		std::copy_n(&visible[(y * width) + dx], width, &bitmap.pix(y, dx));
 
 	return 0;
 }
@@ -290,7 +290,7 @@ INPUT_PORTS_END
 
 void nexus3d_state::machine_start()
 {
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nexus3d_state::timercb),this), 0);
+	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nexus3d_state::timercb),this));
 
 }
 

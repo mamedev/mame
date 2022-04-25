@@ -49,8 +49,8 @@ private:
 	uint8_t p1_r();
 	void p1_w(uint8_t data);
 	uint8_t p2_r();
-	DECLARE_READ8_MEMBER(cpu_r);
-	DECLARE_WRITE8_MEMBER(cpu_w);
+	uint8_t cpu_r(offs_t offset);
+	void cpu_w(offs_t offset, uint8_t data);
 	void cpu_io_map(address_map &map);
 };
 

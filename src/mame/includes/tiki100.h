@@ -61,7 +61,7 @@ public:
 		m_exp(*this, "tiki100bus"),
 		m_rom(*this, Z80_TAG),
 		m_prom(*this, "u4"),
-		m_video_ram(*this, "video_ram"),
+		m_video_ram(*this, "video_ram", TIKI100_VIDEORAM_SIZE, ENDIANNESS_LITTLE),
 		m_y(*this, "Y%u", 1),
 		m_st_io(*this, "ST"),
 		m_palette(*this, "palette"),
@@ -77,14 +77,14 @@ private:
 
 	uint8_t mrq_r(offs_t offset);
 	void mrq_w(offs_t offset, uint8_t data);
-	DECLARE_READ8_MEMBER( iorq_r );
-	DECLARE_WRITE8_MEMBER( iorq_w );
+	uint8_t iorq_r(offs_t offset);
+	void iorq_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( keyboard_r );
-	DECLARE_WRITE8_MEMBER( keyboard_w );
-	DECLARE_WRITE8_MEMBER( video_mode_w );
-	DECLARE_WRITE8_MEMBER( palette_w );
-	DECLARE_WRITE8_MEMBER( system_w );
+	uint8_t keyboard_r();
+	void keyboard_w(uint8_t data);
+	void video_mode_w(uint8_t data);
+	void palette_w(uint8_t data);
+	void system_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( bar0_w );
 	DECLARE_WRITE_LINE_MEMBER( bar2_w );
 	void video_scroll_w(uint8_t data);
@@ -92,7 +92,7 @@ private:
 	uint8_t pio_pb_r();
 	void pio_pb_w(uint8_t data);
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	TIMER_DEVICE_CALLBACK_MEMBER( ctc_tick );
 	TIMER_DEVICE_CALLBACK_MEMBER( tape_tick );
@@ -125,7 +125,7 @@ private:
 	required_device<tiki100_bus_device> m_exp;
 	required_memory_region m_rom;
 	required_memory_region m_prom;
-	optional_shared_ptr<uint8_t> m_video_ram;
+	memory_share_creator<uint8_t> m_video_ram;
 	required_ioport_array<13> m_y;
 	required_ioport m_st_io;
 	required_device<palette_device> m_palette;
@@ -140,25 +140,25 @@ private:
 	};
 
 	// memory state
-	bool m_rome;
-	bool m_vire;
+	bool m_rome = false;
+	bool m_vire = false;
 
 	// video state
-	uint8_t m_scroll;
-	uint8_t m_mode;
-	uint8_t m_palette_val;
-	uint8_t m_current_pixel;
+	uint8_t m_scroll = 0;
+	uint8_t m_mode = 0;
+	uint8_t m_palette_val = 0;
+	uint8_t m_current_pixel = 0;
 
 	// keyboard state
-	int m_keylatch;
+	int m_keylatch = 0;
 
 	// printer state
-	int m_centronics_ack;
-	int m_centronics_busy;
-	int m_centronics_perror;
+	int m_centronics_ack = 0;
+	int m_centronics_busy = 0;
+	int m_centronics_perror = 0;
 
 	// serial state
-	bool m_st;
+	bool m_st = false;
 
 };
 

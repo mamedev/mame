@@ -24,18 +24,6 @@
 #define ROTATE_L(x, r) ((x << r) | (x >> (32-r)))
 #define ROTATE_R(x, r) ((x >> r) | (x << (32-r)))
 
-#define CMP_OVERFLOW32(r, s, d)     ((((d) ^ (s)) & ((d) ^ (r)) & 0x80000000) ? 1 : 0)
-#define CMP_OVERFLOW16(r, s, d)     ((((d) ^ (s)) & ((d) ^ (r)) & 0x8000) ? 1 : 0)
-#define CMP_OVERFLOW8(r, s, d)      ((((d) ^ (s)) & ((d) ^ (r)) & 0x80) ? 1 : 0)
-#define CARRY32(x)                  (((x) & (((uint64_t)1) << 32)) ? 1 : 0)
-#define CARRY16(x)                  (((x) & 0x10000) ? 1 : 0)
-#define CARRY8(x)                   (((x) & 0x100) ? 1 : 0)
-#define SIGN32(x)                   (((x) & 0x80000000) ? 1 : 0)
-#define SIGN16(x)                   (((x) & 0x8000) ? 1 : 0)
-#define SIGN8(x)                    (((x) & 0x80) ? 1 : 0)
-
-#define SIGN_EXTEND(x, r)           ((x) | (((x) & (0x80000000 >> r)) ? ((int32_t)(0x80000000) >> r) : 0))
-
 
 
 bool tms32082_mp_device::test_condition(int condition, uint32_t value)
@@ -72,63 +60,64 @@ bool tms32082_mp_device::test_condition(int condition, uint32_t value)
 
 uint32_t tms32082_mp_device::calculate_cmp(uint32_t src1, uint32_t src2)
 {
-	uint16_t src1_16 = (uint16_t)(src1);
-	uint8_t src1_8 = (uint8_t)(src1);
-	uint16_t src2_16 = (uint16_t)(src2);
-	uint8_t src2_8 = (uint8_t)(src2);
+	int32_t a32 = (uint32_t)(src1);
+	int16_t a16 = (uint16_t)(src1);
+	int8_t a8 = (uint8_t)(src1);
+	int32_t b32 = (uint32_t)(src2);
+	int16_t b16 = (uint16_t)(src2);
+	int8_t b8 = (uint8_t)(src2);
 
-	uint64_t res32 = (uint64_t)src1 - (uint64_t)src2;
-	int z32 = (res32 == 0) ? 1 : 0;
-	int n32 = SIGN32(res32);
-	int v32 = CMP_OVERFLOW32(res32, src2, src1);
-	int c32 = CARRY32(res32);
+	int32_t res32 = a32 - b32;
+	int16_t res16 = a16 - b16;
+	int8_t res8 = a8 - b8;
 
-	uint32_t res16 = (uint32_t)src1_16 - (uint32_t)src2_16;
-	int z16 = (res16 == 0) ? 1 : 0;
-	int n16 = SIGN16(res16);
-	int v16 = CMP_OVERFLOW16(res16, src2_16, src1_16);
-	int c16 = CARRY16(res16);
-
-	uint16_t res8 = (uint16_t)src1_8 - (uint16_t)src2_8;
-	int z8 = (res8 == 0) ? 1 : 0;
-	int n8 = SIGN8(res8);
-	int v8 = CMP_OVERFLOW8(res8, src2_8, src1_8);
-	int c8 = CARRY8(res8);
+	int z32 = res32 == 0;
+	int n32 = ((res32) & 0x80000000) ? 1 : 0;
+	int v32 = ((((a32) ^ (b32)) & ((a32) ^ (res32))) & 0x80000000) ? 1 : 0;
+	int c32 = (!((uint32_t)a32 < (uint32_t)b32)) ? 1 : 0;
+	int z16 = res16 == 0;
+	int n16 = ((res16) & 0x8000) ? 1 : 0;
+	int v16 = ((((a16) ^ (b16)) & ((a16) ^ (res16))) & 0x8000) ? 1 : 0;
+	int c16 = (!((uint16_t)a16 < (uint16_t)b16)) ? 1 : 0;
+	int z8 = res8 == 0;
+	int n8 = ((res8) & 0x80) ? 1 : 0;
+	int v8 = ((((a8) ^ (b8)) & ((a8) ^ (res8))) & 0x80) ? 1 : 0;
+	int c8 = (!((uint8_t)a8 < (uint8_t)b8)) ? 1 : 0;
 
 	uint32_t flags = 0;
 	// 32-bits (bits 20-29)
-	flags |= ((~c32) & 1) << 29;                                // higher than or same (C)
-	flags |= ((c32) & 1) << 28;                                 // lower than (~C)
-	flags |= ((c32|z32) & 1) << 27;                             // lower than or same (~C|Z)
-	flags |= ((~c32&~z32) & 1) << 26;                           // higher than (C&~Z)
-	flags |= (((n32&v32)|(~n32&~v32)) & 1) << 25;               // greater than or equal (N&V)|(~N&~V)
-	flags |= (((n32&~v32)|(~n32&v32)) & 1) << 24;               // less than (N&~V)|(~N&V)
-	flags |= (((n32&~v32)|(~n32&v32)|(z32)) & 1) << 23;         // less than or equal (N&~V)|(~N&V)|Z
-	flags |= (((n32&v32&~z32)|(~n32&~v32&~z32)) & 1) << 22;     // greater than (N&V&~Z)|(~N&~V&~Z)
-	flags |= ((~z32) & 1) << 21;                                // not equal (~Z)
-	flags |= ((z32) & 1) << 20;                                 // equal (Z)
+	flags |= ((c32) & 1) << 29;                                         // higher than or same (C)
+	flags |= ((~c32) & 1) << 28;                                        // lower than (~C)
+	flags |= ((~c32 | z32) & 1) << 27;                                  // lower than or same (~C|Z)
+	flags |= ((c32 & ~z32) & 1) << 26;                                  // higher than (C&~Z)
+	flags |= (((n32 & v32) | (~n32 & ~v32)) & 1) << 25;                 // greater than or equal (N&V)|(~N&~V)
+	flags |= (((n32 & ~v32) | (~n32 & v32)) & 1) << 24;                 // less than (N&~V)|(~N&V)
+	flags |= (((n32 & ~v32) | (~n32 & v32) | (z32)) & 1) << 23;         // less than or equal (N&~V)|(~N&V)|Z
+	flags |= (((n32 & v32 & ~z32) | (~n32 & ~v32 & ~z32)) & 1) << 22;   // greater than (N&V&~Z)|(~N&~V&~Z)
+	flags |= ((~z32) & 1) << 21;                                        // not equal (~Z)
+	flags |= ((z32) & 1) << 20;                                         // equal (Z)
 	// 16-bits (bits 10-19)
-	flags |= ((~c16) & 1) << 19;                                // higher than or same (C)
-	flags |= ((c16) & 1) << 18;                                 // lower than (~C)
-	flags |= ((c16|z16) & 1) << 17;                             // lower than or same (~C|Z)
-	flags |= ((~c16&~z16) & 1) << 16;                           // higher than (C&~Z)
-	flags |= (((n16&v16)|(~n16&~v16)) & 1) << 15;               // greater than or equal (N&V)|(~N&~V)
-	flags |= (((n16&~v16)|(~n16&v16)) & 1) << 14;               // less than (N&~V)|(~N&V)
-	flags |= (((n16&~v16)|(~n16&v16)|(z16)) & 1) << 13;         // less than or equal (N&~V)|(~N&V)|Z
-	flags |= (((n16&v16&~z16)|(~n16&~v16&~z16)) & 1) << 12;     // greater than (N&V&~Z)|(~N&~V&~Z)
-	flags |= ((~z16) & 1) << 11;                                // not equal (~Z)
-	flags |= ((z16) & 1) << 10;                                 // equal (Z)
+	flags |= ((c16) & 1) << 19;                                         // higher than or same (C)
+	flags |= ((~c16) & 1) << 18;                                        // lower than (~C)
+	flags |= ((~c16 | z16) & 1) << 17;                                  // lower than or same (~C|Z)
+	flags |= ((c16 & ~z16) & 1) << 16;                                  // higher than (C&~Z)
+	flags |= (((n16 & v16) | (~n16 & ~v16)) & 1) << 15;                 // greater than or equal (N&V)|(~N&~V)
+	flags |= (((n16 & ~v16) | (~n16 & v16)) & 1) << 14;                 // less than (N&~V)|(~N&V)
+	flags |= (((n16 & ~v16) | (~n16 & v16) | (z16)) & 1) << 13;         // less than or equal (N&~V)|(~N&V)|Z
+	flags |= (((n16 & v16 & ~z16) | (~n16 & ~v16 & ~z16)) & 1) << 12;   // greater than (N&V&~Z)|(~N&~V&~Z)
+	flags |= ((~z16) & 1) << 11;                                        // not equal (~Z)
+	flags |= ((z16) & 1) << 10;                                         // equal (Z)
 	// 8-bits (bits 0-9)
-	flags |= ((~c8) & 1) << 9;                                  // higher than or same (C)
-	flags |= ((c8) & 1) << 8;                                   // lower than (~C)
-	flags |= ((c8|z8) & 1) << 7;                                // lower than or same (~C|Z)
-	flags |= ((~c8&~z8) & 1) << 6;                              // higher than (C&~Z)
-	flags |= (((n8&v8)|(~n8&~v8)) & 1) << 5;                    // greater than or equal (N&V)|(~N&~V)
-	flags |= (((n8&~v8)|(~n8&v8)) & 1) << 4;                    // less than (N&~V)|(~N&V)
-	flags |= (((n8&~v8)|(~n8&v8)|(z8)) & 1) << 3;               // less than or equal (N&~V)|(~N&V)|Z
-	flags |= (((n8&v8&~z8)|(~n8&~v8&~z8)) & 1) << 2;            // greater than (N&V&~Z)|(~N&~V&~Z)
-	flags |= ((~z8) & 1) << 1;                                  // not equal (~Z)
-	flags |= ((z8) & 1) << 0;                                   // equal (Z)
+	flags |= ((c8) & 1) << 9;                                           // higher than or same (C)
+	flags |= ((~c8) & 1) << 8;                                          // lower than (~C)
+	flags |= ((~c8 | z8) & 1) << 7;                                     // lower than or same (~C|Z)
+	flags |= ((c8 & ~z8) & 1) << 6;                                     // higher than (C&~Z)
+	flags |= (((n8 & v8) | (~n8 & ~v8)) & 1) << 5;                      // greater than or equal (N&V)|(~N&~V)
+	flags |= (((n8 & ~v8) | (~n8 & v8)) & 1) << 4;                      // less than (N&~V)|(~N&V)
+	flags |= (((n8 & ~v8) | (~n8 & v8) | (z8)) & 1) << 3;               // less than or equal (N&~V)|(~N&V)|Z
+	flags |= (((n8 & v8 & ~z8) | (~n8 & ~v8 & ~z8)) & 1) << 2;          // greater than (N&V&~Z)|(~N&~V&~Z)
+	flags |= ((~z8) & 1) << 1;                                          // not equal (~Z)
+	flags |= ((z8) & 1) << 0;                                           // equal (Z)
 
 	return flags;
 }
@@ -287,7 +276,9 @@ void tms32082_mp_device::execute_short_imm()
 			if (r)      // right
 			{
 				res = ROTATE_R(source, rot) & compmask;
-				res = SIGN_EXTEND(res, rot);
+				// sign extend
+				if (res & (1 << (end - 1)))
+					res |= 0xffffffff << end;
 			}
 			else        // left
 			{
@@ -312,8 +303,7 @@ void tms32082_mp_device::execute_short_imm()
 			uint32_t endmask = SHIFT_MASK[end ? end : 32];
 			if (inv) endmask = ~endmask;
 
-			int shift = r ? 32-rot : rot;
-			uint32_t shiftmask = SHIFT_MASK[shift ? shift : 32];
+			uint32_t shiftmask = SHIFT_MASK[r ? 32 - rot : rot];
 			uint32_t compmask = endmask & shiftmask;
 
 			uint32_t res;
@@ -373,15 +363,16 @@ void tms32082_mp_device::execute_short_imm()
 			uint32_t endmask = SHIFT_MASK[end ? end : 32];
 			if (inv) endmask = ~endmask;
 
-			int shift = r ? 32-rot : rot;
-			uint32_t shiftmask = SHIFT_MASK[shift ? shift : 32];
+			uint32_t shiftmask = SHIFT_MASK[r ? 32 - rot : rot];
 			uint32_t compmask = endmask & shiftmask;
 
 			uint32_t res;
 			if (r)      // right
 			{
 				res = ROTATE_R(source, rot) & compmask;
-				res = SIGN_EXTEND(res, rot);
+				// sign extend
+				if (res & (1 << (31 - rot)))
+					res |= 0xffffffff << (31 - rot);
 			}
 			else        // left
 			{
@@ -885,16 +876,15 @@ void tms32082_mp_device::execute_reg_long_imm()
 		{
 			int r = (m_ir & (1 << 10));
 			int inv = (m_ir & (1 << 11));
-			int rot = m_reg[OP_ROTATE()];
+			int rot = m_reg[OP_ROTATE()] & 0x1f;
 			int end = OP_ENDMASK();
 			uint32_t source = m_reg[OP_RS()];
 			int rd = OP_RD();
 
-			uint32_t endmask = end ? SHIFT_MASK[end ? end : 32] : m_reg[OP_ROTATE()+1];
+			uint32_t endmask = end ? SHIFT_MASK[end] : 0xffffffff;
 			if (inv) endmask = ~endmask;
 
-			int shift = r ? 32-rot : rot;
-			uint32_t shiftmask = SHIFT_MASK[shift ? shift : 32];
+			uint32_t shiftmask = SHIFT_MASK[r ? 32 - rot : rot];
 			uint32_t compmask = endmask & shiftmask;
 
 			uint32_t res;
@@ -916,23 +906,24 @@ void tms32082_mp_device::execute_reg_long_imm()
 		{
 			int r = (m_ir & (1 << 10));
 			int inv = (m_ir & (1 << 11));
-			int rot = m_reg[OP_ROTATE()];
+			int rot = m_reg[OP_ROTATE()] & 0x1f;
 			int end = OP_ENDMASK();
 			uint32_t source = m_reg[OP_RS()];
 			int rd = OP_RD();
 
-			uint32_t endmask = end ? SHIFT_MASK[end ? end : 32] : m_reg[OP_ROTATE()+1];
+			uint32_t endmask = SHIFT_MASK[end ? end : 32];
 			if (inv) endmask = ~endmask;
 
-			int shift = r ? 32-rot : rot;
-			uint32_t shiftmask = SHIFT_MASK[shift ? shift : 32];
+			uint32_t shiftmask = SHIFT_MASK[r ? 32 - rot : rot];
 			uint32_t compmask = endmask & shiftmask;
 
 			uint32_t res;
 			if (r)      // right
 			{
 				res = ROTATE_R(source, rot) & compmask;
-				res = SIGN_EXTEND(res, rot);
+				// sign extend
+				if (res & (1 << (31 - rot)))
+					res |= 0xffffffff << (31 - rot);
 			}
 			else        // left
 			{
@@ -948,16 +939,15 @@ void tms32082_mp_device::execute_reg_long_imm()
 		{
 			int r = (m_ir & (1 << 10));
 			int inv = (m_ir & (1 << 11));
-			int rot = m_reg[OP_ROTATE()];
+			int rot = m_reg[OP_ROTATE()] & 0x1f;
 			int end = OP_ENDMASK();
 			uint32_t source = m_reg[OP_RS()];
 			int rd = OP_RD();
 
-			uint32_t endmask = end ? SHIFT_MASK[end ? end : 32] : m_reg[OP_ROTATE()+1];
+			uint32_t endmask = end ? SHIFT_MASK[end] : 0xffffffff;
 			if (inv) endmask = ~endmask;
 
-			int shift = r ? 32-rot : rot;
-			uint32_t shiftmask = SHIFT_MASK[shift ? shift : 32];
+			uint32_t shiftmask = SHIFT_MASK[r ? 32 - rot : rot];
 			uint32_t compmask = endmask & ~shiftmask;
 
 			uint32_t res;
@@ -1301,28 +1291,29 @@ void tms32082_mp_device::execute_reg_long_imm()
 			int ls_bit1 = m_ir & (1 << 10);
 			int ls_bit2 = m_ir & (1 << 6);
 			int rd = OP_RS();
-			int src1 OP_SRC1();
+			int src1 = OP_SRC1();
 
 			double source = has_imm ? (double)u2f(imm32) : (p1 ? u2d(m_fpair[src1 >> 1]) : (double)u2f(m_reg[src1]));
-
-			if (rd)
-			{
-				if (pd)
-				{
-					double res = source * u2d(m_fpair[rd >> 1]);
-					m_fpair[rd >> 1] = d2u(res);
-				}
-				else
-				{
-					float res = (float)(source) * u2f(m_reg[rd]);
-					m_reg[rd] = f2u(res);
-				}
-			}
+			double source2 = pd ? u2d(m_fpair[rd >> 1]) : (double)(u2f(m_reg[rd]));
 
 			// parallel load/store op
 			if (!(ls_bit1 == 0 && ls_bit2 == 0))
 			{
 				vector_loadstore();
+			}
+
+			if (rd)
+			{
+				if (pd)
+				{
+					double res = source * source2;
+					m_fpair[rd >> 1] = d2u(res);
+				}
+				else
+				{
+					float res = (float)(source * source2);
+					m_reg[rd] = f2u(res);
+				}
 			}
 			break;
 		}
@@ -1341,6 +1332,12 @@ void tms32082_mp_device::execute_reg_long_imm()
 			int rs1 = OP_SRC1();
 
 			double source = has_imm ? (double)u2f(imm32) : (p1 ? u2d(m_fpair[rs1 >> 1]) : (double)u2f(m_reg[rs1]));
+
+			// parallel load/store op
+			if (!(ls_bit1 == 0 && ls_bit2 == 0))
+			{
+				vector_loadstore();
+			}
 
 			if (rd)
 			{
@@ -1369,12 +1366,6 @@ void tms32082_mp_device::execute_reg_long_imm()
 
 				m_facc[acc] = source;
 			}
-
-			// parallel load/store op
-			if (!(ls_bit1 == 0 && ls_bit2 == 0))
-			{
-				vector_loadstore();
-			}
 			break;
 		}
 
@@ -1390,7 +1381,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 			int ls_bit2 = m_ir & (1 << 6);
 			int rd = OP_RD();
 
-			float src1 = u2f(m_reg[OP_SRC1()]);
+			float src1 = has_imm ? u2f(imm32) : u2f(m_reg[OP_SRC1()]);
 			float src2 = u2f(m_reg[OP_RS()]);
 
 			float res = (src1 * src2) + (z ? 0.0f : m_facc[acc]);
@@ -1412,7 +1403,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 					else
 						m_reg[rd] = f2u((float)res);
 				}
-				else
+				else if (pd)
 				{
 					// write to accumulator
 					m_facc[acc] = (double)res;
@@ -1433,7 +1424,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 			int ls_bit2 = m_ir & (1 << 6);
 			int rd = OP_RD();
 
-			float src1 = u2f(m_reg[OP_SRC1()]);
+			float src1 = has_imm ? u2f(imm32) : u2f(m_reg[OP_SRC1()]);
 			float src2 = u2f(m_reg[OP_RS()]);
 
 			float res = (z ? 0.0f : m_facc[acc]) - (src1 * src2);
@@ -1455,7 +1446,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 					else
 						m_reg[rd] = f2u((float)res);
 				}
-				else
+				else if (pd)
 				{
 					// write to accumulator
 					m_facc[acc] = (double)res;
@@ -1501,7 +1492,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 					}
 					case 0x11:          // DP - SP -> DP
 					{
-						double s1 = u2d(m_fpair[src1 >> 1]);
+						double s1 = has_imm ? u2f(imm32) : u2d(m_fpair[src1 >> 1]);
 						float s2 = u2f(m_reg[rs]);
 						uint64_t res = d2u(s1 + (double) s2);
 						m_fpair[rd >> 1] = res;
@@ -1509,7 +1500,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 					}
 					case 0x15:          // DP - DP -> DP
 					{
-						double s1 = u2d(m_fpair[src1 >> 1]);
+						double s1 = has_imm ? u2f(imm32) : u2d(m_fpair[src1 >> 1]);
 						double s2 = u2d(m_fpair[rs >> 1]);
 						uint64_t res = d2u((double)(s1 + s2));
 						m_fpair[rd >> 1] = res;
@@ -1559,7 +1550,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 					}
 					case 0x11:          // DP - SP -> DP
 					{
-						double s1 = u2d(m_fpair[src1 >> 1]);
+						double s1 = has_imm ? u2f(imm32) : u2d(m_fpair[src1 >> 1]);
 						float s2 = u2f(m_reg[rs]);
 						uint64_t res = d2u(s1 - (double) s2);
 						m_fpair[rd >> 1] = res;
@@ -1567,7 +1558,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 					}
 					case 0x15:          // DP - DP -> DP
 					{
-						double s1 = u2d(m_fpair[src1 >> 1]);
+						double s1 = has_imm ? u2f(imm32) : u2d(m_fpair[src1 >> 1]);
 						double s2 = u2d(m_fpair[rs >> 1]);
 						uint64_t res = d2u((double)(s1 - s2));
 						m_fpair[rd >> 1] = res;
@@ -1617,7 +1608,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 					}
 					case 0x11:          // DP x SP -> DP
 					{
-						double s1 = u2d(m_fpair[src1 >> 1]);
+						double s1 = has_imm ? u2f(imm32) : u2d(m_fpair[src1 >> 1]);
 						float s2 = u2f(m_reg[rs]);
 						uint64_t res = d2u(s1 * (double) s2);
 						m_fpair[rd >> 1] = res;
@@ -1625,7 +1616,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 					}
 					case 0x15:          // DP x DP -> DP
 					{
-						double s1 = u2d(m_fpair[src1 >> 1]);
+						double s1 = has_imm ? u2f(imm32) : u2d(m_fpair[src1 >> 1]);
 						double s2 = u2d(m_fpair[rs >> 1]);
 						uint64_t res = d2u(s1 * s2);
 						m_fpair[rd >> 1] = res;
@@ -1694,7 +1685,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 					s = has_imm ? (double)(u2f(imm32)) : (double)u2f(m_reg[src1]);
 					break;
 				case 1:
-					s = u2d(m_fpair[src1 >> 1]);
+					s = has_imm ? (double)(u2f(imm32)) : u2d(m_fpair[src1 >> 1]);
 					break;
 				case 2:
 					s = has_imm ? (double)((int32_t)(imm32)) : (double)(int32_t)(m_reg[src1]);
@@ -1794,9 +1785,9 @@ void tms32082_mp_device::execute_reg_long_imm()
 
 			for (int i=0; i < 32; i++)
 			{
-				if (source & (1 << (31-i)))
+				if (source & (1 << i))
 				{
-					bit = i;
+					bit = 31 - i;
 					break;
 				}
 			}

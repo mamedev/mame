@@ -77,6 +77,29 @@ YA  YB
 Andy Welburn
 www.andys-arcade.com
 
+========================================
+Falgas and Videotronic (both from Spain) did a clone of "Imola GP" called "Ferrari 1".
+The hardware is almost the same, being the only notable difference is that it uses bigger
+ROMs (just three, labeled "P1/1", "P2/1" and "P2/2"), but the contents are the same:
+
+p2-1.bin     [1/4]      12.bin                  IDENTICAL
+p2-2.bin     [1/4]      10.bin                  IDENTICAL
+p1-1.bin     [1/4]      03.bin                  IDENTICAL
+p2-1.bin     [2/4]      08.bin                  IDENTICAL
+p2-2.bin     [2/4]      06.bin                  IDENTICAL
+p1-1.bin     [2/4]      01.bin                  IDENTICAL
+p2-1.bin     [3/4]      11.bin                  IDENTICAL
+p2-2.bin     [3/4]      09.bin                  IDENTICAL
+p1-1.bin     [3/4]      04.bin                  IDENTICAL
+p2-1.bin     [4/4]      07.bin                  IDENTICAL
+p2-2.bin     [4/4]      05.bin                  IDENTICAL
+p1-1.bin     [4/4]      02.bin                  IDENTICAL
+
+The only xtal on this PCB is 16.00000 MHz.
+This "Ferrari 1" was legally registered by Videotronic on Spain on 1985. The PCB is
+silkscreened by Falgas and the cab contains Falgas logos with a small note that reads
+"Manufactured by Videotronic for Falgas" (in Spanish).
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -182,7 +205,7 @@ uint32_t imolagp_state::screen_update_imolagp(screen_device &screen, bitmap_ind1
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			uint8_t const *const source = &m_videoram[layer][(y & 0xff) * 0x40];
-			uint16_t *const dest = &bitmap.pix16(y & 0xff);
+			uint16_t *const dest = &bitmap.pix(y & 0xff);
 			for (int i = 0; i < 0x40; i++)
 			{
 				uint8_t const data = source[i];
@@ -534,6 +557,8 @@ void imolagp_state::imolagp(machine_config &config)
 	ppi.in_pc_callback().set_ioport("IN1");
 
 	/* video hardware */
+	// Part of the screen is obscured by the cabinet - this is handled by the visible area and physical aspect ratio here
+	// It would be better to move this into the layout so that the video output can be used with a restored cabinet.
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -543,6 +568,7 @@ void imolagp_state::imolagp(machine_config &config)
 	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
 	screen.set_palette("palette");
 	screen.screen_vblank().set(FUNC(imolagp_state::vblank_irq));
+	screen.set_physical_aspect(13, 12);
 
 	PALETTE(config, "palette", FUNC(imolagp_state::imolagp_palette), 0x20);
 

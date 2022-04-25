@@ -136,9 +136,9 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_HSGPL, bus::ti99::peb, snug_high_speed_gpl_device, "ti99_hsgpl", "SNUG High-speed GPL card")
+DEFINE_DEVICE_TYPE(TI99_HSGPL, bus::ti99::peb::snug_high_speed_gpl_device, "ti99_hsgpl", "SNUG High-speed GPL card")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 #define CRU_BASE 0x1B00
 #define SUPERCART_BASE 0x0800
@@ -183,7 +183,7 @@ snug_high_speed_gpl_device::snug_high_speed_gpl_device(const machine_config &mco
 /*
    Read hsgpl CRU interface. None here.
 */
-READ8Z_MEMBER(snug_high_speed_gpl_device::crureadz)
+void snug_high_speed_gpl_device::crureadz(offs_t offset, uint8_t *value)
 {
 	return;
 }
@@ -268,7 +268,7 @@ void snug_high_speed_gpl_device::cruwrite(offs_t offset, uint8_t data)
 /*
     Memory read
 */
-READ8Z_MEMBER(snug_high_speed_gpl_device::readz)
+void snug_high_speed_gpl_device::readz(offs_t offset, uint8_t *value)
 {
 	if ((offset & 0x7e000)==0x74000)
 	{
@@ -717,4 +717,4 @@ ioport_constructor snug_high_speed_gpl_device::device_input_ports() const
 	return INPUT_PORTS_NAME(ti99_hsgpl);
 }
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb

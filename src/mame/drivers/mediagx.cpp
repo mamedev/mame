@@ -79,6 +79,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define SPEEDUP_HACKS   1
 
 class mediagx_state : public pcat_base_state
@@ -124,6 +127,7 @@ private:
 	void parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t ad1847_r(offs_t offset);
 	void ad1847_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	[[maybe_unused]] void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint8_t io20_r(offs_t offset);
 	void io20_w(offs_t offset, uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -172,41 +176,41 @@ private:
 
 	optional_ioport_array<9> m_ports;   // but parallel_pointer takes values 0 -> 23
 
-	uint32_t m_disp_ctrl_reg[256/4];
-	int m_frame_width;
-	int m_frame_height;
+	uint32_t m_disp_ctrl_reg[256/4]{};
+	int m_frame_width = 0;
+	int m_frame_height = 0;
 
-	uint32_t m_memory_ctrl_reg[256/4];
-	int m_pal_index;
+	uint32_t m_memory_ctrl_reg[256/4]{};
+	int m_pal_index = 0;
 
-	uint32_t m_biu_ctrl_reg[256/4];
+	uint32_t m_biu_ctrl_reg[256/4]{};
 
-	uint8_t m_mediagx_config_reg_sel;
-	uint8_t m_mediagx_config_regs[256];
+	uint8_t m_mediagx_config_reg_sel = 0;
+	uint8_t m_mediagx_config_regs[256]{};
 
-	//uint8_t m_controls_data;
-	uint8_t m_parallel_pointer;
-	uint8_t m_parallel_latched;
-	uint32_t m_parport;
-	//int m_control_num;
-	//int m_control_num2;
-	//int m_control_read;
+	//uint8_t m_controls_data = 0;
+	uint8_t m_parallel_pointer = 0;
+	uint8_t m_parallel_latched = 0;
+	uint32_t m_parport = 0;
+	//int m_control_num = 0;
+	//int m_control_num2 = 0;
+	//int m_control_read = 0;
 
-	uint32_t m_cx5510_regs[256/4];
+	uint32_t m_cx5510_regs[256/4]{};
 
 	std::unique_ptr<int16_t[]> m_dacl;
 	std::unique_ptr<int16_t[]> m_dacr;
-	int m_dacl_ptr;
-	int m_dacr_ptr;
+	int m_dacl_ptr = 0;
+	int m_dacr_ptr = 0;
 
-	uint8_t m_ad1847_regs[16];
-	uint32_t m_ad1847_sample_counter;
-	uint32_t m_ad1847_sample_rate;
+	uint8_t m_ad1847_regs[16]{};
+	uint32_t m_ad1847_sample_counter = 0;
+	uint32_t m_ad1847_sample_rate = 0;
 
 #if SPEEDUP_HACKS
-	const speedup_entry *m_speedup_table;
-	uint32_t m_speedup_hits[12];
-	int m_speedup_count;
+	const speedup_entry *m_speedup_table = nullptr;
+	uint32_t m_speedup_hits[12]{};
+	int m_speedup_count = 0;
 #endif
 
 	using speedup_handler = std::pair<uint32_t (mediagx_state::*)(address_space &), const char *>;
@@ -266,19 +270,17 @@ void mediagx_state::video_start()
 
 void mediagx_state::draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y)
 {
-	int i,j;
-	const uint8_t *dp;
 	int index = 0;
-	const pen_t *pens = &m_palette->pen(0);
+	pen_t const *const pens = &m_palette->pen(0);
 
-	dp = gfx->get_data(ch);
+	uint8_t const *const dp = gfx->get_data(ch);
 
-	for (j=y; j < y+8; j++)
+	for (int j=y; j < y+8; j++)
 	{
-		uint32_t *p = &bitmap.pix32(j);
-		for (i=x; i < x+8; i++)
+		uint32_t *const p = &bitmap.pix(j);
+		for (int i=x; i < x+8; i++)
 		{
-			uint8_t pen = dp[index++];
+			uint8_t const pen = dp[index++];
 			if (pen)
 				p[i] = pens[gfx->colorbase() + (att & 0xf)];
 			else
@@ -292,18 +294,16 @@ void mediagx_state::draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, g
 
 void mediagx_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int i, j;
-	int width, height;
-	int line_delta = (m_disp_ctrl_reg[DC_LINE_DELTA] & 0x3ff) * 4;
+	int const line_delta = (m_disp_ctrl_reg[DC_LINE_DELTA] & 0x3ff) * 4;
 
-	width = (m_disp_ctrl_reg[DC_H_TIMING_1] & 0x7ff) + 1;
+	int width = (m_disp_ctrl_reg[DC_H_TIMING_1] & 0x7ff) + 1;
 	if (m_disp_ctrl_reg[DC_TIMING_CFG] & 0x8000)     // pixel double
 	{
 		width >>= 1;
 	}
 	width += 4;
 
-	height = (m_disp_ctrl_reg[DC_V_TIMING_1] & 0x7ff) + 1;
+	int height = (m_disp_ctrl_reg[DC_V_TIMING_1] & 0x7ff) + 1;
 
 	if ( (width != m_frame_width || height != m_frame_height) &&
 			(width > 1 && height > 1 && width <= 640 && height <= 480) )
@@ -319,19 +319,19 @@ void mediagx_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &clip
 
 	if (m_disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)        // 8-bit mode
 	{
-		uint8_t *framebuf = (uint8_t*)&m_vram[m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
-		uint8_t *pal = m_pal;
+		uint8_t const *const framebuf = (uint8_t const *)&m_vram[m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
+		uint8_t const *const pal = m_pal;
 
-		for (j=0; j < m_frame_height; j++)
+		for (int j=0; j < m_frame_height; j++)
 		{
-			uint32_t *p = &bitmap.pix32(j);
-			uint8_t *si = &framebuf[j * line_delta];
-			for (i=0; i < m_frame_width; i++)
+			uint32_t *const p = &bitmap.pix(j);
+			uint8_t const *si = &framebuf[j * line_delta];
+			for (int i=0; i < m_frame_width; i++)
 			{
-				int c = *si++;
-				int r = pal[(c*3)+0] << 2;
-				int g = pal[(c*3)+1] << 2;
-				int b = pal[(c*3)+2] << 2;
+				int const c = *si++;
+				int const r = pal[(c*3)+0] << 2;
+				int const g = pal[(c*3)+1] << 2;
+				int const b = pal[(c*3)+2] << 2;
 
 				p[i] = r << 16 | g << 8 | b;
 			}
@@ -339,21 +339,21 @@ void mediagx_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &clip
 	}
 	else            // 16-bit
 	{
-		uint16_t *framebuf = (uint16_t*)&m_vram[m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
+		uint16_t const *const framebuf = (uint16_t const *)&m_vram[m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
 
 		// RGB 5-6-5 mode
 		if ((m_disp_ctrl_reg[DC_OUTPUT_CFG] & 0x2) == 0)
 		{
-			for (j=0; j < m_frame_height; j++)
+			for (int j=0; j < m_frame_height; j++)
 			{
-				uint32_t *p = &bitmap.pix32(j);
-				uint16_t *si = &framebuf[j * (line_delta/2)];
-				for (i=0; i < m_frame_width; i++)
+				uint32_t *const p = &bitmap.pix(j);
+				uint16_t const *si = &framebuf[j * (line_delta/2)];
+				for (int i=0; i < m_frame_width; i++)
 				{
-					uint16_t c = *si++;
-					int r = ((c >> 11) & 0x1f) << 3;
-					int g = ((c >> 5) & 0x3f) << 2;
-					int b = (c & 0x1f) << 3;
+					uint16_t const c = *si++;
+					int const r = ((c >> 11) & 0x1f) << 3;
+					int const g = ((c >> 5) & 0x3f) << 2;
+					int const b = (c & 0x1f) << 3;
 
 					p[i] = r << 16 | g << 8 | b;
 				}
@@ -362,16 +362,16 @@ void mediagx_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &clip
 		// RGB 5-5-5 mode
 		else
 		{
-			for (j=0; j < m_frame_height; j++)
+			for (int j=0; j < m_frame_height; j++)
 			{
-				uint32_t *p = &bitmap.pix32(j);
-				uint16_t *si = &framebuf[j * (line_delta/2)];
-				for (i=0; i < m_frame_width; i++)
+				uint32_t *const p = &bitmap.pix(j);
+				uint16_t const *si = &framebuf[j * (line_delta/2)];
+				for (int i=0; i < m_frame_width; i++)
 				{
-					uint16_t c = *si++;
-					int r = ((c >> 10) & 0x1f) << 3;
-					int g = ((c >> 5) & 0x1f) << 3;
-					int b = (c & 0x1f) << 3;
+					uint16_t const c = *si++;
+					int const r = ((c >> 10) & 0x1f) << 3;
+					int const g = ((c >> 5) & 0x1f) << 3;
+					int const b = (c & 0x1f) << 3;
 
 					p[i] = r << 16 | g << 8 | b;
 				}
@@ -502,11 +502,9 @@ void mediagx_state::biu_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	}
 }
 
-#ifdef UNUSED_FUNCTION
 void mediagx_state::bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
-#endif
 
 uint8_t mediagx_state::io20_r(offs_t offset)
 {
@@ -916,6 +914,10 @@ void mediagx_state::mediagx(machine_config &config)
 void mediagx_state::init_mediagx()
 {
 	m_frame_width = m_frame_height = 1;
+	m_parallel_pointer = 0;
+	std::fill(std::begin(m_disp_ctrl_reg), std::end(m_disp_ctrl_reg), 0);
+	std::fill(std::begin(m_biu_ctrl_reg), std::end(m_biu_ctrl_reg), 0);
+	std::fill(std::begin(m_speedup_hits), std::end(m_speedup_hits), 0);
 }
 
 #if SPEEDUP_HACKS
@@ -947,7 +949,7 @@ void mediagx_state::report_speedups()
 
 void mediagx_state::install_speedups(const speedup_entry *entries, int count)
 {
-	assert(count < ARRAY_LENGTH(s_speedup_handlers));
+	assert(count < std::size(s_speedup_handlers));
 
 	m_speedup_table = entries;
 	m_speedup_count = count;
@@ -981,7 +983,7 @@ void mediagx_state::init_a51site4()
 	init_mediagx();
 
 #if SPEEDUP_HACKS
-	install_speedups(a51site4_speedups, ARRAY_LENGTH(a51site4_speedups));
+	install_speedups(a51site4_speedups, std::size(a51site4_speedups));
 #endif
 }
 
@@ -1018,6 +1020,8 @@ ROM_START( a51site4a ) /* When dumped connected straight to IDE the cylinders we
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "a51site4-2_0", 0, SHA1(4de421e4d1708ecbdfb50730000814a1ea36a044) ) /* Stock drive, sticker on drive shows REV 2.0 and Test Mode screen shows the date September 11, 1998 */
 ROM_END
+
+} // Anonymous namespace
 
 
 /*****************************************************************************/

@@ -43,19 +43,17 @@ copyright-holders:Roberto Lavarone
 	</element>
 
 	<view name="Default Layout">
-		<backdrop element="gray">
+		<element ref="gray">
 			<bounds x="65" y="74" width="640" height="480" />
-		</backdrop>
+		</element>
 
-		<bezel element="LX.388">
-			<bounds x="67" y="80" width="90" height="30" />
-		</bezel>
-
-		<screen index="0">
+		<screen index="0" blend="add">
 			<bounds x="65" y="74" width="640" height="480" />
 		</screen>
 
+		<element ref="LX.388">
+			<bounds x="67" y="80" width="90" height="30" />
+		</element>
 	</view>
-
 
 </mamelayout>

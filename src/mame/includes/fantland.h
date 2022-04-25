@@ -21,8 +21,8 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
-		m_spriteram(*this, "spriteram", 0),
-		m_spriteram2(*this, "spriteram2", 0),
+		m_spriteram(*this, "spriteram", 0x2800, ENDIANNESS_LITTLE),
+		m_spriteram2(*this, "spriteram2", 0x10000, ENDIANNESS_LITTLE),
 		m_wheel(*this, "WHEEL%u", 0U)
 	{ }
 
@@ -34,7 +34,7 @@ public:
 
 protected:
 	/* misc */
-	uint8_t    m_nmi_enable;
+	uint8_t    m_nmi_enable = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -45,8 +45,8 @@ protected:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory pointers */
-	required_shared_ptr<uint8_t> m_spriteram;
-	required_shared_ptr<uint8_t> m_spriteram2;
+	memory_share_creator<uint8_t> m_spriteram;
+	memory_share_creator<uint8_t> m_spriteram2;
 
 	optional_ioport_array<2> m_wheel;
 
@@ -88,13 +88,13 @@ public:
 
 private:
 	/* misc */
-	int        m_old_x[2];
-	int        m_old_y[2];
-	int        m_old_f[2];
-	uint8_t    m_input_ret[2];
-	int        m_adpcm_playing[4];
-	int        m_adpcm_addr[2][4];
-	int        m_adpcm_nibble[4];
+	int        m_old_x[2]{};
+	int        m_old_y[2]{};
+	int        m_old_f[2]{};
+	uint8_t    m_input_ret[2]{};
+	int        m_adpcm_playing[4]{};
+	int        m_adpcm_addr[2][4]{};
+	int        m_adpcm_nibble[4]{};
 
 	/* devices */
 	required_device_array<msm5205_device, 4> m_msm;

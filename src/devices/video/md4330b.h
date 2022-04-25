@@ -49,7 +49,7 @@ public:
 	auto write_do() { return m_write_do.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(clk_w);
-	DECLARE_WRITE_LINE_MEMBER(tc_w) { m_tc = (state) ? 1 : 0; update_q(); }
+	DECLARE_WRITE_LINE_MEMBER(tc_w) { m_tc = (state) ? 1 : 0; update_output(); }
 	DECLARE_WRITE_LINE_MEMBER(di_w) { m_di = (state) ? 1 : 0; }
 	DECLARE_WRITE_LINE_MEMBER(rst_w) { m_rst = (state) ? 1 : 0; }
 	DECLARE_READ_LINE_MEMBER(do_r) { return m_do; }
@@ -60,7 +60,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
-	void update_q();
+	void update_output();
 
 	const u8 m_qmax; // number of Q pins
 	u32 m_shift;

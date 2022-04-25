@@ -62,6 +62,9 @@ via the PC 16 Terminal, operates independently after programming), connects to t
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class alphatpc16_state : public driver_device
 {
 public:
@@ -84,9 +87,10 @@ public:
 public:
 	void alphatpc16(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override;
 
+private:
 	void apc16_io(address_map &map);
 	void apc16_map(address_map &map);
 	void apc16_z80_io(address_map &map);
@@ -117,14 +121,21 @@ private:
 	required_device<floppy_connector> m_flop3;
 	required_ioport_array<8> m_keys;
 
-	u8 m_p1, m_p2, m_data, m_p40;
-	bool m_bsy, m_req, m_ack, m_cd, m_io, m_sel;
+	u8 m_p1 = 0, m_p2 = 0, m_data = 0, m_p40 = 0;
+	bool m_bsy = false, m_req = false, m_ack = false, m_cd = false, m_io = false, m_sel = false;
 };
 
 void alphatpc16_state::machine_start()
 {
 	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->size() - 1, m_ram->pointer());
 	m_wdfdc->set_floppy(m_flop0->get_device());
+
+	m_bsy = false;
+	m_req = false;
+	m_ack = false;
+	m_cd = false;
+	m_io = false;
+	m_sel = false;
 }
 
 void alphatpc16_state::p1_w(u8 data)
@@ -492,11 +503,11 @@ void alphatpc16_state::alphatpc16(machine_config &config)
 	m_z80->set_addrmap(AS_PROGRAM, &alphatpc16_state::apc16_z80_map);
 	m_z80->set_addrmap(AS_IO, &alphatpc16_state::apc16_z80_io);
 	WD1770(config, m_wdfdc, 8_MHz_XTAL);
-	FLOPPY_CONNECTOR(config, m_flop0, atpc16_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_flop0, atpc16_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 	dynamic_cast<device_slot_interface *>(m_flop0.target())->set_fixed(true);
-	FLOPPY_CONNECTOR(config, m_flop1, atpc16_floppies, "525dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_flop2, atpc16_floppies, "525dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_flop3, atpc16_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_flop1, atpc16_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_flop2, atpc16_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_flop3, atpc16_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 
 	i8741a_device& i8741(I8741A(config, "i8741", 4.608_MHz_XTAL));
 	i8741.p1_in_cb().set(FUNC(alphatpc16_state::p1_r));
@@ -517,7 +528,7 @@ void alphatpc16_state::alphatpc16(machine_config &config)
 	EF9345(config, m_ef9345, 0);
 	m_ef9345->set_palette_tag("palette");
 
-	TIMER(config, "scanline").configure_scanline(NAME([this](timer_device &t, void *ptr, s32 p){m_ef9345->update_scanline((uint16_t)p);}), screen, 0, 10);
+	TIMER(config, "scanline").configure_scanline(NAME([this](timer_device &t, s32 p){m_ef9345->update_scanline((uint16_t)p);}), screen, 0, 10);
 
 	// these are supported by the bios, they may not have been available on real hardware
 	RAM(config, m_ram).set_default_size("64K").set_extra_options("128K,192K,256K,384K,448K,512K");
@@ -537,6 +548,9 @@ ROM_START( alphatpc16 )
 	ROM_REGION( 0x4000, "ef9345", 0 )
 	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )                // from dcvg5k
 ROM_END
+
+} // Anonymous namespace
+
 
 COMP( 1985, alphatpc16,  0, 0, alphatpc16, alphatpc16, alphatpc16_state, empty_init, "Triumph-Adler", "alphatronic PC-16",  MACHINE_NOT_WORKING)
 

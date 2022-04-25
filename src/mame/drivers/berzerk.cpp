@@ -62,17 +62,17 @@ private:
 
 	output_finder<> m_led;
 
-	uint8_t m_magicram_control;
-	uint8_t m_last_shift_data;
-	uint8_t m_intercept;
-	emu_timer *m_irq_timer;
-	emu_timer *m_nmi_timer;
-	uint8_t m_irq_enabled;
-	uint8_t m_nmi_enabled;
-	int m_p1_counter_74ls161;
-	int m_p1_direction;
-	int m_p2_counter_74ls161;
-	int m_p2_direction;
+	uint8_t m_magicram_control = 0;
+	uint8_t m_last_shift_data = 0;
+	uint8_t m_intercept = 0;
+	emu_timer *m_irq_timer = nullptr;
+	emu_timer *m_nmi_timer = nullptr;
+	uint8_t m_irq_enabled = 0;
+	uint8_t m_nmi_enabled = 0;
+	int m_p1_counter_74ls161 = 0;
+	int m_p1_direction = 0;
+	int m_p2_counter_74ls161 = 0;
+	int m_p2_direction = 0;
 
 	uint8_t led_on_r();
 	void led_on_w(uint8_t data);
@@ -492,30 +492,30 @@ uint32_t berzerk_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	for (int offs = 0; offs < m_videoram.bytes(); offs++)
 	{
-		int i;
-
 		uint8_t data = m_videoram[offs];
 		uint8_t color = m_colorram[((offs >> 2) & 0x07e0) | (offs & 0x001f)];
 
 		uint8_t y = offs >> 5;
 		uint8_t x = offs << 3;
 
+		int i;
+
 		for (i = 0; i < 4; i++)
 		{
 			rgb_t pen = (data & 0x80) ? pens[color >> 4] : rgb_t::black();
-			bitmap.pix32(y, x) = pen;
+			bitmap.pix(y, x) = pen;
 
-			x = x + 1;
-			data = data << 1;
+			x++;
+			data <<= 1;
 		}
 
 		for (; i < 8; i++)
 		{
 			rgb_t pen = (data & 0x80) ? pens[color & 0x0f] : rgb_t::black();
-			bitmap.pix32(y, x) = pen;
+			bitmap.pix(y, x) = pen;
 
-			x = x + 1;
-			data = data << 1;
+			x++;
+			data <<= 1;
 		}
 	}
 

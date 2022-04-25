@@ -121,9 +121,9 @@ private:
 	output_finder<6> m_led;
 
 	// for I/O hacks
-	uint32_t m_pchackaddress1;
-	uint32_t m_pchackaddress2;
-	uint16_t m_controller_sense_addr;
+	uint32_t m_pchackaddress1 = 0;
+	uint32_t m_pchackaddress2 = 0;
+	uint16_t m_controller_sense_addr = 0;
 };
 
 

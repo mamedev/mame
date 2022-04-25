@@ -140,8 +140,6 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual uint8_t z180_read_memory(offs_t addr);
-	virtual void z180_write_memory(offs_t addr, uint8_t data);
 	virtual uint8_t z180_internal_port_read(uint8_t port);
 	virtual void z180_internal_port_write(uint8_t port, uint8_t data);
 
@@ -152,6 +150,9 @@ protected:
 	void set_address_width(int bits);
 
 private:
+	uint8_t z180_read_memory(offs_t addr) { return m_program.read_byte(addr); }
+	void z180_write_memory(offs_t addr, uint8_t data) { m_program.write_byte(addr, data); }
+
 	int memory_wait_states() const { return (m_dcntl & 0xc0) >> 6; }
 	int io_wait_states() const { return (m_dcntl & 0x30) == 0 ? 0 : ((m_dcntl & 0x30) >> 4) + 1; }
 	bool is_internal_io_address(uint16_t port) const { return ((port ^ m_iocr) & (m_extended_io ? 0xff80 : 0xffc0)) == 0; }
@@ -171,10 +172,11 @@ private:
 	uint8_t   m_asci_rdr[2];                    // ASCI receive data register 0-1
 	uint8_t   m_csio_cntr;                      // CSI/O control/status register
 	uint8_t   m_csio_trdr;                      // CSI/O transmit/receive register
-	PAIR16    m_tmdr[2];                        // TIMER data register ch 0-1
-	PAIR16    m_rldr[2];                        // TIMER reload register ch 0-1
-	uint8_t   m_tcr;                            // TIMER control register
-	uint8_t   m_frc;                            // free running counter
+	PAIR16    m_tmdr[2];                        // PRT data register ch 0-1
+	PAIR16    m_rldr[2];                        // PRT reload register ch 0-1
+	uint8_t   m_tcr;                            // PRT control register
+	uint8_t   m_frc;                            // free running counter (also time base for ASCI, CSI/O & PRT)
+	uint8_t   m_frc_prescale;                   // divide CPU clock by 10
 	PAIR      m_dma_sar0;                       // DMA source address register ch 0
 	PAIR      m_dma_dar0;                       // DMA destination address register ch 0
 	PAIR16    m_dma_bcr[2];                     // DMA byte register ch 0-1
@@ -200,9 +202,6 @@ private:
 	uint8_t   m_int_pending[11 + 1];            // interrupt pending
 	uint8_t   m_after_EI;                       // are we in the EI shadow?
 	uint32_t  m_ea;
-	uint8_t   m_timer_cnt;                      // timer counter / divide by 20
-	uint8_t   m_dma0_cnt;                       // DMA0 counter / divide by 20
-	uint8_t   m_dma1_cnt;                       // DMA1 counter / divide by 20
 	memory_access<20, 0, 0, ENDIANNESS_LITTLE>::cache m_cprogram, m_copcodes;
 	memory_access<20, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_io;

@@ -8,8 +8,6 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/dmv_dsk.h"
 
 dmv_format::dmv_format() : upd765_format(formats)
@@ -52,4 +50,4 @@ const dmv_format::format dmv_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_DMV_FORMAT = &floppy_image_format_creator<dmv_format>;
+const dmv_format FLOPPY_DMV_FORMAT;

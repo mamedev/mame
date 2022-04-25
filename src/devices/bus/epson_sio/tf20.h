@@ -36,7 +36,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -56,9 +56,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( rxc_w );
 	DECLARE_WRITE_LINE_MEMBER( pinc_w );
 
-	DECLARE_READ8_MEMBER( rom_disable_r );
-	DECLARE_READ8_MEMBER( upd765_tc_r );
-	DECLARE_WRITE8_MEMBER( fdc_control_w );
+	uint8_t rom_disable_r();
+	uint8_t upd765_tc_r();
+	void fdc_control_w(uint8_t data);
 
 	void cpu_io(address_map &map);
 	void cpu_mem(address_map &map);

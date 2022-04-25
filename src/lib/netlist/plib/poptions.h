@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Couriersud
 
 #ifndef POPTIONS_H_
@@ -136,7 +136,7 @@ namespace plib {
 
 			if (raw != plib::container::npos)
 			{
-				m_val = static_cast<T>(raw);
+				m_val = narrow_cast<T>(raw);
 				return 0;
 			}
 
@@ -261,12 +261,12 @@ namespace plib {
 		return nullptr;
 	}
 
-	option *getopt_short(const pstring &arg) const;
-	option *getopt_long(const pstring &arg) const;
+		option *getopt_short(const pstring &arg) const;
+		option *getopt_long(const pstring &arg) const;
 
-	std::vector<option_base *> m_opts;
-	pstring m_app;
-	option_args * m_other_args;
+		std::vector<option_base *> m_opts;
+		pstring m_app;
+		option_args * m_other_args;
 };
 
 } // namespace plib

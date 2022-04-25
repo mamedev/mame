@@ -41,9 +41,11 @@ Cassette (nascom2):
 #include "bus/nasbus/nasbus.h"
 
 #include "emupal.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "screen.h"
 
+
+namespace {
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -95,16 +97,11 @@ protected:
 	required_memory_region m_gfx1_region;
 	required_ioport_array<8> m_keyboard;
 
-	int m_tape_size;
-	uint8_t *m_tape_image;
-	int m_tape_index;
 	uint8_t m_kb_select;
 	uint8_t m_kb_control;
 	bool m_cassinbit, m_cassoutbit, m_cassold;
 	u8 m_port00;
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( load_nascom1_cassette );
-	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( unload_nascom1_cassette );
 	template<int Dest> DECLARE_SNAPSHOT_LOAD_MEMBER( snapshot_cb );
 };
 
@@ -145,9 +142,11 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(cass_speed);
 
+protected:
+	virtual void machine_reset() override;
+
 private:
 	TIMER_DEVICE_CALLBACK_MEMBER(nascom2_kansas_r);
-	DECLARE_MACHINE_RESET(nascom2);
 	DECLARE_WRITE_LINE_MEMBER(nascom2_kansas_w);
 	DECLARE_WRITE_LINE_MEMBER(ram_disable_w);
 	DECLARE_WRITE_LINE_MEMBER(ram_disable_cpm_w);
@@ -312,25 +311,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( nascom2_state::nascom2_kansas_r )
 	}
 }
 
-// This stuff has never been connected up - what's it for?
-DEVICE_IMAGE_LOAD_MEMBER( nascom_state::load_nascom1_cassette )
-{
-	m_tape_size = image.length();
-	m_tape_image = (uint8_t*)image.ptr();
-
-	if (!m_tape_image)
-		return image_init_result::FAIL;
-
-	m_tape_index = 0;
-	return image_init_result::PASS;
-}
-
-DEVICE_IMAGE_UNLOAD_MEMBER( nascom_state::unload_nascom1_cassette )
-{
-	m_tape_image = nullptr;
-	m_tape_size = m_tape_index = 0;
-}
-
 
 //**************************************************************************
 //  SNAPSHOTS
@@ -363,7 +343,7 @@ SNAPSHOT_LOAD_MEMBER(nascom_state::snapshot_cb)
 		}
 		else
 		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported file format");
+			image.seterror(image_error::INVALIDIMAGE, "Unsupported file format");
 			return image_init_result::FAIL;
 		}
 		dummy = 0x00;
@@ -388,7 +368,7 @@ image_init_result nascom2_state::load_cart(device_image_interface &image, generi
 	{
 		if (slot->length() > 0x1000)
 		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported file size");
+			image.seterror(image_error::INVALIDIMAGE, "Unsupported file size");
 			return image_init_result::FAIL;
 		}
 
@@ -459,10 +439,8 @@ void nascom_state::machine_reset()
 	m_hd6402->write_cs(1);
 }
 
-MACHINE_RESET_MEMBER(nascom2_state, nascom2)
+void nascom2_state::machine_reset()
 {
-	machine_reset();
-
 	// nascom2: restore speed at machine start
 	m_cass_speed = ioport("DSW0")->read();
 
@@ -630,7 +608,7 @@ static INPUT_PORTS_START( nascom1 )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("New Line")              PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(13)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('=')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('@')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(0xff) PORT_CHAR('@')  // have to press shift to get @
 	PORT_BIT(0x48, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("KEY.1")
@@ -671,7 +649,7 @@ static INPUT_PORTS_START( nascom1 )
 
 	PORT_START("KEY.5")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('+')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)  PORT_CHAR('.') PORT_CHAR('>')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)  PORT_CHAR('.') PORT_CHAR('>') // > nascom2 only
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)     PORT_CHAR('9') PORT_CHAR(')')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)     PORT_CHAR('3') PORT_CHAR(0xA3)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)     PORT_CHAR('Q') PORT_CHAR('q')
@@ -681,7 +659,7 @@ static INPUT_PORTS_START( nascom1 )
 	PORT_START("KEY.6")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(':') PORT_CHAR('*')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)     PORT_CHAR('0')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)     PORT_CHAR('0') PORT_CHAR('^')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)     PORT_CHAR('2') PORT_CHAR('\"')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)     PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)     PORT_CHAR('P') PORT_CHAR('p')
@@ -839,8 +817,6 @@ void nascom2_state::nascom2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nascom2_state::nascom2_mem);
 	m_maincpu->set_addrmap(AS_IO, &nascom2_state::nascom2_io);
 
-	MCFG_MACHINE_RESET_OVERRIDE(nascom2_state, nascom2 )
-
 	// video hardware
 	m_screen->set_size(48 * 8, 16 * 14);
 	m_screen->set_visarea(0, 48 * 8 - 1, 0, 16 * 14 - 1);
@@ -939,6 +915,8 @@ ROM_START( nascom2c )
 	ROM_LOAD("nascom1.ic66", 0x0000, 0x0800, CRC(33e92a04) SHA1(be6e1cc80e7f95a032759f7df19a43c27ff93a52))
 	ROM_LOAD("nasgra.ic54",  0x0800, 0x0800, CRC(2bc09d32) SHA1(d384297e9b02cbcb283c020da51b3032ff62b1ae))
 ROM_END
+
+} // Anonymous namespace
 
 
 //**************************************************************************

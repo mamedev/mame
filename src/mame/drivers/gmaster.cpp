@@ -14,7 +14,7 @@
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -52,16 +52,16 @@ private:
 
 	struct
 	{
-		uint8_t data[8];
-		int index;
-		int x, y;
-		bool mode; // true read does not increase address
-		bool delayed;
-		uint8_t pixels[8][64];
+		uint8_t data[8]{};
+		int index = 0;
+		int x = 0, y = 0;
+		bool mode = false; // true read does not increase address
+		bool delayed = false;
+		uint8_t pixels[8][64]{};
 	} m_video;
 
-	uint8_t m_ports[5];
-	uint8_t m_ram[0x4000];
+	uint8_t m_ports[5]{};
+	uint8_t m_ram[0x4000]{};
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<generic_slot_device> m_cart;
@@ -135,7 +135,7 @@ void gmaster_state::gmaster_io_w(offs_t offset, uint8_t data)
 			break;
 		case 1:
 			m_video.delayed = false;
-			if (m_video.x < ARRAY_LENGTH(m_video.pixels[0])) // continental galaxy flutlicht
+			if (m_video.x < std::size(m_video.pixels[0])) // continental galaxy flutlicht
 			{
 				m_video.pixels[m_video.y][m_video.x] = data;
 			}
@@ -280,30 +280,20 @@ void gmaster_state::gmaster_palette(palette_device &palette) const
 
 uint32_t gmaster_state::screen_update_gmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
-	for (y = 0; y < ARRAY_LENGTH(m_video.pixels); y++)
+	for (int y = 0; y < std::size(m_video.pixels); y++)
 	{
-		for (x = 0; x < ARRAY_LENGTH(m_video.pixels[0]); x++)
+		for (int x = 0; x < std::size(m_video.pixels[0]); x++)
 		{
-			uint8_t d = m_video.pixels[y][x];
-			uint16_t *line;
+			uint8_t const d = m_video.pixels[y][x];
 
-			line = &bitmap.pix16((y * 8), x);
-			line[0] = BIT(d, 0);
-			line = &bitmap.pix16((y * 8 + 1), x);
-			line[0] = BIT(d, 1);
-			line = &bitmap.pix16((y * 8 + 2), x);
-			line[0] = BIT(d, 2);
-			line = &bitmap.pix16((y * 8 + 3), x);
-			line[0] = BIT(d, 3);
-			line = &bitmap.pix16((y * 8 + 4), x);
-			line[0] = BIT(d, 4);
-			line = &bitmap.pix16((y * 8 + 5), x);
-			line[0] = BIT(d, 5);
-			line = &bitmap.pix16((y * 8 + 6), x);
-			line[0] = BIT(d, 6);
-			line = &bitmap.pix16((y * 8 + 7), x);
-			line[0] = BIT(d, 7);
+			bitmap.pix((y * 8 + 0), x) = BIT(d, 0);
+			bitmap.pix((y * 8 + 1), x) = BIT(d, 1);
+			bitmap.pix((y * 8 + 2), x) = BIT(d, 2);
+			bitmap.pix((y * 8 + 3), x) = BIT(d, 3);
+			bitmap.pix((y * 8 + 4), x) = BIT(d, 4);
+			bitmap.pix((y * 8 + 5), x) = BIT(d, 5);
+			bitmap.pix((y * 8 + 6), x) = BIT(d, 6);
+			bitmap.pix((y * 8 + 7), x) = BIT(d, 7);
 		}
 	}
 	return 0;
@@ -349,7 +339,7 @@ void gmaster_state::gmaster(machine_config &config)
 	screen.set_screen_update(FUNC(gmaster_state::screen_update_gmaster));
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(gmaster_state::gmaster_palette), ARRAY_LENGTH(gmaster_pens));
+	PALETTE(config, "palette", FUNC(gmaster_state::gmaster_palette), std::size(gmaster_pens));
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(0, "mono", 0.50);

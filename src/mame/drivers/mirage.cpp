@@ -73,7 +73,7 @@ public:
 
 private:
 	/* misc */
-	uint8_t m_mux_data;
+	uint8_t m_mux_data = 0;
 
 	/* devices */
 	required_device<m68000_device> m_maincpu;

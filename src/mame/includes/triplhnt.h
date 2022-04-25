@@ -52,6 +52,11 @@ public:
 
 	void init_triplhnt();
 
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
 private:
 	enum
 	{
@@ -61,21 +66,18 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_w);
 	DECLARE_WRITE_LINE_MEMBER(tape_control_w);
 
-	DECLARE_READ8_MEMBER(cmos_r);
-	DECLARE_READ8_MEMBER(input_port_4_r);
-	DECLARE_READ8_MEMBER(misc_r);
-	DECLARE_READ8_MEMBER(da_latch_r);
+	uint8_t cmos_r(offs_t offset);
+	uint8_t input_port_4_r();
+	uint8_t misc_r(offs_t offset);
+	uint8_t da_latch_r(offs_t offset);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void video_start() override;
 	void triplhnt_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void set_collision(int code);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual void machine_start() override;
 	void triplhnt_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
@@ -94,15 +96,15 @@ private:
 	required_shared_ptr<uint8_t> m_code_ram;
 	output_finder<> m_lamp;
 
-	uint8_t m_cmos[16];
-	uint8_t m_da_latch;
-	uint8_t m_cmos_latch;
-	uint8_t m_hit_code;
-	int m_sprite_zoom;
-	int m_sprite_bank;
+	uint8_t m_cmos[16]{};
+	uint8_t m_da_latch = 0;
+	uint8_t m_cmos_latch = 0;
+	uint8_t m_hit_code = 0;
+	int m_sprite_zoom = 0;
+	int m_sprite_bank = 0;
 	bitmap_ind16 m_helper;
-	emu_timer *m_hit_timer;
-	tilemap_t* m_bg_tilemap;
+	emu_timer *m_hit_timer = nullptr;
+	tilemap_t* m_bg_tilemap = nullptr;
 };
 
 /*----------- defined in audio/triplhnt.cpp -----------*/

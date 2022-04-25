@@ -2,7 +2,7 @@
 // reference_counted.cpp
 // ~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -13,6 +13,7 @@
 #include <memory>
 #include <utility>
 #include <vector>
+#include <ctime>
 
 using asio::ip::tcp;
 
@@ -60,7 +61,7 @@ private:
 
     auto self(shared_from_this());
     asio::async_write(socket_, buffer,
-        [this, self](std::error_code /*ec*/, std::size_t /*length*/)
+        [self](std::error_code /*ec*/, std::size_t /*length*/)
         {
         });
   }

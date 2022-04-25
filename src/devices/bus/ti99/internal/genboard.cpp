@@ -434,11 +434,11 @@
 #include "genboard.h"
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(GENEVE_GATE_ARRAY, bus::ti99::internal, geneve_gate_array_device, "geneve_gate_array", "Geneve Gate Array")
-DEFINE_DEVICE_TYPE_NS(GENMOD_DECODER,    bus::ti99::internal, genmod_decoder_device, "genmod_decoder", "GenMod decoder circuit")
-DEFINE_DEVICE_TYPE_NS(GENEVE_PAL,        bus::ti99::internal, geneve_pal_device, "geneve_pal", "Geneve PAL circuit")
+DEFINE_DEVICE_TYPE(GENEVE_GATE_ARRAY, bus::ti99::internal::geneve_gate_array_device, "geneve_gate_array", "Geneve Gate Array")
+DEFINE_DEVICE_TYPE(GENMOD_DECODER,    bus::ti99::internal::genmod_decoder_device, "genmod_decoder", "GenMod decoder circuit")
+DEFINE_DEVICE_TYPE(GENEVE_PAL,        bus::ti99::internal::geneve_pal_device, "geneve_pal", "Geneve PAL circuit")
 
-namespace bus { namespace ti99 { namespace internal {
+namespace bus::ti99::internal {
 
 geneve_gate_array_device::geneve_gate_array_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock),
@@ -459,6 +459,8 @@ geneve_gate_array_device::geneve_gate_array_device(const machine_config &mconfig
 	m_direct_mode(false),
 
 	m_keyint(*this),
+	m_keyb_clk(*this),
+	m_keyb_data(*this),
 	m_keyboard_shift_reg(0),
 	m_keyboard_last_clock(CLEAR_LINE),
 	m_keyboard_data_in(CLEAR_LINE),
@@ -466,7 +468,6 @@ geneve_gate_array_device::geneve_gate_array_device(const machine_config &mconfig
 
 	m_pal(*owner, GENEVE_PAL_TAG),
 	m_peribox(*owner, TI_PERIBOX_TAG),
-	m_keyb_conn(*owner, GENEVE_KEYBOARD_CONN_TAG),
 
 	m_debug(false)
 {
@@ -477,14 +478,14 @@ geneve_gate_array_device::geneve_gate_array_device(const machine_config &mconfig
 {
 }
 
-WRITE8_MEMBER( geneve_gate_array_device::cru_sstep_write )
+void geneve_gate_array_device::cru_sstep_write(offs_t offset, uint8_t data)
 {
 	// Single step
 	// 13c0 - 13fe: 0001 0011 11xx xxx0  (offset << 1)
 	LOGMASKED(LOG_WARN, "Single step not implemented; bit %d set to %d\n", offset & 0x001f, data);
 }
 
-WRITE8_MEMBER( geneve_gate_array_device::cru_ctrl_write )
+void geneve_gate_array_device::cru_ctrl_write(offs_t offset, uint8_t data)
 {
 	// This is just mirroring the internal flags of the 9995
 	int bit = (offset & 0x000f);
@@ -564,7 +565,7 @@ WRITE8_MEMBER( geneve_gate_array_device::cru_ctrl_write )
 */
 WRITE_LINE_MEMBER( geneve_gate_array_device::set_keyboard_clock)
 {
-	m_keyb_conn->clock_write_from_mb(state);
+	m_keyb_clk(state);
 }
 
 /*
@@ -594,7 +595,7 @@ void geneve_gate_array_device::shift_reg_changed()
 	// The level of the data line is the inverse of the rightmost bit of
 	// the shift register. This means that once the start bit reaches that
 	// position, it will pull down the data line and stop the transfer.
-	m_keyb_conn->data_write_from_mb(1 - (m_keyboard_shift_reg & 1));
+	m_keyb_data(1 - (m_keyboard_shift_reg & 1));
 	m_keyint((m_keyboard_shift_reg & 1)? ASSERT_LINE : CLEAR_LINE);
 	if (m_keyboard_shift_reg & 1)
 		LOGMASKED(LOG_KEYBOARD, "Scan code complete; raise interrupt, hold down data line\n");
@@ -1082,6 +1083,8 @@ int geneve_gate_array_device::get_prefix(int lines)
 void geneve_gate_array_device::device_start()
 {
 	m_keyint.resolve_safe();
+	m_keyb_clk.resolve_safe();
+	m_keyb_data.resolve_safe();
 
 	m_geneve_mode = false;
 	m_direct_mode = true;
@@ -1369,7 +1372,11 @@ void geneve_pal_device::set_ready()
 			  (pin4_9 && m_pin17q && m_pin16q && m_pin15q) ||
 			  !m_pin19;
 
-	if (m_prev_ready != ready_line) LOGMASKED(LOG_WAIT, "READY = %d (%d %d %d %d, %d %d %d, %d %d)\n", ready_line, m_pin14d, m_pin15d, m_pin16d, m_pin17d, m_pin3, m_pin4, m_pin9, m_pin5, m_pin19 );   m_prev_ready = ready_line;
+	if (m_prev_ready != ready_line)
+	{
+		LOGMASKED(LOG_WAIT, "READY = %d (%d %d %d %d, %d %d %d, %d %d)\n", ready_line, m_pin14d, m_pin15d, m_pin16d, m_pin17d, m_pin3, m_pin4, m_pin9, m_pin5, m_pin19);
+		m_prev_ready = ready_line;
+	}
 	m_ready(ready_line);
 }
 
@@ -1520,5 +1527,4 @@ void genmod_decoder_device::device_start()
 	save_item(NAME(m_sndready));
 }
 
-} } } // end namespace bus::ti99::internal
-
+} // end namespace bus::ti99::internal

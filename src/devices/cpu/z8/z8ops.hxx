@@ -325,7 +325,7 @@ void z8_device::decimal_adjust(uint8_t dst)
 		if (flag(C) | (data>0x99)) new_data+=0x60;
 	}
 
-	set_flag_c(new_data & 0x100);
+	set_flag_c(flag(C)|(new_data & 0x100));
 	set_flag_s(new_data & 0x80);
 	new_data &= 0xff;
 	set_flag_z(new_data == 0);

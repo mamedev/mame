@@ -60,9 +60,9 @@ private:
 
 	required_device<nt7534_device> m_lcdc;
 
-	uint8_t m_p0_data;
-	uint8_t m_p1_data;
-	uint8_t m_p3_data;
+	uint8_t m_p0_data = 0xff;
+	uint8_t m_p1_data = 0xff;
+	uint8_t m_p3_data = 0xff;
 };
 
 

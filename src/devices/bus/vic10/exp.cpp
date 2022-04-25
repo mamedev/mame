@@ -29,10 +29,7 @@ DEFINE_DEVICE_TYPE(VIC10_EXPANSION_SLOT, vic10_expansion_slot_device, "vic10_exp
 //-------------------------------------------------
 
 device_vic10_expansion_card_interface::device_vic10_expansion_card_interface(const machine_config &mconfig, device_t &device) :
-	device_interface(device, "vic10exp"),
-	m_lorom(*this, "lorom"),
-	m_exram(*this, "exram"),
-	m_uprom(*this, "uprom")
+	device_interface(device, "vic10exp")
 {
 	m_slot = dynamic_cast<vic10_expansion_slot_device *>(device.owner());
 }
@@ -59,7 +56,7 @@ device_vic10_expansion_card_interface::~device_vic10_expansion_card_interface()
 vic10_expansion_slot_device::vic10_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VIC10_EXPANSION_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_vic10_expansion_card_interface>(mconfig, *this),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	m_write_irq(*this),
 	m_write_res(*this),
 	m_write_cnt(*this),
@@ -82,15 +79,6 @@ void vic10_expansion_slot_device::device_start()
 	m_write_res.resolve_safe();
 	m_write_cnt.resolve_safe();
 	m_write_sp.resolve_safe();
-
-	// inherit bus clock
-	// FIXME: this should be unnecessary as slots pass DERIVED_CLOCK(1, 1) through by default
-	if (clock() == 0)
-	{
-		vic10_expansion_slot_device *root = machine().device<vic10_expansion_slot_device>(VIC10_EXPANSION_SLOT_TAG);
-		assert(root);
-		set_unscaled_clock(root->clock());
-	}
 }
 
 
@@ -133,11 +121,11 @@ image_init_result vic10_expansion_slot_device::call_load()
 					uint8_t *roml = nullptr;
 					uint8_t *romh = nullptr;
 
-					m_card->m_lorom.allocate(roml_size);
-					m_card->m_uprom.allocate(romh_size);
+					m_card->m_lorom = std::make_unique<uint8_t[]>(roml_size);
+					m_card->m_uprom = std::make_unique<uint8_t[]>(romh_size);
 
-					if (roml_size) roml = m_card->m_lorom;
-					if (romh_size) romh = m_card->m_lorom;
+					if (roml_size) roml = m_card->m_lorom.get();
+					if (romh_size) romh = m_card->m_lorom.get();
 
 					cbm_crt_read_data(image_core_file(), roml, romh);
 				}

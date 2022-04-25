@@ -4,12 +4,32 @@
 #include "emu.h"
 #include "ie15.h"
 
-ie15_terminal_device::ie15_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SERIAL_TERMINAL_IE15, tag, owner, clock)
-	, device_rs232_port_interface(mconfig, *this)
-	, m_ie15(*this, "ie15")
+#include "machine/ie15.h"
+
+namespace {
+
+class ie15_terminal_device : public device_t, public device_rs232_port_interface
 {
-}
+public:
+	ie15_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, SERIAL_TERMINAL_IE15, tag, owner, clock)
+		, device_rs232_port_interface(mconfig, *this)
+		, m_ie15(*this, "ie15")
+	{
+	}
+
+	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override { m_ie15->rs232_conn_rxd_w(state); }
+
+protected:
+	virtual void device_start() override { }
+	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+
+private:
+	required_device<ie15_device> m_ie15;
+};
+
 
 void ie15_terminal_device::device_add_mconfig(machine_config &config)
 {
@@ -28,15 +48,6 @@ ioport_constructor ie15_terminal_device::device_input_ports() const
 	return INPUT_PORTS_NAME(ie15_terminal);
 }
 
-WRITE_LINE_MEMBER(ie15_terminal_device::input_txd)
-{
-	m_ie15->rs232_conn_rxd_w(state);
-}
-
-void ie15_terminal_device::device_start()
-{
-}
-
 void ie15_terminal_device::device_reset()
 {
 	output_rxd(1);
@@ -47,4 +58,7 @@ void ie15_terminal_device::device_reset()
 	output_cts(0);
 }
 
-DEFINE_DEVICE_TYPE(SERIAL_TERMINAL_IE15, ie15_terminal_device, "ie15_terminal", "IE15 Terminal")
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(SERIAL_TERMINAL_IE15, device_rs232_port_interface, ie15_terminal_device, "ie15_terminal", "IE15 Terminal")

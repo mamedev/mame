@@ -74,7 +74,7 @@ void iq151_staper_device::device_add_mconfig(machine_config &config)
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void iq151_staper_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void iq151_staper_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_PRINTER)
 		m_ppi->pc2_w(0);

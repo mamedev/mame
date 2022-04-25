@@ -11,7 +11,7 @@ license:CC0
 		<year>1984</year>
 		<publisher>Digital Research Inc.</publisher>
 		<info name="serial" value="1006-1269-00306" />
-		<info name="part" value="MM00027/MM00028" />
+		<info name="partno" value="MM00027/MM00028" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System &amp; Utl. (1)"/>
 			<dataarea name="flop" size="368974">
@@ -31,7 +31,7 @@ license:CC0
 		<year>1983</year>
 		<publisher>MicroPro International</publisher>
 		<info name="serial" value="BC01-0003-01003" />
-		<info name="part" value="MM00013" />
+		<info name="partno" value="MM00013" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="CalcStar"/>
 			<dataarea name="flop" size="368974">
@@ -45,7 +45,7 @@ license:CC0
 		<year>1982</year>
 		<publisher>MicroPro International</publisher>
 		<info name="serial" value="BC01-0004-01003" />
-		<info name="part" value="MM00014" />
+		<info name="partno" value="MM00014" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="DataStar"/>
 			<dataarea name="flop" size="368974">
@@ -71,7 +71,7 @@ license:CC0
 		<year>1982</year>
 		<publisher>MicroPro International</publisher>
 		<info name="serial" value="BC01-0005-01003/BC01-0006-01003" />
-		<info name="part" value="MM00015/MM00018" />
+		<info name="partno" value="MM00015/MM00018" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="ReportStar"/>
 			<dataarea name="flop" size="368974">
@@ -91,7 +91,7 @@ license:CC0
 		<year>1983</year>
 		<publisher>MicroPro International</publisher>
 		<info name="serial" value="BC01-0001-01003/BC01-0002-01003" />
-		<info name="part" value="MM00011/MM00012" />
+		<info name="partno" value="MM00011/MM00012" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="WordStar &amp; MailMerge"/>
 			<dataarea name="flop" size="368974">

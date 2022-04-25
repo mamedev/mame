@@ -56,7 +56,7 @@ Notes:
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6809/hd6309.h"
 #include "machine/watchdog.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -67,7 +67,7 @@ WRITE_LINE_MEMBER(rockrage_state::vblank_irq)
 		m_maincpu->set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
-WRITE8_MEMBER(rockrage_state::rockrage_bankswitch_w)
+void rockrage_state::rockrage_bankswitch_w(uint8_t data)
 {
 	/* bits 4-6 = bank number */
 	m_rombank->set_entry((data & 0x70) >> 4);
@@ -79,18 +79,18 @@ WRITE8_MEMBER(rockrage_state::rockrage_bankswitch_w)
 	/* other bits unknown */
 }
 
-WRITE8_MEMBER(rockrage_state::rockrage_sh_irqtrigger_w)
+void rockrage_state::rockrage_sh_irqtrigger_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
-READ8_MEMBER(rockrage_state::rockrage_VLM5030_busy_r)
+uint8_t rockrage_state::rockrage_VLM5030_busy_r()
 {
 	return (m_vlm->bsy() ? 1 : 0);
 }
 
-WRITE8_MEMBER(rockrage_state::rockrage_speech_w)
+void rockrage_state::rockrage_speech_w(uint8_t data)
 {
 	/* bit2 = data bus enable */
 	m_vlm->rst((data >> 1) & 0x01);
@@ -152,7 +152,9 @@ static INPUT_PORTS_START( rockrage )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW2:3" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) ) // Actually noted as "テーブル" / "Table". Set here as initial in original Japanese version
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, "30k & Every 70k" )
 	PORT_DIPSETTING(    0x00, "40k & Every 80k" )
@@ -188,7 +190,9 @@ static INPUT_PORTS_START( rockrage )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x80, 0x80, "Sound Mode" )            PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x80, DEF_STR( Stereo ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Mono ) )
 
 	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)

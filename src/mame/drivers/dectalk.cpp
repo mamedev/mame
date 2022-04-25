@@ -245,7 +245,6 @@ dgc (dg(no!spam)cx@mac.com)
 #include "machine/mc68681.h"
 #include "machine/x2212.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -271,33 +270,32 @@ private:
 	};
 
 	// input fifo, between m68k and tms32010
-	uint16_t m_infifo[32]; // technically eight 74LS224 4bit*16stage FIFO chips, arranged as a 32 stage, 16-bit wide fifo
-	uint8_t m_infifo_count;
-	uint8_t m_infifo_tail_ptr;
-	uint8_t m_infifo_head_ptr;
+	uint16_t m_infifo[32]{}; // technically eight 74LS224 4bit*16stage FIFO chips, arranged as a 32 stage, 16-bit wide fifo
+	uint8_t m_infifo_count = 0;
+	uint8_t m_infifo_tail_ptr = 0;
+	uint8_t m_infifo_head_ptr = 0;
 	// output fifo, between tms32010 and 10khz sample latch for dac
-	uint16_t m_outfifo[16]; // technically three 74LS224 4bit*16stage FIFO chips, arranged as a 16 stage, 12-bit wide fifo
-	uint8_t m_outfifo_count;
-	uint8_t m_outfifo_tail_ptr;
-	uint8_t m_outfifo_head_ptr;
-	bool m_infifo_semaphore; // latch for status of output fifo, d-latch 74ls74 @ E64 'lower half'
-	bool m_spc_error_latch; // latch for error status of speech dsp, d-latch 74ls74 @ E64 'upper half'
-	uint8_t m_m68k_spcflags_latch; // latch for initializing the speech dsp, d-latch 74ls74 @ E29 'lower half', AND latch for spc irq enable, d-latch 74ls74 @ E29 'upper half'; these are stored in bits 0 and 6 respectively, the rest of the bits stored here MUST be zeroed! // TODO: Split this into two separate booleans!
-	uint8_t m_m68k_tlcflags_latch; // latch for telephone interface stuff, d-latches 74ls74 @ E93 'upper half' and @ 103 'upper and lower halves' // TODO: Split this into three separate booleans!
-	bool m_simulate_outfifo_error; // simulate an error on the outfifo, which does something unusual to the dsp latches
-	bool m_tlc_tonedetect;
-	bool m_tlc_ringdetect;
-	uint8_t m_tlc_dtmf; // dtmf holding reg
-	uint8_t m_duart_inport; // low 4 bits of duart input
-	uint8_t m_duart_outport; // most recent duart output
-	bool m_hack_self_test_is_second_read; // temp variable for hack below
+	uint16_t m_outfifo[16]{}; // technically three 74LS224 4bit*16stage FIFO chips, arranged as a 16 stage, 12-bit wide fifo
+	uint8_t m_outfifo_count = 0;
+	uint8_t m_outfifo_tail_ptr = 0;
+	uint8_t m_outfifo_head_ptr = 0;
+	bool m_infifo_semaphore = false; // latch for status of output fifo, d-latch 74ls74 @ E64 'lower half'
+	bool m_spc_error_latch = false; // latch for error status of speech dsp, d-latch 74ls74 @ E64 'upper half'
+	uint8_t m_m68k_spcflags_latch = 0; // latch for initializing the speech dsp, d-latch 74ls74 @ E29 'lower half', AND latch for spc irq enable, d-latch 74ls74 @ E29 'upper half'; these are stored in bits 0 and 6 respectively, the rest of the bits stored here MUST be zeroed! // TODO: Split this into two separate booleans!
+	uint8_t m_m68k_tlcflags_latch = 0; // latch for telephone interface stuff, d-latches 74ls74 @ E93 'upper half' and @ 103 'upper and lower halves' // TODO: Split this into three separate booleans!
+	bool m_simulate_outfifo_error = 0; // simulate an error on the outfifo, which does something unusual to the dsp latches
+	bool m_tlc_tonedetect = false;
+	bool m_tlc_ringdetect = false;
+	uint8_t m_tlc_dtmf = 0; // dtmf holding reg
+	uint8_t m_duart_inport = 0; // low 4 bits of duart input
+	uint8_t m_duart_outport = 0; // most recent duart output
+	bool m_hack_self_test_is_second_read = false; // temp variable for hack below
 
 	required_device<m68000_base_device> m_maincpu;
 	required_device<tms32010_device> m_dsp;
 	required_device<scn2681_device> m_duart;
 	required_device<x2212_device> m_nvram;
 	required_device<dac_word_interface> m_dac;
-	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_txa);
 	uint8_t duart_input();
 	void duart_output(uint8_t data);
@@ -317,7 +315,7 @@ private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	TIMER_CALLBACK_MEMBER(outfifo_read_cb);
-	emu_timer *m_outfifo_read_timer;
+	emu_timer *m_outfifo_read_timer = nullptr;
 	void outfifo_check();
 	void clear_all_fifos();
 	void dsp_semaphore_w(bool state);
@@ -328,16 +326,11 @@ private:
 	void tms32010_io(address_map &map);
 	void tms32010_mem(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 
 /* 2681 DUART */
-WRITE_LINE_MEMBER(dectalk_state::duart_irq_handler)
-{
-	m_maincpu->set_input_line(M68K_IRQ_6, state);
-}
-
 uint8_t dectalk_state::duart_input()
 {
 	uint8_t data = 0;
@@ -846,12 +839,12 @@ INPUT_PORTS_END
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
-void dectalk_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void dectalk_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_OUTFIFO_READ:
-		outfifo_read_cb(ptr, param);
+		outfifo_read_cb(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in dectalk_state::device_timer");
@@ -881,7 +874,7 @@ void dectalk_state::dectalk(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dectalk_state::m68k_mem);
 
 	SCN2681(config, m_duart, XTAL(3'686'400)); // MC2681 DUART ; Y3 3.6864MHz xtal */
-	m_duart->irq_cb().set(FUNC(dectalk_state::duart_irq_handler));
+	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_6);
 	m_duart->a_tx_cb().set(FUNC(dectalk_state::duart_txa));
 	m_duart->b_tx_cb().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_duart->inport_cb().set(FUNC(dectalk_state::duart_input));
@@ -905,9 +898,6 @@ void dectalk_state::dectalk(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	AD7541(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.9); // ad7541.e107 (E88 10KHz OSC, handled by timer)
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* Y2 is a 3.579545 MHz xtal for the dtmf decoder chip */
 

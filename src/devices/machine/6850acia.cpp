@@ -2,7 +2,7 @@
 // copyright-holders:smf
 /*********************************************************************
 
-    6850acia.c
+    6850acia.cpp
 
     6850 ACIA code
 
@@ -92,6 +92,7 @@ acia6850_device::acia6850_device(const machine_config &mconfig, device_type type
 	, m_irq(0)
 	, m_txc(0)
 	, m_txd(0)
+	, m_tx_state(0)
 	, m_tx_counter(0)
 	, m_tx_irq_enable(false)
 	, m_rxc(0)

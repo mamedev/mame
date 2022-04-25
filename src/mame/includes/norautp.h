@@ -58,7 +58,7 @@ protected:
 private:
 	DECLARE_WRITE_LINE_MEMBER(ppi2_obf_w);
 	TIMER_CALLBACK_MEMBER(ppi2_ack);
-	DECLARE_READ8_MEMBER(test2_r);
+	uint8_t test2_r();
 	void mainlamps_w(uint8_t data);
 	void soundlamps_w(uint8_t data);
 	void counterlamps_w(uint8_t data);

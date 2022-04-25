@@ -622,7 +622,7 @@ license:CC0
 			<feature name="exrom" value="1" />
 
 			<dataarea name="romh" size="0x4000">
-				<rom name="251476" size="0x4000" crc="c741fa77" sha1="2044028d42def60df79b8ab57d005721b41190fa"/>
+				<rom name="251476-01.u6" size="0x4000" crc="c741fa77" sha1="2044028d42def60df79b8ab57d005721b41190fa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1837,7 +1837,7 @@ license:CC0
 	</software>
 
 	<software name="blueprnt">
-		<description>Blue-Print</description>
+		<description>Blueprint</description> <!-- spelt 'Blueprint' on cart and 'Blueprint', 'Blue-Print' and 'Blue - - Print' on various game screens -->
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64612" />
@@ -1845,7 +1845,8 @@ license:CC0
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="blue print (1983)(commodore).80" size="0x4000" crc="b929eb5c" sha1="0acd28c13074ab0af4e6437ae4612cecad5c3133"/>
+				<rom name="317022-01.u1" size="0x2000" crc="09d33a92" sha1="b836ee02f19067c7e83be8dc882da92480d031ab"/>
+				<rom name="317023-01.u2" size="0x2000" crc="afbef1dd" sha1="8ca791e866da70983dc521b37b33cba98882da92" offset="0x2000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2188,7 +2189,7 @@ license:CC0
 	</software>
 
 	<software name="dragnden">
-		<description>Dragon's Den</description>
+		<description>Dragonsden</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64???" />
@@ -2196,7 +2197,8 @@ license:CC0
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="dragon's den (1983)(commodore).80" size="0x4000" crc="447e9930" sha1="432a1fe70a975b5ad1bee1c0138b3672df7b1899"/>
+				<rom name="317012-02.u1" size="0x2000" crc="b1a5fdf9" sha1="7978c4b949da3a798d7bfabcd3acb10621defc2b"/>
+				<rom name="317013-02.u2" size="0x2000" crc="29a43ebc" sha1="ca54f0a780d0cff2ba6c0891e1023dee6dc47766" offset="0x2000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2307,7 +2309,7 @@ license:CC0
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="frog master (1983)(commodore).80" size="0x2000" crc="8bf36a9f" sha1="f92e1b04b04b6bf193739bc45384aa2655ca81b0"/>
+				<rom name="901295-01.u1" size="0x2000" crc="8bf36a9f" sha1="f92e1b04b04b6bf193739bc45384aa2655ca81b0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2388,7 +2390,8 @@ license:CC0
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="gorf (1983)(commodore).80" size="0x4000" crc="33812a19" sha1="4d24d5ed3d8b38235d9ae5965b675ffece0981cc"/>
+				<rom name="317015-01.u1" size="0x2000" crc="7fad7739" sha1="6c759036a7113cf44fc9f4c069105780305fcc01"/>
+				<rom name="317014-01.u2" size="0x2000" crc="08cf1535" sha1="5428fe6532f9bb9be873af1a318ad564a7fc92e3" offset="0x2000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2401,8 +2404,8 @@ license:CC0
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
-			<dataarea name="roml" size="0x2000">
-				<rom name="gridrunner (1983)(hesware).80" size="0x2000" crc="12f36a09" sha1="218625325984ebdef88a5b56bc81bcff229d61db"/>
+			<dataarea name="roml" size="0x1000">
+				<rom name="hn462732p.u1" size="0x1000" crc="43b1df18" sha1="7fccb49a2557b50be7244945dd7031e411789089"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2480,7 +2483,7 @@ license:CC0
 		<description>International Soccer</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
-		<info name="serial" value="C-64???" />
+		<info name="serial" value="C-64635" />
 		<!--
 		ASSY 250423
 		FAB 251463
@@ -2849,14 +2852,14 @@ license:CC0
 	</software>
 
 	<software name="minfats">
-		<description>Minnesota Fat's Pool Challenger</description>
+		<description>Minnesota Fat's Pool Challenger</description> <!-- spelt Minnesota Fats´ Pool Challenger on cart -->
 		<year>1983</year>
 		<publisher>HesWare</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="minnesota fat's pool challenger (1983)(hesware).80" size="0x2000" crc="7f2d8a46" sha1="44f8f8ee6238829bca8ca2d412b3f238159377a4"/>
+				<rom name="mfpc.u1" size="0x2000" crc="7f2d8a46" sha1="44f8f8ee6238829bca8ca2d412b3f238159377a4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3069,7 +3072,7 @@ license:CC0
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="omega race (1982)(commodore).80" size="0x2000" crc="b6e99657" sha1="7931433edba8e9ca1ea85b84351cea0760f7aabf"/>
+				<rom name="m5l2764k.u1" size="0x2000" crc="b6e99657" sha1="7931433edba8e9ca1ea85b84351cea0760f7aabf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3096,8 +3099,8 @@ license:CC0
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
-			<dataarea name="roml" size="0x4000">
-				<rom name="paint brush (1983)(hesware).80" size="0x4000" crc="4c880095" sha1="88c0faff4617270d3d6ff0e8084b796abe94f31b"/>
+			<dataarea name="roml" size="0x1000">
+				<rom name="hn462532p.u2" size="0x1000" crc="c26dab1a" sha1="5a06123516e31c6e4ca73e621dff76edffd6285a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3517,6 +3520,7 @@ license:CC0
 		<description>Rootin' Tootin'</description>
 		<year>1983</year>
 		<publisher>HesWare</publisher>
+		<info name="serial" value="C529" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3638,12 +3642,13 @@ license:CC0
 		<description>Solar Fox</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
-		<info name="serial" value="C-64???" />
+		<info name="serial" value="C-64619" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="solar fox (1983)(commodore).80" size="0x4000" crc="99afd39f" sha1="ebf948b3b88f8ee347b8647ea69bdc60f8771dcd"/>
+				<rom name="317031-01.u1" size="0x2000" crc="3d346f0e" sha1="21b859e5716f6b0dea13773a8250673c70586c36"/>
+				<rom name="317032-01.u2" size="0x2000" crc="79481cc4" sha1="bd9c239e38f97afbadcf9d94b4357a61bd6ed2ac" offset="0x2000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3818,7 +3823,8 @@ license:CC0
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="story machine (1983)(spinnaker).80" size="0x4000" crc="1a6a8a2d" sha1="4800a7815d91b1703f647140e8578f8e34d0ca20"/>
+				<rom name="2764.u1" size="0x2000" crc="538a8ebc" sha1="8917f59cea45b3408e0c032ae7edf72266435019"/>
+				<rom name="2764.u2" size="0x2000" crc="f46075ae" sha1="186565c0d5d0877b5c0e91334899f2ceea7ce435" offset="0x2000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3832,7 +3838,7 @@ license:CC0
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="super smash (1983)(commodore).80" size="0x2000" crc="13c7d30f" sha1="0b282a187766b457395a3e287e826664c7000cb8"/>
+				<rom name="325428-01.u1" size="0x2000" crc="13c7d30f" sha1="0b282a187766b457395a3e287e826664c7000cb8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4062,12 +4068,13 @@ license:CC0
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<info name="developer" value="Camelot" />
-		<info name="serial" value="C-64???" />
+		<info name="serial" value="C-64636" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="viduzzles - computerized jigsaw puzzles (1983)(commodore).80" size="0x4000" crc="f062806b" sha1="0a19ed2bd40fc3933e707f3b725edfe75ce68abd"/>
+				<rom name="317029-01.u1" size="0x2000" crc="d99cedb0" sha1="1c10bf9cbf422281e2cb7553c82a3b7b0e88303b"/>
+				<rom name="317030-01.u2" size="0x2000" crc="d4fddb36" sha1="92ba45c849373670cd9c23c7314a04e24bffda8b" offset="0x2000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4110,7 +4117,8 @@ license:CC0
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="wizard of wor (1984)(commodore).80" size="0x4000" crc="2717b789" sha1="1dc18920c9c3869f321da3fec1e29e7483487808"/>
+				<rom name="317010-01.u1" size="0x2000" crc="38e12a7e" sha1="0baba549736c46c77479c2823421124ec70e177e"/>
+				<rom name="317011-01.u2" size="0x2000" crc="23f7cbe0" sha1="a8fa2e33be937bbe411dc3f28235fb1242c70641" offset="0x2000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5096,14 +5104,15 @@ license:CC0
 	</software>
 
 	<software name="finadv">
-		<description>The Financial Advisor</description>
+		<description>Financial Advisor</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
+		<info name="serial" value="C-64228" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="financial advisor (1983)(commodore).80" size="0x2000" crc="cb1e6a4a" sha1="2da69234b4d60ae41453f8f6dcc118539f715267"/>
+				<rom name="317026-01.u1" size="0x2000" crc="cb1e6a4a" sha1="2da69234b4d60ae41453f8f6dcc118539f715267"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5156,8 +5165,8 @@ license:CC0
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
-			<dataarea name="roml" size="0x2000">
-				<rom name="hes mon 64 (1983)(hesware).80" size="0x2000" crc="fdcdc0a4" sha1="1055bd169c0de0b5ff0f351eaad0a0d6a159bd31"/>
+			<dataarea name="roml" size="0x1000">
+				<rom name="hesmon.u1" size="0x1000" crc="cc0f6ab4" sha1="0014a7c9cd2343b98d3e6f2a4cfb07b77ae96ac2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5288,15 +5297,16 @@ license:CC0
 		<description>Simons' BASIC</description>
 		<year>198?</year>
 		<publisher>Commodore</publisher>
+		<info name="serial" value="C-64108" />
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="simons_basic" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="317008-02" size="0x2000" crc="3117d4ee" sha1="9a67cc6d01939eae6f9fd141a6d963259820335d"/>
+				<rom name="317008-02.u2" size="0x2000" crc="3117d4ee" sha1="9a67cc6d01939eae6f9fd141a6d963259820335d"/>
 			</dataarea>
 			<dataarea name="romh" size="0x2000">
-				<rom name="317009-02" size="0x2000" crc="23f1bd02" sha1="2a103fb2f5f2895af79e235c75393e96d213eaa9"/>
+				<rom name="317009-02.u1" size="0x2000" crc="23f1bd02" sha1="2a103fb2f5f2895af79e235c75393e96d213eaa9"/>
 			</dataarea>
 		</part>
 	</software>

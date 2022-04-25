@@ -36,7 +36,7 @@
     Dragon Quest - Monster Battle Road
     Dragon Quest - Monster Battle Road II Legends
     Gigawing Generations
-    Goketsuji Ichizoku: Matsuri Senzo Kuyou
+    Gouketsuji Ichizoku: Senzo Kuyou
     Harakari Professional Baseball
     Homura
     King Of Jurassic
@@ -336,7 +336,7 @@ GAME( 2006, shikiga3,  0,    taito_type_x, taito_type_x, taito_type_x_state, emp
 GAME( 2007, raiden4,   0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "MOSS / Seibu Kaihatsu", "Raiden IV (v1.00J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2008, kof98um,   0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "SNK", "The King of Fighters '98: Ultimate Match (v1.00)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2008, trbwtchs,  0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Adventure Planning Service/Studio SiestA", "Trouble Witches AC (v1.00J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2009, goketsuj,  0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Atlus", "Goketsuji Ichizoku: Matsuri Senzo Kuyou (v200906230)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2009, goketsuj,  0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Atlus", "Gouketsuji Ichizoku: Senzo Kuyou (v200906230)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2010, kofskyst,  0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Moss / SNK Playmore", "KOF Sky Stage (v1.00J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 

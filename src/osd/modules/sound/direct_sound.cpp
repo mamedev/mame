@@ -359,7 +359,7 @@ void sound_direct_sound::update_audio_stream(
 void sound_direct_sound::set_mastervolume(int attenuation)
 {
 	// clamp the attenuation to 0-32 range
-	attenuation = std::max(std::min(attenuation, 0), -32);
+	attenuation = std::clamp(attenuation, -32, 0);
 
 	// set the master volume
 	if (m_stream_buffer)
@@ -428,7 +428,8 @@ HRESULT sound_direct_sound::dsound_init()
 		stream_format.nAvgBytesPerSec   = stream_format.nSamplesPerSec * stream_format.nBlockAlign;
 
 		// compute the buffer size based on the output sample rate
-		DWORD stream_buffer_size = stream_format.nSamplesPerSec * stream_format.nBlockAlign * m_audio_latency / 10;
+		int audio_latency = std::max(m_audio_latency, 1);
+		DWORD stream_buffer_size = stream_format.nSamplesPerSec * stream_format.nBlockAlign * audio_latency / 10;
 		stream_buffer_size = std::max(DWORD(1024), (stream_buffer_size / 1024) * 1024);
 
 		LOG(("stream_buffer_size = %u\n", (unsigned)stream_buffer_size));

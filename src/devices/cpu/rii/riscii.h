@@ -56,6 +56,18 @@ public:
 		RII_VOCON
 	};
 
+	enum
+	{
+		PA0_LINE = 0,
+		PA1_LINE,
+		PA2_LINE,
+		PA3_LINE,
+		PA4_LINE,
+		PA5_LINE,
+		PA6_LINE,
+		PA7_LINE
+	};
+
 	// callback configuration
 	auto in_porta_cb() { return m_porta_in_cb.bind(); }
 	auto in_portb_cb() { return m_port_in_cb[0].bind(); }
@@ -173,6 +185,9 @@ protected:
 	void sprm_w(u8 data);
 	u8 sprh_r();
 	void sprh_w(u8 data);
+	void timer0_reload();
+	TIMER_CALLBACK_MEMBER(timer0);
+	u16 timer0_count() const;
 	u8 trl0l_r();
 	void trl0l_w(u8 data);
 	u8 trl0h_r();
@@ -264,6 +279,7 @@ private:
 	void execute_undef(u16 opcode);
 	void execute_cycle1(u16 opcode);
 	void execute_tbrd(u32 ptr);
+	void idle_wakeup();
 
 	// interrupt helpers
 	bool interrupt_active() const;
@@ -281,7 +297,8 @@ private:
 		EXEC_L0CALL, EXEC_L1CALL, EXEC_L2CALL, EXEC_L3CALL,
 		EXEC_L4CALL, EXEC_L5CALL, EXEC_L6CALL, EXEC_L7CALL,
 		EXEC_L8CALL, EXEC_L9CALL, EXEC_LACALL, EXEC_LBCALL,
-		EXEC_LCCALL, EXEC_LDCALL, EXEC_LECALL, EXEC_LFCALL
+		EXEC_LCCALL, EXEC_LDCALL, EXEC_LECALL, EXEC_LFCALL,
+		EXEC_IDLE
 	};
 
 	// address spaces
@@ -325,6 +342,7 @@ private:
 	u8 m_port_dcr[6];
 	u8 m_port_control[2];
 	u8 m_stbcon;
+	u8 m_pa;
 	u8 m_painten;
 	u8 m_paintsta;
 	u8 m_pawake;
@@ -344,9 +362,10 @@ private:
 	u8 m_tr01con;
 	u8 m_tr2con;
 	u8 m_trlir;
-	u8 m_sfcr;
+	emu_timer *m_timer0;
 
 	// synthesizer state
+	u8 m_sfcr;
 	u32 m_add[4];
 	u8 m_env[4];
 	u8 m_mtcon[4];

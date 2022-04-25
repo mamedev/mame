@@ -176,7 +176,7 @@ Notes:
     U18: CY7C63513-PVC 8-bit RISC Microcontroller @12MHz (6MHz OSC)
     U19: DS14185WM RS-232 Interface IC
     U20: PC16550DV UART Interface IC
-    U21: Oscilator 3.6864 MHz
+    U21: Oscillator 3.6864 MHz
     U22: HC04 Hex Inverter
     Y1: Crystal/XTAL 6.000 MHz
 
@@ -254,6 +254,9 @@ Notes:
 #include "machine/idectrl.h"
 #include "video/pc_vga.h"
 
+
+namespace {
+
 class midqslvr_state : public pcat_base_state
 {
 public:
@@ -264,6 +267,10 @@ public:
 
 	void midqslvr(machine_config &config);
 	void graphite(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	std::unique_ptr<uint32_t[]> m_bios_ram;
@@ -285,8 +292,6 @@ private:
 	void bios_ext4_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	void intel82439tx_init();
 	void midqslvr_io(address_map &map);
 	void midqslvr_map(address_map &map);
@@ -685,6 +690,10 @@ ROM_START( hydrthnd )
 	ROM_REGION32_LE(0x80000, "bios", 0)
 	ROM_LOAD( "lh28f004sct.u8b1", 0x000000, 0x080000, CRC(ab04a343) SHA1(ba77933400fe470f45ab187bc0d315922caadb12) )
 
+	ROM_REGION( 0x8000, "video_bios", ROMREGION_ERASEFF ) // TODO: Voodoo 2 has no bios, to be removed once the driver is updated not to look for this region
+//  ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
+//  ROM_CONTINUE(                                 0x0001, 0x4000 )
+
 	ROM_REGION( 0x2000, "iocpu", 0 )   /* Diego board CY7C63513 MCU code */
 	ROM_LOAD( "diego.u8", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
 
@@ -695,6 +704,10 @@ ROM_END
 ROM_START( offrthnd )
 	ROM_REGION32_LE(0x80000, "bios", 0)
 	ROM_LOAD( "lh28f004sct.u8b1", 0x000000, 0x080000, CRC(ab04a343) SHA1(ba77933400fe470f45ab187bc0d315922caadb12) )
+
+	ROM_REGION( 0x8000, "video_bios", ROMREGION_ERASEFF ) // TODO: Voodoo 2 has no bios, to be removed once the driver is updated not to look for this region
+//  ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
+//  ROM_CONTINUE(                                 0x0001, 0x4000 )
 
 	ROM_REGION( 0x2000, "iocpu", 0 )   /* Magicbus board CY7C63513 MCU code */
 	ROM_LOAD( "magicbus.u18", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
@@ -707,6 +720,10 @@ ROM_START( arctthnd )
 	ROM_REGION32_LE(0x80000, "bios", ROMREGION_ERASEFF)
 	ROM_LOAD( "m29f002bt.u6", 0x040000, 0x040000, CRC(012c9290) SHA1(cdee6f19d5e5ea5bb1dd6a5ec397ac70b3452790) )
 
+	ROM_REGION( 0x8000, "video_bios", ROMREGION_ERASEFF ) // TODO: Voodoo 2 has no bios, to be removed once the driver is updated not to look for this region
+//  ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
+//  ROM_CONTINUE(                                 0x0001, 0x4000 )
+
 	ROM_REGION( 0x2000, "iocpu", 0 )   /* Substitute board 87C552 MCU code */
 	ROM_LOAD( "87c552.bin", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
 
@@ -717,6 +734,10 @@ ROM_END
 ROM_START( ultarctc )
 	ROM_REGION32_LE(0x80000, "bios", ROMREGION_ERASEFF)
 	ROM_LOAD( "m29f002bt.u6", 0x040000, 0x040000, CRC(012c9290) SHA1(cdee6f19d5e5ea5bb1dd6a5ec397ac70b3452790) )
+
+	ROM_REGION( 0x8000, "video_bios", ROMREGION_ERASEFF ) // TODO: Voodoo 2 has no bios, to be removed once the driver is updated not to look for this region
+//  ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
+//  ROM_CONTINUE(                                 0x0001, 0x4000 )
 
 	ROM_REGION( 0x2000, "iocpu", 0 )   /* Substitute board 87C552 MCU code */
 	ROM_LOAD( "87c552.bin", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
@@ -732,6 +753,10 @@ ROM_START( ultarctcup )
 	ROM_REGION32_LE(0x80000, "bios", ROMREGION_ERASEFF)
 	ROM_LOAD( "m29f002bt.u6", 0x040000, 0x040000, CRC(012c9290) SHA1(cdee6f19d5e5ea5bb1dd6a5ec397ac70b3452790) )
 
+	ROM_REGION( 0x8000, "video_bios", ROMREGION_ERASEFF ) // TODO: Voodoo 2 has no bios, to be removed once the driver is updated not to look for this region
+//  ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
+//  ROM_CONTINUE(                                 0x0001, 0x4000 )
+
 	ROM_REGION( 0x2000, "iocpu", 0 )   /* Substitute board 87C552 MCU code */
 	ROM_LOAD( "87c552.bin", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
 
@@ -746,12 +771,15 @@ ROM_START( ultarctcup )
 
 ROM_END
 
+} // Anonymous namespace
+
+
 // there are almost certainly multiple versions of these; updates were offered on floppy disk.  The version numbers for the existing CHDs are unknown.
-GAME(1999, hydrthnd,    0,        midqslvr, at_keyboard, midqslvr_state, empty_init, ROT0, "Midway Games", "Hydro Thunder", MACHINE_IS_SKELETON)
+GAME(1999, hydrthnd,    0,        midqslvr, 0, midqslvr_state, empty_init, ROT0, "Midway Games", "Hydro Thunder", MACHINE_IS_SKELETON)
 
-GAME(2000, offrthnd,    0,        midqslvr, at_keyboard, midqslvr_state, empty_init, ROT0, "Midway Games", "Offroad Thunder", MACHINE_IS_SKELETON)
+GAME(2000, offrthnd,    0,        midqslvr, 0, midqslvr_state, empty_init, ROT0, "Midway Games", "Offroad Thunder", MACHINE_IS_SKELETON)
 
-GAME(2001, arctthnd,    0,        graphite, at_keyboard, midqslvr_state, empty_init, ROT0, "Midway Games", "Arctic Thunder (v1.002)", MACHINE_IS_SKELETON)
+GAME(2001, arctthnd,    0,        graphite, 0, midqslvr_state, empty_init, ROT0, "Midway Games", "Arctic Thunder (v1.002)", MACHINE_IS_SKELETON)
 
-GAME(2001, ultarctc,    0,        graphite, at_keyboard, midqslvr_state, empty_init, ROT0, "Midway Games", "Ultimate Arctic Thunder", MACHINE_IS_SKELETON)
-GAME(2004, ultarctcup,  ultarctc, graphite, at_keyboard, midqslvr_state, empty_init, ROT0, "Midway Games", "Ultimate Arctic Thunder Update CD ver 1.950 (5/3/04)", MACHINE_IS_SKELETON)
+GAME(2001, ultarctc,    0,        graphite, 0, midqslvr_state, empty_init, ROT0, "Midway Games", "Ultimate Arctic Thunder", MACHINE_IS_SKELETON)
+GAME(2004, ultarctcup,  ultarctc, graphite, 0, midqslvr_state, empty_init, ROT0, "Midway Games", "Ultimate Arctic Thunder Update CD ver 1.950 (5/3/04)", MACHINE_IS_SKELETON)

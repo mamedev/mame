@@ -51,7 +51,7 @@ protected:
 	virtual void eop_w(int state) override;
 
 private:
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	uint8_t fdc_input_r();
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );

@@ -67,14 +67,14 @@ WRITE_LINE_MEMBER( vertigo_state::adc_eoc_w )
 }
 
 
-READ16_MEMBER(vertigo_state::vertigo_io_convert)
+uint16_t vertigo_state::vertigo_io_convert(offs_t offset)
 {
 	m_adc->address_offset_start_w(offset, 0);
 	return 0;
 }
 
 
-READ16_MEMBER(vertigo_state::vertigo_coin_r)
+uint16_t vertigo_state::vertigo_coin_r()
 {
 	update_irq_encoder(INPUT_LINE_IRQ6, CLEAR_LINE);
 	return (ioport("COIN")->read());
@@ -96,7 +96,7 @@ INTERRUPT_GEN_MEMBER(vertigo_state::vertigo_interrupt)
  *
  *************************************/
 
-WRITE16_MEMBER(vertigo_state::vertigo_wsot_w)
+void vertigo_state::vertigo_wsot_w(uint16_t data)
 {
 	/* Reset sound cpu */
 	if ((data & 2) == 0)
@@ -118,14 +118,14 @@ TIMER_CALLBACK_MEMBER(vertigo_state::sound_command_w)
 }
 
 
-WRITE16_MEMBER(vertigo_state::vertigo_audio_w)
+void vertigo_state::vertigo_audio_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(vertigo_state::sound_command_w),this), data & 0xff);
 }
 
 
-READ16_MEMBER(vertigo_state::vertigo_sio_r)
+uint16_t vertigo_state::vertigo_sio_r()
 {
 	return m_custom->exidy440_sound_command_ack() ? 0xfc : 0xfd;
 }
@@ -170,7 +170,7 @@ void vertigo_state::machine_reset()
  *
  *************************************/
 
-WRITE16_MEMBER(vertigo_state::vertigo_motor_w)
+void vertigo_state::vertigo_motor_w(uint16_t data)
 {
 	/* Motor controller interface. Not emulated. */
 }

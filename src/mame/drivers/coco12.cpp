@@ -26,25 +26,14 @@
 #include "emu.h"
 #include "includes/coco12.h"
 
-#include "bus/coco/coco_dcmodem.h"
-#include "bus/coco/coco_dwsock.h"
-#include "bus/coco/coco_fdc.h"
-#include "bus/coco/coco_gmc.h"
-#include "bus/coco/coco_multi.h"
-#include "bus/coco/coco_orch90.h"
-#include "bus/coco/coco_pak.h"
-#include "bus/coco/coco_psg.h"
-#include "bus/coco/coco_rs232.h"
-#include "bus/coco/coco_ssc.h"
-#include "bus/coco/coco_ram.h"
+#include "bus/coco/cococart.h"
 #include "bus/coco/coco_t4426.h"
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6809/hd6309.h"
 #include "imagedev/cassette.h"
-#include "sound/volt_reg.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/coco_cas.h"
@@ -106,6 +95,13 @@ void coco12_state::coco_ff60(address_map &map)
 	map(0x00, 0x7f).rw(FUNC(coco12_state::ff60_read), FUNC(coco12_state::ff60_write));
 }
 
+void coco12_state::ms1600_rom2(address_map &map)
+{
+	// $C000-$FEFF
+	map(0x0000, 0x2fff).rw(m_cococart, FUNC(cococart_slot_device::cts_read), FUNC(cococart_slot_device::cts_write));
+	map(0x3000, 0x3eff).rom().region(MAINCPU_TAG, 0x7000).nopw();
+}
+
 
 //**************************************************************************
 //  INPUT PORTS
@@ -149,13 +145,13 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( coco_joystick )
 	PORT_START(JOYSTICK_RX_TAG)
-	PORT_BIT( 0xff, 0x80,  IPT_AD_STICK_X) PORT_NAME("Right Joystick X") PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0x00,0xFF) PORT_CODE_DEC(KEYCODE_4_PAD) PORT_CODE_INC(KEYCODE_6_PAD) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH) PORT_PLAYER(1) PORT_CONDITION(CTRL_SEL_TAG, 0x0f, EQUALS, 0x01)
+	PORT_BIT( 0x3ff, 0x200,  IPT_AD_STICK_X) PORT_NAME("Right Joystick X") PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0,1023) PORT_CODE_DEC(KEYCODE_4_PAD) PORT_CODE_INC(KEYCODE_6_PAD) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH) PORT_PLAYER(1) PORT_CONDITION(CTRL_SEL_TAG, 0x0f, EQUALS, 0x01)
 	PORT_START(JOYSTICK_RY_TAG)
-	PORT_BIT( 0xff, 0x80,  IPT_AD_STICK_Y) PORT_NAME("Right Joystick Y") PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0x00,0xFF) PORT_CODE_DEC(KEYCODE_8_PAD) PORT_CODE_INC(KEYCODE_2_PAD) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH)   PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH)  PORT_PLAYER(1) PORT_CONDITION(CTRL_SEL_TAG, 0x0f, EQUALS, 0x01)
+	PORT_BIT( 0x3ff, 0x200,  IPT_AD_STICK_Y) PORT_NAME("Right Joystick Y") PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0,1023) PORT_CODE_DEC(KEYCODE_8_PAD) PORT_CODE_INC(KEYCODE_2_PAD) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH)   PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH)  PORT_PLAYER(1) PORT_CONDITION(CTRL_SEL_TAG, 0x0f, EQUALS, 0x01)
 	PORT_START(JOYSTICK_LX_TAG)
-	PORT_BIT( 0xff, 0x80,  IPT_AD_STICK_X) PORT_NAME("Left Joystick X") PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0x00,0xFF) PORT_CODE_DEC(KEYCODE_4_PAD) PORT_CODE_INC(KEYCODE_6_PAD) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH) PORT_PLAYER(2) PORT_CONDITION(CTRL_SEL_TAG, 0xf0, EQUALS, 0x10)
+	PORT_BIT( 0x3ff, 0x200,  IPT_AD_STICK_X) PORT_NAME("Left Joystick X") PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0,1023) PORT_CODE_DEC(KEYCODE_4_PAD) PORT_CODE_INC(KEYCODE_6_PAD) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH) PORT_PLAYER(2) PORT_CONDITION(CTRL_SEL_TAG, 0xf0, EQUALS, 0x10)
 	PORT_START(JOYSTICK_LY_TAG)
-	PORT_BIT( 0xff, 0x80,  IPT_AD_STICK_Y) PORT_NAME("Left Joystick Y") PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0x00,0xFF) PORT_CODE_DEC(KEYCODE_8_PAD) PORT_CODE_INC(KEYCODE_2_PAD) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH)   PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH)  PORT_PLAYER(2) PORT_CONDITION(CTRL_SEL_TAG, 0xf0, EQUALS, 0x10)
+	PORT_BIT( 0x3ff, 0x200,  IPT_AD_STICK_Y) PORT_NAME("Left Joystick Y") PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0,1023) PORT_CODE_DEC(KEYCODE_8_PAD) PORT_CODE_INC(KEYCODE_2_PAD) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH)   PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH)  PORT_PLAYER(2) PORT_CONDITION(CTRL_SEL_TAG, 0xf0, EQUALS, 0x10)
 	PORT_START(JOYSTICK_BUTTONS_TAG)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Right Button") PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(JOYCODE_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_PLAYER(1) PORT_CONDITION(CTRL_SEL_TAG, 0x0f, EQUALS, 0x01)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Left Button")  PORT_CHANGED_MEMBER(DEVICE_SELF, coco12_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(JOYCODE_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_PLAYER(2) PORT_CONDITION(CTRL_SEL_TAG, 0xf0, EQUALS, 0x10)
@@ -401,28 +397,16 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  SLOT_INTERFACE_START(coco_cart)
+//  coco_cart
 //-------------------------------------------------
 
 void coco_cart(device_slot_interface &device)
 {
-	device.option_add("fdc", COCO_FDC);
-	device.option_add("fdcv11", COCO_FDC_V11);
-	device.option_add("cc2hdb1", COCO2_HDB1);
-	device.option_add("cc3hdb1", COCO3_HDB1);
-	device.option_add("cp450_fdc", CP450_FDC);
-	device.option_add("cd6809_fdc", CD6809_FDC);
-	device.option_add("rs232", COCO_RS232);
-	device.option_add("dcmodem", COCO_DCMODEM);
-	device.option_add("orch90", COCO_ORCH90);
-	device.option_add("ssc", COCO_SSC);
-	device.option_add("ram", COCO_PAK_RAM);
-	device.option_add("games_master", COCO_PAK_GMC);
-	device.option_add("banked_16k", COCO_PAK_BANKED);
-	device.option_add("pak", COCO_PAK);
-	device.option_add("multi", COCO_MULTIPAK);
-	device.option_add("ccpsg", COCO_PSG);
+	coco_cart_add_basic_devices(device);
+	coco_cart_add_fdcs(device);
+	coco_cart_add_multi_pak(device);
 }
+
 
 //-------------------------------------------------
 //  SLOT_INTERFACE_START(t4426_cart)
@@ -443,12 +427,9 @@ void coco_state::coco_sound(machine_config &config)
 
 	// 6-bit D/A: R10-15 = 10K, 20K, 40.2K, 80.6K, 162K, 324K (according to parts list); output also controls joysticks
 	DAC_6BIT_BINARY_WEIGHTED(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.125);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "sbs", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "sbs", -1.0, DAC_VREF_NEG_INPUT);
 
 	// Single-bit sound: R22 = 10K
-	DAC_1BIT(config, "sbs", 0).add_route(ALL_OUTPUTS, "speaker", 0.125);
+	DAC_1BIT(config, "sbs", 0).set_output_range(-1, 1).add_route(ALL_OUTPUTS, "speaker", 0.125);
 }
 
 
@@ -459,6 +440,7 @@ void coco_state::coco_sound(machine_config &config)
 void coco_state::coco_floating_map(address_map &map)
 {
 	map(0x0000, 0xFFFF).r(FUNC(coco_state::floating_bus_r));
+	map(0x0000, 0xFFFF).nopw(); /* suppress log warnings */
 }
 
 
@@ -472,9 +454,8 @@ void coco_state::coco_floating(machine_config &config)
 //  DEVICE_INPUT_DEFAULTS_START( printer )
 //-------------------------------------------------
 
-static DEVICE_INPUT_DEFAULTS_START( printer )
+static DEVICE_INPUT_DEFAULTS_START( rs_printer )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
@@ -494,13 +475,17 @@ void coco12_state::coco(machine_config &config)
 	m_maincpu->set_dasm_override(FUNC(coco_state::dasm_override));
 
 	// devices
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, m_firqs).output_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
+
 	pia6821_device &pia0(PIA6821(config, PIA0_TAG, 0));
 	pia0.writepa_handler().set(FUNC(coco_state::pia0_pa_w));
 	pia0.writepb_handler().set(FUNC(coco_state::pia0_pb_w));
+	pia0.tspb_handler().set_constant(0xff);
 	pia0.ca2_handler().set(FUNC(coco_state::pia0_ca2_w));
 	pia0.cb2_handler().set(FUNC(coco_state::pia0_cb2_w));
-	pia0.irqa_handler().set(FUNC(coco_state::pia0_irq_a));
-	pia0.irqb_handler().set(FUNC(coco_state::pia0_irq_b));
+	pia0.irqa_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
+	pia0.irqb_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 
 	pia6821_device &pia1(PIA6821(config, PIA1_TAG, 0));
 	pia1.readpa_handler().set(FUNC(coco_state::pia1_pa_r));
@@ -509,8 +494,8 @@ void coco12_state::coco(machine_config &config)
 	pia1.writepb_handler().set(FUNC(coco_state::pia1_pb_w));
 	pia1.ca2_handler().set(FUNC(coco_state::pia1_ca2_w));
 	pia1.cb2_handler().set(FUNC(coco_state::pia1_cb2_w));
-	pia1.irqa_handler().set(FUNC(coco_state::pia1_firq_a));
-	pia1.irqb_handler().set(FUNC(coco_state::pia1_firq_b));
+	pia1.irqa_handler().set(m_firqs, FUNC(input_merger_device::in_w<0>));
+	pia1.irqb_handler().set(m_firqs, FUNC(input_merger_device::in_w<1>));
 
 	SAM6883(config, m_sam, XTAL(14'318'181), m_maincpu);
 	m_sam->set_addrmap(0, &coco12_state::coco_ram);
@@ -532,14 +517,9 @@ void coco12_state::coco(machine_config &config)
 	m_cassette->set_formats(coco_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
-	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, "printer"));
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, "rs_printer"));
 	rs232.dcd_handler().set(PIA1_TAG, FUNC(pia6821_device::ca1_w));
-	rs232.set_option_device_input_defaults("printer", DEVICE_INPUT_DEFAULTS_NAME(printer));
-
-	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), coco_cart, "pak"));
-	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
-	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	rs232.set_option_device_input_defaults("rs_printer", DEVICE_INPUT_DEFAULTS_NAME(rs_printer));
 
 	// video hardware
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
@@ -555,6 +535,12 @@ void coco12_state::coco(machine_config &config)
 
 	// floating space
 	coco_floating(config);
+
+	// cartridge
+	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), coco_cart, "pak"));
+	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
+	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
 	// software lists
 	SOFTWARE_LIST(config, "coco_cart_list").set_original("coco_cart").set_filter("COCO");
@@ -654,6 +640,12 @@ void coco12_state::cd6809(machine_config &config)
 	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 }
 
+void coco12_state::ms1600(machine_config &config)
+{
+	coco(config);
+	m_sam->set_addrmap(3, &coco12_state::ms1600_rom2);
+}
+
 //**************************************************************************
 //  ROMS
 //**************************************************************************
@@ -730,6 +722,11 @@ ROM_START(cd6809)
 	ROMX_LOAD("cd6809extbas84.rom", 0x0000, 0x2000, CRC(8dc853e2) SHA1(d572ce4497c115af53d2b0feeb52d3c7a7fec175), ROM_BIOS(1))
 ROM_END
 
+ROM_START(ms1600)
+	ROM_REGION(0x8000,MAINCPU_TAG,0)
+	ROM_LOAD("ms1600.rom",  0x0000, 0x8000, CRC(66f0fafc) SHA1(6e709b8b44aa34a3235a889eb1c3615c0235c3d0))
+ROM_END
+
 #define rom_cocoh rom_coco
 #define rom_cocoeh rom_cocoe
 #define rom_coco2h rom_coco2
@@ -740,18 +737,19 @@ ROM_END
 //**************************************************************************
 
 //    YEAR   NAME       PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT        COMPANY                         FULLNAME                               FLAGS
-COMP( 1980,  coco,      0,      0,      coco,    coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer",                      0 )
-COMP( 1981,  trsvidtx,  coco,   0,      coco,    coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Videotex", MACHINE_NOT_WORKING )
-COMP( 19??,  cocoh,     coco,   0,      cocoh,   coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer (HD6309)",             MACHINE_UNOFFICIAL )
-COMP( 1981,  cocoe,     coco,   0,      cocoe,   coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer (Extended BASIC 1.0)", 0 )
-COMP( 19??,  cocoeh,    coco,   0,      cocoeh,  coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer (Extended BASIC 1.0; HD6309)", MACHINE_UNOFFICIAL )
-COMP( 1983,  coco2,     coco,   0,      coco2,   coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer 2",                    0 )
-COMP( 19??,  coco2h,    coco,   0,      coco2h,  coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer 2 (HD6309)",           MACHINE_UNOFFICIAL )
-COMP( 1985?, coco2b,    coco,   0,      coco2b,  coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer 2B",                   0 )
-COMP( 19??,  coco2bh,   coco,   0,      coco2bh, coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer 2B (HD6309)",          MACHINE_UNOFFICIAL )
-COMP( 1983,  cp400,     coco,   0,      cp400,   coco,    coco12_state, empty_init, "Prológica",                    "CP400",                               0 )
-COMP( 1985,  cp400c2,   coco,   0,      cp400,   cp400c2, coco12_state, empty_init, "Prológica",                    "CP400 Color II",                      0 )
-COMP( 1983,  lzcolor64, coco,   0,      coco,    coco,    coco12_state, empty_init, "Novo Tempo / LZ Equipamentos", "Color64",                             0 )
-COMP( 1983,  cd6809,    coco,   0,      cd6809,  coco,    coco12_state, empty_init, "Codimex",                      "CD-6809",              0 )
-COMP( 1984,  mx1600,    coco,   0,      coco,    coco,    coco12_state, empty_init, "Dynacom",                      "MX-1600",                             0 )
-COMP( 1986,  t4426,     coco,   0,      t4426,   coco,    coco12_state, empty_init, "Terco AB",                     "Terco 4426 CNC Programming station",  0 )
+COMP( 1980,  coco,      0,      0,      coco,    coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer",                      MACHINE_SUPPORTS_SAVE )
+COMP( 1981,  trsvidtx,  coco,   0,      coco,    coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Videotex",                            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+COMP( 1981,  cocoe,     coco,   0,      cocoe,   coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer (Extended BASIC 1.0)", MACHINE_SUPPORTS_SAVE )
+COMP( 19??,  cocoh,     coco,   0,      cocoh,   coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer (HD6309)",             MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
+COMP( 19??,  cocoeh,    coco,   0,      cocoeh,  coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer (Extended BASIC 1.0; HD6309)", MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
+COMP( 1983,  coco2,     coco,   0,      coco2,   coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer 2",                    MACHINE_SUPPORTS_SAVE )
+COMP( 19??,  coco2h,    coco,   0,      coco2h,  coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer 2 (HD6309)",           MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
+COMP( 1985?, coco2b,    coco,   0,      coco2b,  coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer 2B",                   MACHINE_SUPPORTS_SAVE )
+COMP( 19??,  coco2bh,   coco,   0,      coco2bh, coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer 2B (HD6309)",          MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
+COMP( 1983,  cp400,     coco,   0,      cp400,   coco,    coco12_state, empty_init, "Prológica",                    "CP400",                               MACHINE_SUPPORTS_SAVE )
+COMP( 1985,  cp400c2,   coco,   0,      cp400,   cp400c2, coco12_state, empty_init, "Prológica",                    "CP400 Color II",                      MACHINE_SUPPORTS_SAVE )
+COMP( 1984,  mx1600,    coco,   0,      coco,    coco,    coco12_state, empty_init, "Dynacom",                      "MX-1600",                             MACHINE_SUPPORTS_SAVE )
+COMP( 1986,  t4426,     coco,   0,      t4426,   coco,    coco12_state, empty_init, "Terco AB",                     "Terco 4426 CNC Programming station",  MACHINE_SUPPORTS_SAVE )
+COMP( 1983,  lzcolor64, coco,   0,      coco,    coco,    coco12_state, empty_init, "Novo Tempo / LZ Equipamentos", "Color64",                             MACHINE_SUPPORTS_SAVE )
+COMP( 1983,  cd6809,    coco,   0,      cd6809,  coco,    coco12_state, empty_init, "Codimex",                      "CD-6809",                             MACHINE_SUPPORTS_SAVE )
+COMP( 1987,  ms1600,    coco,   0,      ms1600,  coco,    coco12_state, empty_init, "ILCE / SEP",                   "Micro-SEP 1600",                      MACHINE_SUPPORTS_SAVE )

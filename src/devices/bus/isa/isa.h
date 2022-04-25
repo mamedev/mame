@@ -143,14 +143,21 @@ public:
 	// for ISA8, put the 8-bit configs in the primary slots and the 16-bit configs in the secondary
 	virtual space_config_vector memory_space_config() const override;
 
-	template<typename R, typename W> void install_device(offs_t start, offs_t end, R rhandler, W whandler);
+	template<typename R, typename W> void install_device(offs_t start, offs_t end, R rhandler, W whandler)
+	{
+		install_space(AS_ISA_IO, start, end, rhandler, whandler);
+	}
 	template<typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(class address_map &map), uint64_t unitmask = ~u64(0))
 	{
 		m_iospace->install_device(addrstart, addrend, device, map, unitmask);
 	}
-	void install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data);
-	void install_rom(device_t *dev, offs_t start, offs_t end, const char *tag, const char *region);
-	template<typename R, typename W> void install_memory(offs_t start, offs_t end, R rhandler, W whandler);
+	void install_bank(offs_t start, offs_t end, uint8_t *data);
+	void install_bank(offs_t start, offs_t end, memory_bank *bank);
+	void install_rom(device_t *dev, offs_t start, offs_t end, const char *region);
+	template<typename R, typename W> void install_memory(offs_t start, offs_t end, R rhandler, W whandler)
+	{
+		install_space(AS_ISA_MEM, start, end, rhandler, whandler);
+	}
 
 	void unmap_device(offs_t start, offs_t end) const { m_iospace->unmap_readwrite(start, end); }
 	void unmap_bank(offs_t start, offs_t end);
@@ -312,8 +319,7 @@ public:
 	auto drq6_callback() { return m_out_drq6_cb.bind(); }
 	auto drq7_callback() { return m_out_drq7_cb.bind(); }
 
-	void install16_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler);
-	void install16_device(offs_t start, offs_t end, read16s_delegate rhandler, write16s_delegate whandler);
+	template<typename R, typename W> void install16_device(offs_t start, offs_t end, R rhandler, W whandler);
 
 	// for ISA16, put the 16-bit configs in the primary slots and the 8-bit configs in the secondary
 	virtual space_config_vector memory_space_config() const override;

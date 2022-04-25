@@ -70,4 +70,16 @@
 		</part>
 	</software>
 
+	<software name="schicks" supported="no">
+		<description>Super Chicks (USA)</description>
+		<year>2008</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13289-B"/>
+		<part name="cart" interface="leapfrog_didj_cart">
+			<dataarea name="rom" size="0x4200000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="500-13289-B - Super Chicks (US).bin" size="0x4200000" crc="852646c5" sha1="17a2dd4cf097481b755c7a40da41a62b4fc2b1b7" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

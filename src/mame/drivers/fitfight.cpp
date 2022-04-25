@@ -3,16 +3,16 @@
 /* Fit of Fighting / The History of Martial Arts / 'BB' */
 
 /* NIX or Novatecnia (both spanish) may have produced these
-   its probably NIX due to somes similarities with Pirates
+   its probably NIX due to some similarities with Pirates
 
     Supported Games                  Rip-off of
 
-    Fit of Fighting                  Art of Fighting (neogeo.c)
-    The History of Martial Arts      Fighter's History (deco32.c)
+    Fit of Fighting                  Art of Fighting (neogeo.cpp)
+    The History of Martial Arts      Fighter's History (deco32.cpp)
     'BB' Untitled Prototype          -none, original-
 
    'BB' Prototype isn't a game as such, 'BB' was the label on
-   the prototype board. which appears to have been used simply
+   the prototype board, which appears to have been used simply
    for testings / practice.  There is no 'game' to it, no
    title screen, simply 3 characters, 1 portrait, 1 background,
    the characters don't appear to have any moves other than
@@ -42,7 +42,7 @@ todo:
 
 fix scrolling
 sound
-fix s7prite colour problems.
+fix sprite colour problems.
 should these be considered clones or not since the game has
 been rewritten, they just use the gfx ...
 
@@ -148,7 +148,7 @@ void fitfight_state::fitfight_main_map(address_map &map)
 	//      @0x000031ae/0x00002b3a: 0xF000, once, during POST
 	//       0xe001ae/0xe00096 holds the address (0x600000), 0xe001b2/0xe0009a holds the word to output
 	//      @0x00003294/0x00002c1a: word content of 0xe001b2
-	//      @0x000032cc/?: 0xF0dd byte from 0xe001b5, dd seems to be allways 0xFD
+	//      @0x000032cc/?: 0xF0dd byte from 0xe001b5, dd seems to be always 0xFD
 	//      @0x000036bc/?: 0xF0FD when inserting coin
 	//      @0x000037a6/0x000030e6: 0x??dd byte from 0xe08c05, 0xF101 then 0xF001/0xF157 then 0xF057
 
@@ -780,8 +780,8 @@ void fitfight_state::bbprot(machine_config &config)
 Here's the info about this dump:
 
 Name:            Fit of Fighting
-Manufacturer:    Unknow (There are chances that was produced by NIX, but it's not                          possible to verify)
-Year:            Unknow
+Manufacturer:    Unknown (There are chances that was produced by NIX, but it's not possible to verify)
+Year:            Unknown
 Date Dumped:     16-07-2002 (DD-MM-YYYY)
 
 CPU:             68000, possibly at 12mhz
@@ -833,8 +833,8 @@ ROM_END
 /***
 
 Name:            The History of Martial Arts
-Manufacturer:    Unknow, maybe NIX / Novatecnia
-Year:            Unknow
+Manufacturer:    Unknown, maybe NIX / Novatecnia
+Year:            Unknown
 Date Dumped:     18-07-2002 (DD-MM-YYYY)
 
 CPU:             68000
@@ -845,9 +845,9 @@ Country:         Maybe Spain
 
 About the game:
 
-This is a Karnov's revenge ripp off like Fit of Fighting with Art of Fighting.
+This is a Karnov's revenge rip-off like Fit of Fighting with Art of Fighting.
 Same GFX, but reprogrammed from 0, and with FM music... Another nice bootleg!
-It was dumped from a faulty board, wich doesn't boot, but with intact eproms :)
+It was dumped from a faulty board, which doesn't boot, but with intact eproms :)
 
 ***/
 
@@ -884,13 +884,46 @@ ROM_START( histryma )
 	ROM_LOAD( "s8h_th.bin",  0x080000, 0x080000, CRC(cd7bd0de) SHA1(2cd0f41e2575e667aa971f2f5716694dee203ab3) )
 ROM_END
 
+ROM_START( histryma2 ) // only the program ROMs were dumped (no PCB available, only those 2 loose ROMs), so the rest are marked as BAD_DUMP even if they could be correct
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "27c4001.5", 0x000001, 0x080000, CRC(9479f8b9) SHA1(576ad1394212ae46c728150a1fe304518360fd69) )
+	ROM_LOAD16_BYTE( "27c4001.4", 0x000000, 0x080000, CRC(268f3648) SHA1(5defd9cae46384774b919894643a959b414b0d57) )
+
+	ROM_REGION( 0x01c000, "audiocpu", 0 )
+	ROM_LOAD( "y61f.bin",  0x000000, 0x004000, BAD_DUMP CRC(b588525a) SHA1(b768bd75d6351430f9656289146119e9c0308554) )
+	ROM_CONTINUE(          0x010000, 0x00c000 )
+
+	ROM_REGION( 0x100000, "oki", 0 ) // OKI Samples?
+	ROM_LOAD( "u7_th.bin",  0x000000, 0x080000, BAD_DUMP CRC(88b41ef5) SHA1(565e2c4554dde79cd2da8b8a181b3378818223cc) ) //seems to be a merge of 2 0x040000 roms
+	ROM_LOAD( "u18_th.bin", 0x080000, 0x080000, BAD_DUMP CRC(a734cd77) SHA1(3fe4cba6f6d691dfc4775de634e6e39bf4bb08b8) ) //seems to be a merge of 2 0x040000 roms
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "p1_th.bin",   0x0c0000, 0x040000, BAD_DUMP CRC(501c5336) SHA1(1743221d73d59ba40ddad3f69bc4aa1a51c29962) )
+	ROM_LOAD( "p2_th.bin",   0x080000, 0x040000, BAD_DUMP CRC(f50666c7) SHA1(46856e70426388c9704eed94d4dbbbe5674b9be6) )
+	ROM_LOAD( "p4_th.bin",   0x040000, 0x040000, BAD_DUMP CRC(c70223cf) SHA1(d3ee1b73a22a0aaab909141b32696c6b48f2b7ee) )
+	ROM_LOAD( "p8_th.bin",   0x000000, 0x040000, BAD_DUMP CRC(8104b963) SHA1(ed02c3be16b8e94d9316391fe0f9fcf39679c1de) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) // Sprites
+	ROM_LOAD( "s1_th.bin",   0x300000, 0x080000, BAD_DUMP CRC(e9c2d27a) SHA1(f47cc318f4a3db84858b4d302be4063f3bb1b071) )
+	ROM_LOAD( "s1h_th.bin",  0x380000, 0x080000, BAD_DUMP CRC(d806c92e) SHA1(4781dd08755cd91f3d09ff418a9d13744d888922) )
+
+	ROM_LOAD( "s2_th.bin",   0x200000, 0x080000, BAD_DUMP CRC(fa011056) SHA1(8f896d248c74faae5f320e0ef1730681fb7af57b) )
+	ROM_LOAD( "s2h_th.bin",  0x280000, 0x080000, BAD_DUMP CRC(ef5f2268) SHA1(d2f13e6a393256cba24a70f1f85c7aeec93d0c51) )
+
+	ROM_LOAD( "s4_th.bin",   0x100000, 0x080000, BAD_DUMP CRC(fa80fdec) SHA1(590dd27d727d1910b5935dbcb8f958c435b6077a) )
+	ROM_LOAD( "s4h_th.bin",  0x180000, 0x080000, BAD_DUMP CRC(0fd3b43e) SHA1(971e8813e3a3d7735a96f31d557c28b9bbcf91d1) )
+
+	ROM_LOAD( "s8_th.bin",   0x000000, 0x080000, BAD_DUMP CRC(57fd170f) SHA1(2b8cc688de894bbb7d44f9458b3d012a64f79b20) )
+	ROM_LOAD( "s8h_th.bin",  0x080000, 0x080000, BAD_DUMP CRC(cd7bd0de) SHA1(2cd0f41e2575e667aa971f2f5716694dee203ab3) )
+ROM_END
+
 /***
 
 Here's the info about this dump:
 
 Name:            "BB" (Protoype name in some of the EPROM stickers)
-Manufacturer:    Unknow (There are chances that was produced by NIX, but it's not                          possible to verify, same as Fit of Fighting )
-Year:            Unknow
+Manufacturer:    Unknown (There are chances that was produced by NIX, but it's not possible to verify, same as Fit of Fighting )
+Year:            Unknown
 Date Dumped:     17-07-2002 (DD-MM-YYYY)
 
 CPU:             68000, possibly at 12mhz
@@ -909,7 +942,7 @@ dramatically lame fight)... Character selection just shows garbage, maybe stage
 selection shows rubbish, and the game itself is all the time displaying a lot of
 garbage.. But this is VERY nice! :) The most funny thing about this game is that
 the three visible fighter characters can be based on some of the NIX workers, but
-i really can't verify this :)
+I really can't verify this :)
 
 Some of the eproms seem to be two times inserted in different slots of the board,
 but with a different date wrote on the stickers, those are the ??_DD_MM.bin files.
@@ -1010,7 +1043,8 @@ void fitfight_state::init_hotmindff()
 
 /* GAME */
 
-GAME( 199?, fitfight,  0,       fitfight, fitfight, fitfight_state, init_fitfight,  ROT0, "bootleg",   "Fit of Fighting",                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, histryma,  0,       fitfight, histryma, fitfight_state, init_histryma,  ROT0, "bootleg",   "The History of Martial Arts",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, bbprot,    0,       bbprot,   bbprot,   fitfight_state, init_bbprot,    ROT0, "<unknown>", "unknown fighting game 'BB' (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, hotmindff, hotmind, fitfight, fitfight, fitfight_state, init_hotmindff, ROT0, "Playmark",  "Hot Mind (Fit of Fighting hardware)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // need to fix scroll offsets + inputs
+GAME( 199?, fitfight,  0,        fitfight, fitfight, fitfight_state, init_fitfight,  ROT0, "bootleg",   "Fit of Fighting",                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, histryma,  0,        fitfight, histryma, fitfight_state, init_histryma,  ROT0, "bootleg",   "The History of Martial Arts (set 1)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, histryma2, histryma, fitfight, histryma, fitfight_state, init_histryma,  ROT0, "bootleg",   "The History of Martial Arts (set 2)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, bbprot,    0,        bbprot,   bbprot,   fitfight_state, init_bbprot,    ROT0, "<unknown>", "unknown fighting game 'BB' (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, hotmindff, hotmind,  fitfight, fitfight, fitfight_state, init_hotmindff, ROT0, "Playmark",  "Hot Mind (Fit of Fighting hardware)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // need to fix scroll offsets + inputs

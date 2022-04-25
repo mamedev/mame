@@ -263,6 +263,7 @@
 #include "emupal.h"
 
 #include <algorithm>
+#include <iterator>
 #include <memory>
 
 

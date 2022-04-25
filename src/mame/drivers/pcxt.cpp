@@ -16,8 +16,9 @@ Notes:
 TODO:
 - 02851: tetriskr: Corrupt game graphics after some time of gameplay, caused by a wrong
   reading of the i/o $3c8 bit 1. (seems fixed?)
+- tetriskr can store inputs read during the timer irq.  If ds is 0x40 when the irq is taken
+  it will corrupt the BIOS data area which can lead to corrupt graphics
 - Add a proper FDC device.
-- Filetto: Add UM5100 sound chip, might be connected to the prototyping card;
 - buzzer sound has issues in both games
 
 ********************************************************************************************
@@ -79,6 +80,11 @@ public:
 	void tetriskr(machine_config &config);
 	void filetto(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
 private:
 	int m_lastvalue;
 	uint8_t m_disk_data[2];
@@ -101,9 +107,6 @@ private:
 	void port_b_w(uint8_t data);
 	void voice_start_w(uint8_t data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	required_device<cpu_device> m_maincpu;
 	required_device<pc_noppi_mb_device> m_mb;
 	optional_device<address_map_bank_device> m_bank;
@@ -162,7 +165,8 @@ public:
 	uint8_t bg_bank_r();
 	void bg_bank_w(uint8_t data);
 private:
-	uint8_t m_bg_bank;
+	required_region_ptr<uint8_t> m_bg;
+	uint8_t m_bg_bank = 0;
 };
 
 
@@ -174,7 +178,8 @@ DEFINE_DEVICE_TYPE(ISA8_CGA_TETRISKR, isa8_cga_tetriskr_device, "tetriskr_cga", 
 //-------------------------------------------------
 
 isa8_cga_tetriskr_device::isa8_cga_tetriskr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	isa8_cga_superimpose_device(mconfig, ISA8_CGA_TETRISKR, tag, owner, clock)
+	isa8_cga_superimpose_device(mconfig, ISA8_CGA_TETRISKR, tag, owner, clock),
+	m_bg(*this, "gfx2")
 {
 }
 
@@ -199,34 +204,24 @@ uint8_t isa8_cga_tetriskr_device::bg_bank_r()
 
 uint32_t isa8_cga_tetriskr_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
-	int yi;
-	const uint8_t *bg_rom = memregion("gfx2")->base();
-
 	//popmessage("%04x",m_start_offs);
 
 	bitmap.fill(rgb_t::black(), cliprect);
 
-	for(y=0;y<200/8;y++)
+	for(int y=cliprect.min_y;y<=cliprect.max_y;y++)
 	{
-		for(yi=0;yi<8;yi++)
+		int yi = y % 8;
+		int yj = y / 8;
+		for(int x=cliprect.min_x;x<=cliprect.max_x;x++)
 		{
-			for(x=0;x<320/8;x++)
-			{
-				uint8_t color;
-				int xi,pen_i;
+			int xi = x % 8;
+			int xj = x / 8;
+			uint8_t color = 0;
+			/* TODO: first byte seems bogus? */
+			for(int pen_i = 0;pen_i<4;pen_i++)
+				color |= ((m_bg[yj*320/8+xj+(pen_i*0x20000)+yi*0x400+m_bg_bank*0x2000+1] >> (7-xi)) & 1) << pen_i;
 
-				for(xi=0;xi<8;xi++)
-				{
-					color = 0;
-					/* TODO: first byte seems bogus? */
-					for(pen_i = 0;pen_i<4;pen_i++)
-						color |= ((bg_rom[y*320/8+x+(pen_i*0x20000)+yi*0x400+m_bg_bank*0x2000+1] >> (7-xi)) & 1) << pen_i;
-
-					if(cliprect.contains(x*8+xi, y*8+yi))
-						bitmap.pix32(y*8+yi, x*8+xi) = m_palette->pen(color);
-				}
-			}
+			bitmap.pix(y, x) = m_palette->pen(color);
 		}
 	}
 
@@ -424,6 +419,9 @@ void pcxt_state::tetriskr_io(address_map &map)
 {
 	map.global_mask(0x3ff);
 	map(0x0000, 0x00ff).m(m_mb, FUNC(pc_noppi_mb_device::map));
+	map(0x0060, 0x0060).r(FUNC(pcxt_state::port_a_r));  //not a real 8255
+	map(0x0061, 0x0061).rw(FUNC(pcxt_state::port_b_r), FUNC(pcxt_state::port_b_w));
+	map(0x0062, 0x0062).r(FUNC(pcxt_state::port_c_r));
 	map(0x03c8, 0x03c8).portr("IN0");
 	map(0x03c9, 0x03c9).portr("IN1");
 //  map(0x03ce, 0x03ce).portr("IN1"); //read then discarded?
@@ -511,7 +509,7 @@ static INPUT_PORTS_START( tetriskr )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-void pcxt_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pcxt_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_cvsd->digit_w(BIT(m_samples->as_u8(m_vaddr), m_bit));
 	m_cvsd->clock_w(1);
@@ -529,6 +527,9 @@ void pcxt_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 void pcxt_state::machine_start()
 {
 	m_sample = timer_alloc();
+
+	m_status = 0;
+	m_clr_status = 0;
 }
 
 void pcxt_state::machine_reset()
@@ -577,7 +578,7 @@ void pcxt_state::tetriskr(machine_config &config)
 
 	ISA8_SLOT(config, "isa1", 0, "mb:isa", filetto_isa8_cards, "tetriskr", true); // FIXME: determine ISA bus clock
 
-	RAM(config, RAM_TAG).set_default_size("640K");
+	RAM(config, RAM_TAG).set_default_size("64K");
 }
 
 ROM_START( filetto )
@@ -605,6 +606,11 @@ ROM_END
 ROM_START( tetriskr )
 	ROM_REGION( 0x10000, "bios", 0 ) /* code */
 	ROM_LOAD( "b-10.u10", 0x0000, 0x10000, CRC(efc2a0f6) SHA1(5f0f1e90237bee9b78184035a32055b059a91eb3) )
+	ROM_FILL( 0x1bdb, 1, 0xba ) // patch to work around input bug mentioned above
+	ROM_FILL( 0x1bdc, 1, 0x00 )
+	ROM_FILL( 0x1bdd, 1, 0x01 )
+	ROM_FILL( 0x1bde, 1, 0x8e )
+	ROM_FILL( 0x1bdf, 1, 0xda )
 ROM_END
 
 GAME( 1990, filetto,  0, filetto,  filetto,  pcxt_state, empty_init, ROT0,  "Novarmatic", "Filetto (v1.05 901009)",                             MACHINE_IMPERFECT_SOUND )

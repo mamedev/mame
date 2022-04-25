@@ -20,8 +20,6 @@
 #include "unsp.h"
 #include "unspfe.h"
 
-#include "debugger.h"
-
 #include "unspdasm.h"
 
 #include <climits>
@@ -59,6 +57,7 @@ unsp_device::unsp_device(const machine_config &mconfig, device_type type, const 
 	, m_mem_read(nullptr)
 	, m_mem_write(nullptr)
 	, m_enable_drc(false)
+	, m_vectorbase(0xfff0)
 {
 	m_iso = 10;
 	m_numregs = 8;
@@ -256,11 +255,11 @@ void unsp_device::device_start()
 	state_add(UNSP_FIQ_EN, "FIQE", m_core->m_enable_fiq).formatstr("%1u");
 	state_add(UNSP_FIR_MOV_EN, "FIR_MOV", m_core->m_fir_move).formatstr("%1u");
 	state_add(UNSP_SB,     "SB", m_core->m_sb).formatstr("%1X");
-	state_add(UNSP_AQ,     "AQ", m_core->m_sb).formatstr("%1u");
-	state_add(UNSP_FRA,    "FRA", m_core->m_sb).formatstr("%1u");
-	state_add(UNSP_BNK,    "BNK", m_core->m_sb).formatstr("%1u");
-	state_add(UNSP_INE,    "INE", m_core->m_sb).formatstr("%1u");
-	state_add(UNSP_PRI,    "PRI", m_core->m_sb).formatstr("%1u");
+	state_add(UNSP_AQ,     "AQ", m_core->m_aq).formatstr("%1u");
+	state_add(UNSP_FRA,    "FRA", m_core->m_fra).formatstr("%1u");
+	state_add(UNSP_BNK,    "BNK", m_core->m_bnk).formatstr("%1u");
+	state_add(UNSP_INE,    "INE", m_core->m_ine).formatstr("%1u");
+	state_add(UNSP_PRI,    "PRI", m_core->m_pri).formatstr("%1u");
 #if UNSP_LOG_OPCODES || UNSP_LOG_REGS
 	state_add(UNSP_LOG_OPS,"LOG", m_log_ops).formatstr("%1u");
 #endif
@@ -309,7 +308,7 @@ void unsp_20_device::device_start()
 
 void unsp_device::device_reset()
 {
-	for (int i = 0; i < ARRAY_LENGTH(m_core->m_r); i++)
+	for (int i = 0; i < std::size(m_core->m_r); i++)
 	{
 		if (i < m_numregs)
 			m_core->m_r[i] = 0;
@@ -317,7 +316,7 @@ void unsp_device::device_reset()
 			m_core->m_r[i] = 0xdeadbeef;
 	}
 
-	m_core->m_r[REG_PC] = read16(0xfff7);
+	m_core->m_r[REG_PC] = read16(m_vectorbase + 0x7);
 	m_core->m_enable_irq = 0;
 	m_core->m_enable_fiq = 0;
 	m_core->m_fir_move = 1;
@@ -454,7 +453,7 @@ inline void unsp_device::trigger_fiq()
 
 	push(m_core->m_r[REG_PC], &m_core->m_r[REG_SP]);
 	push(m_core->m_r[REG_SR], &m_core->m_r[REG_SP]);
-	m_core->m_r[REG_PC] = read16(0xfff6);
+	m_core->m_r[REG_PC] = read16(m_vectorbase + 0x06);
 	m_core->m_r[REG_SR] = 0;
 	standard_irq_callback(UNSP_FIQ_LINE);
 }
@@ -476,7 +475,7 @@ inline void unsp_device::trigger_irq(int line)
 	if (m_core->m_ine)
 		m_core->m_pri = line;
 
-	m_core->m_r[REG_PC] = read16(0xfff8 + line);
+	m_core->m_r[REG_PC] = read16(m_vectorbase + 0x08 + line);
 	m_core->m_r[REG_SR] = 0;
 	standard_irq_callback(UNSP_IRQ0_LINE+line);
 }

@@ -18,10 +18,11 @@
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
-#include "sound/tms5220.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+#include "sound/flt_biquad.h"
 #include "sound/hc55516.h"
+#include "sound/tms5220.h"
 
 
 //**************************************************************************
@@ -84,7 +85,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	// internal helpers
@@ -142,13 +143,14 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	// devices
 	required_device<m68000_device> m_cpu;
 	required_device<pia6821_device> m_pia;
-	required_device<dac_word_interface> m_dac;
+	required_device<ad7533_device> m_dac;
+	required_device_array<filter_biquad_device, 3> m_dac_filter;
 
 	// internal state
 	uint8_t m_status;
@@ -181,13 +183,14 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	// devices
 	required_device<mc6809e_device> m_cpu;
 	required_device<pia6821_device> m_pia;
-	required_device<dac_word_interface> m_dac;
+	required_device<ad7533_device> m_dac;
+	required_device_array<filter_biquad_device, 3> m_dac_filter;
 
 	// internal state
 	uint8_t m_status;

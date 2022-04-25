@@ -21,7 +21,7 @@
 
 #include "joyport.h"
 
-namespace bus { namespace ti99 { namespace joyport {
+namespace bus::ti99::joyport {
 
 class ti99_handset_device : public device_t, public device_ti99_joyport_interface
 {
@@ -38,7 +38,7 @@ protected:
 	virtual void device_reset() override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	static constexpr unsigned MAX_HANDSETS = 4;
@@ -79,7 +79,8 @@ private:
 	// and then routed back to the port via the joystick
 	int m_joystick;
 };
-} } } // end namespace bus::ti99::joyport
+
+} // end namespace bus::ti99::joyport
 
 DECLARE_DEVICE_TYPE_NS(TI99_HANDSET, bus::ti99::joyport, ti99_handset_device)
 DECLARE_DEVICE_TYPE_NS(TI99_JOYSTICK, bus::ti99::joyport, ti99_twin_joystick_device)

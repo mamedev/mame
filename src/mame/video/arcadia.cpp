@@ -288,9 +288,8 @@ static const uint8_t chars[0x40][8]={
 
 void arcadia_state::video_start()
 {
-	int i;
 	memcpy(&m_chars, chars, sizeof(chars));
-	for (i=0; i<0x40; i++)
+	for (int i=0; i<0x40; i++)
 	{
 		m_rectangle[i][0]=0;
 		m_rectangle[i][4]=0;
@@ -309,6 +308,10 @@ void arcadia_state::video_start()
 		int height = m_screen->height();
 		m_bitmap = std::make_unique<bitmap_ind16>(width, height);
 	}
+
+	m_line = 0;
+	std::fill(std::begin(m_reg.d.pal), std::end(m_reg.d.pal), 0);
+	m_shift = 0;
 }
 
 uint8_t arcadia_state::video_r(offs_t offset)
@@ -584,7 +587,7 @@ void arcadia_state::draw_sprites()
 				for (j=0,m=0x80; j<8; j++, m>>=1)
 				{
 					if (b & m)
-						m_bitmap->pix16(y, x + j) = color;
+						m_bitmap->pix(y, x + j) = color;
 				}
 			}
 			else
@@ -594,8 +597,8 @@ void arcadia_state::draw_sprites()
 				{
 					if (b & m)
 					{
-						m_bitmap->pix16(y, x + j) = color;
-						m_bitmap->pix16(y+1, x + j) = color;
+						m_bitmap->pix(y, x + j) = color;
+						m_bitmap->pix(y+1, x + j) = color;
 					}
 				}
 			}

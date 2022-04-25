@@ -12,9 +12,10 @@
 
 ************************************************************************/
 
-#include <cassert>
+#include "agat840k_hle_dsk.h"
+#include "imageutl.h"
 
-#include "formats/agat840k_hle_dsk.h"
+#include <cstring>
 
 
 static FLOPPY_IDENTIFY(agat840k_hle_dsk_identify)

@@ -7,7 +7,7 @@
 
 #include "bus/msx_slot/slot.h"
 #include "bus/msx_slot/rom.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 
 
 DECLARE_DEVICE_TYPE(MSX_SLOT_MUSIC, msx_slot_music_device)

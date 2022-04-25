@@ -397,20 +397,19 @@ void tms36xx_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void tms36xx_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void tms36xx_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	int samplerate = m_samplerate;
-	stream_sample_t *buffer = outputs[0];
+	auto &buffer = outputs[0];
 
 	/* no tune played? */
 	if( !tunes[m_tune_num] || m_voices == 0 )
 	{
-		while (--samples >= 0)
-			buffer[samples] = 0;
+		buffer.fill(0);
 		return;
 	}
 
-	while( samples-- > 0 )
+	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 	{
 		int sum = 0;
 
@@ -444,7 +443,7 @@ void tms36xx_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		TONE( 0) TONE( 1) TONE( 2) TONE( 3) TONE( 4) TONE( 5)
 		TONE( 6) TONE( 7) TONE( 8) TONE( 9) TONE(10) TONE(11)
 
-		*buffer++ = sum / m_voices;
+		buffer.put_int(sampindex, sum, 32768 * m_voices);
 	}
 }
 

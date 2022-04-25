@@ -32,9 +32,10 @@
 #include "machine/timer.h"
 #include "sound/i5000.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "layout/generic.h"
 
 
 #define EMULATE_BLITTER 0 // FIXME: code is incomplete
@@ -235,30 +236,25 @@ void tmmjprd_state::draw_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, i
 	{
 		for (int drawx=x;drawx<x+sizex;drawx++)
 		{
-			uint16_t dat;
-			uint16_t* dst;
-
 			if (!depth)
 			{
 				if (cliprect.contains(drawx, drawy))
 				{
-					dat = (rom[(tileaddr*32)+count] & 0xf0)>>4;
+					uint16_t dat = (rom[(tileaddr*32)+count] & 0xf0)>>4;
 					if (dat!=15)
 					{
 						//dat += (colour<<8);
-						dst = &bitmap.pix16(drawy, drawx);
-						dst[0] = dat;
+						bitmap.pix(drawy, drawx) = dat;
 					}
 				}
 				drawx++;
 				if (cliprect.contains(drawx, drawy))
 				{
-					dat = (rom[(tileaddr*32)+count] & 0x0f);
+					uint16_t dat = (rom[(tileaddr*32)+count] & 0x0f);
 					if (dat!=15)
 					{
 						//dat += (colour<<8);
-						dst = &bitmap.pix16(drawy, drawx);
-						dst[0] = dat;
+						bitmap.pix(drawy, drawx) = dat;
 					}
 				}
 
@@ -268,12 +264,11 @@ void tmmjprd_state::draw_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, i
 			{
 				if (cliprect.contains(drawx, drawy))
 				{
-					dat = (rom[(tileaddr*32)+count] & 0xff);
+					uint16_t dat = (rom[(tileaddr*32)+count] & 0xff);
 					if (dat!=255)
 					{
 						dat += (colour<<8) & 0xf00;
-						dst = &bitmap.pix16(drawy, drawx);
-						dst[0] = dat;
+						bitmap.pix(drawy, drawx) = dat;
 					}
 				}
 				count++;

@@ -92,22 +92,14 @@ void ioc2_device::device_add_mconfig(machine_config &config)
 	PC_LPT(config, m_pi1);
 
 	// keyboard connector
-	pc_kbdc_device &kbd_con(PC_KBDC(config, "kbd_con", 0));
+	pc_kbdc_device &kbd_con(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
 	kbd_con.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_clk_w));
 	kbd_con.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_data_w));
 
-	// keyboard port
-	pc_kbdc_slot_device &kbd(PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
-	kbd.set_pc_kbdc_slot(&kbd_con);
-
 	// auxiliary connector
-	pc_kbdc_device &aux_con(PC_KBDC(config, "aux_con", 0));
+	pc_kbdc_device &aux_con(PC_KBDC(config, "aux", ps2_mice, STR_HLE_PS2_MOUSE));
 	aux_con.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::aux_clk_w));
 	aux_con.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::aux_data_w));
-
-	// auxiliary port
-	pc_kbdc_slot_device &aux(PC_KBDC_SLOT(config, "aux", ps2_mice, STR_HLE_PS2_MOUSE));
-	aux.set_pc_kbdc_slot(&aux_con);
 
 	// keyboard controller
 	PS2_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL);
@@ -121,7 +113,7 @@ void ioc2_device::device_add_mconfig(machine_config &config)
 	m_kbdc->kbd_irq().set(kbdc_irq, FUNC(input_merger_device::in_w<0>));
 	m_kbdc->aux_irq().set(kbdc_irq, FUNC(input_merger_device::in_w<1>));
 
-	PIT8254(config, m_pit, 0);
+	PIT8254(config, m_pit);
 	m_pit->set_clk<0>(0);
 	m_pit->set_clk<1>(0);
 	m_pit->set_clk<2>(1000000);

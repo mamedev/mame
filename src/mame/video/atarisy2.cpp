@@ -27,7 +27,7 @@ TILE_GET_INFO_MEMBER(atarisy2_state::get_alpha_tile_info)
 
 TILE_GET_INFO_MEMBER(atarisy2_state::get_playfield_tile_info)
 {
-	uint16_t data = m_playfield_tilemap->basemem_read(tile_index);
+	uint16_t data = tile_index < 020000/2 ? m_playfieldt[tile_index] : m_playfieldb[tile_index & (020000/2 - 1)];
 	int code = (m_playfield_tile_bank[(data >> 10) & 1] << 10) | (data & 0x3ff);
 	int color = (data >> 11) & 7;
 	tileinfo.set(0, code, color, 0);
@@ -79,7 +79,6 @@ void atarisy2_state::video_start()
 {
 	// reset the statics
 	m_yscroll_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(atarisy2_state::reset_yscroll_callback),this));
-	m_vrambank->set_bank(0);
 
 	// save states
 	save_item(NAME(m_playfield_tile_bank));
@@ -183,32 +182,6 @@ rgb_t atarisy2_state::RRRRGGGGBBBBIIII(uint32_t raw)
 
 /*************************************
  *
- *  Video RAM bank read/write handlers
- *
- *************************************/
-
-uint16_t atarisy2_state::slapstic_r(address_space &space, offs_t offset)
-{
-	int result = m_slapstic_base[offset];
-	m_slapstic->slapstic_tweak(space, offset);
-
-	/* an extra tweak for the next opcode fetch */
-	m_vrambank->set_bank(m_slapstic->slapstic_tweak(space, 0x1234));
-	return result;
-}
-
-
-void atarisy2_state::slapstic_w(address_space &space, offs_t offset, uint16_t data)
-{
-	m_slapstic->slapstic_tweak(space, offset);
-
-	/* an extra tweak for the next opcode fetch */
-	m_vrambank->set_bank(m_slapstic->slapstic_tweak(space, 0x1234));
-}
-
-
-/*************************************
- *
  *  Video RAM read/write handlers
  *
  *************************************/
@@ -219,6 +192,18 @@ void atarisy2_state::spriteram_w(offs_t offset, uint16_t data, uint16_t mem_mask
 	if (offset == 0x0003)
 		m_screen->update_partial(m_screen->vpos());
 	COMBINE_DATA(&m_mob->spriteram()[offset]);
+}
+
+void atarisy2_state::playfieldt_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(m_playfieldt + offset);
+	m_playfield_tilemap->mark_tile_dirty(offset);
+}
+
+void atarisy2_state::playfieldb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(m_playfieldb + offset);
+	m_playfield_tilemap->mark_tile_dirty(offset + 020000/2);
 }
 
 
@@ -248,13 +233,13 @@ uint32_t atarisy2_state::screen_update_atarisy2(screen_device &screen, bitmap_in
 	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->top(); y <= rect->bottom(); y++)
 		{
-			uint16_t *mo = &mobitmap.pix16(y);
-			uint16_t *pf = &bitmap.pix16(y);
-			uint8_t *pri = &priority_bitmap.pix8(y);
+			uint16_t const *const mo = &mobitmap.pix(y);
+			uint16_t *const pf = &bitmap.pix(y);
+			uint8_t const *const pri = &priority_bitmap.pix(y);
 			for (int x = rect->left(); x <= rect->right(); x++)
 				if (mo[x] != 0xffff)
 				{
-					int mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
+					int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
 
 					// high priority PF?
 					if ((mopriority + pri[x]) & 2)

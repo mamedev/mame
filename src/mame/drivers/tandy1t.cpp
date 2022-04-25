@@ -52,7 +52,7 @@ used XTA (8-bit IDE) harddisks.
 #include "cpu/i86/i286.h"
 #include "bus/pc_joy/pc_joy.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 DECLARE_DEVICE_TYPE(T1000_MOTHERBOARD, t1000_mb_device)
 
@@ -96,6 +96,9 @@ public:
 	void t1000hx(machine_config &config);
 	void t1000tx(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 
@@ -125,26 +128,24 @@ private:
 	void tandy1000_write_eeprom(uint8_t data);
 	void tandy1000_set_bios_bank();
 
-	void machine_start() override;
-
 	DECLARE_MACHINE_RESET(tandy1000rl);
 
 	struct
 	{
-		uint8_t low, high;
+		uint8_t low = 0, high = 0;
 	} m_eeprom_ee[0x40]; /* only 0 to 4 used in hx, addressing seems to allow this */
 
-	int m_eeprom_state;
-	int m_eeprom_clock;
-	uint8_t m_eeprom_oper;
-	uint16_t m_eeprom_data;
+	int m_eeprom_state = 0;
+	int m_eeprom_clock = 0;
+	uint8_t m_eeprom_oper = 0;
+	uint16_t m_eeprom_data = 0;
 
-	uint8_t m_tandy_data[8];
+	uint8_t m_tandy_data[8]{};
 
-	uint8_t m_tandy_bios_bank;    /* I/O port FFEAh */
-	uint8_t m_tandy_ppi_porta, m_tandy_ppi_ack;
-	uint8_t m_tandy_ppi_portb, m_tandy_ppi_portc;
-	uint8_t m_vram_bank;
+	uint8_t m_tandy_bios_bank = 0;    /* I/O port FFEAh */
+	uint8_t m_tandy_ppi_porta = 0, m_tandy_ppi_ack = 0;
+	uint8_t m_tandy_ppi_portb = 0, m_tandy_ppi_portc = 0;
+	uint8_t m_vram_bank = 0;
 	static void cfg_fdc_35(device_t *device);
 	static void cfg_fdc_525(device_t *device);
 
@@ -437,6 +438,8 @@ void tandy1000_state::machine_start()
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(m_ram->size() - (128*1024), 640*1024 - 1,
 				read8sm_delegate(*this, FUNC(tandy1000_state::vram_r)), write8sm_delegate(*this, FUNC(tandy1000_state::vram_w)), 0xffff);
 	subdevice<nvram_device>("nvram")->set_base(m_eeprom_ee, sizeof(m_eeprom_ee));
+
+	m_eeprom_state = 0;
 }
 
 uint8_t tandy1000_state::tandy1000_bank_r(offs_t offset)
@@ -479,7 +482,7 @@ void tandy1000_state::tandy1000_bank_w(offs_t offset, uint8_t data)
 	}
 }
 
-static INPUT_PORTS_START( t1000_common )
+static INPUT_PORTS_START( t1000 )
 	PORT_START("IN0") /* IN0 */
 	PORT_BIT ( 0xf0, 0xf0,   IPT_UNUSED )
 	PORT_BIT ( 0x08, 0x08,   IPT_CUSTOM ) PORT_VBLANK("pcvideo_t1000:screen")
@@ -554,15 +557,29 @@ static INPUT_PORTS_START( t1000_keyboard )
 	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F12") PORT_CODE(KEYCODE_F12) /* F12                         5a  Da */
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( t1000_90key )
-	PORT_INCLUDE(t1000_common)
-	PORT_INCLUDE(t1000_keyboard)
-INPUT_PORTS_END
+class t1000_keyboard_device : public pc_keyboard_device
+{
+public:
+	t1000_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-static INPUT_PORTS_START( t1000_101key )
-	PORT_INCLUDE(t1000_common)
-	PORT_INCLUDE(at_keyboard)
-INPUT_PORTS_END
+protected:
+	virtual ioport_constructor device_input_ports() const override;
+};
+
+DEFINE_DEVICE_TYPE(T1000_KEYB, t1000_keyboard_device, "t1000_keyb", "Tandy 1000 Keyboard")
+
+t1000_keyboard_device::t1000_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pc_keyboard_device(mconfig, T1000_KEYB, tag, owner, clock)
+{
+	m_type = KEYBOARD_TYPE::PC;
+}
+
+ioport_constructor t1000_keyboard_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(t1000_keyboard);
+}
+
+
 
 void tandy1000_state::tandy1000_map(address_map &map)
 {
@@ -696,7 +713,7 @@ void tandy1000_state::tandy1000_common(machine_config &config)
 
 void tandy1000_state::tandy1000_90key(machine_config &config)
 {
-	PC_KEYB(config, m_keyboard);
+	T1000_KEYB(config, m_keyboard);
 	m_keyboard->keypress().set("mb:pic8259", FUNC(pic8259_device::ir1_w));
 }
 
@@ -957,10 +974,10 @@ ROM_END
 
 
 // tandy 1000
-//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT         CLASS            INIT        COMPANY              FULLNAME           FLAGS
-COMP( 1987, t1000hx,  ibm5150, 0,      t1000hx,  t1000_90key,  tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 HX",   0 )
-COMP( 1987, t1000sx,  ibm5150, 0,      t1000sx,  t1000_90key,  tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 SX",   0 )
-COMP( 1987, t1000tx,  ibm5150, 0,      t1000tx,  t1000_90key,  tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 TX",   0 )
-COMP( 1989, t1000rl,  ibm5150, 0,      t1000rl,  t1000_101key, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 RL",   0 )
-COMP( 1989, t1000tl2, ibm5150, 0,      t1000tl,  t1000_101key, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 TL/2", 0 )
-COMP( 1988, t1000sl2, ibm5150, 0,      t1000sl2, t1000_101key, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 SL/2", 0 )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  CLASS            INIT        COMPANY              FULLNAME           FLAGS
+COMP( 1987, t1000hx,  ibm5150, 0,      t1000hx,  t1000, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 HX",   0 )
+COMP( 1987, t1000sx,  ibm5150, 0,      t1000sx,  t1000, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 SX",   0 )
+COMP( 1987, t1000tx,  ibm5150, 0,      t1000tx,  t1000, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 TX",   0 )
+COMP( 1989, t1000rl,  ibm5150, 0,      t1000rl,  t1000, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 RL",   0 )
+COMP( 1989, t1000tl2, ibm5150, 0,      t1000tl,  t1000, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 TL/2", 0 )
+COMP( 1988, t1000sl2, ibm5150, 0,      t1000sl2, t1000, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 SL/2", 0 )

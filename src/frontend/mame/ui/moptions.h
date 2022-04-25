@@ -38,6 +38,8 @@
 #define OPTION_UI_PATH                "ui_path"
 
 // core misc options
+#define OPTION_SYSTEM_NAMES           "system_names"
+#define OPTION_SKIP_WARNINGS          "skip_warnings"
 #define OPTION_REMEMBER_LAST          "remember_last"
 #define OPTION_ENLARGE_SNAPS          "enlarge_snaps"
 #define OPTION_FORCED4X3              "forced4x3"
@@ -49,6 +51,7 @@
 #define OPTION_LAST_USED_MACHINE      "last_used_machine"
 #define OPTION_INFO_AUTO_AUDIT        "info_audit_enabled"
 #define OPTION_HIDE_ROMLESS           "hide_romless"
+#define OPTION_UNTHROTTLE_MUTE        "unthrottle_mute"
 
 
 // core UI options
@@ -102,6 +105,8 @@ public:
 	const char *ui_path() const { return value(OPTION_UI_PATH); }
 
 	// Misc options
+	const char *system_names() const { return value(OPTION_SYSTEM_NAMES); }
+	bool skip_warnings() const { return bool_value(OPTION_SKIP_WARNINGS); }
 	bool remember_last() const { return bool_value(OPTION_REMEMBER_LAST); }
 	bool enlarge_snaps() const { return bool_value(OPTION_ENLARGE_SNAPS); }
 	bool forced_4x3_snapshot() const { return bool_value(OPTION_FORCED4X3); }
@@ -113,6 +118,7 @@ public:
 	int last_right_panel() const { return int_value(OPTION_LAST_RIGHT_PANEL); }
 	bool info_audit() const { return bool_value(OPTION_INFO_AUTO_AUDIT); }
 	bool hide_romless() const { return bool_value(OPTION_HIDE_ROMLESS); }
+	bool unthrottle_mute() const { return bool_value(OPTION_UNTHROTTLE_MUTE); }
 
 	// UI options
 	float infos_size() const { return float_value(OPTION_INFOS_SIZE); }

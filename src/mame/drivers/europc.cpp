@@ -10,7 +10,7 @@
 * Euro PC: Computer and floppy drive integrated into the keyboard, 8088, 512K RAM, there was an upgrade card for the ISA slot that took it to 640K, single ISA slot
            FD360 external 360K 5.25" DS DD floppy, FD720 external 720K 3,5" DS DD floppy, HD-20 external harddisk, internal graphics card is CGA or Hercules, 64KB VRAM
 * Euro PC II: like Euro PC, socket for 8087, 768K RAM on board, driver on Schneider DOS disk allowed the portion over 640K to be used as extended memory or ramdisk.
-* Euro XT: conventional desktop, specs like Euro PC II, two ISA slots on a riser card, 102 key seperate keyboard, internal XTA (XT-IDE) 20MB harddisk, connector for FD360 and FD720 was retained
+* Euro XT: conventional desktop, specs like Euro PC II, two ISA slots on a riser card, 102 key separate keyboard, internal XTA (XT-IDE) 20MB harddisk, connector for FD360 and FD720 was retained
 *
 * https://www.forum64.de/index.php?thread/43066-schneider-euro-pc-i-ii-xt-welche-bios-version-habt-ihr/ claims Versions BIOS >=2.06 have a change in memory management.
 * Versions 2.04 and 2.05 only show a single dash on the top left of the screen, set slot 1 to from AGA to CGA or Hercules to get them to display.
@@ -37,8 +37,7 @@
 #include "machine/m3002.h"
 #include "machine/pckeybrd.h"
 #include "machine/ram.h"
-
-#include "coreutil.h"
+#include "softlist_dev.h"
 
 
 class europc_pc_state : public driver_device
@@ -77,7 +76,7 @@ private:
 
 	uint8_t m_jim_data[16];
 	uint8_t m_jim_state;
-	isa8_aga_device::mode_t m_jim_mode;
+	isa8_aga_device::mode_t m_jim_mode{};
 	int m_port61; // bit 0,1 must be 0 for startup; reset?
 
 	void europc_io(address_map &map);
@@ -366,7 +365,9 @@ static INPUT_PORTS_START( europc )
 	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
 	PORT_BIT( 0x02, 0x02,   IPT_UNUSED ) /* no turbo switch */
 	PORT_BIT( 0x01, 0x01,   IPT_UNUSED )
+INPUT_PORTS_END
 
+static INPUT_PORTS_START( europc_keyboard )
 	PORT_INCLUDE(pc_keyboard)
 	PORT_MODIFY("pc_keyboard_2") /* IN6 */
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("` ~") PORT_CODE(KEYCODE_BACKSLASH) /* `                           29  A9 */
@@ -382,6 +383,28 @@ static INPUT_PORTS_START( europc )
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP Enter") PORT_CODE(KEYCODE_ENTER_PAD)       /* PAD Enter                   60  e0 */
 	PORT_BIT(0xfffe, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
+
+class europc_keyboard_device : public pc_keyboard_device
+{
+public:
+	europc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+protected:
+	virtual ioport_constructor device_input_ports() const override;
+};
+
+DEFINE_DEVICE_TYPE(EUROPC_KEYB, europc_keyboard_device, "europc_keyb", "EURO PC Keyboard")
+
+europc_keyboard_device::europc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pc_keyboard_device(mconfig, EUROPC_KEYB, tag, owner, clock)
+{
+	m_type = KEYBOARD_TYPE::PC;
+}
+
+ioport_constructor europc_keyboard_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(europc_keyboard);
+}
 
 void europc_pc_state::europc_map(address_map &map)
 {
@@ -471,7 +494,7 @@ void europc_pc_state::europc(machine_config &config)
 	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "lpt", true);
 	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "com", true);
 	ISA8_SLOT(config, "isa4", 0, "mb:isa", europc_fdc, "fdc", true);
-	PC_KEYB(config, m_keyboard);
+	EUROPC_KEYB(config, m_keyboard);
 	m_keyboard->keypress().set("mb:pic8259", FUNC(pic8259_device::ir1_w));
 
 	M3002(config, m_rtc, 32.768_kHz_XTAL);
@@ -498,6 +521,9 @@ void europc_pc_state::euroxt(machine_config &config)
 	europc(config);
 
 	config.device_remove("kbdctrl");
+
+	PC_KEYB(config.replace(), m_keyboard);
+	m_keyboard->keypress().set("mb:pic8259", FUNC(pic8259_device::ir1_w));
 
 	m_ram->set_default_size("768K");
 

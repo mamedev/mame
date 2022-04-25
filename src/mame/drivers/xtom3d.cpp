@@ -49,6 +49,8 @@ MX29F1610MC 16M FlashROM (x7)
 #include "video/pc_vga.h"
 
 
+namespace {
+
 class xtom3d_state : public pcat_base_state
 {
 public:
@@ -59,6 +61,10 @@ public:
 	}
 
 	void xtom3d(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	std::unique_ptr<uint32_t[]> m_bios_ram;
@@ -80,8 +86,6 @@ private:
 	void bios_ext4_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	void intel82439tx_init();
 
 	void xtom3d_io(address_map &map);
@@ -397,6 +401,9 @@ void xtom3d_state::machine_start()
 	m_isa_ram1 = std::make_unique<uint32_t[]>(0x4000/4);
 	m_isa_ram2 = std::make_unique<uint32_t[]>(0x4000/4);
 
+	for (int i = 0; i < 4; i++)
+		std::fill(std::begin(m_piix4_config_reg[i]), std::end(m_piix4_config_reg[i]), 0);
+
 	intel82439tx_init();
 }
 
@@ -448,5 +455,7 @@ ROM_START( xtom3d )
 	ROM_LOAD( "u20", 0xc00000, 0x200000, CRC(452131d9) SHA1(f62a0f1a7da9025ac1f7d5de4df90166871ac1e5) )
 ROM_END
 
+} // Anonymous namespace
 
-GAME(1999, xtom3d, 0, xtom3d, at_keyboard, xtom3d_state, empty_init, ROT0, "Jamie System Development", "X Tom 3D", MACHINE_IS_SKELETON)
+
+GAME(1999, xtom3d, 0, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Jamie System Development", "X Tom 3D", MACHINE_IS_SKELETON)

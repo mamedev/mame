@@ -8,8 +8,6 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/naslite_dsk.h"
 
 naslite_format::naslite_format() : upd765_format(formats)
@@ -52,4 +50,4 @@ void naslite_format::build_sector_description(const format &f, uint8_t *sectdata
 	}
 }
 
-const floppy_format_type FLOPPY_NASLITE_FORMAT = &floppy_image_format_creator<naslite_format>;
+const naslite_format FLOPPY_NASLITE_FORMAT;

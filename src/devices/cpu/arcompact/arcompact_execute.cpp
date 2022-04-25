@@ -2,7 +2,6 @@
 // copyright-holders:David Haywood
 
 #include "emu.h"
-#include "debugger.h"
 #include "arcompact.h"
 #include "arcompactdasm.h"
 
@@ -6564,7 +6563,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_21_p10(OPS_32)
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_21_p11_m0(OPS_32) // Jcc.D   (no link, delay)
 {
 	int size = 4;
-	uint32_t limm;
+	[[maybe_unused]] uint32_t limm;
 	int got_limm = 0;
 
 	COMMON32_GET_creg

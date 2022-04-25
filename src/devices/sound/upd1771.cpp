@@ -255,7 +255,7 @@ void upd1771c_device::device_start()
 
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd1771c_device::ack_callback),this));
 
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, clock() / 4);
+	m_channel = stream_alloc(0, 1, clock() / 4);
 
 	save_item(NAME(m_packet));
 	save_item(NAME(m_index));
@@ -479,9 +479,9 @@ TIMER_CALLBACK_MEMBER( upd1771c_device::ack_callback )
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void upd1771c_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void upd1771c_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *buffer = outputs[0];
+	auto &buffer = outputs[0];
 
 	switch (m_state)
 	{
@@ -489,9 +489,9 @@ void upd1771c_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 			//logerror( "upd1771_STATE_TONE samps:%d %d %d %d %d %d\n",(int)samples,
 			//    (int)m_t_timbre,(int)m_t_offset,(int)m_t_volume,(int)m_t_period,(int)m_t_tpos);
 
-			while (--samples >= 0)
+			for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 			{
-				*buffer++ = (WAVEFORMS[m_t_timbre][m_t_tpos]) * m_t_volume * 2;
+				buffer.put_int(sampindex, (WAVEFORMS[m_t_timbre][m_t_tpos]) * m_t_volume, 32768 / 2);
 
 				m_t_ppos++;
 				if (m_t_ppos >= m_t_period)
@@ -506,10 +506,8 @@ void upd1771c_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 			break;
 
 		case STATE_NOISE:
-			while (--samples >= 0)
+			for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 			{
-				*buffer = 0;
-
 				//"wavetable-LFSR" component
 				int wlfsr_val = ((int)noise_tbl[m_nw_tpos]) - 127;//data too wide
 
@@ -535,23 +533,18 @@ void upd1771c_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 					}
 				}
 				//not quite, but close.
-				*buffer+= (
+				buffer.put_int(sampindex,
 							(wlfsr_val * m_nw_volume) |
 							(res[0] * m_n_volume[0]) |
 							(res[1] * m_n_volume[1]) |
-							(res[2] * m_n_volume[2])
-							) ;
-
-				buffer++;
+							(res[2] * m_n_volume[2]),
+							32768) ;
 			}
 			break;
 
 		default:
 			//fill buffer with silence
-			while (--samples >= 0)
-			{
-				*buffer++ = 0;
-			}
+			buffer.fill(0);
 			break;
 	}
 }

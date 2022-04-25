@@ -31,7 +31,7 @@ OSC: 16.000, 21.477270, 1.8432
 #include "bus/isa/isa_cards.h"
 #include "bus/isa/fdc.h"
 #include "machine/pckeybrd.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
 #include "machine/bankdev.h"
@@ -67,7 +67,7 @@ private:
 	required_device<pc_keyboard_device> m_keyboard;
 	required_device<wd37c65c_device> m_fdc;
 	required_device<address_map_bank_device> m_bank;
-	bool m_obf;
+	bool m_obf = false;
 };
 
 void olivpc1_state::machine_start()
@@ -106,7 +106,6 @@ void olivpc1_state::pc8_io(address_map &map)
 }
 
 static INPUT_PORTS_START(olivpc1)
-	PORT_INCLUDE(pc_keyboard)
 INPUT_PORTS_END
 
 // TODO: replace with 8042 dump

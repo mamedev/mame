@@ -113,7 +113,7 @@ public:
 	void scudhamm_map(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_leds.resolve(); }
+	virtual void machine_start() override { m_leds.resolve(); m_scudhamm_motor_command = 0; }
 	virtual void video_start() override;
 
 	optional_device_array<megasys1_tilemap_device, 3> m_tmap;
@@ -121,20 +121,21 @@ protected:
 	optional_shared_ptr_array<uint16_t,2> m_roadram;
 	optional_shared_ptr<uint16_t> m_f1gpstr2_ioready;
 
-	uint16_t *m_objectram;
-	uint16_t m_active_layers;
+	uint16_t m_active_layers = 0U;
 
-	int m_prev;
-	uint16_t m_scudhamm_motor_command;
-	int m_ip_select;
-	uint16_t m_wildplt_output;
-	uint8_t m_drawmode_table[16];
-	int m_debugsprites;
-	int m_show_unknown;
-	uint16_t *m_spriteram;
+	int m_prev = 0;
+	uint16_t m_scudhamm_motor_command = 0U;
+	int m_ip_select = 0;
+	uint16_t m_wildplt_output = 0U;
+	uint8_t m_drawmode_table[16]{};
+#ifdef MAME_DEBUG
+	int m_debugsprites = 0;
+#endif
+	int m_show_unknown = 0;
+	uint16_t *m_spriteram = nullptr;
 
-	uint8_t m_motor_value;
-	uint8_t m_io_value;
+	uint8_t m_motor_value = 0U;
+	uint8_t m_io_value = 0U;
 
 	// TODO: make these to have a more meaningful name
 	optional_device<cpu_device> m_maincpu;
@@ -169,7 +170,7 @@ public:
 	void motor_command_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t analog_r();
 	void output_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	
+
 	void armchmp2(machine_config &config);
 	void armchmp2_map(address_map &map);
 	TIMER_DEVICE_CALLBACK_MEMBER(armchamp2_scanline);
@@ -189,7 +190,7 @@ public:
 		: cischeat_state(mconfig, type, tag)
 	{}
 
-	uint16_t *m_buffer_spriteram;
+	uint16_t *m_buffer_spriteram = nullptr;
 	std::unique_ptr<uint16_t[]> m_allocated_spriteram;
 	void wildplt_map(address_map &map);
 	void wildplt(machine_config &config);
@@ -199,7 +200,7 @@ protected:
 	virtual void video_start() override;
 
 private:
-	uint16_t m_sprite_dma_reg;
+	uint16_t m_sprite_dma_reg = 0U;
 };
 
 class captflag_state : public cischeat_state

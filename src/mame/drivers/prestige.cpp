@@ -106,8 +106,10 @@ Notes:
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
+
+namespace {
 
 class prestige_state : public driver_device
 {
@@ -238,12 +240,12 @@ void prestige_state::bankswitch_w(offs_t offset, uint8_t data)
 		{
 			//cartridge memory is writable
 			if (data & 0x02)
-				program.install_readwrite_bank(0x4000, 0x7fff, "bank2");
+				program.install_readwrite_bank(0x4000, 0x7fff, m_bank2);
 			else
 				program.unmap_write(0x4000, 0x7fff);
 
 			if (data & 0x04)
-				program.install_readwrite_bank(0x8000, 0xbfff, "bank3");
+				program.install_readwrite_bank(0x8000, 0xbfff, m_bank3);
 			else
 				program.unmap_write(0x8000, 0xbfff);
 		}
@@ -251,7 +253,7 @@ void prestige_state::bankswitch_w(offs_t offset, uint8_t data)
 		{
 			//cartridge memory is read-only
 			program.unmap_write(0x4000, 0xbfff);
-			program.install_read_bank(0x8000, 0xbfff, "bank3");
+			program.install_read_bank(0x8000, 0xbfff, m_bank3);
 		}
 		break;
 	case 6:
@@ -693,6 +695,15 @@ void prestige_state::machine_start()
 	m_bank4->set_entry(0);
 	m_bank5->set_entry(0);
 
+	m_irq_counter = 0;
+
+	m_lcdc.addr1 = 0;
+	m_lcdc.addr2 = 0;
+	m_lcdc.lcd_w = 0;
+	m_lcdc.lcd_h = 0;
+	m_lcdc.fb_width = 0;
+	m_lcdc.split_pos = 0;
+
 	//pointer to the videoram
 	m_vram = ram;
 }
@@ -734,7 +745,7 @@ uint32_t prestige_state::screen_update(int bpp, screen_device &screen, bitmap_in
 					pix |= BIT(data, 7 - b) << b;
 
 				if (cliprect.contains(sx * 8 / bpp + x, y))
-					bitmap.pix16(y, sx * 8 / bpp + x) = pix;
+					bitmap.pix(y, sx * 8 / bpp + x) = pix;
 
 				data <<= bpp;
 			}
@@ -917,6 +928,7 @@ ROM_START( gmmc )
 	ROM_CONTINUE( 0x000000, 0x020000 )
 ROM_END
 
+} // Anonymous namespace
 
 
 /* Driver */
@@ -929,8 +941,8 @@ COMP( 1995, snotec,   0,       0,      snotec,   glcolor,  prestige_state, empty
 COMP( 1996, snotecex, 0,       0,      snotec,   glcolor,  prestige_state, empty_init, "Bandai", "Super Note Club EX (Japan)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1996, glmcolor, 0,       0,      glmcolor, glmcolor, prestige_state, empty_init, "VTech",  "Genius Leader Magic Color (Germany)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1997, gl6000sl, 0,       0,      gl6000sl, prestige, prestige_state, empty_init, "VTech",  "Genius Leader 6000SL (Germany)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1998, snotecu,  0,       0,      snotec,   glcolor,  prestige_state, empty_init, "Bandai", "Super Note Club \xce\xbc (Japan)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1998, snotecu,  0,       0,      snotec,   glcolor,  prestige_state, empty_init, "Bandai", u8"Super Note Club µ (Japan)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1998, gl7007sl, 0,       0,      gl7007sl, prestige, prestige_state, empty_init, "VTech",  "Genius Leader 7007SL (Germany)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1998, prestige, 0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "PreComputer Prestige Elite",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1999, gwnf,     0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Winner Notebook Fun (Germany)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 19??, gmmc,     0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Master Mega Color (Germany)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 199?, gmmc,     0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Master Mega Color (Germany)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

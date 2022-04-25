@@ -176,7 +176,6 @@ Two card decks exist (red and blue), each has the same set of barcodes.
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/s14001a.h"
-#include "sound/volt_reg.h"
 #include "video/pwm.h"
 #include "speaker.h"
 
@@ -585,7 +584,7 @@ void card_state::brc_base(machine_config &config)
 	m_mcu->t0_in_cb().set(FUNC(card_state::mcu_t0_r));
 
 	// MCU T1 tied to master clock / 4
-	CLOCK(config, "t1_clock", 5_MHz_XTAL/4).signal_handler().set_nop();
+	CLOCK(config, "t1_clock", 5_MHz_XTAL/4);
 	m_mcu->t1_in_cb().set("t1_clock", FUNC(clock_device::signal_r)).invert();
 
 	I8243(config, m_i8243);
@@ -609,7 +608,6 @@ void card_state::brc(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 void card_state::vbrc(machine_config &config)

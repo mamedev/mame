@@ -194,8 +194,8 @@ void kaneko_view2_tilemap_device::vram_w(int _N_, offs_t offset, u16 data, u16 m
 void kaneko_view2_tilemap_device::prepare(bitmap_ind16 &bitmap, const rectangle &cliprect) { prepare_common(bitmap, cliprect); }
 void kaneko_view2_tilemap_device::prepare(bitmap_rgb32 &bitmap, const rectangle &cliprect) { prepare_common(bitmap, cliprect); }
 
-template<class _BitmapClass>
-void kaneko_view2_tilemap_device::prepare_common(_BitmapClass &bitmap, const rectangle &cliprect)
+template<class BitmapClass>
+void kaneko_view2_tilemap_device::prepare_common(BitmapClass &bitmap, const rectangle &cliprect)
 {
 	const u16 layers_flip_0 = m_regs[4];
 
@@ -240,8 +240,8 @@ void kaneko_view2_tilemap_device::prepare_common(_BitmapClass &bitmap, const rec
 void kaneko_view2_tilemap_device::render_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri) { render_tilemap_common(screen, bitmap, cliprect, pri); }
 void kaneko_view2_tilemap_device::render_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri) { render_tilemap_common(screen, bitmap, cliprect, pri); }
 
-template<class _BitmapClass>
-void kaneko_view2_tilemap_device::render_tilemap_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int pri)
+template<class BitmapClass>
+void kaneko_view2_tilemap_device::render_tilemap_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int pri)
 {
 	m_tmap[0]->draw(screen, bitmap, cliprect, pri, pri, 0);
 	m_tmap[1]->draw(screen, bitmap, cliprect, pri, pri, 0);
@@ -250,8 +250,8 @@ void kaneko_view2_tilemap_device::render_tilemap_common(screen_device &screen, _
 void kaneko_view2_tilemap_device::render_tilemap_alt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int v2pri) { render_tilemap_alt_common(screen, bitmap, cliprect, pri, v2pri); }
 void kaneko_view2_tilemap_device::render_tilemap_alt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri, int v2pri) { render_tilemap_alt_common(screen, bitmap, cliprect, pri, v2pri); }
 
-template<class _BitmapClass>
-void kaneko_view2_tilemap_device::render_tilemap_alt_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int pri, int v2pri)
+template<class BitmapClass>
+void kaneko_view2_tilemap_device::render_tilemap_alt_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int pri, int v2pri)
 {
 	m_tmap[0]->draw(screen, bitmap, cliprect, pri, v2pri ? pri : 0, 0);
 	m_tmap[1]->draw(screen, bitmap, cliprect, pri, v2pri ? pri : 0, 0);

@@ -1,25 +1,7 @@
-// AsmJit - Machine code generation for C++
+// This file is part of AsmJit project <https://asmjit.com>
 //
-//  * Official AsmJit Home Page: https://asmjit.com
-//  * Official Github Repository: https://github.com/asmjit/asmjit
-//
-// Copyright (c) 2008-2020 The AsmJit Authors
-//
-// This software is provided 'as-is', without any express or implied
-// warranty. In no event will the authors be held liable for any damages
-// arising from the use of this software.
-//
-// Permission is granted to anyone to use this software for any purpose,
-// including commercial applications, and to alter it and redistribute it
-// freely, subject to the following restrictions:
-//
-// 1. The origin of this software must not be misrepresented; you must not
-//    claim that you wrote the original software. If you use this software
-//    in a product, an acknowledgment in the product documentation would be
-//    appreciated but is not required.
-// 2. Altered source versions must be plainly marked as such, and must not be
-//    misrepresented as being the original software.
-// 3. This notice may not be removed or altered from any source distribution.
+// See asmjit.h or LICENSE.md for license and copyright information
+// SPDX-License-Identifier: Zlib
 
 // ============================================================================
 // tablegen.js
@@ -178,6 +160,21 @@ exports.Lang = Lang;
 class StringUtils {
   static asString(x) { return String(x); }
 
+  static countOf(s, pattern) {
+    if (!pattern)
+      FAIL(`Pattern cannot be empty`);
+
+    var n = 0;
+    var pos = 0;
+
+    while ((pos = s.indexOf(pattern, pos)) >= 0) {
+      n++;
+      pos += pattern.length;
+    }
+
+    return n;
+  }
+
   static capitalize(s) {
     s = String(s);
     return !s ? s : s[0].toUpperCase() + s.substr(1);
@@ -276,15 +273,28 @@ class StringUtils {
     return lines.join("\n");
   }
 
+  static extract(s, start, end) {
+    var iStart = s.indexOf(start);
+    var iEnd   = s.indexOf(end);
+
+    if (iStart === -1)
+      FAIL(`StringUtils.extract(): Couldn't locate start mark '${start}'`);
+
+    if (iEnd === -1)
+      FAIL(`StringUtils.extract(): Couldn't locate end mark '${end}'`);
+
+    return s.substring(iStart + start.length, iEnd).trim();
+  }
+
   static inject(s, start, end, code) {
     var iStart = s.indexOf(start);
     var iEnd   = s.indexOf(end);
 
     if (iStart === -1)
-      FAIL(`Utils.inject(): Couldn't locate start mark '${start}'`);
+      FAIL(`StringUtils.inject(): Couldn't locate start mark '${start}'`);
 
     if (iEnd === -1)
-      FAIL(`Utils.inject(): Couldn't locate end mark '${end}'`);
+      FAIL(`StringUtils.inject(): Couldn't locate end mark '${end}'`);
 
     var nIndent = 0;
     while (iStart > 0 && s[iStart-1] === " ") {
@@ -426,7 +436,10 @@ exports.MapUtils = MapUtils;
 // ============================================================================
 
 class CxxUtils {
-  static flags(obj, fn) {
+  static flags(obj, fn, none) {
+    if (none == null)
+      none = "0";
+
     if (!fn)
       fn = nop;
 
@@ -435,7 +448,7 @@ class CxxUtils {
       if (obj[k])
         out += (out ? " | " : "") + fn(k);
     }
-    return out ? out : "0";
+    return out ? out : none;
   }
 
   static struct(...args) {
@@ -890,14 +903,14 @@ class NameTable extends Task {
     var maxLength = 0;
     for (var i = 0; i < insts.length; i++) {
       const inst = insts[i];
-      instNames.add(inst.name);
-      maxLength = Math.max(maxLength, inst.name.length);
+      instNames.add(inst.displayName);
+      maxLength = Math.max(maxLength, inst.displayName.length);
     }
     instNames.index();
 
     for (var i = 0; i < insts.length; i++) {
       const inst = insts[i];
-      const name = inst.name;
+      const name = inst.displayName;
       const nameIndex = instNames.getIndex(name);
 
       const index = name.charCodeAt(0) - 'a'.charCodeAt(0);

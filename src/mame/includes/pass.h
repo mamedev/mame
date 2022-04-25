@@ -27,8 +27,8 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE16_MEMBER(pass_bg_videoram_w);
-	DECLARE_WRITE16_MEMBER(pass_fg_videoram_w);
+	void pass_bg_videoram_w(offs_t offset, uint16_t data);
+	void pass_fg_videoram_w(offs_t offset, uint16_t data);
 	TILE_GET_INFO_MEMBER(get_pass_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_pass_fg_tile_info);
 
@@ -38,8 +38,8 @@ private:
 	void pass_sound_io_map(address_map &map);
 	void pass_sound_map(address_map &map);
 
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
 
 	required_shared_ptr<uint16_t> m_bg_videoram;
 	required_shared_ptr<uint16_t> m_fg_videoram;

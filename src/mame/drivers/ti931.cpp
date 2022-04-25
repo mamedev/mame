@@ -52,10 +52,10 @@ SCN2672_DRAW_CHARACTER_MEMBER(ti931_state::draw_character)
 	{
 		if (!half_shift)
 			dots <<= 1;
-		bitmap.pix32(y, x++) = BIT(dots, 8) ? rgb_t::white() : rgb_t::black();
+		bitmap.pix(y, x++) = BIT(dots, 8) ? rgb_t::white() : rgb_t::black();
 		if (half_shift)
 			dots <<= 1;
-		bitmap.pix32(y, x++) = BIT(dots, 8) ? rgb_t::white() : rgb_t::black();
+		bitmap.pix(y, x++) = BIT(dots, 8) ? rgb_t::white() : rgb_t::black();
 	}
 }
 

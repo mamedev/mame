@@ -29,7 +29,7 @@
 
 inline void pdp1_state::pdp1_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color)
 {
-	bitmap.pix16(y, x) = color;
+	bitmap.pix(y, x) = color;
 }
 
 /*
@@ -37,17 +37,17 @@ inline void pdp1_state::pdp1_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint
 */
 void pdp1_state::video_start()
 {
-	m_typewriter_color = color_typewriter_black;
+	m_typewriter->m_color = color_typewriter_black;
 
 	/* alloc bitmaps for our private fun */
 	m_panel_bitmap.allocate(panel_window_width, panel_window_height, BITMAP_FORMAT_IND16);
-	m_typewriter_bitmap.allocate(typewriter_window_width, typewriter_window_height, BITMAP_FORMAT_IND16);
+	m_typewriter->m_bitmap.allocate(typewriter_window_width, typewriter_window_height, BITMAP_FORMAT_IND16);
 
 	/* set up out bitmaps */
 	pdp1_draw_panel_backdrop(m_panel_bitmap);
 
 	const rectangle typewriter_bitmap_bounds(0, typewriter_window_width-1, 0, typewriter_window_height-1);
-	m_typewriter_bitmap.fill(pen_typewriter_bg, typewriter_bitmap_bounds);
+	m_typewriter->m_bitmap.fill(pen_typewriter_bg, typewriter_bitmap_bounds);
 }
 
 
@@ -84,7 +84,7 @@ uint32_t pdp1_state::screen_update_pdp1(screen_device &screen, bitmap_ind16 &bit
 	pdp1_draw_panel(m_panel_bitmap);
 	copybitmap(bitmap, m_panel_bitmap, 0, 0, panel_window_offset_x, panel_window_offset_y, cliprect);
 
-	copybitmap(bitmap, m_typewriter_bitmap, 0, 0, typewriter_window_offset_x, typewriter_window_offset_y, cliprect);
+	copybitmap(bitmap, m_typewriter->m_bitmap, 0, 0, typewriter_window_offset_x, typewriter_window_offset_y, cliprect);
 	return 0;
 }
 
@@ -353,28 +353,27 @@ enum
 };
 
 
-void pdp1_state::pdp1_typewriter_linefeed()
+void pdp1_typewriter_device::linefeed()
 {
 	uint8_t buf[typewriter_window_width];
-	int y;
 
-	assert(typewriter_window_width <= m_typewriter_bitmap.width());
-	assert(typewriter_window_height <= m_typewriter_bitmap.height());
-	for (y=0; y<typewriter_window_height-typewriter_scroll_step; y++)
+	assert(typewriter_window_width <= m_bitmap.width());
+	assert(typewriter_window_height <= m_bitmap.height());
+	for (int y=0; y<typewriter_window_height-typewriter_scroll_step; y++)
 	{
-		std::copy_n(&m_typewriter_bitmap.pix16(y+typewriter_scroll_step, 0), typewriter_window_width, buf);
-		draw_scanline8(m_typewriter_bitmap, 0, y, typewriter_window_width, buf, m_palette->pens());
+		std::copy_n(&m_bitmap.pix(y+typewriter_scroll_step, 0), typewriter_window_width, buf);
+		draw_scanline8(m_bitmap, 0, y, typewriter_window_width, buf, m_driver_state->m_palette->pens());
 	}
 
 	const rectangle typewriter_scroll_clear_window(0, typewriter_window_width-1,    typewriter_window_height-typewriter_scroll_step, typewriter_window_height-1);
-	m_typewriter_bitmap.fill(pen_typewriter_bg, typewriter_scroll_clear_window);
+	m_bitmap.fill(pen_typewriter_bg, typewriter_scroll_clear_window);
 }
 
-void pdp1_state::pdp1_typewriter_drawchar(int character)
+void pdp1_typewriter_device::drawchar(int character)
 {
 	static const char ascii_table[2][64] =
-	{   /* n-s = non-spacing */
-		{   /* lower case */
+	{   // n-s = non-spacing
+		{   // lower case
 			' ',                '1',                '2',                '3',
 			'4',                '5',                '6',                '7',
 			'8',                '9',                '*',                '*',
@@ -392,7 +391,7 @@ void pdp1_state::pdp1_typewriter_drawchar(int character)
 			'h',                'i',                '*',/*Lower Case*/  '.',
 			'*',/*Upper Case*/  '*',/*Backspace*/   '*',                '*'/*Carriage Return*/
 		},
-		{   /* upper case */
+		{   // upper case
 			' ',                '"',                '\'',               '~',
 			'\202',/*implies*/  '\203',/*or*/       '\204',/*and*/      '<',
 			'>',                '\205',/*up arrow*/ '*',                '*',
@@ -419,58 +418,58 @@ void pdp1_state::pdp1_typewriter_drawchar(int character)
 	switch (character)
 	{
 	case 034:
-		/* Black */
-		m_typewriter_color = color_typewriter_black;
+		// Black
+		m_color = color_typewriter_black;
 		break;
 
 	case 035:
-		/* Red */
-		m_typewriter_color = color_typewriter_red;
+		// Red
+		m_color = color_typewriter_red;
 		break;
 
 	case 036:
-		/* Tab */
+		// Tab
 		m_pos = m_pos + tab_step - (m_pos % tab_step);
 		break;
 
 	case 072:
-		/* Lower case */
+		// Lower case
 		m_case_shift = 0;
 		break;
 
 	case 074:
-		/* Upper case */
+		// Upper case
 		m_case_shift = 1;
 		break;
 
 	case 075:
-		/* Backspace */
+		// Backspace
 		if (m_pos)
 			m_pos--;
 		break;
 
 	case 077:
-		/* Carriage Return */
+		// Carriage Return
 		m_pos = 0;
-		pdp1_typewriter_linefeed();
+		linefeed();
 		break;
 
 	default:
-		/* Any printable character... */
+		// Any printable character...
 
 		if (m_pos >= 80)
-		{   /* if past right border, wrap around. (Right???) */
-			pdp1_typewriter_linefeed();  /* next line */
-			m_pos = 0;                   /* return to start of line */
+		{   // if past right border, wrap around. (Right???)
+			linefeed(); // next line
+			m_pos = 0;  // return to start of line
 		}
 
-		/* print character (lookup ASCII equivalent in table) */
-		pdp1_draw_char(m_typewriter_bitmap, ascii_table[m_case_shift][character],
+		// print character (lookup ASCII equivalent in table)
+		m_driver_state->pdp1_draw_char(m_bitmap, ascii_table[m_case_shift][character],
 						8*m_pos, typewriter_write_offset_y,
-						m_typewriter_color); /* print char */
+						m_color); // print char
 
-		if ((character!= 040) && (character!= 056)) /* 040 and 056 are non-spacing characters */
-			m_pos++;     /* step carriage forward */
+		if ((character!= 040) && (character!= 056)) // 040 and 056 are non-spacing characters
+			m_pos++;     // step carriage forward
 
 		break;
 	}

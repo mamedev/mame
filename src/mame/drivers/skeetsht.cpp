@@ -45,10 +45,10 @@ public:
 private:
 	required_device<tlc34076_device> m_tlc34076;
 	required_shared_ptr<uint16_t> m_tms_vram;
-	uint8_t m_porta_latch;
-	uint8_t m_ay_sel;
-	uint8_t m_lastdataw;
-	uint16_t m_lastdatar;
+	uint8_t m_porta_latch = 0;
+	uint8_t m_ay_sel = 0;
+	uint8_t m_lastdataw = 0;
+	uint16_t m_lastdatar = 0;
 	uint16_t ramdac_r(offs_t offset);
 	void ramdac_w(offs_t offset, uint16_t data);
 	void tms_w(offs_t offset, uint8_t data);
@@ -90,13 +90,12 @@ void skeetsht_state::video_start()
 
 TMS340X0_SCANLINE_RGB32_CB_MEMBER(skeetsht_state::scanline_update)
 {
-	const pen_t *const pens = m_tlc34076->pens();
+	pen_t const *const pens = m_tlc34076->pens();
 	uint16_t *vram = &m_tms_vram[(params->rowaddr << 8) & 0x3ff00];
-	uint32_t *dest = &bitmap.pix32(scanline);
+	uint32_t *const dest = &bitmap.pix(scanline);
 	int coladdr = params->coladdr;
-	int x;
 
-	for (x = params->heblnk; x < params->hsblnk; x += 2)
+	for (int x = params->heblnk; x < params->hsblnk; x += 2)
 	{
 		uint16_t pixels = vram[coladdr++ & 0xff];
 		dest[x + 0] = pens[pixels & 0xff];

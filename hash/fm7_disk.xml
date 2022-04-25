@@ -361,6 +361,17 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="fmlogo">
+		<description>FM Logo 2.0</description>
+		<year>1984</year>
+		<publisher>Logo Computer Systems</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="fm_logo_2.0.d77" size="348848" crc="89dd51b4" sha1="f32cb4642ec2bbf5712e023dc3bf13a8b24796b0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gambler">
 	<!-- Keys listed in readme are as follows:
 キー操作/ リターン:チー F1:リーチ F2:ポン F3:カン F4:和了 F10:九種九牌
@@ -899,6 +910,19 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="the quest (disk 4).d77" size="348848" crc="f66530b5" sha1="74284cc57f3331ce10546a98ba337d7603b89e90"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rayieza">
+		<description>The Earth Fighter Rayieza</description>
+		<year>1985</year>
+		<publisher>エニックス (Enix)</publisher>
+		<info name="serial" value="E-G154"/>
+		<info name="alt_title" value="地球戦士ライーザ"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1083470">
+				<rom name="chikyuu_senshi_rayieza.mfm" size="1083470" crc="f834a5fa" sha1="f96d0bce8542fd4b6b41a235825bf562943f0653" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

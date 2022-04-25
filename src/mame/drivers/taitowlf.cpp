@@ -6,6 +6,21 @@ Driver by Ville Linde
 
 Three board system consisting of a P5TX-LA PC motherboard, a Taito main board and a rom board.
 
+TODO:
+- program ROM is read via parallel port (for offset write, encrypted) and game port.
+  It's the first thing that the BIOS does at boot (cfr. accesses at $20x),
+  if these ports are fed with proper values then it sets up PnP then tries a DMA ch. 3 transfer,
+  otherwise it just boots the normal P5TX-LA bootstrap sequence.
+  cfr. PC=e850b, PC=e4fc8, PC=fd84a (reading I/O $0006).
+- Above needs to be converted to a proper EISA device, program ROM board is connected on MB thru the only
+  available slot option;
+- Convert North/South bridge to newest PCI model;
+- Hookup Voodoo to PCI root;
+- Convert P5TX-LA to a proper stand-alone driver;
+- According to manual hold A+B+service button for 10 seconds for entering test mode during initial bootup
+  sequence. Board and input test menu doesn't seem to have a dedicated test mode switch. This statement needs
+  verification once we get there;
+
 Hardware configuration:
 
 P5TX-LA Motherboard:
@@ -41,11 +56,6 @@ Taito W Rom Board:
 -AMD M4-128N/64 CPLD stamped 'E58-05'
 -Program, Sound roms
 
-TODO:
-- program ROM is read via parallel port (for offset write, encrypted) and game port!? 
-- Emulation of the entire Taito Wolf main board which plugs into the PC motherboard's only PCI slot.
-- PCI comms between both boards have yet to be understood.
-
 */
 
 #include "emu.h"
@@ -61,6 +71,9 @@ TODO:
 #endif
 #include "emupal.h"
 #include "screen.h"
+
+
+namespace {
 
 class taitowlf_state : public pcat_base_state
 {
@@ -113,22 +126,18 @@ private:
 #if !TAITOWLF_ENABLE_VGA
 uint32_t taitowlf_state::screen_update_taitowlf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x,y,count;
-
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	count = (0);
+	int count = 0;
 
-	for(y=0;y<256;y++)
+	for(int y=0;y<256;y++)
 	{
-		for(x=0;x<512;x++)
+		for(int x=0;x<512;x++)
 		{
-			uint32_t color;
-
-			color = (m_bootscreen_rom[count] & 0xff);
+			uint32_t color = m_bootscreen_rom[count] & 0xff;
 
 			if(cliprect.contains(x+0, y))
-				bitmap.pix32(y, x+0) = m_palette->pen(color);
+				bitmap.pix(y, x+0) = m_palette->pen(color);
 
 			count++;
 		}
@@ -330,44 +339,10 @@ void taitowlf_state::taitowlf_io(address_map &map)
 
 /*****************************************************************************/
 
-#if 0
-#define AT_KEYB_HELPER(bit, text, key1) \
-	PORT_BIT( bit, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(text) PORT_CODE(key1)
-
-static INPUT_PORTS_START(taitowlf)
-	PORT_START("pc_keyboard_0")
-	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED )     /* unused scancode 0 */
-	AT_KEYB_HELPER( 0x0002, "Esc",          KEYCODE_Q           ) /* Esc                         01  81 */
-
-	PORT_START("pc_keyboard_1")
-	AT_KEYB_HELPER( 0x0020, "Y",            KEYCODE_Y           ) /* Y                           15  95 */
-	AT_KEYB_HELPER( 0x1000, "Enter",        KEYCODE_ENTER       ) /* Enter                       1C  9C */
-
-	PORT_START("pc_keyboard_2")
-
-	PORT_START("pc_keyboard_3")
-	AT_KEYB_HELPER( 0x0002, "N",            KEYCODE_N           ) /* N                           31  B1 */
-	AT_KEYB_HELPER( 0x0800, "F1",           KEYCODE_S           ) /* F1                          3B  BB */
-
-	PORT_START("pc_keyboard_4")
-
-	PORT_START("pc_keyboard_5")
-
-	PORT_START("pc_keyboard_6")
-	AT_KEYB_HELPER( 0x0040, "(MF2)Cursor Up",       KEYCODE_UP          ) /* Up                          67  e7 */
-	AT_KEYB_HELPER( 0x0080, "(MF2)Page Up",         KEYCODE_PGUP        ) /* Page Up                     68  e8 */
-	AT_KEYB_HELPER( 0x0100, "(MF2)Cursor Left",     KEYCODE_LEFT        ) /* Left                        69  e9 */
-	AT_KEYB_HELPER( 0x0200, "(MF2)Cursor Right",    KEYCODE_RIGHT       ) /* Right                       6a  ea */
-	AT_KEYB_HELPER( 0x0800, "(MF2)Cursor Down",     KEYCODE_DOWN        ) /* Down                        6c  ec */
-	AT_KEYB_HELPER( 0x1000, "(MF2)Page Down",       KEYCODE_PGDN        ) /* Page Down                   6d  ed */
-	AT_KEYB_HELPER( 0x4000, "Del",                  KEYCODE_A           ) /* Delete                      6f  ef */
-
-	PORT_START("pc_keyboard_7")
-INPUT_PORTS_END
-#endif
-
 void taitowlf_state::machine_start()
 {
+	for (int i = 0; i < 4; i++)
+		std::fill(std::begin(m_piix4_config_reg[i]), std::end(m_piix4_config_reg[i]), 0);
 }
 
 void taitowlf_state::machine_reset()
@@ -439,11 +414,11 @@ ROM_START(pf2012)
 	ROM_CONTINUE(                                 0x0001, 0x4000 )
 #endif
 
-	ROM_REGION(0x400000, "user3", 0) // Program ROM
+	ROM_REGION(0x400000, "user3", 0) // Program ROM (FAT12)
 	ROM_LOAD("u1.bin", 0x000000, 0x200000, CRC(8f4c09cb) SHA1(0969a92fec819868881683c580f9e01cbedf4ad2))
 	ROM_LOAD("u2.bin", 0x200000, 0x200000, CRC(59881781) SHA1(85ff074ab2a922eac37cf96f0bf153a2dac55aa4))
 
-	ROM_REGION(0x4000000, "user4", 0) // Data ROM
+	ROM_REGION(0x4000000, "user4", 0) // Data ROM (FAT12)
 	ROM_LOAD("e59-01.u20", 0x0000000, 0x800000, CRC(701d3a9a) SHA1(34c9f34f4da34bb8eed85a4efd1d9eea47a21d77) )
 	ROM_LOAD("e59-02.u23", 0x0800000, 0x800000, CRC(626df682) SHA1(35bb4f91201734ce7ccdc640a75030aaca3d1151) )
 	ROM_LOAD("e59-03.u26", 0x1000000, 0x800000, CRC(74e4efde) SHA1(630235c2e4a11f615b5f3b8c93e1e645da09eefe) )
@@ -468,6 +443,9 @@ ROM_START(pf2012)
 	ROM_LOAD("e58-04.u71", 0x000000, 0x20000, CRC(500e6113) SHA1(93226706517c02e336f96bdf9443785158e7becf) )
 ROM_END
 
+} // Anonymous namespace
+
+
 /*****************************************************************************/
 
-GAME(1997, pf2012, 0,   taitowlf, pc_keyboard, taitowlf_state, init_taitowlf, ROT0, "Taito",  "Psychic Force 2012", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1997, pf2012, 0,   taitowlf, 0, taitowlf_state, init_taitowlf, ROT0, "Taito",  "Psychic Force 2012", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

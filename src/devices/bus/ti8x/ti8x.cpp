@@ -432,6 +432,7 @@ TIMER_CALLBACK_MEMBER(device_ti8x_link_port_bit_interface::bit_timeout)
 	// send timeout:
 	case WAIT_IDLE:
 		assert(EMPTY != m_tx_bit_buffer);
+		[[fallthrough]];
 	case WAIT_ACK_0:
 	case WAIT_ACK_1:
 	case WAIT_REL_0:
@@ -611,6 +612,12 @@ void device_ti8x_link_port_byte_interface::bit_received(bool data)
 #include "graphlinkhle.h"
 #include "teeconn.h"
 #include "tispeaker.h"
+
+
+// must come after including the headers that declare these extern
+template class device_finder<device_ti8x_link_port_interface, false>;
+template class device_finder<device_ti8x_link_port_interface, true>;
+
 
 void default_ti8x_link_devices(device_slot_interface &device)
 {

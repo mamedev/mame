@@ -156,7 +156,7 @@ void st_state::shifter_tick()
 		break;
 	}
 
-	m_bitmap.pix32(y, x) = pen;
+	m_bitmap.pix(y, x) = pen;
 }
 
 
@@ -192,7 +192,7 @@ inline void st_state::shifter_load()
 void st_state::draw_pixel(int x, int y, u32 pen)
 {
 	if(x < m_bitmap.width() && y < m_bitmap.height())
-		m_bitmap.pix32(y, x) = pen;
+		m_bitmap.pix(y, x) = pen;
 }
 
 void st_state::glue_tick()

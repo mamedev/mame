@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="playmaker" description="Tiger Playmaker playcards">
+<!--
+
+3 playcards came with the handheld: Basketball, Hockey, Soccer.
+
+Each playcard also functions as a screen overlay, but MAME doesn't support this yet
+through the softwarelist.
+
+-->
+
+	<software name="baskball">
+		<description>Basketball</description>
+		<year>1980</year>
+		<publisher>Tiger Electronics</publisher>
+		<part name="cart" interface="playmaker_cart">
+			<feature name="notch" value="0x1" />
+			<dataarea name="nodata" size="0x10"></dataarea>
+		</part>
+	</software>
+
+	<software name="hockey">
+		<description>Hockey</description>
+		<year>1980</year>
+		<publisher>Tiger Electronics</publisher>
+		<part name="cart" interface="playmaker_cart">
+			<feature name="notch" value="0x3" />
+			<dataarea name="nodata" size="0x10"></dataarea>
+		</part>
+	</software>
+
+	<software name="soccer">
+		<description>Soccer</description>
+		<year>1980</year>
+		<publisher>Tiger Electronics</publisher>
+		<part name="cart" interface="playmaker_cart">
+			<feature name="notch" value="0x2" />
+			<dataarea name="nodata" size="0x10"></dataarea>
+		</part>
+	</software>
+
+</softwarelist>

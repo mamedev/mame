@@ -209,7 +209,7 @@ void popnrun_state::popnrun_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 		//if ((m_spriteram[offs+3] & 0xff00)!=0xf00) continue;
 
 		pri = 0;
-		#ifdef UNUSED_FUNCTION
+#if 0
 		switch (m_spriteram[offs+2]&0xc000) {
 		default:
 		case 0xc000: pri=0; break; /* Unknown */
@@ -217,28 +217,28 @@ void popnrun_state::popnrun_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 		case 0x4000: pri=0xf0; break; /* Under top playfield */
 		case 0x0000: pri=0xf0|0xcc; break; /* Under middle playfield */
 		}
-		#endif
+#endif
 
 		fx = m_spriteram[offs+0]&0x4000;
 		fy = m_spriteram[offs+0]&0x8000;
 		y = m_spriteram[offs+1] & 0xff;
 		x = (m_spriteram[offs+1] >> 8) & 0xff;
-		#ifdef UNUSED_FUNCTION
+#if 0
 		if (fy) fy=0; else fy=1;
 		if (m_spriteram[offs+2]&0x100) x=0-(0xff-x);
-		#endif
+#endif
 
 		color = (m_spriteram[offs+0]>>12)&0x7;
 		sprite = m_spriteram[offs+0]&0xfff;
 
-		#ifdef UNUSED_FUNCTION
+#if 0
 		if (flip_screen()) {
 			x=240-x;
 			y=240-y;
 			if (fx) fx=0; else fx=1;
 			if (fy) fy=0; else fy=1;
 		}
-		#endif
+#endif
 
 		m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
 				sprite,

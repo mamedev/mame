@@ -19,7 +19,6 @@ public:
 	// TCU
 	void set_tclk(double clk) { m_tclk = clk; }
 	void set_tclk(const XTAL &xtal) { set_tclk(xtal.dvalue()); }
-	template <unsigned Timer> auto out_handler() { return device().subdevice<pit8253_device>("tcu")->out_handler<Timer>(); }
 	DECLARE_WRITE_LINE_MEMBER(tclk_w);
 
 	// DMAU
@@ -86,6 +85,7 @@ protected:
 	void WCY1_w(u8 data) {}
 	void WCY0_w(u8 data) {}
 	void WAC_w(u8 data) {}
+	u8 TCKS_r();
 	void TCKS_w(u8 data);
 	void SBCR_w(u8 data) {}
 	void RFC_w(u8 data) {}
@@ -93,11 +93,17 @@ protected:
 	void WCY2_w(u8 data) {}
 	void WCY3_w(u8 data) {}
 	void WCY4_w(u8 data) {}
+	u8 SULA_r();
 	void SULA_w(u8 data);
+	u8 TULA_r();
 	void TULA_w(u8 data);
+	u8 IULA_r();
 	void IULA_w(u8 data);
+	u8 DULA_r();
 	void DULA_w(u8 data);
+	u8 OPHA_r();
 	void OPHA_w(u8 data);
+	u8 OPSEL_r();
 	void OPSEL_w(u8 data);
 	u8 get_pic_ack() { return 0; }
 	DECLARE_WRITE_LINE_MEMBER(internal_irq_w);
@@ -139,6 +145,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(hack_w) { m_dmau->hack_w(state); }
 	DECLARE_WRITE_LINE_MEMBER(tctl2_w) { m_tcu->write_gate2(state); }
 
+	auto tout1_cb() { return m_tout1_callback.bind(); }
+	auto tout2_cb() { return subdevice<pit8253_device>("tcu")->out_handler<2>(); }
+
 protected:
 	v50_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool is_16bit, u8 prefetch_size, u8 prefetch_cycles, u32 chip_type);
 
@@ -165,10 +174,18 @@ protected:
 
 	void internal_port_map(address_map &map);
 
+	u8 OPCN_r();
 	void OPCN_w(u8 data);
 
 private:
+	DECLARE_WRITE_LINE_MEMBER(tout1_w);
+
+	devcb_write_line m_tout1_callback;
+
 	u8 m_OPCN;
+	bool m_tout1;
+	bool m_intp1;
+	bool m_intp2;
 };
 
 class v40_device : public v50_base_device
@@ -208,6 +225,8 @@ public:
 	}
 	DECLARE_WRITE_LINE_MEMBER(hack_w);
 
+	template <unsigned Timer> auto out_handler() { return subdevice<pit8253_device>("tcu")->out_handler<Timer>(); }
+
 protected:
 	v53_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
@@ -233,6 +252,7 @@ protected:
 	void internal_port_map(address_map &map);
 	virtual void install_peripheral_io() override;
 
+	u8 SCTL_r();
 	void SCTL_w(u8 data);
 
 private:

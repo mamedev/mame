@@ -17,27 +17,27 @@ license:CC0
 
 	<view name="Default Layout">
 		<!-- Black background -->
-		<bezel element="background">
+		<element ref="background">
 			<bounds left="00" top="00" right="400" bottom="100" />
-		</bezel>
+		</element>
 
-		<bezel name="digit0" element="digit">
+		<element name="digit0" ref="digit">
 			<bounds x="340" y="10" width="50" height="80" />
-		</bezel>
-		<bezel name="digit1" element="digit">
+		</element>
+		<element name="digit1" ref="digit">
 			<bounds x="280" y="10" width="50" height="80" />
-		</bezel>
-		<bezel name="digit2" element="digit">
+		</element>
+		<element name="digit2" ref="digit">
 			<bounds x="190" y="10" width="50" height="80" />
-		</bezel>
-		<bezel name="digit3" element="digit">
+		</element>
+		<element name="digit3" ref="digit">
 			<bounds x="130" y="10" width="50" height="80" />
-		</bezel>
-		<bezel name="digit4" element="digit">
+		</element>
+		<element name="digit4" ref="digit">
 			<bounds x="70" y="10" width="50" height="80" />
-		</bezel>
-		<bezel name="digit5" element="digit">
+		</element>
+		<element name="digit5" ref="digit">
 			<bounds x="10" y="10" width="50" height="80" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

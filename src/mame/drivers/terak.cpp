@@ -12,6 +12,7 @@ Floppies were 8 inch IBM format.
 ****************************************************************************/
 
 #include "emu.h"
+//#include "bus/qbus/qbus.h"
 #include "cpu/t11/t11.h"
 #include "emupal.h"
 #include "screen.h"
@@ -36,8 +37,8 @@ private:
 
 	void mem_map(address_map &map);
 
-	uint8_t m_unit;
-	uint8_t m_cmd;
+	uint8_t m_unit = 0;
+	uint8_t m_cmd = 0;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	required_device<t11_device> m_maincpu;
@@ -105,7 +106,7 @@ uint32_t terak_state::screen_update_terak(screen_device &screen, bitmap_ind16 &b
 void terak_state::terak(machine_config &config)
 {
 	/* basic machine hardware */
-	T11(config, m_maincpu, XTAL(4'000'000));
+	T11(config, m_maincpu, 4'000'000); // FIXME: actually LSI-11
 	m_maincpu->set_initial_mode(6 << 13);
 	m_maincpu->set_addrmap(AS_PROGRAM, &terak_state::mem_map);
 

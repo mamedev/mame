@@ -16,6 +16,7 @@ public:
 	static float s_flicker;
 	static float s_beam_width_min;
 	static float s_beam_width_max;
+	static float s_beam_dot_size;
 	static float s_beam_intensity_weight;
 
 protected:

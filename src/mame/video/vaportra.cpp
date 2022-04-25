@@ -16,7 +16,7 @@
 
 /******************************************************************************/
 
-WRITE16_MEMBER(vaportra_state::priority_w)
+void vaportra_state::priority_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_priority[offset]);
 }
@@ -36,13 +36,13 @@ void vaportra_state::update_palette( int offset )
 	m_palette->set_pen_color(offset, rgb_t(r,g,b));
 }
 
-WRITE16_MEMBER(vaportra_state::palette_w)
+void vaportra_state::palette_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_paletteram[offset]);
 	update_palette(offset);
 }
 
-WRITE16_MEMBER(vaportra_state::palette_ext_w)
+void vaportra_state::palette_ext_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_paletteram_ext[offset]);
 	update_palette(offset);

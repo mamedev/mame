@@ -41,7 +41,10 @@ Super Sensor IV:
 - MOS MPS6502A @ 2MHz
 - 1KB battery-backed RAM (2*TC5514AP-3)
 - 8KB ROM (TMM2364P)
-- 2 ROM sockets unpopulated
+- 2 ROM sockets for expansion (blue @ u6, white @ u5)
+
+Known Super Sensor IV expansion ROMs:
+- Quartz Chess Clock (came with the clock accessory)
 
 Sensor Dynamic's ROM is identical to Super Sensor IV "1I", the hardware is
 basically a low-budget version of it with peripheral ports removed.
@@ -53,19 +56,23 @@ Super Constellation:
 
 TODO:
 - is Dynamic S a program update of ssensor4 or identical?
-- verify IRQ active time for ssensor4
 
 ******************************************************************************/
 
 #include "emu.h"
+
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m65sc02.h"
 #include "cpu/m6502/r65c02.h"
-#include "machine/sensorboard.h"
+#include "machine/clock.h"
 #include "machine/nvram.h"
-#include "machine/timer.h"
+#include "machine/sensorboard.h"
 #include "sound/beep.h"
 #include "video/pwm.h"
+
+#include "softlist_dev.h"
 #include "speaker.h"
 
 // internal artwork
@@ -83,7 +90,6 @@ public:
 	const_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_irq_on(*this, "irq_on"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_beeper(*this, "beeper"),
@@ -109,7 +115,6 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device<timer_device> m_irq_on;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<beep_device> m_beeper;
@@ -119,10 +124,6 @@ private:
 	void const_map(address_map &map);
 	void ssensor4_map(address_map &map);
 	void sconst_map(address_map &map);
-
-	// periodic interrupts
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// I/O handlers
 	void update_display();
@@ -226,9 +227,12 @@ u8 const_state::input2_r()
 void const_state::ssensor4_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram().share("nvram");
+	map(0x2000, 0x2000).nopw(); // accessory?
+	map(0x4000, 0x4000).nopw(); // "
 	map(0x6000, 0x6000).rw(FUNC(const_state::input2_r), FUNC(const_state::mux_w));
 	map(0x8000, 0x8000).rw(FUNC(const_state::input1_r), FUNC(const_state::control_w));
-	map(0xa000, 0xffff).rom();
+	map(0xc000, 0xdfff).r("exrom", FUNC(generic_slot_device::read_rom));
+	map(0xe000, 0xffff).rom();
 }
 
 void const_state::const_map(address_map &map)
@@ -242,8 +246,8 @@ void const_state::const_map(address_map &map)
 void const_state::sconst_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share("nvram");
-	map(0x1c00, 0x1c00).nopw(); // printer/clock?
-	map(0x1d00, 0x1d00).nopw(); // printer/clock?
+	map(0x1c00, 0x1c00).nopw(); // accessory?
+	map(0x1d00, 0x1d00).nopw(); // "
 	map(0x1e00, 0x1e00).rw(FUNC(const_state::input2_r), FUNC(const_state::mux_w));
 	map(0x1f00, 0x1f00).rw(FUNC(const_state::input1_r), FUNC(const_state::control_w));
 	map(0x2000, 0xffff).rom();
@@ -350,10 +354,9 @@ void const_state::nconst(machine_config &config)
 	M6502(config, m_maincpu, 2_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::const_map);
 
-	const attotime irq_period = attotime::from_hz(2_MHz_XTAL / 0x2000); // through 4020 IC, ~244Hz
-	TIMER(config, m_irq_on).configure_periodic(FUNC(const_state::irq_on<M6502_IRQ_LINE>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(17200)); // active for ~17.2us
-	TIMER(config, "irq_off").configure_periodic(FUNC(const_state::irq_off<M6502_IRQ_LINE>), irq_period);
+	auto &irq_clock(CLOCK(config, "irq_clock", 2_MHz_XTAL / 0x2000)); // through 4020 IC, ~244Hz
+	irq_clock.set_pulse_width(attotime::from_nsec(17200)); // active for ~17.2us
+	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -376,10 +379,16 @@ void const_state::ssensor4(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::ssensor4_map);
 
+	subdevice<clock_device>("irq_clock")->set_pulse_width(attotime::from_usec(39)); // irq active for 39us
+
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 	m_board->set_nvram_enable(true);
 
 	config.set_default_layout(layout_novag_ssensor4);
+
+	/* expansion */
+	GENERIC_SOCKET(config, "exrom", generic_plain_slot, "novag_ssensor4");
+	SOFTWARE_LIST(config, "cart_list").set_original("novag_ssensor4");
 }
 
 void const_state::nconst36(machine_config &config)
@@ -390,10 +399,7 @@ void const_state::nconst36(machine_config &config)
 	M65SC02(config.replace(), m_maincpu, 7.2_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::const_map);
 
-	const attotime irq_period = attotime::from_hz(7.2_MHz_XTAL/2 / 0x2000); // through 4020 IC, ~439Hz
-	TIMER(config.replace(), m_irq_on).configure_periodic(FUNC(const_state::irq_on<M6502_IRQ_LINE>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(17200)); // same as nconst
-	TIMER(config.replace(), "irq_off").configure_periodic(FUNC(const_state::irq_off<M6502_IRQ_LINE>), irq_period);
+	subdevice<clock_device>("irq_clock")->set_clock(7.2_MHz_XTAL/2 / 0x2000); // ~439Hz (pulse width same as nconst)
 
 	m_board->set_delay(attotime::from_msec(200));
 
@@ -425,10 +431,7 @@ void const_state::nconstq(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_clock(8_MHz_XTAL/2);
 
-	const attotime irq_period = attotime::from_hz(8_MHz_XTAL/4 / 0x1000); // through 4020 IC, ~488Hz
-	TIMER(config.replace(), m_irq_on).configure_periodic(FUNC(const_state::irq_on<M6502_IRQ_LINE>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(17200)); // same as nconst
-	TIMER(config.replace(), "irq_off").configure_periodic(FUNC(const_state::irq_off<M6502_IRQ_LINE>), irq_period);
+	subdevice<clock_device>("irq_clock")->set_clock(8_MHz_XTAL/4 / 0x1000); // ~488Hz (pulse width same as nconst)
 
 	config.set_default_layout(layout_novag_constq);
 
@@ -445,7 +448,7 @@ void const_state::sconst(machine_config &config)
 	M6502(config.replace(), m_maincpu, 8_MHz_XTAL/2); // UM6502C
 	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::sconst_map);
 
-	m_irq_on->set_start_delay(m_irq_on->period() - attotime::from_nsec(10200)); // irq active for 10.2us
+	subdevice<clock_device>("irq_clock")->set_pulse_width(attotime::from_nsec(10200)); // irq active for 10.2us
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 	m_board->set_nvram_enable(true);
@@ -460,7 +463,7 @@ void const_state::sconst(machine_config &config)
 ******************************************************************************/
 
 ROM_START( ssensor4 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("5611_1i_orange.u4", 0xe000, 0x2000, CRC(f4ee99d1) SHA1(f44144a26b92c51f4350da85858470e6c3b66fc1) ) // TMM2364P
 ROM_END
 

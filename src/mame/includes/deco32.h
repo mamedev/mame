@@ -11,10 +11,10 @@
 #include "machine/gen_latch.h"
 #include "sound/lc7535.h"
 #include "sound/okim6295.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "machine/deco146.h"
 #include "machine/deco104.h"
-#include "video/deco_zoomspr.h"
+#include "video/namco_c355spr.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -90,11 +90,11 @@ protected:
 
 	virtual void video_start() override;
 
-	std::unique_ptr<u8[]> m_dirty_palette; // all but captaven
-	int m_pri; // all but dragngun
-	std::unique_ptr<u16[]> m_spriteram16[2]; // all but dragngun
-	std::unique_ptr<u16[]> m_spriteram16_buffered[2]; // all but dragngun
-	std::unique_ptr<u16[]> m_pf_rowscroll[4]; // common
+	std::unique_ptr<u8[]> m_dirty_palette{}; // all but captaven
+	int m_pri = 0; // all but dragngun
+	std::unique_ptr<u16[]> m_spriteram16[2]{}; // all but dragngun
+	std::unique_ptr<u16[]> m_spriteram16_buffered[2]{}; // all but dragngun
+	std::unique_ptr<u16[]> m_pf_rowscroll[4]{}; // common
 
 private:
 	// we use the pointers below to store a 32-bit copy..
@@ -204,13 +204,13 @@ private:
 
 	std::unique_ptr<bitmap_ind16> m_tilemap_alpha_bitmap;
 
-	int m_tattass_eprom_bit;
-	int m_last_clock;
-	u32 m_buffer;
-	int m_buf_ptr;
-	int m_pending_command;
-	int m_read_bit_count;
-	int m_byte_addr;
+	int m_tattass_eprom_bit = 0;
+	int m_last_clock = 0;
+	u32 m_buffer = 0U;
+	int m_buf_ptr = 0;
+	int m_pending_command = 0;
+	int m_read_bit_count = 0;
+	int m_byte_addr = 0;
 };
 
 class dragngun_state : public deco32_state
@@ -218,10 +218,12 @@ class dragngun_state : public deco32_state
 public:
 	dragngun_state(const machine_config &mconfig, device_type type, const char *tag)
 		: deco32_state(mconfig, type, tag)
-		, m_sprgenzoom(*this, "spritegen_zoom")
+		, m_sprgenzoom(*this, "c355spr")
 		, m_spriteram(*this, "spriteram")
-		, m_sprite_layout_ram(*this, "lay%u", 0)
-		, m_sprite_lookup_ram(*this, "look%u", 0)
+		, m_sprite_spriteformat(*this, "lay%u", 0)
+		, m_sprite_spritetile(*this, "look%u", 0)
+		, m_sprite_cliptable(*this, "spclip")
+		, m_sprite_indextable(*this, "spindex")
 		, m_vol_main(*this, "vol_main")
 		, m_vol_gun(*this, "vol_gun")
 		, m_io_inputs(*this, "INPUTS")
@@ -241,11 +243,14 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(lockload_gun_trigger);
 
 private:
-	required_device<deco_zoomspr_device> m_sprgenzoom;
+	required_device<namco_c355spr_device> m_sprgenzoom;
 	required_device<buffered_spriteram32_device> m_spriteram;
 
-	required_shared_ptr_array<u32, 2> m_sprite_layout_ram;
-	required_shared_ptr_array<u32, 2> m_sprite_lookup_ram;
+	required_shared_ptr_array<u32, 2> m_sprite_spriteformat;
+	required_shared_ptr_array<u32, 2> m_sprite_spritetile;
+	required_shared_ptr<u32> m_sprite_cliptable;
+	required_shared_ptr<u32> m_sprite_indextable;
+
 	required_device<lc7535_device> m_vol_main;
 	optional_device<lc7535_device> m_vol_gun;
 
@@ -253,10 +258,10 @@ private:
 	optional_ioport_array<2> m_io_light_x;
 	optional_ioport_array<2> m_io_light_y;
 
-	u32 m_sprite_ctrl;
-	int m_lightgun_port;
-	int m_oki2_bank; // lockload
-	bitmap_rgb32 m_temp_render_bitmap;
+	u32 m_sprite_ctrl = 0U;
+	int m_lightgun_port = 0;
+	int m_oki2_bank = 0; // lockload
+	bitmap_rgb32 m_temp_render_bitmap{};
 
 	u32 lightgun_r();
 	void lightgun_w(offs_t offset, u32 data = 0);
@@ -276,6 +281,16 @@ private:
 	void lockload_okibank_hi_w(u8 data); // lockload
 
 	virtual void video_start() override;
+
+	int sprite_bank_callback(int sprite);
+	u16 read_spritetile(int lookupram_offset);
+	u16 read_spriteformat(int spriteformatram_offset, u8 attr);
+	u16 read_spritetable(int offs, u8 attr, int whichlist);
+	u16 read_spritelist(int offs, int whichlist);
+	u16 read_cliptable(int offs, u8 attr);
+	int sprite_priority_callback(int priority);
+
+	void expand_sprite_data();
 	void dragngun_init_common();
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -283,6 +298,9 @@ private:
 	DECO16IC_BANK_CB_MEMBER(bank_1_callback);
 	DECO16IC_BANK_CB_MEMBER(bank_2_callback);
 
+	void namco_sprites(machine_config &config);
+
+	void namcosprite_map(address_map &map);
 	void dragngun_map(address_map &map);
 	void lockload_map(address_map &map);
 	void lockloadu_map(address_map &map);

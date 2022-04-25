@@ -44,11 +44,11 @@ protected:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(nmi_ack_w);
-	DECLARE_WRITE8_MEMBER(sound_nmi_ack_w);
+	void nmi_ack_w(uint8_t data);
+	void sound_nmi_ack_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(ay1reset_r);
-	DECLARE_READ8_MEMBER(ay2reset_r);
+	uint8_t ay1reset_r();
+	uint8_t ay2reset_r();
 
 	DECLARE_WRITE_LINE_MEMBER(palette_bank_0_w);
 	DECLARE_WRITE_LINE_MEMBER(palette_bank_1_w);
@@ -77,11 +77,11 @@ private:
 
 	/* video-related */
 	std::unique_ptr<bitmap_ind16> m_tmpbitmap;
-	int          m_palette_bank;
-	int          m_flipscreen;
+	int          m_palette_bank = 0;
+	int          m_flipscreen = 0;
 
 	/* misc */
-	int          m_nmi_enable;
+	int          m_nmi_enable = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

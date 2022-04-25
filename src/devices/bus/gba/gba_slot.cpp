@@ -534,7 +534,7 @@ void device_gba_cart_interface::nvram_alloc(uint32_t size)
 //-------------------------------------------------
 gba_cart_slot_device::gba_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, GBA_CART_SLOT, tag, owner, clock),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	device_slot_interface(mconfig, *this),
 	m_type(GBA_STD),
 	m_cart(nullptr)
@@ -594,7 +594,7 @@ static int gba_get_pcb_id(const char *slot)
 {
 	for (auto & elem : slot_list)
 	{
-		if (!core_stricmp(elem.slot_option, slot))
+		if (!strcmp(elem.slot_option, slot))
 			return elem.pcb_id;
 	}
 
@@ -625,7 +625,7 @@ image_init_result gba_cart_slot_device::call_load()
 		uint32_t size = loaded_through_softlist() ? get_software_region_length("rom") : length();
 		if (size > 0x4000000)
 		{
-			seterror(IMAGE_ERROR_UNSPECIFIED, "Attempted loading a cart larger than 64MB");
+			seterror(image_error::INVALIDIMAGE, "Attempted loading a cart larger than 64MB");
 			return image_init_result::FAIL;
 		}
 
@@ -659,13 +659,13 @@ image_init_result gba_cart_slot_device::call_load()
 		{
 			case 2 * 1024 * 1024:
 				memcpy(ROM + 0x200000, ROM, 0x200000);
-				// intentional fall-through
+				[[fallthrough]];
 			case 4 * 1024 * 1024:
 				memcpy(ROM + 0x400000, ROM, 0x400000);
-				// intentional fall-through
+				[[fallthrough]];
 			case 8 * 1024 * 1024:
 				memcpy(ROM + 0x800000, ROM, 0x800000);
-				// intentional fall-through
+				[[fallthrough]];
 			case 16 * 1024 * 1024:
 				memcpy(ROM + 0x1000000, ROM, 0x1000000);
 				break;
@@ -719,7 +719,11 @@ static inline std::string gba_chip_string( uint32_t chip )
 	if (chip & GBA_CHIP_FLASH_512) str += "FLASH_512 ";
 	if (chip & GBA_CHIP_SRAM) str += "SRAM ";
 	if (chip & GBA_CHIP_RTC) str += "RTC ";
-	strtrimspace(str);
+	if (!str.empty())
+	{
+		assert(str.back() == ' ');
+		str = str.substr(0, str.length() - 1);
+	}
 	return str;
 }
 
@@ -879,15 +883,15 @@ std::string gba_cart_slot_device::get_default_card_software(get_default_card_sof
 {
 	if (hook.image_file())
 	{
-		const char *slot_string;
-		uint32_t len = hook.image_file()->size();
+		uint64_t len;
+		hook.image_file()->length(len); // FIXME: check error return, guard against excessively large files
 		std::vector<uint8_t> rom(len);
-		int type;
 
-		hook.image_file()->read(&rom[0], len);
+		size_t actual;
+		hook.image_file()->read(&rom[0], len, actual); // FIXME: check error return or read returning short
 
-		type = get_cart_type(&rom[0], len);
-		slot_string = gba_get_slot(type);
+		int const type = get_cart_type(&rom[0], len);
+		char const *const slot_string = gba_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
 
@@ -901,26 +905,26 @@ std::string gba_cart_slot_device::get_default_card_software(get_default_card_sof
  read
  -------------------------------------------------*/
 
-READ32_MEMBER(gba_cart_slot_device::read_rom)
+uint32_t gba_cart_slot_device::read_rom(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_rom(space, offset, mem_mask);
+		return m_cart->read_rom(offset);
 	else
 		return 0xffffffff;
 }
 
-READ32_MEMBER(gba_cart_slot_device::read_ram)
+uint32_t gba_cart_slot_device::read_ram(offs_t offset, uint32_t mem_mask)
 {
 	if (m_cart)
-		return m_cart->read_ram(space, offset, mem_mask);
+		return m_cart->read_ram(offset, mem_mask);
 	else
 		return 0xffffffff;
 }
 
-READ32_MEMBER(gba_cart_slot_device::read_gpio)
+uint32_t gba_cart_slot_device::read_gpio(offs_t offset, uint32_t mem_mask)
 {
 	if (m_cart)
-		return m_cart->read_gpio(space, offset, mem_mask);
+		return m_cart->read_gpio(offset, mem_mask);
 	else
 		return 0xffffffff;
 }
@@ -930,14 +934,14 @@ READ32_MEMBER(gba_cart_slot_device::read_gpio)
  write
  -------------------------------------------------*/
 
-WRITE32_MEMBER(gba_cart_slot_device::write_ram)
+void gba_cart_slot_device::write_ram(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_cart)
-		m_cart->write_ram(space, offset, data, mem_mask);
+		m_cart->write_ram(offset, data, mem_mask);
 }
 
-WRITE32_MEMBER(gba_cart_slot_device::write_gpio)
+void gba_cart_slot_device::write_gpio(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_cart)
-		m_cart->write_gpio(space, offset, data, mem_mask);
+		m_cart->write_gpio(offset, data, mem_mask);
 }

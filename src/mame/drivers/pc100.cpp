@@ -127,19 +127,19 @@ private:
 	void rtc_portc_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(irqnmi_w);
 	DECLARE_WRITE_LINE_MEMBER(drqnmi_w);
-	uint16_t m_kanji_addr;
-	uint8_t m_timer_mode;
+	uint16_t m_kanji_addr = 0;
+	uint8_t m_timer_mode = 0;
 
-	uint8_t m_bank_r,m_bank_w,m_key;
-	bool m_nmi_mask, m_irq_state, m_drq_state;
+	uint8_t m_bank_r = 0, m_bank_w = 0, m_key = 0;
+	bool m_nmi_mask = false, m_irq_state = false, m_drq_state = false;
 
 	struct{
-		uint8_t shift;
-		uint16_t mask;
-		uint16_t cmd;
-		uint16_t vstart;
-		uint8_t addr;
-		uint8_t reg[8];
+		uint8_t shift = 0;
+		uint16_t mask = 0;
+		uint16_t cmd = 0;
+		uint16_t vstart = 0;
+		uint8_t addr = 0;
+		uint8_t reg[8]{};
 	}m_crtc;
 	uint32_t screen_update_pc100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pc100_vblank_irq);
@@ -164,40 +164,35 @@ void pc100_state::video_start()
 
 uint32_t pc100_state::screen_update_pc100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
-	int count;
-	int xi;
-	int dot;
-	int pen[4],pen_i;
+	int count = (m_crtc.vstart + 0x20) * 0x40;
 
-	count = ((m_crtc.vstart + 0x20) * 0x40);
-
-	for(y=0;y<512;y++)
+	for(int y=0;y<512;y++)
 	{
 		count &= 0xffff;
 
-		for(x=0;x<1024/16;x++)
+		for(int x=0;x<1024/16;x++)
 		{
-			for(xi=0;xi<16;xi++)
+			for(int xi=0;xi<16;xi++)
 			{
 				if(m_crtc.cmd != 0xffff)
 				{
-					for(pen_i=0;pen_i<4;pen_i++)
+					int pen[4];
+					for(int pen_i=0;pen_i<4;pen_i++)
 						pen[pen_i] = (m_vram[count+pen_i*0x10000] >> xi) & 1;
 
-					dot = 0;
-					for(pen_i=0;pen_i<4;pen_i++)
+					int dot = 0;
+					for(int pen_i=0;pen_i<4;pen_i++)
 						dot |= pen[pen_i]<<pen_i;
 
 					if(y < 512 && x*16+xi < 768) /* TODO: safety check */
-						bitmap.pix16(y, x*16+xi) = m_palette->pen(dot);
+						bitmap.pix(y, x*16+xi) = m_palette->pen(dot);
 				}
 				else
 				{
-					dot = (m_vram[count] >> xi) & 1;
+					int dot = (m_vram[count] >> xi) & 1;
 
 					if(y < 512 && x*16+xi < 768) /* TODO: safety check */
-						bitmap.pix16(y, x*16+xi) = m_palette->pen(dot ? 15 : 0);
+						bitmap.pix(y, x*16+xi) = m_palette->pen(dot ? 15 : 0);
 				}
 			}
 
@@ -677,8 +672,8 @@ void pc100_state::pc100(machine_config &config)
 	m_rtc->d2_handler().set(FUNC(pc100_state::rtc_portc_2_w));
 	m_rtc->d3_handler().set(FUNC(pc100_state::rtc_portc_3_w));
 
-	FLOPPY_CONNECTOR(config, "upd765:0", pc100_floppies, "525dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "upd765:1", pc100_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:0", pc100_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", pc100_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

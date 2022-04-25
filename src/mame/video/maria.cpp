@@ -291,8 +291,7 @@ void atari_maria_device::draw_scanline()
 
 	// draw line buffer to screen
 	m_active_buffer = !m_active_buffer; // switch buffers
-	uint16_t *scanline;
-	scanline = &m_bitmap.pix16(m_screen->vpos());
+	uint16_t *const scanline = &m_bitmap.pix(m_screen->vpos());
 
 
 	for (int i = 0; i < 160; i++)

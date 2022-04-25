@@ -157,9 +157,9 @@ Thanks to http://z80ne.com for info!
 	An interesting note from z80ne.com:
 
 	This version has been recovered by undeleting some files that were on the original
-	NE-DOS version G.1.0 floppy. Probably, Nuova Elettronica tecnicians saved that files
-	on the master floppy to be distributed, but they deleted them because that files weren't
-	part of the distribution (infact editor assembler/disassembler was sold separately).
+	NE-DOS version G.1.0 floppy. Probably, Nuova Elettronica tecnicians saved those files
+	on the master floppy to be distributed, but they deleted them because the files weren't
+	part of the distribution (in fact editor assembler/disassembler was sold separately).
 	Anyway, due to the fact that they are recovered files, I cannot guarantee that they are
 	the official version and not a test version instead. However, from the tests I made, they
 	work perfectly.
@@ -167,12 +167,12 @@ Thanks to http://z80ne.com for info!
 	From the NE-DOS version G.1.0 original floppy I was able to undelete and recover the
 	following programs, that I saved on this floppy: Editor assembler, Disassembler, Super
 	Debug, Disk Print and LmOffset.
-	The Super Debug has been announced on the magazine, but it was never released.
-	It's clear that it's a preliminar version, because it's clearly a bad preliminar translation
+	The Super Debug has been announced in the magazine, but it was never released.
+	It's clear that it's a preliminary version, because it's clearly a bad preliminary translation
 	in italian of an english program, probably SuperZap that was made for Tandy TRS-80.
-	The Disk Print is a program never named on the magazine, that dumps floppy
+	The Disk Print is a program never named in the magazine, that dumps floppy
 	contents on video or printer.
-	Then the LmOffset program, also never named on the magazine, it's the same
+	Then the LmOffset program, also never named in the magazine, it's the same
 	program that can be found on the Tandy TRS-80
 	-->
 	<software name="editasmg">
@@ -562,7 +562,7 @@ Thanks to http://z80ne.com for info!
 	</software>
 
 	<!--
-	This disk is a collection of games that can be found in other disks also, starting from a single main menù.
+	This disk is a collection of games that can be found in other disks also, starting from a single main menu.
 
 	- basic G.1 + ne-dos G.1.0  operating system and basic
 	- battnava/bas              naval battle

@@ -111,9 +111,6 @@ uint32_t thedealr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 {
 	bitmap.fill(0x1f0, cliprect);
 
-	m_seta001->set_bg_yoffsets(  0x11+1, -0x10 );   // + is up (down with flip)
-	m_seta001->set_fg_yoffsets( -0x12+1, -0x01 );
-
 	m_seta001->draw_sprites(screen, bitmap, cliprect, 0x1000);
 	return 0;
 }
@@ -352,7 +349,7 @@ static INPUT_PORTS_START( thedealr )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SERVICE1      ) PORT_NAME("Reset") // RST (reset)
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_GAMBLE_KEYOUT ) // PAY
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SERVICE2      ) // (unused?)
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_POKER_BET     ) // BET (bet)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_GAMBLE_BET    ) // BET (bet)
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_POKER_CANCEL  ) // MET (cancel? keep pressed to show stats)
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_GAMBLE_HIGH   ) PORT_NAME("Big") // BIG (big)
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_GAMBLE_D_UP   ) // D.U (double up?)
@@ -555,8 +552,9 @@ void thedealr_state::thedealr(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	SETA001_SPRITE(config, m_seta001, 0);
-	m_seta001->set_gfxdecode_tag("gfxdecode");
+	SETA001_SPRITE(config, m_seta001, 16'000'000, m_palette, gfx_thedealr);
+	m_seta001->set_bg_yoffsets(  0x11+1, -0x10 );   // + is up (down with flip)
+	m_seta001->set_fg_yoffsets( -0x12+1, -0x01 );
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -569,7 +567,6 @@ void thedealr_state::thedealr(machine_config &config)
 	screen.screen_vblank().append_inputline(m_subcpu, INPUT_LINE_NMI);
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_thedealr);
 	PALETTE(config, m_palette, FUNC(thedealr_state::thedealr_palette), 512);
 
 	// sound hardware

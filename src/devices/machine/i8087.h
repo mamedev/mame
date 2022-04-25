@@ -26,7 +26,7 @@ protected:
 	i8087_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	address_space &space() { return *m_space; }

@@ -105,8 +105,8 @@ Notes:
 
     Start the Visual 1050 emulator with the floppy and hard disk images mounted:
 
-    $ mess v1050 -flop1 cpm3:flop2 -hard tm501.chd
-    $ mess v1050 -flop1 cpm3:flop2 -hard cm5412.chd
+    $ mame v1050 -flop1 cpm3:flop2 -hard tm501.chd
+    $ mame v1050 -flop1 cpm3:flop2 -hard cm5412.chd
 
     Start the Winchester Format Program from the CP/M prompt:
 
@@ -128,13 +128,13 @@ Notes:
 
     You can now boot from the hard disk with:
 
-    $ mess v1050 -hard tm501.chd
-    $ mess v1050 -hard cm5412.chd
+    $ mame v1050 -hard tm501.chd
+    $ mame v1050 -hard cm5412.chd
 
     Or skip all of the above and use the preformatted images in the software list:
 
-    $ mess v1050 -hard cpm3hd5
-    $ mess v1050 -hard cpm3hd10
+    $ mame v1050 -hard cpm3hd5
+    $ mame v1050 -hard cpm3hd10
 
 */
 
@@ -181,12 +181,12 @@ void v1050_state::bankswitch()
 
 	if (BIT(m_bank, 0))
 	{
-		program.install_readwrite_bank(0x0000, 0x1fff, "bank1");
+		program.install_readwrite_bank(0x0000, 0x1fff, membank("bank1"));
 		membank("bank1")->set_entry(bank);
 	}
 	else
 	{
-		program.install_read_bank(0x0000, 0x1fff, "bank1");
+		program.install_read_bank(0x0000, 0x1fff, membank("bank1"));
 		program.unmap_write(0x0000, 0x1fff);
 		membank("bank1")->set_entry(3);
 	}
@@ -199,8 +199,8 @@ void v1050_state::bankswitch()
 	}
 	else
 	{
-		program.install_readwrite_bank(0x4000, 0x7fff, "bank3");
-		program.install_readwrite_bank(0x8000, 0xbfff, "bank4");
+		program.install_readwrite_bank(0x4000, 0x7fff, membank("bank3"));
+		program.install_readwrite_bank(0x8000, 0xbfff, membank("bank4"));
 		membank("bank3")->set_entry(bank);
 		membank("bank4")->set_entry(bank);
 	}
@@ -326,7 +326,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(v1050_state::v1050_keyboard_tick)
 	scan_keyboard();
 }
 
-READ8_MEMBER( v1050_state::kb_data_r )
+uint8_t v1050_state::kb_data_r()
 {
 	m_keyavail = 0;
 
@@ -335,7 +335,7 @@ READ8_MEMBER( v1050_state::kb_data_r )
 	return m_keydata;
 }
 
-READ8_MEMBER( v1050_state::kb_status_r )
+uint8_t v1050_state::kb_status_r()
 {
 	uint8_t val = m_uart_kb->status_r();
 
@@ -344,37 +344,37 @@ READ8_MEMBER( v1050_state::kb_status_r )
 
 // Z80 Read/Write Handlers
 
-WRITE8_MEMBER( v1050_state::v1050_i8214_w )
+void v1050_state::v1050_i8214_w(uint8_t data)
 {
 	m_pic->b_w((data >> 1) & 0x07);
 	m_pic->sgs_w(BIT(data, 4));
 }
 
-READ8_MEMBER( v1050_state::vint_clr_r )
+uint8_t v1050_state::vint_clr_r()
 {
 	set_interrupt(INT_VSYNC, 0);
 
 	return 0xff;
 }
 
-WRITE8_MEMBER( v1050_state::vint_clr_w )
+void v1050_state::vint_clr_w(uint8_t data)
 {
 	set_interrupt(INT_VSYNC, 0);
 }
 
-READ8_MEMBER( v1050_state::dint_clr_r )
+uint8_t v1050_state::dint_clr_r()
 {
 	set_interrupt(INT_DISPLAY, 0);
 
 	return 0xff;
 }
 
-WRITE8_MEMBER( v1050_state::dint_clr_w )
+void v1050_state::dint_clr_w(uint8_t data)
 {
 	set_interrupt(INT_DISPLAY, 0);
 }
 
-WRITE8_MEMBER( v1050_state::bank_w )
+void v1050_state::bank_w(uint8_t data)
 {
 	m_bank = data;
 
@@ -383,17 +383,17 @@ WRITE8_MEMBER( v1050_state::bank_w )
 
 // SY6502A Read/Write Handlers
 
-WRITE8_MEMBER( v1050_state::dint_w )
+void v1050_state::dint_w(uint8_t data)
 {
 	set_interrupt(INT_DISPLAY, 1);
 }
 
-WRITE8_MEMBER( v1050_state::dvint_clr_w )
+void v1050_state::dvint_clr_w(uint8_t data)
 {
 	m_subcpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER( v1050_state::sasi_data_w )
+void v1050_state::sasi_data_w(uint8_t data)
 {
 	m_sasi_data = data;
 
@@ -429,7 +429,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(v1050_state::sasi_rst_tick)
 	m_sasibus->write_rst(0);
 }
 
-WRITE8_MEMBER( v1050_state::sasi_ctrl_w )
+void v1050_state::sasi_ctrl_w(uint8_t data)
 {
 	/*
 
@@ -980,17 +980,17 @@ void v1050_state::machine_start()
 	membank("bank1")->configure_entry(2, ram + 0x1c000);
 	membank("bank1")->configure_entry(3, m_rom->base());
 
-	program.install_readwrite_bank(0x2000, 0x3fff, "bank2");
+	program.install_readwrite_bank(0x2000, 0x3fff, membank("bank2"));
 	membank("bank2")->configure_entries(0, 2, ram + 0x2000, 0x10000);
 	membank("bank2")->configure_entry(2, ram + 0x1e000);
 
-	program.install_readwrite_bank(0x4000, 0x7fff, "bank3");
+	program.install_readwrite_bank(0x4000, 0x7fff, membank("bank3"));
 	membank("bank3")->configure_entries(0, 2, ram + 0x4000, 0x10000);
 
-	program.install_readwrite_bank(0x8000, 0xbfff, "bank4");
+	program.install_readwrite_bank(0x8000, 0xbfff, membank("bank4"));
 	membank("bank4")->configure_entries(0, 2, ram + 0x8000, 0x10000);
 
-	program.install_readwrite_bank(0xc000, 0xffff, "bank5");
+	program.install_readwrite_bank(0xc000, 0xffff, membank("bank5"));
 	membank("bank5")->configure_entries(0, 3, ram + 0xc000, 0);
 
 	bankswitch();
@@ -1101,10 +1101,10 @@ void v1050_state::v1050(machine_config &config)
 	MB8877(config, m_fdc, 16_MHz_XTAL/16);
 	m_fdc->intrq_wr_callback().set(FUNC(v1050_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(v1050_state::fdc_drq_w));
-	FLOPPY_CONNECTOR(config, MB8877_TAG":0", v1050_floppies, "525qd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, MB8877_TAG":1", v1050_floppies, "525qd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, MB8877_TAG":2", v1050_floppies, nullptr, floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, MB8877_TAG":3", v1050_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, MB8877_TAG":0", v1050_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, MB8877_TAG":1", v1050_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, MB8877_TAG":2", v1050_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, MB8877_TAG":3", v1050_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 
 	// SASI bus
 	SCSI_PORT(config, m_sasibus, 0);

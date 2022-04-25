@@ -11,7 +11,7 @@
 #include "cpu/m6800/m6801.h"
 #include "machine/adc0808.h"
 #include "machine/nvram.h"
-#include "sound/ym2151.h"
+#include "sound/ymopz.h"
 #include "video/hd44780.h"
 #include "emupal.h"
 #include "screen.h"
@@ -57,7 +57,7 @@ void yamaha_dx11_state::machine_start()
 HD44780_PIXEL_UPDATE(yamaha_dx11_state::lcd_pixel_update)
 {
 	if (x < 5 && y < 8 && line < 2 && pos < 16)
-		bitmap.pix16(line * 8 + y, pos * 6 + x) = state;
+		bitmap.pix(line * 8 + y, pos * 6 + x) = state;
 }
 
 void yamaha_dx11_state::palette_init(palette_device &palette)

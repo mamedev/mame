@@ -14,6 +14,7 @@
 #pragma once
 
 #include <set>
+#include <utility>
 
 
 //**************************************************************************
@@ -81,6 +82,7 @@ public:
 	void go_exception(int exception, const char *condition);
 	void go_milliseconds(u64 milliseconds);
 	void go_privilege(const char *condition);
+	void go_branch(bool sense, const char *condition);
 	void go_next_device();
 
 	template <typename Format, typename... Params>
@@ -118,10 +120,6 @@ public:
 	bool registerpoint_enable(int index, bool enable = true);
 	void registerpoint_enable_all(bool enable = true );
 
-	// hotspots
-	bool hotspot_tracking_enabled() const { return !m_hotspots.empty(); }
-	void hotspot_track(int numspots, int threshhold);
-
 	// comments
 	void comment_add(offs_t address, const char *comment, rgb_t color);
 	bool comment_remove(offs_t addr);
@@ -133,16 +131,16 @@ public:
 	u32 compute_opcode_crc32(offs_t pc) const;
 
 	// history
-	offs_t history_pc(int index) const;
+	std::pair<offs_t, bool> history_pc(int index) const;
 
 	// pc tracking
-	void set_track_pc(bool value) { m_track_pc = value; }
-	bool track_pc_visited(const offs_t& pc) const;
-	void set_track_pc_visited(const offs_t& pc);
+	void set_track_pc(bool value);
+	bool track_pc_visited(offs_t pc) const;
+	void set_track_pc_visited(offs_t pc);
 	void track_pc_data_clear() { m_track_pc_set.clear(); }
 
 	// memory tracking
-	void set_track_mem(bool value) { m_track_mem = value; }
+	void set_track_mem(bool value);
 	offs_t track_mem_pc_from_space_address_data(const int& space,
 												const offs_t& address,
 												const u64& data) const;
@@ -170,7 +168,6 @@ private:
 	// breakpoint and watchpoint helpers
 	void breakpoint_update_flags();
 	void breakpoint_check(offs_t pc);
-	void hotspot_check(address_space &space, offs_t address);
 	void reinstall_all(read_or_write mode);
 	void reinstall(address_space &space, read_or_write mode);
 	void write_tracking(address_space &space, offs_t address, u64 data);
@@ -188,15 +185,16 @@ private:
 	debug_instruction_hook_func m_instrhook;            // per-instruction callback hook
 
 	// stepping information
-	offs_t                  m_stepaddr;                 // step target address for DEBUG_FLAG_STEPPING_OVER
+	offs_t                  m_stepaddr;                 // step target address for DEBUG_FLAG_STEPPING_OVER or DEBUG_FLAG_STEPPING_BRANCH
 	int                     m_stepsleft;                // number of steps left until done
+	int                     m_delay_steps;              // number of steps until target address check
 
 	// execution information
 	offs_t                  m_stopaddr;                 // stop address for DEBUG_FLAG_STOP_PC
 	attotime                m_stoptime;                 // stop time for DEBUG_FLAG_STOP_TIME
 	int                     m_stopirq;                  // stop IRQ number for DEBUG_FLAG_STOP_INTERRUPT
 	int                     m_stopexception;            // stop exception number for DEBUG_FLAG_STOP_EXCEPTION
-	std::unique_ptr<parsed_expression> m_privilege_condition;      // expression to evaluate on privilege change
+	std::unique_ptr<parsed_expression> m_stop_condition;           // expression to evaluate on privilege change
 	std::unique_ptr<parsed_expression> m_exception_condition;      // expression to evaluate on exception hit
 	attotime                m_endexectime;              // ending time of the current execution
 	u64                     m_total_cycles;             // current total cycles
@@ -205,6 +203,7 @@ private:
 	// history
 	offs_t                  m_pc_history[HISTORY_SIZE]; // history of recent PCs
 	u32                     m_pc_history_index;         // current history index
+	u32                     m_pc_history_valid;         // number of valid PC history entries
 
 	// breakpoints and watchpoints
 	std::multimap<offs_t, std::unique_ptr<debug_breakpoint>> m_bplist;     // list of breakpoints
@@ -242,22 +241,10 @@ private:
 														//    (0 = not tracing over,
 														//    ~0 = not currently tracing over)
 	};
-	std::unique_ptr<tracer>                m_trace;                    // tracer state
+	std::unique_ptr<tracer>                m_trace;     // tracer state
 
-	// hotspots
-	struct hotspot_entry
-	{
-		offs_t              m_access;                   // access address
-		offs_t              m_pc;                       // PC of the access
-		address_space *     m_space;                    // space where the access occurred
-		u32                 m_count;                    // number of hits
-	};
-	std::vector<hotspot_entry> m_hotspots;              // hotspot list
-	int                     m_hotspot_threshhold;       // threshhold for the number of hits to print
-
-	std::vector<memory_passthrough_handler *> m_phr;    // passthrough handler reference for each space, read mode
-	std::vector<memory_passthrough_handler *> m_phw;    // passthrough handler reference for each space, write mode
-	std::vector<int>        m_notifiers;                // notifiers for each space
+	std::vector<memory_passthrough_handler> m_phw;      // passthrough handler reference for each space, write mode
+	std::vector<util::notifier_subscription> m_notifiers; // notifiers for each space
 
 	// pc tracking
 	class dasm_pc_tag
@@ -337,12 +324,17 @@ private:
 	static constexpr u32 DEBUG_FLAG_SUSPENDED       = 0x00004000;       // CPU currently suspended
 	static constexpr u32 DEBUG_FLAG_LIVE_BP         = 0x00010000;       // there are live breakpoints for this CPU
 	static constexpr u32 DEBUG_FLAG_STOP_PRIVILEGE  = 0x00020000;       // run until execution level changes
+	static constexpr u32 DEBUG_FLAG_STEPPING_BRANCH_TRUE  = 0x0040000;  // run until true branch
+	static constexpr u32 DEBUG_FLAG_STEPPING_BRANCH_FALSE = 0x0080000;  // run until false branch
+	static constexpr u32 DEBUG_FLAG_CALL_IN_PROGRESS = 0x01000000;      // CPU is in the middle of a subroutine call
+	static constexpr u32 DEBUG_FLAG_TEST_IN_PROGRESS = 0x02000000;      // CPU is performing a conditional test and branch
 
-	static constexpr u32 DEBUG_FLAG_STEPPING_ANY    = DEBUG_FLAG_STEPPING | DEBUG_FLAG_STEPPING_OVER | DEBUG_FLAG_STEPPING_OUT;
+	static constexpr u32 DEBUG_FLAG_STEPPING_BRANCH = DEBUG_FLAG_STEPPING_BRANCH_TRUE | DEBUG_FLAG_STEPPING_BRANCH_FALSE;
+	static constexpr u32 DEBUG_FLAG_STEPPING_ANY    = DEBUG_FLAG_STEPPING | DEBUG_FLAG_STEPPING_OVER | DEBUG_FLAG_STEPPING_OUT | DEBUG_FLAG_STEPPING_BRANCH;
 	static constexpr u32 DEBUG_FLAG_TRACING_ANY     = DEBUG_FLAG_TRACING | DEBUG_FLAG_TRACING_OVER;
 	static constexpr u32 DEBUG_FLAG_TRANSIENT       = DEBUG_FLAG_STEPPING_ANY | DEBUG_FLAG_STOP_PC |
 			DEBUG_FLAG_STOP_INTERRUPT | DEBUG_FLAG_STOP_EXCEPTION | DEBUG_FLAG_STOP_VBLANK |
-			DEBUG_FLAG_STOP_TIME | DEBUG_FLAG_STOP_PRIVILEGE;
+			DEBUG_FLAG_STOP_TIME | DEBUG_FLAG_STOP_PRIVILEGE | DEBUG_FLAG_CALL_IN_PROGRESS | DEBUG_FLAG_TEST_IN_PROGRESS;
 };
 
 //**************************************************************************
@@ -399,7 +391,7 @@ public:
 	void set_memory_modified(bool memory_modified) { m_memory_modified = memory_modified; }
 	void set_execution_stopped() { m_execution_state = exec_state::STOPPED; }
 	void set_execution_running() { m_execution_state = exec_state::RUNNING; }
-	void set_wpinfo(offs_t address, u64 data) { m_wpaddr = address; m_wpdata = data; }
+	void set_wpinfo(offs_t address, u64 data, offs_t size) { m_wpaddr = address; m_wpdata = data; m_wpsize = size; }
 
 	// device_debug helpers
 	// [TODO] [RH]: Look into this more later, can possibly merge these two classes
@@ -437,6 +429,7 @@ private:
 
 	u64         m_wpdata;
 	u64         m_wpaddr;
+	u64         m_wpsize;
 	std::unique_ptr<u64[]> m_tempvar;
 
 	osd_ticks_t m_last_periodic_update_time;

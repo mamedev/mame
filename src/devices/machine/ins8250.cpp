@@ -81,7 +81,7 @@ ASCII/EBCDIC control character recognition, timed interrupts and more.
 
 
 Known issues:
-- MESS does currently not handle all these model specific features.
+- MAME does currently not handle all these model specific features.
 
 
 History:
@@ -111,6 +111,7 @@ ins8250_uart_device::ins8250_uart_device(const machine_config &mconfig, device_t
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_serial_interface(mconfig, *this)
 	, m_device_type(device_type)
+	, m_regs{0}
 	, m_out_tx_cb(*this)
 	, m_out_dtr_cb(*this)
 	, m_out_rts_cb(*this)
@@ -712,7 +713,7 @@ void ns16550_device::device_reset()
 	ins8250_uart_device::device_reset();
 }
 
-void ns16550_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ns16550_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if(!id)
 	{

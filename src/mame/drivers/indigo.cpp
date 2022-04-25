@@ -60,7 +60,7 @@ protected:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	std::unique_ptr<uint32_t[]> m_dsp_ram;
 	required_device<light_video_device> m_light;
-	address_space *m_space;
+	address_space *m_space = nullptr;
 };
 
 class indigo3k_state : public indigo_state
@@ -158,7 +158,7 @@ void indigo_state::indigo_map(address_map &map)
 void indigo3k_state::mem_map(address_map &map)
 {
 	indigo_map(map);
-	map(0x1fc00000, 0x1fc3ffff).rom().share("share10").region("user1", 0);
+	map(0x1fc00000, 0x1fc3ffff).rom().region("user1", 0);
 }
 
 void indigo4k_state::write_ram(offs_t offset, uint64_t data, uint64_t mem_mask)
@@ -183,10 +183,10 @@ void indigo4k_state::mem_map(address_map &map)
 {
 	indigo_map(map);
 	map(0x00000000, 0x0007ffff).bankrw("bank1");
-	map(0x08000000, 0x17ffffff).ram().share("share1").w(FUNC(indigo4k_state::write_ram));     /* 128 MB of main RAM */
+	map(0x08000000, 0x17ffffff).ram().share("share1").w(FUNC(indigo4k_state::write_ram));     /* 256 MB of main RAM */
 	map(0x1fa00000, 0x1fa1ffff).rw(m_mem_ctrl, FUNC(sgi_mc_device::read), FUNC(sgi_mc_device::write));
-	map(0x1fc00000, 0x1fc7ffff).rom().share("share5").region("user1", 0);
-	map(0x20000000, 0x27ffffff).ram().share("share1").w(FUNC(indigo4k_state::write_ram));     /* 128 MB of main RAM */
+	map(0x1fc00000, 0x1fc7ffff).rom().region("user1", 0);
+	map(0x20000000, 0x2fffffff).ram().share("share1").w(FUNC(indigo4k_state::write_ram));     /* 256 MB of main RAM */
 }
 
 static INPUT_PORTS_START(indigo)
@@ -214,7 +214,7 @@ void indigo4k_state::indigo4k(machine_config &config)
 {
 	indigo_base(config);
 
-	R4000(config, m_maincpu, 50000000*2);
+	R4000(config, m_maincpu, 50000000);
 	//m_maincpu->set_icache_size(32768);
 	//m_maincpu->set_dcache_size(32768);
 	m_maincpu->set_addrmap(AS_PROGRAM, &indigo4k_state::mem_map);
@@ -234,9 +234,12 @@ ROM_END
 
 ROM_START( indigo4k )
 	ROM_REGION64_BE( 0x80000, "user1", 0 )
-	ROMX_LOAD( "ip20prom.070-8116-004.bin", 0x000000, 0x080000, CRC(940d960e) SHA1(596aba530b53a147985ff3f6f853471ce48c866c), ROM_GROUPDWORD | ROM_REVERSE )
+	ROM_SYSTEM_BIOS( 0, "405d-rev-a", "SGI Version 4.0.5D Rev A IP20, Aug 19, 1992" )
+	ROMX_LOAD( "ip20prom.070-8116-004.bin", 0x000000, 0x080000, CRC(940d960e) SHA1(596aba530b53a147985ff3f6f853471ce48c866c), ROM_GROUPDWORD | ROM_REVERSE | ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "405g-rev-b", "SGI Version 4.0.5G Rev B IP20, Nov 10, 1992" ) // dumped over serial connection from boot monitor and swapped
+	ROMX_LOAD( "ip20prom.070-8116-005.bin", 0x000000, 0x080000, CRC(1875b645) SHA1(52f5d7baea3d1bc720eb2164104c177e23504345), ROM_GROUPDWORD | ROM_REVERSE | ROM_BIOS(1) )
 ROM_END
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   CLASS           INIT        COMPANY                 FULLNAME                                          FLAGS
 COMP( 1991, indigo3k, 0,      0,      indigo3k, indigo, indigo3k_state, empty_init, "Silicon Graphics Inc", "IRIS Indigo (R3000, 33MHz)",                     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1993, indigo4k, 0,      0,      indigo4k, indigo, indigo4k_state, empty_init, "Silicon Graphics Inc", "IRIS Indigo (R4400, 150MHz, Ver. 4.0.5D Rev A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1993, indigo4k, 0,      0,      indigo4k, indigo, indigo4k_state, empty_init, "Silicon Graphics Inc", "IRIS Indigo (R4400, 150MHz)",                    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

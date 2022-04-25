@@ -14,7 +14,7 @@
 
 /**************************************************************************/
 
-READ8_MEMBER(slapfght_state::tigerh_mcu_status_r)
+uint8_t slapfght_state::tigerh_mcu_status_r()
 {
 	return
 			(m_screen->vblank() ? 0x01 : 0x00) |
@@ -37,7 +37,7 @@ void slapfght_state::scroll_from_mcu_w(offs_t offset, uint8_t data)
 
 ***************************************************************************/
 
-READ8_MEMBER(slapfght_state::getstar_mcusim_status_r)
+uint8_t slapfght_state::getstar_mcusim_status_r()
 {
 	static const int states[3]={ 0xc7, 0x55, 0x00 };
 
@@ -49,7 +49,7 @@ READ8_MEMBER(slapfght_state::getstar_mcusim_status_r)
 	return m_getstar_status;
 }
 
-READ8_MEMBER(slapfght_state::getstar_mcusim_r)
+uint8_t slapfght_state::getstar_mcusim_r()
 {
 	uint8_t getstar_val = 0;
 	uint8_t lives_lookup_table[] = {0x03, 0x05, 0x01, 0x02};                                     /* table at 0x0e62 in 'getstarb1' */
@@ -85,7 +85,7 @@ READ8_MEMBER(slapfght_state::getstar_mcusim_r)
 	return getstar_val;
 }
 
-WRITE8_MEMBER(slapfght_state::getstar_mcusim_w)
+void slapfght_state::getstar_mcusim_w(uint8_t data)
 {
 	/* due to code at 0x108d (GUARDIAN) or 0x1152 (GETSTARJ), register C is a unaltered copy of register A */
 	#define GS_SAVE_REGS  m_gs_a = m_maincpu->state_int(Z80_BC) >> 0; \
@@ -188,7 +188,7 @@ WRITE8_MEMBER(slapfght_state::getstar_mcusim_w)
 
 ***************************************************************************/
 
-READ8_MEMBER(slapfght_state::tigerhb1_prot_r)
+uint8_t slapfght_state::tigerhb1_prot_r()
 {
 	uint8_t tigerhb_val = 0;
 	switch (m_tigerhb_cmd)
@@ -203,7 +203,7 @@ READ8_MEMBER(slapfght_state::tigerhb1_prot_r)
 	return tigerhb_val;
 }
 
-WRITE8_MEMBER(slapfght_state::tigerhb1_prot_w)
+void slapfght_state::tigerhb1_prot_w(uint8_t data)
 {
 	switch (data)
 	{
@@ -221,7 +221,7 @@ WRITE8_MEMBER(slapfght_state::tigerhb1_prot_w)
 
 /**************************************************************************/
 
-READ8_MEMBER(slapfght_state::getstarb1_prot_r)
+uint8_t slapfght_state::getstarb1_prot_r()
 {
 	/* The bootleg has it's own 'protection' on startup ?
 	    6D1A: 06 04         ld   b,$04

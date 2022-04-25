@@ -127,7 +127,7 @@ void atom2_state::atom2(machine_config &config)
 ROM_START( spongbob )
 	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASE00 )
 	// Main board
-	ROM_LOAD("ic4", 0x0000000, 0x80000, NO_DUMP )
+	ROM_LOAD("epr-24430.ic4", 0x0000000, 0x80000, NO_DUMP )
 
 	// ROM board
 	ROM_LOAD("ic1", 0x0000000, 0x1000000, CRC(607a0989) SHA1(17706df8400e13800edd1d1cf45047d1c970d0b8) )

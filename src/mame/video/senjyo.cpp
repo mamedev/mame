@@ -130,27 +130,27 @@ void senjyo_state::radar_palette(palette_device &palette) const
 
 ***************************************************************************/
 
-WRITE8_MEMBER(senjyo_state::fgvideoram_w)
+void senjyo_state::fgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
-WRITE8_MEMBER(senjyo_state::fgcolorram_w)
+void senjyo_state::fgcolorram_w(offs_t offset, uint8_t data)
 {
 	m_fgcolorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
-WRITE8_MEMBER(senjyo_state::bg1videoram_w)
+void senjyo_state::bg1videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg1videoram[offset] = data;
 	m_bg1_tilemap->mark_tile_dirty(offset);
 }
-WRITE8_MEMBER(senjyo_state::bg2videoram_w)
+void senjyo_state::bg2videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg2videoram[offset] = data;
 	m_bg2_tilemap->mark_tile_dirty(offset);
 }
-WRITE8_MEMBER(senjyo_state::bg3videoram_w)
+void senjyo_state::bg3videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg3videoram[offset] = data;
 	m_bg3_tilemap->mark_tile_dirty(offset);
@@ -182,10 +182,10 @@ void senjyo_state::draw_bgbitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect
 		{
 			if (flip)
 				for (int y = 0;y < 256;y++)
-					bitmap.pix32(y, 255 - x) = m_palette->pen_color(384 + pen);
+					bitmap.pix(y, 255 - x) = m_palette->pen_color(384 + pen);
 			else
 				for (int y = 0;y < 256;y++)
-					bitmap.pix32(y, x) = m_palette->pen_color(384 + pen);
+					bitmap.pix(y, x) = m_palette->pen_color(384 + pen);
 
 			count += 0x10;
 			if (count >= strwid)
@@ -215,7 +215,7 @@ void senjyo_state::draw_radar(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				}
 
 				if (cliprect.contains(sx, sy))
-					bitmap.pix32(sy, sx) =  m_radar_palette->pen_color(offs < 0x200 ? 0 : 1);
+					bitmap.pix(sy, sx) =  m_radar_palette->pen_color(offs < 0x200 ? 0 : 1);
 			}
 }
 

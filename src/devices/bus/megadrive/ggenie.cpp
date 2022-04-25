@@ -63,7 +63,7 @@ void md_rom_ggenie_device::device_reset()
  mapper specific handlers
  -------------------------------------------------*/
 
-READ16_MEMBER(md_rom_ggenie_device::read)
+uint16_t md_rom_ggenie_device::read(offs_t offset)
 {
 	if (!m_gg_bypass || !m_exp->m_cart)
 	{
@@ -88,13 +88,13 @@ READ16_MEMBER(md_rom_ggenie_device::read)
 		else if (offset == m_gg_addr[5]/2 && BIT(m_gg_regs[0], 5))
 			return m_gg_data[5];
 		else
-			return m_exp->m_cart->read(space, offset);
+			return m_exp->m_cart->read(offset);
 	}
 	else
 		return 0xffff;
 }
 
-WRITE16_MEMBER(md_rom_ggenie_device::write)
+void md_rom_ggenie_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset >= 0x40/2)
 		return;

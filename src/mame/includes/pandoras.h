@@ -36,14 +36,14 @@ public:
 	required_shared_ptr<uint8_t> m_videoram;
 
 	/* video-related */
-	tilemap_t     *m_layer0;
-	int         m_flipscreen;
+	tilemap_t     *m_layer0 = nullptr;
+	int         m_flipscreen = 0;
 
-	int m_irq_enable_a;
-	int m_irq_enable_b;
-	int m_firq_old_data_a;
-	int m_firq_old_data_b;
-	int m_i8039_status;
+	int m_irq_enable_a = 0;
+	int m_irq_enable_b = 0;
+	int m_firq_old_data_a = 0;
+	int m_firq_old_data_b = 0;
+	int m_i8039_status = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -55,16 +55,16 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(cpua_irq_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(cpub_irq_enable_w);
-	DECLARE_WRITE8_MEMBER(pandoras_cpua_irqtrigger_w);
-	DECLARE_WRITE8_MEMBER(pandoras_cpub_irqtrigger_w);
-	DECLARE_WRITE8_MEMBER(pandoras_i8039_irqtrigger_w);
+	void pandoras_cpua_irqtrigger_w(uint8_t data);
+	void pandoras_cpub_irqtrigger_w(uint8_t data);
+	void pandoras_i8039_irqtrigger_w(uint8_t data);
 	void i8039_irqen_and_status_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(pandoras_z80_irqtrigger_w);
+	void pandoras_z80_irqtrigger_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
-	DECLARE_WRITE8_MEMBER(pandoras_vram_w);
-	DECLARE_WRITE8_MEMBER(pandoras_cram_w);
-	DECLARE_WRITE8_MEMBER(pandoras_scrolly_w);
+	void pandoras_vram_w(offs_t offset, uint8_t data);
+	void pandoras_cram_w(offs_t offset, uint8_t data);
+	void pandoras_scrolly_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	uint8_t pandoras_portA_r();
 	uint8_t pandoras_portB_r();

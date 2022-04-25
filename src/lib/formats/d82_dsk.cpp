@@ -8,8 +8,6 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/d82_dsk.h"
 
 d82_format::d82_format() : d80_format(file_formats)
@@ -38,4 +36,4 @@ const d82_format::format d82_format::file_formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_D82_FORMAT = &floppy_image_format_creator<d82_format>;
+const d82_format FLOPPY_D82_FORMAT;

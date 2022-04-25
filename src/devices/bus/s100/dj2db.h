@@ -63,7 +63,7 @@ private:
 	required_device<floppy_connector> m_floppy3;
 	floppy_image_device *m_floppy;
 	required_memory_region m_rom;
-	optional_shared_ptr<uint8_t> m_ram;
+	memory_share_creator<uint8_t> m_ram;
 	required_ioport m_j1a;
 	required_ioport m_j3a;
 	required_ioport m_j4;

@@ -74,8 +74,8 @@ Secret menu hack [totmejan only] (I couldn't find official way to enter, so it's
 #include "audio/seibu.h"
 
 #include "cpu/nec/nec.h"
-#include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "sound/ymopl.h"
 #include "video/seibu_crtc.h"
 #include "emupal.h"
 #include "screen.h"
@@ -120,15 +120,15 @@ private:
 
 	required_ioport_array<5> m_key;
 
-	tilemap_t *m_sc0_tilemap;
-	tilemap_t *m_sc1_tilemap;
-	tilemap_t *m_sc2_tilemap;
-	tilemap_t *m_sc3_tilemap;
+	tilemap_t *m_sc0_tilemap = nullptr;
+	tilemap_t *m_sc1_tilemap = nullptr;
+	tilemap_t *m_sc2_tilemap = nullptr;
+	tilemap_t *m_sc3_tilemap = nullptr;
 
-	uint16_t m_mux_data;
-	uint16_t m_seibucrtc_sc0bank;
-	uint16_t m_layer_en;
-	uint16_t m_scrollram[6];
+	uint16_t m_mux_data = 0;
+	uint16_t m_seibucrtc_sc0bank = 0;
+	uint16_t m_layer_en = 0;
+	uint16_t m_scrollram[6]{};
 
 	void gfxbank_w(uint16_t data);
 	uint16_t mahjong_panel_r();
@@ -422,11 +422,11 @@ void goodejan_state::goodejan_io_map(address_map &map)
 {
 	common_io_map(map);
 	map(0x8000, 0x807f).lrw16(
-							  NAME([this](address_space &space, offs_t offset, u16 mem_mask) {
-								  return m_crtc->read(space, offset ^ 0x20, mem_mask);
+							  NAME([this](offs_t offset) {
+								  return m_crtc->read(offset ^ 0x20);
 							  }),
-							  NAME([this](address_space &space, offs_t offset, u16 data, u16 mem_mask) {
-								  m_crtc->write(space, offset ^ 0x20, data, mem_mask);
+							  NAME([this](offs_t offset, u16 data) {
+								  m_crtc->write(offset ^ 0x20, data);
 							  }));
 }
 

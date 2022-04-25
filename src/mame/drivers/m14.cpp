@@ -108,12 +108,12 @@ private:
 	void m14_map(address_map &map);
 
 	/* video-related */
-	tilemap_t  *m_m14_tilemap;
+	tilemap_t  *m_m14_tilemap = nullptr;
 
 	/* input-related */
 	//uint8_t m_hop_mux;
-	uint8_t m_ballx,m_bally;
-	uint8_t m_paddlex;
+	uint8_t m_ballx = 0, m_bally = 0;
+	uint8_t m_paddlex = 0;
 };
 
 
@@ -161,33 +161,31 @@ void m14_state::video_start()
 
 void m14_state::draw_ball_and_paddle(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int xi,yi;
 	//const rgb_t white_pen =  rgb_t::white();
 	const uint8_t white_pen = 0x1f;
 	const int xoffs = -8; // matches left-right wall bounces
 	const int p_ybase = 184; // matches ball bounce to paddle
-	int resx,resy;
 
 	// draw ball
-	for(xi=0;xi<4;xi++)
-		for(yi=0;yi<4;yi++)
+	for(int xi=0;xi<4;xi++)
+		for(int yi=0;yi<4;yi++)
 		{
-			resx = flip_screen() ?  32*8-(m_ballx+xi+xoffs) : m_ballx+xi+xoffs;
-			resy = flip_screen() ?  28*8-(m_bally+yi) :       m_bally+yi;
+			const int resx = flip_screen() ?  32*8-(m_ballx+xi+xoffs) : m_ballx+xi+xoffs;
+			const int resy = flip_screen() ?  28*8-(m_bally+yi) :       m_bally+yi;
 
 			if(cliprect.contains(resx,resy))
-				bitmap.pix16(resy, resx) = m_palette->pen(white_pen);
+				bitmap.pix(resy, resx) = m_palette->pen(white_pen);
 		}
 
 	// draw paddle
-	for(xi=0;xi<16;xi++)
-		for(yi=0;yi<4;yi++)
+	for(int xi=0;xi<16;xi++)
+		for(int yi=0;yi<4;yi++)
 		{
-			resx = flip_screen() ? 32*8-(m_paddlex+xi+xoffs) : (m_paddlex+xi+xoffs);
-			resy = flip_screen() ? 28*8-(p_ybase+yi) :         p_ybase+yi;
+			const int resx = flip_screen() ? 32*8-(m_paddlex+xi+xoffs) : (m_paddlex+xi+xoffs);
+			const int resy = flip_screen() ? 28*8-(p_ybase+yi) :         p_ybase+yi;
 
 			if(cliprect.contains(resx,resy))
-				bitmap.pix16(resy, resx) = m_palette->pen(white_pen);
+				bitmap.pix(resy, resx) = m_palette->pen(white_pen);
 		}
 
 
@@ -396,19 +394,8 @@ static INPUT_PORTS_START( m14 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, m14_state,right_coin_inserted, 0) //coin x 1
 INPUT_PORTS_END
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	1,
-	{ RGN_FRAC(0,1) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
 static GFXDECODE_START( gfx_m14 )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 0x10 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x1,     0, 0x10 )
 GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(m14_state::m14_irq)

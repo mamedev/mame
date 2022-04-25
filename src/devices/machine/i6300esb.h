@@ -41,97 +41,97 @@ private:
 	uint8_t gen_pmcon_2, gen_pmcon_3, apm_cnt, apm_sts, mon_fwd_en, nmi_sc;
 	int siu_config_state;
 
-	DECLARE_WRITE8_MEMBER (nop_w);
+	void nop_w(uint8_t data);
 
 	// configuration space registers
-	DECLARE_READ32_MEMBER (pmbase_r);               // 40
-	DECLARE_WRITE32_MEMBER(pmbase_w);
-	DECLARE_READ8_MEMBER  (acpi_cntl_r);            // 44
-	DECLARE_WRITE8_MEMBER (acpi_cntl_w);
-	DECLARE_READ16_MEMBER (bios_cntl_r);            // 4e
-	DECLARE_WRITE16_MEMBER(bios_cntl_w);
-	DECLARE_READ8_MEMBER  (tco_cntl_r);             // 54
-	DECLARE_WRITE8_MEMBER (tco_cntl_w);
-	DECLARE_READ32_MEMBER (gpio_base_r);            // 58
-	DECLARE_WRITE32_MEMBER(gpio_base_w);
-	DECLARE_READ8_MEMBER  (gpio_cntl_r);            // 5c
-	DECLARE_WRITE8_MEMBER (gpio_cntl_w);
-	DECLARE_READ8_MEMBER  (pirq_rout_r);            // 60-63
-	DECLARE_WRITE8_MEMBER (pirq_rout_w);
-	DECLARE_READ8_MEMBER  (serirq_cntl_r);          // 64
-	DECLARE_WRITE8_MEMBER (serirq_cntl_w);
-	DECLARE_READ8_MEMBER  (pirq2_rout_r);           // 68-6b
-	DECLARE_WRITE8_MEMBER (pirq2_rout_w);
-	DECLARE_READ8_MEMBER  (d31_err_cfg_r);          // 88
-	DECLARE_WRITE8_MEMBER (d31_err_cfg_w);
-	DECLARE_READ8_MEMBER  (d31_err_sts_r);          // 8a
-	DECLARE_WRITE8_MEMBER (d31_err_sts_w);
-	DECLARE_READ16_MEMBER (pci_dma_cfg_r);          // 90
-	DECLARE_WRITE16_MEMBER(pci_dma_cfg_w);
-	DECLARE_READ16_MEMBER (gen_pmcon_1_r);          // a0
-	DECLARE_WRITE16_MEMBER(gen_pmcon_1_w);
-	DECLARE_READ8_MEMBER (gen_pmcon_2_r);           // a2
-	DECLARE_WRITE8_MEMBER(gen_pmcon_2_w);
-	DECLARE_READ8_MEMBER  (gen_pmcon_3_r);          // a4
-	DECLARE_WRITE8_MEMBER (gen_pmcon_3_w);
-	DECLARE_READ32_MEMBER (rst_cnt2_r);             // ac
-	DECLARE_WRITE32_MEMBER(rst_cnt2_w);
-	DECLARE_READ8_MEMBER  (apm_cnt_r);              // b2
-	DECLARE_WRITE8_MEMBER (apm_cnt_w);
-	DECLARE_READ8_MEMBER  (apm_sts_r);              // b3
-	DECLARE_WRITE8_MEMBER (apm_sts_w);
-	DECLARE_READ32_MEMBER (gpi_rout_r);             // b8
-	DECLARE_WRITE32_MEMBER(gpi_rout_w);
-	DECLARE_READ8_MEMBER  (mon_fwd_en_r);           // c0
-	DECLARE_WRITE8_MEMBER (mon_fwd_en_w);
-	DECLARE_READ16_MEMBER (mon_trp_rng_r);          // c4-ca
-	DECLARE_WRITE16_MEMBER(mon_trp_rng_w);
-	DECLARE_READ16_MEMBER (mon_trp_msk_r);          // cc
-	DECLARE_WRITE16_MEMBER(mon_trp_msk_w);
-	DECLARE_READ32_MEMBER (gen_cntl_r);             // d0
-	DECLARE_WRITE32_MEMBER(gen_cntl_w);
-	DECLARE_READ8_MEMBER  (gen_sta_r);              // d4
-	DECLARE_WRITE8_MEMBER (gen_sta_w);
-	DECLARE_READ8_MEMBER  (back_cntl_r);            // d5
-	DECLARE_WRITE8_MEMBER (back_cntl_w);
-	DECLARE_READ8_MEMBER  (rtc_conf_r);             // d8
-	DECLARE_WRITE8_MEMBER (rtc_conf_w);
-	DECLARE_READ8_MEMBER  (lpc_if_com_range_r);     // e0
-	DECLARE_WRITE8_MEMBER (lpc_if_com_range_w);
-	DECLARE_READ8_MEMBER  (lpc_if_fdd_lpt_range_r); // e1
-	DECLARE_WRITE8_MEMBER (lpc_if_fdd_lpt_range_w);
-	DECLARE_READ8_MEMBER  (lpc_if_sound_range_r);   // e2
-	DECLARE_WRITE8_MEMBER (lpc_if_sound_range_w);
-	DECLARE_READ8_MEMBER  (fwh_dec_en1_r);          // e3
-	DECLARE_WRITE8_MEMBER (fwh_dec_en1_w);
-	DECLARE_READ16_MEMBER (gen1_dec_r);             // e4
-	DECLARE_WRITE16_MEMBER(gen1_dec_w);
-	DECLARE_READ16_MEMBER (lpc_en_r);               // e6
-	DECLARE_WRITE16_MEMBER(lpc_en_w);
-	DECLARE_READ32_MEMBER (fwh_sel1_r);             // e8
-	DECLARE_WRITE32_MEMBER(fwh_sel1_w);
-	DECLARE_READ16_MEMBER (gen2_dec_r);             // ec
-	DECLARE_WRITE16_MEMBER(gen2_dec_w);
-	DECLARE_READ16_MEMBER (fwh_sel2_r);             // ee
-	DECLARE_WRITE16_MEMBER(fwh_sel2_w);
-	DECLARE_READ8_MEMBER  (fwh_dec_en2_r);          // f0
-	DECLARE_WRITE8_MEMBER (fwh_dec_en2_w);
-	DECLARE_READ16_MEMBER (func_dis_r);             // f2
-	DECLARE_WRITE16_MEMBER(func_dis_w);
-	DECLARE_READ32_MEMBER (etr1_r);                 // f4
-	DECLARE_WRITE32_MEMBER(etr1_w);
-	DECLARE_READ32_MEMBER (mfid_r);                 // f8
-	DECLARE_READ32_MEMBER (unk_fc_r);               // fc
-	DECLARE_WRITE32_MEMBER(unk_fc_w);
+	uint32_t pmbase_r();                   // 40
+	void pmbase_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t acpi_cntl_r();                 // 44
+	void acpi_cntl_w(uint8_t data);
+	uint16_t bios_cntl_r();                // 4e
+	void bios_cntl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t tco_cntl_r();                  // 54
+	void tco_cntl_w(uint8_t data);
+	uint32_t gpio_base_r();                // 58
+	void gpio_base_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t gpio_cntl_r();                 // 5c
+	void gpio_cntl_w(uint8_t data);
+	uint8_t pirq_rout_r(offs_t offset);    // 60-63
+	void pirq_rout_w(offs_t offset, uint8_t data);
+	uint8_t serirq_cntl_r();               // 64
+	void serirq_cntl_w(uint8_t data);
+	uint8_t pirq2_rout_r(offs_t offset);   // 68-6b
+	void pirq2_rout_w(offs_t offset, uint8_t data);
+	uint8_t d31_err_cfg_r();               // 88
+	void d31_err_cfg_w(uint8_t data);
+	uint8_t d31_err_sts_r();               // 8a
+	void d31_err_sts_w(uint8_t data);
+	uint16_t pci_dma_cfg_r();              // 90
+	void pci_dma_cfg_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t gen_pmcon_1_r();              // a0
+	void gen_pmcon_1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t gen_pmcon_2_r();               // a2
+	void gen_pmcon_2_w(uint8_t data);
+	uint8_t gen_pmcon_3_r();               // a4
+	void gen_pmcon_3_w(uint8_t data);
+	uint32_t rst_cnt2_r();                 // ac
+	void rst_cnt2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t apm_cnt_r();                   // b2
+	void apm_cnt_w(uint8_t data);
+	uint8_t apm_sts_r();                   // b3
+	void apm_sts_w(uint8_t data);
+	uint32_t gpi_rout_r();                 // b8
+	void gpi_rout_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t mon_fwd_en_r();                // c0
+	void mon_fwd_en_w(uint8_t data);
+	uint16_t mon_trp_rng_r(offs_t offset); // c4-ca
+	void mon_trp_rng_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t mon_trp_msk_r();              // cc
+	void mon_trp_msk_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint32_t gen_cntl_r();                 // d0
+	void gen_cntl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t gen_sta_r();                   // d4
+	void gen_sta_w(uint8_t data);
+	uint8_t back_cntl_r();                 // d5
+	void back_cntl_w(uint8_t data);
+	uint8_t rtc_conf_r();                  // d8
+	void rtc_conf_w(uint8_t data);
+	uint8_t lpc_if_com_range_r();          // e0
+	void lpc_if_com_range_w(uint8_t data);
+	uint8_t lpc_if_fdd_lpt_range_r();      // e1
+	void lpc_if_fdd_lpt_range_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	uint8_t lpc_if_sound_range_r();        // e2
+	void lpc_if_sound_range_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	uint8_t fwh_dec_en1_r();               // e3
+	void fwh_dec_en1_w(uint8_t data);
+	uint16_t gen1_dec_r();                 // e4
+	void gen1_dec_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t lpc_en_r();                   // e6
+	void lpc_en_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint32_t fwh_sel1_r();                 // e8
+	void fwh_sel1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint16_t gen2_dec_r();                 // ec
+	void gen2_dec_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t fwh_sel2_r();                 // ee
+	void fwh_sel2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t fwh_dec_en2_r();               // f0
+	void fwh_dec_en2_w(uint8_t data);
+	uint16_t func_dis_r();                 // f2
+	void func_dis_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint32_t etr1_r();                     // f4
+	void etr1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t mfid_r();                     // f8
+	uint32_t unk_fc_r();                   // fc
+	void unk_fc_w(uint32_t data);
 
 
 	// i/o space registers
-	DECLARE_READ8_MEMBER  (siu_config_port_r);      // 4e
-	DECLARE_WRITE8_MEMBER (siu_config_port_w);
-	DECLARE_READ8_MEMBER  (siu_data_port_r);        // 4f
-	DECLARE_WRITE8_MEMBER (siu_data_port_w);
-	DECLARE_READ8_MEMBER  (nmi_sc_r);               // 61
-	DECLARE_WRITE8_MEMBER (nmi_sc_w);
+	uint8_t siu_config_port_r();      // 4e
+	void siu_config_port_w(uint8_t data);
+	uint8_t siu_data_port_r();        // 4f
+	void siu_data_port_w(uint8_t data);
+	uint8_t nmi_sc_r();               // 61
+	void nmi_sc_w(uint8_t data);
 
 	void map_bios(address_space *memory_space, uint32_t start, uint32_t end, int idsel);
 };

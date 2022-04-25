@@ -120,25 +120,11 @@ public:
 	void init_jrpacman();
 
 private:
-	void jrpacman_interrupt_vector_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void main_map(address_map &map);
 	void port_map(address_map &map);
 };
 
 
-
-void jrpacman_state::jrpacman_interrupt_vector_w(uint8_t data)
-{
-	m_maincpu->set_input_line_vector(0, data); // Z80
-	m_maincpu->set_input_line(0, CLEAR_LINE);
-}
-
-WRITE_LINE_MEMBER(jrpacman_state::irq_mask_w)
-{
-	m_irq_mask = state;
-}
 
 /*************************************
  *
@@ -168,7 +154,7 @@ void jrpacman_state::main_map(address_map &map)
 void jrpacman_state::port_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0, 0).w(FUNC(jrpacman_state::jrpacman_interrupt_vector_w));
+	map(0, 0).w(FUNC(jrpacman_state::pacman_interrupt_vector_w));
 }
 
 
@@ -273,18 +259,13 @@ GFXDECODE_END
  *
  *************************************/
 
-WRITE_LINE_MEMBER(jrpacman_state::vblank_irq)
-{
-	if (state && m_irq_mask)
-		m_maincpu->set_input_line(0, HOLD_LINE);
-}
-
 void jrpacman_state::jrpacman(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 18432000/6);    /* 3.072 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &jrpacman_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &jrpacman_state::port_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(jrpacman_state::interrupt_vector_r));
 
 	ls259_device &latch1(LS259(config, "latch1")); // 5P
 	latch1.q_out_cb<0>().set(FUNC(jrpacman_state::irq_mask_w));

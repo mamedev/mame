@@ -112,7 +112,7 @@ Note: To initiate booting from the floppy drive hold down the LOAD key for 3-5 s
 
 The software for the Fanuc System P-Model G is extremely rare now and very difficult to find.
 If you do have any of these wanted software titles or any manuals listed below and want to help
-please contact me (Guru) via http://mamedev.org/contact.html
+please contact me (Guru) via http://members.iinet.net.au/~lantra9jp1_nbn/gurudumps/comments.html
 
 The following is a complete list of manuals available for the first edition of the
 Fanuc System P-Model G released in 1983. The info is taken from a glossy sales brochure
@@ -590,7 +590,7 @@ private:
 	required_shared_ptr<uint8_t> m_shared;
 	required_memory_region m_chargen;
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
@@ -846,11 +846,10 @@ void fanucspmg_state::memory_write_byte(offs_t offset, uint8_t data)
 
 MC6845_UPDATE_ROW( fanucspmg_state::crtc_update_row )
 {
-	uint32_t  *p = &bitmap.pix32(y);
-	int i;
-	uint8_t *chargen = m_chargen->base();
+	uint32_t *p = &bitmap.pix(y);
+	uint8_t const *const chargen = m_chargen->base();
 
-	for ( i = 0; i < x_count; i++ )
+	for ( int i = 0; i < x_count; i++ )
 	{
 		uint16_t offset = ( ma + i );
 
@@ -868,14 +867,14 @@ MC6845_UPDATE_ROW( fanucspmg_state::crtc_update_row )
 				if (attr & 0x40) fg |= 0x00ff00;
 				if (attr & 0x80) fg |= 0x0000ff;
 
-				*p++ = ( data & 0x01 ) ? fg : bg;
-				*p++ = ( data & 0x02 ) ? fg : bg;
-				*p++ = ( data & 0x04 ) ? fg : bg;
-				*p++ = ( data & 0x08 ) ? fg : bg;
-				*p++ = ( data & 0x10 ) ? fg : bg;
-				*p++ = ( data & 0x20 ) ? fg : bg;
-				*p++ = ( data & 0x40 ) ? fg : bg;
-				*p++ = ( data & 0x80 ) ? fg : bg;
+				*p++ = BIT(data, 0) ? fg : bg;
+				*p++ = BIT(data, 1) ? fg : bg;
+				*p++ = BIT(data, 2) ? fg : bg;
+				*p++ = BIT(data, 3) ? fg : bg;
+				*p++ = BIT(data, 4) ? fg : bg;
+				*p++ = BIT(data, 5) ? fg : bg;
+				*p++ = BIT(data, 6) ? fg : bg;
+				*p++ = BIT(data, 7) ? fg : bg;
 			}
 		}
 		else
@@ -894,11 +893,10 @@ MC6845_UPDATE_ROW( fanucspmg_state::crtc_update_row )
 
 MC6845_UPDATE_ROW( fanucspmg_state::crtc_update_row_mono )
 {
-	uint32_t  *p = &bitmap.pix32(y);
-	int i;
-	uint8_t *chargen = m_chargen->base();
+	uint32_t *p = &bitmap.pix(y);
+	uint8_t const *const chargen = m_chargen->base();
 
-	for ( i = 0; i < x_count; i++ )
+	for ( int i = 0; i < x_count; i++ )
 	{
 		uint16_t offset = ( ma + i );
 
@@ -912,14 +910,14 @@ MC6845_UPDATE_ROW( fanucspmg_state::crtc_update_row_mono )
 				uint32_t fg = 0xff00;
 				uint32_t bg = 0;
 
-				*p++ = ( data & 0x01 ) ? fg : bg;
-				*p++ = ( data & 0x02 ) ? fg : bg;
-				*p++ = ( data & 0x04 ) ? fg : bg;
-				*p++ = ( data & 0x08 ) ? fg : bg;
-				*p++ = ( data & 0x10 ) ? fg : bg;
-				*p++ = ( data & 0x20 ) ? fg : bg;
-				*p++ = ( data & 0x40 ) ? fg : bg;
-				*p++ = ( data & 0x80 ) ? fg : bg;
+				*p++ = BIT(data, 0) ? fg : bg;
+				*p++ = BIT(data, 1) ? fg : bg;
+				*p++ = BIT(data, 2) ? fg : bg;
+				*p++ = BIT(data, 3) ? fg : bg;
+				*p++ = BIT(data, 4) ? fg : bg;
+				*p++ = BIT(data, 5) ? fg : bg;
+				*p++ = BIT(data, 6) ? fg : bg;
+				*p++ = BIT(data, 7) ? fg : bg;
 			}
 		}
 		else
@@ -941,9 +939,11 @@ static void fanuc_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-FLOPPY_FORMATS_MEMBER( fanucspmg_state::floppy_formats )
-	FLOPPY_IMD_FORMAT
-FLOPPY_FORMATS_END
+void fanucspmg_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_IMD_FORMAT);
+}
 
 void fanucspmg_state::fanucspmg(machine_config &config)
 {

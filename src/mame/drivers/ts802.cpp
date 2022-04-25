@@ -62,9 +62,9 @@ private:
 	void ts802_io(address_map &map);
 	void ts802_mem(address_map &map);
 
-	uint8_t m_term_data;
-	address_space *m_mem;
-	address_space *m_io;
+	uint8_t m_term_data = 0;
+	address_space *m_mem = nullptr;
+	address_space *m_io = nullptr;
 	required_device<z80_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 };
@@ -219,7 +219,7 @@ void ts802_state::ts802(machine_config &config)
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	FD1793(config, "fdc", 4'000'000 / 2);                  // unknown clock
-	FLOPPY_CONNECTOR(config, "fdc:0", ts802_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", ts802_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 
 /* ROM definition */

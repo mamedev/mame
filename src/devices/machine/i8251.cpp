@@ -837,9 +837,12 @@ WRITE_LINE_MEMBER(i8251_device::write_cts)
 {
 	m_cts = state;
 
-	check_for_tx_start();
-	update_tx_ready();
-	update_tx_empty();
+	if (started())
+	{
+		check_for_tx_start();
+		update_tx_ready();
+		update_tx_empty();
+	}
 }
 
 WRITE_LINE_MEMBER(i8251_device::write_dsr)

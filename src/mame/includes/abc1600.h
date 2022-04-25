@@ -9,6 +9,7 @@
 #include "bus/abckb/abckb.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
+#include "formats/abc1600_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/abc1600mac.h"
 #include "machine/e0516.h"
@@ -62,6 +63,7 @@ public:
 	abc1600_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, MC68008P8_TAG),
+		m_mac(*this, ABC1600_MAC_TAG),
 		m_dma0(*this, Z8410AB1_0_TAG),
 		m_dma1(*this, Z8410AB1_1_TAG),
 		m_dma2(*this, Z8410AB1_2_TAG),
@@ -81,7 +83,11 @@ public:
 		m_bus2(*this, BUS2_TAG)
 	{ }
 
+	void abc1600(machine_config &config);
+
+private:
 	required_device<m68000_base_device> m_maincpu;
+	required_device<abc1600_mac_device> m_mac;
 	required_device<z80dma_device> m_dma0;
 	required_device<z80dma_device> m_dma1;
 	required_device<z80dma_device> m_dma2;
@@ -103,6 +109,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	static void floppy_formats(format_registration &fr);
+
 	uint8_t bus_r(offs_t offset);
 	void bus_w(offs_t offset, uint8_t data);
 	uint8_t dart_r(offs_t offset);
@@ -115,7 +123,7 @@ public:
 	void fw1_w(uint8_t data);
 	void spec_contr_reg_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( dbrq_w );
+	void dbrq_w(int state);
 
 	uint8_t cio_pa_r();
 	uint8_t cio_pb_r();
@@ -123,32 +131,38 @@ public:
 	uint8_t cio_pc_r();
 	void cio_pc_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( nmi_w );
+	void nmi_w(int state);
+	void buserr_w(offs_t offset, uint8_t data);
 
 	void cpu_space_map(address_map &map);
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
-
-	void update_drdy0();
-	void update_drdy1();
-	void update_drdy2();
+	void update_pren0(int state);
+	void update_pren1(int state);
+	void update_drdy0(int state);
+	void update_drdy1(int state);
+	void sccrq_a_w(int state) { m_sccrq_a = state; update_drdy1(0); }
+	void sccrq_b_w(int state) { m_sccrq_b = state; update_drdy1(0); }
+	void dart_irq_w(int state) { m_dart_irq = state; m_maincpu->set_input_line(M68K_IRQ_5, (m_dart_irq || m_scc_irq) ? ASSERT_LINE : CLEAR_LINE); }
+	void scc_irq_w(int state) { m_scc_irq = state; m_maincpu->set_input_line(M68K_IRQ_5, (m_dart_irq || m_scc_irq) ? ASSERT_LINE : CLEAR_LINE); }
 
 	// DMA
-	int m_dmadis;
-	int m_sysscc;
-	int m_sysfs;
-	uint8_t m_cause;
-	int m_partst;               // parity test
+	int m_dmadis = 0;
+	int m_sysscc = 0;
+	int m_sysfs = 0;
 
-	void abc1600(machine_config &config);
 	void abc1600_mem(address_map &map);
 	void mac_mem(address_map &map);
+
 	// peripherals
-	int m_cs7;                  // card select address bit 7
-	int m_bus0;                 // BUS 0 selected
-	uint8_t m_csb;                // card select
-	int m_atce;                 // V.24 channel A external clock enable
-	int m_btce;                 // V.24 channel B external clock enable
+	int m_cs7 = 0;                  // card select address bit 7
+	int m_bus0 = 0;                 // BUS 0 selected
+	uint8_t m_csb = 0U;             // card select
+	int m_atce = 0;                 // V.24 channel A external clock enable
+	int m_btce = 0;                 // V.24 channel B external clock enable
+	bool m_sccrq_a = 0;
+	bool m_sccrq_b = 0;
+	int m_scc_irq = 0;
+	int m_dart_irq = 0;
 };
 
 

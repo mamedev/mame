@@ -126,7 +126,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(irq7_w)       { update_irqs(6, state); }
 	DECLARE_WRITE_LINE_MEMBER(irq7a_w)      { update_irqs(7, state); }
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	uint8_t program_read(int cas, offs_t offset);
@@ -309,31 +309,31 @@ UPD7220_DISPLAY_PIXELS_MEMBER( dmv_state::hgdc_display_pixels )
 	if (m_color_mode)
 	{
 		// 96KB videoram (32KB green + 32KB red + 32KB blue)
-		uint16_t green = m_video_ram[(0x00000 + (address & 0x7fff)) >> 1];
-		uint16_t red   = m_video_ram[(0x08000 + (address & 0x7fff)) >> 1];
-		uint16_t blue  = m_video_ram[(0x10000 + (address & 0x7fff)) >> 1];
+		uint16_t green = m_video_ram[(0x00000 + (address & 0x3fff))];
+		uint16_t red   = m_video_ram[(0x04000 + (address & 0x3fff))];
+		uint16_t blue  = m_video_ram[(0x08000 + (address & 0x3fff))];
 
 		for(int xi=0; xi<16; xi++)
 		{
-			int r = ((red   >> xi) & 1) ? 255 : 0;
-			int g = ((green >> xi) & 1) ? 255 : 0;
-			int b = ((blue  >> xi) & 1) ? 255 : 0;
+			int r = BIT(red,   xi) ? 255 : 0;
+			int g = BIT(green, xi) ? 255 : 0;
+			int b = BIT(blue,  xi) ? 255 : 0;
 
 			if (bitmap.cliprect().contains(x + xi, y))
-				bitmap.pix32(y, x + xi) = rgb_t(r, g, b);
+				bitmap.pix(y, x + xi) = rgb_t(r, g, b);
 		}
 	}
 	else
 	{
-		const rgb_t *palette = m_palette->palette()->entry_list_raw();
+		rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
 		// 32KB videoram
-		uint16_t gfx = m_video_ram[(address & 0xffff) >> 1];
+		uint16_t gfx = m_video_ram[(address & 0x3fff)];
 
 		for(int xi=0;xi<16;xi++)
 		{
 			if (bitmap.cliprect().contains(x + xi, y))
-				bitmap.pix32(y, x + xi) = ((gfx >> xi) & 1) ? palette[2] : palette[0];
+				bitmap.pix(y, x + xi) = ((gfx >> xi) & 1) ? palette[2] : palette[0];
 		}
 	}
 }
@@ -362,23 +362,25 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( dmv_state::hgdc_draw_text )
 		{
 			uint8_t tile_data = m_chargen->base()[(tile*16+yi) & 0x7ff];
 
+			if((attr & 2) && (m_screen->frame_number() & 0x10)) // FIXME: blink freq
+				tile_data = 0;
+
 			if(cursor_on && cursor_addr == addr+x) //TODO
 				tile_data^=0xff;
 
 			for( int xi = 0; xi < 8; xi++)
 			{
-				int res_x,res_y;
 				int pen = (tile_data >> xi) & 1 ? 1 : 0;
 
-				res_x = x * 8 + xi;
-				res_y = y + yi;
+				int res_x = x * 8 + xi;
+				int res_y = y + yi;
 
 				if(!m_screen->visible_area().contains(res_x, res_y))
 					continue;
 
 				if(yi >= 16) { pen = 0; }
 
-				bitmap.pix32(res_y, res_x) = pen ? fg : bg;
+				bitmap.pix(res_y, res_x) = pen ? fg : bg;
 			}
 		}
 	}
@@ -401,10 +403,11 @@ QUICKLOAD_LOAD_MEMBER(dmv_state::quickload_cb)
 	if ((m_ram->base()[0] != 0xc3) || (m_ram->base()[5] != 0xc3))
 		return image_init_result::FAIL;
 
-	if (quickload_size >= 0xfd00)
+	if (image.length() >= 0xfd00)
 		return image_init_result::FAIL;
 
 	/* Load image to the TPA (Transient Program Area) */
+	uint16_t quickload_size = image.length();
 	for (uint16_t i = 0; i < quickload_size; i++)
 	{
 		uint8_t data;
@@ -612,8 +615,8 @@ void dmv_state::kb_mcu_port2_w(uint8_t data)
 
 void dmv_state::upd7220_map(address_map &map)
 {
-	map.global_mask(0x1ffff);
-	map(0x00000, 0x1ffff).ram().share("video_ram");
+	map.global_mask(0xffff);
+	map(0x0000, 0xffff).ram().share("video_ram");
 }
 
 /* Input ports */
@@ -747,9 +750,11 @@ WRITE_LINE_MEMBER( dmv_state::fdc_irq )
 }
 
 
-FLOPPY_FORMATS_MEMBER( dmv_state::floppy_formats )
-	FLOPPY_DMV_FORMAT
-FLOPPY_FORMATS_END
+void dmv_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_DMV_FORMAT);
+}
 
 
 static void dmv_slot1(device_slot_interface &device)

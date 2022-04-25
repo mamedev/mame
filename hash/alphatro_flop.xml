@@ -6,8 +6,8 @@ license:CC0
 <softwarelist name="alphatro_flop" description="Triumph-Adler Alphatronic PC diskettes">
 
 	<software name="cpm">
-		<description>CP/M 2.2 / 3.1</description>
-		<year>198?</year>
+		<description>56K CP/M 2.2/3.1 System Disk</description>
+		<year>1984</year>
 		<publisher>Triumph-Adler</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -17,14 +17,26 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="basic">
-		<description>Disk Basic 5.26b</description>
+	<software name="dbasic">
+		<description>Disk-Basic Ver. 5.26B</description>
 		<year>1984</year>
 		<publisher>Microsoft</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="64140">
 				<rom name="dskbasic.td0" size="64140" crc="38834574" sha1="27a813ba8f7bb7f024ff5ebc49374bd46e005c65"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbasicb">
+		<description>Disk-Basic Beispielprogramme für hochauflösende Graphik</description>
+		<year>1984</year>
+		<publisher>BiCom</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="74913">
+				<rom name="dskbasic_bicom.td0" size="74913" crc="d2028930" sha1="4d676e9a98ee3e07fa5ef069b084411c9484f6c3"/>
 			</dataarea>
 		</part>
 	</software>

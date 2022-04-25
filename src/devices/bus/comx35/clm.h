@@ -52,7 +52,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_memory_region m_rom;
 	required_memory_region m_char_rom;
-	optional_shared_ptr<uint8_t> m_video_ram;
+	memory_share_creator<uint8_t> m_video_ram;
 };
 
 

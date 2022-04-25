@@ -34,7 +34,7 @@
 #include "machine/z80daisy.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 class bbcbc_state : public driver_device
 {
@@ -43,17 +43,17 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_z80pio(*this, "z80pio")
-		, m_buttons(*this, "BUTTONS.%u", 0)
+		, m_buttons(*this, "BUTTONS.%u", 0U)
 	{ }
 
+	void bbcbc(machine_config &config);
+
+private:
 	uint8_t input_r();
 	void input_select_w(uint8_t data);
-
-	void bbcbc(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
-	uint8_t m_input_select;
+	uint8_t m_input_select = 0U;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<z80_device> m_maincpu;
@@ -181,4 +181,4 @@ ROM_END
 ***************************************************************************/
 
 //   YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY    FULLNAME                FLAGS
-CONS(1985, bbcbc, 0,      0,      bbcbc,   bbcbc, bbcbc_state, empty_init, "Unicard", "BBC Bridge Companion", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)
+CONS(1985, bbcbc, 0,      0,      bbcbc,   bbcbc, bbcbc_state, empty_init, "Unicard", "BBC Bridge Companion", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

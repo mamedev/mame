@@ -44,19 +44,19 @@ void tagteam_state::tagteam_palette(palette_device &palette) const
 }
 
 
-WRITE8_MEMBER(tagteam_state::videoram_w)
+void tagteam_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(tagteam_state::colorram_w)
+void tagteam_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_MEMBER(tagteam_state::mirrorvideoram_r)
+uint8_t tagteam_state::mirrorvideoram_r(offs_t offset)
 {
 	int x,y;
 
@@ -68,7 +68,7 @@ READ8_MEMBER(tagteam_state::mirrorvideoram_r)
 	return m_videoram[offset];
 }
 
-READ8_MEMBER(tagteam_state::mirrorcolorram_r)
+uint8_t tagteam_state::mirrorcolorram_r(offs_t offset)
 {
 	int x,y;
 
@@ -80,7 +80,7 @@ READ8_MEMBER(tagteam_state::mirrorcolorram_r)
 	return m_colorram[offset];
 }
 
-WRITE8_MEMBER(tagteam_state::mirrorvideoram_w)
+void tagteam_state::mirrorvideoram_w(offs_t offset, uint8_t data)
 {
 	int x,y;
 
@@ -89,10 +89,10 @@ WRITE8_MEMBER(tagteam_state::mirrorvideoram_w)
 	y = offset % 32;
 	offset = 32 * y + x;
 
-	videoram_w(space,offset,data);
+	videoram_w(offset,data);
 }
 
-WRITE8_MEMBER(tagteam_state::mirrorcolorram_w)
+void tagteam_state::mirrorcolorram_w(offs_t offset, uint8_t data)
 {
 	int x,y;
 
@@ -101,10 +101,10 @@ WRITE8_MEMBER(tagteam_state::mirrorcolorram_w)
 	y = offset % 32;
 	offset = 32 * y + x;
 
-	colorram_w(space,offset,data);
+	colorram_w(offset,data);
 }
 
-WRITE8_MEMBER(tagteam_state::control_w)
+void tagteam_state::control_w(uint8_t data)
 {
 	// d0-3: color for blank screen, applies to h/v borders too
 	// (not implemented yet, and tagteam doesn't have a global screen on/off bit)
@@ -113,7 +113,7 @@ WRITE8_MEMBER(tagteam_state::control_w)
 	m_palettebank = (data & 0x80) >> 7;
 }
 
-WRITE8_MEMBER(tagteam_state::flipscreen_w)
+void tagteam_state::flipscreen_w(uint8_t data)
 {
 	// d0: flip screen
 	if (flip_screen() != (data &0x01))

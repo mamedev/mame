@@ -34,24 +34,24 @@ private:
 	void map(address_map &map);
 
 	// PCI9050 I/O register space handlers
-	DECLARE_READ32_MEMBER( lasrr_r  );
-	DECLARE_WRITE32_MEMBER(lasrr_w  );
-	DECLARE_READ32_MEMBER( eromrr_r );
-	DECLARE_WRITE32_MEMBER(eromrr_w );
-	DECLARE_READ32_MEMBER( lasba_r  );
-	DECLARE_WRITE32_MEMBER(lasba_w  );
-	DECLARE_READ32_MEMBER( eromba_r );
-	DECLARE_WRITE32_MEMBER(eromba_w );
-	DECLARE_READ32_MEMBER( lasbrd_r );
-	DECLARE_WRITE32_MEMBER(lasbrd_w );
-	DECLARE_READ32_MEMBER( erombrd_r);
-	DECLARE_WRITE32_MEMBER(erombrd_w);
-	DECLARE_READ32_MEMBER( csbase_r );
-	DECLARE_WRITE32_MEMBER(csbase_w );
-	DECLARE_READ32_MEMBER( intcsr_r );
-	DECLARE_WRITE32_MEMBER(intcsr_w );
-	DECLARE_READ32_MEMBER( cntrl_r  );
-	DECLARE_WRITE32_MEMBER(cntrl_w  );
+	uint32_t lasrr_r(offs_t offset);
+	void lasrr_w(offs_t offset, uint32_t data);
+	uint32_t eromrr_r();
+	void eromrr_w(uint32_t data);
+	uint32_t lasba_r(offs_t offset);
+	void lasba_w(offs_t offset, uint32_t data);
+	uint32_t eromba_r();
+	void eromba_w(uint32_t data);
+	uint32_t lasbrd_r(offs_t offset);
+	void lasbrd_w(offs_t offset, uint32_t data);
+	uint32_t erombrd_r();
+	void erombrd_w(uint32_t data);
+	uint32_t csbase_r(offs_t offset);
+	void csbase_w(offs_t offset, uint32_t data);
+	uint32_t intcsr_r();
+	void intcsr_w(uint32_t data);
+	uint32_t cntrl_r();
+	void cntrl_w(uint32_t data);
 
 	const char *m_names[4];
 	device_t *m_devices[4];

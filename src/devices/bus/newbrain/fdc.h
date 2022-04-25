@@ -57,10 +57,7 @@ private:
 
 	required_device<z80_device> m_maincpu;
 	required_device<upd765a_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
+	required_device_array<floppy_connector, 4> m_floppy;
 	required_device<newbrain_expansion_slot_device> m_exp;
 
 	void moton(int state);

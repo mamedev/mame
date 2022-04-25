@@ -15,7 +15,7 @@
 #include "machine/ram.h"
 #include "machine/z80scc.h"
 
-#define SUN4CMMU_LOG_MEM_ACCESSES	(0)
+#define SUN4CMMU_LOG_MEM_ACCESSES   (0)
 
 class sun4_mmu_base_device : public device_t, public sparc_mmu_interface
 {
@@ -127,7 +127,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_stop() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	uint32_t page_entry_to_uint(uint32_t index);
 	void merge_page_entry(uint32_t index, uint32_t data, uint32_t mem_mask);
@@ -138,7 +138,7 @@ protected:
 	void type0_timeout_r(const uint32_t offset);
 	void type0_timeout_w(const uint32_t offset);
 	bool translate(uint32_t &addr);
-	void l2p_command(int ref, const std::vector<std::string> &params);
+	void l2p_command(const std::vector<std::string> &params);
 	uint32_t vaddr_to_cache_line(uint32_t vaddr);
 
 	enum

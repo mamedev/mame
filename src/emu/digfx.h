@@ -199,7 +199,7 @@ private:
 };
 
 // iterator
-typedef device_interface_iterator<device_gfx_interface> gfx_interface_iterator;
+typedef device_interface_enumerator<device_gfx_interface> gfx_interface_enumerator;
 
 
 #endif  /* MAME_EMU_DIGFX_H */

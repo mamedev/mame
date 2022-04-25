@@ -191,9 +191,11 @@ void beta_disk_device::motors_control()
 	}
 }
 
-FLOPPY_FORMATS_MEMBER(beta_disk_device::floppy_formats)
-	FLOPPY_TRD_FORMAT
-FLOPPY_FORMATS_END
+void beta_disk_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_TRD_FORMAT);
+}
 
 static void beta_disk_floppies(device_slot_interface &device)
 {

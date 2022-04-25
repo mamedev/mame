@@ -136,9 +136,9 @@ sounds.
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
-#include "sound/2203intf.h"
 #include "sound/flt_vol.h"
 #include "sound/msm5205.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -324,8 +324,8 @@ void darius_state::update_psg1(int port)
 
 void darius_state::update_da()
 {
-	const int left  = m_def_vol[(m_pan[4] >> 4) & 0x0f];
-	const int right = m_def_vol[(m_pan[4] >> 0) & 0x0f];
+	const int left  = m_def_vol[(m_pan[4] >> 0) & 0x0f];
+	const int right = m_def_vol[(m_pan[4] >> 4) & 0x0f];
 
 	if (m_msm5205_l != nullptr)
 		m_msm5205_l->flt_volume_set_volume(left / 100.0);
@@ -499,7 +499,6 @@ void darius_state::darius_sound2_io_map(address_map &map)
                       INPUT PORTS, DIPs
 ***********************************************************/
 
-
 #define TAITO_COINAGE_JAPAN_16 \
 	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:5,6") \
 	PORT_DIPSETTING(      0x0010, DEF_STR( 2C_1C ) ) \
@@ -544,7 +543,7 @@ static INPUT_PORTS_START( darius )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START("DSW")   /* DSW */
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -589,22 +588,31 @@ static INPUT_PORTS_START( darius )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( dariusu ) /* The US version uses the Japan coinage settings & Extra Version has continue */
+static INPUT_PORTS_START( dariuse )
 	PORT_INCLUDE( darius )
 
-	PORT_MODIFY("DSW")   /* DSW */
+	PORT_MODIFY("DSW")
 	TAITO_COINAGE_JAPAN_16
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( dariusj )
-	PORT_INCLUDE( darius )
+static INPUT_PORTS_START( dariusj ) // No Continue for this version
+	PORT_INCLUDE( dariuse )
 
-	PORT_MODIFY("DSW")   /* DSW */
-	TAITO_COINAGE_JAPAN_16
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:8") /* No Continue for this version */
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( dariusu ) // US version uses the Japan coinage settings
+	PORT_INCLUDE( dariuse )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Continue_Price ) ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(      0x4000, "Discount" )
+	PORT_DIPSETTING(      0x0000, "Same as Start" )
+INPUT_PORTS_END
+
 
 /**************************************************************
                            GFX DECODING
@@ -677,7 +685,7 @@ void darius_state::machine_reset()
 	m_adpcm_command = 0;
 	m_nmi_enable = 0;
 
-	machine().sound().system_enable(true);  /* mixer enabled */
+	machine().sound().system_mute(false);  /* mixer enabled */
 
 	for (auto & elem : m_vol)
 		elem = 0x00;    /* min volume */
@@ -1090,4 +1098,4 @@ GAME( 1986, darius,  0,       darius,  darius,  darius_state, empty_init, ROT0, 
 GAME( 1986, dariusu, darius,  darius,  dariusu, darius_state, empty_init, ROT0, "Taito America Corporation", "Darius (US, rev 2)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1986, dariusj, darius,  darius,  dariusj, darius_state, empty_init, ROT0, "Taito Corporation",         "Darius (Japan, rev 1)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1986, dariuso, darius,  darius,  dariusj, darius_state, empty_init, ROT0, "Taito Corporation",         "Darius (Japan)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dariuse, darius,  darius,  dariusu, darius_state, empty_init, ROT0, "Taito Corporation",         "Darius Extra Version (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dariuse, darius,  darius,  dariuse, darius_state, empty_init, ROT0, "Taito Corporation",         "Darius Extra Version (Japan)", MACHINE_SUPPORTS_SAVE )

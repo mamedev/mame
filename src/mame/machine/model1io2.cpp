@@ -282,7 +282,7 @@ HD44780_PIXEL_UPDATE( model1io2_device::lcd_pixel_update )
 		return;
 
 	if (line < 2 && pos < 20)
-		bitmap.pix16(1 + y + line*8 + line, 1 + pos*6 + x) = state ? 1 : 2;
+		bitmap.pix(1 + y + line*8 + line, 1 + pos*6 + x) = state ? 1 : 2;
 }
 
 
@@ -386,7 +386,7 @@ ioport_value model1io2_device::analog3_r()
 
 
 //**************************************************************************
-//  FGPA (Virtua Cop)
+//  FPGA (Virtua Cop)
 //**************************************************************************
 
 uint8_t model1io2_device::fpga_r(offs_t offset)

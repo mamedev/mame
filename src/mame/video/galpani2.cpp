@@ -78,13 +78,13 @@ void galpani2_state::copybg8(screen_device &screen, bitmap_rgb32 &bitmap, const 
 	int y = + ( *m_bg8_scrolly[layer] + 0x200 - 0x0f5 );
 	uint16_t* ram = m_bg8[layer];
 
-	const pen_t *clut = &m_bg8palette->pen(0);
+	pen_t const *const clut = &m_bg8palette->pen(0);
 	for (int xx = 0; xx < 320; xx++)
 	{
 		for (int yy = 0; yy < 240; yy++)
 		{
 			uint16_t pen = ram[(((y + yy) & 0xff) * 512) + ((x + xx) & 0x1ff)];
-			if (pen) bitmap.pix32(yy, xx) = clut[pen & 0xff];
+			if (pen) bitmap.pix(yy, xx) = clut[pen & 0xff];
 		}
 	}
 }
@@ -101,13 +101,13 @@ void galpani2_state::copybg15(screen_device &screen, bitmap_rgb32 &bitmap, const
 	//int x = 0;
 	//int y = 0;
 
-	const pen_t *clut = &m_bg15palette->pen(0);
+	pen_t const *const clut = &m_bg15palette->pen(0);
 	for (int xx = 0; xx < 320; xx++)
 	{
 		for (int yy = 0; yy < 240; yy++)
 		{
 			uint16_t pen = ram[(xx * 0x800) + yy];
-			bitmap.pix32(yy, xx) = clut[pen & 0x7fff];
+			bitmap.pix(yy, xx) = clut[pen & 0x7fff];
 		}
 	}
 }

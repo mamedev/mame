@@ -405,6 +405,6 @@ void hng64_state::hng64_audio(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	L7A1045(config, m_dsp, 32000000/2); // ??
-	m_dsp->add_route(0, "lspeaker", 1.0);
-	m_dsp->add_route(1, "rspeaker", 1.0);
+	m_dsp->add_route(0, "lspeaker", 0.1);
+	m_dsp->add_route(1, "rspeaker", 0.1);
 }

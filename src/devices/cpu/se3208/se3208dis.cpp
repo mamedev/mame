@@ -762,7 +762,7 @@ INST(JV)
 	util::stream_format(stream, "JV    0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
-	return 0;
+	return STEP_COND;
 }
 
 INST(JNV)
@@ -778,7 +778,7 @@ INST(JNV)
 	util::stream_format(stream, "JNV   0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
-	return 0;
+	return STEP_COND;
 }
 
 INST(JC)
@@ -794,7 +794,7 @@ INST(JC)
 	util::stream_format(stream, "JC    0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
-	return 0;
+	return STEP_COND;
 }
 
 INST(JNC)
@@ -810,7 +810,7 @@ INST(JNC)
 	util::stream_format(stream, "JNC   0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
-	return 0;
+	return STEP_COND;
 }
 
 INST(JP)
@@ -826,7 +826,7 @@ INST(JP)
 	util::stream_format(stream, "JP    0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
-	return 0;
+	return STEP_COND;
 }
 
 INST(JM)
@@ -842,7 +842,7 @@ INST(JM)
 	util::stream_format(stream, "JM    0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
-	return 0;
+	return STEP_COND;
 }
 
 INST(JNZ)
@@ -858,7 +858,7 @@ INST(JNZ)
 	util::stream_format(stream, "JNZ   0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
-	return 0;
+	return STEP_COND;
 }
 
 INST(JZ)
@@ -874,7 +874,7 @@ INST(JZ)
 	util::stream_format(stream, "JZ    0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
-	return 0;
+	return STEP_COND;
 }
 
 INST(JGE)
@@ -890,7 +890,7 @@ INST(JGE)
 	util::stream_format(stream, "JGE   0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
-	return 0;
+	return STEP_COND;
 }
 
 INST(JLE)
@@ -906,7 +906,7 @@ INST(JLE)
 	util::stream_format(stream, "JLE   0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
-	return 0;
+	return STEP_COND;
 }
 
 INST(JHI)
@@ -922,7 +922,7 @@ INST(JHI)
 	util::stream_format(stream, "JHI   0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
-	return 0;
+	return STEP_COND;
 }
 
 INST(JLS)
@@ -938,7 +938,7 @@ INST(JLS)
 	util::stream_format(stream, "JLS   0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
-	return 0;
+	return STEP_COND;
 }
 
 INST(JGT)
@@ -954,7 +954,7 @@ INST(JGT)
 	util::stream_format(stream, "JGT   0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
-	return 0;
+	return STEP_COND;
 }
 
 INST(JLT)
@@ -970,7 +970,7 @@ INST(JLT)
 	util::stream_format(stream, "JLT   0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
-	return 0;
+	return STEP_COND;
 }
 
 

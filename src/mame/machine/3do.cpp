@@ -637,6 +637,7 @@ void _3do_state::madam_w(offs_t offset, uint32_t data, uint32_t mem_mask){
 	case 0x0680/4: case 0x0684/4: case 0x0688/4: case 0x068c/4:
 	case 0x0690/4: case 0x0694/4: case 0x0698/4: case 0x069c/4:
 		m_madam.mult[offset & 0x3f] = data;
+		break;
 	case 0x07f0/4:
 		m_madam.mult_control |= data;
 		break;
@@ -1046,8 +1047,8 @@ uint32_t _3do_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 	for ( int y = 0; y < 120; y++ )
 	{
-		uint32_t  *dest_p0 = &bitmap.pix32(22 + y * 2, 254 );
-		uint32_t  *dest_p1 = &bitmap.pix32(22 + y * 2 + 1, 254 );
+		uint32_t  *dest_p0 = &bitmap.pix(22 + y * 2, 254 );
+		uint32_t  *dest_p1 = &bitmap.pix(22 + y * 2 + 1, 254 );
 
 		for ( int x = 0; x < 320; x++ )
 		{

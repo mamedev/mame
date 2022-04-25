@@ -119,6 +119,8 @@
 #include "mil4000.lh"
 
 
+namespace {
+
 #define MAIN_CLOCK    XTAL(12'000'000)
 #define SEC_CLOCK     XTAL(14'318'181)
 
@@ -155,14 +157,14 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	output_finder<7> m_lamps;
 
-	tilemap_t *m_sc0_tilemap;
-	tilemap_t *m_sc1_tilemap;
-	tilemap_t *m_sc2_tilemap;
-	tilemap_t *m_sc3_tilemap;
-	uint16_t m_vblank;
-	uint16_t m_hblank;
-	uint8_t m_mcucomm;
-	uint8_t m_mcudata;
+	tilemap_t *m_sc0_tilemap = nullptr;
+	tilemap_t *m_sc1_tilemap = nullptr;
+	tilemap_t *m_sc2_tilemap = nullptr;
+	tilemap_t *m_sc3_tilemap = nullptr;
+	uint16_t m_vblank = 0;
+	uint16_t m_hblank = 0;
+	uint8_t m_mcucomm = 0;
+	uint8_t m_mcudata = 0;
 
 	uint16_t hvretrace_r();
 	uint16_t unk_r();
@@ -256,6 +258,9 @@ void mil4000_state::video_start()
 
 	save_item(NAME(m_vblank));
 	save_item(NAME(m_hblank));
+
+	m_vblank = 0;
+	m_hblank = 0;
 }
 
 uint32_t mil4000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -770,6 +775,8 @@ ROM_START( chewheel )
 	ROM_REGION( 0x4000, "nvram", 0 )   // default NVRAM (1x 6264 storing the odd bytes)
 	ROM_LOAD( "chewheel_nvram.bin", 0x0000, 0x4000, CRC(af73a270) SHA1(3e3e2c0a629bf506830b34d4c5a45ddbece618c3) )
 ROM_END
+
+} // Anonymous namespace
 
 
 //     YEAR  NAME      PARENT   MACHINE   INPUT    STATE          INIT        ROT   COMPANY              FULLNAME                               FLAGS                          LAYOUT

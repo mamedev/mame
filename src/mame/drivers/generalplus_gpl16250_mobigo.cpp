@@ -2,18 +2,18 @@
 // copyright-holders:David Haywood
 
 /*
-	GPL16250 / GPAC800 / GMC384 / GCM420 related support
+    GPL16250 / GPAC800 / GMC384 / GCM420 related support
 
-	GPL16250 is the GeneralPlus / SunPlus part number
-	GPAC800 is the JAKKS Pacific codename
-	GMC384 / GCM420 is what is printed on the die
+    GPL16250 is the GeneralPlus / SunPlus part number
+    GPAC800 is the JAKKS Pacific codename
+    GMC384 / GCM420 is what is printed on the die
 
-	----
+    ----
 
-	GPL16250 Mobigo support
-	the original Mobigo is ROM+RAM config
-	the Mobigo 2 is NAND+RAM config
-	cartridges are compatible
+    GPL16250 Mobigo support
+    the original Mobigo is ROM+RAM config
+    the Mobigo 2 is NAND+RAM config
+    cartridges are compatible
 */
 
 #include "emu.h"
@@ -164,6 +164,6 @@ ROM_START( mobigo2 )
 	ROM_LOAD( "mobigo2_bios_ger.bin", 0x00000, 0x8400000, CRC(d5ab613d) SHA1(6fb104057dc3484fa958e2cb20c5dd0c19589f75) ) // SPANSION S34ML01G100TF100
 ROM_END
 
-CONS( 200?, mobigo,  0,      0, mobigo,   mobigo, mobigo_state,  init_mobigo , "VTech", "MobiGo", MACHINE_IS_SKELETON )
-CONS( 200?, mobigos, mobigo, 0, mobigo,   mobigo, mobigo_state,  init_mobigo , "VTech", "MobiGo (Spain)", MACHINE_IS_SKELETON )
-CONS( 200?, mobigo2, 0,      0, mobigo2,  mobigo, mobigo2_state, nand_init840, "VTech", "MobiGo 2 (Germany)", MACHINE_IS_SKELETON )
+CONS( 2010, mobigo,  0,      0, mobigo,   mobigo, mobigo_state,  init_mobigo , "VTech", "MobiGo", MACHINE_IS_SKELETON )
+CONS( 2010, mobigos, mobigo, 0, mobigo,   mobigo, mobigo_state,  init_mobigo , "VTech", "MobiGo (Spain)", MACHINE_IS_SKELETON )
+CONS( 2012, mobigo2, 0,      0, mobigo2,  mobigo, mobigo2_state, nand_init840, "VTech", "MobiGo 2 (Germany)", MACHINE_IS_SKELETON )

@@ -22,22 +22,23 @@ class codata_state : public driver_device
 public:
 	codata_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_p_base(*this, "rambase")
+		, m_ram(*this, "mainram")
 		, m_maincpu(*this, "maincpu")
 	{ }
 
 	void codata(machine_config &config);
-	void mem_map(address_map &map);
+
 private:
+	void mem_map(address_map &map);
 	virtual void machine_reset() override;
-	required_shared_ptr<uint16_t> m_p_base;
+	required_shared_ptr<u16> m_ram;
 	required_device<cpu_device> m_maincpu;
 };
 
 void codata_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x000000, 0x1fffff).ram().share("rambase");
+	map(0x000000, 0x1fffff).ram().share("mainram");
 	map(0x200000, 0x203fff).rom().region("bios", 0);
 	map(0x400000, 0x403fff).rom().region("bios", 0x4000);
 	map(0x600000, 0x600007).mirror(0x1ffff8).rw("uart", FUNC(upd7201_device::ba_cd_r), FUNC(upd7201_device::ba_cd_w)).umask16(0xff00);
@@ -57,8 +58,8 @@ INPUT_PORTS_END
 
 void codata_state::machine_reset()
 {
-	uint8_t* RAM = memregion("bios")->base();
-	memcpy(m_p_base, RAM, 16);
+	uint8_t* bios = memregion("bios")->base();
+	memcpy(m_ram, bios, 16);
 }
 
 void codata_state::codata(machine_config &config)
@@ -109,4 +110,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                      FULLNAME  FLAGS
-COMP( 1982, codata, 0,      0,      codata,  codata, codata_state, empty_init, "Contel Codata Corporation", "Codata", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1982, codata, 0,      0,      codata,  codata, codata_state, empty_init, "Contel Codata Corporation", "Codata", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

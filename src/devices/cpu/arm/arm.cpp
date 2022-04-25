@@ -18,7 +18,6 @@
 
 #include "emu.h"
 #include "arm.h"
-#include "debugger.h"
 #include "armdasm.h"
 
 #define ARM_DEBUG_CORE 0
@@ -497,10 +496,13 @@ void arm_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 
-	if(m_program->endianness() == ENDIANNESS_LITTLE) {
+	if(m_program->endianness() == ENDIANNESS_LITTLE)
+	{
 		m_program->cache(m_cachele);
 		m_pr32 = [this](offs_t address) -> u32 { return m_cachele.read_dword(address); };
-	} else {
+	}
+	else
+	{
 		m_program->cache(m_cachebe);
 		m_pr32 = [this](offs_t address) -> u32 { return m_cachebe.read_dword(address); };
 	}
@@ -539,8 +541,8 @@ void arm_cpu_device::device_start()
 	state_add( ARM32_SR13, "SR13", m_sArmRegister[eR13_SVC] ).formatstr("%08X");
 	state_add( ARM32_SR14, "SR14", m_sArmRegister[eR14_SVC] ).formatstr("%08X");
 
-	state_add(STATE_GENPC, "GENPC", m_sArmRegister[15]).mask(ADDRESS_MASK).formatstr("%8s").noshow();
-	state_add(STATE_GENPCBASE, "CURPC", m_sArmRegister[15]).mask(ADDRESS_MASK).formatstr("%8s").noshow();
+	state_add(STATE_GENPC, "GENPC", m_sArmRegister[15]).mask(ADDRESS_MASK).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_sArmRegister[15]).mask(ADDRESS_MASK).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_sArmRegister[15]).formatstr("%11s").noshow();
 
 	set_icountptr(m_icount);
@@ -765,7 +767,7 @@ void arm_cpu_device::HandleMemSingle( uint32_t insn )
 		((R15 &~ (N_MASK | Z_MASK | V_MASK | C_MASK)) \
 		| (((!SIGN_BITS_DIFFER(rn, op2)) && SIGN_BITS_DIFFER(rn, rd)) \
 			<< V_BIT) \
-		| (((~(rn)) < (op2)) << C_BIT) \
+		| (((IsNeg(rn) & IsNeg(op2)) | (IsNeg(rn) & IsPos(rd)) | (IsNeg(op2) & IsPos(rd))) ? C_MASK : 0) \
 		| HandleALUNZFlags(rd)) \
 		+ 4; \
 	else R15 += 4;
@@ -824,7 +826,7 @@ void arm_cpu_device::HandleALU( uint32_t insn )
 	{
 		op2 = decodeShift(insn, (insn & INSN_S) ? &sc : nullptr);
 
-			if (!(insn & INSN_S))
+		if (!(insn & INSN_S))
 			sc=0;
 	}
 

@@ -155,29 +155,16 @@ uint8_t fortyl_state::fortyl_pixram_r(offs_t offset)
 
 void fortyl_state::fortyl_plot_pix( int offset )
 {
-	int x, y, i, c, d1, d2;
+	const int x = (offset & 0x1f) * 8;
+	const int y = (offset >> 5) & 0xff;
 
-	x = (offset & 0x1f) * 8;
-	y = (offset >> 5) & 0xff;
+	const int d1 = (m_pixram_sel ? m_pixram2 : m_pixram1)[offset];
+	const int d2 = (m_pixram_sel ? m_pixram2 : m_pixram1)[offset + 0x2000];
 
-	if (m_pixram_sel)
+	for (int i = 0; i < 8; i++)
 	{
-		d1 = m_pixram2[offset];
-		d2 = m_pixram2[offset + 0x2000];
-	}
-	else
-	{
-		d1 = m_pixram1[offset];
-		d2 = m_pixram1[offset + 0x2000];
-	}
-
-	for (i = 0; i < 8; i++)
-	{
-		c = ((d2 >> i) & 1) + ((d1 >> i) & 1) * 2;
-		if (m_pixram_sel)
-			m_tmp_bitmap2->pix16(y, x + i) = m_pix_color[c] | ((m_color_bank == true) ? 0x200 : 0);
-		else
-			m_tmp_bitmap1->pix16(y, x + i) = m_pix_color[c] | ((m_color_bank == true) ? 0x200 : 0);
+		const int c = BIT(d2, i) | (BIT(d1, i) << 1);
+		(m_pixram_sel ? m_tmp_bitmap2 : m_tmp_bitmap1)->pix(y, x + i) = m_pix_color[c] | (m_color_bank ? 0x200 : 0);
 	}
 }
 

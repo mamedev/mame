@@ -61,7 +61,7 @@ protected:
 	void program_w(offs_t offset, uint8_t data);
 
 private:
-	DECLARE_READ8_MEMBER(rom_r);
+	uint8_t rom_r(offs_t offset);
 };
 
 
@@ -104,8 +104,8 @@ protected:
 private:
 	int                         m_snr;
 
-	DECLARE_READ8_MEMBER(snr_r);
-	DECLARE_WRITE8_MEMBER(snr_w);
+	uint8_t snr_r();
+	void snr_w(uint8_t data);
 
 	void k234_mem(address_map &map);
 };

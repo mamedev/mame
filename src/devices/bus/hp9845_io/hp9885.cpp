@@ -303,10 +303,9 @@ WRITE_LINE_MEMBER(hp9885_device::preset_w)
 	LOG("PRESET = %d\n" , state);
 }
 
-static const floppy_format_type hp9885_floppy_formats[] = {
-	FLOPPY_MFI_FORMAT,
-	FLOPPY_HPI_FORMAT,
-	nullptr
+static void hp9885_floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_HPI_FORMAT);
 };
 
 void hp9885_device::device_add_mconfig(machine_config &config)
@@ -360,7 +359,7 @@ void hp9885_device::device_reset()
 	set_state(FSM_IDLE);
 }
 
-void hp9885_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void hp9885_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	LOG_TIMER("Tmr %.06f ID %d FSM %d HD %d\n" , machine().time().as_double() , id , m_fsm_state , m_head_state);
 

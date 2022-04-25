@@ -149,7 +149,7 @@ public:
 	void write_bus16(offs_t offset, uint16_t data);
 	void write_bus32(offs_t offset, uint32_t data);
 
-	void * ram_ptr() { return m_ram; }
+	void * ram_ptr() { return m_ram.get(); }
 	offs_t ram_start() { return RAM_BASE; }
 	offs_t ram_end() { return RAM_BASE + m_ram_mask; }
 	uint32_t get_rambank_size(uint32_t bank) const { return m_rambank_size[bank]; }
@@ -164,7 +164,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	enum base_addr
@@ -215,9 +215,9 @@ public: // TODO: THIS SHOULD NOT BE PUBLIC
 	required_device<m2_te_device>       m_te;
 
 	// System RAM
-	uint32_t                *m_ram;
-	uint32_t                m_rambank_size[2];
-	uint32_t                m_ram_mask;
+	std::unique_ptr<uint32_t[]> m_ram;
+	uint32_t                    m_rambank_size[2];
+	uint32_t                    m_ram_mask;
 
 	devcb_write16       m_dac_l;
 	devcb_write16       m_dac_r;
@@ -370,10 +370,10 @@ private:
 	devcb_write_line::array<4> m_gpio_out;
 
 	// Registers
-	uint32_t    m_mcfg;
-	uint32_t    m_mref;
-	uint32_t    m_mcntl;
-	uint32_t    m_reset;
+	uint32_t    m_mcfg = 0;
+	uint32_t    m_mref = 0;
+	uint32_t    m_mcntl = 0;
+	uint32_t    m_reset = 0;
 };
 
 
@@ -400,7 +400,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	enum timer_id
@@ -525,7 +525,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 

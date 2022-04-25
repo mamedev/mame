@@ -16,7 +16,7 @@ DECLARE_DEVICE_TYPE(DOOYONG_RAM_TILEMAP, dooyong_ram_tilemap_device)
 class dooyong_tilemap_device_base : public device_t
 {
 public:
-	template <typename T> void set_gfxdecode_tag(T &&cpu_tag) { m_gfxdecode.set_tag(std::forward<T>(cpu_tag)); }
+	template <typename T> void set_gfxdecode_tag(T &&gfxdecode_tag) { m_gfxdecode.set_tag(std::forward<T>(gfxdecode_tag)); }
 	void set_gfxnum(int gfxnum) { m_gfxnum = gfxnum; }
 
 	void draw(screen_device &screen, bitmap_ind16 &dest, rectangle const &cliprect, u32 flags, u8 priority, u8 priority_mask = 0xff);

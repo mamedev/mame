@@ -24,6 +24,8 @@ void beathead_state::video_start()
 	save_item(NAME(m_hsyncram_offset));
 	save_item(NAME(m_hsyncram_start));
 	save_item(NAME(m_hsyncram));
+
+	m_hsyncram_offset = 0;
 }
 
 

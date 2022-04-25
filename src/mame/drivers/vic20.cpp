@@ -11,7 +11,7 @@
 
 #include "emu.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 #include "bus/cbmiec/cbmiec.h"
 #include "bus/pet/cass.h"
@@ -44,7 +44,7 @@ public:
 		m_vic(*this, VIC_TAG),
 		m_iec(*this, CBM_IEC_TAG),
 		m_joy(*this, CONTROL1_TAG),
-		m_exp(*this, VIC20_EXPANSION_SLOT_TAG),
+		m_exp(*this, "exp"),
 		m_user(*this, PET_USER_PORT_TAG),
 		m_cassette(*this, PET_DATASSETTE_PORT_TAG),
 		m_ram(*this, RAM_TAG),
@@ -164,7 +164,7 @@ private:
 
 QUICKLOAD_LOAD_MEMBER(vic20_state::quickload_vc20)
 {
-	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress);
+	return general_cbm_loadsnap(image, m_maincpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress);
 }
 
 //**************************************************************************
@@ -464,7 +464,7 @@ static INPUT_PORTS_START( vic20 )
 
 	PORT_START( "ROW6" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F3)             PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_CHAR(UCHAR_MAMEKEY(F6))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x91  Pi") PORT_CODE(KEYCODE_DEL) PORT_CHAR(0x2191) PORT_CHAR(0x03C0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x91  Pi") PORT_CODE(KEYCODE_DEL) PORT_CHAR(0x2191,'^') PORT_CHAR(0x03C0)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE)      PORT_CHAR('@')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O)              PORT_CHAR('O')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U)              PORT_CHAR('U')
@@ -861,7 +861,7 @@ void vic20_state::add_clocked_devices(machine_config &config, uint32_t clock)
 	M6502(config, m_maincpu, clock);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vic20_state::vic20_mem);
 
-	VIA6522(config, m_via1, clock);
+	MOS6522(config, m_via1, clock);
 	m_via1->readpa_handler().set(FUNC(vic20_state::via1_pa_r));
 	m_via1->writepa_handler().set(FUNC(vic20_state::via1_pa_w));
 	m_via1->writepb_handler().set(FUNC(vic20_state::via1_pb_w));
@@ -870,7 +870,7 @@ void vic20_state::add_clocked_devices(machine_config &config, uint32_t clock)
 	m_via1->cb2_handler().set(m_user, FUNC(pet_user_port_device::write_m));
 	m_via1->irq_handler().set_inputline(m_maincpu, M6502_NMI_LINE);
 
-	VIA6522(config, m_via2, clock);
+	MOS6522(config, m_via2, clock);
 	m_via2->readpa_handler().set(FUNC(vic20_state::via2_pa_r));
 	m_via2->readpb_handler().set(FUNC(vic20_state::via2_pb_r));
 	m_via2->writepb_handler().set(FUNC(vic20_state::via2_pb_w));

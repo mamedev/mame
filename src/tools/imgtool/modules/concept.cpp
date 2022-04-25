@@ -8,11 +8,14 @@
     Raphael Nabet, 2003
 */
 
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
-#include <climits>
 #include "imgtool.h"
+
+#include "opresolv.h"
+
+#include <climits>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 struct UINT16xE
 {
@@ -201,7 +204,6 @@ static int read_physical_record(imgtool::stream &file_handle, int secnum, void *
 	return 0;
 }
 
-#ifdef UNUSED_FUNCTION
 /*
     write_physical_record
 
@@ -213,7 +215,7 @@ static int read_physical_record(imgtool::stream &file_handle, int secnum, void *
 
     Return non-zero on error
 */
-static int write_physical_record(imgtool::stream *file_handle, int secnum, const void *src)
+[[maybe_unused]] static int write_physical_record(imgtool::stream *file_handle, int secnum, const void *src)
 {
 	int reply;
 
@@ -228,7 +230,6 @@ static int write_physical_record(imgtool::stream *file_handle, int secnum, const
 
 	return 0;
 }
-#endif
 
 /*
     Search for a file name on a concept_image
@@ -357,8 +358,8 @@ static imgtoolerr_t concept_image_nextenum(imgtool::directory &enumeration, imgt
 		int len = iter->image->dev_dir.file_dir[iter->index].filename[0];
 		const char *type;
 
-		if (len > ARRAY_LENGTH(ent.filename))
-			len = ARRAY_LENGTH(ent.filename);
+		if (len > std::size(ent.filename))
+			len = std::size(ent.filename);
 		memcpy(ent.filename, iter->image->dev_dir.file_dir[iter->index].filename + 1, len);
 		ent.filename[len] = 0;
 
@@ -382,7 +383,7 @@ static imgtoolerr_t concept_image_nextenum(imgtool::directory &enumeration, imgt
 			type = "???";
 			break;
 		}
-		snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "%s", type);
+		snprintf(ent.attr, std::size(ent.attr), "%s", type);
 
 		/* len in physrecs */
 		ent.filesize = get_UINT16xE(iter->image->dev_dir.vol_hdr.disk_flipped, iter->image->dev_dir.file_dir[iter->index].next_block)

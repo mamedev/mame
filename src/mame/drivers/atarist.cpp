@@ -7,7 +7,7 @@
 #include "bus/midi/midi.h"
 #include "video/atarist.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 /*
@@ -52,7 +52,7 @@ static const double DMASOUND_RATE[] = { Y2/640.0/8.0, Y2/640.0/4.0, Y2/640.0/2.0
 //  TIMERS
 //**************************************************************************
 
-void st_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void st_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -825,7 +825,7 @@ void ste_state::dmasound_tick()
 }
 
 
-void ste_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ste_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -836,7 +836,7 @@ void ste_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		microwire_tick();
 		break;
 	default:
-		st_state::device_timer(timer, id, param, ptr);
+		st_state::device_timer(timer, id, param);
 	}
 }
 
@@ -1887,6 +1887,10 @@ void st_state::machine_start()
 	m_mfp->i4_w(1);
 	m_mfp->i5_w(1);
 	m_mfp->i7_w(1);
+
+	m_shifter_base = 0;
+	m_shifter_ofs = 0;
+	m_shifter_mode = 0;
 }
 
 
@@ -1940,6 +1944,10 @@ void ste_state::machine_start()
 	m_mfp->i4_w(1);
 	m_mfp->i5_w(1);
 	m_mfp->i7_w(1);
+
+	m_shifter_base = 0;
+	m_shifter_ofs = 0;
+	m_shifter_mode = 0;
 }
 
 
@@ -1985,9 +1993,13 @@ void stbook_state::machine_start()
 	m_mfp->i5_w(1);
 }
 
-FLOPPY_FORMATS_MEMBER( st_state::floppy_formats )
-	FLOPPY_ST_FORMAT, FLOPPY_MSA_FORMAT, FLOPPY_PASTI_FORMAT
-FLOPPY_FORMATS_END
+void st_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ST_FORMAT);
+	fr.add(FLOPPY_MSA_FORMAT);
+	fr.add(FLOPPY_PASTI_FORMAT);
+}
 
 static void atari_floppies(device_slot_interface &device)
 {

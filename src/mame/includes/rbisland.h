@@ -45,15 +45,9 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_WRITE16_MEMBER(jumping_sound_w);
-	DECLARE_READ8_MEMBER(jumping_latch_r);
-	DECLARE_WRITE16_MEMBER(rbisland_cchip_ctrl_w);
-	DECLARE_WRITE16_MEMBER(rbisland_cchip_bank_w);
-	DECLARE_WRITE16_MEMBER(rbisland_cchip_ram_w);
-	DECLARE_READ16_MEMBER(rbisland_cchip_ctrl_r);
-	DECLARE_READ16_MEMBER(rbisland_cchip_ram_r);
-	DECLARE_WRITE16_MEMBER(rbisland_spritectrl_w);
-	DECLARE_WRITE16_MEMBER(jumping_spritectrl_w);
+	void jumping_sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t jumping_latch_r();
+	void jumping_spritectrl_w(offs_t offset, uint16_t data);
 	void bankswitch_w(uint8_t data);
 	void counters_w(uint8_t data);
 	DECLARE_VIDEO_START(jumping);
@@ -73,11 +67,11 @@ private:
 	optional_shared_ptr<uint16_t> m_spriteram;
 
 	/* video-related */
-	uint16_t      m_sprite_ctrl;
-	uint16_t      m_sprites_flipscreen;
+	uint16_t      m_sprite_ctrl = 0;
+	uint16_t      m_sprites_flipscreen = 0;
 
 	/* misc */
-	uint8_t       m_jumping_latch;
+	uint8_t       m_jumping_latch = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

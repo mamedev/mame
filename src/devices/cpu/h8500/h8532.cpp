@@ -10,9 +10,10 @@
 #include "h8532.h"
 
 DEFINE_DEVICE_TYPE(HD6435328, hd6435328_device, "hd6435328", "Hitachi HD6435328 (H8/532)")
+DEFINE_DEVICE_TYPE(HD6475328, hd6475328_device, "hd6475328", "Hitachi HD6475328 (H8/532)")
 
 h8532_device::h8532_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: h8500_device(mconfig, type, tag, owner, clock, 20, 8, 10, address_map_constructor(FUNC(h8532_device::internal_map), this))
+	: h8500_device(mconfig, type, tag, owner, clock, 20, 8, 10, 4, address_map_constructor(FUNC(h8532_device::internal_map), this))
 {
 }
 
@@ -21,9 +22,15 @@ hd6435328_device::hd6435328_device(const machine_config &mconfig, const char *ta
 {
 }
 
+hd6475328_device::hd6475328_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: h8532_device(mconfig, HD6475328, tag, owner, clock)
+{
+}
+
 void h8532_device::internal_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom().region(DEVICE_SELF, 0); // modes 2, 4, 7
+	if (mode_control() == 2 || mode_control() == 4 || mode_control() == 7)
+		map(0x0000, 0x7fff).rom().region(DEVICE_SELF, 0);
 #if 0
 	map(0xff80, 0xff80).w(FUNC(h8532_device::p1ddr_w));
 	map(0xff81, 0xff81).w(FUNC(h8532_device::p2ddr_w));

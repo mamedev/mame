@@ -9,7 +9,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "mcs96.h"
 
 mcs96_device::mcs96_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_width, address_map_constructor regs_map) :
@@ -38,7 +37,6 @@ void mcs96_device::device_start()
 
 	state_add(STATE_GENPC,     "GENPC",     PC).noshow();
 	state_add(STATE_GENPCBASE, "CURPC",     PPC).noshow();
-	state_add(STATE_GENSP,     "GENSP",     register_file[0]).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  PSW).formatstr("%16s").noshow();
 	state_add(MCS96_PC,        "PC",        PC);
 	state_add(MCS96_PSW,       "PSW",       PSW);

@@ -111,7 +111,7 @@ void acclaim_rax_device::adsp_control_w(offs_t offset, uint16_t data)
 		{
 			m_control_regs[BDMA_WORD_COUNT_REG] = data & 0x3fff;
 
-			const uint8_t * adsp_rom = m_rom + m_rom_bank * 0x400000;
+			const uint8_t *adsp_rom = &m_rom[m_rom_bank * 0x400000];
 
 			uint32_t page = (m_control_regs[BDMA_CONTROL_REG] >> 8) & 0xff;
 			uint32_t dir = (m_control_regs[BDMA_CONTROL_REG] >> 2) & 1;
@@ -184,7 +184,7 @@ void acclaim_rax_device::adsp_control_w(offs_t offset, uint16_t data)
 			/* autobuffer off: nuke the timer, and disable the DAC */
 			if ((data & 0x0002) == 0)
 			{
-				dmadac_enable(&m_dmadac[1], 1, 0);
+				m_dmadac[1]->enable(0);
 			}
 			break;
 
@@ -192,8 +192,8 @@ void acclaim_rax_device::adsp_control_w(offs_t offset, uint16_t data)
 			/* autobuffer off: nuke the timer, and disable the DAC */
 			if ((data & 0x0002) == 0)
 			{
-				dmadac_enable(&m_dmadac[0], 1, 0);
-				m_reg_timer[0]->reset();
+				m_dmadac[0]->enable(0);
+				m_reg_timer->reset();
 			}
 			break;
 
@@ -236,9 +236,9 @@ TIMER_DEVICE_CALLBACK_MEMBER( acclaim_rax_device::dma_timer_callback )
 void acclaim_rax_device::update_data_ram_bank()
 {
 	if (m_dmovlay_val == 0)
-		membank("databank")->set_entry(0);
+		m_adsp_data_bank->set_entry(0);
 	else
-		membank("databank")->set_entry(1 + m_data_bank);
+		m_adsp_data_bank->set_entry(1 + m_data_bank);
 }
 
 void acclaim_rax_device::ram_bank_w(uint16_t data)
@@ -281,7 +281,7 @@ void acclaim_rax_device::adsp_program_map(address_map &map)
 void acclaim_rax_device::adsp_data_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x1fff).bankrw("databank");
+	map(0x0000, 0x1fff).bankrw(m_adsp_data_bank);
 	map(0x2000, 0x3fdf).ram(); // Internal RAM
 	map(0x3fe0, 0x3fff).rw(FUNC(acclaim_rax_device::adsp_control_r), FUNC(acclaim_rax_device::adsp_control_w));
 }
@@ -297,19 +297,12 @@ void acclaim_rax_device::adsp_io_map(address_map &map)
 
 void acclaim_rax_device::device_start()
 {
-	m_rom = (uint8_t *)machine().root_device().memregion("rax")->base();
-
 	m_program = &m_cpu->space(AS_PROGRAM);
 	m_data = &m_cpu->space(AS_DATA);
 
-	m_dmadac[0] = subdevice<dmadac_sound_device>("dacl");
-	m_dmadac[1] = subdevice<dmadac_sound_device>("dacr");
-
-	m_reg_timer[0] = subdevice<timer_device>("adsp_reg_timer0");
-	m_dma_timer = subdevice<timer_device>("adsp_dma_timer");
-
 	// 1 bank for internal
-	membank("databank")->configure_entries(0, 5, auto_alloc_array(machine(), uint16_t, 0x2000 * 5), 0x2000*sizeof(uint16_t));
+	m_banked_ram = make_unique_clear<uint16_t[]>(0x2000 * 5);
+	m_adsp_data_bank->configure_entries(0, 5, &m_banked_ram[0], 0x2000*sizeof(uint16_t));
 }
 
 void acclaim_rax_device::device_reset()
@@ -362,7 +355,11 @@ void acclaim_rax_device::adsp_irq(int which)
 		reg += m_incs[which];
 	}
 
-	dmadac_transfer(&m_dmadac[0], 2, 1, 2, count/2, buffer);
+	for (int i = 0; i < 2; i++)
+	{
+		m_dmadac[i]->flush();
+		m_dmadac[i]->transfer(i, 1, 2, count/2, buffer);
+	}
 
 	/* check for wrapping */
 	if (reg >= m_ireg_base[which] + m_size[which])
@@ -390,14 +387,17 @@ void acclaim_rax_device::recompute_sample_rate(int which)
 
 	/* now put it down to samples, so we know what the channel frequency has to be */
 	sample_period = sample_period * (16 * 1);
-	dmadac_set_frequency(&m_dmadac[0], 2, sample_period.as_hz());
-	dmadac_enable(&m_dmadac[0], 2, 1);
+	for (auto &dmadac : m_dmadac)
+	{
+		dmadac->set_frequency(sample_period.as_hz());
+		dmadac->enable(1);
+	}
 
 	/* fire off a timer which will hit every half-buffer */
 	if (m_incs[which])
 	{
 		attotime period = (sample_period * m_size[which]) / (4 * 2 * m_incs[which]);
-		m_reg_timer[which]->adjust(period, 0, period);
+		m_reg_timer->adjust(period, 0, period);
 	}
 }
 
@@ -408,10 +408,10 @@ void acclaim_rax_device::adsp_sound_tx_callback(offs_t offset, uint32_t data)
 	if (which != 0)
 		return;
 
-	int autobuf_reg = which ? S1_AUTOBUF_REG : S0_AUTOBUF_REG;
+	int autobuf_reg = which ? S1_AUTOBUF_REG : S0_AUTOBUF_REG; // "which" must equal 0 here, invalid test: Coverity 315932
 
 	/* check if SPORT1 is enabled */
-	if (m_control_regs[SYSCONTROL_REG] & (which ? 0x0800 : 0x1000)) /* bit 11 */
+	if (m_control_regs[SYSCONTROL_REG] & (which ? 0x0800 : 0x1000)) /* bit 11 */ // invalid test here too
 	{
 		/* we only support autobuffer here (which is what this thing uses), bail if not enabled */
 		if (m_control_regs[autobuf_reg] & 0x0002) /* bit 1 */
@@ -449,15 +449,16 @@ void acclaim_rax_device::adsp_sound_tx_callback(offs_t offset, uint32_t data)
 	}
 
 	/* if we get there, something went wrong. Disable playing */
-	dmadac_enable(&m_dmadac[0], 2, 0);
+	for (auto &dmadac : m_dmadac)
+		dmadac->enable(0);
 
 	/* remove timer */
-	m_reg_timer[which]->reset();
+	m_reg_timer->reset();
 }
 
 void acclaim_rax_device::dmovlay_callback(uint32_t data)
 {
-	if (data < 0 || data > 1)
+	if (data > 1)
 	{
 		fatalerror("dmovlay_callback: Error! dmovlay called with value = %X\n", data);
 	}
@@ -478,8 +479,12 @@ DEFINE_DEVICE_TYPE(ACCLAIM_RAX, acclaim_rax_device, "rax_audio", "Acclaim RAX")
 acclaim_rax_device::acclaim_rax_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ACCLAIM_RAX, tag, owner, clock)
 	, m_cpu(*this, "adsp")
+	, m_dmadac(*this, { "dacl", "dacr" })
+	, m_reg_timer(*this, "adsp_reg_timer")
+	, m_dma_timer(*this, "adsp_dma_timer")
 	, m_adsp_pram(*this, "adsp_pram")
 	, m_adsp_data_bank(*this, "databank")
+	, m_rom(*this, DEVICE_SELF)
 	, m_data_in(*this, "data_in")
 	, m_data_out(*this, "data_out")
 {
@@ -499,7 +504,7 @@ void acclaim_rax_device::device_add_mconfig(machine_config &config)
 	m_cpu->set_addrmap(AS_DATA, &acclaim_rax_device::adsp_data_map);
 	m_cpu->set_addrmap(AS_IO, &acclaim_rax_device::adsp_io_map);
 
-	TIMER(config, "adsp_reg_timer0").configure_generic(FUNC(acclaim_rax_device::adsp_irq0));
+	TIMER(config, "adsp_reg_timer").configure_generic(FUNC(acclaim_rax_device::adsp_irq0));
 	TIMER(config, "adsp_dma_timer").configure_generic(FUNC(acclaim_rax_device::dma_timer_callback));
 
 	GENERIC_LATCH_16(config, m_data_in);

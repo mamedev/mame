@@ -1,11 +1,8 @@
-// license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria
+// license:GPL-2.0+
+// copyright-holders:Jarek Burczynski
 /***************************************************************************
 
-  bagman.c
-
-  Functions to emulate general aspects of the machine (RAM, ROM, interrupts,
-  I/O ports)
+  Bagman protection emulation
 
 ***************************************************************************/
 

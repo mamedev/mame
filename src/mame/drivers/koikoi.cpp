@@ -11,7 +11,7 @@ driver by
 TODO:
 - map missing inputs (temp mapped to z-x-left shift)
 - is there (still..) some kind of protection ? timers looks weird (2nd player timer is frozen) (this seems fixed now -AS)
-- colors (afaik color(?) prom outputs are connected to one of pals), Missing color prom apparently.
+- colors (afaik color(?) prom outputs are connected to one of pals), Missing color prom apparently. Reference: https://www.youtube.com/watch?v=inc4tyuh4qk
 
 
 Basic hw is...
@@ -68,13 +68,13 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 
 	/* video-related */
-	tilemap_t  *m_tmap;
+	tilemap_t  *m_tmap = nullptr;
 
 	/* misc */
-	int m_inputcnt;
-	int m_inputval;
-	int m_inputlen;
-	int m_ioram[8];
+	int m_inputcnt = 0;
+	int m_inputval = 0;
+	int m_inputlen = 0;
+	int m_ioram[8]{};
 	void vram_w(offs_t offset, uint8_t data);
 	uint8_t io_r(offs_t offset);
 	void io_w(offs_t offset, uint8_t data);

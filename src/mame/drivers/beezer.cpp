@@ -108,7 +108,7 @@ protected:
 		TIMER_SCANLINE
 	};
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -257,8 +257,8 @@ uint32_t beezer_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	{
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
-			bitmap.pix16(y, x + 1) = m_videoram[0x80 * x + y] & 0x0f;
-			bitmap.pix16(y, x + 0) = m_videoram[0x80 * x + y] >> 4;
+			bitmap.pix(y, x + 1) = m_videoram[0x80 * x + y] & 0x0f;
+			bitmap.pix(y, x + 0) = m_videoram[0x80 * x + y] >> 4;
 		}
 	}
 
@@ -297,7 +297,7 @@ uint8_t beezer_state::line_r()
 //  AUDIO
 //**************************************************************************
 
-void beezer_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void beezer_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -508,7 +508,7 @@ void beezer_state::beezer(machine_config &config)
 	m_sysbank->set_addr_width(15);
 	m_sysbank->set_stride(0x1000);
 
-	VIA6522(config, m_via_system, XTAL(12'000'000) / 12);
+	MOS6522(config, m_via_system, XTAL(12'000'000) / 12);
 	m_via_system->readpa_handler().set(FUNC(beezer_state::via_system_pa_r));
 	m_via_system->readpb_handler().set(FUNC(beezer_state::via_system_pb_r));
 	m_via_system->writepa_handler().set(FUNC(beezer_state::via_system_pa_w));
@@ -537,7 +537,7 @@ void beezer_state::beezer(machine_config &config)
 	input_merger_device &audio_irqs(INPUT_MERGER_ANY_HIGH(config, "audio_irqs"));
 	audio_irqs.output_handler().set_inputline(m_audiocpu, M6809_IRQ_LINE);
 
-	VIA6522(config, m_via_audio, XTAL(4'000'000) / 4);
+	MOS6522(config, m_via_audio, XTAL(4'000'000) / 4);
 	m_via_audio->readpa_handler().set(FUNC(beezer_state::via_audio_pa_r));
 	m_via_audio->writepa_handler().set(FUNC(beezer_state::via_audio_pa_w));
 	m_via_audio->writepb_handler().set(FUNC(beezer_state::via_audio_pb_w));
@@ -554,7 +554,7 @@ void beezer_state::beezer(machine_config &config)
 	// schematics show an input labeled VCO to channel 2, but the source is unknown
 
 	mm5837_device &noise(MM5837(config, "noise"));
-	noise.set_vdd_voltage(12);
+	noise.set_vdd(-12);
 	noise.output_callback().set(FUNC(beezer_state::noise_w));
 
 	SPEAKER(config, "speaker").front_center();

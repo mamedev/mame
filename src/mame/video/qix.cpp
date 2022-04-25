@@ -22,9 +22,6 @@
 
 void qix_state::video_start()
 {
-	/* allocate memory for the full video RAM */
-	m_videoram.allocate(256 * 256);
-
 	/* initialize the palette */
 	for (int x = 0; x < 0x400; x++)
 		set_pen(x);
@@ -87,7 +84,7 @@ WRITE_LINE_MEMBER(qix_state::qix_flip_screen_w)
  *
  *************************************/
 
-READ8_MEMBER(qix_state::qix_videoram_r)
+uint8_t qix_state::qix_videoram_r(offs_t offset)
 {
 	/* add in the upper bit of the address latch */
 	offset += (m_videoram_address[0] & 0x80) << 8;
@@ -95,7 +92,7 @@ READ8_MEMBER(qix_state::qix_videoram_r)
 }
 
 
-WRITE8_MEMBER(qix_state::qix_videoram_w)
+void qix_state::qix_videoram_w(offs_t offset, uint8_t data)
 {
 	/* update the screen in case the game is writing "behind" the beam -
 	   Zookeeper likes to do this */
@@ -110,7 +107,7 @@ WRITE8_MEMBER(qix_state::qix_videoram_w)
 }
 
 
-WRITE8_MEMBER(qix_state::slither_videoram_w)
+void qix_state::slither_videoram_w(offs_t offset, uint8_t data)
 {
 	/* update the screen in case the game is writing "behind" the beam -
 	   Zookeeper likes to do this */
@@ -141,7 +138,7 @@ WRITE8_MEMBER(qix_state::slither_videoram_w)
  *
  *************************************/
 
-READ8_MEMBER(qix_state::qix_addresslatch_r)
+uint8_t qix_state::qix_addresslatch_r(offs_t offset)
 {
 	/* compute the value at the address latch */
 	offset = (m_videoram_address[0] << 8) | m_videoram_address[1];
@@ -149,7 +146,7 @@ READ8_MEMBER(qix_state::qix_addresslatch_r)
 }
 
 
-WRITE8_MEMBER(qix_state::qix_addresslatch_w)
+void qix_state::qix_addresslatch_w(offs_t offset, uint8_t data)
 {
 	/* update the screen in case the game is writing "behind" the beam */
 //  m_screen->update_now();
@@ -163,7 +160,7 @@ WRITE8_MEMBER(qix_state::qix_addresslatch_w)
 }
 
 
-WRITE8_MEMBER(qix_state::slither_addresslatch_w)
+void qix_state::slither_addresslatch_w(offs_t offset, uint8_t data)
 {
 	/* update the screen in case the game is writing "behind" the beam */
 //  m_screen->update_now();
@@ -185,7 +182,7 @@ WRITE8_MEMBER(qix_state::slither_addresslatch_w)
  *************************************/
 
 
-WRITE8_MEMBER(qix_state::qix_paletteram_w)
+void qix_state::qix_paletteram_w(offs_t offset, uint8_t data)
 {
 	uint8_t old_data = m_paletteram[offset];
 
@@ -204,7 +201,7 @@ WRITE8_MEMBER(qix_state::qix_paletteram_w)
 }
 
 
-WRITE8_MEMBER(qix_state::qix_palettebank_w)
+void qix_state::qix_palettebank_w(uint8_t data)
 {
 	/* set the bank value */
 	if (m_palette_bank != (data & 3))
@@ -281,8 +278,8 @@ MC6845_BEGIN_UPDATE( qix_state::crtc_begin_update )
 
 MC6845_UPDATE_ROW( qix_state::crtc_update_row )
 {
-	uint32_t *dest = &bitmap.pix32(y);
-	pen_t *pens = &m_pens[m_palette_bank << 8];
+	uint32_t *const dest = &bitmap.pix(y);
+	pen_t const *const pens = &m_pens[m_palette_bank << 8];
 
 	/* the memory is hooked up to the MA, RA lines this way */
 	offs_t offs = ((ma << 6) & 0xf800) | ((ra << 8) & 0x0700);

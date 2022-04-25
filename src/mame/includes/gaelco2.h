@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Manuel Abadia
+// copyright-holders:Manuel Abadia, David Haywood
 #include "cpu/m68000/m68000.h"
 #include "video/bufsprite.h"
 #include "machine/74259.h"
@@ -81,6 +81,7 @@ private:
 	void snowboar_protection_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	template<unsigned Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 	template<unsigned Layer> TILE_GET_INFO_MEMBER(get_tile_info_dual);
+	int get_rowscrollmode_yscroll(bool first_screen);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int mask);
 	u32 dual_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int index);
 	void ROM16_split_gfx(const char *src_reg, const char *dst_reg, int start, int length, int dest1, int dest2);
@@ -97,12 +98,12 @@ private:
 	u16 srollnd_share_sim_r(offs_t offset, u16 mem_mask = ~0);
 	void srollnd_share_sim_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	u32 m_snowboard_latch;
+	u32 m_snowboard_latch = 0U;
 
-	u16 *m_videoram;
-	tilemap_t *m_pant[2];
-	int m_dual_monitor;
-	int m_global_spritexoff;
+	u16 *m_videoram = nullptr;
+	tilemap_t *m_pant[2]{};
+	int m_dual_monitor = 0;
+	int m_global_spritexoff = 0;
 
 	required_shared_ptr<u16> m_vregs;
 	optional_shared_ptr<u16> m_snowboar_protection;
@@ -132,7 +133,7 @@ private:
 	required_ioport m_light1_x;
 	required_ioport m_light1_y;
 
-	int m_clr_gun_int;
+	int m_clr_gun_int = 0;
 
 	u16 p1_gun_x();
 	u16 p1_gun_y();
@@ -161,7 +162,7 @@ private:
 	required_ioport m_analog0;
 	required_ioport m_analog1;
 
-	uint8_t m_analog_ports[2];
+	uint8_t m_analog_ports[2]{};
 
 	DECLARE_WRITE_LINE_MEMBER(wrally2_adc_clk);
 	DECLARE_WRITE_LINE_MEMBER(wrally2_adc_cs);

@@ -4,6 +4,8 @@
 
     ITT 3030
 
+    When the machine is started you get a black screen.
+    Hold down B until the cursor appears. It will then boot from the floppy.
 
     ToDo:
     - Check Beeper
@@ -200,6 +202,7 @@ Beeper Circuit, all ICs shown:
 #include "video/tms9927.h"          //Display hardware
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 #include "formats/itt3030_dsk.h"
 #include "debugger.h"
@@ -252,7 +255,7 @@ private:
 	void fdc_w(offs_t offset, uint8_t data);
 	uint8_t fdc_stat_r();
 	void fdc_cmd_w(uint8_t data);
-	DECLARE_FLOPPY_FORMATS(itt3030_floppy_formats);
+	static void itt3030_floppy_formats(format_registration &fr);
 
 	DECLARE_WRITE_LINE_MEMBER(fdcirq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdcdrq_w);
@@ -279,11 +282,11 @@ private:
 	// shared pointers
 	required_shared_ptr<uint8_t> m_vram;
 
-	uint8_t m_kbdclk, m_kbdread, m_kbdport2;
+	uint8_t m_kbdclk = 0, m_kbdread = 0, m_kbdport2 = 0;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	floppy_image_device *m_curfloppy;
-	bool m_fdc_irq, m_fdc_drq, m_fdc_hld;
+	floppy_image_device *m_curfloppy = nullptr;
+	bool m_fdc_irq = false, m_fdc_drq = false, m_fdc_hld = false;
 };
 
 //**************************************************************************
@@ -658,9 +661,11 @@ void itt3030_state::fdc_cmd_w(uint8_t data)
 //  FLOPPY - Drive definitions
 //**************************************************************************
 
-FLOPPY_FORMATS_MEMBER( itt3030_state::itt3030_floppy_formats )
-	FLOPPY_ITT3030_FORMAT
-FLOPPY_FORMATS_END
+void itt3030_state::itt3030_floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ITT3030_FORMAT);
+}
 
 
 static void itt3030_floppies(device_slot_interface &device)

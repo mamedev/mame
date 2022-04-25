@@ -201,6 +201,48 @@ Acorn BBC Master ROM Cartridges
 		</part>
 	</software>
 
+	<software name="prisma2" supported="no">
+		<description>MasterPieCe 1.10</description>
+		<year>1987</year>
+		<publisher>G2 Systems</publisher>
+		<info name="usage" value="Requires Prisma-2"/>
+		<part name="cart" interface="bbcm_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="MasterPieCe-1.10.rom" size="16384" crc="14b85cdd" sha1="c975041933dd0e223470292d169dd70568c25c59" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prisma3" supported="no">
+		<description>Prisma-3 1.30</description>
+		<year>1988</year>
+		<publisher>Millipede</publisher>
+		<info name="usage" value="Requires Prisma-3"/>
+		<part name="cart" interface="bbcm_cart">
+			<dataarea name="lorom" size="16384">
+				<rom name="Prisma3-1.30-Main.rom" size="16384" crc="6ed1e8aa" sha1="ceda5ca869f960a4bb5368adbf4acd4861efd3a0" />
+			</dataarea>
+			<dataarea name="uprom" size="16384">
+				<rom name="Prisma3-1.30-Utils.rom" size="16384" crc="76c42acb" sha1="36aab45a3565325dd31ada64934597bafe765ed8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prisma3p" cloneof="prisma3" supported="no">
+		<description>Prisma-3 2.30</description>
+		<year>1990</year>
+		<publisher>Millipede</publisher>
+		<info name="usage" value="Requires Prisma-3/3+"/>
+		<part name="cart" interface="bbcm_cart">
+			<dataarea name="lorom" size="16384">
+				<rom name="Prisma3-2.30-Main.rom" size="16384" crc="b9489c7c" sha1="59a7606e3b92e1c7fbd0075d54e4fffd7c28417e" />
+			</dataarea>
+			<dataarea name="uprom" size="16384">
+				<rom name="Prisma3-2.30-Utils.rom" size="16384" crc="fa395bca" sha1="be7b1f590818e362a8acc5b203f0a08fce967f42" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="techcad">
 		<description>TechnoCAD</description>
 		<year>1988</year>

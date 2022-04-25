@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -100,7 +100,7 @@ extern "C" const char* strstr(const char* _str, const char* _find)
 
 extern "C" void qsort(void* _base, size_t _num, size_t _size, bx::ComparisonFn _fn)
 {
-	BX_CHECK(_num <= UINT32_MAX && _size <= UINT32_MAX, "");
+	BX_ASSERT(_num <= UINT32_MAX && _size <= UINT32_MAX, "");
 	return bx::quickSort(_base, _num, _size, _fn);
 }
 

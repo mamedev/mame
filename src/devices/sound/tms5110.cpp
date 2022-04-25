@@ -1048,7 +1048,7 @@ void tms5110_device::device_start()
 	m_data_cb.resolve();
 
 	/* initialize a stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / 80);
+	m_stream = stream_alloc(0, 1, clock() / 80);
 
 	m_state = CTL_STATE_INPUT; /* most probably not defined */
 	m_romclk_hack_timer = timer_alloc(0);
@@ -1193,7 +1193,7 @@ uint8_t m58817_device::status_r()
 
 ******************************************************************************/
 
-void tms5110_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void tms5110_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_romclk_hack_state = !m_romclk_hack_state;
 }
@@ -1223,24 +1223,22 @@ int tms5110_device::romclk_hack_r()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void tms5110_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void tms5110_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	int16_t sample_data[MAX_SAMPLE_CHUNK];
-	stream_sample_t *buffer = outputs[0];
+	auto &buffer = outputs[0];
 
 	/* loop while we still have samples to generate */
-	while (samples)
+	for (int sampindex = 0; sampindex < buffer.samples(); )
 	{
-		int length = (samples > MAX_SAMPLE_CHUNK) ? MAX_SAMPLE_CHUNK : samples;
-		int index;
+		int length = buffer.samples() - sampindex;
+		if (length > MAX_SAMPLE_CHUNK)
+			length = MAX_SAMPLE_CHUNK;
 
 		/* generate the samples and copy to the target buffer */
 		process(sample_data, length);
-		for (index = 0; index < length; index++)
-			*buffer++ = sample_data[index];
-
-		/* account for the samples */
-		samples -= length;
+		for (int index = 0; index < length; index++)
+			buffer.put_int(sampindex++, sample_data[index], 32768);
 	}
 }
 
@@ -1324,7 +1322,7 @@ void tmsprom_device::update_prom_cnt()
 		m_prom_cnt &= 0x0f;
 }
 
-void tmsprom_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void tmsprom_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	/* only 16 bytes needed ... The original dump is bad. This
 	 * is what is needed to get speech to work. The prom data has
@@ -1511,7 +1509,7 @@ DEFINE_DEVICE_TYPE(TMSPROM, tmsprom_device, "tmsprom", "TMSPROM")
 tmsprom_device::tmsprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TMSPROM, tag, owner, clock),
 		m_rom(*this, DEVICE_SELF),
-		m_prom(*this, finder_base::DUMMY_TAG, 0x20),
+		m_prom(*this, finder_base::DUMMY_TAG),
 		m_rom_size(0),
 		m_pdc_bit(0),
 		m_ctl1_bit(0),

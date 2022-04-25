@@ -305,7 +305,7 @@ u8 z8038_device::byte_count_r(u8 const port)
 {
 	/*
 	 * Bit 6 is reset upon completion of the CPU read of the Byte Count
-	 * register. The ongoing count appears in t he Byte Count register after
+	 * register. The ongoing count appears in the Byte Count register after
 	 * the read.
 	 */
 	if (m_port[port].control_1 & CR1_FBCR)

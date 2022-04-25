@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "gamebooster.h"
 
+#include "softlist_dev.h"
+
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
@@ -80,7 +82,7 @@ uint16_t psx_gamebooster_device::exp_r(offs_t offset, uint16_t mem_mask)
 	else if (offset < 0x24000)
 	{
 		offset -= 0x20000;
-		uint16_t retval = 0;;
+		uint16_t retval = 0;
 
 		if (mem_mask & 0xff00) retval |= (m_cartslot->read_rom((offset*2)+1))<<8;
 		if (mem_mask & 0x00ff) retval |= m_cartslot->read_rom((offset*2)+0);

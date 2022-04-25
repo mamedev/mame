@@ -209,22 +209,21 @@ void williams2_state::video_start()
 uint32_t williams_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	rgb_t pens[16];
-	int x, y;
 
 	/* precompute the palette */
-	for (x = 0; x < 16; x++)
+	for (int x = 0; x < 16; x++)
 		pens[x] = m_palette->pen_color(m_paletteram[x]);
 
 	/* loop over rows */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint8_t *source = &m_videoram[y];
-		uint32_t *dest = &bitmap.pix32(y);
+		uint8_t const *const source = &m_videoram[y];
+		uint32_t *const dest = &bitmap.pix(y);
 
 		/* loop over columns */
-		for (x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
+		for (int x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
 		{
-			int pix = source[(x/2) * 256];
+			int const pix = source[(x/2) * 256];
 			dest[x+0] = pens[pix >> 4];
 			dest[x+1] = pens[pix & 0x0f];
 		}
@@ -235,6 +234,8 @@ uint32_t williams_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 uint32_t blaster_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	uint8_t *palette_0 = &m_videoram[0xbb00];
+	uint8_t *scanline_control = &m_videoram[0xbc00];
 	rgb_t pens[16];
 
 	/* precompute the palette */
@@ -243,23 +244,23 @@ uint32_t blaster_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	/* if we're blitting from the top, start with a 0 for color 0 */
 	if (cliprect.min_y == screen.visible_area().min_y || !(m_video_control & 1))
-		m_color0 = m_palette->pen_color(m_palette_0[0] ^ 0xff);
+		m_color0 = m_palette->pen_color(palette_0[0] ^ 0xff);
 
 	/* loop over rows */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		int erase_behind = m_video_control & m_scanline_control[y] & 2;
-		uint8_t *source = &m_videoram[y];
-		uint32_t *dest = &bitmap.pix32(y);
+		int erase_behind = m_video_control & scanline_control[y] & 2;
+		uint8_t *const source = &m_videoram[y];
+		uint32_t *const dest = &bitmap.pix(y);
 
 		/* latch a new color0 pen? */
-		if (m_video_control & m_scanline_control[y] & 1)
-			m_color0 = m_palette->pen_color(m_palette_0[y] ^ 0xff);
+		if (m_video_control & scanline_control[y] & 1)
+			m_color0 = m_palette->pen_color(palette_0[y] ^ 0xff);
 
 		/* loop over columns */
 		for (int x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
 		{
-			int pix = source[(x/2) * 256];
+			int const pix = source[(x/2) * 256];
 
 			/* clear behind us if requested */
 			if (erase_behind)
@@ -288,13 +289,13 @@ uint32_t williams2_state::screen_update(screen_device &screen, bitmap_rgb32 &bit
 	/* loop over rows */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint8_t *source = &m_videoram[y];
-		uint32_t *dest = &bitmap.pix32(y);
+		uint8_t const *const source = &m_videoram[y];
+		uint32_t *const dest = &bitmap.pix(y);
 
 		/* loop over columns */
 		for (int x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
 		{
-			int pix = source[(x/2) * 256];
+			int const pix = source[(x/2) * 256];
 
 			if (pix & 0xf0)
 				dest[x+0] = pens[pix >> 4];
@@ -322,13 +323,13 @@ uint32_t mysticm_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		for (int x = 1; x < 16; x++)
 			pens[x] = m_palette->pen_color(color_decode(m_fg_color, 1, y) * 16 + x);
 
-		uint8_t *source = &m_videoram[y];
-		uint32_t *dest = &bitmap.pix32(y);
+		uint8_t const *const source = &m_videoram[y];
+		uint32_t *const dest = &bitmap.pix(y);
 
 		/* loop over columns */
 		for (int x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
 		{
-			int pix = source[(x/2) * 256];
+			int const pix = source[(x/2) * 256];
 
 			if (pix & 0xf0)
 				dest[x+0] = pens[pix >> 4];
@@ -666,6 +667,7 @@ void blaster_state::video_control_w(u8 data)
 
 void williams_state::blitter_init(int blitter_config, const uint8_t *remap_prom)
 {
+	std::fill(std::begin(m_blitterram), std::end(m_blitterram), 0);
 	static const uint8_t dummy_table[] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
 
 	/* by default, there is no clipping window - this will be touched only by games that have one */
@@ -687,7 +689,7 @@ void williams_state::blitter_init(int blitter_config, const uint8_t *remap_prom)
 }
 
 
-WRITE8_MEMBER(williams_state::blitter_w)
+void williams_state::blitter_w(address_space &space, offs_t offset, u8 data)
 {
 	/* store the data */
 	m_blitterram[offset] = data;

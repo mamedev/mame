@@ -77,7 +77,7 @@ ymz770_device::ymz770_device(const machine_config &mconfig, device_type type, co
 void ymz770_device::device_start()
 {
 	// create the stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, m_sclock);
+	m_stream = stream_alloc(0, 2, m_sclock);
 
 	for (auto & channel : m_channels)
 	{
@@ -182,14 +182,12 @@ void ymz770_device::device_reset()
 //  our sound stream
 //-------------------------------------------------
 
-void ymz770_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void ymz770_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *outL, *outR;
+	auto &outL = outputs[0];
+	auto &outR = outputs[1];
 
-	outL = outputs[0];
-	outR = outputs[1];
-
-	for (int i = 0; i < samples; i++)
+	for (int i = 0; i < outL.samples(); i++)
 	{
 		sequencer();
 
@@ -268,22 +266,22 @@ retry:
 		switch (m_cpl)
 		{
 		case 3:
-			mixl = (mixl > ClipMax3) ? ClipMax3 : (mixl < -ClipMax3) ? -ClipMax3 : mixl;
-			mixr = (mixr > ClipMax3) ? ClipMax3 : (mixr < -ClipMax3) ? -ClipMax3 : mixr;
+			mixl = std::clamp(mixl, -ClipMax3, ClipMax3);
+			mixr = std::clamp(mixr, -ClipMax3, ClipMax3);
 			break;
 		case 2:
-			mixl = (mixl > ClipMax2) ? ClipMax2 : (mixl < -ClipMax2) ? -ClipMax2 : mixl;
-			mixr = (mixr > ClipMax2) ? ClipMax2 : (mixr < -ClipMax2) ? -ClipMax2 : mixr;
+			mixl = std::clamp(mixl, -ClipMax2, ClipMax2);
+			mixr = std::clamp(mixr, -ClipMax2, ClipMax2);
 			break;
 		case 1:
-			mixl = (mixl > 32767) ? 32767 : (mixl < -32768) ? -32768 : mixl;
-			mixr = (mixr > 32767) ? 32767 : (mixr < -32768) ? -32768 : mixr;
+			mixl = std::clamp(mixl, -32768, 32767);
+			mixr = std::clamp(mixr, -32768, 32767);
 			break;
 		}
 		if (m_mute)
 			mixr = mixl = 0;
-		outL[i] = mixl;
-		outR[i] = mixr;
+		outL.put_int(i, mixl, 32768);
+		outR.put_int(i, mixr, 32768);
 	}
 }
 

@@ -13,7 +13,7 @@ TODO:
   for signal 5 (74LS156)
 
 - The 8910 outputs go through some analog circuitry to make them sound more like
-  real intruments.
+  real instruments.
   #0 Ch. A = "rullante"/"cassa" (drum roll/bass drum) (selected by bits 3&4 of port A)
   #0 Ch. B = "basso" (bass)
   #0 Ch. C = straight out through an optional filter
@@ -22,6 +22,10 @@ TODO:
   #1 Ch. C = disabled (there's an open jumper, otherwise would go out through a filter)
 
 - some minor color issues (see video)
+
+- testing dips in service mode, they don't match what MAME's UI shows
+ (i.e. dip 5 in the UI causes dip 8 to change in service mode display).
+  A dip listing is available online.
 
 
 Notes:
@@ -96,15 +100,15 @@ uint8_t zaccaria_state::prot1_r(offs_t offset)
 	switch (offset)
 	{
 		case 0:
-			return 0x50;    /* Money Money */
+			return 0x50;    // Money Money
 
 		case 4:
-			return 0x40;    /* Jack Rabbit */
+			return 0x40;    // Jack Rabbit
 
 		case 6:
 			if (&machine().system() == &GAME_NAME(monymony))
-				return 0x70;    /* Money Money */
-			return 0xa0;    /* Jack Rabbit */
+				return 0x70;    // Money Money
+			return 0xa0;    // Jack Rabbit
 
 		default:
 			return 0;
@@ -116,16 +120,16 @@ uint8_t zaccaria_state::prot2_r(offs_t offset)
 	switch (offset)
 	{
 		case 0:
-			return ioport("COINS")->read();   /* bits 4 and 5 must be 0 in Jack Rabbit */
+			return m_coins->read();   // bits 4 and 5 must be 0 in Jack Rabbit
 
 		case 2:
-			return 0x10;    /* Jack Rabbit */
+			return 0x10;    // Jack Rabbit
 
 		case 4:
-			return 0x80;    /* Money Money */
+			return 0x80;    // Money Money
 
 		case 6:
-			return 0x00;    /* Money Money */
+			return 0x00;    // Money Money
 
 		default:
 			return 0;
@@ -148,11 +152,11 @@ WRITE_LINE_MEMBER(zaccaria_state::nmi_mask_w)
 void zaccaria_state::main_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
-	map(0x6000, 0x67ff).ram().w(FUNC(zaccaria_state::videoram_w)).share("videoram"); /* 6400-67ff is 4 bits wide */
+	map(0x6000, 0x67ff).ram().w(FUNC(zaccaria_state::videoram_w)).share(m_videoram); // 6400-67ff is 4 bits wide
 	map(0x6400, 0x6407).r(FUNC(zaccaria_state::prot1_r));
-	map(0x6800, 0x683f).w(FUNC(zaccaria_state::attributes_w)).share("attributesram");
-	map(0x6840, 0x685f).ram().share("spriteram");
-	map(0x6881, 0x68c0).ram().share("spriteram2");
+	map(0x6800, 0x683f).w(FUNC(zaccaria_state::attributes_w)).share(m_attributesram);
+	map(0x6840, 0x685f).ram().share(m_spriteram[0]);
+	map(0x6881, 0x68c0).ram().share(m_spriteram[1]);
 	map(0x6c00, 0x6c07).mirror(0x81f8).r(FUNC(zaccaria_state::prot2_r)).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0x6e00, 0x6e00).mirror(0x81f8).r(FUNC(zaccaria_state::dsw_r)).w(m_audiopcb, FUNC(zac1b11142_audio_device::hs_w));
 	map(0x7000, 0x77ff).ram();
@@ -184,7 +188,7 @@ static INPUT_PORTS_START( monymony )
 	PORT_DIPNAME( 0x40, 0x00, "Cross Hatch Pattern" )       PORT_DIPLOCATION("SW 5I:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW 5I:8") /* random high scores? */
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW 5I:8") // random high scores?
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -261,14 +265,14 @@ static INPUT_PORTS_START( monymony )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	/* other bits are outputs */
+	// other bits are outputs
 
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("audiopcb", zac1b11142_audio_device, acs_r)
-	/* other bits come from a protection device */
+	// other bits come from a protection device
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jackrabt )
@@ -332,8 +336,8 @@ WRITE_LINE_MEMBER(zaccaria_state::vblank_irq)
 
 void zaccaria_state::zaccaria(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(18'432'000)/6);   /* verified on pcb */
+	// basic machine hardware
+	Z80(config, m_maincpu, XTAL(18'432'000)/6);   // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &zaccaria_state::main_map);
 
 //  config.set_maximum_quantum(attotime::from_hz(1000000));
@@ -353,9 +357,9 @@ void zaccaria_state::zaccaria(machine_config &config)
 	ppi.in_pc_callback().set_ioport("SYSTEM");
 	ppi.out_pc_callback().set(FUNC(zaccaria_state::dsw_sel_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60.57); /* verified on pcb */
+	screen.set_refresh_hz(60.57); // verified on PCB
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
@@ -364,9 +368,9 @@ void zaccaria_state::zaccaria(machine_config &config)
 	screen.screen_vblank().set(FUNC(zaccaria_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_zaccaria);
-	PALETTE(config, m_palette, FUNC(zaccaria_state::zaccaria_palette), 32*8 + 32*8, 512);
+	PALETTE(config, m_palette, FUNC(zaccaria_state::palette), 32*8 + 32*8, 512);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	ZACCARIA_1B11142(config, "audiopcb").add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
@@ -394,11 +398,11 @@ ROM_START( monymony )
 	ROM_LOAD( "cpu6.2c",           0x5000, 0x1000, CRC(31da62b1) SHA1(486f07087244f8537510afacb64ddd59eb512a4d) )
 	ROM_CONTINUE(             0xd000, 0x1000 )
 
-	ROM_REGION( 0x10000, "audiopcb:melodycpu", 0 ) /* 64k for first 6802 */
-	ROM_LOAD( "snd13.2g",           0x8000, 0x2000, CRC(78b01b98) SHA1(2aabed56cdae9463deb513c0c5021f6c8dfd271e) )
+	ROM_REGION( 0x10000, "audiopcb:melodycpu", 0 ) // 64k for first 6802
+	ROM_LOAD( "snd13.2g",          0x8000, 0x2000, CRC(78b01b98) SHA1(2aabed56cdae9463deb513c0c5021f6c8dfd271e) )
 	ROM_LOAD( "snd9.1i",           0xc000, 0x2000, CRC(94e3858b) SHA1(04961f67b95798b530bd83355dec612389f22255) )
 
-	ROM_REGION( 0x10000, "audiopcb:audiocpu", 0 ) /* 64k for second 6802 */
+	ROM_REGION( 0x10000, "audiopcb:audiocpu", 0 ) // 64k for second 6802
 	ROM_LOAD( "snd8.1h",           0x2000, 0x1000, CRC(aad76193) SHA1(e08fc184efced392ee902c4cc9daaaf3310cdfe2) )
 	ROM_CONTINUE(             0x6000, 0x1000 )
 	ROM_LOAD( "snd7.1g",           0x3000, 0x1000, CRC(1e8ffe3e) SHA1(858ee7abe88d5801237e519cae2b50ae4bf33a58) )
@@ -429,11 +433,11 @@ ROM_START( monymony2 )
 	ROM_LOAD( "cpu6.2c",           0x5000, 0x1000, CRC(31da62b1) SHA1(486f07087244f8537510afacb64ddd59eb512a4d) )
 	ROM_CONTINUE(             0xd000, 0x1000 )
 
-	ROM_REGION( 0x10000, "audiopcb:melodycpu", 0 ) /* 64k for first 6802 */
-	ROM_LOAD( "snd13.2g",           0x8000, 0x2000, CRC(78b01b98) SHA1(2aabed56cdae9463deb513c0c5021f6c8dfd271e) )
+	ROM_REGION( 0x10000, "audiopcb:melodycpu", 0 ) // 64k for first 6802
+	ROM_LOAD( "snd13.2g",          0x8000, 0x2000, CRC(78b01b98) SHA1(2aabed56cdae9463deb513c0c5021f6c8dfd271e) )
 	ROM_LOAD( "snd9.1i",           0xc000, 0x2000, CRC(94e3858b) SHA1(04961f67b95798b530bd83355dec612389f22255) )
 
-	ROM_REGION( 0x10000, "audiopcb:audiocpu", 0 ) /* 64k for second 6802 */
+	ROM_REGION( 0x10000, "audiopcb:audiocpu", 0 ) // 64k for second 6802
 	ROM_LOAD( "snd8.1h",           0x2000, 0x1000, CRC(aad76193) SHA1(e08fc184efced392ee902c4cc9daaaf3310cdfe2) )
 	ROM_CONTINUE(             0x6000, 0x1000 )
 	ROM_LOAD( "snd7.1g",           0x3000, 0x1000, CRC(1e8ffe3e) SHA1(858ee7abe88d5801237e519cae2b50ae4bf33a58) )
@@ -463,12 +467,24 @@ ROM_START( jackrabt )
 	ROM_LOAD( "cpu-01.4h",    0xb000, 0x1000, CRC(0b9db007) SHA1(836f8cacf2a097fd80d5c045bdc49b3a3174b89e) )
 	ROM_LOAD( "cpu-01.5h",    0xc000, 0x1000, CRC(785e1a01) SHA1(a748d300be9455cad4f912e01c2279bb8465edfe) )
 	ROM_LOAD( "cpu-01.6h",    0xd000, 0x1000, CRC(dd5979cf) SHA1(e9afe7002b2258a1c3132bdd951c6e20d473fb6a) )
+/* This set was also found with bigger program ROMs (but for the first which matches)
+    ROM_LOAD( "cpu-01-2.1b",   0x1000, 0x1000, CRC(1af79299) SHA1(8e68606a31aa7a7940ff90a7059f56ca7db0ac7c) )
+    ROM_CONTINUE(              0x9000, 0x1000)
+    ROM_LOAD( "cpu-01-3.1c",   0x2000, 0x1000, CRC(a02d5bc7) SHA1(1cb0ad29e7895b80053212bdf9aab9efe334326a) )
+    ROM_CONTINUE(              0xa000, 0x1000)
+    ROM_LOAD( "cpu-01-4.1d",   0x3000, 0x1000) CRC(8e7fbbb3) SHA1(3d57ddf6a47d5f28e4fd24002e948287803a2438) )
+    ROM_CONTINUE(              0xb000, 0x1000)
+    ROM_LOAD( "cpu-01-5.2a",   0x4000, 0x1000, CRC(2f3aa2a4) SHA1(4256894f178980abf187bb5424f9d738fcae2623) )
+    ROM_CONTINUE(              0xc000, 0x1000)
+    ROM_LOAD( "cpu-01-6.2c",   0x5000, 0x1000, CRC(c38228c0) SHA1(1ccc720b0d64b16c268a2bcfb8990f3c71b65913) )
+    ROM_CONTINUE(              0xd000, 0x1000)
+*/
 
-	ROM_REGION( 0x10000, "audiopcb:melodycpu", 0 ) /* 64k for first 6802 */
+	ROM_REGION( 0x10000, "audiopcb:melodycpu", 0 ) // 64k for first 6802
 	ROM_LOAD( "13snd.2g",     0x8000, 0x2000, CRC(fc05654e) SHA1(ed9c66672fe89c41e320e1d27b53f5efa92dce9c) )
 	ROM_LOAD( "9snd.1i",      0xc000, 0x2000, CRC(3dab977f) SHA1(3e79c06d2e70b050f01b7ac58be5127ba87904b0) )
 
-	ROM_REGION( 0x10000, "audiopcb:audiocpu", 0 ) /* 64k for second 6802 */
+	ROM_REGION( 0x10000, "audiopcb:audiocpu", 0 ) // 64k for second 6802
 	ROM_LOAD( "8snd.1h",      0x2000, 0x1000, CRC(f4507111) SHA1(0513f0831b94aeda84aa4f3b4a7c60dfc5113b2d) )
 	ROM_CONTINUE(             0x6000, 0x1000 )
 	ROM_LOAD( "7snd.1g",      0x3000, 0x1000, CRC(c722eff8) SHA1(d8d1c091ab80ea2d6616e4dc030adc9905c0a496) )
@@ -484,8 +500,8 @@ ROM_START( jackrabt )
 	ROM_LOAD( "jr-ic9f",      0x0200, 0x0200, CRC(085914d1) SHA1(3d6f9318f5a9f08ce89e4184e3efb9881f671fa7) )
 
 	ROM_REGION( 0x0400, "plds", 0 )
-	ROM_LOAD( "jr-pal16l8.6j",   0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "jr-pal16l8.6k",   0x0200, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "jr-pal16l8.6j",   0x0000, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "jr-pal16l8.6k",   0x0200, 0x0104, NO_DUMP ) // PAL is read protected
 ROM_END
 
 ROM_START( jackrabt2 )
@@ -503,11 +519,11 @@ ROM_START( jackrabt2 )
 	ROM_LOAD( "6cpu2.2c",     0x5000, 0x1000, CRC(404496eb) SHA1(44381e27e540fe9d8cacab4c3b1fe9a4f20d26a8) )
 	ROM_CONTINUE(             0xd000, 0x1000 )
 
-	ROM_REGION( 0x10000, "audiopcb:melodycpu", 0 ) /* 64k for first 6802 */
+	ROM_REGION( 0x10000, "audiopcb:melodycpu", 0 ) // 64k for first 6802
 	ROM_LOAD( "13snd.2g",     0x8000, 0x2000, CRC(fc05654e) SHA1(ed9c66672fe89c41e320e1d27b53f5efa92dce9c) )
 	ROM_LOAD( "9snd.1i",      0xc000, 0x2000, CRC(3dab977f) SHA1(3e79c06d2e70b050f01b7ac58be5127ba87904b0) )
 
-	ROM_REGION( 0x10000, "audiopcb:audiocpu", 0 ) /* 64k for second 6802 */
+	ROM_REGION( 0x10000, "audiopcb:audiocpu", 0 ) // 64k for second 6802
 	ROM_LOAD( "8snd.1h",      0x2000, 0x1000, CRC(f4507111) SHA1(0513f0831b94aeda84aa4f3b4a7c60dfc5113b2d) )
 	ROM_CONTINUE(             0x6000, 0x1000 )
 	ROM_LOAD( "7snd.1g",      0x3000, 0x1000, CRC(c722eff8) SHA1(d8d1c091ab80ea2d6616e4dc030adc9905c0a496) )
@@ -544,11 +560,11 @@ ROM_START( jackrabts )
 	ROM_LOAD( "6cpu.2c",      0x5000, 0x1000, CRC(f53d6356) SHA1(9b167edca59cf81a2468368a372bab132f15e2ea) )
 	ROM_CONTINUE(             0xd000, 0x1000 )
 
-	ROM_REGION( 0x10000, "audiopcb:melodycpu", 0 ) /* 64k for first 6802 */
+	ROM_REGION( 0x10000, "audiopcb:melodycpu", 0 ) // 64k for first 6802
 	ROM_LOAD( "13snd.2g",     0x8000, 0x2000, CRC(fc05654e) SHA1(ed9c66672fe89c41e320e1d27b53f5efa92dce9c) )
 	ROM_LOAD( "9snd.1i",      0xc000, 0x2000, CRC(3dab977f) SHA1(3e79c06d2e70b050f01b7ac58be5127ba87904b0) )
 
-	ROM_REGION( 0x10000, "audiopcb:audiocpu", 0 ) /* 64k for second 6802 */
+	ROM_REGION( 0x10000, "audiopcb:audiocpu", 0 ) // 64k for second 6802
 	ROM_LOAD( "8snd.1h",      0x2000, 0x1000, CRC(f4507111) SHA1(0513f0831b94aeda84aa4f3b4a7c60dfc5113b2d) )
 	ROM_CONTINUE(             0x6000, 0x1000 )
 	ROM_LOAD( "7snd.1g",      0x3000, 0x1000, CRC(c722eff8) SHA1(d8d1c091ab80ea2d6616e4dc030adc9905c0a496) )

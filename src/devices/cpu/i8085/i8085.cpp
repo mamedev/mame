@@ -107,7 +107,6 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "i8085.h"
 #include "8085dasm.h"
 
@@ -308,7 +307,7 @@ void i8085a_cpu_device::device_start()
 	m_irq_state[3] = m_irq_state[2] = m_irq_state[1] = m_irq_state[0] = 0;
 	m_trap_pending = 0;
 	m_trap_im_copy = 0;
-	m_sod_state = 0;
+	m_sod_state = true; // SOD will go low at reset
 	m_in_acknowledge = false;
 	m_ietemp = false;
 
@@ -320,7 +319,6 @@ void i8085a_cpu_device::device_start()
 		state_add(STATE_GENPC,  "GENPC",  m_PC.w.l).noshow();
 		state_add(STATE_GENPCBASE, "CURPC", m_PC.w.l).noshow();
 		state_add(I8085_SP,     "SP",     m_SP.w.l);
-		state_add(STATE_GENSP,  "GENSP",  m_SP.w.l).noshow();
 		state_add(STATE_GENFLAGS, "GENFLAGS", m_AF.b.l).noshow().formatstr("%8s");
 		state_add(I8085_A,      "A",      m_AF.b.h).noshow();
 		state_add(I8085_B,      "B",      m_BC.b.h).noshow();
@@ -502,7 +500,7 @@ void i8085a_cpu_device::execute_set_input(int irqline, int state)
 	}
 
 	/* remaining sources are level triggered */
-	else if (irqline < ARRAY_LENGTH(m_irq_state))
+	else if (irqline < std::size(m_irq_state))
 		m_irq_state[irqline] = state;
 }
 

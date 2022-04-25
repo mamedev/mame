@@ -23,8 +23,7 @@ public:
 	{
 	}
 
-	void wrlshunt(machine_config &config);
-	void paccon(machine_config &config);
+	void gpl16250_romram(machine_config &config);
 
 	void init_wrlshunt();
 	void init_ths();
@@ -48,7 +47,7 @@ private:
 	virtual uint16_t cs1_r(offs_t offset) override;
 	virtual void cs1_w(offs_t offset, uint16_t data) override;
 
-	int m_romwords_mask;
+	int m_romwords_mask = 0;
 };
 
 class jak_s500_game_state : public wrlshunt_game_state

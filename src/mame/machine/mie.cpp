@@ -143,7 +143,7 @@ void mie_device::control_w(offs_t offset, uint8_t data)
 	}
 }
 
-void mie_device::device_timer(emu_timer &_timer, device_timer_id id, int param, void *ptr)
+void mie_device::device_timer(emu_timer &_timer, device_timer_id id, int param)
 {
 	timer->adjust(attotime::never);
 	if(control & CTRL_RXB) {

@@ -30,9 +30,8 @@ TODO
 #include "includes/galivan.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/3526intf.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
+#include "sound/ymopl.h"
 #include "speaker.h"
 
 
@@ -339,29 +338,6 @@ INPUT_PORTS_END
 
 
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
-static const gfx_layout tilelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 4,0,12,8,20,16,28,24,36,32,44,40,52,48,60,56 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-		8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	16*16*4
-};
-
 static const gfx_layout spritelayout =
 {
 	16,16,
@@ -376,15 +352,15 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_galivan )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,             0,  16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,         16*16,  16 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 16*16+16*16, 256 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_lsb,       0,  16 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_16x16x4_packed_lsb, 16*16,  16 )
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,     16*16+16*16, 256 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_ninjemak )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,             0,   8 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,          8*16,  16 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,  8*16+16*16, 256 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_lsb,      0,   8 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_16x16x4_packed_lsb, 8*16,  16 )
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,     8*16+16*16, 256 )
 GFXDECODE_END
 
 
@@ -475,9 +451,6 @@ void galivan_state::galivan(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
 	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void dangarj_state::dangarj(machine_config &config)
@@ -485,7 +458,7 @@ void dangarj_state::dangarj(machine_config &config)
 	galivan(config);
 	m_maincpu->set_addrmap(AS_IO, &dangarj_state::dangarj_io_map);
 
-	NB1412M2(config, m_prot, XTAL(8'000'000)); // divided by 2 maybe
+	NB1412M2(config, m_prot, XTAL(8'000'000)/2); // divided by 2 maybe
 }
 
 void galivan_state::ninjemak(machine_config &config)
@@ -522,9 +495,6 @@ void galivan_state::ninjemak(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
 	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void galivan_state::youmab(machine_config &config)
@@ -875,10 +845,10 @@ ROM_START( ninjemak )
 	ROM_LOAD( "ninjemak.pr1", 0x0000, 0x0100, CRC(8a62d4e4) SHA1(99ca4da01ea1b5585f6e3ebf162c3f988ab317e5) )    /* red */
 	ROM_LOAD( "ninjemak.pr2", 0x0100, 0x0100, CRC(2ccf976f) SHA1(b804ee761793697087fbe3372352f301a22feeab) )    /* green */
 	ROM_LOAD( "ninjemak.pr3", 0x0200, 0x0100, CRC(16b2a7a4) SHA1(53c410b439c8a835447f15f2ab250b363b3f7888) )    /* blue */
-	ROM_LOAD( "yncp-2d.bin",  0x0300, 0x0100, BAD_DUMP CRC(23bade78) SHA1(7e2de5eb08d888f97830807b6dbe85d09bb3b7f8)  )  /* sprite lookup table */
+	ROM_LOAD( "yncp-2d.bin",  0x0300, 0x0100, CRC(23bade78) SHA1(7e2de5eb08d888f97830807b6dbe85d09bb3b7f8) )    /* sprite lookup table */
 
 	ROM_REGION( 0x0100, "user1", 0 )
-	ROM_LOAD( "yncp-7f.bin",  0x0000, 0x0100, BAD_DUMP CRC(262d0809) SHA1(a67281af02cef082023c0d7d57e3824aeef67450)  )  /* sprite palette bank */
+	ROM_LOAD( "yncp-7f.bin",  0x0000, 0x0100, CRC(262d0809) SHA1(a67281af02cef082023c0d7d57e3824aeef67450) )    /* sprite palette bank */
 ROM_END
 
 ROM_START( youma )
@@ -1124,9 +1094,9 @@ ROM_END
 void galivan_state::youmab_extra_bank_w(uint8_t data)
 {
 	if (data == 0xff)
-		membank("bank2")->set_entry(1);
+		m_rombank->set_entry(1);
 	else if (data == 0x00)
-		membank("bank2")->set_entry(0);
+		m_rombank->set_entry(0);
 	else
 		printf("data %03x\n", data);
 }
@@ -1172,12 +1142,11 @@ void galivan_state::init_youmab()
 {
 	// TODO: move all of this to an address map instead
 	m_maincpu->space(AS_IO).install_write_handler(0x82, 0x82, write8smo_delegate(*this, FUNC(galivan_state::youmab_extra_bank_w))); // banks rom at 0x8000? writes 0xff and 0x00 before executing code there
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x7fff, "bank3");
-	membank("bank3")->set_base(memregion("maincpu")->base());
+	m_maincpu->space(AS_PROGRAM).install_rom(0x0000, 0x7fff, memregion("maincpu")->base());
 
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0xbfff, "bank2");
-	membank("bank2")->configure_entries(0, 2, memregion("user2")->base(), 0x4000);
-	membank("bank2")->set_entry(0);
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0xbfff, m_rombank);
+	m_rombank->configure_entries(0, 2, memregion("user2")->base(), 0x4000);
+	m_rombank->set_entry(0);
 
 	m_maincpu->space(AS_IO).install_write_handler(0x81, 0x81, write8smo_delegate(*this, FUNC(galivan_state::youmab_81_w))); // ?? often, alternating values
 	m_maincpu->space(AS_IO).install_write_handler(0x84, 0x84, write8smo_delegate(*this, FUNC(galivan_state::youmab_84_w))); // ?? often, sequence..

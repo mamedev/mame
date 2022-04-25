@@ -549,7 +549,7 @@ See: http://rawdump.net/
 		<rom name="Bram Stoker's Dracula (USA) (Alt) (Track 6).bin" size="3276336" crc="9591b847" />
 		<rom name="Bram Stoker's Dracula (USA) (Alt) (Track 7).bin" size="46428480" crc="b62ed339" />
 		-->
-		<description>Bram Stoker's Dracula (USA, Alt)</description>
+		<description>Bram Stoker's Dracula (USA, alt)</description>
 		<year>1992</year>
 		<publisher>Sony Imagesoft</publisher>
 		<info name="release" value="199311xx" />
@@ -573,7 +573,7 @@ See: http://rawdump.net/
 		<rom name="Bram Stoker's Dracula (USA) (Rev A) (Track 6).bin" size="4019568" crc="8be25c31" md5="8cd2e0d97bb0471dd1f8193438873221" sha1="190ad2fd0ac9e1255dbad8ebc6191aff65ea7a16"/>
 		<rom name="Bram Stoker's Dracula (USA) (Rev A) (Track 7).bin" size="46778928" crc="d9599d60" md5="cc2083ef2ddf06cf7819af7f800fdeb6" sha1="1f079234d51d1fd01288d9c2f6a5cbaea62e1232"/>
 		-->
-		<description>Bram Stoker's Dracula (USA, Rev. A)</description>
+		<description>Bram Stoker's Dracula (USA, rev. A)</description>
 		<year>1992</year>
 		<publisher>Sony Imagesoft</publisher>
 		<info name="release" value="199311xx" />
@@ -964,7 +964,7 @@ See: http://rawdump.net/
 		<rom name="Ecco - The Tides of Time (USA) (Track 16).bin" size="48597024" crc="8c8b6c37" md5="5244482ce6d7ad3ef977bd4e9c288db4" sha1="fbb32ced119dc47e097c7abc679cec9fc54d31bf"/>
 		<rom name="Ecco - The Tides of Time (USA) (Track 17).bin" size="10814496" crc="1475c942" md5="2f7ef97ed5b8c74272e3f78ffefade1a" sha1="a16a6dd2011d973172322e6f63e3be37a7b06b3d"/>
 		-->
-		<description>Ecco - The Tides of Time (USA, Alt)</description>
+		<description>Ecco - The Tides of Time (USA, alt)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4441"/>
@@ -1070,7 +1070,7 @@ See: http://rawdump.net/
 		<rom name="Eternal Champions - Challenge from the Dark Side (USA) (RE) (Track 18).bin" size="24159744" crc="9cd9cd92" md5="5a90a744954763bc8e4151deb0f55bbc" sha1="c2899fad72ff6b788053a3421d23baef26df521f"/>
 		<rom name="Eternal Champions - Challenge from the Dark Side (USA) (RE) (Track 19).bin" size="19436928" crc="56b8e348" md5="db2ee275ab481b3010ec6ffe874d584e" sha1="6b4ca877e581257f1b871d270d8fdee258c529f1"/>
 		-->
-		<description>Eternal Champions - Challenge from the Dark Side (USA, Alt)</description>
+		<description>Eternal Champions - Challenge from the Dark Side (USA, alt)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4427"/>
@@ -1704,7 +1704,7 @@ See: http://rawdump.net/
 		<rom name="Lethal Enforcers (USA) (U12) (Track 22).bin" size="22666224" crc="025d7467" md5="0928be28ff5d1cef3fd92d505dc1af21" sha1="376c19913de5dc4fdbe74225e0b538b84af7bc92"/>
 		<rom name="Lethal Enforcers (USA) (U12) (Track 23).bin" size="37516752" crc="c2d48f9c" md5="37771c3a002d859d0c5de4c5b4d0f863" sha1="c8c37b52f54168aa6fb968837d74d756f77a2feb"/>
 		-->
-		<description>Lethal Enforcers (USA, Alt)</description>
+		<description>Lethal Enforcers (USA, alt)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-95015"/>
@@ -2304,7 +2304,7 @@ See: http://rawdump.net/
 		<rom name="Night Trap (USA) (Disc 2).cue" size="91" crc="b4a7c1fa" />
 		<rom name="Night Trap (USA) (Disc 2).bin" size="515351424" crc="7c560ae9" />
 		-->
-		<description>Night Trap (USA, Alt)</description>
+		<description>Night Trap (USA, alt)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4903"/>
@@ -2574,7 +2574,7 @@ See: http://rawdump.net/
 		<rom name="Rise of the Dragon (USA) (Track 4).bin" size="21530208" crc="7552ef3d" />
 		<rom name="Rise of the Dragon (USA) (Track 5).bin" size="29244768" crc="e5463515" />
 		-->
-		<description>Rise of the Dragon (USA, Rev. A)</description>
+		<description>Rise of the Dragon (USA, rev. A)</description>
 		<year>1994</year>
 		<publisher>Dynamix</publisher>
 		<info name="serial" value="T-110035"/>
@@ -2665,7 +2665,7 @@ See: http://rawdump.net/
 		<rom name="Sega Classics Arcade Collection (USA) (RE) (4-in-1) (Track 11).bin" size="3709104" crc="e6b94a35" md5="307821e989681d84156deae0fde99aa6" sha1="8ddf9194867c8e484c536fbcd3200d3c89fba929"/>
 		<rom name="Sega Classics Arcade Collection (USA) (RE) (4-in-1) (Track 12).bin" size="12173952" crc="99653684" md5="a4dae7ac971f906ec16b2f7494ac4272" sha1="d0bb6b3e99fd29a53759acc211b0215bff37ca25"/>
 		-->
-		<description>Sega Classics Arcade Collection (USA, 4 in 1, Alt)</description>
+		<description>Sega Classics Arcade Collection (USA, 4 in 1, alt)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="release" value="19921015" />
@@ -2728,7 +2728,7 @@ See: http://rawdump.net/
 		<rom name="Sewer Shark (USA).cue" size="83" crc="1db0c2a0" />
 		<rom name="Sewer Shark (USA).bin" size="488418672" crc="19f2fe42" />
 		-->
-		<description>Sewer Shark (USA, Rev. A)</description>
+		<description>Sewer Shark (USA, rev. A)</description>
 		<year>1992</year>
 		<publisher>Sony Imagesoft</publisher>
 		<info name="serial" value="T-6201"/>
@@ -2748,7 +2748,7 @@ See: http://rawdump.net/
 		<rom name="Sewer Shark (USA) (Bundle) (Alt) (Track 1).bin" size="487360272" crc="57b21ebe" />
 		<rom name="Sewer Shark (USA) (Bundle) (Alt) (Track 2).bin" size="2234400" crc="9705cbfe" />
 		-->
-		<description>Sewer Shark (USA, Rev. B)</description>
+		<description>Sewer Shark (USA, rev. B)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4101"/>
@@ -2768,7 +2768,7 @@ See: http://rawdump.net/
 		<rom name="Sewer Shark (USA) (Rev B) (Alt 1) (Track 1).bin" size="487360272" crc="57b21ebe" md5="b05ca93f4b221bee8b206b6e368bc699" sha1="a14d881c0956434ccd04b0b86f8afe6b214f1f8a"/>
 		<rom name="Sewer Shark (USA) (Rev B) (Alt 1) (Track 2).bin" size="2234400" crc="ff2f7adc" md5="af34f10417653d93e6ed0ad3cda9f9a8" sha1="d8ee48d98af0fc667ed5d999b1a32365d7ea892b"/>
 		-->
-		<description>Sewer Shark (USA, Rev. B, Alt)</description>
+		<description>Sewer Shark (USA, rev. B, alt)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="release" value="199212xx" />
@@ -2787,7 +2787,7 @@ See: http://rawdump.net/
 		<rom name="Sewer Shark (USA) (Bundle) (Track 1).bin" size="487360272" crc="57b21ebe" />
 		<rom name="Sewer Shark (USA) (Bundle) (Track 2).bin" size="2234400" crc="75573804" />
 		-->
-		<description>Sewer Shark (USA, Rev. B, Alt 2)</description>
+		<description>Sewer Shark (USA, rev. B, alt 2)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="release" value="199212xx" />
@@ -2939,7 +2939,7 @@ See: http://rawdump.net/
 		<rom name="Shining Force CD (USA) (Alt) (Track 34).bin" size="1822800" crc="d934bfd5" />
 		<rom name="Shining Force CD (USA) (Alt) (Track 35).bin" size="19314624" crc="8a07247e" />
 		-->
-		<description>Shining Force CD (USA, Alt)</description>
+		<description>Shining Force CD (USA, alt)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK-4656"/>
@@ -2994,7 +2994,7 @@ See: http://rawdump.net/
 		<rom name="Slam City with Scottie Pippen (USA) (Disc 4) (Smash) (Track 1).bin" size="541714992" crc="d1bc5a00" md5="7b0ef7c4df8f2ac1868689e5d0f5725c" sha1="5f9cdffe15d4f577b2777ed27ade62174e1be36b"/>
 		<rom name="Slam City with Scottie Pippen (USA) (Disc 4) (Smash) (Track 2).bin" size="17122560" crc="a47ac691" md5="2f2fa2e38081e85dcfb5e64e6e5aae53" sha1="d2247274b9e36c085565490311652751aa3d3168"/>
 		-->
-		<description>Slam City with Scottie Pippen (USA, Rev. A)</description>
+		<description>Slam City with Scottie Pippen (USA, rev. A)</description>
 		<year>1994</year>
 		<publisher>Digital Pictures</publisher>
 		<info name="serial" value="T-162035"/>
@@ -3191,7 +3191,7 @@ See: http://rawdump.net/
 		<rom name="Sonic CD (USA) (RE125) (Track 34).bin" size="16405200" crc="393386fd" md5="d798e31b863cf5e31ef6e1b242aabe86" sha1="b52aa2b587cd4682e95a56e087cd15e215afa316"/>
 		<rom name="Sonic CD (USA) (RE125) (Track 35).bin" size="31940160" crc="9cebd39d" md5="dcfce720b4e4cb2236cc54537eb551c5" sha1="f3113ef9547a9242fc93bd6654adeb860f22dc27"/>
 		-->
-		<description>Sonic the Hedgehog CD (USA, Alt)</description>
+		<description>Sonic the Hedgehog CD (USA, alt)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4407"/>
@@ -3245,7 +3245,7 @@ See: http://rawdump.net/
 		<rom name="Sonic CD (USA) (RE125) (Alt) (Track 34).bin" size="16405200" crc="393386fd" md5="d798e31b863cf5e31ef6e1b242aabe86" sha1="b52aa2b587cd4682e95a56e087cd15e215afa316"/>
 		<rom name="Sonic CD (USA) (RE125) (Alt) (Track 35).bin" size="31940160" crc="9cebd39d" md5="dcfce720b4e4cb2236cc54537eb551c5" sha1="f3113ef9547a9242fc93bd6654adeb860f22dc27"/>
 		-->
-		<description>Sonic the Hedgehog CD (USA, Alt 2)</description>
+		<description>Sonic the Hedgehog CD (USA, alt 2)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="alt_title" value="Sonic CD (Box)" />
@@ -3621,7 +3621,7 @@ See: http://rawdump.net/
 		<rom name="Tomcat Alley (USA) (Track 1).bin" size="567756336" crc="e064fd12" md5="147bfb944524cbcdd78671348205853c" sha1="49b8fdc6d399bc2bf4c1c5c48922abf1ef5accc8"/>
 		<rom name="Tomcat Alley (USA) (Track 2).bin" size="2337888" crc="aa74f12a" md5="157a4fb5cc0fddde1a5d7ec4b2bd848d" sha1="cbb5362ca92cc0d8ff050c92af3ed5ecf934b045"/>
 		-->
-		<description>Tomcat Alley (USA, Alt)</description>
+		<description>Tomcat Alley (USA, alt)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4429"/>
@@ -3873,7 +3873,7 @@ See: http://rawdump.net/
 		<rom name="Battle Frenzy (2003)(Good Deal Games - Oldergames)(NTSC)(US)(M4)(Track 17 of 17)[!].wav" size="64651820" crc="b0b20d52" md5="03c5360790de73e4be476745680c3cdc" sha1="2fed7d760ff7c687c553a03ed6920d4093d88c62"/>
 		<rom name="Battle Frenzy (2003)(Good Deal Games - Oldergames)(NTSC)(US)(M4)[!].cue" size="2465" crc="f04bb8a2" md5="91f5ef49402455bb7c8e791417c68b7a" sha1="6b81c198a7d3309276b935fee96fc8b8799efab6"/>
 		-->
-		<description>Battle Frenzy (USA, Prototype)</description>
+		<description>Battle Frenzy (USA, prototype)</description>
 		<year>2003</year>
 		<publisher>Good Deal Games</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -3893,7 +3893,7 @@ See: http://rawdump.net/
 		<rom name="Battletech - Gray Death Legion (2007)(Good Deal Games)(NTSC)(US)[!][unreleased beta].cue" size="173" crc="14ae9d68" md5="340a8d067cea412924cec94f015c665f" sha1="746cc88be999098afd138a485933d8999bb4948f"/>
 		<rom name="Battletech - Gray Death Legion (2007)(Good Deal Games)(NTSC)(US)[!][unreleased beta].iso" size="119787520" crc="107be434" md5="a7aad507e31d0aa79efedfab58c5d0ff" sha1="badbff8119a59546e9bc1efcda9700112a3cb183"/>
 		-->
-		<description>Battletech - Gray Death Legion (USA, Prototype)</description>
+		<description>Battletech - Gray Death Legion (USA, prototype)</description>
 		<year>200?</year>
 		<publisher>Good Deal Games</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -3931,7 +3931,7 @@ See: http://rawdump.net/
 		<rom name="Blackhole Assault (1993)(Bignet)(NTSC)(US)(Track 22 of 23)[!][CDAC-031700 2].wav" size="35141276" crc="9b0b72d2" />
 		<rom name="Blackhole Assault (1993)(Bignet)(NTSC)(US)(Track 23 of 23)[!][CDAC-031700 2].wav" size="34301612" crc="0dd98031" />
 		-->
-		<description>Black Hole Assault (USA, Alt)</description>
+		<description>Black Hole Assault (USA, alt)</description>
 		<year>1993</year>
 		<publisher>Bignet</publisher>
 		<info name="alt_title" value="Blackhole Assault (Box)" />
@@ -3956,7 +3956,7 @@ See: http://rawdump.net/
 		<rom name="Bug Blasters - The Exterminators (2000)(Good Deal Games)(NTSC)(US)(Track 2 of 2).wav" size="39036188" crc="2514f737" md5="17abb3aba0581b8a3824133dcc7fbbb8" sha1="1fc932cb99a91c4b7b46d8cd7a5b6b558eaf632a"/>
 		<rom name="Bug Blasters - The Exterminators (2000)(Good Deal Games)(NTSC)(US).cue" size="329" crc="edd2cc36" md5="10bdedc766be4cbbd7c3549b59513624" sha1="375bd4383edb0cd3c5b0eb4c2450b626d1faff82"/>
 		-->
-		<description>The Exterminators (USA, Prototype)</description>
+		<description>The Exterminators (USA, prototype)</description>
 		<year>2001</year>
 		<publisher>Good Deal Games</publisher>
 		<info name="alt_title" value="Bug Blasters - The Exterminators (Box)" />
@@ -3979,7 +3979,7 @@ See: http://rawdump.net/
 		<rom name="Bug Blasters - The Exterminators (2003)(Good Deal Games)(US)(Track 2 of 2)[!][Special Edition].wav" size="39036188" crc="ac3f1d80" md5="6037ed6379d9cdc1aee4c6906832bfeb" sha1="f97c6d45c2e25da8c6a9cf386eec7f911ebd8c6a"/>
 		<rom name="Bug Blasters - The Exterminators (2003)(Good Deal Games)(US)[!][Special Edition].cue" size="357" crc="87732831" md5="e0ff2d0320675ce21e10b60b6a79eb87" sha1="12ea928038d19dedf574922024246851a2b95c90"/>
 		-->
-		<description>The Exterminators - Special Edition (USA, Prototype)</description>
+		<description>The Exterminators - Special Edition (USA, prototype)</description>
 		<year>2003</year>
 		<publisher>Good Deal Games</publisher>
 		<info name="alt_title" value="Bug Blasters - The Exterminators (Box)" />
@@ -4051,7 +4051,7 @@ See: http://rawdump.net/
 		<rom name="Citizen X Beta (2002)(Good Deal Games - Oldergames)(NTSC)(US)[!][unreleased beta].cue" size="170" crc="71c85c20" />
 		<rom name="Citizen X Beta (2002)(Good Deal Games - Oldergames)(NTSC)(US)[!][unreleased beta].iso" size="329457664" crc="36c21367" />
 		-->
-		<description>Citizen X (USA, Prototype)</description>
+		<description>Citizen X (USA, prototype)</description>
 		<year>2002</year>
 		<publisher>Good Deal Games</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -4102,7 +4102,7 @@ See: http://rawdump.net/
 		<rom name="Dragon's Lair - Demo CD (1993)(ReadySoft)(NTSC)(US).cue" size="140" crc="186a5613" />
 		<rom name="Dragon's Lair - Demo CD (1993)(ReadySoft)(NTSC)(US).iso" size="12802048" crc="22189e3c" />
 		-->
-		<description>Dragon's Lair (USA, Demo)</description>
+		<description>Dragon's Lair (USA, demo)</description>
 		<year>1993</year>
 		<publisher>ReadySoft</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -4222,7 +4222,7 @@ See: http://rawdump.net/
 		<rom name="Burning Fists - Force Striker (2006)(Good Deal Games)(NTSC)(US)(Track 13 of 13)[!].wav" size="17308412" crc="f34cdb68" md5="b4b94c40d55956aeb729fbcac52d9e73" sha1="20db6f89d6c3d67def2c512d9be26f70322ab660"/>
 		<rom name="Burning Fists - Force Striker (2006)(Good Deal Games)(NTSC)(US)[!].cue" size="1884" crc="fcdd6569" md5="fc32f66714b4e60f6358e57201f3fd60" sha1="2493d17b99a8fc6374eb25d05f7f608e6257c434"/>
 		-->
-		<description>Force Striker (USA, Prototype)</description>
+		<description>Force Striker (USA, prototype)</description>
 		<year>2006</year>
 		<publisher>Good Deal Games</publisher>
 		<info name="alt_title" value="Burning Fists - Force Striker (Box)" />
@@ -4261,7 +4261,7 @@ See: http://rawdump.net/
 		<rom name="Ground Zero Texas (1993)(Sony Imagesoft)(NTSC)(US)(Disc 2 of 2)(Track 1 of 2)[!][CDAC-053300 2].iso" size="522225664" crc="36720a8d" />
 		<rom name="Ground Zero Texas (1993)(Sony Imagesoft)(NTSC)(US)(Disc 2 of 2)(Track 2 of 2)[!][CDAC-053300 2].wav" size="2234444" crc="b08c0b8f" />
 		-->
-		<description>Ground Zero Texas (USA, Alt)</description>
+		<description>Ground Zero Texas (USA, alt)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
 		<info name="serial" value="T-93145"/>
@@ -4306,7 +4306,7 @@ See: http://rawdump.net/
 		<rom name="Hook (1992)(Sony Imagesoft)(NTSC)(US)(Track 21 of 22)[!][CDAC-032400 6, CDAC-032400 7].wav" size="54637004" crc="b8b74872" />
 		<rom name="Hook (1992)(Sony Imagesoft)(NTSC)(US)(Track 22 of 22)[!][CDAC-032400 6, CDAC-032400 7].wav" size="8079164" crc="763e831a" />
 		-->
-		<description>Hook (USA, Alt)</description>
+		<description>Hook (USA, alt)</description>
 		<year>1992</year>
 		<publisher>Sony Imagesoft</publisher>
 		<info name="serial" value="T-6205"/>
@@ -4404,7 +4404,7 @@ See: http://rawdump.net/
 		<rom name="Links - The Challenge of Golf (1994)(Virgin)(NTSC)(US)(Track 1 of 2)[!][SEGAT70095 R1J].iso" size="530802688" crc="4139c33c" />
 		<rom name="Links - The Challenge of Golf (1994)(Virgin)(NTSC)(US)(Track 2 of 2)[!][SEGAT70095 R1J].wav" size="705644" crc="6eddd6e8" />
 		-->
-		<description>Links - The Challenge of Golf (USA, Alt)</description>
+		<description>Links - The Challenge of Golf (USA, alt)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-70095"/>
@@ -4461,7 +4461,7 @@ See: http://rawdump.net/
 		<rom name="Marko (2003)(Good Deal Games - Oldergames)(NTSC)(US)(Track 17 of 17)[!].wav" size="35983292" crc="04a87920" md5="715610e50d8faf39260ebad88d48fbfe" sha1="ca5f8454dc60763d9884da94531e9a7fcb0d44a3"/>
 		<rom name="Marko (2003)(Good Deal Games - Oldergames)(NTSC)(US)[!].cue" size="2261" crc="330fbfd8" md5="7bef009a6bef65308bb40ccdea8dd28d" sha1="df7323fbd221ced1aa560375b5ae5ed641b1faca"/>
 		-->
-		<description>Marko (USA, Prototype)</description>
+		<description>Marko (USA, prototype)</description>
 		<year>200?</year>
 		<publisher>Good Deal Games</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -4840,7 +4840,7 @@ See: http://rawdump.net/
 		<rom name="Space Ace - Demo Disc (1994)(ReadySoft)(NTSC)(US).cue" size="138" crc="b931b4d1" />
 		<rom name="Space Ace - Demo Disc (1994)(ReadySoft)(NTSC)(US).iso" size="8802304" crc="884f4f1f" />
 		-->
-		<description>Space Ace (USA, Demo)</description>
+		<description>Space Ace (USA, demo)</description>
 		<year>1994</year>
 		<publisher>ReadySoft</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -4862,7 +4862,7 @@ See: http://rawdump.net/
 		<rom name="Star Strike (2000)(Good Deal Games)(NTSC)(US)(Track 2 of 2)[!].wav" size="1244252" crc="11acc95b" md5="ae1e4adf83c26c7934321f3c62c7e4b2" sha1="34dc4f6d52da38a9da4488cba5a6763b0d1bf432"/>
 		<rom name="Star Strike (2000)(Good Deal Games)(NTSC)(US)[!].cue" size="293" crc="4bcf74d3" md5="724764b925749718f1b8e8c09a6a65ed" sha1="09b6d016757d5f5352695a9d40da3277d7569221"/>
 		-->
-		<description>Star Strike (USA, Prototype)</description>
+		<description>Star Strike (USA, prototype)</description>
 		<year>2001</year>
 		<publisher>Good Deal Games</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -5076,7 +5076,7 @@ See: http://rawdump.net/
 		<rom name="Timecop (2007)(Good Deal Games)(NTSC)(US)(Track 2 of 2)[!][unreleased beta].wav" size="13088924" crc="6ca3b180" md5="0b5d13d7a30ac7455fe740a47b6d36bf" sha1="63279a793dae15ec41f06d17b60386eb6b36c21e"/>
 		<rom name="Timecop (2007)(Good Deal Games)(NTSC)(US)[!][unreleased beta].cue" size="319" crc="586ff418" md5="ae38e45bbb2e631ea9165feee5562bde" sha1="622be6b138e1723e20910ddc911165ad3eab93eb"/>
 		-->
-		<description>Timecop (USA, Prototype)</description>
+		<description>Timecop (USA, prototype)</description>
 		<year>200?</year>
 		<publisher>Good Deal Games</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -5247,7 +5247,7 @@ See: http://rawdump.net/
 	<!-- Sourced from the hiddenpalace forums - http://hiddenpalace.org/forums/viewtopic.php?t=2880 -->
 	<!-- Marked as bad dump as it's an MP3-based dump -->
 	<software name="blackhp" cloneof="blackh">
-		<description>Blackhole Assault (USA, Prototype 19920210)</description>
+		<description>Blackhole Assault (USA, prototype 19920210)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -5264,7 +5264,7 @@ See: http://rawdump.net/
 	-->
 	<!-- Marked as bad dump as it's an MP3-based dump. -->
 	<software name="soniccd510" cloneof="soniccd">
-		<description>CD Sonic the Hedgehog (USA, Prototype 19930510)</description>
+		<description>CD Sonic the Hedgehog (USA, prototype 19930510)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -5427,7 +5427,7 @@ See: http://rawdump.net/
 	<!-- Sourced from the hiddenpalace forums - http://hiddenpalace.org/forums/viewtopic.php?t=2880 -->
 	<!-- Marked as bad dump as it's an MP3-based dump, but possibly it's also a broken dump. -->
 	<software name="fatfurspp" cloneof="fatfursp">
-		<description>Fatal Fury Special (USA, Prototype)</description>
+		<description>Fatal Fury Special (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>JVC</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -5458,7 +5458,7 @@ See: http://rawdump.net/
 		<!-- Source: http://frogfeast.rastersoft.net/SegaCD.html
 		<rom name="Frog.iso" size="411648" crc="d96c1966" />
 		-->
-		<description>Frog Feast (USA, Demo)</description>
+		<description>Frog Feast (USA, demo)</description>
 		<year>2007</year>
 		<publisher>RasterSoft</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -5471,7 +5471,7 @@ See: http://rawdump.net/
 	<!-- Sourced from the hiddenpalace forums - http://hiddenpalace.org/forums/viewtopic.php?t=2880 -->
 	<!-- Marked as bad dump as it's an MP3-based dump, but probably it's also a broken dump. -->
 	<software name="johnnymn">
-		<description>Johnny Mnemonic (USA, Prototype)</description>
+		<description>Johnny Mnemonic (USA, prototype)</description>
 		<year>1995?</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom1" interface="scd_cdrom">
@@ -5492,7 +5492,7 @@ See: http://rawdump.net/
 	<!-- Marked as bad dump as it's an MP3-based dump. -->
 	<software name="jparkp" cloneof="jpark">
 		<!-- Unknown source -->
-		<description>Jurassic Park (USA, Prototype)</description>
+		<description>Jurassic Park (USA, prototype)</description>
 		<year>1993?</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -5656,7 +5656,7 @@ See: http://rawdump.net/
 	<!-- Marked as bad dump as it's an MP3-based dump. -->
 	<software name="pennsmok">
 		<!-- Unknown source -->
-		<description>Penn &amp; Teller's Smoke and Mirrors (USA, Prototype)</description>
+		<description>Penn &amp; Teller's Smoke and Mirrors (USA, prototype)</description>
 		<year>1995?</year>
 		<publisher>Absolute Entertainment</publisher>
 		<part name="cdrom1" interface="scd_cdrom">
@@ -5697,7 +5697,7 @@ See: http://rawdump.net/
 		<rom name="Road Rash CD (Beta 3 - Feb 11, 1995) (hidden-palace.org).cue" size="178" sha1="6da98e6e94ee8cb9ecef40f4c6207d29359b5da2" />
 		<rom name="Road Rash CD (Beta 3 - Feb 11, 1995) (hidden-palace.org).bin" size="625509696" sha1="bd741d48a1977bcc267312f8bfabfdd9355e36c7" />
 		-->
-		<description>Road Rash (USA, Prototype, Beta 3 - 19950211)</description>
+		<description>Road Rash (USA, prototype, beta 3 - 19950211)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -5783,7 +5783,7 @@ See: http://rawdump.net/
 	<!-- Sourced from the hiddenpalace forums - http://hiddenpalace.org/forums/viewtopic.php?t=2880 -->
 	<!-- Marked as bad dump as it's an MP3-based dump. -->
 	<software name="shinfrcep" cloneof="shinfrce">
-		<description>Shining Force CD (USA, Prototype)</description>
+		<description>Shining Force CD (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -5799,7 +5799,7 @@ See: http://rawdump.net/
 	the alias Phugolz. The disc is a blue Sega Mega CD-R marked SONIC 712.
 	-->
 	<software name="soniccd712" cloneof="soniccd">
-		<description>Sonic the Hedgehog CD (USA, Prototype 19930712)</description>
+		<description>Sonic the Hedgehog CD (USA, prototype 19930712)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -5819,7 +5819,7 @@ See: http://rawdump.net/
 		<rom name="SonicCD920-beta.CUE" size="2006" sha1="5b164c2d1089bc629a234b879e4d70cc617798af" />
 		<rom name="SonicCD920-beta.BIN" size="583084320" sha1="02d3566c12e640f81b5258fe70aed9cec27209e9" />
 		-->
-		<description>Sonic the Hedgehog CD (USA, Prototype 19930920)</description>
+		<description>Sonic the Hedgehog CD (USA, prototype 19930920)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -5834,7 +5834,7 @@ See: http://rawdump.net/
 		<rom name="Syndicate.cue" size="75" crc="76504918" />
 		<rom name="Syndicate.bin" size="19411056" crc="a36311a7" />
 		-->
-		<description>Syndicate (USA, Prototype)</description>
+		<description>Syndicate (USA, prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -5883,7 +5883,7 @@ See: http://rawdump.net/
 	<!-- Is the Good Deal Games disc based off this dump? -->
 	<!-- Marked as bad dump as it's an MP3-based dump. -->
 	<software name="timecopp" cloneof="timecop">
-		<description>Timecop (USA, Early Prototype)</description>
+		<description>Timecop (USA, early prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="scd_cdrom">

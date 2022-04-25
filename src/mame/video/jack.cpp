@@ -2,7 +2,7 @@
 // copyright-holders:Brad Oliver
 /***************************************************************************
 
-  video/jack.c
+  video/jack.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -13,25 +13,25 @@
 
 
 
-WRITE8_MEMBER(jack_state::jack_videoram_w)
+void jack_state::jack_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(jack_state::jack_colorram_w)
+void jack_state::jack_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_MEMBER(jack_state::jack_flipscreen_r)
+uint8_t jack_state::jack_flipscreen_r(offs_t offset)
 {
 	flip_screen_set(offset);
 	return 0;
 }
 
-WRITE8_MEMBER(jack_state::jack_flipscreen_w)
+void jack_state::jack_flipscreen_w(offs_t offset, uint8_t data)
 {
 	flip_screen_set(offset);
 }
@@ -120,7 +120,7 @@ uint32_t jack_state::screen_update_striv(screen_device &screen, bitmap_ind16 &bi
 
 ***************************************************************************/
 
-WRITE8_MEMBER(jack_state::joinem_scroll_w)
+void jack_state::joinem_scroll_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 3)
 	{

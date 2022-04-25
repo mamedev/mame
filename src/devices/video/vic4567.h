@@ -197,6 +197,7 @@ private:
 	int m_columns, m_rows;
 
 	/* background/foreground for sprite collision */
+	std::unique_ptr<uint8_t []> m_screendata;
 	uint8_t *m_screenptr[216], m_shift[216];
 
 	/* convert multicolor byte to background/foreground for sprite collision */

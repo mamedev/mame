@@ -108,18 +108,18 @@
 #include "softlist.h"
 
 
-READ8_MEMBER( tdv2324_state::tdv2324_main_io_30 )
+uint8_t tdv2324_state::tdv2324_main_io_30()
 {
 	return 0xff;
 }
 
 // Not sure what this is for, i/o read at 0xE6 on maincpu, post fails if it does not return bit 4 set
-READ8_MEMBER( tdv2324_state::tdv2324_main_io_e6 )
+uint8_t tdv2324_state::tdv2324_main_io_e6()
 {
 	return 0x10; // TODO: this should actually return something meaningful, for now is enough to pass early boot test
 }
 
-WRITE8_MEMBER( tdv2324_state::tdv2324_main_io_e2 )
+void tdv2324_state::tdv2324_main_io_e2(uint8_t data)
 {
 	printf("%c\n", data);
 }
@@ -301,8 +301,8 @@ void tdv2324_state::tdv2324(machine_config &config)
 	Z80SIO(config, MK3887N4_TAG, 8000000/2);
 
 	FD1797(config, FD1797PL02_TAG, 8000000/4);
-	FLOPPY_CONNECTOR(config, FD1797PL02_TAG":0", tdv2324_floppies, "8dsdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, FD1797PL02_TAG":1", tdv2324_floppies, "8dsdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1797PL02_TAG":0", tdv2324_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1797PL02_TAG":1", tdv2324_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");

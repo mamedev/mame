@@ -1,0 +1,152 @@
+<?xml version="1.0"?>
+
+<!--
+license: CC0
+copyright-holders: Dirk Best
+
+ACL Manufacturing Video Poker machine layout
+-->
+
+<mamelayout version="2">
+
+	<element name="background">
+	</element>
+
+	<element name="rect_orange" defstate="0">
+		<rect state="0">
+			<color red="0.3" green="0.15" blue="0.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.9" green="0.45" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="rect_red" defstate="0">
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.9" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="rect_white" defstate="0">
+		<rect state="0">
+			<color red="0.3" green="0.3" blue="0.3" />
+		</rect>
+		<rect state="1">
+			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+	</element>
+
+	<element name="text_EVEN"><text string="EVEN"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_START"><text string="START"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_BOWL"><text string="BOWL"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_CREDITS"><text string="CREDITS"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_KINGPIN"><text string="KINGPIN"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_QUIT"><text string="QUIT"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_ODD"><text string="ODD"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_HOPPER"><text string="HOPPER"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_COIN1"><text string="COIN1"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_COIN2"><text string="COIN2"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_SERVICE"><text string="SERVICE"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_PAY"><text string="PAY"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+
+	<view name="Buttons">
+		<element ref="background">
+			<bounds x="0" y="0" width="640" height="640" />
+		</element>
+
+		<screen index="0">
+			<bounds left="0" top="0" right="640" bottom="480" />
+		</screen>
+
+		<element name="led_0" ref="rect_orange" inputtag="IN0" inputmask="0x01">
+			<bounds x="80" y="505" width="70" height="35" />
+		</element>
+		<element name="led_1" ref="rect_orange" inputtag="IN0" inputmask="0x02">
+			<bounds x="180" y="505" width="70" height="35" />
+		</element>
+		<element name="led_2" ref="rect_orange" inputtag="IN0" inputmask="0x04">
+			<bounds x="280" y="505" width="70" height="35" />
+		</element>
+		<element name="led_3" ref="rect_orange" inputtag="IN0" inputmask="0x08">
+			<bounds x="380" y="505" width="70" height="35" />
+		</element>
+		<element name="led_4" ref="rect_orange" inputtag="IN0" inputmask="0x10">
+			<bounds x="480" y="505" width="70" height="35" />
+		</element>
+
+		<element name="led_5" ref="rect_red" inputtag="IN0" inputmask="0x20">
+			<bounds x="80" y="555" width="70" height="35" />
+		</element>
+		<element ref="text_EVEN">
+			<bounds x="90" y="560" width="50" height="25" />
+		</element>
+		<element name="led_6" ref="rect_red" inputtag="IN0" inputmask="0x40">
+			<bounds x="180" y="555" width="70" height="35" />
+		</element>
+		<element ref="text_START">
+			<bounds x="190" y="558" width="50" height="13" />
+		</element>
+		<element ref="text_BOWL">
+			<bounds x="190" y="573" width="50" height="13" />
+		</element>
+		<element name="led_7" ref="rect_red" inputtag="IN0" inputmask="0x80">
+			<bounds x="280" y="555" width="70" height="35" />
+		</element>
+		<element ref="text_CREDITS">
+			<bounds x="290" y="558" width="50" height="13" />
+		</element>
+		<element ref="text_KINGPIN">
+			<bounds x="290" y="573" width="50" height="13" />
+		</element>
+		<element name="led_8" ref="rect_red" inputtag="IN1" inputmask="0x01">
+			<bounds x="380" y="555" width="70" height="35" />
+		</element>
+		<element ref="text_QUIT">
+			<bounds x="390" y="560" width="50" height="25" />
+		</element>
+		<element name="led_9" ref="rect_red" inputtag="IN1" inputmask="0x02">
+			<bounds x="480" y="555" width="70" height="35" />
+		</element>
+		<element ref="text_ODD">
+			<bounds x="490" y="560" width="50" height="25" />
+		</element>
+
+		<element name="led_10" ref="rect_white" inputtag="IN1" inputmask="0x04">
+			<bounds x="280" y="605" width="35" height="20" />
+		</element>
+		<element ref="text_HOPPER">
+			<bounds x="280" y="605" width="35" height="20" />
+		</element>
+		<element name="led_11" ref="rect_white" inputtag="IN1" inputmask="0x08">
+			<bounds x="330" y="605" width="35" height="20" />
+		</element>
+		<element ref="text_COIN1">
+			<bounds x="330" y="605" width="35" height="20" />
+		</element>
+		<element name="led_12" ref="rect_white" inputtag="IN1" inputmask="0x10">
+			<bounds x="380" y="605" width="35" height="20" />
+		</element>
+		<element ref="text_COIN2">
+			<bounds x="380" y="605" width="35" height="20" />
+		</element>
+		<element name="led_13" ref="rect_white" inputtag="IN1" inputmask="0x20">
+			<bounds x="430" y="605" width="35" height="20" />
+		</element>
+		<element ref="text_SERVICE">
+			<bounds x="430" y="605" width="35" height="20" />
+		</element>
+		<element name="led_14" ref="rect_white" inputtag="IN1" inputmask="0x40">
+			<bounds x="480" y="605" width="35" height="20" />
+		</element>
+		<element ref="text_PAY">
+			<bounds x="480" y="605" width="35" height="20" />
+		</element>
+		<element name="led_15" ref="rect_white" inputtag="IN1" inputmask="0x80">
+			<bounds x="530" y="605" width="35" height="20" />
+		</element>
+	</view>
+
+</mamelayout>

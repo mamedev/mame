@@ -25,12 +25,12 @@ public:
 	u32 clock_69m() const { return m_clock_69m; }
 	u32 clock_50m() const { return m_clock_50m; }
 
-	DECLARE_WRITE16_MEMBER(crtc_w);
-	DECLARE_READ16_MEMBER(crtc_r);
-	DECLARE_WRITE16_MEMBER(gvram_w);
-	DECLARE_READ16_MEMBER(gvram_r);
-	DECLARE_WRITE16_MEMBER(tvram_w);
-	DECLARE_READ16_MEMBER(tvram_r);
+	void crtc_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 crtc_r(offs_t offset);
+	void gvram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 gvram_r(offs_t offset);
+	void tvram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 tvram_r(offs_t offset);
 
 	// getters
 	u16 xscr_text() const { return m_reg[10]; }
@@ -39,7 +39,9 @@ public:
 	u16 yscr_gfx(int page) const { return m_reg[13 + page * 2]; }
 	u8 vfactor() const { return (m_reg[20] & 0x0c) >> 2; }
 	bool is_1024x1024() const { return BIT(m_reg[20], 10); }
+	bool gfx_double_scan() const { return (m_reg[20] & 0x1e) == 0x10; }
 	bool gfx_layer_buffer() const { return BIT(m_reg[20], 11); }
+	u8 gfx_color_mode() const { return (m_reg[20] >> 8) & 3; }
 	bool text_layer_buffer() const { return BIT(m_reg[20], 12); }
 	u16 hbegin() const { return m_hbegin; }
 	u16 vbegin() const { return m_vbegin; }

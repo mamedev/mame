@@ -77,6 +77,8 @@ void sidepckt_state::video_start()
 	m_bg_tilemap->set_transmask(1,0x01,0xfe); /* split type 1 has pen 0 transparent in front half */
 
 	machine().tilemap().set_flip_all(TILEMAP_FLIPX);
+
+	save_item(NAME(m_scroll_y));
 }
 
 
@@ -87,24 +89,24 @@ void sidepckt_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(sidepckt_state::videoram_w)
+void sidepckt_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sidepckt_state::colorram_w)
+void sidepckt_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_MEMBER(sidepckt_state::scroll_y_r)
+uint8_t sidepckt_state::scroll_y_r()
 {
 	return (m_scroll_y);
 }
 
-WRITE8_MEMBER(sidepckt_state::scroll_y_w)
+void sidepckt_state::scroll_y_w(uint8_t data)
 {
 	// Bits 0-5: Scroll y
 	m_scroll_y = data & 0x3F;

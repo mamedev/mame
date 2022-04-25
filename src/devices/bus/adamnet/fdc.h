@@ -52,9 +52,9 @@ private:
 	required_shared_ptr<uint8_t> m_ram;
 	required_ioport m_sw3;
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
-	DECLARE_READ8_MEMBER( data_r );
+	uint8_t data_r(offs_t offset);
 	uint8_t p1_r();
 	void p1_w(uint8_t data);
 	uint8_t p2_r();

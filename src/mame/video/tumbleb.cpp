@@ -24,7 +24,7 @@ to switch between 8*8 tiles and 16*16 tiles.
 
 /******************************************************************************/
 
-WRITE16_MEMBER(tumbleb_state::bcstory_tilebank_w)
+void tumbleb_state::bcstory_tilebank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= mem_mask;
 
@@ -34,7 +34,7 @@ WRITE16_MEMBER(tumbleb_state::bcstory_tilebank_w)
 	m_pf2_tilemap->mark_all_dirty();
 }
 
-WRITE16_MEMBER(tumbleb_state::chokchok_tilebank_w)
+void tumbleb_state::chokchok_tilebank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= mem_mask;
 
@@ -44,7 +44,7 @@ WRITE16_MEMBER(tumbleb_state::chokchok_tilebank_w)
 	m_pf2_tilemap->mark_all_dirty();
 }
 
-WRITE16_MEMBER(tumbleb_state::wlstar_tilebank_w)
+void tumbleb_state::wlstar_tilebank_w(uint16_t data)
 {
 	/* it just writes 0000 or ffff */
 	m_tilebank = data & 0x4000;
@@ -54,7 +54,7 @@ WRITE16_MEMBER(tumbleb_state::wlstar_tilebank_w)
 }
 
 
-WRITE16_MEMBER(tumbleb_state::suprtrio_tilebank_w)
+void tumbleb_state::suprtrio_tilebank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= mem_mask;
 
@@ -65,14 +65,14 @@ WRITE16_MEMBER(tumbleb_state::suprtrio_tilebank_w)
 }
 
 
-WRITE16_MEMBER(tumbleb_state::tumblepb_pf1_data_w)
+void tumbleb_state::tumblepb_pf1_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pf1_data[offset]);
 	m_pf1_tilemap->mark_tile_dirty(offset);
 	m_pf1_alt_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(tumbleb_state::tumblepb_pf2_data_w)
+void tumbleb_state::tumblepb_pf2_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pf2_data[offset]);
 	m_pf2_tilemap->mark_tile_dirty(offset);
@@ -81,33 +81,33 @@ WRITE16_MEMBER(tumbleb_state::tumblepb_pf2_data_w)
 		m_pf2_alt_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(tumbleb_state::fncywld_pf1_data_w)
+void tumbleb_state::fncywld_pf1_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pf1_data[offset]);
 	m_pf1_tilemap->mark_tile_dirty(offset / 2);
 	m_pf1_alt_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(tumbleb_state::fncywld_pf2_data_w)
+void tumbleb_state::fncywld_pf2_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pf2_data[offset]);
 	m_pf2_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(tumbleb_state::tumblepb_control_0_w)
+void tumbleb_state::tumblepb_control_0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_control_0[offset]);
 }
 
 
-WRITE16_MEMBER(tumbleb_state::pangpang_pf1_data_w)
+void tumbleb_state::pangpang_pf1_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pf1_data[offset]);
 	m_pf1_tilemap->mark_tile_dirty(offset / 2);
 	m_pf1_alt_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(tumbleb_state::pangpang_pf2_data_w)
+void tumbleb_state::pangpang_pf2_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pf2_data[offset]);
 	m_pf2_tilemap->mark_tile_dirty(offset / 2);

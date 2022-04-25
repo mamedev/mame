@@ -16,7 +16,7 @@
 #include <type_traits>
 
 
-namespace bus { namespace rs232 {
+namespace bus::rs232 {
 
 //**************************************************
 // Microsoft mouse base
@@ -220,7 +220,7 @@ protected:
 	virtual void device_start() override;
 };
 
-} } // namespace bus::rs232
+} // namespace bus::rs232
 
 
 //**************************************************

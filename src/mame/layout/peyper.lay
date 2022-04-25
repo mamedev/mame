@@ -40,144 +40,134 @@ license:CC0
 			<color red="0.09375" green="0.0" blue="0.0" />
 		</disk>
 	</element>
-	<element name="background">
-		<rect>
-			<bounds left="0" top="0" right="1" bottom="1" />
-			<color red="0.0" green="0.0" blue="0.0" />
-		</rect>
-	</element>
 
 	<view name="Standard">
-		<!-- Background -->
-		<backdrop element="background">
-			<bounds left="5" top="5" right="513" bottom="87" />
-		</backdrop>
+		<bounds left="5" top="5" right="513" bottom="87" />
 
 		<!-- Jugador 1 -->
-		<bezel name="led_1" element="red_led">
+		<element name="led_1" ref="red_led">
 			<bounds x="10" y="17" width="10" height="10" />
-		</bezel>
-		<bezel name="dpl_30" element="digit">
+		</element>
+		<element name="dpl_30" ref="digit">
 			<bounds x="30"  y="10" width="18" height="24" />
-		</bezel>
-		<bezel name="dpl_1" element="digit">
+		</element>
+		<element name="dpl_1" ref="digit">
 			<bounds x="54"  y="10" width="18" height="24" />
-		</bezel>
-		<bezel name="dpl_2" element="digit">
+		</element>
+		<element name="dpl_2" ref="digit">
 			<bounds x="72"  y="10" width="18" height="24" />
-		</bezel>
-		<bezel name="dpl_3" element="digit">
+		</element>
+		<element name="dpl_3" ref="digit">
 			<bounds x="90"  y="10" width="18" height="24" />
-		</bezel>
-		<bezel name="dpl_4" element="digit">
+		</element>
+		<element name="dpl_4" ref="digit">
 			<bounds x="114"  y="10" width="18" height="24" />
-		</bezel>
-		<bezel name="dpl_5" element="digit">
+		</element>
+		<element name="dpl_5" ref="digit">
 			<bounds x="132"  y="10" width="18" height="24" />
-		</bezel>
-		<bezel name="dpl_6" element="digit">
+		</element>
+		<element name="dpl_6" ref="digit">
 			<bounds x="150"  y="10" width="18" height="24" />
-		</bezel>
+		</element>
 
 		<!-- Credito -->
-		<bezel name="dpl_25" element="digit">
+		<element name="dpl_25" ref="digit">
 			<bounds x="230"  y="40" width="12" height="16" />
-		</bezel>
-		<bezel name="dpl_26" element="digit">
+		</element>
+		<element name="dpl_26" ref="digit">
 			<bounds x="242"  y="40" width="12" height="16" />
-		</bezel>
+		</element>
 
 		<!-- Extra play -->
-		<bezel name="dpl_27" element="digit">
+		<element name="dpl_27" ref="digit">
 			<bounds x="275"  y="40" width="12" height="16" />
-		</bezel>
+		</element>
 		<!-- Extra ball -->
-		<bezel name="dpl_28" element="digit">
+		<element name="dpl_28" ref="digit">
 			<bounds x="300"  y="40" width="12" height="16" />
-		</bezel>
+		</element>
 
 		<!-- Jugador 2 -->
-		<bezel name="led_2" element="red_led">
+		<element name="led_2" ref="red_led">
 			<bounds x="350" y="17" width="10" height="10" />
-		</bezel>
-		<bezel name="dpl_31" element="digit">
+		</element>
+		<element name="dpl_31" ref="digit">
 			<bounds x="370"  y="10" width="18" height="24" />
-		</bezel>
-		<bezel name="dpl_7" element="digit">
+		</element>
+		<element name="dpl_7" ref="digit">
 			<bounds x="394"  y="10" width="18" height="24" />
-		</bezel>
-		<bezel name="dpl_8" element="digit">
+		</element>
+		<element name="dpl_8" ref="digit">
 			<bounds x="412"  y="10" width="18" height="24" />
-		</bezel>
-		<bezel name="dpl_9" element="digit">
+		</element>
+		<element name="dpl_9" ref="digit">
 			<bounds x="430"  y="10" width="18" height="24" />
-		</bezel>
-		<bezel name="dpl_10" element="digit">
+		</element>
+		<element name="dpl_10" ref="digit">
 			<bounds x="454"  y="10" width="18" height="24" />
-		</bezel>
-		<bezel name="dpl_11" element="digit">
+		</element>
+		<element name="dpl_11" ref="digit">
 			<bounds x="472"  y="10" width="18" height="24" />
-		</bezel>
-		<bezel name="dpl_12" element="digit">
+		</element>
+		<element name="dpl_12" ref="digit">
 			<bounds x="490"  y="10" width="18" height="24" />
-		</bezel>
+		</element>
 
 		<!-- Jugador 3 -->
-		<bezel name="led_3" element="red_led">
+		<element name="led_3" ref="red_led">
 			<bounds x="10" y="65" width="10" height="10" />
-		</bezel>
-		<bezel name="dpl_32" element="digit">
+		</element>
+		<element name="dpl_32" ref="digit">
 			<bounds x="30"  y="58" width="18" height="24" />
-		</bezel>
-		<bezel name="dpl_13" element="digit">
+		</element>
+		<element name="dpl_13" ref="digit">
 			<bounds x="54"  y="58" width="18" height="24" />
-		</bezel>
-		<bezel name="dpl_14" element="digit">
+		</element>
+		<element name="dpl_14" ref="digit">
 			<bounds x="72"  y="58" width="18" height="24" />
-		</bezel>
-		<bezel name="dpl_15" element="digit">
+		</element>
+		<element name="dpl_15" ref="digit">
 			<bounds x="90"  y="58" width="18" height="24" />
-		</bezel>
-		<bezel name="dpl_16" element="digit">
+		</element>
+		<element name="dpl_16" ref="digit">
 			<bounds x="114"  y="58" width="18" height="24" />
-		</bezel>
-		<bezel name="dpl_17" element="digit">
+		</element>
+		<element name="dpl_17" ref="digit">
 			<bounds x="132"  y="58" width="18" height="24" />
-		</bezel>
-		<bezel name="dpl_18" element="digit">
+		</element>
+		<element name="dpl_18" ref="digit">
 			<bounds x="150"  y="58" width="18" height="24" />
-		</bezel>
+		</element>
 
 		<!-- Bola en juego / Loteria -->
-		<bezel name="dpl_29" element="digit">
+		<element name="dpl_29" ref="digit">
 			<bounds x="260"  y="58" width="18" height="24" />
-		</bezel>
+		</element>
 
 		<!-- Jugador 4 -->
-		<bezel name="led_4" element="red_led">
+		<element name="led_4" ref="red_led">
 			<bounds x="350" y="65" width="10" height="10" />
-		</bezel>
-		<bezel name="dpl_33" element="digit">
+		</element>
+		<element name="dpl_33" ref="digit">
 			<bounds x="370"  y="58" width="18" height="24" />
-		</bezel>
-		<bezel name="dpl_19" element="digit">
+		</element>
+		<element name="dpl_19" ref="digit">
 			<bounds x="394"  y="58" width="18" height="24" />
-		</bezel>
-		<bezel name="dpl_20" element="digit">
+		</element>
+		<element name="dpl_20" ref="digit">
 			<bounds x="412"  y="58" width="18" height="24" />
-		</bezel>
-		<bezel name="dpl_21" element="digit">
+		</element>
+		<element name="dpl_21" ref="digit">
 			<bounds x="430"  y="58" width="18" height="24" />
-		</bezel>
-		<bezel name="dpl_22" element="digit">
+		</element>
+		<element name="dpl_22" ref="digit">
 			<bounds x="454"  y="58" width="18" height="24" />
-		</bezel>
-		<bezel name="dpl_23" element="digit">
+		</element>
+		<element name="dpl_23" ref="digit">
 			<bounds x="472"  y="58" width="18" height="24" />
-		</bezel>
-		<bezel name="dpl_24" element="digit">
+		</element>
+		<element name="dpl_24" ref="digit">
 			<bounds x="490"  y="58" width="18" height="24" />
-		</bezel>
-
+		</element>
 	</view>
 </mamelayout>

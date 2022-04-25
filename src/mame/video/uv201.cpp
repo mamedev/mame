@@ -81,7 +81,7 @@
 	((_y >= cliprect.min_y) && (_y <= cliprect.max_y))
 
 #define DRAW_PIXEL(_scanline, _dot) \
-	if (IS_VISIBLE(_scanline)) bitmap.pix32((_scanline), HSYNC_WIDTH + HFP_WIDTH + _dot) = m_palette_val[pixel];
+	if (IS_VISIBLE(_scanline)) bitmap.pix((_scanline), HSYNC_WIDTH + HFP_WIDTH + _dot) = m_palette_val[pixel];
 
 
 
@@ -164,7 +164,7 @@ void uv201_device::device_reset()
 //  device_timer - handle timer events
 //-------------------------------------------------
 
-void uv201_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void uv201_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	int scanline = screen().vpos();
 

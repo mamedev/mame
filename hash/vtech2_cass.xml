@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+
+-->
+
+<softwarelist name="vtech2_cass" description="VTech Laser 500 cassettes">
+
+	<software name="bomber">
+		<description>Cross Bomber</description>
+		<year>????</year>
+		<publisher>Fabrizio Caruso</publisher>
+		<info name="usage" value="CLOAD, start tape. RUN. Space for all actions." />
+		<part name="cass1" interface="vtech2_cass">
+			<dataarea name="cass" size="0x48751a">
+				<rom name="bomber.wav" size="0x48751a" crc="c772e86d" sha1="eb5c8a1d5d7733579e0d7702ca8bed66075fd171"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chase">
+		<description>Cross Chase</description>
+		<year>????</year>
+		<publisher>Fabrizio Caruso</publisher>
+		<info name="usage" value="CLOAD, start tape. RUN. Space to start." />
+		<part name="cass1" interface="vtech2_cass">
+			<dataarea name="cass" size="0x8decfc">
+				<rom name="chase.wav" size="0x8decfc" crc="36f28a4c" sha1="42805ac413251b8cfccf938fb4a30548149a8376"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="horde">
+		<description>Cross Horde</description>
+		<year>????</year>
+		<publisher>Fabrizio Caruso</publisher>
+		<info name="usage" value="CLOAD, start tape. RUN. Space = fire, J = left, L = right" />
+		<part name="cass1" interface="vtech2_cass">
+			<dataarea name="cass" size="0x7cb0c8">
+				<rom name="horde.wav" size="0x7cb0c8" crc="a6089087" sha1="e4905d5f1c24af70fcec856c11711869fc8e8104"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shoot">
+		<description>Cross Shoot</description>
+		<year>????</year>
+		<publisher>Fabrizio Caruso</publisher>
+		<info name="usage" value="CLOAD, start tape. RUN. Space to start." />
+		<part name="cass1" interface="vtech2_cass">
+			<dataarea name="cass" size="0xc55272">
+				<rom name="shoot.wav" size="0xc55272" crc="b1a78aa5" sha1="f632f70a30fa1a80efda2e5fe739e1b004f51376"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snake">
+		<description>Cross Snake</description>
+		<year>????</year>
+		<publisher>Fabrizio Caruso</publisher>
+		<info name="usage" value="CLOAD, start tape. RUN. Space to start." />
+		<part name="cass1" interface="vtech2_cass">
+			<dataarea name="cass" size="0x932196">
+				<rom name="snake.wav" size="0x932196" crc="9526ec01" sha1="3b2dacf550202f67a1ba22571caad1c2ea40595b"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

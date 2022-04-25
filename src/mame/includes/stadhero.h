@@ -41,10 +41,10 @@ private:
 
 	required_ioport m_coin;
 
-	tilemap_t *m_pf1_tilemap;
+	tilemap_t *m_pf1_tilemap = nullptr;
 
-	DECLARE_WRITE16_MEMBER(int_ack_w);
-	DECLARE_WRITE16_MEMBER(pf1_data_w);
+	void int_ack_w(uint16_t data);
+	void pf1_data_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t mystery_r();
 
 	virtual void video_start() override;

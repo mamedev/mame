@@ -21,7 +21,7 @@ enum { spaceod_bg_detect_tile_color = 1 };
  *
  *************************************/
 
-void segag80r_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void segag80r_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -235,6 +235,8 @@ void segag80r_state::video_start()
 			break;
 	}
 
+	m_bg_scrollx = 0;
+
 	/* register for save states */
 	save_item(NAME(m_video_control));
 	save_item(NAME(m_video_flip));
@@ -262,9 +264,8 @@ void segag80r_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(segag80r_state::segag80r_videoram_w)
+void segag80r_state::segag80r_videoram_w(offs_t offset, uint8_t data)
 {
-	uint8_t *videoram = m_videoram;
 	/* accesses to the upper half of VRAM go to paletteram if selected */
 	if ((offset & 0x1000) && (m_video_control & 0x02))
 	{
@@ -275,7 +276,7 @@ WRITE8_MEMBER(segag80r_state::segag80r_videoram_w)
 	}
 
 	/* all other accesses go to videoram */
-	videoram[offset] = data;
+	m_videoram[offset] = data;
 
 	/* track which characters are dirty */
 	if (offset & 0x800)
@@ -290,7 +291,7 @@ WRITE8_MEMBER(segag80r_state::segag80r_videoram_w)
  *
  *************************************/
 
-READ8_MEMBER(segag80r_state::segag80r_video_port_r)
+uint8_t segag80r_state::segag80r_video_port_r(offs_t offset)
 {
 	if (offset == 0)
 	{
@@ -310,7 +311,7 @@ READ8_MEMBER(segag80r_state::segag80r_video_port_r)
 }
 
 
-WRITE8_MEMBER(segag80r_state::segag80r_video_port_w)
+void segag80r_state::segag80r_video_port_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
@@ -338,7 +339,7 @@ WRITE8_MEMBER(segag80r_state::segag80r_video_port_w)
  *
  *************************************/
 
-READ8_MEMBER(segag80r_state::spaceod_back_port_r)
+uint8_t segag80r_state::spaceod_back_port_r(offs_t offset)
 {
 	/* force an update to get the current detection value */
 	m_screen->update_partial(m_screen->vpos());
@@ -346,7 +347,7 @@ READ8_MEMBER(segag80r_state::spaceod_back_port_r)
 }
 
 
-WRITE8_MEMBER(segag80r_state::spaceod_back_port_w)
+void segag80r_state::spaceod_back_port_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 7)
 	{
@@ -426,7 +427,7 @@ WRITE8_MEMBER(segag80r_state::spaceod_back_port_w)
  *
  *************************************/
 
-WRITE8_MEMBER(segag80r_state::monsterb_videoram_w)
+void segag80r_state::monsterb_videoram_w(offs_t offset, uint8_t data)
 {
 	/* accesses to the area $f040-$f07f go to background palette if */
 	/* the palette access enable bit is set */
@@ -440,11 +441,11 @@ WRITE8_MEMBER(segag80r_state::monsterb_videoram_w)
 	}
 
 	/* handle everything else */
-	segag80r_videoram_w(space, offset, data);
+	segag80r_videoram_w(offset, data);
 }
 
 
-WRITE8_MEMBER(segag80r_state::monsterb_back_port_w)
+void segag80r_state::monsterb_back_port_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 7)
 	{
@@ -496,7 +497,7 @@ WRITE8_MEMBER(segag80r_state::monsterb_back_port_w)
  *
  *************************************/
 
-WRITE8_MEMBER(segag80r_state::pignewt_videoram_w)
+void segag80r_state::pignewt_videoram_w(offs_t offset, uint8_t data)
 {
 	/* accesses to the area $f040-$f07f go to background palette if */
 	/* the palette access enable bit is set */
@@ -509,11 +510,11 @@ WRITE8_MEMBER(segag80r_state::pignewt_videoram_w)
 	}
 
 	/* handle everything else */
-	segag80r_videoram_w(space, offset, data);
+	segag80r_videoram_w(offset, data);
 }
 
 
-WRITE8_MEMBER(segag80r_state::pignewt_back_color_w)
+void segag80r_state::pignewt_back_color_w(offs_t offset, uint8_t data)
 {
 	/* it is not really known what this does */
 	if (offset == 0)
@@ -523,7 +524,7 @@ WRITE8_MEMBER(segag80r_state::pignewt_back_color_w)
 }
 
 
-WRITE8_MEMBER(segag80r_state::pignewt_back_port_w)
+void segag80r_state::pignewt_back_port_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 7)
 	{
@@ -579,7 +580,7 @@ WRITE8_MEMBER(segag80r_state::pignewt_back_port_w)
  *
  *************************************/
 
-WRITE8_MEMBER(segag80r_state::sindbadm_videoram_w)
+void segag80r_state::sindbadm_videoram_w(offs_t offset, uint8_t data)
 {
 	/* accesses to the area $f000-$f03f go to background palette if */
 	/* the palette access enable bit is set */
@@ -592,11 +593,11 @@ WRITE8_MEMBER(segag80r_state::sindbadm_videoram_w)
 	}
 
 	/* handle everything else */
-	segag80r_videoram_w(space, offset, data);
+	segag80r_videoram_w(offset, data);
 }
 
 
-WRITE8_MEMBER(segag80r_state::sindbadm_back_port_w)
+void segag80r_state::sindbadm_back_port_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 3)
 	{
@@ -671,7 +672,6 @@ void segag80r_state::draw_background_spaceod(bitmap_ind16 &bitmap, const rectang
 	int xoffset = (m_spaceod_bg_control & 0x02) ? 0x10 : 0x00;
 	int xmask = pixmap.width() - 1;
 	int ymask = pixmap.height() - 1;
-	int x, y;
 
 	/* The H and V counters on this board are independent of the ones on */
 	/* the main board. The H counter starts counting from 0 when EXT BLK */
@@ -680,14 +680,14 @@ void segag80r_state::draw_background_spaceod(bitmap_ind16 &bitmap, const rectang
 	/* 240, giving us an offset of (262-240) = 22 scanlines. */
 
 	/* now fill in the background wherever there are black pixels */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		int effy = (y + m_spaceod_vcounter + 22) ^ flipmask;
-		uint16_t *src = &pixmap.pix16(effy & ymask);
-		uint16_t *dst = &bitmap.pix16(y);
+		uint16_t const *const src = &pixmap.pix(effy & ymask);
+		uint16_t *const dst = &bitmap.pix(y);
 
 		/* loop over horizontal pixels */
-		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			int effx = ((x + m_spaceod_hcounter) ^ flipmask) + xoffset;
 			uint8_t fgpix = m_paletteram[dst[x]];
@@ -727,7 +727,6 @@ void segag80r_state::draw_background_page_scroll(bitmap_ind16 &bitmap, const rec
 	int flipmask = (m_video_control & 0x08) ? 0xff : 0x00;
 	int xmask = pixmap.width() - 1;
 	int ymask = pixmap.height() - 1;
-	int x, y;
 
 	/* if disabled, draw nothing */
 	if (!m_bg_enable)
@@ -737,14 +736,14 @@ void segag80r_state::draw_background_page_scroll(bitmap_ind16 &bitmap, const rec
 	}
 
 	/* now fill in the background wherever there are black pixels */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		int effy = m_bg_scrolly + (((y ^ flipmask) + (flipmask & 0xe0)) & 0xff);
-		uint16_t *src = &pixmap.pix16(effy & ymask);
-		uint16_t *dst = &bitmap.pix16(y);
+		uint16_t const *const src = &pixmap.pix(effy & ymask);
+		uint16_t *const dst = &bitmap.pix(y);
 
 		/* loop over horizontal pixels */
-		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			int effx = m_bg_scrollx + (x ^ flipmask);
 			dst[x] = src[effx & xmask];
@@ -767,7 +766,6 @@ void segag80r_state::draw_background_full_scroll(bitmap_ind16 &bitmap, const rec
 	int flipmask = (m_video_control & 0x08) ? 0x3ff : 0x000;
 	int xmask = pixmap.width() - 1;
 	int ymask = pixmap.height() - 1;
-	int x, y;
 
 	/* if disabled, draw nothing */
 	if (!m_bg_enable)
@@ -777,14 +775,14 @@ void segag80r_state::draw_background_full_scroll(bitmap_ind16 &bitmap, const rec
 	}
 
 	/* now fill in the background wherever there are black pixels */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		int effy = (y + m_bg_scrolly) ^ flipmask;
-		uint16_t *src = &pixmap.pix16(effy & ymask);
-		uint16_t *dst = &bitmap.pix16(y);
+		uint16_t const *const src = &pixmap.pix(effy & ymask);
+		uint16_t *const dst = &bitmap.pix(y);
 
 		/* loop over horizontal pixels */
-		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			int effx = (x + m_bg_scrollx) ^ flipmask;
 			dst[x] = src[effx & xmask];

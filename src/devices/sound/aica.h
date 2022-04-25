@@ -39,12 +39,13 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// device_memory_interface configuration
 	virtual space_config_vector memory_space_config() const override;
 
 	address_space_config m_data_config;
+
 private:
 	enum AICA_STATE {AICA_ATTACK,AICA_DECAY1,AICA_DECAY2,AICA_RELEASE};
 
@@ -123,8 +124,9 @@ private:
 	void UpdateRegR(int reg);
 	void w16(u32 addr,u16 val);
 	u16 r16(u32 addr);
-	inline s32 UpdateSlot(AICA_SLOT *slot);
-	void DoMasterSamples(int nsamples);
+	[[maybe_unused]] void TimersAddTicks(int ticks);
+	s32 UpdateSlot(AICA_SLOT *slot);
+	void DoMasterSamples(std::vector<read_stream_view> const &inputs, write_stream_view &bufl, write_stream_view &bufr);
 	void exec_dma();
 
 
@@ -183,11 +185,6 @@ private:
 	int m_ARTABLE[64], m_DRTABLE[64];
 
 	AICADSP m_DSP;
-
-	stream_sample_t *m_bufferl;
-	stream_sample_t *m_bufferr;
-	stream_sample_t *m_exts0;
-	stream_sample_t *m_exts1;
 
 	s32 m_EG_TABLE[0x400];
 	int m_PLFO_TRI[256],m_PLFO_SQR[256],m_PLFO_SAW[256],m_PLFO_NOI[256];

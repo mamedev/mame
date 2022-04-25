@@ -544,29 +544,28 @@ void digitalker_device::digitalker_step()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void digitalker_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void digitalker_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *sout = outputs[0];
+	auto &sout = outputs[0];
 	int cpos = 0;
-	while(cpos != samples) {
+	while(cpos != sout.samples()) {
 		if(m_zero_count == 0 && m_dac_index == 128)
 			digitalker_step();
 
 		if(m_zero_count) {
-			int n = samples - cpos;
-			int i;
+			int n = sout.samples() - cpos;
 			if(n > m_zero_count)
 				n = m_zero_count;
-			for(i=0; i != n; i++)
-				sout[cpos++] = 0;
+			sout.fill(0, cpos, n);
+			cpos += n;
 			m_zero_count -= n;
 
 		} else if(m_dac_index != 128) {
-			while(cpos != samples && m_dac_index != 128) {
-				short v = m_dac[m_dac_index];
+			while(cpos != sout.samples() && m_dac_index != 128) {
+				s32 v = m_dac[m_dac_index];
 				int pp = m_pitch_pos;
-				while(cpos != samples && pp != m_pitch) {
-					sout[cpos++] = v;
+				while(cpos != sout.samples() && pp != m_pitch) {
+					sout.put_int(cpos++, v, 32768);
 					pp++;
 				}
 				if(pp == m_pitch) {
@@ -577,8 +576,8 @@ void digitalker_device::sound_stream_update(sound_stream &stream, stream_sample_
 			}
 
 		} else {
-			while(cpos != samples)
-				sout[cpos++] = 0;
+			sout.fill(0, cpos);
+			break;
 		}
 	}
 }

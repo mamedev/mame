@@ -24,7 +24,7 @@ protected:
 private:
 	required_device<harddisk_image_device> m_image0;
 	required_device<harddisk_image_device> m_image1;
-	hard_disk_info m_param[2];
+	hard_disk_file::info m_param[2];
 };
 
 DECLARE_DEVICE_TYPE(OMTI5100, omti5100_device)

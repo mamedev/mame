@@ -103,15 +103,19 @@ BOOL win_is_gui_application()
 //============================================================
 void osd_subst_env(std::string &dst, const std::string &src)
 {
-	TCHAR buffer[MAX_PATH];
-
-	osd::text::tstring t_src = osd::text::to_tstring(src);
-#if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
-	ExpandEnvironmentStrings(t_src.c_str(), buffer, ARRAY_LENGTH(buffer));
-#else
-	wcsncpy(buffer, t_src.c_str(), ARRAY_LENGTH(buffer));
-#endif
-	osd::text::from_tstring(dst, buffer);
+	std::wstring const w_src = osd::text::to_wstring(src);
+	std::vector<wchar_t> buffer(w_src.size() + 2);
+	DWORD length(ExpandEnvironmentStringsW(w_src.c_str(), &buffer[0], buffer.size()));
+	while (length && (buffer.size() < length))
+	{
+		buffer.clear();
+		buffer.resize(length + 1);
+		length = ExpandEnvironmentStringsW(w_src.c_str(), &buffer[0], buffer.size());
+	}
+	if (length)
+		osd::text::from_wstring(dst, &buffer[0]);
+	else
+		dst.clear();
 }
 
 //-------------------------------------------------

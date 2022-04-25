@@ -19,27 +19,27 @@ license:CC0
 
 		<!-- score -->
 
-		<bezel name="digit0" element="digit">
+		<element name="digit0" ref="digit">
 			<bounds x="1.000" y="3.1" width="0.145" height="0.2" />
-		</bezel>
-		<bezel name="digit1" element="digit">
+		</element>
+		<element name="digit1" ref="digit">
 			<bounds x="1.145" y="3.1" width="0.145" height="0.2" />
-		</bezel>
-		<bezel name="digit2" element="digit">
+		</element>
+		<element name="digit2" ref="digit">
 			<bounds x="1.290" y="3.1" width="0.145" height="0.2" />
-		</bezel>
-		<bezel name="digit3" element="digit">
+		</element>
+		<element name="digit3" ref="digit">
 			<bounds x="1.435" y="3.1" width="0.145" height="0.2" />
-		</bezel>
+		</element>
 
 		<!-- time -->
 
-		<bezel name="digit4" element="digit">
+		<element name="digit4" ref="digit">
 			<bounds x="2.580" y="3.1" width="0.145" height="0.2" />
-		</bezel>
-		<bezel name="digit5" element="digit">
+		</element>
+		<element name="digit5" ref="digit">
 			<bounds x="2.725" y="3.1" width="0.145" height="0.2" />
-		</bezel>
+		</element>
 
 	</view>
 </mamelayout>

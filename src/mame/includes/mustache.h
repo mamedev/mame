@@ -40,12 +40,12 @@ private:
 
 	required_ioport m_dswb;
 
-	tilemap_t *m_bg_tilemap;
-	int m_control_byte;
+	tilemap_t *m_bg_tilemap = nullptr;
+	int m_control_byte = 0;
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(video_control_w);
-	DECLARE_WRITE8_MEMBER(scroll_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void video_control_w(uint8_t data);
+	void scroll_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 

@@ -890,6 +890,7 @@ void pic17_cpu_device::execute_run()
 	{
 		while (true)
 		{
+			[[fallthrough]];
 		case exec_phase::Q1:
 			if ((m_execflags & SLEEP) != 0)
 			{
@@ -922,6 +923,7 @@ void pic17_cpu_device::execute_run()
 				m_execphase = exec_phase::Q2;
 				return;
 			}
+			[[fallthrough]];
 
 		case exec_phase::Q2:
 			if ((m_execflags & INTRPT) == 0)
@@ -942,6 +944,7 @@ void pic17_cpu_device::execute_run()
 				m_execphase = exec_phase::Q3;
 				return;
 			}
+			[[fallthrough]];
 
 		case exec_phase::Q3:
 			if ((m_execflags & (TABLRD | TABLWT)) == 0)
@@ -967,6 +970,7 @@ void pic17_cpu_device::execute_run()
 				m_execphase = exec_phase::Q4;
 				return;
 			}
+			[[fallthrough]];
 
 		case exec_phase::Q4:
 			if ((m_intsample & m_intsta) != 0)

@@ -14,7 +14,7 @@
 #include "cpu/mcs51/mcs51.h"
 #include "machine/i8279.h"
 #include "sound/ay8910.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "speaker.h"
 
 class gsspade_state : public driver_device

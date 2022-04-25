@@ -40,13 +40,10 @@
 #include "speaker.h"
 
 
-void zerozone_state::sound_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void zerozone_state::sound_w(uint8_t data)
 {
-	if (ACCESSING_BITS_8_15)
-	{
-		m_soundlatch->write(data >> 8);
-		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
-	}
+	m_soundlatch->write(data);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 
@@ -57,13 +54,13 @@ void zerozone_state::main_map(address_map &map)
 	map(0x080002, 0x080003).portr("INPUTS");
 	map(0x080008, 0x080009).portr("DSWB");
 	map(0x08000a, 0x08000b).portr("DSWA");
-	map(0x084000, 0x084001).w(FUNC(zerozone_state::sound_w));
+	map(0x084000, 0x084000).w(FUNC(zerozone_state::sound_w));
 	map(0x088000, 0x0881ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x098000, 0x098001).ram();     /* Watchdog? */
-	map(0x09ce00, 0x09ffff).ram().w(FUNC(zerozone_state::tilemap_w)).share("videoram");
-	map(0x0b4000, 0x0b4001).w(FUNC(zerozone_state::tilebank_w));
+	map(0x098000, 0x098001).ram();     // Watchdog?
+	map(0x09ce00, 0x09ffff).ram().w(FUNC(zerozone_state::tilemap_w)).share(m_vram);
+	map(0x0b4001, 0x0b4001).w(FUNC(zerozone_state::tilebank_w));
 	map(0x0c0000, 0x0cffff).ram();
-	map(0x0f8000, 0x0f87ff).ram();     /* Never read from */
+	map(0x0f8000, 0x0f87ff).ram();     // Never read from
 }
 
 void zerozone_state::sound_map(address_map &map)
@@ -146,18 +143,18 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,    /* 8*8 characters */
-	RGN_FRAC(1,1),  /* 4096 characters */
-	4,  /* 4 bits per pixel */
+	8,8,    // 8*8 characters
+	RGN_FRAC(1,1),  // 4096 characters
+	4,  // 4 bits per pixel
 	{ 0, 1, 2, 3 },
 	{ 0, 4, 8+0, 8+4, 16+0, 16+4, 24+0, 24+4 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8    /* every sprite takes 32 consecutive bytes */
+	32*8    // every sprite takes 32 consecutive bytes
 };
 
 
 static GFXDECODE_START( gfx_zerozone )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 256 )         /* sprites & playfield */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 256 )         // sprites & playfield
 GFXDECODE_END
 
 
@@ -180,16 +177,16 @@ WRITE_LINE_MEMBER(zerozone_state::vblank_w)
 
 void zerozone_state::zerozone(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 10000000);   /* 10 MHz */
+	// basic machine hardware
+	M68000(config, m_maincpu, 10_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &zerozone_state::main_map);
 
-	Z80(config, m_audiocpu, 1000000);  /* 1 MHz ??? */
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 16);  // divisor not verified, 1 MHz ???
 	m_audiocpu->set_addrmap(AS_PROGRAM, &zerozone_state::sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -203,7 +200,7 @@ void zerozone_state::zerozone(machine_config &config)
 
 	PALETTE(config, "palette").set_format(palette_device::RRRRGGGGBBBBRGBx, 256);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
@@ -220,39 +217,39 @@ void zerozone_state::zerozone(machine_config &config)
 
 ***************************************************************************/
 
-ROM_START( zerozone )
-	ROM_REGION( 0x20000, "maincpu", 0 )     /* 128k for 68000 code */
+ROM_START( zerozone ) // PCB 'COMAD MADE IN KOREA 93 EDIT00', sticker 'COMAD-078'
+	ROM_REGION( 0x20000, "maincpu", 0 )     // 128k for 68000 code
 	ROM_LOAD16_BYTE( "zz-4.rom", 0x0000, 0x10000, CRC(83718b9b) SHA1(b3fc6da5816142b9c92a7b8615eb5bcb2c78ea46) )
 	ROM_LOAD16_BYTE( "zz-5.rom", 0x0001, 0x10000, CRC(18557f41) SHA1(6ef908732b7775c1ea2b33f799635075db5756de) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "zz-1.rom", 0x00000, 0x08000, CRC(223ccce5) SHA1(3aa25ca914960b929dc853d07a958ed874e42fee) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "zz-6.rom", 0x00000, 0x80000, CRC(c8b906b9) SHA1(1775d69df6397d6772b20c65751d44556d76c033) )
 
-	ROM_REGION( 0x40000, "oki", 0 )      /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )      // ADPCM samples
 	ROM_LOAD( "zz-2.rom", 0x00000, 0x20000, CRC(c7551e81) SHA1(520de3074fa6a71fef10d5a76cba5580fd1cbbae) )
 	ROM_LOAD( "zz-3.rom", 0x20000, 0x20000, CRC(e348ff5e) SHA1(6d2755d9b31366f4c2ddd296790234deb8f821c8) )
 ROM_END
 
-ROM_START( lvgirl94 )
-	ROM_REGION( 0x20000, "maincpu", 0 )     /* 128k for 68000 code */
+ROM_START( lvgirl94 ) // PCB 'COMAD MADE IN KOREA 93 EDIT00', sticker 'COMAD-078'
+	ROM_REGION( 0x20000, "maincpu", 0 )     // 128k for 68000 code
 	ROM_LOAD16_BYTE( "rom4", 0x0000, 0x10000, CRC(c4fb449e) SHA1(dd1c567ba2cf951267dd622e2e9af265e742f246) )
 	ROM_LOAD16_BYTE( "rom5", 0x0001, 0x10000, CRC(5d446a1a) SHA1(2d7ea25e5b86e7cf4eb7f10daa1eaaaed6830a53) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "rom6", 0x00000, 0x40000, CRC(eeeb94ba) SHA1(9da09312c090ef2d40f596247d9a7decf3724e54) )
 
-	/* sound roms are the same as zerozone */
-	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
+	// sound roms are the same as zerozone
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "rom1", 0x00000, 0x08000, CRC(223ccce5) SHA1(3aa25ca914960b929dc853d07a958ed874e42fee) )
 
-	ROM_REGION( 0x40000, "oki", 0 )      /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )      // ADPCM samples
 	ROM_LOAD( "rom2", 0x00000, 0x20000, CRC(c7551e81) SHA1(520de3074fa6a71fef10d5a76cba5580fd1cbbae) )
 	ROM_LOAD( "rom3", 0x20000, 0x20000, CRC(e348ff5e) SHA1(6d2755d9b31366f4c2ddd296790234deb8f821c8) )
 ROM_END
 
 
-GAME( 1993, zerozone, 0, zerozone, zerozone, zerozone_state, empty_init, ROT0, "Comad", "Zero Zone", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, zerozone, 0, zerozone, zerozone, zerozone_state, empty_init, ROT0, "Comad", "Zero Zone",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1994, lvgirl94, 0, zerozone, zerozone, zerozone_state, empty_init, ROT0, "Comad", "Las Vegas Girl (Girl '94)", MACHINE_SUPPORTS_SAVE )

@@ -25,15 +25,7 @@ render_primitive_list *renderer_none::get_primitives()
 		return nullptr;
 
 	RECT client;
-#if defined(OSD_WINDOWS)
 	GetClientRect(std::static_pointer_cast<win_window_info>(win)->platform_window(), &client);
-#elif defined(OSD_UWP)
-	auto bounds = std::static_pointer_cast<uwp_window_info>(win)->platform_window()->Bounds;
-	client.left = bounds.Left;
-	client.right = bounds.Right;
-	client.top = bounds.Top;
-	client.bottom = bounds.Bottom;
-#endif
 	if ((rect_width(&client) == 0) || (rect_height(&client) == 0))
 		return nullptr;
 	win->target()->set_bounds(rect_width(&client), rect_height(&client), win->pixel_aspect());

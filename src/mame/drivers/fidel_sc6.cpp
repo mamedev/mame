@@ -49,6 +49,9 @@ Gambit(v3) hardware notes:
 
 MCU ports I/O again identical to SC6.
 The same MCU+ROM was also used in Designer 1500(PCB label 510.1131A01).
+And also in The Classic(PCB label 510-1095A01), 100-1020B02 MCU.
+
+100-1020B02 ROM contents is confirmed to be identical to 100-1020B01.
 
 Gambit Voice hardware notes:
 - TMP80C50AP-6-9311 MCU, 4KB internal ROM, 6MHz XTAL
@@ -61,7 +64,7 @@ Silver Bullet hardware notes:
 - buzzer, 16 leds, 8*8 chessboard buttons, module slot
 
 To summarize, known MCU chip ROM serials+year:
-- 100-1020B01 (1989), The Gambit
+- 100-1020B01 (1989), The Gambit, Designer 1500, Peri Beta
 - 100-1020B02 (1986), Silver Bullet
 - 100-1020B02 (1987), The Classic
 - 100-1020C01 (1987), Gambit Voice
@@ -72,12 +75,11 @@ To summarize, known MCU chip ROM serials+year:
 #include "cpu/mcs48/mcs48.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/pwm.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 // internal artwork
@@ -297,7 +299,6 @@ void sc6_state::gambit(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 void sc6_state::msc(machine_config &config)

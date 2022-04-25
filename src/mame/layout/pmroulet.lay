@@ -35,11 +35,11 @@ license:CC0
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
-		<bezel name="lamp1" element="L1">
+		<element name="lamp1" ref="L1">
 			<bounds x="0" y="3.13" width="0.40" height="0.24" />
-		</bezel>
-		<bezel name="lamp2" element="L2">
+		</element>
+		<element name="lamp2" ref="L2">
 			<bounds x="0.5" y="3.13" width="0.40" height="0.24" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

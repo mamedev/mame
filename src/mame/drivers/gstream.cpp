@@ -117,7 +117,7 @@
 +------------------------------------------------+
 
   CPU: Hyperstone E1-32XT
-Sound: OKI 6295 x 2 (rebaged as AD-65)
+Sound: OKI 6295 x 2 (rebadged as AD-65)
   OSC: 54.000MHz, 27.000MHz, 16.000MHz & 1.000MHz
 Other: Sigma Xilinx XC95255 x 2
 
@@ -182,7 +182,7 @@ private:
 	/* misc */
 	int       m_oki_bank[2];
 	int       m_toggle;
-	int       m_xoffset;
+	int       m_xoffset = 0;
 
 	void vram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	template<int Layer> void scrollx_w(uint16_t data);
@@ -587,10 +587,8 @@ void gstream_state::drawgfx_transpen_x2222(bitmap_rgb32 &dest, const rectangle &
 	do {
 		g_profiler.start(PROFILER_DRAWGFX);
 		do {
-			const uint8_t *srcdata, *srcdata2;
 			int32_t destendx, destendy;
 			int32_t srcx, srcy;
-			int32_t curx, cury;
 			int32_t dy;
 
 			assert(dest.valid());
@@ -649,8 +647,8 @@ void gstream_state::drawgfx_transpen_x2222(bitmap_rgb32 &dest, const rectangle &
 			}
 
 			/* fetch the source data */
-			srcdata = gfx->get_data(code);
-			srcdata2 = gfx2->get_data(code);
+			const uint8_t *srcdata = gfx->get_data(code);
+			const uint8_t *srcdata2 = gfx2->get_data(code);
 
 			/* compute how many blocks of 4 pixels we have */
 			uint32_t leftovers = (destendx + 1 - destx);
@@ -663,16 +661,16 @@ void gstream_state::drawgfx_transpen_x2222(bitmap_rgb32 &dest, const rectangle &
 			if (!flipx)
 			{
 				/* iterate over pixels in Y */
-				for (cury = desty; cury <= destendy; cury++)
+				for (int32_t cury = desty; cury <= destendy; cury++)
 				{
-					uint32_t *destptr = &dest.pix32(cury, destx);
+					uint32_t *destptr = &dest.pix(cury, destx);
 					const uint8_t *srcptr = srcdata;
 					const uint8_t *srcptr2 = srcdata2;
 					srcdata += dy;
 					srcdata2 += dy;
 
 					/* iterate over leftover pixels */
-					for (curx = 0; curx < leftovers; curx++)
+					for (int32_t curx = 0; curx < leftovers; curx++)
 					{
 						uint32_t srcdata = (srcptr[0]);
 						uint32_t srcdata2 = (srcptr2[0]);
@@ -692,9 +690,9 @@ void gstream_state::drawgfx_transpen_x2222(bitmap_rgb32 &dest, const rectangle &
 			else
 			{
 				/* iterate over pixels in Y */
-				for (cury = desty; cury <= destendy; cury++)
+				for (int32_t cury = desty; cury <= destendy; cury++)
 				{
-					uint32_t *destptr = &dest.pix32(cury, destx);
+					uint32_t *destptr = &dest.pix(cury, destx);
 					const uint8_t *srcptr = srcdata;
 					const uint8_t *srcptr2 = srcdata2;
 
@@ -702,7 +700,7 @@ void gstream_state::drawgfx_transpen_x2222(bitmap_rgb32 &dest, const rectangle &
 					srcdata2 += dy;
 
 					/* iterate over leftover pixels */
-					for (curx = 0; curx < leftovers; curx++)
+					for (int32_t curx = 0; curx < leftovers; curx++)
 					{
 						uint32_t srcdata = (srcptr[0]);
 						uint32_t srcdata2 = (srcptr2[0]);

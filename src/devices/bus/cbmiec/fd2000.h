@@ -38,7 +38,7 @@ public:
 	uint8_t via_pb_r();
 	void via_pb_w(uint8_t data);
 
-	//DECLARE_FLOPPY_FORMATS( floppy_formats );
+	//static void floppy_formats(format_registration &fr);
 
 protected:
 	fd2000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

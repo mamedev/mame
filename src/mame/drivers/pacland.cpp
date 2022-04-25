@@ -15,8 +15,8 @@ Custom ICs:
 13XX     dual scrolling tilemap address generator
 98XX     lamp/coin output
 99XX     sound volume
-CUS27    clock divider
-CUS29    sprite line buffer and sprite/tilemap mixer
+CUS27    ULA clock divider
+CUS29    ULA sprite line buffer and sprite/tilemap mixer
 CUS30    sound control
 CUS34A   address decoder
 CUS36    dual tilemap generator
@@ -206,20 +206,20 @@ void pacland_state::machine_start()
 	save_item(NAME(m_mcu_irq_mask));
 }
 
-WRITE8_MEMBER(pacland_state::subreset_w)
+void pacland_state::subreset_w(offs_t offset, uint8_t data)
 {
 	int bit = !BIT(offset,11);
 	m_mcu->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE8_MEMBER(pacland_state::flipscreen_w)
+void pacland_state::flipscreen_w(offs_t offset, uint8_t data)
 {
 	int bit = !BIT(offset,11);
 	flip_screen_set(bit);
 }
 
 
-READ8_MEMBER(pacland_state::input_r)
+uint8_t pacland_state::input_r(offs_t offset)
 {
 	int shift = 4 * (offset & 1);
 	int port = offset & 2;
@@ -243,7 +243,7 @@ void pacland_state::led_w(uint8_t data)
 	m_leds[1] = BIT(data, 4);
 }
 
-WRITE8_MEMBER(pacland_state::irq_1_ctrl_w)
+void pacland_state::irq_1_ctrl_w(offs_t offset, uint8_t data)
 {
 	int bit = !BIT(offset, 11);
 	m_main_irq_mask = bit;
@@ -251,7 +251,7 @@ WRITE8_MEMBER(pacland_state::irq_1_ctrl_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(pacland_state::irq_2_ctrl_w)
+void pacland_state::irq_2_ctrl_w(offs_t offset, uint8_t data)
 {
 	int bit = !BIT(offset, 13);
 	m_mcu_irq_mask = bit;

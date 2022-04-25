@@ -12,8 +12,8 @@
 #pragma once
 
 #include "bus/cbus/pc9801_cbus.h"
-#include "sound/2608intf.h"
 #include "sound/dac.h"
+#include "sound/ymopn.h"
 #include "pc9801_snd.h"
 
 //**************************************************************************
@@ -29,13 +29,6 @@ public:
 	pc9801_86_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	pc9801_86_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(opna_r);
-	DECLARE_WRITE8_MEMBER(opna_w);
-	DECLARE_READ8_MEMBER(id_r);
-	DECLARE_WRITE8_MEMBER(mask_w);
-	DECLARE_READ8_MEMBER(pcm_r);
-	DECLARE_WRITE8_MEMBER(pcm_w);
-
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 
 protected:
@@ -45,25 +38,37 @@ protected:
 	virtual void device_reset() override;
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
+	void opna_reset_routes_config(machine_config &config);
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	void pc9801_86_config(machine_config &config);
+	virtual u16 read_io_base() override;
 
 	required_device<pc9801_slot_device> m_bus;
 	required_device<ym2608_device>  m_opna;
 
+	void opna_map(address_map &map);
+
+	u8 opna_r(offs_t offset);
+	void opna_w(offs_t offset, u8 data);
+	virtual u8 id_r();
+	void mask_w(u8 data);
+	u8 pcm_r(offs_t offset);
+	void pcm_w(offs_t offset, u8 data);
+
+	u8 m_mask;
+
 private:
 	int queue_count();
-	uint8_t queue_pop();
+	u8 queue_pop();
 
-
-	uint8_t m_mask, m_pcm_mode, m_vol[7], m_pcm_ctrl, m_pcm_mute;
+	u8 m_pcm_mode, m_vol[7], m_pcm_ctrl, m_pcm_mute;
 	uint16_t m_head, m_tail, m_count, m_irq_rate;
 	bool m_pcmirq, m_fmirq, m_pcm_clk, m_init;
 	required_device<dac_word_interface> m_ldac;
 	required_device<dac_word_interface> m_rdac;
-	std::vector<uint8_t> m_queue;
+	std::vector<u8> m_queue;
 	emu_timer *m_dac_timer;
 };
 
@@ -73,8 +78,10 @@ public:
 	// construction/destruction
 	pc9801_speakboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(opna_slave_r);
-	DECLARE_WRITE8_MEMBER(opna_slave_w);
+	static constexpr feature_type imperfect_features() { return feature::SOUND; }
+
+	u8 opna_slave_r(offs_t offset);
+	void opna_slave_w(offs_t offset, u8 data);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -86,13 +93,33 @@ private:
 	required_device<ym2608_device>  m_opna_slave;
 };
 
+class otomichan_kai_device : public pc9801_86_device
+{
+public:
+	// construction/destruction
+	otomichan_kai_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	static constexpr feature_type imperfect_features() { return feature::SOUND; }
+
+	u8 opn2c_r(offs_t offset);
+	void opn2c_w(offs_t offset, u8 data);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	required_device<ym3438_device>  m_opn2c;
+
+	virtual u8 id_r() override;
+};
 
 // device type definition
 DECLARE_DEVICE_TYPE(PC9801_86, pc9801_86_device)
 DECLARE_DEVICE_TYPE(PC9801_SPEAKBOARD, pc9801_speakboard_device)
-
-
-
+DECLARE_DEVICE_TYPE(OTOMICHAN_KAI, otomichan_kai_device)
 
 
 #endif // MAME_BUS_CBUS_PC9801_86_H

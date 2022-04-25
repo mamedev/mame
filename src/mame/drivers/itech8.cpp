@@ -22,7 +22,7 @@
         * Peggle [2 sets]
         * Poker Dice
         * Hot Shots Tennis [2 sets]
-        * Rim Rockin' Basketball [4 sets]
+        * Rim Rockin' Basketball [5 sets]
         * Ninja Clowns
 
     Known issues:
@@ -505,11 +505,9 @@
 #include "cpu/z80/z80.h"
 #include "machine/6522via.h"
 #include "machine/6821pia.h"
-#include "machine/nvram.h"
-#include "sound/2203intf.h"
-#include "sound/2608intf.h"
-#include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "sound/ymopn.h"
+#include "sound/ymopl.h"
 
 #include "speaker.h"
 
@@ -676,21 +674,21 @@ void grmatch_state::machine_reset()
 	m_palette_timer->adjust(m_screen->time_until_pos(m_screen->vpos()+1));
 }
 
-void itech8_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void itech8_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_IRQ_OFF:
-		irq_off(ptr, param);
+		irq_off(param);
 		break;
 	case TIMER_BEHIND_BEAM_UPDATE:
-		behind_the_beam_update(ptr, param);
+		behind_the_beam_update(param);
 		break;
 	case TIMER_BLITTER_DONE:
-		blitter_done(ptr, param);
+		blitter_done(param);
 		break;
 	case TIMER_DELAYED_Z80_CONTROL:
-		delayed_z80_control_w(ptr, param);
+		delayed_z80_control_w(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in itech8_state::device_timer");
@@ -955,8 +953,8 @@ void itech8_state::gtg2_map(address_map &map)
 /*------ Ninja Clowns layout ------*/
 void itech8_state::ninclown_map(address_map &map)
 {
-	map(0x000000, 0x00007f).ram().region("maincpu", 0);
-	map(0x000080, 0x003fff).ram().share("nvram");
+	map(0x000000, 0x003fff).ram().share("nvram");
+	map(0x000000, 0x000007).rom();
 	map(0x004000, 0x03ffff).rom();
 	map(0x040000, 0x07ffff).r(FUNC(itech8_state::rom_constant_r));
 	map(0x100080, 0x100080).w(m_soundlatch, FUNC(generic_latch_8_device::write));
@@ -1723,7 +1721,7 @@ WRITE_LINE_MEMBER(itech8_state::generate_tms34061_interrupt)
 
 void itech8_state::itech8_core_devices(machine_config &config)
 {
-	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_RANDOM);
 
 	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
@@ -1745,7 +1743,7 @@ void itech8_state::itech8_core_devices(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch, 0);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, M6809_IRQ_LINE);
 
-	via6522_device &via(VIA6522(config, "via6522_0", CLOCK_8MHz/4));
+	via6522_device &via(MOS6522(config, "via6522_0", CLOCK_8MHz/4));
 	via.writepb_handler().set(FUNC(itech8_state::pia_portb_out));
 	via.irq_handler().set_inputline(m_soundcpu, M6809_FIRQ_LINE);
 }
@@ -1954,6 +1952,8 @@ void itech8_state::ninclown(machine_config &config)
 	itech8_core_devices(config);
 	itech8_sound_ym3812_external(config);
 
+	//  m_nvram->set_custom_handler([this](nvram_device &, void *p, size_t s) { memcpy(p, memregion("maincpu")->base(), s); }, "vectors");
+
 	M68000(config, m_maincpu, CLOCK_12MHz);
 	m_maincpu->set_addrmap(AS_PROGRAM, &itech8_state::ninclown_map);
 
@@ -1982,37 +1982,37 @@ void itech8_state::gtg2(machine_config &config)
 
 ROM_START( wfortune )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "wofpgm", 0x00000, 0x10000, CRC(bd984654) SHA1(8e16d2feb26e9a6f86c4a36bf0f03db80ded03f6) )
+	ROM_LOAD( "wofpgm.u5", 0x00000, 0x10000, CRC(bd984654) SHA1(8e16d2feb26e9a6f86c4a36bf0f03db80ded03f6) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "wofsnd", 0x08000, 0x8000, CRC(0a6aa5dc) SHA1(42eef40a4300d6d16d9e2af678432a02be05f104) )
+	ROM_LOAD( "wof_snd-wof.u27", 0x08000, 0x8000, CRC(0a6aa5dc) SHA1(42eef40a4300d6d16d9e2af678432a02be05f104) )
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "wofgrom0", 0x00000, 0x10000, CRC(9a157b2c) SHA1(c349b41ba00cf6e2fec32872627c8cfdd8b5c1b9) )
-	ROM_LOAD( "wofgrom1", 0x10000, 0x10000, CRC(5064739b) SHA1(424e3f94333f8ca21ac39b64b684cf6b487164d3) )
-	ROM_LOAD( "wofgrom2", 0x20000, 0x10000, CRC(3d393b2b) SHA1(2c94d2dab7369c099c470cf96391b033f39add78) )
-	ROM_LOAD( "wofgrom3", 0x30000, 0x10000, CRC(117a2ce9) SHA1(8d601c1cf9f783a42617f13c6862a5835553ac4f) )
+	ROM_LOAD( "grom0-wof.grom0", 0x00000, 0x10000, CRC(9a157b2c) SHA1(c349b41ba00cf6e2fec32872627c8cfdd8b5c1b9) )
+	ROM_LOAD( "grom1-wof.grom1", 0x10000, 0x10000, CRC(5064739b) SHA1(424e3f94333f8ca21ac39b64b684cf6b487164d3) )
+	ROM_LOAD( "grom2-wof.grom2", 0x20000, 0x10000, CRC(3d393b2b) SHA1(2c94d2dab7369c099c470cf96391b033f39add78) )
+	ROM_LOAD( "grom3-wof.grom3", 0x30000, 0x10000, CRC(117a2ce9) SHA1(8d601c1cf9f783a42617f13c6862a5835553ac4f) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "wofsbom0", 0x00000, 0x20000, CRC(5c28c3fe) SHA1(eba64ede749fb26f9926f644d66860b54b4c76e7) )
+	ROM_LOAD( "wof_vr-sbom0.srom0", 0x00000, 0x20000, CRC(5c28c3fe) SHA1(eba64ede749fb26f9926f644d66860b54b4c76e7) ) /* Labeled as WOF VR-SBOM0  (yes it's actually "SBOM0") */
 ROM_END
 
 
 ROM_START( wfortunea )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "wofpgmr1.bin", 0x00000, 0x10000, CRC(c3d3eb21) SHA1(21137663afd19fba875e188640f0347fc8c5dcf0) )
+	ROM_LOAD( "wof-pgm_r1.u5", 0x00000, 0x10000, CRC(c3d3eb21) SHA1(21137663afd19fba875e188640f0347fc8c5dcf0) ) /* Labeled as WOF-PGM R1 */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "wofsnd", 0x08000, 0x8000, CRC(0a6aa5dc) SHA1(42eef40a4300d6d16d9e2af678432a02be05f104) )
+	ROM_LOAD( "wof_snd-wof.u27", 0x08000, 0x8000, CRC(0a6aa5dc) SHA1(42eef40a4300d6d16d9e2af678432a02be05f104) )
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "wofgrom0", 0x00000, 0x10000, CRC(9a157b2c) SHA1(c349b41ba00cf6e2fec32872627c8cfdd8b5c1b9) )
-	ROM_LOAD( "wofgrom1", 0x10000, 0x10000, CRC(5064739b) SHA1(424e3f94333f8ca21ac39b64b684cf6b487164d3) )
-	ROM_LOAD( "wofgrom2", 0x20000, 0x10000, CRC(3d393b2b) SHA1(2c94d2dab7369c099c470cf96391b033f39add78) )
-	ROM_LOAD( "wofgrom3", 0x30000, 0x10000, CRC(117a2ce9) SHA1(8d601c1cf9f783a42617f13c6862a5835553ac4f) )
+	ROM_LOAD( "grom0-wof.grom0", 0x00000, 0x10000, CRC(9a157b2c) SHA1(c349b41ba00cf6e2fec32872627c8cfdd8b5c1b9) )
+	ROM_LOAD( "grom1-wof.grom1", 0x10000, 0x10000, CRC(5064739b) SHA1(424e3f94333f8ca21ac39b64b684cf6b487164d3) )
+	ROM_LOAD( "grom2-wof.grom2", 0x20000, 0x10000, CRC(3d393b2b) SHA1(2c94d2dab7369c099c470cf96391b033f39add78) )
+	ROM_LOAD( "grom3-wof.grom3", 0x30000, 0x10000, CRC(117a2ce9) SHA1(8d601c1cf9f783a42617f13c6862a5835553ac4f) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "wofsbom0", 0x00000, 0x20000, CRC(5c28c3fe) SHA1(eba64ede749fb26f9926f644d66860b54b4c76e7) )
+	ROM_LOAD( "wof_vr-sbom0.srom0", 0x00000, 0x20000, CRC(5c28c3fe) SHA1(eba64ede749fb26f9926f644d66860b54b4c76e7) ) /* Labeled as WOF VR-SBOM0  (yes it's actually "SBOM0") */
 ROM_END
 
 
@@ -2113,7 +2113,7 @@ ROM_END
 
 ROM_START( gtgt )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "gtg.bin_2.0.u5", 0x0000, 0x10000, CRC(4c907166) SHA1(338a599645fa49c9fcbfbe5ba3431dafffddacc7) ) /* Trackball version */
+	ROM_LOAD( "gtg.bim_2.0.u5", 0x0000, 0x10000, CRC(4c907166) SHA1(338a599645fa49c9fcbfbe5ba3431dafffddacc7) ) /* Trackball version */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "golf-snd.u27", 0x08000, 0x8000, CRC(f6a7429b) SHA1(0fb378606c12c3543aa1ff603101e262acb9c692) )
@@ -2133,7 +2133,7 @@ ROM_END
 
 ROM_START( gtgt1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "gtg.bin_1.0.u5", 0x00000, 0x10000, CRC(ec70b510) SHA1(318984d77eb1df6258b855781ae1c9a09aa74f15) ) /* Trackball version */
+	ROM_LOAD( "gtg.bim_1.0.u5", 0x00000, 0x10000, CRC(ec70b510) SHA1(318984d77eb1df6258b855781ae1c9a09aa74f15) ) /* Trackball version */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "snd-u27.256", 0x08000, 0x8000, CRC(471da557) SHA1(32bfe450a42d9eb6c14edcfa2b4e33f65a11126e) )
@@ -2176,7 +2176,7 @@ ROM_END
 
 ROM_START( gtg2j )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "gtg2.bin_1.0.u5", 0x00000, 0x10000, CRC(9c95ceaa) SHA1(d9fd2b2419c026822a07d2ba51d6ab40b7cd0d49) ) /* Joystick version */
+	ROM_LOAD( "gtg2.bim_1.0.u5", 0x00000, 0x10000, CRC(9c95ceaa) SHA1(d9fd2b2419c026822a07d2ba51d6ab40b7cd0d49) ) /* Joystick version */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "gtgii_snd_v1_u27.u27", 0x08000, 0x8000, CRC(dd2a5905) SHA1(dc93f13de3953852a6757361eb9683a57d3ed326) ) /* labeled GTGII SND V1 (U27) */
@@ -2202,20 +2202,20 @@ ROM_START( slikshot )
 	ROM_LOAD( "poolpgm-20.u5",  0x00000, 0x10000, CRC(370a00eb) SHA1(b2878f161f4931d9fc3979a84b29660941e2608f) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "u27.bin", 0x08000, 0x8000, CRC(a96ce0f7) SHA1(c1fec3aeef97c846fd1a20b91af54f6bf9723a71) )
+	ROM_LOAD( "pool_snd-u27.u27", 0x08000, 0x8000, CRC(a96ce0f7) SHA1(c1fec3aeef97c846fd1a20b91af54f6bf9723a71) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "u53.bin", 0x00000, 0x0800, CRC(04b85918) SHA1(409aef2e71937c7654334999df9313909d757966) )
-	ROM_CONTINUE(        0x00000, 0x0800 )
-	ROM_CONTINUE(        0x00000, 0x0800 )
-	ROM_CONTINUE(        0x00000, 0x0800 )
+	ROM_LOAD( "z80_pgm_u53.u53", 0x00000, 0x0800, CRC(04b85918) SHA1(409aef2e71937c7654334999df9313909d757966) ) /* labeled Z80 PGM (U53) */
+	ROM_CONTINUE(                0x00000, 0x0800 )
+	ROM_CONTINUE(                0x00000, 0x0800 )
+	ROM_CONTINUE(                0x00000, 0x0800 )
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "grom0.bin", 0x00000, 0x20000, CRC(e60c2804) SHA1(e62d11b6c4439a70a2f32df72c8c64e2f110351e) )
-	ROM_LOAD( "grom1.bin", 0x20000, 0x20000, CRC(d764d542) SHA1(43fc0c9b627484a670d87da91e212741b137e995) )
+	ROM_LOAD( "pool-grom0.grom0", 0x00000, 0x20000, CRC(e60c2804) SHA1(e62d11b6c4439a70a2f32df72c8c64e2f110351e) )
+	ROM_LOAD( "pool-grom1.grom1", 0x20000, 0x20000, CRC(d764d542) SHA1(43fc0c9b627484a670d87da91e212741b137e995) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "srom0.bin", 0x00000, 0x10000, CRC(4b075f5e) SHA1(d1ac2c06352a5b96486a7e8cf8baae0c0e5b1883) )
+	ROM_LOAD( "pool_vr-srom0.srom0", 0x00000, 0x10000, CRC(4b075f5e) SHA1(d1ac2c06352a5b96486a7e8cf8baae0c0e5b1883) )
 ROM_END
 
 
@@ -2224,20 +2224,20 @@ ROM_START( slikshot17 )
 	ROM_LOAD( "poolpgm-17.u5", 0x00000, 0x10000, CRC(09d70554) SHA1(a009cd3b22261c60f1028694baef51f61713154f) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "u27.bin", 0x08000, 0x8000, CRC(a96ce0f7) SHA1(c1fec3aeef97c846fd1a20b91af54f6bf9723a71) )
+	ROM_LOAD( "pool_snd-u27.u27", 0x08000, 0x8000, CRC(a96ce0f7) SHA1(c1fec3aeef97c846fd1a20b91af54f6bf9723a71) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "u53.bin", 0x00000, 0x0800, CRC(04b85918) SHA1(409aef2e71937c7654334999df9313909d757966) )
-	ROM_CONTINUE(        0x00000, 0x0800 )
-	ROM_CONTINUE(        0x00000, 0x0800 )
-	ROM_CONTINUE(        0x00000, 0x0800 )
+	ROM_LOAD( "z80_pgm_u53.u53", 0x00000, 0x0800, CRC(04b85918) SHA1(409aef2e71937c7654334999df9313909d757966) ) /* labeled Z80 PGM (U53) */
+	ROM_CONTINUE(                0x00000, 0x0800 )
+	ROM_CONTINUE(                0x00000, 0x0800 )
+	ROM_CONTINUE(                0x00000, 0x0800 )
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "grom0.bin", 0x00000, 0x20000, CRC(e60c2804) SHA1(e62d11b6c4439a70a2f32df72c8c64e2f110351e) )
-	ROM_LOAD( "grom1.bin", 0x20000, 0x20000, CRC(d764d542) SHA1(43fc0c9b627484a670d87da91e212741b137e995) )
+	ROM_LOAD( "pool-grom0.grom0", 0x00000, 0x20000, CRC(e60c2804) SHA1(e62d11b6c4439a70a2f32df72c8c64e2f110351e) )
+	ROM_LOAD( "pool-grom1.grom1", 0x20000, 0x20000, CRC(d764d542) SHA1(43fc0c9b627484a670d87da91e212741b137e995) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "srom0.bin", 0x00000, 0x10000, CRC(4b075f5e) SHA1(d1ac2c06352a5b96486a7e8cf8baae0c0e5b1883) )
+	ROM_LOAD( "pool_vr-srom0.srom0", 0x00000, 0x10000, CRC(4b075f5e) SHA1(d1ac2c06352a5b96486a7e8cf8baae0c0e5b1883) )
 ROM_END
 
 
@@ -2246,26 +2246,26 @@ ROM_START( slikshot16 )
 	ROM_LOAD( "poolpgm-16.u5", 0x00000, 0x10000, CRC(c0f17012) SHA1(5d466e058daf91b4f52e634498df9d2a03627aaa) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "u27.bin", 0x08000, 0x8000, CRC(a96ce0f7) SHA1(c1fec3aeef97c846fd1a20b91af54f6bf9723a71) )
+	ROM_LOAD( "pool_snd-u27.u27", 0x08000, 0x8000, CRC(a96ce0f7) SHA1(c1fec3aeef97c846fd1a20b91af54f6bf9723a71) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "u53.bin", 0x00000, 0x0800, CRC(04b85918) SHA1(409aef2e71937c7654334999df9313909d757966) )
-	ROM_CONTINUE(        0x00000, 0x0800 )
-	ROM_CONTINUE(        0x00000, 0x0800 )
-	ROM_CONTINUE(        0x00000, 0x0800 )
+	ROM_LOAD( "z80_pgm_u53.u53", 0x00000, 0x0800, CRC(04b85918) SHA1(409aef2e71937c7654334999df9313909d757966) ) /* labeled Z80 PGM (U53) */
+	ROM_CONTINUE(                0x00000, 0x0800 )
+	ROM_CONTINUE(                0x00000, 0x0800 )
+	ROM_CONTINUE(                0x00000, 0x0800 )
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "pool-grom.0", 0x00000, 0x10000, CRC(e6d0edc6) SHA1(5287a31bbdde1e4291d8e9e6b99d3aa12bfb6e18) )
-	ROM_LOAD( "pool-grom.1", 0x10000, 0x10000, CRC(5a071aa2) SHA1(9c5506e37625d213429b1231d457d7ce8a7a81ff) )
-	ROM_LOAD( "pool-grom.2", 0x20000, 0x10000, CRC(c0bdf4e0) SHA1(3b7c635375c5e5fddcbc1bd1b186c960081ec37e) )
-	ROM_LOAD( "pool-grom.3", 0x30000, 0x10000, CRC(cb0bd9a3) SHA1(107ff127f9adad84a5f92077851423249fce8e30) )
+	ROM_LOAD( "grom0-pool.grom0", 0x00000, 0x10000, CRC(e6d0edc6) SHA1(5287a31bbdde1e4291d8e9e6b99d3aa12bfb6e18) )
+	ROM_LOAD( "grom1-pool.grom1", 0x10000, 0x10000, CRC(5a071aa2) SHA1(9c5506e37625d213429b1231d457d7ce8a7a81ff) )
+	ROM_LOAD( "grom2-pool.grom2", 0x20000, 0x10000, CRC(c0bdf4e0) SHA1(3b7c635375c5e5fddcbc1bd1b186c960081ec37e) )
+	ROM_LOAD( "grom3-pool.grom3", 0x30000, 0x10000, CRC(cb0bd9a3) SHA1(107ff127f9adad84a5f92077851423249fce8e30) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "srom0.bin", 0x00000, 0x10000, CRC(4b075f5e) SHA1(d1ac2c06352a5b96486a7e8cf8baae0c0e5b1883) )
+	ROM_LOAD( "pool_vr-srom0.srom0", 0x00000, 0x10000, CRC(4b075f5e) SHA1(d1ac2c06352a5b96486a7e8cf8baae0c0e5b1883) )
 ROM_END
 
 
-ROM_START( dynobop )
+ROM_START( dynobop ) /* known to be labeled as DYNO PGM 1.0 U5, but same data - a "true" v1.0 most likely labeled as DYNO BIM U5 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dyno_pgm_1.1_u5.u5", 0x00000, 0x10000, CRC(98452c40) SHA1(9b9316fc258792e0d825f16e0fadf8e0c35a864e) )
 
@@ -2273,10 +2273,10 @@ ROM_START( dynobop )
 	ROM_LOAD( "dyno_snd-u27.u27", 0x08000, 0x8000, CRC(a37d862b) SHA1(922eeae184df2c5c28040da27699dd55744f8dca) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "dynobop.u53", 0x00000, 0x0800, CRC(04b85918) SHA1(409aef2e71937c7654334999df9313909d757966) )
-	ROM_CONTINUE(            0x00000, 0x0800 )
-	ROM_CONTINUE(            0x00000, 0x0800 )
-	ROM_CONTINUE(            0x00000, 0x0800 )
+	ROM_LOAD( "z80_pgm_u53.u53", 0x00000, 0x0800, CRC(04b85918) SHA1(409aef2e71937c7654334999df9313909d757966) ) /* labeled Z80 PGM (U53) */
+	ROM_CONTINUE(                0x00000, 0x0800 )
+	ROM_CONTINUE(                0x00000, 0x0800 )
+	ROM_CONTINUE(                0x00000, 0x0800 )
 
 	ROM_REGION( 0xc0000, "grom", 0 )
 	ROM_LOAD( "grom00-dyno.grom0", 0x00000, 0x20000, CRC(3525a7a3) SHA1(fe0b08203c135d55507506936dc34e1503e4906b) )
@@ -2335,17 +2335,17 @@ ROM_END
 
 ROM_START( pokrdice )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pd-v17.u5", 0x00000, 0x10000, CRC(5e24be82) SHA1(97e50cc023ff651fb09cc5e85a1bef1bc234ccb9) )
+	ROM_LOAD( "pd-v1.7_u5.u5", 0x00000, 0x10000, CRC(5e24be82) SHA1(97e50cc023ff651fb09cc5e85a1bef1bc234ccb9) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "pd-snd.bin", 0x08000, 0x8000, CRC(4925401c) SHA1(e35983bec4a0dd4cb1d942fd909790b1adeb415d) )
+	ROM_LOAD( "pd-snd.u27", 0x08000, 0x8000, CRC(4925401c) SHA1(e35983bec4a0dd4cb1d942fd909790b1adeb415d) )
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "pd-grom0.bin", 0x00000, 0x20000, CRC(7c2573e7) SHA1(d6a2a16277ad854c66927d88c5617d05eefe1057) )
-	ROM_LOAD( "pd-grom1.bin", 0x20000, 0x20000, CRC(e7c06aeb) SHA1(4be54b078d886359bf6ed376019cc1f6f04f52d6) )
+	ROM_LOAD( "pd-grom0.grom0", 0x00000, 0x20000, CRC(7c2573e7) SHA1(d6a2a16277ad854c66927d88c5617d05eefe1057) )
+	ROM_LOAD( "pd-grom1.grom1", 0x20000, 0x20000, CRC(e7c06aeb) SHA1(4be54b078d886359bf6ed376019cc1f6f04f52d6) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "pd-srom.0", 0x00000, 0x10000, CRC(f85dbd6f) SHA1(fce53019432e4a84e52f0ae1996b2e0d94b32bc0) )
+	ROM_LOAD( "pd-srom0.srom0", 0x00000, 0x10000, CRC(f85dbd6f) SHA1(fce53019432e4a84e52f0ae1996b2e0d94b32bc0) )
 ROM_END
 
 
@@ -2483,10 +2483,10 @@ ROM_END
 
 ROM_START( rimrockn )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "rrb.bin_2.2.u5", 0x00000, 0x20000, CRC(97777683) SHA1(0998dde26daaa2d2b78e83647e03ba01b0ef31f2) )
+	ROM_LOAD( "rrb.bim_2.2_u5.u5", 0x00000, 0x20000, CRC(97777683) SHA1(0998dde26daaa2d2b78e83647e03ba01b0ef31f2) ) /* Labeled as RRB.BIM 2.2 U5 */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "rrbsndv11.u27", 0x08000, 0x8000, CRC(59f87f0e) SHA1(46f38aca35a7c2faee227b4c950d20a6076c6fa7) ) /* Labeled as RRBSND V1.1 U27 */
+	ROM_LOAD( "rrbsnd_v1.1_u27.u27", 0x08000, 0x8000, CRC(59f87f0e) SHA1(46f38aca35a7c2faee227b4c950d20a6076c6fa7) ) /* Labeled as RRBSND V1.1 U27 */
 
 	ROM_REGION( 0x100000, "grom", 0 )
 	ROM_LOAD( "rbb-grom00",   0x00000, 0x40000, CRC(3eacbad9) SHA1(bff1ec6a24ccf983434e4e9453c30f36fa397534) )
@@ -2506,10 +2506,10 @@ ROM_END
 
 ROM_START( rimrockn20 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "rrb.bin_2.0.u5", 0x00000, 0x20000, CRC(7e9d5545) SHA1(2aa028b3f5d05bec4ee289e7d39eaad30b3d4d5f) )
+	ROM_LOAD( "rrb.bim_2.0_u5.u5", 0x00000, 0x20000, CRC(7e9d5545) SHA1(2aa028b3f5d05bec4ee289e7d39eaad30b3d4d5f) ) /* Labeled as RRB.BIM 2.0 U5 */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "rrbsndv11.u27", 0x08000, 0x8000, CRC(59f87f0e) SHA1(46f38aca35a7c2faee227b4c950d20a6076c6fa7) ) /* Labeled as RRBSND V1.1 U27 */
+	ROM_LOAD( "rrbsnd_v1.1_u27.u27", 0x08000, 0x8000, CRC(59f87f0e) SHA1(46f38aca35a7c2faee227b4c950d20a6076c6fa7) ) /* Labeled as RRBSND V1.1 U27 */
 
 	ROM_REGION( 0x100000, "grom", 0 )
 	ROM_LOAD( "rbb-grom00",   0x00000, 0x40000, CRC(3eacbad9) SHA1(bff1ec6a24ccf983434e4e9453c30f36fa397534) )
@@ -2524,10 +2524,28 @@ ROM_END
 
 ROM_START( rimrockn16 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "rrb.bin_1.6.u5",0x00000, 0x20000, CRC(999cd502) SHA1(8ad0d641a9f853eff27be1d4de04ab86b9275d57) )
+	ROM_LOAD( "rrb.bim_1.6_u5.u5",0x00000, 0x20000, CRC(999cd502) SHA1(8ad0d641a9f853eff27be1d4de04ab86b9275d57) ) /* Labeled as RRB.BIM 1.6 U5 */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "rrbsndv11.u27", 0x08000, 0x8000, CRC(59f87f0e) SHA1(46f38aca35a7c2faee227b4c950d20a6076c6fa7) ) /* Labeled as RRBSND V1.1 U27 */
+	ROM_LOAD( "rrbsnd_v1.1_u27.u27", 0x08000, 0x8000, CRC(59f87f0e) SHA1(46f38aca35a7c2faee227b4c950d20a6076c6fa7) ) /* Labeled as RRBSND V1.1 U27 */
+
+	ROM_REGION( 0x100000, "grom", 0 )
+	ROM_LOAD( "rbb-grom00", 0x00000, 0x40000, CRC(3eacbad9) SHA1(bff1ec6a24ccf983434e4e9453c30f36fa397534) )
+	ROM_LOAD( "rbb-grom01", 0x40000, 0x40000, CRC(864cc269) SHA1(06f92889cd20881faeb59ec06ca1578ead2294f4) )
+	ROM_LOAD( "rbb-grom02", 0x80000, 0x40000, CRC(34e567d5) SHA1(d0eb6fd0da8b9c3bfe7d4ecfb4bd903e4926b63a) )
+	ROM_LOAD( "rbb-grom03", 0xc0000, 0x40000, CRC(fd18045d) SHA1(a1b98e4a2aa6f3cd33a3e2f5744160e05cc9f8d1) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "rbb-srom0", 0x00000, 0x40000, CRC(7ad42be0) SHA1(c9b519bad3c5c9a3315d1bf3292cc30ee0771db7) )
+ROM_END
+
+
+ROM_START( rimrockn15 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "rrb.bim_1.5_u5.u5",0x00000, 0x20000, CRC(d6c25bdf) SHA1(8255313e93a4afbe537ae61f5219e51fcf60d6b7) ) /* Labeled as RRB.BIM 1.5 U5 */
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "rrbsnd_v1.1_u27.u27", 0x08000, 0x8000, CRC(59f87f0e) SHA1(46f38aca35a7c2faee227b4c950d20a6076c6fa7) ) /* Labeled as RRBSND V1.1 U27 */
 
 	ROM_REGION( 0x100000, "grom", 0 )
 	ROM_LOAD( "rbb-grom00", 0x00000, 0x40000, CRC(3eacbad9) SHA1(bff1ec6a24ccf983434e4e9453c30f36fa397534) )
@@ -2542,10 +2560,10 @@ ROM_END
 
 ROM_START( rimrockn12 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "rrb.bin_1.2.u5",0x00000, 0x20000, CRC(661761a6) SHA1(7224b1eac2fd0969d70657448ab241a433143df4) )
+	ROM_LOAD( "rrb.bim_1.2_u5.u5",0x00000, 0x20000, CRC(661761a6) SHA1(7224b1eac2fd0969d70657448ab241a433143df4) ) /* Labeled as RRB.BIM 1.2 U5 */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "rrbsndv1.u27", 0x08000, 0x8000, CRC(8eda5f53) SHA1(f256544a8c87125587719460ed0fef14efef9015) )
+	ROM_LOAD( "rrbsnd_v1_u27.u27", 0x08000, 0x8000, CRC(8eda5f53) SHA1(f256544a8c87125587719460ed0fef14efef9015) ) /* Labeled as RRBSND V1 U27 */
 
 	ROM_REGION( 0x100000, "grom", 0 )
 	ROM_LOAD( "rbb-grom00", 0x00000, 0x40000, CRC(3eacbad9) SHA1(bff1ec6a24ccf983434e4e9453c30f36fa397534) )
@@ -2609,7 +2627,7 @@ ROM_END
 
 ROM_START( gpgolf ) /* P/N 1047 REV. 1 main board + P/N 1038 REV2 sound board */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "gpgv1_1.bin", 0x00000, 0x10000, CRC(631e77e0) SHA1(847ba1e00d31441620a2a1f45a9aa58df84bde8b) ) /* Joystick version 1.1 */
+	ROM_LOAD( "gpg_v1.1.u5", 0x00000, 0x10000, CRC(631e77e0) SHA1(847ba1e00d31441620a2a1f45a9aa58df84bde8b) ) /* Joystick version 1.1 */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "sndv1.u27", 0x08000, 0x8000, CRC(55734876) SHA1(eb5ef816acbc6e35642749e38a2908b7ba359b9d) )
@@ -2631,7 +2649,7 @@ ROM_START( gpgolfa ) /* P/N 1047 REV. 1 main board + P/N 1038 REV2 sound board *
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "golf_sound_12-19-91_v.96.u27", 0x00000, 0x10000, CRC(f46b4300) SHA1(7be1878b72c55fb83b2cae3b79b1f65fe8825b4a) ) /* 27C512 with the first 0x8000 as 0xFF fill - handwritten label  GOLF SOUND  12/19/91  V.96 */
-//	ROM_LOAD( "golf_sound.u27", 0x08000, 0x8000, CRC(3183d7f3) SHA1(482411947aa3074cec7d4491f6ee64785894d27c) ) /* Different than sndv1.u27 */
+//  ROM_LOAD( "golf_sound.u27", 0x08000, 0x8000, CRC(3183d7f3) SHA1(482411947aa3074cec7d4491f6ee64785894d27c) ) /* Different than sndv1.u27 */
 
 	ROM_REGION( 0xc0000, "grom", 0 )
 	ROM_LOAD( "grom00.grom0", 0x00000, 0x40000, CRC(c3a7b54b) SHA1(414d693bc5337d578d2630817dd647cf7e5cbcf7) )
@@ -2742,7 +2760,7 @@ void itech8_state::init_neckneck()
 
 /* Wheel of Fortune-style PCB */
 GAME( 1989, wfortune,   0,         wfortune,          wfortune, itech8_state, empty_init,    ROT0,   "GameTek", "Wheel Of Fortune (set 1)", 0 )
-GAME( 1989, wfortunea,  wfortune,  wfortune,          wfortune, itech8_state, empty_init,    ROT0,   "GameTek", "Wheel Of Fortune (set 2)", 0 )
+GAME( 1989, wfortunea,  wfortune,  wfortune,          wfortune, itech8_state, empty_init,    ROT0,   "GameTek", "Wheel Of Fortune (set 2)", 0 ) /* program ROM label states "R1" */
 
 /* Grudge Match-style PCB */
 GAME( 1989, grmatch,    0,         grmatch,           grmatch,  grmatch_state, empty_init,   ROT0,   "Yankee Game Technology", "Grudge Match (Yankee Game Technology)", 0 )
@@ -2779,6 +2797,7 @@ GAME( 1992, neckneck,   0,         hstennis_lo,       neckneck, itech8_state, in
 GAME( 1991, rimrockn,    0,        rimrockn,          rimrockn, itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.2)", 0 )
 GAME( 1991, rimrockn20,  rimrockn, rimrockn,          rimrockn, itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.0)", 0 )
 GAME( 1991, rimrockn16,  rimrockn, rimrockn,          rimrockn, itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.6)", 0 )
+GAME( 1991, rimrockn15,  rimrockn, rimrockn,          rimrockn, itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.5)", 0 )
 GAME( 1991, rimrockn12,  rimrockn, rimrockn,          rimrockn, itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.2)", 0 )
 GAME( 1991, rimrockn12b, rimrockn, rimrockn,          rimrockn, itech8_state, empty_init,    ROT0,   "bootleg",                        "Rim Rockin' Basketball (V1.2, bootleg)", 0 )
 

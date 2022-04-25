@@ -238,7 +238,7 @@ Usage:
 #include "includes/vip.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -279,7 +279,7 @@ void vip_state::update_interrupts()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER(vip_state::read)
+uint8_t vip_state::read(offs_t offset)
 {
 	int cs = BIT(offset, 15) || m_8000;
 	int cdef = !((offset >= 0xc00) && (offset < 0x1000));
@@ -304,7 +304,7 @@ READ8_MEMBER(vip_state::read)
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER(vip_state::write)
+void vip_state::write(offs_t offset, uint8_t data)
 {
 	int cs = BIT(offset, 15) || m_8000;
 	int cdef = !((offset >= 0xc00) && (offset < 0x1000));
@@ -323,7 +323,7 @@ WRITE8_MEMBER(vip_state::write)
 //  io_r -
 //-------------------------------------------------
 
-READ8_MEMBER(vip_state::io_r)
+uint8_t vip_state::io_r(offs_t offset)
 {
 	uint8_t data = m_exp->io_r(offset);
 
@@ -352,7 +352,7 @@ READ8_MEMBER(vip_state::io_r)
 //  io_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER(vip_state::io_w)
+void vip_state::io_w(offs_t offset, uint8_t data)
 {
 	m_exp->io_w(offset, data);
 
@@ -755,12 +755,14 @@ void vip_state::vip(machine_config &config)
 	m_exp->dma_in_wr_callback().set(FUNC(vip_state::exp_dma_in_w));
 
 	// devices
-	QUICKLOAD(config, "quickload", "bin,c8,c8x").set_load_callback(FUNC(vip_state::quickload_cb));
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "bin,c8", attotime::from_seconds(2)));
+	quickload.set_load_callback(FUNC(vip_state::quickload_cb));
+	quickload.set_interface("chip8quik");
+	SOFTWARE_LIST(config, "quik_list").set_original("chip8_quik").set_filter("V");
+
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("vip_cass");
-
-	// software lists
 	SOFTWARE_LIST(config, "cass_list").set_original("vip");
 
 	// internal ram

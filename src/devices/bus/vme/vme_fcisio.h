@@ -30,11 +30,11 @@ protected:
 private:
 	uint8_t config_rd();
 
-	DECLARE_READ16_MEMBER (bootvect_r);
+	uint16_t bootvect_r(offs_t offset);
 
 	/* Dummy driver routines */
-	DECLARE_READ8_MEMBER (not_implemented_r);
-	DECLARE_WRITE8_MEMBER (not_implemented_w);
+	uint8_t not_implemented_r();
+	void not_implemented_w(uint8_t data);
 
 	void fcisio1_mem(address_map &map);
 

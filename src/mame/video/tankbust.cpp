@@ -97,25 +97,25 @@ void tankbust_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(tankbust_state::background_videoram_w)
+void tankbust_state::background_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(tankbust_state::background_colorram_w)
+void tankbust_state::background_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(tankbust_state::txtram_w)
+void tankbust_state::txtram_w(offs_t offset, uint8_t data)
 {
 	m_txtram[offset] = data;
 	m_txt_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(tankbust_state::xscroll_w)
+void tankbust_state::xscroll_w(offs_t offset, uint8_t data)
 {
 	if( m_xscroll[offset] != data )
 	{
@@ -131,7 +131,7 @@ WRITE8_MEMBER(tankbust_state::xscroll_w)
 }
 
 
-WRITE8_MEMBER(tankbust_state::yscroll_w)
+void tankbust_state::yscroll_w(offs_t offset, uint8_t data)
 {
 	if( m_yscroll[offset] != data )
 	{

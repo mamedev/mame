@@ -349,9 +349,8 @@ Notes:
 #include "machine/watchdog.h"
 #include "machine/vt83c461.h"
 #include "sound/cdda.h"
-#include "sound/volt_reg.h"
 #include "cdrom.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #define COJAG_CLOCK         XTAL(52'000'000)
@@ -565,7 +564,7 @@ static NVRAM_HANDLER( jaguar )
     }
 }
 */
-WRITE32_MEMBER(jaguar_state::eeprom_w)
+void jaguar_state::eeprom_w(uint32_t data)
 {
 	m_eeprom_bit_count++;
 	if (m_eeprom_bit_count != 9)        /* kill extra bit at end of address */
@@ -576,7 +575,7 @@ WRITE32_MEMBER(jaguar_state::eeprom_w)
 	}
 }
 
-READ32_MEMBER(jaguar_state::eeprom_clk)
+uint32_t jaguar_state::eeprom_clk()
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -586,7 +585,7 @@ READ32_MEMBER(jaguar_state::eeprom_clk)
 	return 0;
 }
 
-READ32_MEMBER(jaguar_state::eeprom_cs)
+uint32_t jaguar_state::eeprom_cs()
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -608,7 +607,7 @@ READ32_MEMBER(jaguar_state::eeprom_cs)
  *
  *************************************/
 
-READ32_MEMBER(jaguar_state::misc_control_r)
+uint32_t jaguar_state::misc_control_r()
 {
 	/*  D7    = board reset (low)
 	    D6    = audio must & reset (high)
@@ -621,7 +620,7 @@ READ32_MEMBER(jaguar_state::misc_control_r)
 }
 
 
-WRITE32_MEMBER(jaguar_state::misc_control_w)
+void jaguar_state::misc_control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("%s:misc_control_w(%02X)\n", machine().describe_context(), data);
 
@@ -661,12 +660,12 @@ WRITE32_MEMBER(jaguar_state::misc_control_w)
  *
  *************************************/
 
-READ32_MEMBER(jaguar_state::gpuctrl_r)
+uint32_t jaguar_state::gpuctrl_r(offs_t offset, uint32_t mem_mask)
 {
 	return m_gpu->iobus_r(offset, mem_mask);
 }
 
-WRITE32_MEMBER(jaguar_state::gpuctrl_w)
+void jaguar_state::gpuctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_gpu->iobus_w(offset, data, mem_mask);
 }
@@ -677,12 +676,12 @@ WRITE32_MEMBER(jaguar_state::gpuctrl_w)
  *
  *************************************/
 
-READ32_MEMBER(jaguar_state::dspctrl_r)
+uint32_t jaguar_state::dspctrl_r(offs_t offset, uint32_t mem_mask)
 {
 	return m_dsp->iobus_r(offset, mem_mask);
 }
 
-WRITE32_MEMBER(jaguar_state::dspctrl_w)
+void jaguar_state::dspctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_dsp->iobus_w(offset, data, mem_mask);
 }
@@ -696,7 +695,7 @@ WRITE32_MEMBER(jaguar_state::dspctrl_w)
  *
  *************************************/
 
-READ32_MEMBER(jaguar_state::joystick_r)
+uint32_t jaguar_state::joystick_r()
 {
 	uint16_t joystick_result = 0xfffe;
 	uint16_t joybuts_result = 0xffef;
@@ -730,7 +729,7 @@ READ32_MEMBER(jaguar_state::joystick_r)
 	return (joystick_result << 16) | joybuts_result;
 }
 
-WRITE32_MEMBER(jaguar_state::joystick_w)
+void jaguar_state::joystick_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/*
 	 *   16        12         8         4         0
@@ -788,7 +787,7 @@ WRITE32_MEMBER(jaguar_state::joystick_w)
  *
  *************************************/
 
-WRITE32_MEMBER(jaguar_state::latch_w)
+void jaguar_state::latch_w(uint32_t data)
 {
 	logerror("%08X:latch_w(%X)\n", m_maincpu->pcbase(), data);
 
@@ -811,7 +810,7 @@ WRITE32_MEMBER(jaguar_state::latch_w)
  *
  *************************************/
 
-READ32_MEMBER(jaguar_state::eeprom_data_r)
+uint32_t jaguar_state::eeprom_data_r(offs_t offset)
 {
 	if (m_is_r3000)
 		return m_nvram[offset] | 0xffffff00;
@@ -820,13 +819,13 @@ READ32_MEMBER(jaguar_state::eeprom_data_r)
 }
 
 
-WRITE32_MEMBER(jaguar_state::eeprom_enable_w)
+void jaguar_state::eeprom_enable_w(uint32_t data)
 {
 	m_eeprom_enable = true;
 }
 
 
-WRITE32_MEMBER(jaguar_state::eeprom_data_w)
+void jaguar_state::eeprom_data_w(offs_t offset, uint32_t data)
 {
 //  if (m_eeprom_enable)
 	{
@@ -870,7 +869,7 @@ WRITE32_MEMBER(jaguar_state::eeprom_data_w)
 */
 
 
-WRITE32_MEMBER(jaguar_state::gpu_jump_w)
+void jaguar_state::gpu_jump_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* update the data in memory */
 	COMBINE_DATA(m_gpu_jump_address);
@@ -885,7 +884,7 @@ WRITE32_MEMBER(jaguar_state::gpu_jump_w)
 }
 
 
-READ32_MEMBER(jaguar_state::gpu_jump_r)
+uint32_t jaguar_state::gpu_jump_r()
 {
 	/* if the current GPU command is just pointing back to the spin loop, and */
 	/* we're reading it from the spin loop, we can optimize */
@@ -926,7 +925,7 @@ READ32_MEMBER(jaguar_state::gpu_jump_r)
 #if ENABLE_SPEEDUP_HACKS
 
 
-READ32_MEMBER(jaguar_state::cojagr3k_main_speedup_r)
+uint32_t jaguar_state::cojagr3k_main_speedup_r()
 {
 	uint64_t curcycles = m_maincpu->total_cycles();
 
@@ -974,7 +973,7 @@ READ32_MEMBER(jaguar_state::cojagr3k_main_speedup_r)
 #if ENABLE_SPEEDUP_HACKS
 
 
-READ32_MEMBER(jaguar_state::main_gpu_wait_r)
+uint32_t jaguar_state::main_gpu_wait_r()
 {
 	if (m_gpu_command_pending)
 		m_maincpu->spin_until_interrupt();
@@ -1000,7 +999,7 @@ READ32_MEMBER(jaguar_state::main_gpu_wait_r)
 
 #if ENABLE_SPEEDUP_HACKS
 
-WRITE32_MEMBER(jaguar_state::area51_main_speedup_w)
+void jaguar_state::area51_main_speedup_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint64_t curcycles = m_maincpu->total_cycles();
 
@@ -1034,7 +1033,7 @@ WRITE32_MEMBER(jaguar_state::area51_main_speedup_w)
     against 0 must handle that explicitly.
 */
 
-WRITE32_MEMBER(jaguar_state::area51mx_main_speedup_w)
+void jaguar_state::area51mx_main_speedup_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint64_t curcycles = m_maincpu->total_cycles();
 
@@ -1072,41 +1071,41 @@ WRITE32_MEMBER(jaguar_state::area51mx_main_speedup_w)
 // surely these should be 16-bit natively if the standard Jaguar is driven by a plain 68k?
 // all these trampolines are not good for performance ;-)
 
-READ16_MEMBER(jaguar_state::gpuctrl_r16){ if (!(offset&1)) { return gpuctrl_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return gpuctrl_r(space, offset>>1, mem_mask); } }
-WRITE16_MEMBER(jaguar_state::gpuctrl_w16){ if (!(offset&1)) { gpuctrl_w(space, offset>>1, data << 16, mem_mask << 16); } else { gpuctrl_w(space, offset>>1, data, mem_mask); } }
-READ16_MEMBER(jaguar_state::blitter_r16){ if (!(offset&1)) { return blitter_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return blitter_r(space, offset>>1, mem_mask); } }
-WRITE16_MEMBER(jaguar_state::blitter_w16){ if (!(offset&1)) { blitter_w(space, offset>>1, data << 16, mem_mask << 16); } else { blitter_w(space, offset>>1, data, mem_mask); } }
-READ16_MEMBER(jaguar_state::serial_r16){ if (!(offset&1)) { return serial_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return serial_r(space, offset>>1, mem_mask); } }
-WRITE16_MEMBER(jaguar_state::serial_w16){ if (!(offset&1)) { serial_w(space, offset>>1, data << 16, mem_mask << 16); } else { serial_w(space, offset>>1, data, mem_mask); } }
-READ16_MEMBER(jaguar_state::dspctrl_r16){ if (!(offset&1)) { return dspctrl_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return dspctrl_r(space, offset>>1, mem_mask); } }
-WRITE16_MEMBER(jaguar_state::dspctrl_w16){ if (!(offset&1)) { dspctrl_w(space, offset>>1, data << 16, mem_mask << 16); } else { dspctrl_w(space, offset>>1, data, mem_mask); } }
-READ16_MEMBER(jaguar_state::eeprom_cs16){ if (!(offset&1)) { return eeprom_cs(space, offset>>1, mem_mask<<16) >> 16;  } else { return eeprom_cs(space, offset>>1, mem_mask); } }
-READ16_MEMBER(jaguar_state::eeprom_clk16){ if (!(offset&1)) { return eeprom_clk(space, offset>>1, mem_mask<<16) >> 16;  } else { return eeprom_clk(space, offset>>1, mem_mask); } }
-WRITE16_MEMBER(jaguar_state::eeprom_w16){ if (!(offset&1)) { eeprom_w(space, offset>>1, data << 16, mem_mask << 16); } else { eeprom_w(space, offset>>1, data, mem_mask); } }
-READ16_MEMBER(jaguar_state::joystick_r16){ if (!(offset&1)) { return joystick_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return joystick_r(space, offset>>1, mem_mask); } }
-WRITE16_MEMBER(jaguar_state::joystick_w16){ if (!(offset&1)) { joystick_w(space, offset>>1, data << 16, mem_mask << 16); } else { joystick_w(space, offset>>1, data, mem_mask); } }
+uint16_t jaguar_state::gpuctrl_r16(offs_t offset, uint16_t mem_mask){ if (!(offset&1)) { return gpuctrl_r(offset>>1, mem_mask<<16) >> 16;  } else { return gpuctrl_r(offset>>1, mem_mask); } }
+void jaguar_state::gpuctrl_w16(offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { gpuctrl_w(offset>>1, data << 16, mem_mask << 16); } else { gpuctrl_w(offset>>1, data, mem_mask); } }
+uint16_t jaguar_state::blitter_r16(offs_t offset, uint16_t mem_mask){ if (!(offset&1)) { return blitter_r(offset>>1, mem_mask<<16) >> 16;  } else { return blitter_r(offset>>1, mem_mask); } }
+void jaguar_state::blitter_w16(offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { blitter_w(offset>>1, data << 16, mem_mask << 16); } else { blitter_w(offset>>1, data, mem_mask); } }
+uint16_t jaguar_state::serial_r16(offs_t offset){ if (!(offset&1)) { return serial_r(offset>>1) >> 16;  } else { return serial_r(offset>>1); } }
+void jaguar_state::serial_w16(offs_t offset, uint16_t data){ if (!(offset&1)) { serial_w(offset>>1, data << 16); } else { serial_w(offset>>1, data); } }
+uint16_t jaguar_state::dspctrl_r16(offs_t offset, uint16_t mem_mask){ if (!(offset&1)) { return dspctrl_r(offset>>1, mem_mask<<16) >> 16;  } else { return dspctrl_r(offset>>1, mem_mask); } }
+void jaguar_state::dspctrl_w16(offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { dspctrl_w(offset>>1, data << 16, mem_mask << 16); } else { dspctrl_w(offset>>1, data, mem_mask); } }
+uint16_t jaguar_state::eeprom_cs16(offs_t offset){ if (!(offset&1)) { return eeprom_cs() >> 16;  } else { return eeprom_cs(); } }
+uint16_t jaguar_state::eeprom_clk16(offs_t offset){ if (!(offset&1)) { return eeprom_clk() >> 16;  } else { return eeprom_clk(); } }
+void jaguar_state::eeprom_w16(offs_t offset, uint16_t data){ if (!(offset&1)) { eeprom_w(data << 16); } else { eeprom_w(data); } }
+uint16_t jaguar_state::joystick_r16(offs_t offset){ if (!(offset&1)) { return joystick_r() >> 16;  } else { return joystick_r(); } }
+void jaguar_state::joystick_w16(offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { joystick_w(offset>>1, data << 16, mem_mask << 16); } else { joystick_w(offset>>1, data, mem_mask); } }
 
-READ32_MEMBER(jaguar_state::shared_ram_r){ return m_shared_ram[offset]; }
-WRITE32_MEMBER(jaguar_state::shared_ram_w){ COMBINE_DATA(&m_shared_ram[offset]); }
-READ32_MEMBER(jaguar_state::rom_base_r){ return m_rom_base[offset*2+1] << 16 | m_rom_base[offset*2]; }
-READ32_MEMBER(jaguar_state::wave_rom_r){ return m_wave_rom[offset*2+1] << 16 | m_wave_rom[offset*2]; }
-READ32_MEMBER(jaguarcd_state::cd_bios_r){ return m_cd_bios[offset*2+1] << 16 | m_cd_bios[offset*2]; }
-READ32_MEMBER(jaguar_state::dsp_ram_r){ return m_dsp_ram[offset]; }
-WRITE32_MEMBER(jaguar_state::dsp_ram_w){ COMBINE_DATA(&m_dsp_ram[offset]); }
-READ32_MEMBER(jaguar_state::gpu_clut_r){ return m_gpu_clut[offset]; }
-WRITE32_MEMBER(jaguar_state::gpu_clut_w){ COMBINE_DATA(&m_gpu_clut[offset]); }
-READ32_MEMBER(jaguar_state::gpu_ram_r){ return m_gpu_ram[offset]; }
-WRITE32_MEMBER(jaguar_state::gpu_ram_w){ COMBINE_DATA(&m_gpu_ram[offset]); }
+uint32_t jaguar_state::shared_ram_r(offs_t offset){ return m_shared_ram[offset]; }
+void jaguar_state::shared_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask){ COMBINE_DATA(&m_shared_ram[offset]); }
+uint32_t jaguar_state::rom_base_r(offs_t offset){ return m_rom_base[offset*2+1] << 16 | m_rom_base[offset*2]; }
+uint32_t jaguar_state::wave_rom_r(offs_t offset){ return m_wave_rom[offset*2+1] << 16 | m_wave_rom[offset*2]; }
+uint32_t jaguarcd_state::cd_bios_r(offs_t offset){ return m_cd_bios[offset*2+1] << 16 | m_cd_bios[offset*2]; }
+uint32_t jaguar_state::dsp_ram_r(offs_t offset){ return m_dsp_ram[offset]; }
+void jaguar_state::dsp_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask){ COMBINE_DATA(&m_dsp_ram[offset]); }
+uint32_t jaguar_state::gpu_clut_r(offs_t offset){ return m_gpu_clut[offset]; }
+void jaguar_state::gpu_clut_w(offs_t offset, uint32_t data, uint32_t mem_mask){ COMBINE_DATA(&m_gpu_clut[offset]); }
+uint32_t jaguar_state::gpu_ram_r(offs_t offset){ return m_gpu_ram[offset]; }
+void jaguar_state::gpu_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask){ COMBINE_DATA(&m_gpu_ram[offset]); }
 
-READ16_MEMBER(jaguar_state::shared_ram_r16){ if (!(offset&1)) { return shared_ram_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return shared_ram_r(space, offset>>1, mem_mask); } }
-WRITE16_MEMBER(jaguar_state::shared_ram_w16){ if (!(offset&1)) { shared_ram_w(space, offset>>1, data << 16, mem_mask << 16); } else { shared_ram_w(space, offset>>1, data, mem_mask); } }
-READ16_MEMBER(jaguar_state::cart_base_r16){ if (!(offset&1)) { return m_cart_base[offset>>1] >> 16;  } else { return m_cart_base[offset>>1] & 0xffff; } }
-READ16_MEMBER(jaguar_state::dsp_ram_r16){ if (!(offset&1)) { return dsp_ram_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return dsp_ram_r(space, offset>>1, mem_mask); } }
-WRITE16_MEMBER(jaguar_state::dsp_ram_w16){ if (!(offset&1)) { dsp_ram_w(space, offset>>1, data << 16, mem_mask << 16); } else { dsp_ram_w(space, offset>>1, data, mem_mask); } }
-READ16_MEMBER(jaguar_state::gpu_clut_r16){ if (!(offset&1)) { return gpu_clut_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return gpu_clut_r(space, offset>>1, mem_mask); } }
-WRITE16_MEMBER(jaguar_state::gpu_clut_w16){ if (!(offset&1)) { gpu_clut_w(space, offset>>1, data << 16, mem_mask << 16); } else { gpu_clut_w(space, offset>>1, data, mem_mask); } }
-READ16_MEMBER(jaguar_state::gpu_ram_r16){ if (!(offset&1)) { return gpu_ram_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return gpu_ram_r(space, offset>>1, mem_mask); } }
-WRITE16_MEMBER(jaguar_state::gpu_ram_w16){ if (!(offset&1)) { gpu_ram_w(space, offset>>1, data << 16, mem_mask << 16); } else { gpu_ram_w(space, offset>>1, data, mem_mask); } }
+uint16_t jaguar_state::shared_ram_r16(offs_t offset){ if (!(offset&1)) { return shared_ram_r(offset>>1) >> 16;  } else { return shared_ram_r(offset>>1); } }
+void jaguar_state::shared_ram_w16(offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { shared_ram_w(offset>>1, data << 16, mem_mask << 16); } else { shared_ram_w(offset>>1, data, mem_mask); } }
+uint16_t jaguar_state::cart_base_r16(offs_t offset){ if (!(offset&1)) { return m_cart_base[offset>>1] >> 16;  } else { return m_cart_base[offset>>1] & 0xffff; } }
+uint16_t jaguar_state::dsp_ram_r16(offs_t offset){ if (!(offset&1)) { return dsp_ram_r(offset>>1) >> 16;  } else { return dsp_ram_r(offset>>1); } }
+void jaguar_state::dsp_ram_w16(offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { dsp_ram_w(offset>>1, data << 16, mem_mask << 16); } else { dsp_ram_w(offset>>1, data, mem_mask); } }
+uint16_t jaguar_state::gpu_clut_r16(offs_t offset){ if (!(offset&1)) { return gpu_clut_r(offset>>1) >> 16;  } else { return gpu_clut_r(offset>>1); } }
+void jaguar_state::gpu_clut_w16(offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { gpu_clut_w(offset>>1, data << 16, mem_mask << 16); } else { gpu_clut_w(offset>>1, data, mem_mask); } }
+uint16_t jaguar_state::gpu_ram_r16(offs_t offset){ if (!(offset&1)) { return gpu_ram_r(offset>>1) >> 16;  } else { return gpu_ram_r(offset>>1); } }
+void jaguar_state::gpu_ram_w16(offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { gpu_ram_w(offset>>1, data << 16, mem_mask << 16); } else { gpu_ram_w(offset>>1, data, mem_mask); } }
 
 void jaguar_state::console_base_map(address_map &map)
 {
@@ -1207,10 +1206,10 @@ TODO: this needs to be device-ized, of course ...
 
 */
 
-READ16_MEMBER(jaguarcd_state::butch_regs_r16){ if (!(offset&1)) { return butch_regs_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return butch_regs_r(space, offset>>1, mem_mask); } }
-WRITE16_MEMBER(jaguarcd_state::butch_regs_w16){ if (!(offset&1)) { butch_regs_w(space, offset>>1, data << 16, mem_mask << 16); } else { butch_regs_w(space, offset>>1, data, mem_mask); } }
+uint16_t jaguarcd_state::butch_regs_r16(offs_t offset){ if (!(offset&1)) { return butch_regs_r(offset>>1) >> 16;  } else { return butch_regs_r(offset>>1); } }
+void jaguarcd_state::butch_regs_w16(offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { butch_regs_w(offset>>1, data << 16, mem_mask << 16); } else { butch_regs_w(offset>>1, data, mem_mask); } }
 
-READ32_MEMBER(jaguarcd_state::butch_regs_r)
+uint32_t jaguarcd_state::butch_regs_r(offs_t offset)
 {
 	switch(offset*4)
 	{
@@ -1222,9 +1221,12 @@ READ32_MEMBER(jaguarcd_state::butch_regs_r)
 	return m_butch_regs[offset];
 }
 
-WRITE32_MEMBER(jaguarcd_state::butch_regs_w)
+void jaguarcd_state::butch_regs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_butch_regs[offset]);
+
+	if (!m_cd_file)
+		return;
 
 	switch(offset*4)
 	{
@@ -1243,12 +1245,12 @@ WRITE32_MEMBER(jaguarcd_state::butch_regs_w)
 						return;
 					}
 
-					msf = cdrom_get_track_start(m_cd_file, 0) + 150;
+					msf = m_cd_file->get_track_start(0) + 150;
 
 					/* first track number */
 					m_butch_cmd_response[0] = 0x2000 | 1;
 					/* last track number */
-					m_butch_cmd_response[1] = 0x2100 | cdrom_get_last_track(m_cd_file);
+					m_butch_cmd_response[1] = 0x2100 | m_cd_file->get_last_track();
 
 					/* start of first track minutes */
 					m_butch_cmd_response[2] = 0x2200 | ((msf / 60) / 60);
@@ -1263,11 +1265,11 @@ WRITE32_MEMBER(jaguarcd_state::butch_regs_w)
 				case 0x14: // Read Long TOC
 					{
 						uint32_t msf;
-						int ntrks = cdrom_get_last_track(m_cd_file);
+						int ntrks = m_cd_file->get_last_track();
 
 						for(int i=0;i<ntrks;i++)
 						{
-							msf = cdrom_get_track_start(m_cd_file, i) + 150;
+							msf = m_cd_file->get_track_start(i) + 150;
 
 							/* track number */
 							m_butch_cmd_response[i*5+0] = 0x6000 | (i+1);
@@ -1766,10 +1768,10 @@ void jaguar_state::video_config(machine_config &config, const XTAL clock)
 
 	JAGUARDSP(config, m_dsp, clock);
 	m_dsp->irq().set(FUNC(jaguar_state::dsp_cpu_int));
-	
-	// TODO: Tom 
+
+	// TODO: Tom
 	// TODO: Object Processor
-	
+
 	JAG_BLITTER(config, m_blitter, clock);
 }
 
@@ -1803,12 +1805,7 @@ void jaguar_state::cojagr3k(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // unknown DAC
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
-	
+
 	// TODO: subwoofer speaker
 }
 
@@ -1858,11 +1855,6 @@ void jaguar_state::jaguar(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // unknown DAC
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* quickload */
 	QUICKLOAD(config, "quickload", "abs,bin,cof,jag,prg").set_load_callback(FUNC(jaguar_state::quickload_cb));
@@ -1919,12 +1911,12 @@ void jaguarcd_state::init_jaguarcd()
 	save_item(NAME(m_joystick_data));
 }
 
-image_init_result jaguar_state::quickload_cb(device_image_interface &image, const char *file_type, int quickload_size)
+image_init_result jaguar_state::quickload_cb(device_image_interface &image)
 {
 	offs_t quickload_begin = 0x4000, start = quickload_begin, skip = 0;
 
 	memset(m_shared_ram, 0, 0x200000);
-	quickload_size = std::min(quickload_size, int(0x200000 - quickload_begin));
+	offs_t quickload_size = std::min(offs_t(image.length()), 0x200000 - quickload_begin);
 
 	image.fread( &memregion("maincpu")->base()[quickload_begin], quickload_size);
 
@@ -1971,14 +1963,14 @@ image_init_result jaguar_state::quickload_cb(device_image_interface &image, cons
 	{
 		memset(m_shared_ram, 0, 0x200000);
 		image.fseek(0, SEEK_SET);
-		image.fread( &memregion("maincpu")->base()[start-skip], quickload_size);
+		image.fread( &m_shared_ram[(start-skip)/4], quickload_size);
 		quickload_begin = start;
 		fix_endian(&memregion("maincpu")->base()[(start-skip)&0xfffffc], quickload_size);
 	}
 
 
 	/* Some programs are too lazy to set a stack pointer */
-	m_maincpu->set_state_int(STATE_GENSP, 0x1000);
+	m_maincpu->set_state_int(M68K_SP, 0x1000);
 	m_shared_ram[0]=0x1000;
 
 	/* Transfer control to image */
@@ -2072,10 +2064,10 @@ ROM_END
 
 ROM_START( area51t ) /* 68020 based, Area51 Time Warner License - MAIN: Oct 17 1996 17:15:41 / OS: 2.03CJ Oct 17 1996 17:15:01 */
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for 68020 code */
-	ROM_LOAD32_BYTE( "136105-0003-q_h.3h", 0x00000, 0x80000, CRC(0681f398) SHA1(9e96db5a4ff90800685a5b95f8d758d211d3b982) ) /* Also found labeled as AREA51, 68K, D2FF, 3H, 11/20/96 (each item on a seperate line) */
-	ROM_LOAD32_BYTE( "136105-0002-q_p.3p", 0x00001, 0x80000, CRC(f76cfc68) SHA1(01a781b42b61279e09e0cb1d924e2a3e0df44591) ) /* Also found labeled as AREA51, 68K, 69FE, 3P, 11/20/96 (each item on a seperate line) */
-	ROM_LOAD32_BYTE( "136105-0001-q_m.3m", 0x00002, 0x80000, CRC(f422b4a8) SHA1(f95ef428be18adafae65e35f412eb03dcdaf7ed4) ) /* Also found labeled as AREA51, 68K, FCFD, 3M, 11/20/96 (each item on a seperate line) */
-	ROM_LOAD32_BYTE( "136105-0000-q_k.3k", 0x00003, 0x80000, CRC(1fb2f2b5) SHA1(cbed65463dd93eaf945750a9dc3a123d1c6bda42) ) /* Also found labeled as AREA51, 68K, 65FC, 3K, 11/20/96 (each item on a seperate line) */
+	ROM_LOAD32_BYTE( "136105-0003-q_h.3h", 0x00000, 0x80000, CRC(0681f398) SHA1(9e96db5a4ff90800685a5b95f8d758d211d3b982) ) /* Also found labeled as AREA51, 68K, D2FF, 3H, 11/20/96 (each item on a separate line) */
+	ROM_LOAD32_BYTE( "136105-0002-q_p.3p", 0x00001, 0x80000, CRC(f76cfc68) SHA1(01a781b42b61279e09e0cb1d924e2a3e0df44591) ) /* Also found labeled as AREA51, 68K, 69FE, 3P, 11/20/96 (each item on a separate line) */
+	ROM_LOAD32_BYTE( "136105-0001-q_m.3m", 0x00002, 0x80000, CRC(f422b4a8) SHA1(f95ef428be18adafae65e35f412eb03dcdaf7ed4) ) /* Also found labeled as AREA51, 68K, FCFD, 3M, 11/20/96 (each item on a separate line) */
+	ROM_LOAD32_BYTE( "136105-0000-q_k.3k", 0x00003, 0x80000, CRC(1fb2f2b5) SHA1(cbed65463dd93eaf945750a9dc3a123d1c6bda42) ) /* Also found labeled as AREA51, 68K, 65FC, 3K, 11/20/96 (each item on a separate line) */
 
 	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
@@ -2114,10 +2106,10 @@ ROM_END
 
 ROM_START( area51 ) /* R3000 based, Area51 Atari Games License - MAIN: Oct 24 1996 12:02:23 / GUTS: 2.06CJ Nov 11 1996 11:46:43 */
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for IDT 79R3041 code */
-	ROM_LOAD32_BYTE( "2-c_area_51_hh.hh", 0x00000, 0x80000, CRC(13af6a1e) SHA1(69da54ed6886e825156bbcc256e8d7abd4dc1ff8) ) /* Grean labels: 2-C AREA 51 HH */
-	ROM_LOAD32_BYTE( "2-c_area_51_hl.hl", 0x00001, 0x80000, CRC(8ab6649b) SHA1(9b4945bc04f8a73161638a2c5fa2fd84c6fd31b4) ) /* Grean labels: 2-C AREA 51 HL */
-	ROM_LOAD32_BYTE( "2-c_area_51_lh.lh", 0x00002, 0x80000, CRC(a6524f73) SHA1(ae377a6803a4f7d1bbcc111725af121a3e82317d) ) /* Grean labels: 2-C AREA 51 LH */
-	ROM_LOAD32_BYTE( "2-c_area_51_ll.ll", 0x00003, 0x80000, CRC(471b15d2) SHA1(4b5f45ee140b03a6be61475cae1c2dbef0f07457) ) /* Grean labels: 2-C AREA 51 LL */
+	ROM_LOAD32_BYTE( "2-c_area_51_hh.hh", 0x00000, 0x80000, CRC(13af6a1e) SHA1(69da54ed6886e825156bbcc256e8d7abd4dc1ff8) ) /* Green labels: 2-C AREA 51 HH */
+	ROM_LOAD32_BYTE( "2-c_area_51_hl.hl", 0x00001, 0x80000, CRC(8ab6649b) SHA1(9b4945bc04f8a73161638a2c5fa2fd84c6fd31b4) ) /* Green labels: 2-C AREA 51 HL */
+	ROM_LOAD32_BYTE( "2-c_area_51_lh.lh", 0x00002, 0x80000, CRC(a6524f73) SHA1(ae377a6803a4f7d1bbcc111725af121a3e82317d) ) /* Green labels: 2-C AREA 51 LH */
+	ROM_LOAD32_BYTE( "2-c_area_51_ll.ll", 0x00003, 0x80000, CRC(471b15d2) SHA1(4b5f45ee140b03a6be61475cae1c2dbef0f07457) ) /* Green labels: 2-C AREA 51 LL */
 
 	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
@@ -2126,10 +2118,11 @@ ROM_START( area51 ) /* R3000 based, Area51 Atari Games License - MAIN: Oct 24 19
 	DISK_IMAGE( "area51", 0, SHA1(3b303bc37e206a6d7339352c869f050d04186f11) )
 ROM_END
 
-ROM_START( maxforce ) /* R3000 based, labeled as "Maximum Force 5-23-97 v1.05" */
+
+ROM_START( maxforce ) /* R3000 based, labeled as "Maximum Force 5-23-97 v1.05" - Usually found with "light grey" labels */
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for IDT 79R3041 code */
-	ROM_LOAD32_BYTE( "1.05_maximum_force_hh_5-23-97.hh", 0x00000, 0x80000, CRC(ec7f8167) SHA1(0cf057bfb1f30c2c9621d3ed25021e7ba7bdd46e) ) /* Usually found with "light grey" labels */
-	ROM_LOAD32_BYTE( "1.05_maximum_force_hl_5-23-97.hl", 0x00001, 0x80000, CRC(3172611c) SHA1(00f14f871b737c66c20f95743740d964d0be3f24) ) /* Also found labeled as "MAXIMUM FORCE EE FIX PROG" */
+	ROM_LOAD32_BYTE( "1.05_maximum_force_hh_5-23-97.hh", 0x00000, 0x80000, CRC(ec7f8167) SHA1(0cf057bfb1f30c2c9621d3ed25021e7ba7bdd46e) ) /* Also found labeled as "MAXIMUM FORCE EE FIX PROG" */
+	ROM_LOAD32_BYTE( "1.05_maximum_force_hl_5-23-97.hl", 0x00001, 0x80000, CRC(3172611c) SHA1(00f14f871b737c66c20f95743740d964d0be3f24) )
 	ROM_LOAD32_BYTE( "1.05_maximum_force_lh_5-23-97.lh", 0x00002, 0x80000, CRC(84d49423) SHA1(88d9a6724f1118f2bbef5dfa27accc2b65c5ba1d) )
 	ROM_LOAD32_BYTE( "1.05_maximum_force_ll_5-23-97.ll", 0x00003, 0x80000, CRC(16d0768d) SHA1(665a6d7602a7f2f5b1f332b0220b1533143d56b1) )
 
@@ -2140,13 +2133,12 @@ ROM_START( maxforce ) /* R3000 based, labeled as "Maximum Force 5-23-97 v1.05" *
 	DISK_IMAGE( "maxforce", 0, SHA1(d54e7a8f3866bb2a1d28ae637e7c92ffa4dbe558) )
 ROM_END
 
-
-ROM_START( maxf_102 ) /* R3000 based, labeled as "Maximum Force 2-27-97 v1.02" */
+ROM_START( maxf_102 ) /* R3000 based, labeled as "Maximum Force 2-27-97 v1.02" - Usually found with "yellow" labels */
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for IDT 79R3041 code */
-	ROM_LOAD32_BYTE( "1.02_maximum_force_hh_2-27-97.hh", 0x00000, 0x80000, CRC(8ff7009d) SHA1(da22eae298a6e0e36f503fa091ac3913423dcd0f) ) /* Usually found with "yellow" labels */
-	ROM_LOAD32_BYTE( "1.02_maximum_force_hl_2-27-97.hl", 0x00001, 0x80000, CRC(96c2cc1d) SHA1(b332b8c042b92c736131c478cefac1c3c2d2673b) )
-	ROM_LOAD32_BYTE( "1.02_maximum_force_lh_2-27-97.lh", 0x00002, 0x80000, CRC(459ffba5) SHA1(adb40db6904e84c17f32ac6518fd2e994da7883f) )
-	ROM_LOAD32_BYTE( "1.02_maximum_force_ll_2-27-97.ll", 0x00003, 0x80000, CRC(e491be7f) SHA1(cbe281c099a4aa87067752d68cf2bb0ab3900531) )
+	ROM_LOAD32_BYTE( "1.02_maximum_force_hh_2-27-97.hh", 0x00000, 0x80000, CRC(8ff7009d) SHA1(da22eae298a6e0e36f503fa091ac3913423dcd0f) ) /* Also found labeled as MAX, FORCE, V. 1.02, PROG, HH, 46FF, 2/27/97 (each item on a separate line) */
+	ROM_LOAD32_BYTE( "1.02_maximum_force_hl_2-27-97.hl", 0x00001, 0x80000, CRC(96c2cc1d) SHA1(b332b8c042b92c736131c478cefac1c3c2d2673b) ) /* Also found labeled as MAX, FORCE, V. 1.02, PROG, HL, 14FE, 2/27/97 (each item on a separate line) */
+	ROM_LOAD32_BYTE( "1.02_maximum_force_lh_2-27-97.lh", 0x00002, 0x80000, CRC(459ffba5) SHA1(adb40db6904e84c17f32ac6518fd2e994da7883f) ) /* Also found labeled as MAX, FORCE, V. 1.02, PROG, LH, 15FD, 2/27/97 (each item on a separate line) */
+	ROM_LOAD32_BYTE( "1.02_maximum_force_ll_2-27-97.ll", 0x00003, 0x80000, CRC(e491be7f) SHA1(cbe281c099a4aa87067752d68cf2bb0ab3900531) ) /* Also found labeled as MAX, FORCE, V. 1.02, PROG, LL, 15FC, 2/27/97 (each item on a separate line) */
 
 	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
@@ -2154,7 +2146,6 @@ ROM_START( maxf_102 ) /* R3000 based, labeled as "Maximum Force 2-27-97 v1.02" *
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "maxforce", 0, SHA1(d54e7a8f3866bb2a1d28ae637e7c92ffa4dbe558) )
 ROM_END
-
 
 ROM_START( maxf_ng ) /* R3000 based - MAIN: Apr 18 1997 11:08:45 */
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for IDT 79R3041 code */
@@ -2188,7 +2179,6 @@ ROM_START( area51mx )   /* 68020 based - MAIN: Apr 22 1998 17:53:57 / GUTS: 2.04
 	DISK_IMAGE( "area51mx", 0, SHA1(5ff10f4e87094d4449eabf3de7549564ca568c7e) )
 ROM_END
 
-
 ROM_START( a51mxr3k ) /* R3000 based - MAIN: Feb 10 1998 11:52:51 / GUTS: 2.07CJ Feb  5 1998 18:52:26 */
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for IDT 79R3041 code */
 	ROM_LOAD32_BYTE( "1.0_r3k_max-a51_kit_hh.hh", 0x00000, 0x80000, CRC(a984dab2) SHA1(debb3bc11ff49e87a52e89a69533a1bab7db700e) ) /* Labeled as 1.0 R3K MAX/A51 KIT HH */
@@ -2203,13 +2193,12 @@ ROM_START( a51mxr3k ) /* R3000 based - MAIN: Feb 10 1998 11:52:51 / GUTS: 2.07CJ
 	DISK_IMAGE( "area51mx", 0, SHA1(5ff10f4e87094d4449eabf3de7549564ca568c7e) )
 ROM_END
 
-
 ROM_START( a51mxr3ka ) /* R3000 based - MAIN: Feb  2 1998 14:10:29 / GUTS: 2.07CJ Jan  9 1998 21:11:55 */
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for IDT 79R3041 code */
-	ROM_LOAD32_BYTE( "maxa51_combo_r3k_hh_prog_2-02-98_67ff.hh", 0x00000, 0x80000, CRC(6af8950a) SHA1(33ae123065b14ed8d83635f3351ac5b5c136d206) ) /* Labeled as MAXA51  COMBO  R3K  HH  PROG  2/02/98  67FF (each item on a seperate line) */
-	ROM_LOAD32_BYTE( "maxa51_combo_r3k_hl_prog_2-02-98_72fe.hl", 0x00001, 0x80000, CRC(30dc3eea) SHA1(2b4e8d43ee28b2d1446c84ff79553a7ce1909f60) ) /* Labeled as MAXA51  COMBO  R3K  HL  PROG  2/02/98  72FE (each item on a seperate line) */
-	ROM_LOAD32_BYTE( "maxa51_combo_r3k_lh_prog_2-02-98_7ffd.lh", 0x00002, 0x80000, CRC(2c2124af) SHA1(6158644ef126f842a1a4f145141ce847302bbd62) ) /* Labeled as MAXA51  COMBO  R3K  LH  PROG  2/02/98  7FFD (each item on a seperate line) */
-	ROM_LOAD32_BYTE( "maxa51_combo_r3k_ll_prog_2-02-98_b3fc.ll", 0x00003, 0x80000, CRC(083f4429) SHA1(2be8db7c756a095c87f056da49b8e8832f18bca9) ) /* Labeled as MAXA51  COMBO  R3K  LL  PROG  2/02/98  B3FC (each item on a seperate line) */
+	ROM_LOAD32_BYTE( "maxa51_combo_r3k_hh_prog_2-02-98_67ff.hh", 0x00000, 0x80000, CRC(6af8950a) SHA1(33ae123065b14ed8d83635f3351ac5b5c136d206) ) /* Labeled as MAXA51  COMBO  R3K  HH  PROG  2/02/98  67FF (each item on a separate line) */
+	ROM_LOAD32_BYTE( "maxa51_combo_r3k_hl_prog_2-02-98_72fe.hl", 0x00001, 0x80000, CRC(30dc3eea) SHA1(2b4e8d43ee28b2d1446c84ff79553a7ce1909f60) ) /* Labeled as MAXA51  COMBO  R3K  HL  PROG  2/02/98  72FE (each item on a separate line) */
+	ROM_LOAD32_BYTE( "maxa51_combo_r3k_lh_prog_2-02-98_7ffd.lh", 0x00002, 0x80000, CRC(2c2124af) SHA1(6158644ef126f842a1a4f145141ce847302bbd62) ) /* Labeled as MAXA51  COMBO  R3K  LH  PROG  2/02/98  7FFD (each item on a separate line) */
+	ROM_LOAD32_BYTE( "maxa51_combo_r3k_ll_prog_2-02-98_b3fc.ll", 0x00003, 0x80000, CRC(083f4429) SHA1(2be8db7c756a095c87f056da49b8e8832f18bca9) ) /* Labeled as MAXA51  COMBO  R3K  LL  PROG  2/02/98  B3FC (each item on a separate line) */
 
 	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
@@ -2491,10 +2480,10 @@ void jaguar_state::cojag_common_init(uint16_t gpu_jump_offs, uint16_t spin_pc)
 
 	/* install synchronization hooks for GPU */
 	if (m_is_r3000)
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0x04f0b000 + gpu_jump_offs, 0x04f0b003 + gpu_jump_offs, write32_delegate(*this, FUNC(jaguar_state::gpu_jump_w)));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x04f0b000 + gpu_jump_offs, 0x04f0b003 + gpu_jump_offs, write32s_delegate(*this, FUNC(jaguar_state::gpu_jump_w)));
 	else
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0xf0b000 + gpu_jump_offs, 0xf0b003 + gpu_jump_offs, write32_delegate(*this, FUNC(jaguar_state::gpu_jump_w)));
-	m_gpu->space(AS_PROGRAM).install_read_handler(0xf03000 + gpu_jump_offs, 0xf03003 + gpu_jump_offs, read32_delegate(*this, FUNC(jaguar_state::gpu_jump_r)));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0xf0b000 + gpu_jump_offs, 0xf0b003 + gpu_jump_offs, write32s_delegate(*this, FUNC(jaguar_state::gpu_jump_w)));
+	m_gpu->space(AS_PROGRAM).install_read_handler(0xf03000 + gpu_jump_offs, 0xf03003 + gpu_jump_offs, read32smo_delegate(*this, FUNC(jaguar_state::gpu_jump_r)));
 	m_gpu_jump_address = &m_gpu_ram[gpu_jump_offs/4];
 	m_gpu_spin_pc = 0xf03000 + spin_pc;
 }
@@ -2507,8 +2496,8 @@ void jaguar_state::init_area51a()
 
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa02030, 0xa02033, write32_delegate(*this, FUNC(jaguar_state::area51_main_speedup_w)));
-	m_main_speedup = m_mainram + 0x2030/4;
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa02030, 0xa02033, write32s_delegate(*this, FUNC(jaguar_state::area51_main_speedup_w)));
+	m_main_speedup = &m_mainram[0x2030/4];
 #endif
 }
 
@@ -2520,8 +2509,8 @@ void jaguar_state::init_area51()
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
 	m_main_speedup_max_cycles = 120;
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x100062e8, 0x100062eb, read32_delegate(*this, FUNC(jaguar_state::cojagr3k_main_speedup_r)));
-	m_main_speedup = m_mainram + 0x62e8/4;
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x100062e8, 0x100062eb, read32smo_delegate(*this, FUNC(jaguar_state::cojagr3k_main_speedup_r)));
+	m_main_speedup = &m_mainram[0x62e8/4];
 #endif
 }
 
@@ -2536,8 +2525,8 @@ void jaguar_state::init_maxforce()
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
 	m_main_speedup_max_cycles = 120;
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000865c, 0x1000865f, read32_delegate(*this, FUNC(jaguar_state::cojagr3k_main_speedup_r)));
-	m_main_speedup = m_mainram + 0x865c/4;
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000865c, 0x1000865f, read32smo_delegate(*this, FUNC(jaguar_state::cojagr3k_main_speedup_r)));
+	m_main_speedup = &m_mainram[0x865c/4];
 #endif
 }
 
@@ -2552,8 +2541,8 @@ void jaguar_state::init_area51mx()
 
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa19550, 0xa19557, write32_delegate(*this, FUNC(jaguar_state::area51mx_main_speedup_w)));
-	m_main_speedup = m_mainram + 0x19550/4;
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa19550, 0xa19557, write32s_delegate(*this, FUNC(jaguar_state::area51mx_main_speedup_w)));
+	m_main_speedup = &m_mainram[0x19550/4];
 #endif
 }
 
@@ -2569,8 +2558,8 @@ void jaguar_state::init_a51mxr3k()
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
 	m_main_speedup_max_cycles = 120;
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x10006f0c, 0x10006f0f, read32_delegate(*this, FUNC(jaguar_state::cojagr3k_main_speedup_r)));
-	m_main_speedup = m_mainram + 0x6f0c/4;
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x10006f0c, 0x10006f0f, read32smo_delegate(*this, FUNC(jaguar_state::cojagr3k_main_speedup_r)));
+	m_main_speedup = &m_mainram[0x6f0c/4];
 #endif
 }
 
@@ -2583,8 +2572,8 @@ void jaguar_state::init_fishfren()
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
 	m_main_speedup_max_cycles = 200;
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x10021b60, 0x10021b63, read32_delegate(*this, FUNC(jaguar_state::cojagr3k_main_speedup_r)));
-	m_main_speedup = m_mainram + 0x21b60/4;
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x10021b60, 0x10021b63, read32smo_delegate(*this, FUNC(jaguar_state::cojagr3k_main_speedup_r)));
+	m_main_speedup = &m_mainram[0x21b60/4];
 #endif
 }
 
@@ -2597,11 +2586,11 @@ void jaguar_state::init_freeze_common(offs_t main_speedup_addr)
 	/* install speedup for main CPU */
 	m_main_speedup_max_cycles = 200;
 	if (main_speedup_addr != 0) {
-		m_maincpu->space(AS_PROGRAM).install_read_handler(main_speedup_addr, main_speedup_addr + 3, read32_delegate(*this, FUNC(jaguar_state::cojagr3k_main_speedup_r)));
-		m_main_speedup = m_mainram + (main_speedup_addr - 0x10000000)/4;
+		m_maincpu->space(AS_PROGRAM).install_read_handler(main_speedup_addr, main_speedup_addr + 3, read32smo_delegate(*this, FUNC(jaguar_state::cojagr3k_main_speedup_r)));
+		m_main_speedup = &m_mainram[(main_speedup_addr - 0x10000000)/4];
 	}
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0400d900, 0x0400d900 + 3, read32_delegate(*this, FUNC(jaguar_state::main_gpu_wait_r)));
-	m_main_gpu_wait = m_shared_ram + 0xd900/4;
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0400d900, 0x0400d900 + 3, read32smo_delegate(*this, FUNC(jaguar_state::main_gpu_wait_r)));
+	m_main_gpu_wait = &m_shared_ram[0xd900/4];
 #endif
 }
 
@@ -2620,9 +2609,9 @@ void jaguar_state::init_vcircle()
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
 	m_main_speedup_max_cycles = 50;
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x12005b34, 0x12005b37, read32_delegate(*this, FUNC(jaguar_state::cojagr3k_main_speedup_r)));
-	m_main_speedup = m_mainram + 0x5b34/4;
-	m_main_speedup = m_mainram2 + 0x5b34/4;
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x12005b34, 0x12005b37, read32smo_delegate(*this, FUNC(jaguar_state::cojagr3k_main_speedup_r)));
+	m_main_speedup = &m_mainram[0x5b34/4];
+	m_main_speedup = &m_mainram2[0x5b34/4]; // FIXME: overwriting immediately after assigning?
 #endif
 }
 

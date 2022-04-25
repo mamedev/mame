@@ -33,13 +33,13 @@ void jailbrek_state::jailbrek_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(jailbrek_state::videoram_w)
+void jailbrek_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(jailbrek_state::colorram_w)
+void jailbrek_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);

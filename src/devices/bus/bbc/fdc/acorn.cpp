@@ -23,14 +23,15 @@ DEFINE_DEVICE_TYPE(BBC_ACORN1770, bbc_acorn1770_device, "bbc_acorn1770", "Acorn 
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( bbc_acorn8271_device::floppy_formats )
-	FLOPPY_ACORN_SSD_FORMAT,
-	FLOPPY_ACORN_DSD_FORMAT,
-	FLOPPY_ACORN_ADFS_OLD_FORMAT,
-	FLOPPY_ACORN_DOS_FORMAT,
-	FLOPPY_FSD_FORMAT,
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
+void bbc_acorn8271_device::floppy_formats(format_registration &fr)
+{
+	fr.add_pc_formats();
+	fr.add(FLOPPY_ACORN_SSD_FORMAT);
+	fr.add(FLOPPY_ACORN_DSD_FORMAT);
+	fr.add(FLOPPY_ACORN_ADFS_OLD_FORMAT);
+	fr.add(FLOPPY_ACORN_DOS_FORMAT);
+	fr.add(FLOPPY_FSD_FORMAT);
+}
 
 static void bbc_floppies_525(device_slot_interface &device)
 {
@@ -95,13 +96,13 @@ ROM_END
 
 void bbc_acorn8271_device::device_add_mconfig(machine_config &config)
 {
-	I8271(config, m_fdc, DERIVED_CLOCK(1, 4));
+	I8271(config, m_fdc, DERIVED_CLOCK(1, 2));
 	m_fdc->intrq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::intrq_w));
 	m_fdc->hdl_wr_callback().set(FUNC(bbc_acorn8271_device::motor_w));
 	m_fdc->opt_wr_callback().set(FUNC(bbc_acorn8271_device::side_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies_525, "525qd", bbc_acorn8271_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies_525, "525qd", bbc_acorn8271_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], bbc_floppies_525, "525qd", bbc_acorn8271_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], bbc_floppies_525, "525qd", bbc_acorn8271_device::floppy_formats).enable_sound(true);
 }
 
 void bbc_acorn1770_device::device_add_mconfig(machine_config &config)
@@ -111,8 +112,8 @@ void bbc_acorn1770_device::device_add_mconfig(machine_config &config)
 	m_fdc->intrq_wr_callback().set(FUNC(bbc_acorn1770_device::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(bbc_acorn1770_device::fdc_drq_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies_525, "525qd", bbc_acorn8271_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies_525, "525qd", bbc_acorn8271_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], bbc_floppies_525, "525qd", bbc_acorn8271_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], bbc_floppies_525, "525qd", bbc_acorn8271_device::floppy_formats).enable_sound(true);
 }
 
 
@@ -138,8 +139,7 @@ bbc_acorn8271_device::bbc_acorn8271_device(const machine_config &mconfig, const 
 	: device_t(mconfig, BBC_ACORN8271, tag, owner, clock)
 	, device_bbc_fdc_interface(mconfig, *this)
 	, m_fdc(*this, "i8271")
-	, m_floppy0(*this, "i8271:0")
-	, m_floppy1(*this, "i8271:1")
+	, m_floppy(*this, "i8271:%u", 0)
 {
 }
 
@@ -147,8 +147,7 @@ bbc_acorn1770_device::bbc_acorn1770_device(const machine_config &mconfig, const 
 	: device_t(mconfig, BBC_ACORN1770, tag, owner, clock)
 	, device_bbc_fdc_interface(mconfig, *this)
 	, m_fdc(*this, "wd1770")
-	, m_floppy0(*this, "wd1770:0")
-	, m_floppy1(*this, "wd1770:1")
+	, m_floppy(*this, "wd1770:%u", 0)
 {
 }
 
@@ -199,15 +198,15 @@ void bbc_acorn8271_device::write(offs_t offset, uint8_t data)
 
 WRITE_LINE_MEMBER(bbc_acorn8271_device::motor_w)
 {
-	if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(!state);
-	if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(!state);
+	if (m_floppy[0]->get_device()) m_floppy[0]->get_device()->mon_w(!state);
+	if (m_floppy[1]->get_device()) m_floppy[1]->get_device()->mon_w(!state);
 	m_fdc->ready_w(!state);
 }
 
 WRITE_LINE_MEMBER(bbc_acorn8271_device::side_w)
 {
-	if (m_floppy0->get_device()) m_floppy0->get_device()->ss_w(state);
-	if (m_floppy1->get_device()) m_floppy1->get_device()->ss_w(state);
+	if (m_floppy[0]->get_device()) m_floppy[0]->get_device()->ss_w(state);
+	if (m_floppy[1]->get_device()) m_floppy[1]->get_device()->ss_w(state);
 }
 
 
@@ -237,8 +236,8 @@ void bbc_acorn1770_device::write(offs_t offset, uint8_t data)
 		floppy_image_device *floppy = nullptr;
 
 		// bit 0, 1: drive select
-		if (BIT(data, 0)) floppy = m_floppy0->get_device();
-		if (BIT(data, 1)) floppy = m_floppy1->get_device();
+		if (BIT(data, 0)) floppy = m_floppy[0]->get_device();
+		if (BIT(data, 1)) floppy = m_floppy[1]->get_device();
 		m_fdc->set_floppy(floppy);
 
 		// bit 2: side select

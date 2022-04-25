@@ -37,6 +37,8 @@ public:
 	// device type constructor
 	m3002_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	auto irq_out() { return m_irq_callback.bind(); }
+
 	// 4-bit read/write handlers
 	u8 read();
 	void write(u8 data);
@@ -54,8 +56,8 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// device_nvram_interface overrides
-	virtual void nvram_read(emu_file &file) override;
-	virtual void nvram_write(emu_file &file) override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 	virtual void nvram_default() override;
 
 	// device_rtc_interface overrides

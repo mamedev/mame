@@ -97,7 +97,7 @@ PC1640-HD30: Western Digital 95038 [-chs 615,6,17 -ss 512]
 #include "bus/rs232/rs232.h"
 #include "bus/isa/ega.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -995,12 +995,7 @@ void pc1512_base_state::drive_select_w(uint8_t data)
 			 img->mon_w((data & 0x03) == n && BIT(data, n + 4) ? 0 : 1);
 	}
 
-	if (m_dreset != BIT(data, 2))
-	{
-		m_dreset = BIT(data, 2);
-		m_fdc->soft_reset();
-	}
-
+	m_fdc->reset_w(!BIT(data, 2));
 	m_nden = BIT(data, 3);
 	update_fdc_int();
 	update_fdc_drq();
@@ -1054,10 +1049,6 @@ void pc1640_isa8_cards(device_slot_interface &device)
 	device.option_add_internal("iga", ISA8_PC1640_IGA);
 }
 
-FLOPPY_FORMATS_MEMBER( pc1512_base_state::floppy_formats )
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
-
 static void pc1512_floppies(device_slot_interface &device)
 {
 	device.option_add("525dd", FLOPPY_525_DD); // Tandon TM65-2L
@@ -1091,7 +1082,6 @@ void pc1512_base_state::machine_start()
 	save_item(NAME(m_nden));
 	save_item(NAME(m_dint));
 	save_item(NAME(m_ddrq));
-	save_item(NAME(m_dreset));
 	save_item(NAME(m_neop));
 	save_item(NAME(m_ack_int_enable));
 	save_item(NAME(m_centronics_ack));
@@ -1223,8 +1213,8 @@ void pc1512_state::pc1512(machine_config &config)
 	// SED9420CAC (dedicated 16 MHz XTAL) is used as read data separator only
 	m_fdc->intrq_wr_callback().set(FUNC(pc1512_state::fdc_int_w));
 	m_fdc->drq_wr_callback().set(FUNC(pc1512_state::fdc_drq_w));
-	FLOPPY_CONNECTOR(config, m_floppy[0], pc1512_floppies, "525dd", pc1512_base_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy[1], pc1512_floppies, nullptr, pc1512_base_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], pc1512_floppies, "525dd", floppy_image_device::default_pc_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], pc1512_floppies, nullptr, floppy_image_device::default_pc_floppy_formats);
 
 	INS8250(config, m_uart, 1.8432_MHz_XTAL);
 	m_uart->out_tx_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
@@ -1359,8 +1349,8 @@ void pc1640_state::pc1640(machine_config &config)
 	// FDC91C36 (clocked by CK8K) is used as read data separator only
 	m_fdc->intrq_wr_callback().set(FUNC(pc1512_base_state::fdc_int_w));
 	m_fdc->drq_wr_callback().set(FUNC(pc1512_base_state::fdc_drq_w));
-	FLOPPY_CONNECTOR(config, m_floppy[0], pc1512_floppies, "525dd", pc1512_base_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy[1], pc1512_floppies, nullptr, pc1512_base_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], pc1512_floppies, "525dd", floppy_image_device::default_pc_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], pc1512_floppies, nullptr, floppy_image_device::default_pc_floppy_formats);
 
 	INS8250(config, m_uart, 1.8432_MHz_XTAL);
 	m_uart->out_tx_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));

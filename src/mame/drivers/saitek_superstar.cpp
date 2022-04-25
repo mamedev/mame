@@ -39,16 +39,16 @@ TODO:
 ******************************************************************************/
 
 #include "emu.h"
+
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/pwm.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 // internal artwork
@@ -199,8 +199,8 @@ void star_state::sstar28k(machine_config &config)
 	M6502(config, m_maincpu, 2000000); // no XTAL
 	m_maincpu->set_addrmap(AS_PROGRAM, &star_state::sstar28k_map);
 
-	const attotime irq_period = attotime::from_hz(2000000 / 0x2000); // 4020 Q13
-	m_maincpu->set_periodic_int(FUNC(star_state::nmi_line_pulse), irq_period);
+	const attotime nmi_period = attotime::from_hz(2000000 / 0x2000); // 4020 Q13
+	m_maincpu->set_periodic_int(FUNC(star_state::nmi_line_pulse), nmi_period);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -213,7 +213,6 @@ void star_state::sstar28k(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 void star_state::tstar432(machine_config &config)
@@ -224,13 +223,13 @@ void star_state::tstar432(machine_config &config)
 	R65C02(config.replace(), m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &star_state::tstar432_map);
 
-	const attotime irq_period = attotime::from_hz(4_MHz_XTAL / 0x4000); // 4020 Q14
-	m_maincpu->set_periodic_int(FUNC(star_state::nmi_line_pulse), irq_period);
+	const attotime nmi_period = attotime::from_hz(4_MHz_XTAL / 0x4000); // 4020 Q14
+	m_maincpu->set_periodic_int(FUNC(star_state::nmi_line_pulse), nmi_period);
 
 	config.set_default_layout(layout_saitek_tstar432);
 
 	/* extension rom */
-	GENERIC_CARTSLOT(config, "extrom", generic_plain_slot, "saitek_kso");
+	GENERIC_SOCKET(config, "extrom", generic_plain_slot, "saitek_kso");
 	SOFTWARE_LIST(config, "cart_list").set_original("saitek_kso");
 }
 
@@ -242,8 +241,8 @@ void star_state::sstar36k(machine_config &config)
 	M6502(config.replace(), m_maincpu, 2_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &star_state::tstar432_map);
 
-	const attotime irq_period = attotime::from_hz(2_MHz_XTAL / 0x2000); // 4020 Q13
-	m_maincpu->set_periodic_int(FUNC(star_state::nmi_line_pulse), irq_period);
+	const attotime nmi_period = attotime::from_hz(2_MHz_XTAL / 0x2000); // 4020 Q13
+	m_maincpu->set_periodic_int(FUNC(star_state::nmi_line_pulse), nmi_period);
 }
 
 

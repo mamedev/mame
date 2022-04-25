@@ -22,6 +22,7 @@
 #include "machine/z80sio.h"
 #include "sound/spkrdev.h"
 #include "sound/beep.h"
+#include "machine/timer.h"
 #include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
 #include "emupal.h"
@@ -64,6 +65,7 @@ public:
 		m_rom(*this, Z80_TAG),
 		m_char_rom(*this, "chargen"),
 		m_video_ram(*this, "video_ram"),
+		m_view(*this, "view"),
 		m_fdc_irq(0),
 		m_fdc_drq(0),
 		m_8n5(0),
@@ -75,10 +77,10 @@ public:
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
-	DECLARE_READ8_MEMBER( fdc_r );
-	DECLARE_WRITE8_MEMBER( fdc_w );
-	DECLARE_WRITE8_MEMBER( scroll_w );
-	//DECLARE_WRITE8_MEMBER( x120_system_w );
+	uint8_t fdc_r(offs_t offset);
+	void fdc_w(offs_t offset, uint8_t data);
+	void scroll_w(offs_t offset, uint8_t data);
+	//void x120_system_w(uint8_t data);
 	uint8_t kbpio_pa_r();
 	void kbpio_pa_w(uint8_t data);
 	uint8_t kbpio_pb_r();
@@ -103,7 +105,7 @@ protected:
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80sio_device> m_sio;
 	required_device<wd_fdc_device_base> m_fdc;
-	required_device<ram_device> m_ram;
+	optional_device<ram_device> m_ram;
 	required_device<palette_device> m_palette;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
@@ -111,23 +113,23 @@ protected:
 	required_memory_region m_rom;
 	required_memory_region m_char_rom;
 	required_shared_ptr<uint8_t> m_video_ram;
+	memory_view m_view;
 
-	virtual void bankswitch(int bank);
 	void update_nmi();
 
 	/* video state */
-	uint8_t m_scroll;                     /* vertical scroll */
-	uint8_t m_framecnt;
-	int m_ncset2;                       /* national character set */
-	int m_vatt;                         /* X120 video attribute */
-	int m_lowlite;                      /* low light attribute */
-	int m_chrom;                        /* character ROM index */
+	uint8_t m_scroll = 0;                     /* vertical scroll */
+	uint8_t m_framecnt = 0;
+	int m_ncset2 = 0;                       /* national character set */
+	int m_vatt = 0;                         /* X120 video attribute */
+	int m_lowlite = 0;                      /* low light attribute */
+	int m_chrom = 0;                        /* character ROM index */
 
 	/* floppy state */
-	bool m_fdc_irq;                     /* interrupt request */
-	bool m_fdc_drq;                     /* data request */
-	int m_8n5;                          /* 5.25" / 8" drive select */
-	int m_400_460;                      /* double sided disk detect */
+	bool m_fdc_irq = false;                     /* interrupt request */
+	bool m_fdc_drq = false;                     /* data request */
+	int m_8n5 = 0;                          /* 5.25" / 8" drive select */
+	int m_400_460 = 0;                      /* double sided disk detect */
 };
 
 class bigboard_state : public xerox820_state
@@ -136,6 +138,7 @@ public:
 	bigboard_state(const machine_config &mconfig, device_type type, const char *tag)
 		: xerox820_state(mconfig, type, tag)
 		, m_beeper(*this, "beeper")
+		, m_beep_timer(*this, "beep_timer")
 	{ }
 
 	void kbpio_pa_w(uint8_t data);
@@ -144,11 +147,12 @@ public:
 protected:
 	virtual void machine_reset() override;
 
-	TIMER_CALLBACK_MEMBER(bigboard_beepoff);
+	TIMER_DEVICE_CALLBACK_MEMBER(beep_timer);
 
 	required_device<beep_device> m_beeper;
+	required_device<timer_device> m_beep_timer;
 
-	bool m_bit5;
+	bool m_bit5 = false;
 };
 
 class xerox820ii_state : public xerox820_state
@@ -161,11 +165,11 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER( bell_w );
-	DECLARE_WRITE8_MEMBER( slden_w );
-	DECLARE_WRITE8_MEMBER( chrom_w );
-	DECLARE_WRITE8_MEMBER( lowlite_w );
-	DECLARE_WRITE8_MEMBER( sync_w );
+	void bell_w(offs_t offset, uint8_t data);
+	void slden_w(offs_t offset, uint8_t data);
+	void chrom_w(offs_t offset, uint8_t data);
+	void lowlite_w(uint8_t data);
+	void sync_w(offs_t offset, uint8_t data);
 
 	void rdpio_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( rdpio_pardy_w );
@@ -177,8 +181,6 @@ public:
 	void xerox820ii_mem(address_map &map);
 protected:
 	virtual void machine_reset() override;
-
-	void bankswitch(int bank) override;
 
 	required_device<speaker_sound_device> m_speaker;
 	required_device<scsi_port_device> m_sasibus;

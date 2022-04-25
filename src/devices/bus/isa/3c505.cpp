@@ -280,7 +280,7 @@ void isa16_3c505_device::device_reset()
 			offs_t const rom_base = (m_romopts->read() & 0xfe) << 12;
 
 			if (m_isa->is_option_rom_space_available(rom_base, 0x2000))
-				m_isa->install_rom(this, rom_base, rom_base | 0x01fff, "host", "host");
+				m_isa->install_rom(this, rom_base, rom_base | 0x01fff, "host");
 		}
 
 		m_isa->set_dma_channel(m_isa_drq, this, true);
@@ -317,6 +317,9 @@ void isa16_3c505_device::map_main(address_map &map)
 {
 	// i82586 upper 4 address lines are ignored
 	map.global_mask(0x0fffff);
+
+	// suppress logging when sizing RAM
+	map(0x00000, 0x7ffff).noprw();
 
 	map(0xfc000, 0xfffff).rom().region("system", 0);
 }
@@ -397,10 +400,10 @@ void isa16_3c505_device::acr_w(u8 data)
 		m_hsr = (m_hsr & ~HSR_ASF) | (data & ACR_ASF);
 
 	if ((data ^ m_acr) & ACR_LED1)
-		m_led[0] = !!(data & ACR_LED1);
+		m_led[0] = bool(data & ACR_LED1);
 
 	if ((data ^ m_acr) & ACR_LED2)
-		m_led[1] = !!(data & ACR_LED2);
+		m_led[1] = bool(data & ACR_LED2);
 
 	m_net->reset_w((data & ACR_R586) ? 1 : 0);
 
@@ -487,6 +490,26 @@ void isa16_3c505_device::hcr_w(u8 data)
 {
 	LOGMASKED(LOG_REG, "hcr_w 0x%02x (%s)\n", data, machine().describe_context());
 
+	// attention condition
+	if (!(m_hcr & HCR_ATTN) && (data & HCR_ATTN))
+	{
+		if (!(data & HCR_FLSH))
+		{
+			LOGMASKED(LOG_REG, "soft reset\n");
+
+			// soft reset
+			m_cpu->set_input_line(INPUT_LINE_NMI, 1);
+			m_cpu->set_input_line(INPUT_LINE_NMI, 0);
+		}
+		else
+		{
+			LOGMASKED(LOG_REG, "hard reset\n");
+
+			// hard reset
+			reset();
+		}
+	}
+
 	// update host status flags
 	if ((data ^ m_hcr) & HCR_HSF)
 		m_asr = (m_asr & ~ASR_HSF) | (data & HCR_HSF);
@@ -528,26 +551,6 @@ void isa16_3c505_device::hcr_w(u8 data)
 		}
 
 		update_rdy(m_acr, data);
-	}
-
-	// attention condition
-	if (!(m_hcr & HCR_ATTN) && (data & HCR_ATTN))
-	{
-		if (!(data & HCR_FLSH))
-		{
-			LOGMASKED(LOG_REG, "soft reset\n");
-
-			// soft reset
-			m_cpu->set_input_line(INPUT_LINE_NMI, 1);
-			m_cpu->set_input_line(INPUT_LINE_NMI, 0);
-		}
-		else
-		{
-			LOGMASKED(LOG_REG, "hard reset\n");
-
-			// hard reset
-			reset();
-		}
 	}
 
 	m_hcr = data;
@@ -635,7 +638,7 @@ void isa16_3c505_device::update_rdy(u8 const acr, u8 const hcr)
 		m_hsr &= ~HSR_HRDY;
 	}
 
-	update_cpu_drq(!!(m_asr & ASR_ARDY));
+	update_cpu_drq(bool(m_asr & ASR_ARDY));
 	update_isa_drq((m_hsr & HSR_HRDY) && (hcr & HCR_DMAE));
 }
 

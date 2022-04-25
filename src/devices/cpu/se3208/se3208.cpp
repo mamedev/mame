@@ -4,8 +4,6 @@
 #include "se3208.h"
 #include "se3208dis.h"
 
-#include "debugger.h"
-
 
 /*
     SE3208 CPU Emulator by ElSemi
@@ -1807,7 +1805,6 @@ void se3208_device::device_start()
 
 	state_add(STATE_GENPC, "GENPC", m_PC).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_PPC).noshow();
-	state_add(STATE_GENSP, "GENSP", m_SP).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_SR).formatstr("%10s").noshow();
 
 	set_icountptr(m_icount);

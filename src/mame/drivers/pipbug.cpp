@@ -76,8 +76,8 @@ private:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	void data_map(address_map &map);
 	void mem_map(address_map &map);
-	u8 m_cass_data[4];
-	bool m_cassold, m_cassinbit;
+	u8 m_cass_data[4]{};
+	bool m_cassold = false, m_cassinbit = false;
 };
 
 void pipbug_state::pipbug_ctrl_w(u8 data)
@@ -141,7 +141,6 @@ INPUT_PORTS_END
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_110 )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_110 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_EVEN )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
@@ -161,12 +160,12 @@ QUICKLOAD_LOAD_MEMBER(pipbug_state::quickload_cb)
 	quick_length = image.length();
 	if (quick_length < 0x0444)
 	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
+		image.seterror(image_error::INVALIDIMAGE, "File too short");
 		image.message(" File too short");
 	}
 	else if (quick_length > 0x8000)
 	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
+		image.seterror(image_error::INVALIDIMAGE, "File too long");
 		image.message(" File too long");
 	}
 	else
@@ -175,12 +174,12 @@ QUICKLOAD_LOAD_MEMBER(pipbug_state::quickload_cb)
 		read_ = image.fread( &quick_data[0], quick_length);
 		if (read_ != quick_length)
 		{
-			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
+			image.seterror(image_error::INVALIDIMAGE, "Cannot read the file");
 			image.message(" Cannot read the file");
 		}
 		else if (quick_data[0] != 0xc4)
 		{
-			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
+			image.seterror(image_error::INVALIDIMAGE, "Invalid header");
 			image.message(" Invalid header");
 		}
 		else
@@ -189,7 +188,7 @@ QUICKLOAD_LOAD_MEMBER(pipbug_state::quickload_cb)
 
 			if (exec_addr >= quick_length)
 			{
-				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Exec address beyond end of file");
+				image.seterror(image_error::INVALIDIMAGE, "Exec address beyond end of file");
 				image.message(" Exec address beyond end of file");
 			}
 			else

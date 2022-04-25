@@ -43,30 +43,39 @@ uint32_t snes_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
     Timers
 
 *************************************/
-void snes_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void snes_state::scpu_irq_refresh()
+{
+	if (m_scpu_irq != nullptr) // multiplexed interrupt?
+		m_scpu_irq->in_w<0>(SNES_CPU_REG(TIMEUP) & 0x80);
+	else
+		m_maincpu->set_input_line(G65816_LINE_IRQ, (SNES_CPU_REG(TIMEUP) & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
+void snes_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_NMI_TICK:
-		snes_nmi_tick(ptr, param);
+		snes_nmi_tick(param);
 		break;
 	case TIMER_HIRQ_TICK:
-		snes_hirq_tick_callback(ptr, param);
+		snes_hirq_tick_callback(param);
 		break;
 	case TIMER_RESET_OAM_ADDRESS:
-		snes_reset_oam_address(ptr, param);
+		snes_reset_oam_address(param);
 		break;
 	case TIMER_RESET_HDMA:
-		snes_reset_hdma(ptr, param);
+		snes_reset_hdma(param);
 		break;
 	case TIMER_UPDATE_IO:
-		snes_update_io(ptr, param);
+		snes_update_io(param);
 		break;
 	case TIMER_SCANLINE_TICK:
-		snes_scanline_tick(ptr, param);
+		snes_scanline_tick(param);
 		break;
 	case TIMER_HBLANK_TICK:
-		snes_hblank_tick(ptr, param);
+		snes_hblank_tick(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in snes_state::device_timer");
@@ -89,7 +98,7 @@ void snes_state::hirq_tick()
 	// (don't need to switch to the 65816 context, we don't do anything dependant on it)
 	m_ppu->set_latch_hv(m_ppu->current_x(), m_ppu->current_y());
 	SNES_CPU_REG(TIMEUP) = 0x80;    /* Indicate that irq occurred */
-	m_maincpu->set_input_line(G65816_LINE_IRQ, ASSERT_LINE);
+	scpu_irq_refresh();
 
 	// don't happen again
 	m_hirq_timer->adjust(attotime::never);
@@ -136,7 +145,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_scanline_tick)
 			SNES_CPU_REG(TIMEUP) = 0x80;    /* Indicate that irq occurred */
 			// IRQ latches the counters, do it now
 			m_ppu->set_latch_hv(m_ppu->current_x(), m_ppu->current_y());
-			m_maincpu->set_input_line(G65816_LINE_IRQ, ASSERT_LINE );
+			scpu_irq_refresh();
 		}
 	}
 	/* Horizontal IRQ timer */
@@ -404,8 +413,9 @@ uint8_t snes_state::snes_r_io(offs_t offset)
 	switch (offset) // offset is from 0x000000
 	{
 		case WMDATA:    /* Data to read from WRAM */
-			value = m_wram[m_wram_address++];
-			m_wram_address &= 0x1ffff;
+			value = m_wram[m_wram_address];
+			if (!machine().side_effects_disabled())
+				m_wram_address = (m_wram_address + 1) & 0x1ffff;
 			return value;
 
 		case OLDJOY1:   /* Data for old NES controllers (JOYSER1) */
@@ -416,12 +426,16 @@ uint8_t snes_state::snes_r_io(offs_t offset)
 
 		case RDNMI:         /* NMI flag by v-blank and version number */
 			value = (SNES_CPU_REG(RDNMI) & 0x80) | (snes_open_bus_r() & 0x70);
-			SNES_CPU_REG(RDNMI) &= 0x70;   /* NMI flag is reset on read */
+			if (!machine().side_effects_disabled())
+				SNES_CPU_REG(RDNMI) &= 0x70;   /* NMI flag is reset on read */
 			return value | 2; //CPU version number
 		case TIMEUP:        /* IRQ flag by H/V count timer */
 			value = (snes_open_bus_r() & 0x7f) | (SNES_CPU_REG(TIMEUP) & 0x80);
-			m_maincpu->set_input_line(G65816_LINE_IRQ, CLEAR_LINE );
-			SNES_CPU_REG(TIMEUP) = 0;   // flag is cleared on both read and write
+			if (!machine().side_effects_disabled())
+			{
+				SNES_CPU_REG(TIMEUP) = 0;   // flag is cleared on both read and write
+				scpu_irq_refresh();
+			}
 			return value;
 		case HVBJOY:        /* H/V blank and joypad controller enable */
 			// electronics test says hcounter 272 is start of hblank, which is beampos 363
@@ -500,16 +514,13 @@ void snes_state::snes_w_io(address_space &space, offs_t offset, uint8_t data)
 			m_wram_address &= 0x1ffff;
 			return;
 		case WMADDL:    /* Address to read/write to wram (low) */
-			m_wram_address = (m_wram_address & 0xffff00) | (data <<  0);
-			m_wram_address &= 0x1ffff;
+			m_wram_address = (m_wram_address & 0x1ff00) | (data <<  0);
 			return;
 		case WMADDM:    /* Address to read/write to wram (mid) */
-			m_wram_address = (m_wram_address & 0xff00ff) | (data <<  8);
-			m_wram_address &= 0x1ffff;
+			m_wram_address = (m_wram_address & 0x100ff) | (data <<  8);
 			return;
 		case WMADDH:    /* Address to read/write to wram (high) */
-			m_wram_address = (m_wram_address & 0x00ffff) | (data << 16);
-			m_wram_address &= 0x1ffff;
+			m_wram_address = (m_wram_address & 0x0ffff) | ((data & 1) << 16);
 			return;
 		case OLDJOY1:   /* Old NES joystick support */
 			write_joy_latch(data);
@@ -521,8 +532,8 @@ void snes_state::snes_w_io(address_space &space, offs_t offset, uint8_t data)
 		case NMITIMEN:  /* Flag for v-blank, timer int. and joy read */
 			if ((data & 0x30) == 0x00)
 			{
-				m_maincpu->set_input_line(G65816_LINE_IRQ, CLEAR_LINE );
 				SNES_CPU_REG(TIMEUP) = 0;   // clear pending IRQ if irq is disabled here, 3x3 Eyes - Seima Korin Den behaves on this
+				scpu_irq_refresh();
 			}
 			SNES_CPU_REG(NMITIMEN) = data;
 			return;
@@ -531,20 +542,16 @@ void snes_state::snes_w_io(address_space &space, offs_t offset, uint8_t data)
 			SNES_CPU_REG(WRIO) = data;
 			return;
 		case HTIMEL:    /* H-Count timer settings (low)  */
-			m_htime = (m_htime & 0xff00) | (data <<  0);
-			m_htime &= 0x1ff;
+			m_htime = (m_htime & 0x100) | (data <<  0);
 			return;
 		case HTIMEH:    /* H-Count timer settings (high) */
-			m_htime = (m_htime & 0x00ff) | (data <<  8);
-			m_htime &= 0x1ff;
+			m_htime = (m_htime & 0x0ff) | ((data & 1) <<  8);
 			return;
 		case VTIMEL:    /* V-Count timer settings (low)  */
-			m_vtime = (m_vtime & 0xff00) | (data <<  0);
-			m_vtime &= 0x1ff;
+			m_vtime = (m_vtime & 0x100) | (data <<  0);
 			return;
 		case VTIMEH:    /* V-Count timer settings (high) */
-			m_vtime = (m_vtime & 0x00ff) | (data <<  8);
-			m_vtime &= 0x1ff;
+			m_vtime = (m_vtime & 0x0ff) | ((data & 1) <<  8);
 			return;
 		case MDMAEN:    /* DMA channel designation and trigger */
 			dma(space, data);
@@ -556,8 +563,8 @@ void snes_state::snes_w_io(address_space &space, offs_t offset, uint8_t data)
 			SNES_CPU_REG(HDMAEN) = data;
 			return;
 		case TIMEUP:    // IRQ Flag is cleared on both read and write
-			m_maincpu->set_input_line(G65816_LINE_IRQ, CLEAR_LINE );
 			SNES_CPU_REG(TIMEUP) = 0;
+			scpu_irq_refresh();
 			return;
 		/* Following are read-only */
 		case HVBJOY:    /* H/V blank and joypad enable */
@@ -1071,21 +1078,18 @@ void snes_state::machine_start()
 
 	snes_init_timers();
 
-	for (int i = 0; i < 8; i++)
-	{
-		save_item(NAME(m_dma_channel[i].dmap), i);
-		save_item(NAME(m_dma_channel[i].dest_addr), i);
-		save_item(NAME(m_dma_channel[i].src_addr), i);
-		save_item(NAME(m_dma_channel[i].bank), i);
-		save_item(NAME(m_dma_channel[i].trans_size), i);
-		save_item(NAME(m_dma_channel[i].ibank), i);
-		save_item(NAME(m_dma_channel[i].hdma_addr), i);
-		save_item(NAME(m_dma_channel[i].hdma_iaddr), i);
-		save_item(NAME(m_dma_channel[i].hdma_line_counter), i);
-		save_item(NAME(m_dma_channel[i].unk), i);
-		save_item(NAME(m_dma_channel[i].do_transfer), i);
-		save_item(NAME(m_dma_channel[i].dma_disabled), i);
-	}
+	save_item(STRUCT_MEMBER(m_dma_channel, dmap));
+	save_item(STRUCT_MEMBER(m_dma_channel, dest_addr));
+	save_item(STRUCT_MEMBER(m_dma_channel, src_addr));
+	save_item(STRUCT_MEMBER(m_dma_channel, bank));
+	save_item(STRUCT_MEMBER(m_dma_channel, trans_size));
+	save_item(STRUCT_MEMBER(m_dma_channel, ibank));
+	save_item(STRUCT_MEMBER(m_dma_channel, hdma_addr));
+	save_item(STRUCT_MEMBER(m_dma_channel, hdma_iaddr));
+	save_item(STRUCT_MEMBER(m_dma_channel, hdma_line_counter));
+	save_item(STRUCT_MEMBER(m_dma_channel, unk));
+	save_item(STRUCT_MEMBER(m_dma_channel, do_transfer));
+	save_item(STRUCT_MEMBER(m_dma_channel, dma_disabled));
 
 	save_item(NAME(m_hblank_offset));
 	save_item(NAME(m_wram_address));
@@ -1107,6 +1111,7 @@ void snes_state::machine_start()
 	m_input_disabled = 0;
 	m_game_over_flag = 0;
 	m_joy_flag = 1;
+	m_wram_address = 0;
 }
 
 void snes_state::machine_reset()
@@ -1217,6 +1222,7 @@ inline int snes_state::dma_abus_valid( uint32_t address )
 
 inline uint8_t snes_state::abus_read( address_space &space, uint32_t abus )
 {
+	// m_maincpu->adjust_icount(-8); // 8 master cycle per memory access
 	if (!dma_abus_valid(abus))
 		return 0;
 
@@ -1227,6 +1233,7 @@ inline void snes_state::dma_transfer( address_space &space, uint8_t dma, uint32_
 {
 	if (m_dma_channel[dma].dmap & 0x80)  /* PPU->CPU */
 	{
+		// m_maincpu->adjust_icount(-8); // 8 master cycle per memory access
 		if (bbus == 0x2180 && ((abus & 0xfe0000) == 0x7e0000 || (abus & 0x40e000) == 0x0000))
 		{
 			//illegal WRAM->WRAM transfer (bus conflict)

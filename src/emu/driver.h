@@ -76,9 +76,14 @@
 typedef delegate<void ()> driver_callback_delegate;
 
 
-// ======================> driver_device
-
-// base class for machine driver-specific devices
+/// \brief Base class for system device classes
+///
+/// System devices can be used as the root device of a system.
+/// Indirection for metadata, input port definitons, initialisation
+/// functions, ROM definitions, internal artwork and emulation status
+/// flags is provided via the #game_driver structure.  This allows
+/// multiple systems to be be implemented using a single
+/// system device class.
 class driver_device : public device_t
 {
 public:
@@ -102,7 +107,10 @@ public:
 	// inline configuration helpers
 	static void static_set_callback(device_t &device, callback_type type, driver_callback_delegate callback);
 
-	// dummy driver_init callback
+	/// \brief Empty system initialisation function
+	///
+	/// Provided as a convenience for systems that have no additional
+	/// initialisation tasks.
 	void empty_init();
 
 	// output heler

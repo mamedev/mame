@@ -61,9 +61,9 @@ license:CC0
 			<bounds left="0" top="0" right="400" bottom="300" />
 		</screen>
 
-		<overlay element="overlay">
+		<element ref="overlay" blend="multiply">
 			<bounds x="-50" y="0" width="500" height="300" />
-		</overlay>
+		</element>
 
 	</view>
 </mamelayout>

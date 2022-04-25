@@ -123,7 +123,7 @@ Compiled by K1W1
 
   * Copy Protection - Some cartridges were produced that utilised a form of copy protection by writing data back to the ROM area in memory. There are many versions of
     these ROM's available that have been altered to circumvent this protection. This collection where possible has used original unaltered ROM's, those that have been
-    altered have been commented. The original Copy Protected versions will run in MESS emulation.
+    altered have been commented. The original Copy Protected versions will run in MAME emulation.
 
   * Re-releases mentioned in the comments below were generally bit copies of the originals re-packaged in different cartridges.
 
@@ -1281,7 +1281,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="bbsba">
+	<software name="bbsba" cloneof="bbsb">
 		<description>Bounty Bob Strikes Back! (Alt)</description>
 			<!-- Identical to the image contained in Bill Hogue's emulator. http://www.bigfivesoftware.com/Emulator/emulator.htm. -->
 		<year>1984</year>
@@ -1365,7 +1365,7 @@ Compiled by K1W1
 		<description>Turbo Blizzard</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
+		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_blizzard" />
 			<dataarea name="rom" size="16384">
@@ -1379,7 +1379,7 @@ Compiled by K1W1
 		<year>199?</year>
 		<publisher>Info-Cell</publisher>
 		<info name="developer" value="Pawel Mironczuk" />
-		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
+		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_blizzard" />
 			<dataarea name="rom" size="16384">
@@ -1393,7 +1393,7 @@ Compiled by K1W1
 		<year>1991</year>
 		<publisher>DOMAIN SOFT</publisher>
 		<info name="developer" value="Tomasz Rolewski" />
-		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
+		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_blizzard" />
 			<dataarea name="rom" size="16384">
@@ -1407,7 +1407,7 @@ Compiled by K1W1
 		<year>1991</year>
 		<publisher>DOMAIN SOFT</publisher>
 		<info name="developer" value="Tomasz Rolewski" />
-		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
+		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_blizzard" />
 			<dataarea name="rom" size="16384">
@@ -1421,7 +1421,7 @@ Compiled by K1W1
 		<year>1991</year>
 		<publisher>ROBOsoft</publisher>
 		<info name="developer" value="Tomasz Rolewski" />
-		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
+		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_blizzard" />
 			<dataarea name="rom" size="16384">
@@ -1435,7 +1435,7 @@ Compiled by K1W1
 		<year>1991</year>
 		<publisher>ROBOsoft</publisher>
 		<info name="developer" value="Tomasz Rolewski" />
-		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
+		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_blizzard" />
 			<dataarea name="rom" size="16384">
@@ -1449,7 +1449,7 @@ Compiled by K1W1
 		<year>1991</year>
 		<publisher>JK Soft</publisher>
 		<info name="developer" value="Bartek Selinger" />
-		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
+		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_blizzard" />
 			<dataarea name="rom" size="16384">
@@ -1462,7 +1462,7 @@ Compiled by K1W1
 		<description>Cartridge System Turbo 2000</description>
 		<year>1991</year>
 		<publisher>Bartek Selinger</publisher>
-		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
+		<info name="usage" value="Requires Lower-Silesian Turbo 2000 hardware modification installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_blizzard" />
 			<dataarea name="rom" size="16384">
@@ -4314,6 +4314,30 @@ Compiled by K1W1
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
 				<rom name="popeye (eu).rom" size="16384" crc="a35d5e6a" sha1="5dcef8b50bc32b305846867ff9039b65841490c0"/> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="popeyep" cloneof="popeye">
+		<description>Popeye (prototype, 19830829)</description>
+		<year>1983</year>
+		<publisher>Parker Brothers</publisher>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_16k" />
+			<dataarea name="rom" size="16384">
+				<rom name="popeye (8-29-83).rom" size="16384" crc="34bcdb96" sha1="a2183d6a89d12c7b6b9fbacc4af1fa61370079e6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="popeyep1" cloneof="popeye">
+		<description>Popeye (prototype, WIP8)</description>
+		<year>1983</year>
+		<publisher>Parker Brothers</publisher>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_16k" />
+			<dataarea name="rom" size="16384">
+				<rom name="popeye_wip8.rom" size="16384" crc="da07e268" sha1="7719e2c6102ff8b7ff715a6df6c1e6efe3b0b159"/>
 			</dataarea>
 		</part>
 	</software>

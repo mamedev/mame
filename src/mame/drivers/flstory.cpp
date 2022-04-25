@@ -17,7 +17,6 @@
 #include "cpu/m6805/m6805.h"
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -797,9 +796,6 @@ void flstory_state::common(machine_config &config)
 	// pin 22 Noise Output  not mapped
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.1); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void flstory_state::flstory(machine_config &config)
@@ -859,6 +855,7 @@ void flstory_state::rumba(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &flstory_state::rumba_map);
+	m_maincpu->set_clock(XTAL(8'000'000) / 2); // verified on PCB
 
 	TAITO68705_MCU(config, m_bmcu, XTAL(18'432'000)/6); /* ? */
 

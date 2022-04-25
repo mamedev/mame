@@ -6,6 +6,9 @@
 
 /*
 
+Other known undumped international versions:
+- Genius Pro 2000 (French version of Genius Tabletop Black Magic CX)
+
 Leader 8008 CX (German version)
 
 +---+-----------+-----+-----------------------+-----+-----+-----+
@@ -39,7 +42,7 @@ Leader 8008 CX (German version)
 
 CPU = epoxy blob
 GM76U8128CLFW85 = LGS / Hynix 131,072 WORDS x 8 BIT CMOS SRAM
-TMP47C241MG = TCLS-47 series 4-bit CPU with 2048x8 internal ROM
+TMP47C241MG = TLCS-47 series 4-bit CPU with 2048x8 internal ROM
 
 */
 

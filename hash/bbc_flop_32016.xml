@@ -8,7 +8,7 @@ Acorn BBC Micro - 32016 Co-Processor Discs
 
 <softwarelist name="bbc_flop_32016" description="Acorn 32016 Co-Processor discs">
 
-	<software name="panos11" cloneof="panos14" supported="no">
+	<software name="panos11" cloneof="panos14">
 		<description>PanOS Version 1.10 System Disks</description>
 		<year>1985</year>
 		<publisher>Acorn Computers</publisher>
@@ -58,10 +58,11 @@ Acorn BBC Micro - 32016 Co-Processor Discs
 		</part>
 	</software>
 
-	<software name="panos14" supported="no">
+	<software name="panos14">
 		<description>PanOS Version 1.40 System Disks</description>
-		<year>1985</year>
+		<year>1986</year>
 		<publisher>Acorn Computers</publisher>
+		<info name="release" value="ANJ18" />
 		<info name="format" value="DFS" />
 		<info name="usage" value="Requires 32016 co-processor" />
 		<part name="flop1" interface="floppy_5_25">
@@ -110,7 +111,7 @@ Acorn BBC Micro - 32016 Co-Processor Discs
 
 	<!-- Scientific Software -->
 
-	<software name="gcal" supported="no">
+	<software name="gcal">
 		<description>GCAL</description>
 		<year>1986</year>
 		<publisher>Acorn Computers</publisher>
@@ -124,7 +125,7 @@ Acorn BBC Micro - 32016 Co-Processor Discs
 		</part>
 	</software>
 
-	<software name="bcpl" supported="no">
+	<software name="bcpl">
 		<description>BCPL</description>
 		<year>1986</year>
 		<publisher>Acorn Computers</publisher>
@@ -147,7 +148,7 @@ Acorn BBC Micro - 32016 Co-Processor Discs
 
 	<!-- 1986 SSS03 SPICE -->
 
-	<software name="reduce" supported="no">
+	<software name="reduce">
 		<description>Reduce</description>
 		<year>1986</year>
 		<publisher>Acorn Computers</publisher>

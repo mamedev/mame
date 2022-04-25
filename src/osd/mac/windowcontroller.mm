@@ -109,7 +109,7 @@ void *GetOSWindow(void *wincontroller)
 	return [wc getWindow];
 }
 
-void *CreateMAMEWindow(char *title, int x, int y, int w, int h, bool isFullscreen)
+void *CreateMAMEWindow(const char *title, int x, int y, int w, int h, bool isFullscreen)
 {
 	NSRect bounds = NSMakeRect(x, y, w, h);
 	NSUInteger style = NSTitledWindowMask | NSClosableWindowMask | NSResizableWindowMask;

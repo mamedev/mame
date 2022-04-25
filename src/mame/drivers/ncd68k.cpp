@@ -92,7 +92,7 @@ public:
 		, m_vram(*this, "vram")
 		, m_duart(*this, "duart")
 		, m_lance(*this, "lance")
-		, m_kbd_con(*this, "kbd_con")
+		, m_kbd_con(*this, "kbd")
 		, m_serial(*this, "serial%u", 0U)
 		, m_eeprom(*this, "eeprom")
 		, m_screen(*this, "screen")
@@ -124,9 +124,9 @@ protected:
 	required_device<screen_device> m_screen;
 
 //private:
-	u8 m_portc, m_to_68k, m_from_68k;
-	u8 m_porta_in, m_porta_out;
-	u8 m_portb_out;
+	u8 m_portc = 0, m_to_68k = 0, m_from_68k = 0;
+	u8 m_porta_in = 0, m_porta_out = 0;
+	u8 m_portb_out = 0;
 };
 
 class ncd16_state : public ncd68k_state
@@ -210,7 +210,7 @@ u32 ncd16_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rect
 {
 	for (unsigned y = 0; y < 1024; y++)
 	{
-		u32 *scanline = &bitmap.pix32(y);
+		u32 *scanline = &bitmap.pix(y);
 		for (unsigned x = 0; x < 1024 / 8; x++)
 		{
 			u8 const pixels = m_vram->read(BYTE_XOR_BE(y * (1024 / 8) + x));
@@ -227,7 +227,7 @@ u32 ncd17c_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rec
 {
 	for (unsigned y = 0; y < 768; y++)
 	{
-		u32 *scanline = &bitmap.pix32(y);
+		u32 *scanline = &bitmap.pix(y);
 		for (unsigned x = 0; x < 1024; x++)
 		{
 			u8 const pixels = m_vram->read((y * 1024) + BYTE4_XOR_BE(x));
@@ -242,7 +242,7 @@ u32 ncd19_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rect
 {
 	for (unsigned y = 0; y < 1024; y++)
 	{
-		u32 *scanline = &bitmap.pix32(y);
+		u32 *scanline = &bitmap.pix(y);
 		for (unsigned x = 0; x < 1280/8; x++)
 		{
 			u8 const pixels = m_vram->read((y * (2048/8)) + BYTE4_XOR_BE(x));
@@ -601,7 +601,7 @@ void ncd68k_state::common(machine_config &config)
 	m_mcu->portb_r().set(FUNC(ncd68k_state::mcu_portb_r));
 
 	// keyboard connector
-	PC_KBDC(config, m_kbd_con, 0);
+	PC_KBDC(config, m_kbd_con, pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL);
 	m_kbd_con->out_clock_cb().set_inputline(m_mcu, M6805_IRQ_LINE).invert();
 	m_kbd_con->out_data_cb().set(
 			[this] (int state)
@@ -611,10 +611,6 @@ void ncd68k_state::common(machine_config &config)
 				else
 					m_porta_in &= ~0x01;
 			});
-
-	// keyboard port
-	pc_kbdc_slot_device &kbd(PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
-	kbd.set_pc_kbdc_slot(m_kbd_con);
 
 	// mouse and auxiliary ports
 	RS232_PORT(config, m_serial[0],

@@ -47,7 +47,14 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")
+		, m_bankr0(*this, "bankr0")
+		, m_bankw0(*this, "bankw0")
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
 		, m_p_chargen(*this, "chargen")
+		, m_p_mram(*this, "mram", 0x40000, ENDIANNESS_LITTLE)
+		, m_p_videoram(*this, "vram", 0x10000, ENDIANNESS_LITTLE)
+		, m_p_attribram(*this, "aram", 0x800, ENDIANNESS_LITTLE)
 		, m_ctc(*this, "ctc")
 		, m_dma(*this, "dma")
 		, m_pio1(*this, "pio1")
@@ -66,6 +73,10 @@ public:
 	void aussiebyte(machine_config &config);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	u8 memory_read_byte(offs_t offset);
@@ -101,31 +112,33 @@ private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
 	u8 crt8002(u8 ac_ra, u8 ac_chr, u8 ac_attr, u16 ac_cnt, bool ac_curs);
-	bool m_port15; // rom switched in (0), out (1)
-	u8 m_port17;
-	u8 m_port17_rdy;
-	u8 m_port19;
-	u8 m_port1a; // bank to switch to when write to port 15 happens
-	u8 m_port28;
-	u8 m_port34;
-	u8 m_port35; // byte to be written to vram or aram
-	u8 m_video_index;
-	u16 m_cnt;
-	u16 m_alpha_address;
-	u16 m_graph_address;
-	bool m_centronics_busy;
+	bool m_port15 = false; // rom switched in (0), out (1)
+	u8 m_port17 = 0U;
+	u8 m_port17_rdy = 0U;
+	u8 m_port19 = 0U;
+	u8 m_port1a = 0U; // bank to switch to when write to port 15 happens
+	u8 m_port28 = 0U;
+	u8 m_port34 = 0U;
+	u8 m_port35 = 0U; // byte to be written to vram or aram
+	u8 m_video_index = 0U;
+	u16 m_cnt = 0U;
+	u16 m_alpha_address = 0U;
+	u16 m_graph_address = 0U;
+	bool m_centronics_busy = false;
 	std::unique_ptr<u8[]> m_vram; // video ram, 64k dynamic
 	std::unique_ptr<u8[]> m_aram; // attribute ram, 2k static
 	std::unique_ptr<u8[]> m_ram;  // main ram, 256k dynamic
 	required_device<palette_device> m_palette;
 	required_device<z80_device> m_maincpu;
+	required_memory_bank m_bankr0, m_bankw0, m_bank1, m_bank2;
 	required_region_ptr<u8> m_p_chargen;
+	memory_share_creator<u8> m_p_mram;
+	memory_share_creator<u8> m_p_videoram;
+	memory_share_creator<u8> m_p_attribram;
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80dma_device> m_dma;
 	required_device<z80pio_device> m_pio1;

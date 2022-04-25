@@ -279,13 +279,13 @@ void decocass_state::draw_special_priority(bitmap_ind16 &bitmap, bitmap_ind8 &pr
 					(dy >= 0 && dy < 64 && dx >= 0 && dx < 64 && objdata1[dy * 64 + dx] != 0))
 				{
 					pri2 = true;
-					if (BIT(m_mode_set, 5) && priority.pix8(y, x) == 0) // least priority?
-						bitmap.pix16(y, x) = color;
+					if (BIT(m_mode_set, 5) && priority.pix(y, x) == 0) // least priority?
+						bitmap.pix(y, x) = color;
 				}
 			}
 
 			if (!pri2)
-				bitmap.pix16(y, x) |= 0x10;
+				bitmap.pix(y, x) |= 0x10;
 		}
 	}
 }
@@ -313,7 +313,7 @@ void decocass_state::draw_center(bitmap_ind16 &bitmap, const rectangle &cliprect
 			if (((sy + y) & m_color_center_bot & 3) == (sy & m_color_center_bot & 3))
 				for (x = 0; x < 256; x++)
 					if (0 != (x & 16) || 0 != (m_center_h_shift_space & 1))
-						bitmap.pix16(sy + y, (sx + x) & 255) = color;
+						bitmap.pix(sy + y, (sx + x) & 255) = color;
 		}
 }
 
@@ -572,16 +572,12 @@ void decocass_state::draw_missiles(bitmap_ind16 &bitmap, bitmap_ind8 &priority, 
 						int missile_y_adjust, int missile_y_adjust_flip_screen,
 						uint8_t *missile_ram, int interleave)
 {
-	int i, offs, x;
-
 	/* Draw the missiles (16 of them) seemingly with alternating colors
 	 * from the E302 latch (color_missiles) */
-	for (i = 0, offs = 0; i < 8; i++, offs += 4 * interleave)
+	for (int i = 0, offs = 0; i < 8; i++, offs += 4 * interleave)
 	{
-		int sx, sy;
-
-		sy = 255 - missile_ram[offs + 0 * interleave];
-		sx = 255 - missile_ram[offs + 2 * interleave];
+		int sy = 255 - missile_ram[offs + 0 * interleave];
+		int sx = 255 - missile_ram[offs + 2 * interleave];
 		if (flip_screen())
 		{
 			sx = 240 - sx;
@@ -589,12 +585,12 @@ void decocass_state::draw_missiles(bitmap_ind16 &bitmap, bitmap_ind8 &priority, 
 		}
 		sy -= missile_y_adjust;
 		if (sy >= cliprect.top() && sy <= cliprect.bottom())
-			for (x = 0; x < 4; x++)
+			for (int x = 0; x < 4; x++)
 			{
 				if (sx >= cliprect.left() && sx <= cliprect.right())
 				{
-					bitmap.pix16(sy, sx) = (m_color_missiles & 7) | 8;
-					priority.pix8(sy, sx) |= 1 << 2;
+					bitmap.pix(sy, sx) = (m_color_missiles & 7) | 8;
+					priority.pix(sy, sx) |= 1 << 2;
 				}
 				sx++;
 			}
@@ -608,12 +604,12 @@ void decocass_state::draw_missiles(bitmap_ind16 &bitmap, bitmap_ind8 &priority, 
 		}
 		sy -= missile_y_adjust;
 		if (sy >= cliprect.top() && sy <= cliprect.bottom())
-			for (x = 0; x < 4; x++)
+			for (int x = 0; x < 4; x++)
 			{
 				if (sx >= cliprect.left() && sx <= cliprect.right())
 				{
-					bitmap.pix16(sy, sx) = ((m_color_missiles >> 4) & 7) | 8;
-					priority.pix8(sy, sx) |= 1 << 3;
+					bitmap.pix(sy, sx) = ((m_color_missiles >> 4) & 7) | 8;
+					priority.pix(sy, sx) |= 1 << 3;
 				}
 				sx++;
 			}
@@ -657,19 +653,17 @@ void decocass_state::draw_edge(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 		srcbitmap = &m_bg_tilemap_r->pixmap();
 	}
 
-	int y,x;
-
 //  printf("m_mode_set %d\n", m_mode_set & 0x3);
 
 	// technically our y drawing probably shouldn't wrap / mask, but simply draw the 128pixel high 'edge' at the requested position
 	//  see note above this funciton
-	for (y=clip.top(); y<=clip.bottom(); y++)
+	for (int y=clip.top(); y<=clip.bottom(); y++)
 	{
 		int srcline = (y + scrolly) & 0x1ff;
-		uint16_t* src = &srcbitmap->pix16(srcline);
-		uint16_t* dst = &bitmap.pix16(y);
+		uint16_t const *const src = &srcbitmap->pix(srcline);
+		uint16_t *const dst = &bitmap.pix(y);
 
-		for (x=clip.left(); x<=clip.right(); x++)
+		for (int x=clip.left(); x<=clip.right(); x++)
 		{
 			int srccol = 0;
 
@@ -683,7 +677,7 @@ void decocass_state::draw_edge(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 				case 0x03: srccol = (x + scrollx) & 0x1ff; break; // hwy, burnrub etc.
 			}
 
-			uint16_t pix = src[srccol];
+			uint16_t const pix = src[srccol];
 
 			if ((pix & 0x3) || opaque)
 				dst[x] = pix;

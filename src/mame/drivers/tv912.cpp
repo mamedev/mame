@@ -123,7 +123,7 @@ private:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tms9927_device> m_crtc;
@@ -249,7 +249,7 @@ void tv912_state::output_40c(u8 data)
 	m_dispram_bank->set_entry(BIT(data, 0));
 }
 
-void tv912_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void tv912_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

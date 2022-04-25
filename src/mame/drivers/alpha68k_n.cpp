@@ -17,57 +17,127 @@
 Kyros no Yakata
 Alpha Denshi, 1986
 
-PCB Layout:
-
+PCB Layout
+----------
 Main Board
+
+(no PCB number)
 |----------------------------------------------------------|
 |                                                          |
 | 0.1T                                              24MHz  |
 |                                                          |
-| 15.3T                                                    |
-|         PROMG.4R          5814                           |
-| 16.5T   PROMR.5R PROMH.5P 5814                  DSW1(8)  |
-|         PROMB.6R PROML.6P                                |
-| 17.7T                                           MCU      |
-|                             2016 2016                    |
-| 18.9T   9.9S 8.9R           2016 2016                    |
-|                                                          |
+| 15.3T                  5814                              |
+|         PROMG.4R                             SW1  |   | 1|
+| 16.5T   PROMR.5R PROMH.5P 5814                    |   | 8|
+|         PROMB.6R PROML.6P                         |   | W|
+| 17.7T                                        8511 |   | A|
+|                             2016 2016             |   | Y|
+| 18.9T   9.9S 8.9R           2016 2016             |   |  |
+|                                                   |   |  |
 | 19.11T                            68000 2016 2.10C 4.10A |
 |              14.12R  12.12N             2016             |
 | 20.13T           13.12P  11.12M              1.13C 3.13A |
-|                                                          |
+|CN                                                        |
 |----------------------------------------------------------|
+Notes:
+         68000 clock - 6.000MHz [24/4]
+                2016 - 2kx8 SRAM
+                5814 - 2kx8 SRAM
+                  CN - 18-pin flat cable connector joining to sound PCB
+                   | - ALPHA-INPUT84 custom ceramic module (x2)
+                 SW1 - 8-position DIP Switch
+               VSync - 60Hz
+               HSync - 15.20kHz
+                8511 - Alpha 8511 Microcontroller at location 7C. '8511' is silkscreened on the PCB.
+                       Clock input 3.000MHz [24/8] (measured on pin 5).
+                       The chip is pin-compatible with Motorola MC68705U3, Motorola MC6805U2
+                       and Hitachi HD6805U1. The 4k MC68705U3 dump in MAME is from a bootleg PCB.
+
+Note from Guru: The bootleg 4k MCU dump was written to a genuine
+Motorola MC68705U3 microcontroller and tested on the original Alpha
+Denshi Kyros no Yakata PCB and works. Since the bootleg PCB is
+visually the same this suggests the bootleggers copied the PCB 1:1
+including the HD6805U1 MCU data then adapted it for the 68705U3 with
+minimal changes.
+*******************************
+romcmp -d *.bin
+Comparing 2 files....
+kyros_68705u3.bin [3/4]      kyros_mcu.bin [1/2]      99.902344%
+kyros_68705u3.bin [4/4]      kyros_mcu.bin [2/2]      88.183594%
+*******************************
 
 Sound Board
+-----------
+
+SOUND BOARD NO.60MC01
 |---------------------|
+| 40174   324  UPC1181|
+| 4013     VOL  VOL   |
+| YM3014  324        6|
+|                    W|
+| YM2203  AY-3-8910  A|
+|                    Y|
+|         AY-3-8910   |
 |                     |
-|                     |
-| YM3014              |
-|                     |
-| YM2203    AY-3-8910 |
-|                     |
-|           AY-3-8910 |
-|                     |
-|                     |
+| DIP28               |
 |                     |
 | 2.1F 2114           |
 |      2114           |
 | 1.1D          16MHz |
 |                     |
 |  Z80                |
-|                     |
+|CN                   |
 |---------------------|
-
 Notes:
-        68k clock: 6.000MHz
-        Z80 clock: 4.000MHz
-            VSync: 60Hz
-            HSync: 15.20kHz
-  AY-3-8910 clock: 2.000MHz
-     YM2203 clock: 2.000MHz
-Unknown MCU clock: 3.000MHz (measured on pin 5)
+      Z80 clock - 4.000MHz [16/4]. The actual chip is a NEC D780C-1
+AY-3-8910 clock - 2.000MHz [16/8]
+   YM2203 clock - 2.000MHz [16/8]
+         YM3014 - Yamaha YM3014 DAC. Clock input 1.33333MHz [16/12]
+        UPC1181 - Power AMP IC
+            324 - LM324 Quad Op Amp
+           2114 - 1kx4 SRAM
+           40xx - 4000-series logic chips
+             CN - 18-pin flat cable connector joining to main PCB
+          DIP28 - Empty socket
+
+PCB Pinout
+----------
+
+       18-WAY Connector (Main)
+           Parts   Solder
+         -----------------
+          +5V A1   B1 +5V
+          +5V A2   B2 +5V
+        1P UP A3   B3 2P DOWN
+      1P DOWN A4   B4 2P RIGHT
+     1P RIGHT A5   B5 2P LEFT
+      1P LEFT A6   B6 2P BUTTON 1
+  1P BUTTON 1 A7   B7 -
+  1P BUTTON 2 A8   B8 -
+           -  A9   B9 COIN 1
+    1P START A10   B10 COIN 2
+       2P UP A11   B11 2P BUTTON 2
+       GREEN A12   B12 -
+        BLUE A13   B13 2P START
+         RED A14   B14 -
+        SYNC A15   B15 -
+         GND A16   B16 GND
+         GND A17   B17 GND
+         GND A18   B18 GND
+
+6-WAY Connector (Sound)
+    Parts   Solder
+  -----------------
+  +12V A1   B1 +12V
+     - A2   B2 -
+   +5V A3   B3 +5V
+  SPK+ A4   B4 SPK+
+  SPK- A5   B5 GND
+   GND A6   B6 GND
+
 
 ***************************************************************************/
+
 
 #include "emu.h"
 #include "includes/alpha68k.h"
@@ -201,7 +271,7 @@ u16 alpha68k_N_state::kyros_alpha_trigger_r(offs_t offset)
 		}
 		else
 		{
-			if (m_microcontroller_id == 0x00ff)     /* Super Stingry */
+			if (m_microcontroller_id == 0x00ff || m_game_id == ALPHA68K_JONGBOU)     /* Super Stingry */
 			{
 				if (m_trigstate >= 12 || m_game_id == ALPHA68K_JONGBOU) /* arbitrary value ! */
 				{
@@ -360,11 +430,11 @@ void sstingray_state::sound_map(address_map &map)
 void alpha68k_N_state::sound_iomap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x10, 0x11).w("ym1", FUNC(ym2203_device::write));
-	map(0x80, 0x80).w("ym2", FUNC(ym2203_device::write_port_w));
-	map(0x81, 0x81).w("ym2", FUNC(ym2203_device::control_port_w));
-	map(0x90, 0x90).w("ym3", FUNC(ym2203_device::write_port_w));
-	map(0x91, 0x91).w("ym3", FUNC(ym2203_device::control_port_w));
+	map(0x10, 0x11).w("ym", FUNC(ym2203_device::write));
+	map(0x80, 0x80).w("aysnd1", FUNC(ay8910_device::data_w));
+	map(0x81, 0x81).w("aysnd1", FUNC(ay8910_device::address_w));
+	map(0x90, 0x90).w("aysnd2", FUNC(ay8910_device::data_w));
+	map(0x91, 0x91).w("aysnd2", FUNC(ay8910_device::address_w));
 }
 
 void jongbou_state::sound_map(address_map &map)
@@ -448,7 +518,7 @@ static const gfx_layout jongbou_layout1 =
 	8,8,    /* 8*8 chars */
 	1024,
 	3,      /* 3 bits per pixel */
-	{ 4, 0+0x20000*8, 4+0x20000*8 },
+	{ 4+0x00000*8, 0+0x8000*8, 4+0x8000*8 },
 	{ 8*8+3, 8*8+2, 8*8+1, 8*8+0, 3, 2, 1, 0 },
 	{ STEP8(0,8) },
 	16*8    /* every char takes 16 consecutive bytes */
@@ -459,40 +529,7 @@ static const gfx_layout jongbou_layout2 =
 	8,8,    /* 8*8 chars */
 	1024,
 	3,      /* 3 bits per pixel */
-	{ 0, 0+0x28000*8, 4+0x28000*8 },
-	{ 8*8+3, 8*8+2, 8*8+1, 8*8+0, 3, 2, 1, 0 },
-	{ STEP8(0,8) },
-	16*8    /* every char takes 16 consecutive bytes */
-};
-
-static const gfx_layout jongbou_layout3 =
-{
-	8,8,    /* 8*8 chars */
-	1024,
-	3,      /* 3 bits per pixel */
-	{ 4+0x8000*8, 0+0x10000*8, 4+0x10000*8 },
-	{ 8*8+3, 8*8+2, 8*8+1, 8*8+0, 3, 2, 1, 0 },
-	{ STEP8(0,8) },
-	16*8    /* every char takes 16 consecutive bytes */
-};
-
-static const gfx_layout jongbou_layout4 =
-{
-	8,8,    /* 8*8 chars */
-	1024,
-	3,      /* 3 bits per pixel */
-	{ 0x8000*8, 0x18000*8, 4+0x18000*8 },
-	{ 8*8+3, 8*8+2, 8*8+1, 8*8+0, 3, 2, 1, 0 },
-	{ STEP8(0,8) },
-	16*8    /* every char takes 16 consecutive bytes */
-};
-
-static const gfx_layout jongbou_layout5 =
-{
-	8,8,    /* 8*8 chars */
-	1024,
-	3,      /* 3 bits per pixel */
-	{ 4+0x4000*8, 0+0x24000*8, 4+0x24000*8 },
+	{ 0+0x00000*8, 0+0x10000*8, 4+0x10000*8 },
 	{ 8*8+3, 8*8+2, 8*8+1, 8*8+0, 3, 2, 1, 0 },
 	{ STEP8(0,8) },
 	16*8    /* every char takes 16 consecutive bytes */
@@ -517,11 +554,14 @@ static GFXDECODE_START( gfx_kyros )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_jongbou )
-	GFXDECODE_ENTRY( "gfx1", 0, jongbou_layout1,  0, 32 )
-	GFXDECODE_ENTRY( "gfx1", 0, jongbou_layout2,  0, 32 )
-	GFXDECODE_ENTRY( "gfx1", 0, jongbou_layout3,  0, 32 )
-	GFXDECODE_ENTRY( "gfx1", 0, jongbou_layout4,  0, 32 )
-	GFXDECODE_ENTRY( "gfx1", 0, jongbou_layout5,  0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, jongbou_layout1,  0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, jongbou_layout2,  0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0x18000, jongbou_layout1,  0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0x18000, jongbou_layout2,  0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0x04000, jongbou_layout1,  0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0x04000, jongbou_layout2,  0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0x1c000, jongbou_layout1,  0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0x1c000, jongbou_layout2,  0, 32 )
 GFXDECODE_END
 
 /*
@@ -718,33 +758,29 @@ void sstingray_state::sstingry(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sstingry);
 	video_config(config, 0x40, 0, true);
 
-	/* sound hardware */
+	// sound hardware
+	ym2203_device &ym(YM2203(config, "ym", 2'000'000));            // Verified from video by PCB, 24MHz/12?
+	ym.add_route(ALL_OUTPUTS, "speaker", 0.30);
 
-	ym2203_device &ym1(YM2203(config, "ym1", 3000000));
-	ym1.add_route(ALL_OUTPUTS, "speaker", 0.35);
+	ay8910_device &aysnd1(AY8910(config, "aysnd1", 2'000'000));    // Verified from video by PCB, 24MHz/12?
+	aysnd1.add_route(ALL_OUTPUTS, "speaker", 0.30);
 
-	ym2203_device &ym2(YM2203(config, "ym2", 3000000));
-	ym2.add_route(ALL_OUTPUTS, "speaker", 0.35);
+	ay8910_device &aysnd2(AY8910(config, "aysnd2", 2'000'000));    // Verified from video by PCB, 24MHz/12?
+	aysnd2.add_route(ALL_OUTPUTS, "speaker", 0.45);
 
-	ym2203_device &ym3(YM2203(config, "ym3", 3000000));
-	ym3.add_route(ALL_OUTPUTS, "speaker", 0.5);
-
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.75); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.50); // unknown DAC
 }
 
 void kyros_state::kyros(machine_config &config)
 {
 	base_config(config);
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 24_MHz_XTAL / 4);   /* Verified on bootleg PCB */
+	// basic machine hardware
+	M68000(config, m_maincpu, 24_MHz_XTAL / 4);   // Verified on original PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &kyros_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(kyros_state::irq1_line_hold));
 	m_maincpu->set_periodic_int(FUNC(kyros_state::irq2_line_hold), attotime::from_hz(60)); // MCU irq
 
-	Z80(config, m_audiocpu, 24_MHz_XTAL / 6); /* Verified on bootleg PCB */
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 4); // Verified on original PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &kyros_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &kyros_state::sound_iomap);
 	m_audiocpu->set_vblank_int("screen", FUNC(kyros_state::irq0_line_hold));
@@ -755,20 +791,17 @@ void kyros_state::kyros(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kyros);
 
-	/* sound hardware */
-	ym2203_device &ym1(YM2203(config, "ym1", 24_MHz_XTAL / 12));    /* Verified on bootleg PCB */
-	ym1.add_route(ALL_OUTPUTS, "speaker", 0.35);
+	// sound hardware
+	ym2203_device &ym(YM2203(config, "ym", 16_MHz_XTAL / 8));            // Verified on original PCB
+	ym.add_route(ALL_OUTPUTS, "speaker", 0.30);
 
-	ym2203_device &ym2(YM2203(config, "ym2", 24_MHz_XTAL / 12));    /* Verified on bootleg PCB */
-	ym2.add_route(ALL_OUTPUTS, "speaker", 0.35);
+	ay8910_device &aysnd1(AY8910(config, "aysnd1", 16_MHz_XTAL / 8));    // Verified on original PCB
+	aysnd1.add_route(ALL_OUTPUTS, "speaker", 0.30);
 
-	ym2203_device &ym3(YM2203(config, "ym3", 24_MHz_XTAL / 12));    /* Verified on bootleg PCB */
-	ym3.add_route(ALL_OUTPUTS, "speaker", 0.9);
+	ay8910_device &aysnd2(AY8910(config, "aysnd2", 16_MHz_XTAL / 8));    // Verified on original PCB
+	aysnd2.add_route(ALL_OUTPUTS, "speaker", 0.6);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.75); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.50);
 }
 
 void jongbou_state::jongbou(machine_config &config)
@@ -935,9 +968,10 @@ ROM_START( jongbou )
 	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
-	ROM_LOAD( "p6.l15", 0x00000, 0x10000, CRC(1facee65) SHA1(6c98338c616e53106960063d0d31483131b492b0) )
-	ROM_LOAD( "p5.k15", 0x10000, 0x10000, CRC(db0ad6bb) SHA1(c2ce0e78a4be9314f4f14ea87f521a79bab3697c) )
-	ROM_LOAD( "p4.j15", 0x20000, 0x10000, CRC(56842cfa) SHA1(141ed992332540487cec951eab61c18be994b618) )
+	ROM_LOAD( "p6.l15", 0x00000, 0x08000, CRC(1facee65) SHA1(6c98338c616e53106960063d0d31483131b492b0) )
+	ROM_CONTINUE(0x18000,0x8000)
+	ROM_LOAD( "p5.k15", 0x20000, 0x10000, CRC(db0ad6bb) SHA1(c2ce0e78a4be9314f4f14ea87f521a79bab3697c) )
+	ROM_LOAD( "p4.j15", 0x08000, 0x10000, CRC(56842cfa) SHA1(141ed992332540487cec951eab61c18be994b618) )
 
 	ROM_REGION( 0x300, "proms", 0 )
 	ROM_LOAD( "r.k2",  0x0000, 0x0100, CRC(0563235a) SHA1(c337a9a15c1a27012a963fc4e1345605aaa1401f) )
@@ -951,6 +985,38 @@ ROM_START( jongbou )
 	ROM_REGION( 0x2000, "color_proms", 0 )
 	ROM_LOAD( "p3.i15", 0x0000, 0x2000, CRC(8c09cd2a) SHA1(317764e0f5af29e78fd764bdf28579bf6be5630f) )
 ROM_END
+
+ROM_START( jongbou2 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "j.b1_ver.2.13a.27c512", 0x00000, 0x10000, CRC(22e18446) SHA1(e6f6f06a99c66dcf8b3e05b85c35597a26b57aa2) )
+	ROM_LOAD16_BYTE( "j.b2_ver.2.16a.27c512", 0x00001, 0x10000, CRC(c30d0030) SHA1(56d3aacf7f53970c21abd6ac5592a5b29ac946c8) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "j.b7.1i.27256", 0x00000, 0x8000, CRC(88d74794) SHA1(98dbbb4d88c1e96a0e251e39ef43b02bd68e0bba) )
+
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_LOAD( "j.b6.16l.27c512",  0x00000, 0x08000, CRC(71c53f95) SHA1(0e12d03f2bbcff14816f739026e40939c9f68bab) )
+	ROM_CONTINUE(0x18000,0x8000)
+	ROM_LOAD( "j.b5.16k.27c512",  0x20000, 0x10000, CRC(d68b6412) SHA1(6734f5eb31fbf7b5b3edf1d8c4369cc74aea74ab) )
+	ROM_LOAD( "j.b24.16j.27c512", 0x08000, 0x10000, CRC(7dad0bda) SHA1(bea00314036a43806c07c39a0d3f7020990ded09) )
+
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "2.l2.82s129a",  0x0000, 0x0100, CRC(aa5c9b97) SHA1(2758d393aa210fab0af9f5fd817edbd5c71a88f2) )
+	ROM_LOAD( "1.l1.82s129a",  0x0100, 0x0100, CRC(15e45cf2) SHA1(f0712b43e8423f811a1691b1f51683a7af58f868) )
+	ROM_LOAD( "3.l3.82s129a",  0x0200, 0x0100, CRC(90de80ca) SHA1(d58c5fed42ac71b84bb51e6acfe1d65158532387) )
+
+	ROM_REGION( 0x200, "clut_proms", 0 )
+	ROM_LOAD( "4.l9.82s129a",  0x0100, 0x0100, CRC(a2c6204a) SHA1(3bb342eced4abc0d7404b00343b3770dd7a0003e) )
+	ROM_LOAD( "5.l10.82s129a", 0x0000, 0x0100, CRC(f7cdebee) SHA1(20cb28e2fb9507ef1aaa9c05f22ca589756eb49d) )
+
+	ROM_REGION( 0x2000, "color_proms", 0 )
+	ROM_LOAD( "j.b3.16i.2764", 0x00000, 0x2000, CRC(d13a1c02) SHA1(7ad4b96f5ce05e0ca5b55c486b3870d756e6bded) )
+ROM_END
+
+
 
 void sstingray_state::init_sstingry()
 {
@@ -981,9 +1047,18 @@ void jongbou_state::init_jongbou()
 	m_game_id = ALPHA68K_JONGBOU;
 }
 
+void jongbou_state::init_jongbou2()
+{
+	init_jongbou();
+	m_microcontroller_id = 0x0012;
+}
+
+
 GAME( 1986, sstingry,  0,        sstingry,       sstingry,  sstingray_state, init_sstingry,  ROT90, "Alpha Denshi Co.",                                  "Super Stingray (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
 
 GAME( 1987, kyros,     0,        kyros,          kyros,     kyros_state, init_kyros,     ROT90, "Alpha Denshi Co. (World Games Inc. license)",       "Kyros", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, kyrosj,    kyros,    kyros,          kyros,     kyros_state, init_kyros,     ROT90, "Alpha Denshi Co.",                                  "Kyros no Yakata (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1987, jongbou,   0,        jongbou,        jongbou,   jongbou_state,    init_jongbou,   ROT90, "SNK",                                               "Mahjong Block Jongbou (Japan)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1987, jongbou2,  0,        jongbou,        jongbou,   jongbou_state,    init_jongbou2,  ROT90, "SNK",                                               "Mahjong Block Jongbou 2 (Japan)", MACHINE_SUPPORTS_SAVE )

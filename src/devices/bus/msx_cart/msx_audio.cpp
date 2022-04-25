@@ -154,7 +154,7 @@ void msx_cart_msx_audio_nms1205_device::device_add_mconfig(machine_config &confi
 	m_y8950->add_route(ALL_OUTPUTS, "mono", 0.40);
 	m_y8950->keyboard_write().set("kbdc", FUNC(msx_audio_kbdc_port_device::write));
 	m_y8950->keyboard_read().set("kbdc", FUNC(msx_audio_kbdc_port_device::read));
-	m_y8950->irq().set(FUNC(msx_cart_msx_audio_nms1205_device::irq_write));
+	m_y8950->irq_handler().set(FUNC(msx_cart_msx_audio_nms1205_device::irq_write));
 
 	MSX_AUDIO_KBDC_PORT(config, "kbdc", msx_audio_keyboards, nullptr);
 

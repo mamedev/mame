@@ -13,6 +13,19 @@ Armoured Assault SD233C // Was available on Cartridge and/or Tape
 
 <softwarelist name="svi318_cart" description="Spectravision SVI-318 cartridges">
 
+	<!-- Says for Spectravideo 328 but seems to run on 318 too, at least in MAME -->
+	<software name="adaptmsx">
+		<description>Adaptor MSX Para Spectravideo SVI-328</description>
+		<year>1986</year>
+		<publisher>CCG</publisher>
+		<part name="cart" interface="svi318_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="1_svi328_msx.bin" size="16384" crc="42ea3dd7" sha1="4bdfa1fd71dfe12b9fda287abe2bf3e154575d79"/>
+				<rom name="2_svi328_msx.bin" size="16384" crc="98b5ce63" sha1="3b6d2998b939cfe204bc9f6aaeded2baed855504" offset="16384"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="flipper">
 		<description>Flipper Slipper</description>
 		<year>1983</year>

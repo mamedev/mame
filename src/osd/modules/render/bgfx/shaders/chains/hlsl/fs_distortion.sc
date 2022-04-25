@@ -183,7 +183,7 @@ void main()
 	// corner distortion at least by the amount of the image distorition
 	float distortCornerAmount = max(u_distort_corner.x, u_distortion.x + u_cubic_distortion.x);
 
-	float roundCornerAmount = u_round_corner.x * 0.5; 
+	float roundCornerAmount = u_round_corner.x * 0.5;
 	float smoothBorderAmount = u_smooth_border.x * 0.5;
 
 	vec2 TexelDims = vec2(1.0 / u_target_dims.x, 1.0 / u_target_dims.y);

@@ -40,7 +40,7 @@ protected:
 	virtual void vip_program_w(offs_t offset, uint8_t data, int cdef, int *minh) override;
 
 private:
-	optional_shared_ptr<uint8_t> m_ram;
+	memory_share_creator<uint8_t> m_ram;
 	required_ioport m_base;
 	required_ioport m_sw1;
 };

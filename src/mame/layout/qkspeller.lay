@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+
+	<!-- define elements -->
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.3" blue="0.2" /></led7seg>
+	</element>
+
+	<element name="ledr" defstate="0">
+		<disk state="1"><color red="1.0" green="0.3" blue="0.2" /></disk>
+		<disk state="0"><color red="0.2" green="0.05" blue="0.04" /></disk>
+	</element>
+	<element name="ledg" defstate="0">
+		<disk state="1"><color red="0.2" green="1.0" blue="0.2" /></disk>
+		<disk state="0"><color red="0.04" green="0.2" blue="0.04" /></disk>
+	</element>
+
+
+	<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="-1" right="61" top="0" bottom="15" />
+
+		<element name="2.a" ref="ledr"><bounds x="49" y="3" width="9" height="9" /></element>
+		<element name="3.a" ref="ledg"><bounds x="2" y="3" width="9" height="9" /></element>
+
+		<element name="digit1" ref="digit"><bounds x="20" y="0" width="10" height="15" /></element>
+		<element name="digit0" ref="digit"><bounds x="30" y="0" width="10" height="15" /></element>
+
+	</view>
+</mamelayout>

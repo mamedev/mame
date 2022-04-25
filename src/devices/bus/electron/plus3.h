@@ -39,7 +39,7 @@ protected:
 
 private:
 	void wd1770_status_w(uint8_t data);
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	required_device<electron_expansion_slot_device> m_exp;
 	required_memory_region m_exp_rom;

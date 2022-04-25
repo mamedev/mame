@@ -65,46 +65,46 @@ license:CC0
 
 	<view name="Internal Layout">
 		<bounds left="0" right="12" top="0" bottom="12" />
-		<bezel element="static_white">
+		<element ref="static_white">
 			<bounds left="-1" right="13" top="-1" bottom="13" />
-		</bezel>
+		</element>
 
 	<!-- middle part -->
 
-		<bezel element="static_black"><bounds x="4" y="4" width="4" height="4" /></bezel>
+		<element ref="static_black"><bounds x="4" y="4" width="4" height="4" /></element>
 
-		<bezel element="text_u"><bounds x="4" y="4.4" width="4" height="0.4" /></bezel>
-		<bezel element="text_d"><bounds x="4" y="7.2" width="4" height="0.4" /></bezel>
-		<bezel element="text_l"><bounds x="4.4" y="4" width="0.4" height="4" /><orientation rotate="90" /></bezel>
-		<bezel element="text_r"><bounds x="7.2" y="4" width="0.4" height="4" /><orientation rotate="270" /></bezel>
+		<element ref="text_u"><bounds x="4" y="4.4" width="4" height="0.4" /></element>
+		<element ref="text_d"><bounds x="4" y="7.2" width="4" height="0.4" /></element>
+		<element ref="text_l"><bounds x="4.4" y="4" width="0.4" height="4" /><orientation rotate="90" /></element>
+		<element ref="text_r"><bounds x="7.2" y="4" width="0.4" height="4" /><orientation rotate="270" /></element>
 
 	<!-- main buttons and leds -->
 
-		<bezel element="disk_red"><bounds x="1" y="3" width="2" height="2" /></bezel>
-		<bezel element="disk_red"><bounds x="1" y="7" width="2" height="2" /></bezel>
-		<bezel element="static_red"><bounds x="1" y="4" width="2" height="4" /></bezel>
+		<element ref="disk_red"><bounds x="1" y="3" width="2" height="2" /></element>
+		<element ref="disk_red"><bounds x="1" y="7" width="2" height="2" /></element>
+		<element ref="static_red"><bounds x="1" y="4" width="2" height="4" /></element>
 
-		<bezel element="disk_yellow"><bounds x="3" y="1" width="2" height="2" /></bezel>
-		<bezel element="disk_yellow"><bounds x="7" y="1" width="2" height="2" /></bezel>
-		<bezel element="static_yellow"><bounds x="4" y="1" width="4" height="2" /></bezel>
+		<element ref="disk_yellow"><bounds x="3" y="1" width="2" height="2" /></element>
+		<element ref="disk_yellow"><bounds x="7" y="1" width="2" height="2" /></element>
+		<element ref="static_yellow"><bounds x="4" y="1" width="4" height="2" /></element>
 
-		<bezel element="disk_orange"><bounds x="9" y="3" width="2" height="2" /></bezel>
-		<bezel element="disk_orange"><bounds x="9" y="7" width="2" height="2" /></bezel>
-		<bezel element="static_orange"><bounds x="9" y="4" width="2" height="4" /></bezel>
+		<element ref="disk_orange"><bounds x="9" y="3" width="2" height="2" /></element>
+		<element ref="disk_orange"><bounds x="9" y="7" width="2" height="2" /></element>
+		<element ref="static_orange"><bounds x="9" y="4" width="2" height="4" /></element>
 
-		<bezel element="disk_green"><bounds x="3" y="9" width="2" height="2" /></bezel>
-		<bezel element="disk_green"><bounds x="7" y="9" width="2" height="2" /></bezel>
-		<bezel element="static_green"><bounds x="4" y="9" width="4" height="2" /></bezel>
+		<element ref="disk_green"><bounds x="3" y="9" width="2" height="2" /></element>
+		<element ref="disk_green"><bounds x="7" y="9" width="2" height="2" /></element>
+		<element ref="static_green"><bounds x="4" y="9" width="4" height="2" /></element>
 
-		<bezel element="hlv" inputtag="IN.0" inputmask="0x02"><bounds x="1" y="3" width="2" height="6" /><color alpha="0.15" /></bezel>
-		<bezel element="hlh" inputtag="IN.0" inputmask="0x04"><bounds x="3" y="1" width="6" height="2" /><color alpha="0.15" /></bezel>
-		<bezel element="hlv" inputtag="IN.0" inputmask="0x01"><bounds x="9" y="3" width="2" height="6" /><color alpha="0.15" /></bezel>
-		<bezel element="hlh" inputtag="IN.0" inputmask="0x08"><bounds x="3" y="9" width="6" height="2" /><color alpha="0.15" /></bezel>
+		<element ref="hlv" inputtag="IN.0" inputmask="0x02"><bounds x="1" y="3" width="2" height="6" /><color alpha="0.15" /></element>
+		<element ref="hlh" inputtag="IN.0" inputmask="0x04"><bounds x="3" y="1" width="6" height="2" /><color alpha="0.15" /></element>
+		<element ref="hlv" inputtag="IN.0" inputmask="0x01"><bounds x="9" y="3" width="2" height="6" /><color alpha="0.15" /></element>
+		<element ref="hlh" inputtag="IN.0" inputmask="0x08"><bounds x="3" y="9" width="6" height="2" /><color alpha="0.15" /></element>
 
-		<bezel name="0.3" element="ledg"><bounds x="5.75" y="8.25" width="0.5" height="0.5" /></bezel>
-		<bezel name="0.1" element="ledr"><bounds x="3.25" y="5.75" width="0.5" height="0.5" /></bezel>
-		<bezel name="0.0" element="ledo"><bounds x="8.25" y="5.75" width="0.5" height="0.5" /></bezel>
-		<bezel name="0.2" element="ledy"><bounds x="5.75" y="3.25" width="0.5" height="0.5" /></bezel>
+		<element name="0.3" ref="ledg"><bounds x="5.75" y="8.25" width="0.5" height="0.5" /></element>
+		<element name="0.1" ref="ledr"><bounds x="3.25" y="5.75" width="0.5" height="0.5" /></element>
+		<element name="0.0" ref="ledo"><bounds x="8.25" y="5.75" width="0.5" height="0.5" /></element>
+		<element name="0.2" ref="ledy"><bounds x="5.75" y="3.25" width="0.5" height="0.5" /></element>
 
 	</view>
 </mamelayout>

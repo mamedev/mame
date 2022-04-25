@@ -44,67 +44,67 @@ license:CC0
 
 	<view name="Internal Layout">
 		<bounds left="0" right="170" top="0" bottom="47" />
-		<bezel element="static_black">
+		<element ref="static_black">
 			<bounds left="0" right="170" top="0" bottom="47" />
-		</bezel>
+		</element>
 
 <!-- left panel -->
 		<!-- TIME -->
-		<bezel name="digit3" element="digit">
+		<element name="digit3" ref="digit">
 			<bounds x="10" y="10" width="10" height="15" />
-		</bezel>
-		<bezel name="digit2" element="digit">
+		</element>
+		<element name="digit2" ref="digit">
 			<bounds x="20" y="10" width="10" height="15" />
-		</bezel>
+		</element>
 
 		<!-- not connected -->
-		<bezel name="dummy_digita" element="digit">
+		<element name="dummy_digita" ref="digit">
 			<bounds x="30" y="10" width="10" height="15" />
-		</bezel>
-		<bezel name="dummy_digitb" element="digit">
+		</element>
+		<element name="dummy_digitb" ref="digit">
 			<bounds x="40" y="10" width="10" height="15" />
-		</bezel>
+		</element>
 
 		<!-- M.P.H. -->
-		<bezel name="digit1" element="digit">
+		<element name="digit1" ref="digit">
 			<bounds x="50" y="10" width="10" height="15" />
-		</bezel>
-		<bezel name="digit0" element="digit">
+		</element>
+		<element name="digit0" ref="digit">
 			<bounds x="60" y="10" width="10" height="15" />
-		</bezel>
+		</element>
 
-		<bezel element="text_time">
+		<element ref="text_time">
 			<bounds x="10" y="30" width="30" height="7" />
-		</bezel>
-		<bezel element="text_mph">
+		</element>
+		<element ref="text_mph">
 			<bounds x="40" y="30" width="30" height="7" />
-		</bezel>
+		</element>
 
 
 <!-- right panel -->
 		<!-- SCORE -->
-		<bezel name="digit9" element="digit">
+		<element name="digit9" ref="digit">
 			<bounds x="100" y="10" width="10" height="15" />
-		</bezel>
-		<bezel name="digit8" element="digit">
+		</element>
+		<element name="digit8" ref="digit">
 			<bounds x="110" y="10" width="10" height="15" />
-		</bezel>
-		<bezel name="digit7" element="digit">
+		</element>
+		<element name="digit7" ref="digit">
 			<bounds x="120" y="10" width="10" height="15" />
-		</bezel>
-		<bezel name="digit6" element="digit">
+		</element>
+		<element name="digit6" ref="digit">
 			<bounds x="130" y="10" width="10" height="15" />
-		</bezel>
-		<bezel name="digit5" element="digit">
+		</element>
+		<element name="digit5" ref="digit">
 			<bounds x="140" y="10" width="10" height="15" />
-		</bezel>
-		<bezel name="digit4" element="digit">
+		</element>
+		<element name="digit4" ref="digit">
 			<bounds x="150" y="10" width="10" height="15" />
-		</bezel>
+		</element>
 
-		<bezel element="text_score">
+		<element ref="text_score">
 			<bounds x="100" y="30" width="60" height="7" />
-		</bezel>
+		</element>
 
 	</view>
 </mamelayout>

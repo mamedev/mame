@@ -56,7 +56,7 @@ protected:
 	u8 p3_r();
 	void p3_w(u8 data);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
-	int m_centronics_busy;
+	int m_centronics_busy = 0;
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	required_device<z8_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -92,7 +92,13 @@ private:
 class jtces40_state : public jtc_state
 {
 public:
-	using jtc_state::jtc_state;
+	jtces40_state(const machine_config &mconfig, device_type type, const char *tag)
+		: jtc_state(mconfig, type, tag)
+		, m_video_ram_40(*this, "videoram40", JTC_ES40_VIDEORAM_SIZE, ENDIANNESS_BIG)
+		, m_color_ram_r(*this, "color_ram_r", JTC_ES40_VIDEORAM_SIZE, ENDIANNESS_BIG)
+		, m_color_ram_g(*this, "color_ram_g", JTC_ES40_VIDEORAM_SIZE, ENDIANNESS_BIG)
+		, m_color_ram_b(*this, "color_ram_b", JTC_ES40_VIDEORAM_SIZE, ENDIANNESS_BIG)
+	{ }
 	void jtces40(machine_config &config);
 private:
 	virtual void video_start() override;
@@ -100,10 +106,12 @@ private:
 	u8 videoram_r(offs_t offset);
 	void videoram_w(offs_t offset, u8 data);
 	void banksel_w(u8 data);
-	u8 m_video_bank;
-	std::unique_ptr<u8[]> m_color_ram_r;
-	std::unique_ptr<u8[]> m_color_ram_g;
-	std::unique_ptr<u8[]> m_color_ram_b;
+	u8 m_video_bank = 0U;
+
+	memory_share_creator<uint8_t> m_video_ram_40;
+	memory_share_creator<uint8_t> m_color_ram_r;
+	memory_share_creator<uint8_t> m_color_ram_g;
+	memory_share_creator<uint8_t> m_color_ram_b;
 	void jtc_es40_mem(address_map &map);
 	void es40_palette(palette_device &palette) const;
 };
@@ -195,7 +203,7 @@ void jtces40_state::videoram_w(offs_t offset, u8 data)
 	if (BIT(m_video_bank, 7)) m_color_ram_r[offset] = data;
 	if (BIT(m_video_bank, 6)) m_color_ram_g[offset] = data;
 	if (BIT(m_video_bank, 5)) m_color_ram_b[offset] = data;
-	if (BIT(m_video_bank, 4)) m_video_ram[offset] = data;
+	if (BIT(m_video_bank, 4)) m_video_ram_40[offset] = data;
 }
 
 void jtces40_state::banksel_w(u8 data)
@@ -589,22 +597,22 @@ QUICKLOAD_LOAD_MEMBER(jtc_state::quickload_cb)
 	{
 		if (quick_length < 0x0088)
 		{
-			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
+			image.seterror(image_error::INVALIDIMAGE, "File too short");
 			image.message(" File too short");
 		}
 		else
 		if (quick_length > 0x8000)
 		{
-			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
+			image.seterror(image_error::INVALIDIMAGE, "File too long");
 			image.message(" File too long");
 		}
 		else
 		{
 			quick_data.resize(quick_length+1);
-			u16 read_ = image.fread( &quick_data[0], quick_length);
+			u16 read_ = image.fread(&quick_data[0], quick_length);
 			if (read_ != quick_length)
 			{
-				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
+				image.seterror(image_error::INVALIDIMAGE, "Cannot read the file");
 				image.message(" Cannot read the file");
 			}
 			else
@@ -613,7 +621,7 @@ QUICKLOAD_LOAD_MEMBER(jtc_state::quickload_cb)
 				quick_length = quick_data[0x14] * 256 + quick_data[0x13] - quick_addr + 0x81;
 				if (image.length() != quick_length)
 				{
-					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid file header");
+					image.seterror(image_error::INVALIDIMAGE, "Invalid file header");
 					image.message(" Invalid file header");
 				}
 				else
@@ -635,7 +643,7 @@ QUICKLOAD_LOAD_MEMBER(jtc_state::quickload_cb)
 		quick_addr = 0xe000;
 		if (quick_length > 0x8000)
 		{
-			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
+			image.seterror(image_error::INVALIDIMAGE, "File too long");
 			image.message(" File too long");
 		}
 		else
@@ -644,7 +652,7 @@ QUICKLOAD_LOAD_MEMBER(jtc_state::quickload_cb)
 			u16 read_ = image.fread( &quick_data[0], quick_length);
 			if (read_ != quick_length)
 			{
-				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
+				image.seterror(image_error::INVALIDIMAGE, "Cannot read the file");
 				image.message(" Cannot read the file");
 			}
 			else
@@ -669,16 +677,14 @@ QUICKLOAD_LOAD_MEMBER(jtc_state::quickload_cb)
 
 u32 jtc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 i, y, sx;
-
-	for (y = 0; y < 64; y++)
+	for (u8 y = 0; y < 64; y++)
 	{
-		for (sx = 0; sx < 8; sx++)
+		for (u8 sx = 0; sx < 8; sx++)
 		{
-			u8 data = m_video_ram[(y * 8) + sx];
+			u8 const data = m_video_ram[(y * 8) + sx];
 
-			for (i = 0; i < 8; i++)
-				bitmap.pix16(y, (sx * 8) + i) = BIT(data, 7-i);
+			for (u8 i = 0; i < 8; i++)
+				bitmap.pix(y, (sx * 8) + i) = BIT(data, 7-i);
 		}
 	}
 
@@ -687,16 +693,14 @@ u32 jtc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const 
 
 u32 jtces23_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 i, y, sx;
-
-	for (y = 0; y < 128; y++)
+	for (u8 y = 0; y < 128; y++)
 	{
-		for (sx = 0; sx < 16; sx++)
+		for (u8 sx = 0; sx < 16; sx++)
 		{
-			u8 data = m_video_ram[(y * 16) + sx];
+			u8 const data = m_video_ram[(y * 16) + sx];
 
-			for (i = 0; i < 8; i++)
-				bitmap.pix16(y, (sx * 8) + i) = BIT(data, 7-i);
+			for (u8 i = 0; i < 8; i++)
+				bitmap.pix(y, (sx * 8) + i) = BIT(data, 7-i);
 		}
 	}
 
@@ -711,18 +715,8 @@ void jtces40_state::es40_palette(palette_device &palette) const
 
 void jtces40_state::video_start()
 {
-	/* allocate memory */
-	m_video_ram.allocate(JTC_ES40_VIDEORAM_SIZE);
-	m_color_ram_r = std::make_unique<u8[]>(JTC_ES40_VIDEORAM_SIZE);
-	m_color_ram_g = std::make_unique<u8[]>(JTC_ES40_VIDEORAM_SIZE);
-	m_color_ram_b = std::make_unique<u8[]>(JTC_ES40_VIDEORAM_SIZE);
-
 	/* register for state saving */
 	save_item(NAME(m_video_bank));
-	save_pointer(NAME(m_video_ram.target()), JTC_ES40_VIDEORAM_SIZE);
-	save_pointer(NAME(m_color_ram_r), JTC_ES40_VIDEORAM_SIZE);
-	save_pointer(NAME(m_color_ram_g), JTC_ES40_VIDEORAM_SIZE);
-	save_pointer(NAME(m_color_ram_b), JTC_ES40_VIDEORAM_SIZE);
 	save_item(NAME(m_centronics_busy));
 }
 
@@ -736,13 +730,13 @@ u32 jtces40_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 		{
 			for (int x = 0; x < 40; x++)
 			{
-				u8 const data = m_video_ram[ma + x];
+				u8 const data = m_video_ram_40[ma + x];
 				u8 const r = ~m_color_ram_r[ma + x];
 				u8 const g = ~m_color_ram_g[ma + x];
 				u8 const b = ~m_color_ram_b[ma + x];
 
 				for (int i = 0; i < 8; i++)
-					bitmap.pix16(y*3+z, (x * 8) + 7 - i) = (BIT(r, i) << 0) | (BIT(g, i) << 1) | (BIT(b, i) << 2) | (BIT(data, i) << 3);
+					bitmap.pix(y*3+z, (x * 8) + 7 - i) = (BIT(r, i) << 0) | (BIT(g, i) << 1) | (BIT(b, i) << 2) | (BIT(data, i) << 3);
 			}
 			ma+=40;
 		}
@@ -895,27 +889,27 @@ void jtces40_state::jtces40(machine_config &config)
 /* ROMs */
 
 ROM_START( jtc )
-	ROM_REGION( 0x10000, UB8830D_TAG, 0 )
+	ROM_REGION( 0x2800, UB8830D_TAG, 0 )
 	ROM_LOAD( "u883rom.bin", 0x0000, 0x0800, CRC(2453c8c1) SHA1(816f5d08f8064b69b1779eb6661fde091aa58ba8) )
 	ROM_LOAD( "os2k_0800.bin", 0x0800, 0x0800, CRC(c81a2e19) SHA1(97c3b36c7b555081e084403e8f800fc9dbf5e68d) ) // u2716c1.bin
 	ROM_LOAD( "u2716c2.bin", 0x2000, 0x0800, NO_DUMP ) // doesn't seem to be needed?
 ROM_END
 
 ROM_START( jtces88 )
-	ROM_REGION( 0x10000, UB8830D_TAG, 0 )
+	ROM_REGION( 0x2800, UB8830D_TAG, 0 )
 	ROM_LOAD( "u883rom.bin", 0x0000, 0x0800, CRC(2453c8c1) SHA1(816f5d08f8064b69b1779eb6661fde091aa58ba8) )
 	ROM_LOAD( "es1988_0800.bin", 0x0800, 0x0800, CRC(af3e882f) SHA1(65af0d0f5f882230221e9552707d93ed32ba794d) )
 	ROM_LOAD( "es1988_2000.bin", 0x2000, 0x0800, CRC(5ff87c1e) SHA1(fbd2793127048bd9706970b7bce84af2cb258dc5) )
 ROM_END
 
 ROM_START( jtces23 )
-	ROM_REGION( 0x10000, UB8830D_TAG, 0 )
+	ROM_REGION( 0x2800, UB8830D_TAG, 0 )
 	ROM_LOAD( "u883rom.bin", 0x0000, 0x0800, CRC(2453c8c1) SHA1(816f5d08f8064b69b1779eb6661fde091aa58ba8) )
 	ROM_LOAD( "es23_0800.bin", 0x0800, 0x1000, CRC(16128b64) SHA1(90fb0deeb5660f4a2bb38d51981cc6223d5ddf6b) )
 ROM_END
 
 ROM_START( jtces40 )
-	ROM_REGION( 0x10000, UB8830D_TAG, 0 )
+	ROM_REGION( 0x2800, UB8830D_TAG, 0 )
 	ROM_LOAD( "u883rom.bin", 0x0000, 0x0800, CRC(2453c8c1) SHA1(816f5d08f8064b69b1779eb6661fde091aa58ba8) )
 	ROM_LOAD( "es40_0800.bin", 0x0800, 0x1800, CRC(770c87ce) SHA1(1a5227ba15917f2a572cb6c27642c456f5b32b90) )
 ROM_END

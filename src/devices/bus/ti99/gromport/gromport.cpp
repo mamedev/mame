@@ -121,9 +121,9 @@
 #define VERBOSE ( LOG_WARN )
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_GROMPORT, bus::ti99::gromport, gromport_device, "gromport", "TI-99 Cartridge port")
+DEFINE_DEVICE_TYPE(TI99_GROMPORT, bus::ti99::gromport::gromport_device, "gromport", "TI-99 Cartridge port")
 
-namespace bus { namespace ti99 { namespace gromport {
+namespace bus::ti99::gromport {
 
 gromport_device::gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	:   device_t(mconfig, TI99_GROMPORT, tag, owner, clock),
@@ -139,7 +139,7 @@ gromport_device::gromport_device(const machine_config &mconfig, const char *tag,
     Reading via the GROM port. Only 13 address lines are passed through
     on the TI-99/4A, and 14 lines on the TI-99/8.
 */
-READ8Z_MEMBER(gromport_device::readz)
+void gromport_device::readz(offs_t offset, uint8_t *value)
 {
 	if (m_connector != nullptr)
 	{
@@ -161,7 +161,7 @@ void gromport_device::write(offs_t offset, uint8_t data)
 	}
 }
 
-READ8Z_MEMBER(gromport_device::crureadz)
+void gromport_device::crureadz(offs_t offset, uint8_t *value)
 {
 	if (m_connector != nullptr)
 		m_connector->crureadz(offset, value);
@@ -288,7 +288,7 @@ void cartridge_connector_device::device_config_complete()
 	m_gromport = static_cast<gromport_device*>(owner());
 }
 
-} } } // end namespace bus::ti99::gromport
+} // end namespace bus::ti99::gromport
 
 void ti99_gromport_options(device_slot_interface &device)
 {

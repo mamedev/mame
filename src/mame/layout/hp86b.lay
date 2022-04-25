@@ -18,14 +18,14 @@ Layout of Hewlett-Packard 86B with 82913A monitor (and run light)
 	<view name="82913A monitor">
 		<!-- dimensions in mm -->
 		<bounds x="0" y="0" width="230" height="160"/>
-		<bezel element="power_s">
-			<bounds x="134" y="152" width="20" height="5"/>
-		</bezel>
-		<bezel name="run_light" element="run_light">
-			<bounds x="130" y="153" width="3" height="3"/>
-		</bezel>
 		<screen index="0">
 			<bounds left="0" top="0" right="230" bottom="150" />
 		</screen>
+		<element ref="power_s">
+			<bounds x="134" y="152" width="20" height="5"/>
+		</element>
+		<element name="run_light" ref="run_light">
+			<bounds x="130" y="153" width="3" height="3"/>
+		</element>
 	</view>
 </mamelayout>

@@ -6,7 +6,7 @@ license:CC0
 <softwarelist name="ekara_pal" description="Takara e-kara (UK/Europe, PAL) cartridges">
 	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit -->
 
-	<!-- UK / Europe cartridges - these have 'UK' part codes, but multiple languages on the case suggesting they were used for the whole of Europe -->
+	<!-- UK / Europe cartridges - these have 'UK' part codes, but multiple languages on the case (except for Vol4/5) suggesting they were used for the whole of Europe -->
 
 	<!-- e-kara UK / Europe Volume 1 (UK-E001)
 	1.  "Oops!...I Did It Again"       Britney Spears
@@ -77,7 +77,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- e-kara UK / Europe Volume 4 (UK-E004) (not dumped) (this is the same tracklist as US-E004, but the code on the UK/EU one would be different as they use a different timing method)
+	<!-- e-kara UK / Europe Volume 4 (UK-E004)
 	1.  "Can't Buy Me Love"   The Beatles
 	2.  "A Hard Day's Night"  The Beatles
 	3.  "Ticket To Ride"      The Beatles
@@ -89,8 +89,18 @@ license:CC0
 	9.  "Drive My Car"        The Beatles
 	10. "We Can Work It Out"  The Beatles
 	-->
+	<software name="uk_vol4">
+		<description>e-kara UK / Europe Volume 4 (UK-E004)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="uk-e004.bin" size="0x100000" crc="d3739137" sha1="e3c404bc916cac4acccc46b8345defd9495431fa"/>
+			</dataarea>
+		</part>
+	</software>
 
-	<!-- e-kara UK / Europe Volume 5 (UK-E005) (not dumped) (this is the same tracklist as US-E005, but the code on the UK/EU one would be different as they use a different timing method)
+	<!-- e-kara UK / Europe Volume 5 (UK-E005)
 	1.  "Lucy In the Sky With Diamonds"  The Beatles
 	2.  "All You Need Is Love"           The Beatles
 	3.  "Hello Goodbye"                  The Beatles
@@ -102,6 +112,16 @@ license:CC0
 	9.  "Let It Be"                      The Beatles
 	10. "The Long And Winding Road"      The Beatles
 	-->
+	<software name="uk_vol5">
+		<description>e-kara UK / Europe Volume 5 (UK-E005)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="uk-e005.bin" size="0x100000" crc="e8e2c9cd" sha1="d1bdcfe88bb28012e52e51dc1b39c20284d30b26"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<!-- e-kara UK / Europe Volume 6 (UK-E006)
 	1.  "Genie In A Bottle"             Christina Aguilera

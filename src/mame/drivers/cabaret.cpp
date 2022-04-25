@@ -26,7 +26,7 @@ are the same of IGS.  AMT may be previous IGS name.
 #include "emu.h"
 #include "cpu/z180/z180.h"
 #include "machine/i8255.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -74,10 +74,10 @@ protected:
 	required_shared_ptr<uint8_t> m_fg_color_ram;
 	required_shared_ptr<uint8_t> m_bg_scroll;
 	required_shared_ptr<uint8_t> m_bg_tile_ram;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
-	int m_nmi_enable;
-	uint8_t m_out[3];
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	int m_nmi_enable = 0;
+	uint8_t m_out[3]{};
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -201,7 +201,7 @@ void cabaret_state::ppi2_c_w(uint8_t data)
 void cabaret_state::cabaret_map(address_map &map)
 {
 	map(0x00000, 0x0efff).rom();
-	map(0x0f000, 0x0ffff).ram().region("maincpu", 0xf000);
+	map(0x0f000, 0x0ffff).ram();
 }
 
 void cabaret_state::cabaret_portmap(address_map &map)

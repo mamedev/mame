@@ -16,13 +16,11 @@ Radio, 1985, N6
 #include "emu.h"
 
 #include "machine/netlist.h"
-
-#include "video/fixfreq.h"
-
 #include "netlist/devices/net_lib.h"
 
 #include "machine/nl_tp1983.h"
 #include "machine/nl_tp1985.h"
+#include "video/fixfreq.h"
 
 #include "screen.h"
 
@@ -56,8 +54,6 @@ protected:
 	virtual void machine_start() override { }
 	virtual void machine_reset() override { }
 
-	virtual void video_start() override { }
-
 private:
 };
 
@@ -69,8 +65,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_video(*this, "fixfreq")
-	{
-	}
+	{ }
 
 	// devices
 	required_device<netlist_mame_device> m_maincpu;
@@ -82,8 +77,6 @@ protected:
 	// driver_device overrides
 	virtual void machine_start() override { }
 	virtual void machine_reset() override { }
-
-	virtual void video_start() override { }
 
 private:
 	NETDEV_ANALOG_CALLBACK_MEMBER(video_out_cb);

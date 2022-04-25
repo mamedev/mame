@@ -64,11 +64,6 @@ nes_golden5_device::nes_golden5_device(const machine_config &mconfig, const char
 
 
 
-void nes_bf9093_device::device_start()
-{
-	common_start();
-}
-
 void nes_bf9093_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
@@ -180,7 +175,7 @@ void nes_bf9096_device::write_h(offs_t offset, uint8_t data)
 
 	if (offset < 0x4000)
 	{
-		m_bank_base = ((data >> 3) & 3) << 2;
+		m_bank_base = (data & 0x18) >> 1;
 		prg16_89ab(m_bank_base | m_latch);
 		prg16_cdef(m_bank_base | 3);
 	}

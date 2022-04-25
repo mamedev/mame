@@ -21,7 +21,7 @@
      bits 0..6 keyboard output select matrix line
 */
 
-WRITE8_MEMBER(pc1403_state::asic_write)
+void pc1403_state::asic_write(offs_t offset, uint8_t data)
 {
 	m_asic[offset >> 9] = data;
 	switch (offset >> 9)
@@ -42,7 +42,7 @@ WRITE8_MEMBER(pc1403_state::asic_write)
 	}
 }
 
-READ8_MEMBER(pc1403_state::asic_read)
+uint8_t pc1403_state::asic_read(offs_t offset)
 {
 	uint8_t data = m_asic[offset >> 9];
 	switch (offset >> 9)

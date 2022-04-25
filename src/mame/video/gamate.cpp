@@ -274,7 +274,7 @@ uint32_t gamate_video_device::screen_update(screen_device &screen, bitmap_ind16 
 			if (m_displayblank)
 				pix = 0;
 
-			bitmap.pix16(y, x) = pix;
+			bitmap.pix(y, x) = pix;
 		}
 	}
 

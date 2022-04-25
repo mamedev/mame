@@ -29,7 +29,7 @@ protected:
 	required_device<fd1793_device> fdc;
 
 	uint8_t *microdisc_rom;
-	floppy_image_device *floppies[4];
+	required_device_array<floppy_connector, 4> floppies;
 	uint8_t port_314;
 	bool intrq_state, drq_state, hld_state;
 
@@ -51,7 +51,7 @@ private:
 
 	void map(address_map &map);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 };
 
 #endif // MAME_BUS_ORICEXT_MICRODISC_H

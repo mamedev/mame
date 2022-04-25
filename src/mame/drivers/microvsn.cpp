@@ -10,13 +10,16 @@ Hardware notes:
 - piezo, 12 buttons under membrane + analog paddle(MB calls it the Control Knob)
 - no CPU on console, it is on the cartridge
 
+The LCD motion blur is normal. To decrease it, simply increase the screen contrast
+in MAME, this makes it similar to repro LCD replacements. It's also advised to
+disable screen filtering, eg. with -prescale or -nofilter.
+
 12 games were released, all of them have a TMS1100 MCU. The first couple of
 games had an Intel 8021 MCU at first, but Milton Bradley switched to TMS1100.
 See the softwarelist XML for details.
 
-Each game had a screen- and button overlay attached to it, MAME external
-artwork is recommended. It's also advised to disable screen filtering,
-eg. with -prescale or -nofilter.
+Each game had a screen- and button overlay attached to it, MAME external artwork
+is recommended.
 
 TODO:
 - dump/add remaining 8021 cartridges, which games have 8021 versions? An online
@@ -32,12 +35,11 @@ TODO:
 #include "cpu/tms1000/tms1100.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/hlcd0488.h"
 #include "video/pwm.h"
 
 #include "emupal.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -189,7 +191,7 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state::cart_load)
 
 	if (size != 0x400 && size != 0x800)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid ROM file size");
+		image.seterror(image_error::INVALIDIMAGE, "Invalid ROM file size");
 		return image_init_result::FAIL;
 	}
 
@@ -204,13 +206,20 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state::cart_load)
 
 	if (image.loaded_through_softlist())
 	{
-		u32 sclock = strtoul(image.get_feature("clock"), nullptr, 0);
+		const char *cclock = image.get_feature("clock");
+		u32 sclock = cclock ? strtoul(cclock, nullptr, 0) : 0;
 		if (sclock != 0)
 			clock = sclock;
 
-		m_butmask_auto = ~strtoul(image.get_feature("butmask"), nullptr, 0) & 0xfff;
-		m_pla_auto = strtoul(image.get_feature("pla"), nullptr, 0) ? 1 : 0;
-		m_paddle_auto = bool(strtoul(image.get_feature("paddle"), nullptr, 0) ? 1 : 0);
+		const char *butmask = image.get_feature("butmask");
+		m_butmask_auto = butmask ? strtoul(butmask, nullptr, 0) : 0;
+		m_butmask_auto = ~m_butmask_auto & 0xfff;
+
+		const char *pla = image.get_feature("pla");
+		m_pla_auto = pla && strtoul(pla, nullptr, 0) ? 1 : 0;
+
+		const char *paddle = image.get_feature("paddle");
+		m_paddle_auto = paddle && strtoul(paddle, nullptr, 0);
 	}
 
 	// detect MCU on file size
@@ -256,10 +265,11 @@ uint32_t microvision_state::screen_update(screen_device &screen, bitmap_rgb32 &b
 		for (int x = 0; x < 16; x++)
 		{
 			// simulate LCD persistence
-			int p = m_lcd_pwm->read_element_bri(y ^ 15, x ^ 15) * 10000;
+			int p = m_lcd_pwm->read_element_bri(y ^ 15, x ^ 15) * 8500;
 			p = (p > 255) ? 0 : p ^ 255;
 
-			bitmap.pix32(y, x) = p << 16 | p << 8 | p;
+			if (cliprect.contains(x, y))
+				bitmap.pix(y, x) = p << 16 | p << 8 | p;
 		}
 	}
 
@@ -456,7 +466,7 @@ void microvision_state::microvision(machine_config &config)
 	m_lcd->write_cols().set(FUNC(microvision_state::lcd_output_w));
 
 	PWM_DISPLAY(config, m_lcd_pwm).set_size(16, 16);
-	m_lcd_pwm->set_interpolation(0.2);
+	m_lcd_pwm->set_interpolation(0.25);
 	config.set_default_layout(layout_microvision);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -469,9 +479,6 @@ void microvision_state::microvision(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "microvision_cart");

@@ -8,10 +8,11 @@
 
 // MAME headers
 #include "emu.h"
-#include "render.h"
-
-#include "rendutil.h"
 #include "emuopts.h"
+#include "render.h"
+#include "rendutil.h"
+#include "screen.h"
+
 #include "aviio.h"
 
 // MAMEOS headers
@@ -118,7 +119,7 @@ static inline uint32_t ycc_to_rgb(uint8_t y, uint8_t cb, uint8_t cr)
 //  drawd3d_init
 //============================================================
 
-static d3d_base *               d3dintf; // FIX ME
+static d3d_base *d3dintf = nullptr; // FIX ME
 
 
 //============================================================
@@ -202,13 +203,15 @@ render_primitive_list *renderer_d3d9::get_primitives()
 
 bool renderer_d3d9::init(running_machine &machine)
 {
-	d3dintf = global_alloc(d3d_base);
+	d3dintf = new d3d_base;
 
 	d3dintf->d3d9_dll = osd::dynamic_module::open({ "d3d9.dll" });
 
 	d3d9_create_fn d3d9_create_ptr = d3dintf->d3d9_dll->bind<d3d9_create_fn>("Direct3DCreate9");
 	if (d3d9_create_ptr == nullptr)
 	{
+		delete d3dintf;
+		d3dintf = nullptr;
 		osd_printf_verbose("Direct3D: Unable to find Direct3D 9 runtime library\n");
 		return true;
 	}
@@ -216,6 +219,8 @@ bool renderer_d3d9::init(running_machine &machine)
 	d3dintf->d3dobj = (*d3d9_create_ptr)(D3D_SDK_VERSION);
 	if (d3dintf->d3dobj == nullptr)
 	{
+		delete d3dintf;
+		d3dintf = nullptr;
 		osd_printf_verbose("Direct3D: Unable to initialize Direct3D 9\n");
 		return true;
 	}
@@ -460,7 +465,7 @@ void d3d_texture_manager::create_resources()
 void d3d_texture_manager::delete_resources()
 {
 	// is part of m_texlist and will be free'd there
-	//global_free(m_default_texture);
+	//delete m_default_texture;
 	m_default_texture = nullptr;
 
 	// free all textures
@@ -503,7 +508,7 @@ renderer_d3d9::renderer_d3d9(std::shared_ptr<osd_window> window)
 	: osd_renderer(window, FLAG_NONE), m_adapter(0), m_width(0), m_height(0), m_refresh(0), m_create_error_count(0), m_device(nullptr), m_gamma_supported(0), m_pixformat(),
 	m_vertexbuf(nullptr), m_lockedbuf(nullptr), m_numverts(0), m_vectorbatch(nullptr), m_batchindex(0), m_numpolys(0), m_toggle(false),
 	m_screen_format(), m_last_texture(nullptr), m_last_texture_flags(0), m_last_blendenable(0), m_last_blendop(0), m_last_blendsrc(0), m_last_blenddst(0), m_last_filter(0),
-	m_last_wrap(), m_last_modmode(0), m_shaders(nullptr), m_texture_manager(nullptr)
+	m_last_wrap(), m_last_modmode(0), m_shaders(nullptr), m_texture_manager()
 {
 }
 
@@ -809,7 +814,7 @@ int renderer_d3d9::device_create(HWND hwnd)
 		return 1;
 	}
 
-	m_texture_manager = global_alloc(d3d_texture_manager(this));
+	m_texture_manager = std::make_unique<d3d_texture_manager>(this);
 
 	// try for XRGB first
 	m_screen_format = D3DFMT_X8R8G8B8;
@@ -869,7 +874,7 @@ int renderer_d3d9::device_create_resources()
 	// create shaders only once
 	if (m_shaders == nullptr)
 	{
-		m_shaders = (shaders*)global_alloc_clear<shaders>();
+		m_shaders = new shaders;
 	}
 
 	if (m_shaders->init(d3dintf, &win->machine(), this))
@@ -960,7 +965,7 @@ renderer_d3d9::~renderer_d3d9()
 	//if (m_shaders != nullptr)
 	//{
 	//  // delete the HLSL interface
-	//  global_free(m_shaders);
+	//  delete m_shaders;
 	//  m_shaders = nullptr;
 	//}
 }
@@ -970,7 +975,8 @@ void renderer_d3d9::exit()
 	if (d3dintf != nullptr)
 	{
 		d3dintf->d3dobj->Release();
-		global_free(d3dintf);
+		delete d3dintf;
+		d3dintf = nullptr;
 	}
 }
 
@@ -981,11 +987,7 @@ void renderer_d3d9::device_delete()
 
 	// we do not delete the HLSL interface here
 
-	if (m_texture_manager != nullptr)
-	{
-		global_free(m_texture_manager);
-		m_texture_manager = nullptr;
-	}
+	m_texture_manager.reset();
 
 	// free the device itself
 	if (m_device != nullptr)
@@ -1279,7 +1281,7 @@ void renderer_d3d9::pick_best_mode()
 	auto win = assert_window();
 
 	// determine the refresh rate of the primary screen
-	const screen_device *primary_screen = screen_device_iterator(win->machine().root_device()).first();
+	const screen_device *primary_screen = screen_device_enumerator(win->machine().root_device()).first();
 	if (primary_screen != nullptr)
 	{
 		target_refresh = ATTOSECONDS_TO_HZ(primary_screen->refresh_attoseconds());
@@ -1521,15 +1523,10 @@ void renderer_d3d9::batch_vector(const render_primitive &prim)
 	}
 
 	// compute the effective width based on the direction of the line
-	float effwidth = prim.width;
-	if (effwidth < 2.0f)
-	{
-		effwidth = 2.0f;
-	}
+	float effwidth = std::max(prim.width, 2.0f);
 
 	// determine the bounds of a quad to draw this line
-	render_bounds b0, b1;
-	render_line_to_quad(&prim.bounds, effwidth, effwidth, &b0, &b1);
+	auto [b0, b1] = render_line_to_quad(prim.bounds, effwidth, effwidth);
 
 	float lx = b1.x1 - b0.x1;
 	float ly = b1.y1 - b0.y1;
@@ -1628,15 +1625,10 @@ void renderer_d3d9::draw_line(const render_primitive &prim)
 	}
 
 	// compute the effective width based on the direction of the line
-	float effwidth = prim.width;
-	if (effwidth < 1.0f)
-	{
-		effwidth = 1.0f;
-	}
+	float effwidth = std::max(prim.width, 1.0f);
 
 	// determine the bounds of a quad to draw this line
-	render_bounds b0, b1;
-	render_line_to_quad(&prim.bounds, effwidth, 0.0f, &b0, &b1);
+	auto [b0, b1] = render_line_to_quad(prim.bounds, effwidth, 0.0f);
 
 	vertex[0].x = b0.x0;
 	vertex[0].y = b0.y0;
@@ -2620,7 +2612,7 @@ bool d3d_render_target::init(renderer_d3d9 *d3d, int source_width, int source_he
 
 	auto win = d3d->assert_window();
 
-	const screen_device *first_screen = screen_device_iterator(win->machine().root_device()).first();
+	const screen_device *first_screen = screen_device_enumerator(win->machine().root_device()).first();
 	bool vector_screen =
 		first_screen != nullptr &&
 		first_screen->screen_type() == SCREEN_TYPE_VECTOR;

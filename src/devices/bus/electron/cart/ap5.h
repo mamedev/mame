@@ -11,6 +11,7 @@
 
 #include "slot.h"
 #include "machine/6522via.h"
+#include "machine/input_merger.h"
 #include "bus/bbc/1mhzbus/1mhzbus.h"
 #include "bus/bbc/tube/tube.h"
 #include "bus/bbc/userport/userport.h"
@@ -45,6 +46,7 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom1_load) { return load_rom(image, m_romslot[0]); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom2_load) { return load_rom(image, m_romslot[1]); }
 
+	required_device<input_merger_device> m_irqs;
 	required_device<via6522_device> m_via;
 	required_device<bbc_tube_slot_device> m_tube;
 	required_device<bbc_1mhzbus_slot_device> m_1mhzbus;

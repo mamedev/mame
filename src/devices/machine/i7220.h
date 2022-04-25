@@ -52,14 +52,13 @@ public:
 	// image-level overrides
 	virtual image_init_result call_load() override;
 
-	virtual iodevice_t image_type() const noexcept override { return IO_MEMCARD; }
-
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return true; }
 	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return true; }
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "bubble"; }
+	virtual const char *image_type_name() const noexcept override { return "bubble"; }
+	virtual const char *image_brief_type_name() const noexcept override { return "mbm"; }
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
@@ -68,7 +67,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	int m_data_size;
 

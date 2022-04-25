@@ -15,7 +15,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "am29000.h"
 #include "am29dasm.h"
 
@@ -108,7 +107,7 @@ am29000_cpu_device::am29000_cpu_device(const machine_config &mconfig, const char
 	m_fpe = 0;
 	m_inte = 0;
 	m_fps = 0;
-	memset( m_exception_queue, 0, sizeof( m_exception_queue) );;
+	memset( m_exception_queue, 0, sizeof( m_exception_queue) );
 	m_irq_active = 0;
 	m_irq_lines = 0;
 	m_exec_ir = 0;

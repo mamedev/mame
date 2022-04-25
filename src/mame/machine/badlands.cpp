@@ -24,8 +24,7 @@
  *************************************/
 
 // TODO: doesn't link?
-#ifdef UNUSED_FUNCTION
-const gfx_layout badlands_molayout =
+[[maybe_unused]] static const gfx_layout badlands_molayout =
 {
 	16,8,
 	RGN_FRAC(1,1),
@@ -35,7 +34,6 @@ const gfx_layout badlands_molayout =
 	{ 0*8, 8*8, 16*8, 24*8, 32*8, 40*8, 48*8, 56*8 },
 	64*8
 };
-#endif
 
 /*************************************
  *

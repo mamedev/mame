@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Couriersud
 
 //
@@ -23,8 +23,7 @@ namespace factory {
 		{
 		}
 	protected:
-		NETLIB_RESETI() { }
-		NETLIB_UPDATEI() { }
+		//NETLIB_RESETI() {}
 	};
 
 	element_t::element_t(const pstring &name, properties &&props)
@@ -42,14 +41,23 @@ namespace factory {
 	{
 	}
 
+	bool exists(const pstring &name);
+
+	bool list_t::exists(const pstring &name) const noexcept
+	{
+		for (const auto & e : *this)
+			if (e->name() == name)
+				return true;
+		return false;
+	}
+
 	void list_t::add(host_arena::unique_ptr<element_t> &&factory)
 	{
-		for (auto & e : *this)
-			if (e->name() == factory->name())
-			{
-				m_log.fatal(MF_FACTORY_ALREADY_CONTAINS_1(factory->name()));
-				throw nl_exception(MF_FACTORY_ALREADY_CONTAINS_1(factory->name()));
-			}
+		if (exists(factory->name()))
+		{
+			m_log.fatal(MF_FACTORY_ALREADY_CONTAINS_1(factory->name()));
+			throw nl_exception(MF_FACTORY_ALREADY_CONTAINS_1(factory->name()));
+		}
 		push_back(std::move(factory));
 	}
 
@@ -76,7 +84,7 @@ namespace factory {
 
 	device_arena::unique_ptr<core_device_t> library_element_t::make_device(device_arena &pool, netlist_state_t &anetlist, const pstring &name)
 	{
-		return pool.make_unique<NETLIB_NAME(wrapper)>(anetlist, name);
+		return plib::make_unique<NETLIB_NAME(wrapper)>(pool, anetlist, name);
 	}
 
 

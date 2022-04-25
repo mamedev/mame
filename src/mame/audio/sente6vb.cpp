@@ -55,6 +55,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "sound/mm5837.h"
 #include "audio/sente6vb.h"
 #include "cpu/z80/z80.h"
 #include "machine/clock.h"
@@ -64,6 +65,8 @@
 #define LOG_CEM_WRITES      0
 
 DEFINE_DEVICE_TYPE(SENTE6VB, sente6vb_device, "sente6vb", "Bally Sente 6VB Audio Board")
+
+
 
 /*************************************
  *
@@ -123,20 +126,18 @@ void sente6vb_device::device_add_mconfig(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
+	mm5837_stream_device &noise(MM5837_STREAM(config, "noise", 0));
+//  noise.set_vdd(-6.5);   // seems too low -- possible the mapping in mm5837 is wrong
+	noise.set_vdd(-8.0);
+
 	for (auto &cem_device : m_cem_device)
 	{
 		CEM3394(config, cem_device, 0);
 		cem_device->set_vco_zero_freq(431.894);
 		cem_device->set_filter_zero_freq(1300.0);
 		cem_device->add_route(ALL_OUTPUTS, "mono", 0.90);
+		noise.add_route(0, *cem_device, 0.5);
 	}
-
-	m_cem_device[0]->set_ext_input_callback(FUNC(sente6vb_device::noise_gen_0));
-	m_cem_device[1]->set_ext_input_callback(FUNC(sente6vb_device::noise_gen_1));
-	m_cem_device[2]->set_ext_input_callback(FUNC(sente6vb_device::noise_gen_2));
-	m_cem_device[3]->set_ext_input_callback(FUNC(sente6vb_device::noise_gen_3));
-	m_cem_device[4]->set_ext_input_callback(FUNC(sente6vb_device::noise_gen_4));
-	m_cem_device[5]->set_ext_input_callback(FUNC(sente6vb_device::noise_gen_5));
 }
 
 
@@ -164,24 +165,21 @@ const tiny_rom_entry *sente6vb_device::device_rom_region() const
  *
  *************************************/
 
-sente6vb_device::sente6vb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SENTE6VB, tag, owner, clock)
-	, m_pit(*this, "pit")
-	, m_counter_0_timer(*this, "8253_0_timer")
-	, m_cem_device(*this, "cem%u", 1U)
-	, m_audiocpu(*this, "audiocpu")
-	, m_uart(*this, "uart")
-	, m_send_cb(*this)
-	, m_clock_out_cb(*this)
+sente6vb_device::sente6vb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SENTE6VB, tag, owner, clock),
+	m_pit(*this, "pit"),
+	m_counter_0_timer(*this, "8253_0_timer"),
+	m_cem_device(*this, "cem%u", 1U),
+	m_audiocpu(*this, "audiocpu"),
+	m_uart(*this, "uart"),
+	m_send_cb(*this),
+	m_clock_out_cb(*this)
 {
 }
 
 
 void sente6vb_device::device_start()
 {
-	// create the polynomial tables
-	poly17_init();
-
 	m_send_cb.resolve_safe();
 	m_clock_out_cb.resolve_safe();
 	m_uart->write_cts(0);
@@ -197,8 +195,6 @@ void sente6vb_device::device_start()
 	save_item(NAME(m_chip_select));
 
 	save_item(NAME(m_uint));
-
-	save_item(NAME(m_noise_position));
 }
 
 
@@ -215,64 +211,8 @@ void sente6vb_device::device_reset()
 	m_dac_value = 0;
 	m_dac_register = 0;
 	m_chip_select = 0x3f;
-
-	// reset the noise generator
-	memset(m_noise_position, 0, sizeof(m_noise_position));
 }
 
-
-
-/*************************************
- *
- *  MM5837 noise generator
- *
- *  NOTE: this is stolen straight from
- *          POKEY.c
- *
- *************************************/
-
-void sente6vb_device::poly17_init()
-{
-	uint32_t i, x = 0;
-	uint8_t *p;
-
-	// allocate memory
-	p = m_poly17;
-
-	// generate the polynomial
-	for (i = 0; i < POLY17_SIZE; i++)
-	{
-		// store new values
-		*p++ = x & 1;
-
-		// calculate next bit
-		x = ((x << POLY17_SHL) + (x >> POLY17_SHR) + POLY17_ADD) & POLY17_SIZE;
-	}
-}
-
-
-inline void sente6vb_device::noise_gen_chip(int chip, int count, short *buffer)
-{
-	// noise generator runs at 100kHz
-	uint32_t step = (100000 << 14) / cem3394_device::SAMPLE_RATE;
-	uint32_t noise_counter = m_noise_position[chip];
-
-	while (count--)
-	{
-		*buffer++ = m_poly17[(noise_counter >> 14) & POLY17_SIZE] << 12;
-		noise_counter += step;
-	}
-
-	// remember the noise position
-	m_noise_position[chip] = noise_counter;
-}
-
-CEM3394_EXT_INPUT(sente6vb_device::noise_gen_0) { noise_gen_chip(0, count, buffer); }
-CEM3394_EXT_INPUT(sente6vb_device::noise_gen_1) { noise_gen_chip(1, count, buffer); }
-CEM3394_EXT_INPUT(sente6vb_device::noise_gen_2) { noise_gen_chip(2, count, buffer); }
-CEM3394_EXT_INPUT(sente6vb_device::noise_gen_3) { noise_gen_chip(3, count, buffer); }
-CEM3394_EXT_INPUT(sente6vb_device::noise_gen_4) { noise_gen_chip(4, count, buffer); }
-CEM3394_EXT_INPUT(sente6vb_device::noise_gen_5) { noise_gen_chip(5, count, buffer); }
 
 
 /*************************************

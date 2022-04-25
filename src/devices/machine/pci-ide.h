@@ -26,18 +26,17 @@ public:
 		: ide_pci_device(mconfig, tag, owner, clock)
 	{
 		set_ids(main_id, revision, 0x01018a, subdevice_id);
-		m_bus_master_tag = bmtag;
-		m_bus_master_space = bmspace;
+		m_bus_master_space.set_tag(bmtag, bmspace);
 	}
 	ide_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto irq_handler() { return m_irq_handler.bind(); }
 
 	// This will set the top 12 bits for address decoding in legacy mode. Needed for seattle driver.
-	void set_legacy_top(int val) { m_legacy_top = val & 0xfff; };
+	void set_legacy_top(int val) { m_legacy_top = val & 0xfff; }
 
 	// Sets the default Programming Interface (PIF) register
-	void set_pif(int val) { m_pif = val & 0xff; };
+	void set_pif(int val) { m_pif = val & 0xff; }
 
 protected:
 	virtual void device_start() override;
@@ -50,16 +49,16 @@ protected:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
-	DECLARE_WRITE8_MEMBER(prog_if_w);
-	DECLARE_READ32_MEMBER(pcictrl_r);
-	DECLARE_WRITE32_MEMBER(pcictrl_w);
-	DECLARE_READ32_MEMBER(address_base_r);
-	DECLARE_WRITE32_MEMBER(address_base_w);
-	DECLARE_WRITE32_MEMBER(subsystem_id_w);
-	DECLARE_READ32_MEMBER(ide_read_cs1);
-	DECLARE_WRITE32_MEMBER(ide_write_cs1);
-	DECLARE_READ32_MEMBER(ide2_read_cs1);
-	DECLARE_WRITE32_MEMBER(ide2_write_cs1);
+	void prog_if_w(uint8_t data);
+	uint32_t pcictrl_r(offs_t offset);
+	void pcictrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t address_base_r(offs_t offset);
+	void address_base_w(offs_t offset, uint32_t data);
+	void subsystem_id_w(uint32_t data);
+	uint32_t ide_read_cs1(offs_t offset, uint32_t mem_mask = ~0);
+	void ide_write_cs1(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t ide2_read_cs1(offs_t offset, uint32_t mem_mask = ~0);
+	void ide2_write_cs1(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	required_device<bus_master_ide_controller_device> m_ide;
 	required_device<bus_master_ide_controller_device> m_ide2;
@@ -69,8 +68,7 @@ private:
 	// Bits 31-20 for legacy mode hack
 	uint32_t m_legacy_top;
 	uint32_t m_pif;
-	const char* m_bus_master_tag;
-	uint32_t m_bus_master_space;
+	required_address_space m_bus_master_space;
 
 	uint32_t m_config_data[0x10];
 	void chan1_data_command_map(address_map &map);

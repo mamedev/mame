@@ -14,7 +14,6 @@
 #include "emu.h"
 #include "asap.h"
 #include "asapdasm.h"
-#include "debugger.h"
 
 
 //**************************************************************************
@@ -187,7 +186,6 @@ void asap_device::device_start()
 	// register our state for the debugger
 	state_add(STATE_GENPC,     "GENPC",     m_pc).noshow();
 	state_add(STATE_GENPCBASE, "CURPC",     m_ppc).noshow();
-	state_add(STATE_GENSP,     "GENSP",     m_src2val[REGBASE + 31]).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_flagsio).callimport().callexport().formatstr("%6s").noshow();
 	state_add(ASAP_PC,         "PC",        m_pc);
 	state_add(ASAP_PS,         "PS",        m_flagsio).callimport().callexport();
@@ -616,7 +614,7 @@ void asap_device::bsp()
 	{
 		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
 
-		fetch_instruction();
+		fetch_instruction_debug();
 		m_pc = m_nextpc;
 		m_nextpc = ~0;
 
@@ -631,7 +629,7 @@ void asap_device::bmz()
 	{
 		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
 
-		fetch_instruction();
+		fetch_instruction_debug();
 		m_pc = m_nextpc;
 		m_nextpc = ~0;
 
@@ -646,7 +644,7 @@ void asap_device::bgt()
 	{
 		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
 
-		fetch_instruction();
+		fetch_instruction_debug();
 		m_pc = m_nextpc;
 		m_nextpc = ~0;
 
@@ -661,7 +659,7 @@ void asap_device::ble()
 	{
 		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
 
-		fetch_instruction();
+		fetch_instruction_debug();
 		m_pc = m_nextpc;
 		m_nextpc = ~0;
 
@@ -676,7 +674,7 @@ void asap_device::bge()
 	{
 		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
 
-		fetch_instruction();
+		fetch_instruction_debug();
 		m_pc = m_nextpc;
 		m_nextpc = ~0;
 
@@ -691,7 +689,7 @@ void asap_device::blt()
 	{
 		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
 
-		fetch_instruction();
+		fetch_instruction_debug();
 		m_pc = m_nextpc;
 		m_nextpc = ~0;
 
@@ -706,7 +704,7 @@ void asap_device::bhi()
 	{
 		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
 
-		fetch_instruction();
+		fetch_instruction_debug();
 		m_pc = m_nextpc;
 		m_nextpc = ~0;
 
@@ -721,7 +719,7 @@ void asap_device::bls()
 	{
 		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
 
-		fetch_instruction();
+		fetch_instruction_debug();
 		m_pc = m_nextpc;
 		m_nextpc = ~0;
 
@@ -736,7 +734,7 @@ void asap_device::bcc()
 	{
 		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
 
-		fetch_instruction();
+		fetch_instruction_debug();
 		m_pc = m_nextpc;
 		m_nextpc = ~0;
 
@@ -751,7 +749,7 @@ void asap_device::bcs()
 	{
 		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
 
-		fetch_instruction();
+		fetch_instruction_debug();
 		m_pc = m_nextpc;
 		m_nextpc = ~0;
 
@@ -766,7 +764,7 @@ void asap_device::bpl()
 	{
 		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
 
-		fetch_instruction();
+		fetch_instruction_debug();
 		m_pc = m_nextpc;
 		m_nextpc = ~0;
 
@@ -781,7 +779,7 @@ void asap_device::bmi()
 	{
 		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
 
-		fetch_instruction();
+		fetch_instruction_debug();
 		m_pc = m_nextpc;
 		m_nextpc = ~0;
 
@@ -796,7 +794,7 @@ void asap_device::bne()
 	{
 		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
 
-		fetch_instruction();
+		fetch_instruction_debug();
 		m_pc = m_nextpc;
 		m_nextpc = ~0;
 
@@ -811,7 +809,7 @@ void asap_device::beq()
 	{
 		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
 
-		fetch_instruction();
+		fetch_instruction_debug();
 		m_pc = m_nextpc;
 		m_nextpc = ~0;
 
@@ -826,7 +824,7 @@ void asap_device::bvc()
 	{
 		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
 
-		fetch_instruction();
+		fetch_instruction_debug();
 		m_pc = m_nextpc;
 		m_nextpc = ~0;
 
@@ -841,7 +839,7 @@ void asap_device::bvs()
 	{
 		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
 
-		fetch_instruction();
+		fetch_instruction_debug();
 		m_pc = m_nextpc;
 		m_nextpc = ~0;
 
@@ -857,7 +855,7 @@ void asap_device::bsr()
 	DSTVAL = m_pc + 4;
 	m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
 
-	fetch_instruction();
+	fetch_instruction_debug();
 	m_pc = m_nextpc;
 	m_nextpc = ~0;
 
@@ -869,7 +867,7 @@ void asap_device::bsr_0()
 {
 	m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
 
-	fetch_instruction();
+	fetch_instruction_debug();
 	m_pc = m_nextpc;
 	m_nextpc = ~0;
 
@@ -1604,7 +1602,7 @@ void asap_device::jsr()
 	DSTVAL = m_pc + 4;
 	m_nextpc = SRC1VAL + (SRC2VAL << 2);
 
-	fetch_instruction();
+	fetch_instruction_debug();
 	m_pc = m_nextpc;
 	m_nextpc = ~0;
 
@@ -1616,7 +1614,7 @@ void asap_device::jsr_0()
 {
 	m_nextpc = SRC1VAL + (SRC2VAL << 2);
 
-	fetch_instruction();
+	fetch_instruction_debug();
 	m_pc = m_nextpc;
 	m_nextpc = ~0;
 
@@ -1630,7 +1628,7 @@ void asap_device::jsr_c()
 	m_nextpc = SRC1VAL + (SRC2VAL << 2);
 	m_iflag = m_pflag;
 
-	fetch_instruction();
+	fetch_instruction_debug();
 	m_pc = m_nextpc;
 	m_nextpc = ~0;
 
@@ -1644,7 +1642,7 @@ void asap_device::jsr_c0()
 	m_nextpc = SRC1VAL + (SRC2VAL << 2);
 	m_iflag = m_pflag;
 
-	fetch_instruction();
+	fetch_instruction_debug();
 	m_pc = m_nextpc;
 	m_nextpc = ~0;
 

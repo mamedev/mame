@@ -41,6 +41,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
+	virtual bool supports_pin35_5v() override { return true; }
+
 private:
 	uint8_t porta_r();
 	uint8_t portb_r();
@@ -48,14 +50,14 @@ private:
 	void porta_w(uint8_t data);
 	void portb_w(uint8_t data);
 	void portc_w(uint8_t data);
-	DECLARE_READ8_MEMBER(devsel_r);
-	DECLARE_WRITE8_MEMBER(devsel_w);
-	DECLARE_READ8_MEMBER(gate5a_r);
-	DECLARE_WRITE8_MEMBER(gate5a_w);
-	DECLARE_READ8_MEMBER(iosel_r);
-	DECLARE_WRITE8_MEMBER(iosel_w);
-	DECLARE_READ8_MEMBER(gate7a_r);
-	DECLARE_WRITE8_MEMBER(gate7a_w);
+	uint8_t devsel_r(offs_t offset);
+	void devsel_w(offs_t offset, uint8_t data);
+	uint8_t gate5a_r(offs_t offset);
+	void gate5a_w(offs_t offset, uint8_t data);
+	uint8_t iosel_r(offs_t offset);
+	void iosel_w(offs_t offset, uint8_t data);
+	uint8_t gate7a_r(offs_t offset);
+	void gate7a_w(offs_t offset, uint8_t data);
 
 	void ex800_mem(address_map &map);
 

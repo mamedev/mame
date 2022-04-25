@@ -21,7 +21,6 @@ Based on drivers from Juno First emulator by Chris Hardy (chrish@kcbbs.gen.nz)
 #include "machine/konami1.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "sound/volt_reg.h"
 
 #include "speaker.h"
 
@@ -335,9 +334,6 @@ void hyperspt_state::hyperspt(machine_config &config)
 	TRACKFLD_AUDIO(config, m_soundbrd, 0, m_audiocpu, m_vlm);
 
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	SN76496(config, m_sn, XTAL(14'318'181)/8);  /* verified on pcb */
 	m_sn->add_route(ALL_OUTPUTS, "speaker", 1.0);

@@ -30,7 +30,6 @@
 #include "emu.h"
 #include "v810.h"
 #include "v810dasm.h"
-#include "debugger.h"
 
 #define clkIF 3
 #define clkMEM 3
@@ -1316,7 +1315,6 @@ void v810_device::device_start()
 
 	state_add(STATE_GENPC, "GENPC", PC).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_PPC).noshow();
-	state_add(STATE_GENSP, "GENSP", SP).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", PSW).formatstr("%8s").noshow();
 
 	set_icountptr(m_icount);

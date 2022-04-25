@@ -2,7 +2,6 @@
 // copyright-holders:Carl
 #include "emu.h"
 #include "i286.h"
-#include "debugger.h"
 #include "i86inline.h"
 
 /*
@@ -850,6 +849,7 @@ void i80286_cpu_device::code_descriptor(uint16_t selector, uint16_t offset, int 
 					if (SEGDESC(r) || (GATE(r) != TSSDESCIDLE))
 						throw TRAP(FAULT_GP,IDXTBL(selector));
 
+					[[fallthrough]];
 				case TSSDESCIDLE:
 					switch_task(selector, gate);
 					load_flags(CompressFlags(), CPL);
@@ -1090,8 +1090,8 @@ void i80286_cpu_device::execute_run()
 				{
 					if ( m_fire_trap >= 2 )
 					{
-						interrupt(1);
 						m_fire_trap = 0;
+						interrupt(1);
 					}
 					else
 					{
@@ -1888,7 +1888,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 						break;
 					}
 				}
-
+				[[fallthrough]];
 				default:
 					if(!common_op(op))
 					{

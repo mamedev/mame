@@ -327,24 +327,23 @@ MC6845_ON_UPDATE_ADDR_CHANGED( ts803_state::crtc_update_addr )
 MC6845_UPDATE_ROW( ts803_state::crtc_update_row )
 {
 	bool rv = BIT(m_io_dsw->read(), 8) ? 0 : 1;
-	const rgb_t *pens = m_palette->palette()->entry_list_raw();
-	uint8_t chr,gfx,inv;
-	uint16_t mem,x;
-	uint32_t *p = &bitmap.pix32(y);
+	rgb_t const *const pens = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix(y);
 
-	for (x = 0; x < x_count; x++)
+	for (uint16_t x = 0; x < x_count; x++)
 	{
-		inv = (rv ^ (x == cursor_x)) ? 0xff : 0;
+		uint8_t inv = (rv ^ (x == cursor_x)) ? 0xff : 0;
 
+		uint8_t gfx;
 		if (m_graphics_mode)
 		{
-			mem = (ra*0x2000 + ma + x) & 0x7fff;
+			uint16_t mem = (ra*0x2000 + ma + x) & 0x7fff;
 			gfx = m_videoram[mem] ^ inv;
 		}
 		else
 		{
-			mem = 0x1800 + ((ma + x) & 0x7ff);
-			chr = m_videoram[mem];
+			uint16_t mem = 0x1800 + ((ma + x) & 0x7ff);
+			uint8_t chr = m_videoram[mem];
 			gfx = (ra > 7) ? inv : m_p_chargen[(chr<<3) | ((ra+1)&7)] ^ inv;
 		}
 
@@ -467,8 +466,8 @@ void ts803_state::ts803(machine_config &config)
 	/* floppy disk */
 	FD1793(config, m_fdc, 1_MHz_XTAL);
 	m_fdc->intrq_wr_callback().set("sti", FUNC(z80sti_device::i7_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", ts803_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", ts803_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", ts803_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", ts803_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 
 /* ROM definition */

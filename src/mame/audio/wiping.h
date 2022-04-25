@@ -17,13 +17,13 @@ protected:
 	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
-	/* 8 voices max */
+	// 8 voices max
 	static constexpr unsigned MAX_VOICES = 8;
 
-	/* this structure defines the parameters for a channel */
+	// this structure defines the parameters for a channel
 	struct wp_sound_channel
 	{
 		int frequency;
@@ -36,22 +36,19 @@ private:
 
 	// internal state
 
-	/* data about the sound system */
+	// data about the sound system
 	wp_sound_channel m_channel_list[MAX_VOICES];
 	wp_sound_channel *m_last_channel;
 
-	/* global sound parameters */
-	const uint8_t *m_sound_prom;
-	const uint8_t *m_sound_rom;
+	// global sound parameters
+	required_region_ptr<uint8_t> m_sound_prom;
+	required_region_ptr<uint8_t> m_sound_rom;
 	int m_num_voices;
 	int m_sound_enable;
 	sound_stream *m_stream;
 
-	/* mixer tables and internal buffers */
-	std::unique_ptr<int16_t[]> m_mixer_table;
-	int16_t *m_mixer_lookup;
-	std::unique_ptr<short[]> m_mixer_buffer;
-	std::unique_ptr<short[]> m_mixer_buffer_2;
+	// mixer tables and internal buffers
+	std::vector<short> m_mixer_buffer;
 
 	uint8_t m_soundregs[0x4000];
 

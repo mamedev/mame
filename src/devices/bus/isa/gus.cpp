@@ -4,6 +4,9 @@
  *  Gravis Ultrasound ISA card
  *
  *  Started: 28/01/2012
+ *
+ *  to do: xref with lowsrc.doc from GUS SDK
+ *  - 256K DMA and 16-bit sample playback boundaries
  */
 
 
@@ -204,7 +207,7 @@ void gf1_device::update_volume_ramps()
 	}
 }
 
-void gf1_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void gf1_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{
@@ -243,29 +246,26 @@ void gf1_device::device_timer(emu_timer &timer, device_timer_id id, int param, v
 	}
 }
 
-void gf1_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void gf1_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	int x,y;
+	int x;
 	//uint32_t count;
 
-	stream_sample_t* outputl = outputs[0];
-	stream_sample_t* outputr = outputs[1];
-	memset( outputl, 0x00, samples * sizeof(*outputl) );
-	memset( outputr, 0x00, samples * sizeof(*outputr) );
+	auto &outputl = outputs[0];
+	auto &outputr = outputs[1];
+
+	outputl.fill(0);
+	outputr.fill(0);
 
 	for(x=0;x<32;x++)  // for each voice
 	{
-		stream_sample_t* left = outputl;
-		stream_sample_t* right = outputr;
 		uint16_t vol = (m_volume_table[(m_voice[x].current_vol & 0xfff0) >> 4]);
-		for(y=samples-1; y>=0; y--)
+		for (int sampindex = 0; sampindex < outputl.samples(); sampindex++)
 		{
 			uint32_t current = m_voice[x].current_addr >> 9;
 			// TODO: implement proper panning
-			(*left) += ((m_voice[x].sample) * (vol/8192.0));
-			(*right) += ((m_voice[x].sample) * (vol/8192.0));
-			left++;
-			right++;
+			outputl.add_int(sampindex, m_voice[x].sample * vol, 32768 * 8192);
+			outputr.add_int(sampindex, m_voice[x].sample * vol, 32768 * 8192);
 			if((!(m_voice[x].voice_ctrl & 0x40)) && (m_voice[x].current_addr >= m_voice[x].end_addr) && !m_voice[x].rollover && !(m_voice[x].voice_ctrl & 0x01))
 			{
 				if(m_voice[x].vol_ramp_ctrl & 0x04)
@@ -505,6 +505,7 @@ uint8_t gf1_device::global_reg_data_r(offs_t offset)
 			m_dma_irq_handler(0);
 			return ret;
 		}
+		break;
 	case 0x45:  // Timer control
 		if(offset == 1)
 			return m_timer_ctrl & 0x0c;
@@ -512,15 +513,18 @@ uint8_t gf1_device::global_reg_data_r(offs_t offset)
 	case 0x49:  // Sampling control
 		if(offset == 1)
 			return m_sampling_ctrl & 0xe7;
+		break;
 	case 0x4c:  // Reset
 		if(offset == 1)
 			return m_reset;
+		break;
 	case 0x80: // Voice control
 /* bit 0 - 1 if voice is stopped
  * bit 6 - 1 if addresses are decreasing, can change when looping is enabled
  * bit 7 - 1 if Wavetable IRQ is pending */
 		if(offset == 1)
 			return m_voice[m_current_voice].voice_ctrl & 0xff;
+		break;
 	case 0x81:  // Frequency Control
 		ret = m_voice[m_current_voice].freq_ctrl;
 		if(offset == 0)
@@ -554,12 +558,15 @@ uint8_t gf1_device::global_reg_data_r(offs_t offset)
 	case 0x86:  // Volume Ramp rate
 		if(offset == 1)
 			return m_voice[m_current_voice].vol_ramp_rate;
+		break;
 	case 0x87:  // Volume Ramp start (high 4 bits = exponent, low 4 bits = mantissa)
 		if(offset == 1)
 			return m_voice[m_current_voice].vol_ramp_start;
+		break;
 	case 0x88:  // Volume Ramp end (high 4 bits = exponent, low 4 bits = mantissa)
 		if(offset == 1)
 			return m_voice[m_current_voice].vol_ramp_end;
+		break;
 	case 0x89:  // Current Volume (high 4 bits = exponent, middle 8 bits = mantissa, low 4 bits = 0 [reserved])
 		ret = m_voice[m_current_voice].current_vol;
 		if(offset == 0)
@@ -581,15 +588,18 @@ uint8_t gf1_device::global_reg_data_r(offs_t offset)
 	case 0x8c:  // Pan position (4 bits, 0=full left, 15=full right)
 		if(offset == 1)
 			return m_voice[m_current_voice].pan_position;
+		break;
 	case 0x8d:  // Volume Ramp control
 /* bit 0 - Ramp has stopped
  * bit 6 - Ramp direction
  * bit 7 - Ramp IRQ pending */
 		if(offset == 1)
 			return m_voice[m_current_voice].vol_ramp_ctrl;
+		break;
 	case 0x8e:  // Active voices (6 bits, high 2 bits are always 1)
 		if(offset == 1)
 			return (m_active_voices - 1) | 0xc0;
+		break;
 	case 0x8f:  // IRQ source register
 		if(offset == 1)
 		{
@@ -713,7 +723,7 @@ void gf1_device::global_reg_data_w(offs_t offset, uint8_t data)
  * bit 2 - roll over condition (generate IRQ, and not stop playing voice, no looping)
  * bit 3 - enable looping
  * bit 4 - enable bi-directional looping
- * bit 5 - rnable IRQ at end of ramp */
+ * bit 5 - enable IRQ at end of ramp */
 		if(offset == 1)
 		{
 			m_voice[m_current_voice].vol_ramp_ctrl = data & 0x7f;

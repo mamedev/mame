@@ -91,9 +91,11 @@ public:
 		m_sasi_ctrl_in(*this, "scsi_ctrl_in"),
 		m_rom(*this, Z80_TAG),
 		m_video_ram(*this, "video_ram"),
-		m_attr_ram(*this, "attr_ram"),
+		m_attr_ram(*this, "attr_ram", V1050_VIDEORAM_SIZE, ENDIANNESS_LITTLE),
 		m_int_mask(0),
 		m_int_state(0),
+		m_fdc_irq(0),
+		m_fdc_drq(0),
 		m_rtc_ppi_pa(0),
 		m_rtc_ppi_pc(0)
 	{
@@ -103,16 +105,16 @@ public:
 	void v1050_video(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER( kb_data_r );
-	DECLARE_READ8_MEMBER( kb_status_r );
-	DECLARE_WRITE8_MEMBER( v1050_i8214_w );
-	DECLARE_READ8_MEMBER( vint_clr_r );
-	DECLARE_WRITE8_MEMBER( vint_clr_w );
-	DECLARE_READ8_MEMBER( dint_clr_r );
-	DECLARE_WRITE8_MEMBER( dint_clr_w );
-	DECLARE_WRITE8_MEMBER( bank_w );
-	DECLARE_WRITE8_MEMBER( dint_w );
-	DECLARE_WRITE8_MEMBER( dvint_clr_w );
+	uint8_t kb_data_r();
+	uint8_t kb_status_r();
+	void v1050_i8214_w(uint8_t data);
+	uint8_t vint_clr_r();
+	void vint_clr_w(uint8_t data);
+	uint8_t dint_clr_r();
+	void dint_clr_w(uint8_t data);
+	void bank_w(uint8_t data);
+	void dint_w(uint8_t data);
+	void dvint_clr_w(uint8_t data);
 	void misc_ppi_pa_w(uint8_t data);
 	void misc_ppi_pc_w(uint8_t data);
 	uint8_t rtc_ppi_pa_r();
@@ -125,14 +127,14 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( sio_txrdy_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
-	DECLARE_READ8_MEMBER( attr_r );
-	DECLARE_WRITE8_MEMBER( attr_w );
-	DECLARE_READ8_MEMBER( videoram_r );
-	DECLARE_WRITE8_MEMBER( videoram_w );
+	uint8_t attr_r();
+	void attr_w(uint8_t data);
+	uint8_t videoram_r(offs_t offset);
+	void videoram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( crtc_vs_w );
-	DECLARE_WRITE8_MEMBER(sasi_data_w);
+	void sasi_data_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(write_sasi_io);
-	DECLARE_WRITE8_MEMBER( sasi_ctrl_w );
+	void sasi_ctrl_w(uint8_t data);
 
 	WRITE_LINE_MEMBER( rtc_ppi_pa_0_w ){ m_rtc_ppi_pa = (m_rtc_ppi_pa & ~(1 << 0)) | ((state & 1) << 0); }
 	WRITE_LINE_MEMBER( rtc_ppi_pa_1_w ){ m_rtc_ppi_pa = (m_rtc_ppi_pa & ~(1 << 1)) | ((state & 1) << 1); }
@@ -197,40 +199,40 @@ private:
 	required_device<input_buffer_device> m_sasi_ctrl_in;
 	required_memory_region m_rom;
 	required_shared_ptr<uint8_t> m_video_ram;
-	optional_shared_ptr<uint8_t> m_attr_ram;
+	memory_share_creator<uint8_t> m_attr_ram;
 
 	// interrupt state
 	uint8_t m_int_mask;           // interrupt mask
 	uint8_t m_int_state;
-	int m_f_int_enb;            // floppy interrupt enable
+	int m_f_int_enb = 0;            // floppy interrupt enable
 	bool m_fdc_irq;
 	bool m_fdc_drq;
 
 	// keyboard state
-	uint8_t m_keylatch;           // keyboard row select
-	uint8_t m_keydata;
-	int m_keyavail;
+	uint8_t m_keylatch = 0;           // keyboard row select
+	uint8_t m_keydata = 0;
+	int m_keyavail = 0;
 
 	// serial state
-	int m_rxrdy;                // receiver ready
-	int m_txrdy;                // transmitter ready
-	int m_baud_sel;             // baud select
+	int m_rxrdy = 0;                // receiver ready
+	int m_txrdy = 0;                // transmitter ready
+	int m_baud_sel = 0;             // baud select
 
 	// memory state
-	uint8_t m_bank;               // bank register
+	uint8_t m_bank = 0;               // bank register
 
 	// video state
-	uint8_t m_attr;               // attribute latch
+	uint8_t m_attr = 0;               // attribute latch
 
 	// sasi state
-	uint8_t m_sasi_data;
-	int m_sasi_data_enable;
+	uint8_t m_sasi_data = 0;
+	int m_sasi_data_enable = 0;
 
 	uint8_t m_rtc_ppi_pa;
 	uint8_t m_rtc_ppi_pc;
 
-	int m_centronics_busy;
-	int m_centronics_perror;
+	int m_centronics_busy = 0;
+	int m_centronics_perror = 0;
 };
 
 #endif // MAME_INCLUDES_V1050_H

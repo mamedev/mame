@@ -59,23 +59,23 @@ private:
 	optional_device_array<legacy_floppy_image_device, 4> m_floppy_drive;
 
 	/* register */
-	uint8_t m_data;
-	uint8_t m_drive_num;
-	uint8_t m_track;
-	uint8_t m_sector;
-	uint8_t m_command;
-	uint8_t m_status;
+	uint8_t m_data = 0U;
+	uint8_t m_drive_num = 0U;
+	uint8_t m_track = 0U;
+	uint8_t m_sector = 0U;
+	uint8_t m_command = 0U;
+	uint8_t m_status = 0U;
 
-	uint8_t   m_write_cmd;              /* last write command issued */
+	uint8_t   m_write_cmd = 0U;           // last write command issued
 
-	uint8_t   m_buffer[6144];           /* I/O buffer (holds up to a whole track) */
-	uint32_t  m_data_offset;            /* offset into I/O buffer */
-	int32_t   m_data_count;             /* transfer count from/into I/O buffer */
+	uint8_t   m_buffer[6144]{};           // I/O buffer (holds up to a whole track)
+	uint32_t  m_data_offset = 0U;         // offset into I/O buffer
+	int32_t   m_data_count = 0;           // transfer count from/into I/O buffer
 
-	uint32_t  m_sector_length;          /* sector length (byte) */
+	uint32_t  m_sector_length = 0U;       // sector length (byte)
 
-	/* this is the drive currently selected */
-	legacy_floppy_image_device *m_drive;
+	// this is the drive currently selected
+	legacy_floppy_image_device *m_drive = 0;
 
 	void read_sector();
 	void write_sector();

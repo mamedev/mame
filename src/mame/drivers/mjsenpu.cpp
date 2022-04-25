@@ -80,8 +80,8 @@ private:
 	uint8_t m_pal[0x200];
 	uint32_t m_vram0[0x20000 / 4];
 	uint32_t m_vram1[0x20000 / 4];
-	uint8_t m_control;
-	uint8_t m_mux;
+	uint8_t m_control = 0;
+	uint8_t m_mux = 0;
 
 	uint8_t palette_low_r(offs_t offset);
 	uint8_t palette_high_r(offs_t offset);
@@ -407,32 +407,26 @@ void mjsenpu_state::video_start()
 
 uint32_t mjsenpu_state::screen_update_mjsenpu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x,y,count;
-	int color;
+	uint32_t const *const vram = (m_control & 0x01) ? m_vram0 : m_vram1;
 
-	uint32_t* vram;
-
-	if (m_control & 0x01) vram = m_vram0;
-	else  vram = m_vram1;
-
-
-
-	count = 0;
-	for (y=0;y < 256;y++)
+	int count = 0;
+	for (int y=0;y < 256;y++)
 	{
-		for (x=0;x < 512/4;x++)
+		for (int x=0;x < 512/4;x++)
 		{
+			int color;
+
 			color = vram[count] & 0x000000ff;
-			bitmap.pix16(y, x*4 + 2) = color;
+			bitmap.pix(y, x*4 + 2) = color;
 
 			color = (vram[count] & 0x0000ff00) >> 8;
-			bitmap.pix16(y, x*4 + 3) = color;
+			bitmap.pix(y, x*4 + 3) = color;
 
 			color = (vram[count] & 0x00ff0000) >> 16;
-			bitmap.pix16(y, x*4 + 0) = color;
+			bitmap.pix(y, x*4 + 0) = color;
 
 			color = (vram[count] & 0xff000000) >> 24;
-			bitmap.pix16(y, x*4 + 1) = color;
+			bitmap.pix(y, x*4 + 1) = color;
 
 			count++;
 		}

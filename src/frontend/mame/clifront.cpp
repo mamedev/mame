@@ -18,17 +18,19 @@
 #include "language.h"
 #include "luaengine.h"
 #include "mame.h"
+#include "mameopts.h"
 #include "media_ident.h"
 #include "pluginopts.h"
 
 #include "emuopts.h"
-#include "mameopts.h"
+#include "fileio.h"
 #include "romload.h"
 #include "softlist_dev.h"
 #include "validity.h"
 #include "sound/samples.h"
 
 #include "chd.h"
+#include "corestr.h"
 #include "unzip.h"
 #include "xmlfile.h"
 
@@ -36,7 +38,10 @@
 
 #include <algorithm>
 #include <new>
+#include <set>
+#include <tuple>
 #include <cctype>
+#include <iostream>
 
 
 //**************************************************************************
@@ -78,6 +83,7 @@
 
 
 namespace {
+
 //**************************************************************************
 //  COMMAND-LINE OPTIONS
 //**************************************************************************
@@ -216,25 +222,29 @@ void cli_frontend::start_execution(mame_machine_manager *manager, const std::vec
 	try
 	{
 		m_options.parse_command_line(args, OPTION_PRIORITY_CMDLINE);
-		m_osd.set_verbose(m_options.verbose());
+	}
+	catch (options_warning_exception &ex)
+	{
+		osd_printf_error("%s", ex.message());
 	}
 	catch (options_exception &ex)
 	{
 		// if we failed, check for no command and a system name first; in that case error on the name
 		if (m_options.command().empty() && mame_options::system(m_options) == nullptr && !m_options.attempted_system_name().empty())
-			throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "Unknown system '%s'", m_options.attempted_system_name().c_str());
+			throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "Unknown system '%s'", m_options.attempted_system_name());
 
 		// otherwise, error on the options
-		throw emu_fatalerror(EMU_ERR_INVALID_CONFIG, "%s", ex.message().c_str());
+		throw emu_fatalerror(EMU_ERR_INVALID_CONFIG, "%s", ex.message());
 	}
+	m_osd.set_verbose(m_options.verbose());
 
 	// determine the base name of the EXE
-	std::string exename = core_filename_extract_base(args[0], true);
+	std::string_view exename = core_filename_extract_base(args[0], true);
 
 	// if we have a command, execute that
 	if (!m_options.command().empty())
 	{
-		execute_commands(exename.c_str());
+		execute_commands(exename);
 		return;
 	}
 
@@ -253,10 +263,7 @@ void cli_frontend::start_execution(mame_machine_manager *manager, const std::vec
 	manager->start_luaengine();
 
 	if (option_errors.tellp() > 0)
-	{
-		std::string option_errors_string = option_errors.str();
-		osd_printf_error("Error in command line:\n%s\n", strtrimspace(option_errors_string));
-	}
+		osd_printf_error("Error in command line:\n%s\n", strtrimspace(option_errors.str()));
 
 	// if we can't find it, give an appropriate error
 	const game_driver *system = mame_options::system(m_options);
@@ -285,9 +292,7 @@ int cli_frontend::execute(std::vector<std::string> &args)
 	// handle exceptions of various types
 	catch (emu_fatalerror &fatal)
 	{
-		std::string str(fatal.what());
-		strtrimspace(str);
-		osd_printf_error("%s\n", str);
+		osd_printf_error("%s\n", strtrimspace(fatal.what()));
 		m_result = (fatal.exitcode() != 0) ? fatal.exitcode() : EMU_ERR_FATALERROR;
 
 		// if a game was specified, wasn't a wildcard, and our error indicates this was the
@@ -300,7 +305,7 @@ int cli_frontend::execute(std::vector<std::string> &args)
 			// get the top 16 approximate matches
 			driver_enumerator drivlist(m_options);
 			int matches[16];
-			drivlist.find_approximate_matches(m_options.attempted_system_name(), ARRAY_LENGTH(matches), matches);
+			drivlist.find_approximate_matches(m_options.attempted_system_name(), std::size(matches), matches);
 
 			// work out how wide the titles need to be
 			int titlelen(0);
@@ -310,7 +315,7 @@ int cli_frontend::execute(std::vector<std::string> &args)
 
 			// print them out
 			osd_printf_error("\n\"%s\" approximately matches the following\n"
-					"supported machines (best match first):\n\n", m_options.attempted_system_name().c_str());
+					"supported machines (best match first):\n\n", m_options.attempted_system_name());
 			for (int match : matches)
 			{
 				if (0 <= match)
@@ -343,7 +348,7 @@ int cli_frontend::execute(std::vector<std::string> &args)
 	}
 
 	util::archive_file::cache_clear();
-	global_free(manager);
+	delete manager;
 
 	return m_result;
 }
@@ -514,7 +519,7 @@ void cli_frontend::listcrc(const std::vector<std::string> &args)
 			args,
 			[] (device_t &root, char const *type, bool first)
 			{
-				for (device_t const &device : device_iterator(root))
+				for (device_t const &device : device_enumerator(root))
 				{
 					for (tiny_rom_entry const *rom = device.rom_region(); rom && !ROMENTRY_ISEND(rom); ++rom)
 					{
@@ -547,54 +552,82 @@ void cli_frontend::listroms(const std::vector<std::string> &args)
 					osd_printf_info("\n");
 
 				// iterate through ROMs
-				bool hasroms = false;
-				for (device_t const &device : device_iterator(root))
+				std::list<std::tuple<std::string, int64_t, std::string>> entries;
+				std::set<std::string_view> devnames;
+				for (device_t const &device : device_enumerator(root))
 				{
+					bool hasroms = false;
 					for (const rom_entry *region = rom_first_region(device); region; region = rom_next_region(region))
 					{
 						for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 						{
-							// print a header
 							if (!hasroms)
-								osd_printf_info(
-									"ROMs required for %s \"%s\".\n"
-									"%-32s %10s %s\n",
-									type, root.shortname(), "Name", "Size", "Checksum");
-							hasroms = true;
+							{
+								hasroms = true;
+								if (&device != &root)
+									devnames.insert(device.shortname());
+							}
 
 							// accumulate the total length of all chunks
 							int64_t length = -1;
 							if (ROMREGION_ISROMDATA(region))
 								length = rom_file_size(rom);
 
-							// start with the name
-							const char *name = ROM_GETNAME(rom);
-							osd_printf_info("%-32s ", name);
-
-							// output the length next
-							if (length >= 0)
-								osd_printf_info("%10u", unsigned(uint64_t(length)));
-							else
-								osd_printf_info("%10s", "");
-
-							// output the hash data
-							util::hash_collection hashes(ROM_GETHASHDATA(rom));
-							if (!hashes.flag(util::hash_collection::FLAG_NO_DUMP))
-							{
-								if (hashes.flag(util::hash_collection::FLAG_BAD_DUMP))
-									osd_printf_info(" BAD");
-								osd_printf_info(" %s", hashes.macro_string());
-							}
-							else
-								osd_printf_info(" NO GOOD DUMP KNOWN");
-
-							// end with a CR
-							osd_printf_info("\n");
+							entries.emplace_back(rom->name(), length, rom->hashdata());
 						}
 					}
 				}
-				if (!hasroms)
+
+				// print results
+				if (entries.empty())
 					osd_printf_info("No ROMs required for %s \"%s\".\n", type, root.shortname());
+				else
+				{
+					// print a header
+					osd_printf_info("ROMs required for %s \"%s\"", type, root.shortname());
+					if (!devnames.empty())
+					{
+						osd_printf_info(" (including device%s", devnames.size() > 1 ? "s" : "");
+						bool first = true;
+						for (const std::string_view &devname : devnames)
+						{
+							if (first)
+								first = false;
+							else
+								osd_printf_info(",");
+							osd_printf_info(" \"%s\"", devname);
+						}
+						osd_printf_info(")");
+					}
+					osd_printf_info(".\n%-32s %10s %s\n", "Name", "Size", "Checksum");
+
+					for (auto &entry : entries)
+					{
+						// start with the name
+						osd_printf_info("%-32s ", std::get<0>(entry));
+
+						// output the length next
+						int64_t length = std::get<1>(entry);
+						if (length >= 0)
+							osd_printf_info("%10u", unsigned(uint64_t(length)));
+						else
+							osd_printf_info("%10s", "");
+
+						// output the hash data
+						util::hash_collection hashes(std::get<2>(entry));
+						if (!hashes.flag(util::hash_collection::FLAG_NO_DUMP))
+						{
+							if (hashes.flag(util::hash_collection::FLAG_BAD_DUMP))
+								osd_printf_info(" BAD");
+							osd_printf_info(" %s", hashes.macro_string());
+						}
+						else
+							osd_printf_info(" NO GOOD DUMP KNOWN");
+
+						// end with a CR
+						osd_printf_info("\n");
+					}
+				}
 			});
 }
 
@@ -618,7 +651,7 @@ void cli_frontend::listsamples(const std::vector<std::string> &args)
 	while (drivlist.next())
 	{
 		// see if we have samples
-		samples_device_iterator iter(drivlist.config()->root_device());
+		samples_device_enumerator iter(drivlist.config()->root_device());
 		if (iter.count() == 0)
 			continue;
 
@@ -665,7 +698,7 @@ void cli_frontend::listdevices(const std::vector<std::string> &args)
 
 		// build a list of devices
 		std::vector<device_t *> device_list;
-		for (device_t &device : device_iterator(drivlist.config()->root_device()))
+		for (device_t &device : device_enumerator(drivlist.config()->root_device()))
 			device_list.push_back(&device);
 
 		// sort them by tag
@@ -747,7 +780,7 @@ void cli_frontend::listslots(const std::vector<std::string> &args)
 	{
 		// iterate
 		bool first = true;
-		for (const device_slot_interface &slot : slot_interface_iterator(drivlist.config()->root_device()))
+		for (const device_slot_interface &slot : slot_interface_enumerator(drivlist.config()->root_device()))
 		{
 			if (slot.fixed()) continue;
 
@@ -815,7 +848,7 @@ void cli_frontend::listmedia(const std::vector<std::string> &args)
 	{
 		// iterate
 		bool first = true;
-		for (const device_image_interface &imagedev : image_interface_iterator(drivlist.config()->root_device()))
+		for (const device_image_interface &imagedev : image_interface_enumerator(drivlist.config()->root_device()))
 		{
 			if (!imagedev.user_loadable())
 				continue;
@@ -824,7 +857,7 @@ void cli_frontend::listmedia(const std::vector<std::string> &args)
 			std::string paren_shortname = string_format("(%s)", imagedev.brief_instance_name());
 
 			// output the line, up to the list of extensions
-			printf("%-16s %-16s %-10s ", first ? drivlist.driver().name : "", imagedev.instance_name().c_str(), paren_shortname.c_str());
+			printf("%-16s %-16s %-10s ", drivlist.driver().name, imagedev.instance_name().c_str(), paren_shortname.c_str());
 
 			// get the extensions and print them
 			std::string extensions(imagedev.file_extensions());
@@ -941,7 +974,7 @@ void cli_frontend::verifyroms(const std::vector<std::string> &args)
 	for (std::string const &pat : args)
 	{
 		if (!*it)
-			throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", pat.c_str());
+			throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", pat);
 
 		++it;
 	}
@@ -950,9 +983,9 @@ void cli_frontend::verifyroms(const std::vector<std::string> &args)
 	{
 		// if we didn't get anything at all, display a generic end message
 		if (notfound > 0)
-			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "romset \"%s\" not found!\n", args[0].c_str());
+			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "romset \"%s\" not found!\n", args[0]);
 		else
-			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "romset \"%s\" has no roms!\n", args[0].c_str());
+			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "romset \"%s\" has no roms!\n", args[0]);
 	}
 	else
 	{
@@ -1029,16 +1062,18 @@ const char cli_frontend::s_softlist_xml_dtd[] =
 				"<?xml version=\"1.0\"?>\n" \
 				"<!DOCTYPE softwarelists [\n" \
 				"<!ELEMENT softwarelists (softwarelist*)>\n" \
-				"\t<!ELEMENT softwarelist (software+)>\n" \
+				"\t<!ELEMENT softwarelist (notes?, software+)>\n" \
 				"\t\t<!ATTLIST softwarelist name CDATA #REQUIRED>\n" \
 				"\t\t<!ATTLIST softwarelist description CDATA #IMPLIED>\n" \
-				"\t\t<!ELEMENT software (description, year, publisher, info*, sharedfeat*, part*)>\n" \
+				"\t\t<!ELEMENT notes (#PCDATA)>\n" \
+				"\t\t<!ELEMENT software (description, year, publisher, notes?, info*, sharedfeat*, part*)>\n" \
 				"\t\t\t<!ATTLIST software name CDATA #REQUIRED>\n" \
 				"\t\t\t<!ATTLIST software cloneof CDATA #IMPLIED>\n" \
 				"\t\t\t<!ATTLIST software supported (yes|partial|no) \"yes\">\n" \
 				"\t\t\t<!ELEMENT description (#PCDATA)>\n" \
 				"\t\t\t<!ELEMENT year (#PCDATA)>\n" \
 				"\t\t\t<!ELEMENT publisher (#PCDATA)>\n" \
+				"\t\t\t<!ELEMENT notes (#PCDATA)>\n" \
 				"\t\t\t<!ELEMENT info EMPTY>\n" \
 				"\t\t\t\t<!ATTLIST info name CDATA #REQUIRED>\n" \
 				"\t\t\t\t<!ATTLIST info value CDATA #IMPLIED>\n" \
@@ -1091,17 +1126,20 @@ void cli_frontend::output_single_softlist(std::ostream &out, software_list_devic
 		util::stream_format(out, "\t\t<software name=\"%s\"", util::xml::normalize_string(swinfo.shortname().c_str()));
 		if (!swinfo.parentname().empty())
 			util::stream_format(out, " cloneof=\"%s\"", util::xml::normalize_string(swinfo.parentname().c_str()));
-		if (swinfo.supported() == SOFTWARE_SUPPORTED_PARTIAL)
+		if (swinfo.supported() == software_support::PARTIALLY_SUPPORTED)
 			out << " supported=\"partial\"";
-		if (swinfo.supported() == SOFTWARE_SUPPORTED_NO)
+		else if (swinfo.supported() == software_support::UNSUPPORTED)
 			out << " supported=\"no\"";
 		out << ">\n";
 		util::stream_format(out, "\t\t\t<description>%s</description>\n", util::xml::normalize_string(swinfo.longname().c_str()));
 		util::stream_format(out, "\t\t\t<year>%s</year>\n", util::xml::normalize_string(swinfo.year().c_str()));
 		util::stream_format(out, "\t\t\t<publisher>%s</publisher>\n", util::xml::normalize_string(swinfo.publisher().c_str()));
 
-		for (const feature_list_item &flist : swinfo.other_info())
-			util::stream_format(out, "\t\t\t<info name=\"%s\" value=\"%s\"/>\n", flist.name().c_str(), util::xml::normalize_string(flist.value().c_str()));
+		for (const auto &flist : swinfo.info())
+			util::stream_format(out, "\t\t\t<info name=\"%s\" value=\"%s\"/>\n", flist.name(), util::xml::normalize_string(flist.value().c_str()));
+
+		for (const auto &flist : swinfo.shared_features())
+			util::stream_format(out, "\t\t\t<sharedfeat name=\"%s\" value=\"%s\"/>\n", flist.name(), util::xml::normalize_string(flist.value().c_str()));
 
 		for (const software_part &part : swinfo.parts())
 		{
@@ -1111,8 +1149,8 @@ void cli_frontend::output_single_softlist(std::ostream &out, software_list_devic
 
 			out << ">\n";
 
-			for (const feature_list_item &flist : part.featurelist())
-				util::stream_format(out, "\t\t\t\t<feature name=\"%s\" value=\"%s\" />\n", flist.name().c_str(), util::xml::normalize_string(flist.value().c_str()));
+			for (const auto &flist : part.features())
+				util::stream_format(out, "\t\t\t\t<feature name=\"%s\" value=\"%s\" />\n", flist.name(), util::xml::normalize_string(flist.value().c_str()));
 
 			// TODO: display ROM region information
 			for (const rom_entry *region = part.romdata().data(); region; region = rom_next_region(region))
@@ -1120,9 +1158,9 @@ void cli_frontend::output_single_softlist(std::ostream &out, software_list_devic
 				int is_disk = ROMREGION_ISDISKDATA(region);
 
 				if (!is_disk)
-					util::stream_format(out, "\t\t\t\t<dataarea name=\"%s\" size=\"%d\">\n", util::xml::normalize_string(ROMREGION_GETTAG(region)), ROMREGION_GETLENGTH(region));
+					util::stream_format(out, "\t\t\t\t<dataarea name=\"%s\" size=\"%d\">\n", util::xml::normalize_string(region->name().c_str()), region->get_length());
 				else
-					util::stream_format(out, "\t\t\t\t<diskarea name=\"%s\">\n", util::xml::normalize_string(ROMREGION_GETTAG(region)));
+					util::stream_format(out, "\t\t\t\t<diskarea name=\"%s\">\n", util::xml::normalize_string(region->name().c_str()));
 
 				for (const rom_entry *rom = rom_first_file(region); rom && !ROMENTRY_ISREGIONEND(rom); rom++)
 				{
@@ -1134,7 +1172,7 @@ void cli_frontend::output_single_softlist(std::ostream &out, software_list_devic
 							util::stream_format(out, "\t\t\t\t\t<disk name=\"%s\"", util::xml::normalize_string(ROM_GETNAME(rom)));
 
 						// dump checksum information only if there is a known dump
-						util::hash_collection hashes(ROM_GETHASHDATA(rom));
+						util::hash_collection hashes(rom->hashdata());
 						if (!hashes.flag(util::hash_collection::FLAG_NO_DUMP))
 							util::stream_format(out, " %s", hashes.attribute_string());
 						else
@@ -1215,7 +1253,7 @@ void cli_frontend::listsoftware(const std::vector<std::string> &args)
 			args,
 			[this, &list_map, &firstlist] (device_t &root, char const *type, bool first)
 			{
-				for (software_list_device &swlistdev : software_list_device_iterator(root))
+				for (software_list_device &swlistdev : software_list_device_enumerator(root))
 				{
 					if (list_map.insert(swlistdev.list_name()).second)
 					{
@@ -1268,7 +1306,7 @@ void cli_frontend::verifysoftware(const std::vector<std::string> &args)
 	{
 		matched++;
 
-		for (software_list_device &swlistdev : software_list_device_iterator(drivlist.config()->root_device()))
+		for (software_list_device &swlistdev : software_list_device_enumerator(drivlist.config()->root_device()))
 		{
 			if (swlistdev.is_original())
 			{
@@ -1330,7 +1368,7 @@ void cli_frontend::getsoftlist(const std::vector<std::string> &args)
 			std::vector<std::string>(),
 			[this, gamename, &list_map, &firstlist] (device_t &root, char const *type, bool first)
 			{
-				for (software_list_device &swlistdev : software_list_device_iterator(root))
+				for (software_list_device &swlistdev : software_list_device_enumerator(root))
 				{
 					if (core_strwildcmp(gamename, swlistdev.list_name().c_str()) == 0 && list_map.insert(swlistdev.list_name()).second)
 					{
@@ -1375,7 +1413,7 @@ void cli_frontend::verifysoftlist(const std::vector<std::string> &args)
 
 	while (drivlist.next())
 	{
-		for (software_list_device &swlistdev : software_list_device_iterator(drivlist.config()->root_device()))
+		for (software_list_device &swlistdev : software_list_device_enumerator(drivlist.config()->root_device()))
 		{
 			if (core_strwildcmp(gamename, swlistdev.list_name().c_str()) == 0 && list_map.insert(swlistdev.list_name()).second)
 			{
@@ -1443,7 +1481,7 @@ void cli_frontend::romident(const std::vector<std::string> &args)
 	// create our own copy of options for the purposes of ROM identification
 	// so we are not "polluted" with driver-specific slot/image options
 	emu_options options;
-	options.set_value(OPTION_MEDIAPATH, m_options.media_path(), OPTION_PRIORITY_DEFAULT);
+	options.set_value(OPTION_HASHPATH, m_options.hash_path(), OPTION_PRIORITY_DEFAULT);
 
 	media_identifier ident(options);
 
@@ -1533,7 +1571,7 @@ template <typename T, typename U> void cli_frontend::apply_action(const std::vec
 	for (std::string const &pat : args)
 	{
 		if (!*it)
-			throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", pat.c_str());
+			throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", pat);
 
 		++it;
 	}
@@ -1607,7 +1645,7 @@ const cli_frontend::info_command_struct *cli_frontend::find_command(const std::s
 //  commands
 //-------------------------------------------------
 
-void cli_frontend::execute_commands(const char *exename)
+void cli_frontend::execute_commands(std::string_view exename)
 {
 	// help?
 	if (m_options.command() == CLICOMMAND_HELP)
@@ -1632,8 +1670,7 @@ void cli_frontend::execute_commands(const char *exename)
 			osd_printf_error("Auxiliary verb -validate takes at most 1 argument\n");
 			return;
 		}
-		validity_checker valid(m_options);
-		valid.set_validate_all(true);
+		validity_checker valid(m_options, false);
 		const char *sysname = m_options.command_arguments().empty() ? nullptr : m_options.command_arguments()[0].c_str();
 		bool result = valid.check_all_matching(sysname);
 		if (!result)
@@ -1652,19 +1689,19 @@ void cli_frontend::execute_commands(const char *exename)
 	{
 		// attempt to open the output file
 		emu_file file(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file.open(std::string(emulator_info::get_configname()) + ".ini") != osd_file::error::NONE)
+		if (file.open(std::string(emulator_info::get_configname()) + ".ini"))
 			throw emu_fatalerror("Unable to create file %s.ini\n",emulator_info::get_configname());
 
 		// generate the updated INI
-		file.puts(m_options.output_ini().c_str());
+		file.puts(m_options.output_ini());
 
 		ui_options ui_opts;
 		emu_file file_ui(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file_ui.open("ui.ini") != osd_file::error::NONE)
+		if (file_ui.open("ui.ini"))
 			throw emu_fatalerror("Unable to create file ui.ini\n");
 
 		// generate the updated INI
-		file_ui.puts(ui_opts.output_ini().c_str());
+		file_ui.puts(ui_opts.output_ini());
 
 		plugin_options plugin_opts;
 		path_iterator iter(m_options.plugins_path());
@@ -1675,11 +1712,11 @@ void cli_frontend::execute_commands(const char *exename)
 			plugin_opts.scan_directory(pluginpath, true);
 		}
 		emu_file file_plugin(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file_plugin.open("plugin.ini") != osd_file::error::NONE)
+		if (file_plugin.open("plugin.ini"))
 			throw emu_fatalerror("Unable to create file plugin.ini\n");
 
 		// generate the updated INI
-		file_plugin.puts(plugin_opts.output_ini().c_str());
+		file_plugin.puts(plugin_opts.output_ini());
 
 		return;
 	}
@@ -1718,7 +1755,7 @@ void cli_frontend::execute_commands(const char *exename)
 
 	if (!m_osd.execute_command(m_options.command().c_str()))
 		// if we get here, we don't know what has been requested
-		throw emu_fatalerror(EMU_ERR_INVALID_CONFIG, "Unknown command '%s' specified", m_options.command().c_str());
+		throw emu_fatalerror(EMU_ERR_INVALID_CONFIG, "Unknown command '%s' specified", m_options.command());
 }
 
 
@@ -1727,18 +1764,27 @@ void cli_frontend::execute_commands(const char *exename)
 //  output
 //-------------------------------------------------
 
-void cli_frontend::display_help(const char *exename)
+void cli_frontend::display_help(std::string_view exename)
 {
-	osd_printf_info("%s v%s\n%s\n\n", emulator_info::get_appname(),build_version,emulator_info::get_copyright_info());
-	osd_printf_info("This software reproduces, more or less faithfully, the behaviour of a wide range\n"
-					"of machines. But hardware is useless without software, so images of the ROMs and\n"
-					"other media which run on that hardware are also required.\n\n");
-	osd_printf_info("Usage:  %s [machine] [media] [software] [options]",exename);
-	osd_printf_info("\n\n"
-			"        %s -showusage    for a list of options\n"
-			"        %s -showconfig   to show your current %s.ini\n"
-			"        %s -listmedia    for a full list of supported media\n"
-			"        %s -createconfig to create a %s.ini\n\n"
-			"For usage instructions, please consult the files config.txt and windows.txt.\n",exename,
-			exename,emulator_info::get_configname(),exename,exename,emulator_info::get_configname());
+	osd_printf_info(
+			"%3$s v%2$s\n"
+			"%5$s\n"
+			"\n"
+			"This software reproduces, more or less faithfully, the behaviour of a wide range\n"
+			"of machines. But hardware is useless without software, so images of the ROMs and\n"
+			"other media which run on that hardware are also required.\n"
+			"\n"
+			"Usage:  %1$s [machine] [media] [software] [options]\n"
+			"\n"
+			"        %1$s -showusage    for a list of options\n"
+			"        %1$s -showconfig   to show current configuration in %4$s.ini format\n"
+			"        %1$s -listmedia    for a full list of supported media\n"
+			"        %1$s -createconfig to create a %4$s.ini file\n"
+			"\n"
+			"For usage instructions, please visit https://docs.mamedev.org/\n",
+			exename,
+			build_version,
+			emulator_info::get_appname(),
+			emulator_info::get_configname(),
+			emulator_info::get_copyright_info());
 }

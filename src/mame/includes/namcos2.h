@@ -16,7 +16,7 @@
 #include "machine/namco_c148.h"
 #include "machine/timer.h"
 #include "sound/c140.h"
-#include "video/c45.h"
+#include "video/namco_c45road.h"
 #include "video/namco_c116.h"
 #include "machine/namco65.h"
 #include "machine/namco68.h"
@@ -39,6 +39,7 @@ public:
 	namcos2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_gametype(0),
+		m_update_to_line_before_posirq(false),
 		m_maincpu(*this, "maincpu"),
 		m_slave(*this, "slave"),
 		m_audiocpu(*this, "audiocpu"),
@@ -80,6 +81,7 @@ public:
 	void sgunner2(machine_config &config);
 	void base2(machine_config &config);
 	void finallap_noio(machine_config &config);
+	void base_fl(machine_config &config);
 	void finallap(machine_config &config);
 	void finallap_c68(machine_config &config);
 	void finalap2(machine_config &config);
@@ -104,7 +106,6 @@ public:
 	void init_finehour();
 	void init_finallap();
 	void init_dirtfoxj();
-	void init_marvlanj();
 	void init_sws92();
 	void init_dsaber();
 	void init_assault();
@@ -113,6 +114,7 @@ public:
 	void init_valkyrie();
 	void init_fourtrax();
 	void init_finalap3();
+	void init_finalap3bl();
 	void init_luckywld();
 	void init_assaultj();
 	void init_dsaberj();
@@ -125,6 +127,11 @@ public:
 	void init_ordyne();
 	void init_marvland();
 	void init_rthun2();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 
@@ -166,7 +173,9 @@ enum
 		NAMCOS2_KYUUKAI_DOUCHUUKI,
 	};
 
-	int m_gametype;
+	int m_gametype = 0;
+	bool m_update_to_line_before_posirq = false;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_slave;
 	required_device<cpu_device> m_audiocpu;
@@ -187,22 +196,21 @@ enum
 
 	std::unique_ptr<uint8_t[]> m_eeprom;
 
-	DECLARE_READ16_MEMBER(dpram_word_r);
-	DECLARE_WRITE16_MEMBER(dpram_word_w);
+	uint16_t dpram_word_r(offs_t offset);
+	void dpram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t dpram_byte_r(offs_t offset);
 	void dpram_byte_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(eeprom_w);
-	DECLARE_READ8_MEMBER(eeprom_r);
+	void eeprom_w(offs_t offset, uint8_t data);
+	uint8_t eeprom_r(offs_t offset);
 
-	DECLARE_READ16_MEMBER(c140_rom_r);
-	DECLARE_WRITE8_MEMBER(sound_bankselect_w);
+	uint16_t c140_rom_r(offs_t offset);
+	void sound_bankselect_w(uint8_t data);
 
 	void sound_reset_w(uint8_t data);
 	void system_reset_w(uint8_t data);
 	void reset_all_subcpus(int state);
 
-	virtual void video_start() override;
 	void video_start_luckywld();
 	void video_start_metlhawk();
 	void video_start_sgunner();
@@ -213,13 +221,10 @@ enum
 	uint32_t screen_update_metlhawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sgunner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( c116_r );
+	uint8_t c116_r(offs_t offset);
 
-	DECLARE_READ16_MEMBER( gfx_ctrl_r );
-	DECLARE_WRITE16_MEMBER( gfx_ctrl_w );
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	uint16_t gfx_ctrl_r();
+	void gfx_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void create_shadow_table();
 	void apply_clip( rectangle &clip, const rectangle &cliprect );
@@ -229,23 +234,24 @@ enum
 
 	required_shared_ptr<uint8_t> m_dpram; /* 2Kx8 */
 	optional_shared_ptr<uint16_t> m_spriteram;
-	uint16_t m_gfx_ctrl;
-	uint16_t m_serial_comms_ctrl[0x8];
-	unsigned m_finallap_prot_count;
-	int m_sendval;
+	uint16_t m_gfx_ctrl = 0;
+	unsigned m_finallap_prot_count = 0;
+	int m_sendval = 0;
 
 	optional_device<namco_c45_road_device> m_c45_road;
 	optional_device<namcos2_sprite_device> m_ns2sprite;
 	optional_device<namcos2_roz_device> m_ns2roz;
 
-	DECLARE_READ16_MEMBER( namcos2_68k_key_r );
-	DECLARE_WRITE16_MEMBER( namcos2_68k_key_w );
-	DECLARE_READ16_MEMBER( namcos2_finallap_prot_r );
-	void GollyGhostUpdateLED_c4( int data );
-	void GollyGhostUpdateLED_c6( int data );
-	void GollyGhostUpdateLED_c8( int data );
-	void GollyGhostUpdateLED_ca( int data );
-	void GollyGhostUpdateDiorama_c0( int data );
+	uint16_t namcos2_68k_key_r(offs_t offset);
+	void namcos2_68k_key_w(offs_t offset, uint16_t data);
+	uint16_t namcos2_finallap_prot_r(offs_t offset); // finalap2, finalap3
+	uint16_t finalap3bl_prot_r(); // finalap3bl
+
+	void GollyGhostUpdateLED_c4(int data);
+	void GollyGhostUpdateLED_c6(int data);
+	void GollyGhostUpdateLED_c8(int data);
+	void GollyGhostUpdateLED_ca(int data);
+	void GollyGhostUpdateDiorama_c0(int data);
 	void TilemapCB(uint16_t code, int *tile, int *mask);
 	void TilemapCB_finalap2(uint16_t code, int *tile, int *mask);
 	void RozCB_luckywld(uint16_t code, int *tile, int *mask, int which);

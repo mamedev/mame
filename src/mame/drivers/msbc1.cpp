@@ -71,12 +71,12 @@ public:
 	void msbc1(machine_config &config);
 
 private:
-	void msbc1_mem(address_map &map);
+	void mem_map(address_map &map);
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 
-void msbc1_state::msbc1_mem(address_map &map)
+void msbc1_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x5fffff).ram();
@@ -102,7 +102,7 @@ void msbc1_state::msbc1(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 12.5_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &msbc1_state::msbc1_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &msbc1_state::mem_map);
 
 	PIT68230(config, "pit", 8_MHz_XTAL);
 
@@ -134,4 +134,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME  FLAGS
-COMP( 1985, msbc1, 0,      0,      msbc1,   msbc1, msbc1_state, empty_init, "Omnibyte", "MSBC-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1985, msbc1, 0,      0,      msbc1,   msbc1, msbc1_state, empty_init, "Omnibyte", "MSBC-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

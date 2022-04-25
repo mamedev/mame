@@ -105,7 +105,7 @@ private:
 	int m_secoff;
 	u8 m_cmd, m_stat;
 	bool m_cylhi, m_sechi;
-	const struct hard_disk_info* m_geom;
+	const struct hard_disk_file::info* m_geom;
 	u8 m_sector[512];
 };
 
@@ -136,7 +136,7 @@ void altos8600_state::machine_start()
 	save_item(NAME(m_sector));
 
 	if(m_hdd->get_hard_disk_file())
-		m_geom = hard_disk_get_info(m_hdd->get_hard_disk_file());
+		m_geom = &m_hdd->get_hard_disk_file()->get_info();
 	else
 		m_geom = nullptr;
 }
@@ -152,7 +152,7 @@ void altos8600_state::machine_reset()
 	m_cylhi = m_sechi = false;
 	m_stat = 0;
 	if(m_hdd->get_hard_disk_file())
-		m_geom = hard_disk_get_info(m_hdd->get_hard_disk_file());
+		m_geom = &m_hdd->get_hard_disk_file()->get_info();
 	else
 		m_geom = nullptr;
 }
@@ -198,7 +198,7 @@ u8 altos8600_state::read_sector()
 		secoff -= 3;
 	}
 	if(!secoff)
-		hard_disk_read(m_hdd->get_hard_disk_file(), m_lba, m_sector);
+		m_hdd->get_hard_disk_file()->read(m_lba, m_sector);
 	if(secoff >= 511)
 	{
 		m_dmac->drq1_w(CLEAR_LINE);
@@ -220,7 +220,7 @@ bool altos8600_state::write_sector(u8 data)
 	{
 		m_stat &= ~1;
 		m_stat |= 2;
-		hard_disk_write(m_hdd->get_hard_disk_file(), m_lba, m_sector);
+		m_hdd->get_hard_disk_file()->write(m_lba, m_sector);
 		m_dmac->drq1_w(CLEAR_LINE);
 		m_pic[1]->ir0_w(ASSERT_LINE);
 		return true;
@@ -323,6 +323,7 @@ void altos8600_state::hd_w(offs_t offset, u8 data)
 						m_stat |= 0xa;
 						break;
 					}
+					[[fallthrough]];
 				case 0x4:
 					m_secoff = 0;
 					m_stat |= 1;
@@ -787,10 +788,10 @@ void altos8600_state::altos8600(machine_config &config)
 	FD1797(config, m_fdc, 2000000);
 	m_fdc->intrq_wr_callback().set(m_pic[1], FUNC(pic8259_device::ir1_w));
 	m_fdc->drq_wr_callback().set(FUNC(altos8600_state::fddrq_w));
-	FLOPPY_CONNECTOR(config, "fd1797:0", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fd1797:1", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fd1797:2", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fd1797:3", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fd1797:0", altos8600_floppies, "8dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fd1797:1", altos8600_floppies, "8dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fd1797:2", altos8600_floppies, "8dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fd1797:3", altos8600_floppies, "8dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	ACS8600_ICS(config, m_ics, 0);
 	m_ics->set_host_space(m_dmac, AS_PROGRAM); // TODO: fixme

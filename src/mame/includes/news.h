@@ -31,16 +31,16 @@ private:
 	required_shared_ptr<uint8_t> m_fgram;
 
 	/* video-related */
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
-	int      m_bgpic;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	int      m_bgpic = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	DECLARE_WRITE8_MEMBER(news_fgram_w);
-	DECLARE_WRITE8_MEMBER(news_bgram_w);
-	DECLARE_WRITE8_MEMBER(news_bgpic_w);
+	void news_fgram_w(offs_t offset, uint8_t data);
+	void news_bgram_w(offs_t offset, uint8_t data);
+	void news_bgpic_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	uint32_t screen_update_news(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

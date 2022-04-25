@@ -26,7 +26,7 @@
 #include "bus/sg1000_exp/sg1000exp.h"
 #include "bus/sms_ctrl/smsctrl.h"
 #include "bus/sms_exp/smsexp.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "video/315_5124.h"
 
 #include "screen.h"
@@ -54,6 +54,7 @@ public:
 		m_led_pwr(*this, "led_pwr"),
 		m_region_maincpu(*this, "maincpu"),
 		m_mainram(nullptr),
+		m_BIOS(nullptr),
 		m_is_gamegear(false),
 		m_is_smsj(false),
 		m_is_mark_iii(false),
@@ -280,7 +281,7 @@ private:
 	required_device_array<sega8_cart_slot_device, 16> m_slots;
 	required_device_array<sega8_card_slot_device, 16> m_cards;
 
-	uint8_t m_store_control;
+	uint8_t m_store_control = 0;
 	uint8_t m_store_cart_selection_data;
 };
 
@@ -322,8 +323,8 @@ private:
 	// vertical scaling in the gamegear sms compatibility mode.
 	std::unique_ptr<int[]> m_line_buffer;
 
-	uint8_t m_gg_sio[5];
-	int m_gg_paused;
+	uint8_t m_gg_sio[5]{};
+	int m_gg_paused = 0;
 };
 
 

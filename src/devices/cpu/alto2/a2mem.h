@@ -12,8 +12,8 @@
 #define ALTO2_IO_PAGE_SIZE      0001000                     //!< size of the memory mapped io range
 
 #else   // ALTO2_DEFINE_CONSTANTS
-#ifndef _A2MEM_H_
-#define _A2MEM_H_
+#ifndef MAME_CPU_ALTO2_A2MEM_H
+#define MAME_CPU_ALTO2_A2MEM_H
 //! memory access mode
 enum {
 	ALTO2_MEM_NONE,
@@ -103,11 +103,11 @@ inline bool check_mem_write_stall() {
 }
 
 
-DECLARE_READ16_MEMBER ( mear_r );       //!< memory error address register read
-DECLARE_READ16_MEMBER ( mesr_r );       //!< memory error status register read
-DECLARE_WRITE16_MEMBER( mesr_w );       //!< memory error status register write (clear)
-DECLARE_READ16_MEMBER ( mecr_r );       //!< memory error control register read
-DECLARE_WRITE16_MEMBER( mecr_w );       //!< memory error control register write
+uint16_t mear_r();           //!< memory error address register read
+uint16_t mesr_r();           //!< memory error status register read
+void mesr_w(uint16_t data);  //!< memory error status register write (clear)
+uint16_t mecr_r();           //!< memory error control register read
+void mecr_w(uint16_t data);  //!< memory error control register write
 
 //! Read or write a memory double-word and calculate or compare its Hamming code.
 uint32_t hamming_code(bool write, uint32_t dw_addr, uint32_t dw_data);
@@ -135,5 +135,5 @@ void watch_read(uint32_t addr, uint32_t data);
 void init_memory();                             //!< initialize the memory system
 void exit_memory();                             //!< deinitialize the memory system
 void reset_memory();                            //!< reset the memory system
-#endif // _A2MEM_H_
+#endif // MAME_CPU_ALTO2_A2MEM_H
 #endif  // ALTO2_DEFINE_CONSTANTS

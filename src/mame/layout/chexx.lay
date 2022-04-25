@@ -39,40 +39,40 @@ license:CC0
 
 	<view name="Score Board (No Artwork)">
 	<!-- P1 score -->
-	<backdrop name="digit0" element="digit">
+	<element name="digit0" ref="digit">
 			<bounds x="0" y="0" width="1" height="2"/>
-		</backdrop>
-	<backdrop name="digit1" element="digit">
+		</element>
+	<element name="digit1" ref="digit">
 		<bounds x="1" y="0" width="1" height="2"/>
-	</backdrop>
+	</element>
 
 	<!-- P1 goal lamp -->
-	<backdrop name="lamp0" element="lamp">
+	<element name="lamp0" ref="lamp">
 		<bounds x="0.75" y="-0.5" width="0.5" height="0.5"/>
-	</backdrop>
+	</element>
 
 	<!-- Period being played -->
-	<backdrop name="led0" element="led">
+	<element name="led0" ref="led">
 		<bounds x="3.0" y="-0.33" width="0.5" height="0.33"/>
-	</backdrop>
-	<backdrop name="led1" element="led">
+	</element>
+	<element name="led1" ref="led">
 		<bounds x="3.5" y="-0.33" width="0.5" height="0.33"/>
-	</backdrop>
-	<backdrop name="led2" element="led">
+	</element>
+	<element name="led2" ref="led">
 		<bounds x="4.0" y="-0.33" width="0.5" height="0.33"/>
-	</backdrop>
+	</element>
 
 	<!-- P2 score -->
-	<backdrop name="digit2" element="digit">
+	<element name="digit2" ref="digit">
 		<bounds x="5.5" y="0" width="1" height="2"/>
-	</backdrop>
-	<backdrop name="digit3" element="digit">
+	</element>
+	<element name="digit3" ref="digit">
 		<bounds x="6.5" y="0" width="1" height="2"/>
-	</backdrop>
+	</element>
 
 	<!-- P2 goal lamp -->
-	<backdrop name="lamp1" element="lamp">
+	<element name="lamp1" ref="lamp">
 		<bounds x="6.25" y="-0.5" width="0.5" height="0.5"/>
-	</backdrop>
+	</element>
 	</view>
 </mamelayout>

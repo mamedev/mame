@@ -11,7 +11,7 @@
 ***************************************************************************/
 
 //Build OAM
-static void CX4_op00_00(running_machine &machine)
+static void CX4_op00_00(address_space &space)
 {
 	int32_t i;
 
@@ -46,7 +46,6 @@ static void CX4_op00_00(running_machine &machine)
 	offset = (cx4.ram[0x626] & 3) * 2;
 	srcptr = 0x220;
 
-	address_space &space = machine.device<cpu_device>("maincpu")->space(AS_PROGRAM);
 	for(i = cx4.ram[0x620]; i > 0 && sprcount > 0; i--, srcptr += 16)
 	{
 		uint32_t spraddr = CX4_readl(srcptr + 7);
@@ -135,7 +134,7 @@ static void CX4_op00_03(void)
 }
 
 //Transform Lines
-static void CX4_op00_05(running_machine &machine)
+static void CX4_op00_05(address_space &space)
 {
 	int32_t i;
 	uint32_t ptr = 0, ptr2 = 0;
@@ -154,16 +153,16 @@ static void CX4_op00_05(running_machine &machine)
 		CX4_C4TransfWireFrame();
 
 		//Displace
-		CX4_writew(machine, ptr + 1, cx4.C4WFXVal + 0x80);
-		CX4_writew(machine, ptr + 5, cx4.C4WFYVal + 0x50);
+		CX4_writew(space, ptr + 1, cx4.C4WFXVal + 0x80);
+		CX4_writew(space, ptr + 5, cx4.C4WFYVal + 0x50);
 	}
 
-	CX4_writew(machine, 0x600,     23);
-	CX4_writew(machine, 0x602,     0x60);
-	CX4_writew(machine, 0x605,     0x40);
-	CX4_writew(machine, 0x600 + 8, 23);
-	CX4_writew(machine, 0x602 + 8, 0x60);
-	CX4_writew(machine, 0x605 + 8, 0x40);
+	CX4_writew(space, 0x600,     23);
+	CX4_writew(space, 0x602,     0x60);
+	CX4_writew(space, 0x605,     0x40);
+	CX4_writew(space, 0x600 + 8, 23);
+	CX4_writew(space, 0x602 + 8, 0x60);
+	CX4_writew(space, 0x605 + 8, 0x40);
 
 	ptr = 0xb02;
 
@@ -174,9 +173,9 @@ static void CX4_op00_05(running_machine &machine)
 		cx4.C4WFX2Val = CX4_readw((CX4_read(ptr + 1) << 4) + 1);
 		cx4.C4WFY2Val = CX4_readw((CX4_read(ptr + 1) << 4) + 5);
 		CX4_C4CalcWireFrame();
-		CX4_writew(machine, ptr2 + 0x600, cx4.C4WFDist ? cx4.C4WFDist : 1);
-		CX4_writew(machine, ptr2 + 0x602, cx4.C4WFXVal);
-		CX4_writew(machine, ptr2 + 0x605, cx4.C4WFYVal);
+		CX4_writew(space, ptr2 + 0x600, cx4.C4WFDist ? cx4.C4WFDist : 1);
+		CX4_writew(space, ptr2 + 0x602, cx4.C4WFXVal);
+		CX4_writew(space, ptr2 + 0x605, cx4.C4WFYVal);
 	}
 }
 
@@ -187,13 +186,13 @@ static void CX4_op00_07(void)
 }
 
 //Draw Wireframe
-static void CX4_op00_08(running_machine &machine)
+static void CX4_op00_08(address_space &space)
 {
-	CX4_C4DrawWireFrame(machine);
+	CX4_C4DrawWireFrame(space);
 }
 
 //Disintegrate
-static void CX4_op00_0b(running_machine &machine)
+static void CX4_op00_0b(address_space &space)
 {
 	uint8_t  width, height;
 	uint32_t startx, starty;
@@ -216,7 +215,7 @@ static void CX4_op00_0b(running_machine &machine)
 
 	for(i = 0; i < (width * height) >> 1; i++)
 	{
-		CX4_write(machine, i, 0);
+		CX4_write(space, i, 0);
 	}
 
 	for(y = starty, i = 0;i < height; i++, y += scaley)
@@ -243,7 +242,7 @@ static void CX4_op00_0b(running_machine &machine)
 }
 
 //Bitplane Wave
-static void CX4_op00_0c(running_machine &machine)
+static void CX4_op00_0c(address_space &space)
 {
 	int i, j;
 	uint32_t destptr = 0;
@@ -270,7 +269,7 @@ static void CX4_op00_0c(running_machine &machine)
 						temp |= mask1 & 0xff00;
 					}
 				}
-				CX4_writew(machine, destptr + CX4_wave_data[i], temp);
+				CX4_writew(space, destptr + CX4_wave_data[i], temp);
 				height++;
 			}
 			waveptr = (waveptr + 1) & 0x7f;
@@ -296,7 +295,7 @@ static void CX4_op00_0c(running_machine &machine)
 						temp |= mask1 & 0xff00;
 					}
 				}
-				CX4_writew(machine, destptr + CX4_wave_data[i], temp);
+				CX4_writew(space, destptr + CX4_wave_data[i], temp);
 				height++;
 			}
 			waveptr = (waveptr + 1) & 0x7f;

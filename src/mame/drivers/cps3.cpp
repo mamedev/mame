@@ -62,6 +62,8 @@ Warzard                                              1996  WZD96a00F  CP300000G 
 Warzard                                                    WZD96a00F  CP300000G  JAPAN   X          CAP-WZD000  CAP-WZD-5   CAP-WZD-5    961121
 Red Earth                                                  WZD96aA0F  CP3000B0G  EUROPE  X          CAP-WZD0A0  CAP-WZD-3   CAP-WZD-3    961023
 Red Earth                                                  WZD96aA0F  CP3000B0G  EUROPE  X          CAP-WZD0A0  CAP-WZD-5   CAP-WZD-5    961121
+Red Earth                                                  WZD96aA0F  CP3000C0G  ASIA*       X      CAP-WZD0A0  CAP-WZD-3   CAP-WZD-3    961023
+Red Earth                                                  WZD96aA0F  CP3000C0G  ASIA*       x      CAP-WZD0A0  CAP-WZD-5   CAP-WZD-5    961121
 Red Earth                                                  WZD96aA0F  CP3000H0G  MEXICO* X          CAP-WZD0A0  CAP-WZD-3   CAP-WZD-3    961023
 Red Earth                                                  WZD96aA0F  CP3000H0G  MEXICO* X          CAP-WZD0A0  CAP-WZD-5   CAP-WZD-5    961121
 Red Earth                                                  WZD96aA0F  CP3000U0G  USA*    X          CAP-WZD0A0  CAP-WZD-3   CAP-WZD-3    961023
@@ -87,6 +89,8 @@ Street Fighter III 2nd Impact: Giant Attack          1997  3GA97a00F  CP300000G 
 Street Fighter III 2nd Impact: Giant Attack                3GA97a00F  CP300000G  JAPAN   X          CAP-3GA000  ?           ?            971016*
 Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000C0G  ASIA        X                                           970930
 Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000C0G  ASIA        X                                           971016*
+Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000H0G  MEXICO  X          CAP-3GA0A0  CAP-3GA000  CAP-3GA-1    970930
+Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000H0G  MEXICO  X          CAP-3GA0A0  ?           ?            971016*
 Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000U0G  USA     X          CAP-3GA0A0  CAP-3GA000  CAP-3GA-1    970930
 Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000U0G  USA     X          CAP-3GA0A0  ?           ?            971016*
 
@@ -96,6 +100,9 @@ JoJo no Kimyou na Bouken                                   JJK98c00F  CP300000G 
 JoJo's Venture                                             JJK98cA0F  CP3000C0G  ASIA        X                                           981202
 JoJo's Venture                                             JJK98cA0F  CP3000C0G  ASIA        X                                           990108
 JoJo's Venture                                             JJK98cA0F  CP3000C0G  ASIA        X                                           990128
+JoJo's Venture                                             JJK98cA0F  CP3000C0G  ASIA    X          CAP-JJK0A0  CAP-JJK000  CAP-JJK-140  981202
+JoJo's Venture                                             JJK98cA0F  CP3000C0G  ASIA    X          CAP-JJK0A0  CAP-JJK-2   CAP-JJK-160  990108
+JoJo's Venture                                             JJK98cA0F  CP3000C0G  ASIA    X          CAP-JJK0A0  CAP-JJK-3   CAP-JJK-161  990128
 JoJo's Venture                                             JJK98cA0F  CP3000U0G  USA     X          CAP-JJK0A0  CAP-JJK000  CAP-JJK-140  981202
 JoJo's Venture                                             JJK98cA0F  CP3000U0G  USA     X          CAP-JJK0A0  CAP-JJK-2   CAP-JJK-160  990108
 JoJo's Venture                                             JJK98cA0F  CP3000U0G  USA     X          CAP-JJK0A0  CAP-JJK-3   CAP-JJK-161  990128
@@ -120,6 +127,8 @@ Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000U0G 
 
 JoJo no Kimyou na Bouken: Mirai e no Isan            1999  JJM99900F  CP300000G  JAPAN   X          CAP-JJM000  CAP-JJM-0   CAP-JJM-110  990913
 JoJo no Kimyou na Bouken: Mirai e no Isan                  JJM99900F  CP300000G  JAPAN   X          CAP-JJM000  CAP-JJM-1   CAP-JJM-120  990927
+JoJo's Bizarre Adventure                                   JJM999A0F  CP3000B0G  EUROPE  X          CAP-JJM0A0  CAP-JJM-0   CAP-JJM-110  990913
+JoJo's Bizarre Adventure                                   JJM999A0F  CP3000B0G  EUROPE  X          CAP-JJM0A0  CAP-JJM-1   CAP-JJM-120  990927
 JoJo no Kimyou na Bouken: Mirai e no Isan                  JJM99900F  CP300000G  JAPAN       X                                           990913
 JoJo no Kimyou na Bouken: Mirai e no Isan                  JJM99900F  CP300000G  JAPAN       X                                           990927
 JoJo's Bizarre Adventure                                   JJM999A0F  CP3000B0G  EUROPE      X                                           990913
@@ -705,8 +714,8 @@ inline void cps3_state::cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle 
 					{
 						for (int y = sy; y < ey; y++)
 						{
-							const u8 *source = source_base + (y_index>>16) * gfx->rowbytes();
-							u32 *dest = &dest_bmp.pix32(y);
+							u8 const *const source = source_base + (y_index>>16) * gfx->rowbytes();
+							u32 *const dest = &dest_bmp.pix(y);
 
 							int x_index = x_index_base;
 							for (int x = sx; x < ex; x++)
@@ -721,8 +730,8 @@ inline void cps3_state::cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle 
 					{
 						for (int y = sy; y < ey; y++)
 						{
-							const u8 *source = source_base + (y_index>>16) * gfx->rowbytes();
-							u32 *dest = &dest_bmp.pix32(y);
+							u8 const *const source = source_base + (y_index>>16) * gfx->rowbytes();
+							u32 *const dest = &dest_bmp.pix(y);
 
 							int x_index = x_index_base;
 							for (int x = sx; x < ex; x++)
@@ -738,8 +747,8 @@ inline void cps3_state::cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle 
 					{
 						for (int y = sy; y < ey; y++)
 						{
-							const u8 *source = source_base + (y_index>>16) * gfx->rowbytes();
-							u32 *dest = &dest_bmp.pix32(y);
+							u8 const *const source = source_base + (y_index>>16) * gfx->rowbytes();
+							u32 *const dest = &dest_bmp.pix(y);
 
 							int x_index = x_index_base;
 							for (int x = sx; x < ex; x++)
@@ -755,8 +764,8 @@ inline void cps3_state::cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle 
 					{
 						for (int y = sy; y < ey; y++)
 						{
-							const u8 *source = source_base + (y_index>>16) * gfx->rowbytes();
-							u32 *dest = &dest_bmp.pix32(y);
+							u8 const *const source = source_base + (y_index>>16) * gfx->rowbytes();
+							u32 *const dest = &dest_bmp.pix(y);
 
 							int x_index = x_index_base;
 							for (int x = sx; x < ex; x++)
@@ -880,7 +889,8 @@ void cps3_state::init_crypt(u32 key1, u32 key2, int altEncryption)
 	}
 	else
 	{
-		m_user4 = auto_alloc_array(machine(), u8, USER4REGION_LENGTH);
+		m_user4_allocated = std::make_unique<u8[]>(USER4REGION_LENGTH);
+		m_user4 = m_user4_allocated.get();
 	}
 
 	if (m_user5_region)
@@ -889,7 +899,8 @@ void cps3_state::init_crypt(u32 key1, u32 key2, int altEncryption)
 	}
 	else
 	{
-		m_user5 = auto_alloc_array(machine(), u8, USER5REGION_LENGTH);
+		m_user5_allocated = std::make_unique<u8[]>(USER5REGION_LENGTH);
+		m_user5 = m_user5_allocated.get();
 	}
 
 	m_cps3sound->set_base((s8*)m_user5);
@@ -1286,8 +1297,8 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 		/* copy render bitmap without zoom */
 		for (u32 rendery = cliprect.top(); rendery <= cliprect.bottom(); rendery++)
 		{
-			u32* dstbitmap = &bitmap.pix32(rendery);
-			u32* srcbitmap = &m_renderbuffer_bitmap.pix32(rendery);
+			u32 *const dstbitmap = &bitmap.pix(rendery);
+			u32 const *const srcbitmap = &m_renderbuffer_bitmap.pix(rendery);
 
 			for (u32 renderx = cliprect.left(); renderx <= cliprect.right(); renderx++)
 			{
@@ -1301,8 +1312,8 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 		u32 srcy = cliprect.top() * fszy;
 		for (u32 rendery = cliprect.top(); rendery <= cliprect.bottom(); rendery++)
 		{
-			u32* dstbitmap = &bitmap.pix32(rendery);
-			u32* srcbitmap = &m_renderbuffer_bitmap.pix32(srcy >> 16);
+			u32 *const dstbitmap = &bitmap.pix(rendery);
+			u32 const *const srcbitmap = &m_renderbuffer_bitmap.pix(srcy >> 16);
 			u32 srcx = cliprect.left() * fszx;
 
 			for (u32 renderx = cliprect.left(); renderx <= cliprect.right(); renderx++)
@@ -2137,7 +2148,7 @@ void cps3_state::cps3_map(address_map &map)
 	map(0x03000000, 0x030003ff).ram(); // 'FRAM' (sfiii and warzard memory test mode ONLY, and only odd bytes)
 
 	map(0x04000000, 0x0407ffff).ram().share("spriteram"); // Sprite RAM
-	map(0x04080000, 0x040bffff).rw(FUNC(cps3_state::colourram_r), FUNC(cps3_state::colourram_w)).share("colourram");  // Colour RAM 0x20000 colours
+	map(0x04080000, 0x040bffff).rw(FUNC(cps3_state::colourram_r), FUNC(cps3_state::colourram_w));  // Colour RAM 0x20000 colours
 	// PPU registers
 	map(0x040c0000, 0x040c0007).nopr(); // ?? warzard reads this but not use values, dev/debug leftovers ?
 	map(0x040c000c, 0x040c000d).r(FUNC(cps3_state::dma_status_r));
@@ -2606,7 +2617,7 @@ void cps3_state::jojoba(machine_config &config)
 /* CD sets - use CD BIOS roms */
 
 ROM_START( redearth )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "redearth_euro.29f400.u2", 0x000000, 0x080000, CRC(02e0f336) SHA1(acc37e830dfeb9674f5a0fb24f4cc23217ae4ff5) )
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -2614,7 +2625,7 @@ ROM_START( redearth )
 ROM_END
 
 ROM_START( redearthr1 )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "redearth_euro.29f400.u2", 0x000000, 0x080000, CRC(02e0f336) SHA1(acc37e830dfeb9674f5a0fb24f4cc23217ae4ff5) )
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -2622,7 +2633,7 @@ ROM_START( redearthr1 )
 ROM_END
 
 ROM_START( warzard )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "warzard_japan.29f400.u2", 0x000000, 0x080000, CRC(f8e2f0c6) SHA1(93d6a986f44c211fff014e55681eca4d2a2774d6) )
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -2630,7 +2641,7 @@ ROM_START( warzard )
 ROM_END
 
 ROM_START( warzardr1 )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "warzard_japan.29f400.u2", 0x000000, 0x080000, CRC(f8e2f0c6) SHA1(93d6a986f44c211fff014e55681eca4d2a2774d6) )
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -2639,7 +2650,7 @@ ROM_END
 
 
 ROM_START( sfiii )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii_euro.29f400.u2", 0x000000, 0x080000, CRC(27699ddc) SHA1(d8b525cd27e584560b129598df31fd2c5b2a682a) )
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -2647,7 +2658,7 @@ ROM_START( sfiii )
 ROM_END
 
 ROM_START( sfiiiu )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii_usa_region_b1.29f400.u2", 0x000000, 0x080000, CRC(fb172a8e) SHA1(48ebf59910f246835f7dc0c588da30f7a908072f) )
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -2655,7 +2666,7 @@ ROM_START( sfiiiu )
 ROM_END
 
 ROM_START( sfiiia )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii_asia_region_bd.29f400.u2", 0x000000, 0x080000,  CRC(cbd28de7) SHA1(9c15ecb73b9587d20850e62e8683930a45caa01b) )
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -2663,7 +2674,7 @@ ROM_START( sfiiia )
 ROM_END
 
 ROM_START( sfiiij )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii_japan.29f400.u2", 0x000000, 0x080000, CRC(74205250) SHA1(c3e83ace7121d32da729162662ec6b5285a31211) )
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -2671,7 +2682,7 @@ ROM_START( sfiiij )
 ROM_END
 
 ROM_START( sfiiih )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii_hispanic.29f400.u2", 0x000000, 0x080000, CRC(d2b3cd48) SHA1(00ebb270c24a66515c97e35331de54ff5358000e) )
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -2680,7 +2691,7 @@ ROM_END
 
 
 ROM_START( sfiii2 )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii2_usa.29f400.u2", 0x000000, 0x080000, CRC(75dd72e0) SHA1(5a12d6ea6734df5de00ecee6f9ef470749d2f242) )
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -2688,16 +2699,23 @@ ROM_START( sfiii2 )
 ROM_END
 
 ROM_START( sfiii2j )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii2_japan.29f400.u2", 0x000000, 0x080000, CRC(faea0a3e) SHA1(a03cd63bcf52e4d57f7a598c8bc8e243694624ec) )
 
 	DISK_REGION( "scsi:1:cdrom" )
 	DISK_IMAGE_READONLY( "cap-3ga000", 0, SHA1(a0c11a5c3057dc1ad3962aa38adf95acb3430bec) )
 ROM_END
 
+ROM_START( sfiii2h )
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
+	ROM_LOAD( "sfiii2_hispanic.29f400.u2", 0x000000, 0x080000, CRC(5c799526) SHA1(5a56345b500cd7e20d5fb6cabc791655c6ff4ed2) )
+
+	DISK_REGION( "scsi:1:cdrom" )
+	DISK_IMAGE_READONLY( "cap-3ga000", 0, SHA1(a0c11a5c3057dc1ad3962aa38adf95acb3430bec) )
+ROM_END
 
 ROM_START( jojo )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojo_euro.29f400.u2", 0x000000, 0x080000, CRC(513e40ec) SHA1(03b91f0fbd5be56d24feed4698c7543d4df07837) )
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -2705,7 +2723,7 @@ ROM_START( jojo )
 ROM_END
 
 ROM_START( jojor1 )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojo_euro.29f400.u2", 0x000000, 0x080000, CRC(513e40ec) SHA1(03b91f0fbd5be56d24feed4698c7543d4df07837) )
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -2713,7 +2731,7 @@ ROM_START( jojor1 )
 ROM_END
 
 ROM_START( jojor2 )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojo_euro.29f400.u2", 0x000000, 0x080000, CRC(513e40ec) SHA1(03b91f0fbd5be56d24feed4698c7543d4df07837) )
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -2721,7 +2739,7 @@ ROM_START( jojor2 )
 ROM_END
 
 ROM_START( jojou )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojo_usa.29f400.u2", 0x000000, 0x080000, CRC(8d40f7be) SHA1(2a4bd83db2f959c33b071e517941aa55a0f919c0) )
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -2729,7 +2747,7 @@ ROM_START( jojou )
 ROM_END
 
 ROM_START( jojour1 )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojo_usa.29f400.u2", 0x000000, 0x080000, CRC(8d40f7be) SHA1(2a4bd83db2f959c33b071e517941aa55a0f919c0) )
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -2737,7 +2755,7 @@ ROM_START( jojour1 )
 ROM_END
 
 ROM_START( jojour2 )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojo_usa.29f400.u2", 0x000000, 0x080000, CRC(8d40f7be) SHA1(2a4bd83db2f959c33b071e517941aa55a0f919c0) )
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -2745,7 +2763,7 @@ ROM_START( jojour2 )
 ROM_END
 
 ROM_START( jojoj )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojo_japan.29f400.u2", 0x000000, 0x080000, CRC(02778f60) SHA1(a167f9ebe030592a0cdb0c6a3c75835c6a43be4c) )
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -2753,7 +2771,7 @@ ROM_START( jojoj )
 ROM_END
 
 ROM_START( jojojr1 )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojo_japan.29f400.u2", 0x000000, 0x080000, CRC(02778f60) SHA1(a167f9ebe030592a0cdb0c6a3c75835c6a43be4c) )
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -2761,8 +2779,32 @@ ROM_START( jojojr1 )
 ROM_END
 
 ROM_START( jojojr2 )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojo_japan.29f400.u2", 0x000000, 0x080000, CRC(02778f60) SHA1(a167f9ebe030592a0cdb0c6a3c75835c6a43be4c) )
+
+	DISK_REGION( "scsi:1:cdrom" )
+	DISK_IMAGE_READONLY( "cap-jjk000", 0, SHA1(a24e174aaaf47f98312a38129645026a613cd344) )
+ROM_END
+
+ROM_START( jojoa )
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
+	ROM_LOAD( "jojo_asia.29f400.u2", 0x000000, 0x080000, CRC(789aa72a) SHA1(afcefb963d7c103514585f4a6738b2deb5b7d27a) )
+
+	DISK_REGION( "scsi:1:cdrom" )
+	DISK_IMAGE_READONLY( "cap-jjk-3", 0, SHA1(dc6e74b5e02e13f62cb8c4e234dd6061501e49c1) )
+ROM_END
+
+ROM_START( jojoar1 )
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
+	ROM_LOAD( "jojo_asia.29f400.u2", 0x000000, 0x080000, CRC(789aa72a) SHA1(afcefb963d7c103514585f4a6738b2deb5b7d27a) )
+
+	DISK_REGION( "scsi:1:cdrom" )
+	DISK_IMAGE_READONLY( "cap-jjk-2", 0, SHA1(ce22d10f2b35a0e00f8d83642b97842c9b2327fa) )
+ROM_END
+
+ROM_START( jojoar2 )
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
+	ROM_LOAD( "jojo_asia.29f400.u2", 0x000000, 0x080000, CRC(789aa72a) SHA1(afcefb963d7c103514585f4a6738b2deb5b7d27a) )
 
 	DISK_REGION( "scsi:1:cdrom" )
 	DISK_IMAGE_READONLY( "cap-jjk000", 0, SHA1(a24e174aaaf47f98312a38129645026a613cd344) )
@@ -2770,7 +2812,7 @@ ROM_END
 
 
 ROM_START( sfiii3 )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii3_euro.29f400.u2", 0x000000, 0x080000, CRC(30bbf293) SHA1(f094c2eeaf4f6709060197aca371a4532346bf78) )
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -2778,7 +2820,7 @@ ROM_START( sfiii3 )
 ROM_END
 
 ROM_START( sfiii3r1 )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii3_euro.29f400.u2", 0x000000, 0x080000, CRC(30bbf293) SHA1(f094c2eeaf4f6709060197aca371a4532346bf78) )
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -2786,7 +2828,7 @@ ROM_START( sfiii3r1 )
 ROM_END
 
 ROM_START( sfiii3u )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii3_usa.29f400.u2", 0x000000, 0x080000, CRC(ecc545c1) SHA1(e39083820aae914fd8b80c9765129bedb745ceba) )
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -2794,7 +2836,7 @@ ROM_START( sfiii3u )
 ROM_END
 
 ROM_START( sfiii3ur1 )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii3_usa.29f400.u2", 0x000000, 0x080000, CRC(ecc545c1) SHA1(e39083820aae914fd8b80c9765129bedb745ceba) )
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -2802,7 +2844,7 @@ ROM_START( sfiii3ur1 )
 ROM_END
 
 ROM_START( sfiii3j )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii3_japan.29f400.u2", 0x000000, 0x080000, CRC(63f23d1f) SHA1(58559403c325454f8c8d3eb0f569a531aa22db26) )
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -2810,7 +2852,7 @@ ROM_START( sfiii3j )
 ROM_END
 
 ROM_START( sfiii3jr1 )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii3_japan.29f400.u2", 0x000000, 0x080000, CRC(63f23d1f) SHA1(58559403c325454f8c8d3eb0f569a531aa22db26) )
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -2819,7 +2861,15 @@ ROM_END
 
 
 ROM_START( jojoba )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
+	ROM_LOAD( "jojoba_euro.29f400.u2", 0x000000, 0x080000, CRC(63cc8800) SHA1(f0c7e6abb205a16dab7a114e017b193521071a4b) )
+
+	DISK_REGION( "scsi:1:cdrom" )
+	DISK_IMAGE_READONLY( "cap-jjm-1", 0, SHA1(8628d3fa555fbd5f4121082e925c1834b76c5e65) )
+ROM_END
+
+ROM_START( jojobaj )
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojoba_japan.29f400.u2", 0x000000, 0x080000, CRC(3085478c) SHA1(055eab1fc42816f370a44b17fd7e87ffcb10e8b7) )
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -2827,7 +2877,15 @@ ROM_START( jojoba )
 ROM_END
 
 ROM_START( jojobar1 )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
+	ROM_LOAD( "jojoba_euro.29f400.u2", 0x000000, 0x080000, CRC(63cc8800) SHA1(f0c7e6abb205a16dab7a114e017b193521071a4b) )
+
+	DISK_REGION( "scsi:1:cdrom" )
+	DISK_IMAGE_READONLY( "cap-jjm-0", 0, SHA1(1651896d127dbf32af99175ae91227cd90675aaa) )
+ROM_END
+
+ROM_START( jojobajr1 )
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojoba_japan.29f400.u2", 0x000000, 0x080000, CRC(3085478c) SHA1(055eab1fc42816f370a44b17fd7e87ffcb10e8b7) )
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -2841,7 +2899,7 @@ ROM_END
 /* NO CD sets - use NO CD BIOS roms - don't require the CD image to boot */
 
 ROM_START( sfiiin )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii_asia_nocd.29f400.u2", 0x000000, 0x080000, CRC(ca2b715f) SHA1(86319987f9af4afd272a2488e73de8382743cb37) ) // this is a different VERSION of the bios compared to all other sets, not just an alt region code
 
 	ROM_REGION( 0x200000, "simm1.0", 0 )
@@ -2895,7 +2953,7 @@ ROM_END
 
 
 ROM_START( sfiiina )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii_asia_nocd.29f400.u2", 0x000000, 0x080000, CRC(73e32463) SHA1(45d144e533e4b20cc5a744ca4f618e288430c601) ) // sldh
 
 	ROM_REGION( 0x200000, "simm1.0", 0 )
@@ -2948,7 +3006,7 @@ ROM_START( sfiiina )
 ROM_END
 
 ROM_START( sfiii2n )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii2_asia_nocd.29f400.u2", 0x000000, 0x080000, CRC(fd297c0d) SHA1(4323deda2789f104b53f32a663196ec16de73215) )
 
 	ROM_REGION( 0x200000, "simm1.0", 0 )
@@ -3022,7 +3080,7 @@ ROM_START( sfiii2n )
 ROM_END
 
 ROM_START( jojon )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojo_asia_nocd.29f400.u2", 0x000000, 0x080000, CRC(05b4f953) SHA1(c746c7bb5359acc9adced817cb4870b1912eaefd) )
 
 	ROM_REGION( 0x200000, "simm1.0", 0 )
@@ -3084,7 +3142,7 @@ ROM_START( jojon )
 ROM_END
 
 ROM_START( jojonr1 )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojo_asia_nocd.29f400.u2", 0x000000, 0x080000, CRC(05b4f953) SHA1(c746c7bb5359acc9adced817cb4870b1912eaefd) )
 
 	ROM_REGION( 0x200000, "simm1.0", 0 )
@@ -3146,7 +3204,7 @@ ROM_START( jojonr1 )
 ROM_END
 
 ROM_START( jojonr2 )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojo_asia_nocd.29f400.u2", 0x000000, 0x080000, CRC(05b4f953) SHA1(c746c7bb5359acc9adced817cb4870b1912eaefd) )
 
 	ROM_REGION( 0x200000, "simm1.0", 0 )
@@ -3208,7 +3266,7 @@ ROM_START( jojonr2 )
 ROM_END
 
 ROM_START( sfiii3n )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii3_japan_nocd.29f400.u2", 0x000000, 0x080000, CRC(1edc6366) SHA1(60b4b9adeb030a33059d74fdf03873029e465b52) )
 
 	ROM_REGION( 0x200000, "simm1.0", 0 )
@@ -3299,7 +3357,7 @@ ROM_START( sfiii3n )
 ROM_END
 
 ROM_START( sfiii3nr1 )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii3_japan_nocd.29f400.u2", 0x000000, 0x080000, CRC(1edc6366) SHA1(60b4b9adeb030a33059d74fdf03873029e465b52) )
 
 	ROM_REGION( 0x200000, "simm1.0", 0 )
@@ -3390,7 +3448,7 @@ ROM_START( sfiii3nr1 )
 ROM_END
 
 ROM_START( jojoban )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojoba_japan_nocd.29f400.u2", 0x000000, 0x080000, CRC(4dab19f5) SHA1(ba07190e7662937fc267f07285c51e99a45c061e) )
 
 	ROM_REGION( 0x200000, "simm1.0", 0 )
@@ -3464,7 +3522,7 @@ ROM_START( jojoban )
 ROM_END
 
 ROM_START( jojobanr1 )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojoba_japan_nocd.29f400.u2", 0x000000, 0x080000, CRC(4dab19f5) SHA1(ba07190e7662937fc267f07285c51e99a45c061e) )
 
 	ROM_REGION( 0x200000, "simm1.0", 0 )
@@ -3538,7 +3596,7 @@ ROM_START( jojobanr1 )
 ROM_END
 
 ROM_START( jojobane )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojoba_euro_nocd.29f400.u2", 0x000000, 0x080000, CRC(1ee2d679) SHA1(9e129b454a376606b3f7e8aec64de425cf9c635c) )
 
 	ROM_REGION( 0x200000, "simm1.0", 0 )
@@ -3612,7 +3670,7 @@ ROM_START( jojobane )
 ROM_END
 
 ROM_START( jojobaner1 )
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "jojoba_euro_nocd.29f400.u2", 0x000000, 0x080000, CRC(1ee2d679) SHA1(9e129b454a376606b3f7e8aec64de425cf9c635c) )
 
 	ROM_REGION( 0x200000, "simm1.0", 0 )
@@ -3688,7 +3746,7 @@ ROM_END
 /* Bootlegs for use with modified security carts */
 
 ROM_START( cps3boot ) // for cart with standard SH2
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "no-battery_bios_29f400_for_hd6417095_sh2.u2", 0x000000, 0x080000, CRC(cb9bd5b0) SHA1(ea7ecb3deb69f5307a62d8f0d7d8e68d49013d07))
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -3696,7 +3754,7 @@ ROM_START( cps3boot ) // for cart with standard SH2
 ROM_END
 
 ROM_START( cps3booto ) // for cart with standard SH2
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "no-battery_bios_29f400_for_hd6417095_sh2.u2", 0x000000, 0x080000, CRC(cb9bd5b0) SHA1(ea7ecb3deb69f5307a62d8f0d7d8e68d49013d07))
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -3704,7 +3762,7 @@ ROM_START( cps3booto ) // for cart with standard SH2
 ROM_END
 
 ROM_START( cps3booto2 ) // for cart with standard SH2
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "no-battery_bios_29f400_for_hd6417095_sh2.u2", 0x000000, 0x080000, CRC(cb9bd5b0) SHA1(ea7ecb3deb69f5307a62d8f0d7d8e68d49013d07))
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -3712,7 +3770,7 @@ ROM_START( cps3booto2 ) // for cart with standard SH2
 ROM_END
 
 ROM_START( cps3bs32 ) // for cart with standard SH2
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "no-battery_bios_29f400_for_hd6417095_sh2.u2", 0x000000, 0x080000, CRC(cb9bd5b0) SHA1(ea7ecb3deb69f5307a62d8f0d7d8e68d49013d07))
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -3720,7 +3778,7 @@ ROM_START( cps3bs32 ) // for cart with standard SH2
 ROM_END
 
 ROM_START( cps3bs32a ) // for cart with standard SH2
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "no-battery_bios_29f400_for_hd6417095_sh2.u2", 0x000000, 0x080000, CRC(cb9bd5b0) SHA1(ea7ecb3deb69f5307a62d8f0d7d8e68d49013d07))
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -3728,7 +3786,7 @@ ROM_START( cps3bs32a ) // for cart with standard SH2
 ROM_END
 
 ROM_START( cps3boota ) // for cart with dead custom SH2 (or 2nd Impact CPU which is the same as a dead one)
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "no-battery_bios_29f400_for_dead_security_cart.u2", 0x000000, 0x080000, CRC(0fd56fb3) SHA1(5a8bffc07eb7da73cf4bca6718df72e471296bfd) )
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -3736,7 +3794,7 @@ ROM_START( cps3boota ) // for cart with dead custom SH2 (or 2nd Impact CPU which
 ROM_END
 
 ROM_START( cps3bootao ) // for cart with dead custom SH2 (or 2nd Impact CPU which is the same as a dead one)
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "no-battery_bios_29f400_for_dead_security_cart.u2", 0x000000, 0x080000, CRC(0fd56fb3) SHA1(5a8bffc07eb7da73cf4bca6718df72e471296bfd) )
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -3745,7 +3803,7 @@ ROM_END
 
 
 ROM_START( cps3bootao2 ) // for cart with dead custom SH2 (or 2nd Impact CPU which is the same as a dead one)
-	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "no-battery_bios_29f400_for_dead_security_cart.u2", 0x000000, 0x080000, CRC(0fd56fb3) SHA1(5a8bffc07eb7da73cf4bca6718df72e471296bfd) )
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -3892,17 +3950,15 @@ ROM_END
 
 *****************************************************************************************/
 
-#define GAME_FLAGS (MACHINE_SUPPORTS_SAVE)
-
 /* Red Earth / Warzard */
 
 // 961121
-GAME( 1996, redearth,    0,        redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Red Earth (Euro 961121)", GAME_FLAGS )
-GAME( 1996, warzard,     redearth, redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Warzard (Japan 961121)", GAME_FLAGS )
+GAME( 1996, redearth,    0,        redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Red Earth (Euro 961121)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, warzard,     redearth, redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Warzard (Japan 961121)", MACHINE_SUPPORTS_SAVE )
 
 // 961023
-GAME( 1996, redearthr1,  redearth, redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Red Earth (Euro 961023)", GAME_FLAGS )
-GAME( 1996, warzardr1,   redearth, redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Warzard (Japan 961023)", GAME_FLAGS )
+GAME( 1996, redearthr1,  redearth, redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Red Earth (Euro 961023)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, warzardr1,   redearth, redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Warzard (Japan 961023)", MACHINE_SUPPORTS_SAVE )
 
 /* Street Fighter III: New Generation */
 
@@ -3913,13 +3969,13 @@ GAME( 1996, warzardr1,   redearth, redearth, cps3_re,   cps3_state, init_redeart
 // not dumped
 
 // 970204
-GAME( 1997, sfiii,       0,        sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Euro 970204)", GAME_FLAGS )
-GAME( 1997, sfiiiu,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (USA 970204)", GAME_FLAGS )
-GAME( 1997, sfiiia,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204)", GAME_FLAGS )
-GAME( 1997, sfiiij,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Japan 970204)", GAME_FLAGS )
-GAME( 1997, sfiiih,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Hispanic 970204)", GAME_FLAGS )
-GAME( 1997, sfiiin,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204, NO CD, bios set 1)", GAME_FLAGS )
-GAME( 1997, sfiiina,     sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204, NO CD, bios set 2)", GAME_FLAGS )
+GAME( 1997, sfiii,       0,        sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Euro 970204)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, sfiiiu,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (USA 970204)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, sfiiia,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, sfiiij,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Japan 970204)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, sfiiih,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Hispanic 970204)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, sfiiin,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204, NO CD, bios set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, sfiiina,     sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204, NO CD, bios set 2)", MACHINE_SUPPORTS_SAVE )
 
 /* Street Fighter III 2nd Impact: Giant Attack */
 
@@ -3927,68 +3983,74 @@ GAME( 1997, sfiiina,     sfiii,    sfiii,    cps3,      cps3_state, init_sfiii, 
 // not dumped
 
 // 970930
-GAMEL(1997, sfiii2,      0,        sfiii2,   cps3,      cps3_state, init_sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (USA 970930)", GAME_FLAGS, layout_sfiii2 ) // layout is for widescreen support
-GAMEL(1997, sfiii2j,     sfiii2,   sfiii2,   cps3,      cps3_state, init_sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Japan 970930)", GAME_FLAGS, layout_sfiii2 )
-GAMEL(1997, sfiii2n,     sfiii2,   sfiii2,   cps3,      cps3_state, init_sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Asia 970930, NO CD)", GAME_FLAGS, layout_sfiii2 )
+GAMEL(1997, sfiii2,      0,        sfiii2,   cps3,      cps3_state, init_sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (USA 970930)", MACHINE_SUPPORTS_SAVE, layout_sfiii2 ) // layout is for widescreen support
+GAMEL(1997, sfiii2j,     sfiii2,   sfiii2,   cps3,      cps3_state, init_sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Japan 970930)", MACHINE_SUPPORTS_SAVE, layout_sfiii2 )
+GAMEL(1997, sfiii2h,     sfiii2,   sfiii2,   cps3,      cps3_state, init_sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Hispanic 970930)", MACHINE_SUPPORTS_SAVE, layout_sfiii2 )
+GAMEL(1997, sfiii2n,     sfiii2,   sfiii2,   cps3,      cps3_state, init_sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Asia 970930, NO CD)", MACHINE_SUPPORTS_SAVE, layout_sfiii2 )
 
 /* JoJo's Venture / JoJo no Kimyou na Bouken */
 
 // 990128
-GAME( 1998, jojo,        0,        jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Euro 990128)", GAME_FLAGS )
-GAME( 1998, jojou,       jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (USA 990128)", GAME_FLAGS )
-GAME( 1998, jojoj,       jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo no Kimyou na Bouken (Japan 990128)", GAME_FLAGS )
-GAME( 1998, jojon,       jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 990128, NO CD)", GAME_FLAGS )
+GAME( 1998, jojo,        0,        jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Euro 990128)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, jojou,       jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (USA 990128)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, jojoa,       jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 990128)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, jojoj,       jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo no Kimyou na Bouken (Japan 990128)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, jojon,       jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 990128, NO CD)", MACHINE_SUPPORTS_SAVE )
 
 // 990108
-GAME( 1998, jojor1,      jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Euro 990108)", GAME_FLAGS )
-GAME( 1998, jojour1,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (USA 990108)", GAME_FLAGS )
-GAME( 1998, jojojr1,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo no Kimyou na Bouken (Japan 990108)", GAME_FLAGS )
-GAME( 1998, jojonr1,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 990108, NO CD)", GAME_FLAGS )
+GAME( 1998, jojor1,      jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Euro 990108)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, jojour1,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (USA 990108)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, jojoar1,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 990108)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, jojojr1,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo no Kimyou na Bouken (Japan 990108)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, jojonr1,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 990108, NO CD)", MACHINE_SUPPORTS_SAVE )
 
 // 981202
-GAME( 1998, jojor2,      jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Euro 981202)", GAME_FLAGS )
-GAME( 1998, jojour2,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (USA 981202)", GAME_FLAGS )
-GAME( 1998, jojojr2,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo no Kimyou na Bouken (Japan 981202)", GAME_FLAGS )
-GAME( 1998, jojonr2,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 981202, NO CD)", GAME_FLAGS )
+GAME( 1998, jojor2,      jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Euro 981202)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, jojour2,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (USA 981202)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, jojoar2,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 981202)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, jojojr2,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo no Kimyou na Bouken (Japan 981202)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, jojonr2,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 981202, NO CD)", MACHINE_SUPPORTS_SAVE )
 
 /* Street Fighter III 3rd Strike: Fight for the Future */
 
 // 990608
-GAME( 1999, sfiii3,      0,        sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Euro 990608)", GAME_FLAGS )
-GAME( 1999, sfiii3u,     sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA 990608)", GAME_FLAGS )
-GAME( 1999, sfiii3j,     sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990608)", GAME_FLAGS )
-GAME( 1999, sfiii3n,     sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990608, NO CD)", GAME_FLAGS )
+GAME( 1999, sfiii3,      0,        sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Euro 990608)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, sfiii3u,     sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA 990608)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, sfiii3j,     sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990608)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, sfiii3n,     sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990608, NO CD)", MACHINE_SUPPORTS_SAVE )
 
 // 990512
-GAME( 1999, sfiii3r1,    sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Euro 990512)", GAME_FLAGS )
-GAME( 1999, sfiii3ur1,   sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA 990512)", GAME_FLAGS )
-GAME( 1999, sfiii3jr1,   sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990512)", GAME_FLAGS )
-GAME( 1999, sfiii3nr1,   sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990512, NO CD)", GAME_FLAGS )
+GAME( 1999, sfiii3r1,    sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Euro 990512)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, sfiii3ur1,   sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA 990512)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, sfiii3jr1,   sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990512)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, sfiii3nr1,   sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990512, NO CD)", MACHINE_SUPPORTS_SAVE )
 
 /* JoJo's Bizarre Adventure / JoJo no Kimyou na Bouken: Mirai e no Isan */
 
 // 990927
-GAME( 1999, jojoba,      0,        jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990927)", GAME_FLAGS )
-GAME( 1999, jojoban,     jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990927, NO CD)", GAME_FLAGS )
-GAME( 1999, jojobane,    jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990927, NO CD)", GAME_FLAGS )
+GAME( 1999, jojoba,      0,        jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990927)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, jojobaj,     jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990927)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, jojoban,     jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990927, NO CD)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, jojobane,    jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990927, NO CD)", MACHINE_SUPPORTS_SAVE )
 
 // 990913
-GAME( 1999, jojobar1,    jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990913)", GAME_FLAGS )
-GAME( 1999, jojobanr1,   jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990913, NO CD)", GAME_FLAGS )
-GAME( 1999, jojobaner1,  jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990913, NO CD)", GAME_FLAGS )
+GAME( 1999, jojobar1,    jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990913)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, jojobajr1,   jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990913)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, jojobanr1,   jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990913, NO CD)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, jojobaner1,  jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990913, NO CD)", MACHINE_SUPPORTS_SAVE )
 
 // bootlegs, hold START1 during bootup to change games
 
 // newest revision, fixes some issues with Warzard decryption.
-GAME( 1999, cps3boot,    0,        sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (V4)", GAME_FLAGS )
-GAME( 1999, cps3boota,   cps3boot, sfiii3,   cps3,      cps3_state, init_sfiii2,   ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (V5)", GAME_FLAGS )
+GAME( 1999, cps3boot,    0,        sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (V4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, cps3boota,   cps3boot, sfiii3,   cps3,      cps3_state, init_sfiii2,   ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (V5)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1999, cps3booto,   cps3boot, sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (older)", GAME_FLAGS )
-GAME( 1999, cps3bootao,  cps3boot, sfiii3,   cps3,      cps3_state, init_sfiii2,   ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (older)", GAME_FLAGS )
+GAME( 1999, cps3booto,   cps3boot, sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, cps3bootao,  cps3boot, sfiii3,   cps3,      cps3_state, init_sfiii2,   ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (older)", MACHINE_SUPPORTS_SAVE )
 // this doesn't play 2nd Impact despite it being listed.  2nd Impact uses separate data/code encryption and can't be decrypted cleanly for a standard SH2.  Selecting it just flashes in a copy of 3rd Strike with the 2nd Impact loading screen
-GAME( 1999, cps3booto2,  cps3boot, sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (oldest) (New Generation, 3rd Strike, JoJo's Venture, JoJo's Bizarre Adventure and Red Earth only)", GAME_FLAGS )
+GAME( 1999, cps3booto2,  cps3boot, sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (oldest) (New Generation, 3rd Strike, JoJo's Venture, JoJo's Bizarre Adventure and Red Earth only)", MACHINE_SUPPORTS_SAVE )
 // this does not play Red Earth or the 2 Jojo games.  New Generation and 3rd Strike have been heavily modified to work with the separate code/data encryption a dead cart / 2nd Impact cart has.  Selecting the other games will give an 'invalid CD' message.
-GAME( 1999, cps3bootao2, cps3boot, sfiii3,   cps3,      cps3_state, init_sfiii2,   ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (oldest) (New Generation, 2nd Impact and 3rd Strike only)", GAME_FLAGS )
+GAME( 1999, cps3bootao2, cps3boot, sfiii3,   cps3,      cps3_state, init_sfiii2,   ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (oldest) (New Generation, 2nd Impact and 3rd Strike only)", MACHINE_SUPPORTS_SAVE )
 // these are test bootleg CDs for running 2nd Impact on a standard SH2
-GAME( 1999, cps3bs32,    cps3boot, sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "Street Fighter III 2nd Impact: Giant Attack (USA 970930, bootleg for HD6417095 type SH2, V3)", GAME_FLAGS )
-GAME( 1999, cps3bs32a,   cps3boot, sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "Street Fighter III 2nd Impact: Giant Attack (USA 970930, bootleg for HD6417095 type SH2, older)", GAME_FLAGS ) // older / buggier hack
+GAME( 1999, cps3bs32,    cps3boot, sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "Street Fighter III 2nd Impact: Giant Attack (USA 970930, bootleg for HD6417095 type SH2, V3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, cps3bs32a,   cps3boot, sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "Street Fighter III 2nd Impact: Giant Attack (USA 970930, bootleg for HD6417095 type SH2, older)", MACHINE_SUPPORTS_SAVE ) // older / buggier hack

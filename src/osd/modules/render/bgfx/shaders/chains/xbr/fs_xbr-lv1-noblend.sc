@@ -5,7 +5,7 @@ $input v_texcoord0, v_texcoord1, v_color0
 
 /*
    Hyllian's xBR-lv1-noblend Shader
-   
+
    Copyright (C) 2011-2014 Hyllian - sergiogdb@gmail.com
 
    Permission is hereby granted, free of charge, to any person obtaining a copy

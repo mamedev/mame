@@ -74,7 +74,7 @@ uint32_t orion_state::screen_update_orion128(screen_device &screen, bitmap_ind16
 										break;
 						}
 				}
-				bitmap.pix16(y, x*8+(7-b)) = color;
+				bitmap.pix(y, x*8+(7-b)) = color;
 			}
 		}
 	}

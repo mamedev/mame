@@ -48,7 +48,7 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "sound/sn76496.h"
-#include "sound/2612intf.h"
+#include "sound/ymopn.h"
 
 #include "includes/megadriv.h"
 #include "includes/megadriv_acbl.h"
@@ -259,12 +259,12 @@ void md_boot_state::jzth_map(address_map &map)
 	map(0x710000, 0x710001).rw(FUNC(md_boot_state::bl_710000_r), FUNC(md_boot_state::bl_710000_w)); // protection, will erase the VDP address causing writes to 0 unless this returns 0xe
 }
 
-READ16_MEMBER(md_boot_state::puckpkmna_70001c_r)
+uint16_t md_boot_state::puckpkmna_70001c_r()
 {
 	return 0x0e;
 }
 
-READ16_MEMBER(md_boot_state::puckpkmna_4b2476_r)
+uint16_t md_boot_state::puckpkmna_4b2476_r()
 {
 	if (!strcmp(machine().system().name, "puckpkmnb")) return 0x3100;
 
@@ -283,8 +283,6 @@ void md_boot_state::puckpkmn(machine_config &config)
 	md_ntsc(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &md_boot_state::puckpkmn_map);
-
-	MCFG_MACHINE_START_OVERRIDE(md_boot_state, md_bootleg)
 
 	config.device_remove("genesis_snd_z80");
 

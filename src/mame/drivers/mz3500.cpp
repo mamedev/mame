@@ -167,39 +167,29 @@ UPD7220_DISPLAY_PIXELS_MEMBER( mz3500_state::hgdc_display_pixels )
 
 UPD7220_DRAW_TEXT_LINE_MEMBER( mz3500_state::hgdc_draw_text )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	int x;
-	int xi,yi;
-	int tile;
-	int attr;
-	uint8_t tile_data;
-	uint8_t width80;
-	uint8_t char_size;
-	uint8_t hires;
-	uint8_t color_mode;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
 //  popmessage("%02x",m_crtc[6]);
 
-	color_mode = m_crtc[4] & 1;
-	width80 = (m_crtc[5] & 2) >> 1;
-	hires = (m_crtc[6] & 1);
-	char_size = (hires) ? 16 : 8;
+	uint8_t color_mode = m_crtc[4] & 1;
+	uint8_t width80 = (m_crtc[5] & 2) >> 1;
+	uint8_t hires = (m_crtc[6] & 1);
+	uint8_t char_size = (hires) ? 16 : 8;
 
-	for( x = 0; x < pitch; x++ )
+	for( int x = 0; x < pitch; x++ )
 	{
-		tile = (m_video_ram[(((addr+x)*2) & 0x1fff) >> 1] & 0xff);
-		attr = ((m_video_ram[(((addr+x)*2+1) & 0x3ffff) >> 1] >> 8) & 0x0f);
+		int tile = (m_video_ram[(((addr+x)*2) & 0x1fff) >> 1] & 0xff);
+		int attr = ((m_video_ram[(((addr+x)*2+1) & 0x3ffff) >> 1] >> 8) & 0x0f);
 
 		//if(hires)
 		//  tile <<= 1;
 
-		for( yi = 0; yi < lr; yi++)
+		for( int yi = 0; yi < lr; yi++)
 		{
-			tile_data = m_char_rom[((tile*16+yi) & 0xfff) | (hires*0x1000)];
+			uint8_t tile_data = m_char_rom[((tile*16+yi) & 0xfff) | (hires*0x1000)];
 
-			for( xi = 0; xi < 8; xi++)
+			for( int xi = 0; xi < 8; xi++)
 			{
-				int res_x,res_y;
 				int pen;
 
 				if(yi >= char_size)
@@ -227,18 +217,18 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( mz3500_state::hgdc_draw_text )
 					}
 				}
 
-				res_x = x * 8 + xi;
-				res_y = y + yi;
+				int res_x = x * 8 + xi;
+				int res_y = y + yi;
 
 				if(pen != -1)
 				{
 					if(!width80)
 					{
-						bitmap.pix32(res_y, res_x*2+0) = palette[pen];
-						bitmap.pix32(res_y, res_x*2+1) = palette[pen];
+						bitmap.pix(res_y, res_x*2+0) = palette[pen];
+						bitmap.pix(res_y, res_x*2+1) = palette[pen];
 					}
 					else
-						bitmap.pix32(res_y, res_x) = palette[pen];
+						bitmap.pix(res_y, res_x) = palette[pen];
 				}
 			}
 		}
@@ -774,19 +764,14 @@ void mz3500_state::machine_reset()
 	//m_slave->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_srdy = 0;
 
-	if (m_fdc.found())
+	m_fdd_sel = 0;
+	for(auto & elem : m_floppy_connector)
 	{
-		m_fdd_sel = 0;
-		{
-			for(auto & elem : m_floppy_connector)
-			{
-				elem->get_device()->mon_w(ASSERT_LINE);
-				elem->get_device()->set_rpm(300);
-			}
-
-			m_fdc->set_rate(250000);
-		}
+		elem->get_device()->mon_w(ASSERT_LINE);
+		elem->get_device()->set_rpm(300);
 	}
+
+	m_fdc->set_rate(250000);
 
 	m_beeper->set_state(0);
 }
@@ -829,10 +814,10 @@ void mz3500_state::mz3500(machine_config &config)
 
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_master, INPUT_LINE_IRQ0);
-	FLOPPY_CONNECTOR(config, "upd765a:0", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "upd765a:1", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "upd765a:2", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "upd765a:3", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765a:0", mz3500_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765a:1", mz3500_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765a:2", mz3500_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765a:3", mz3500_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats);
 
 	UPD7220(config, m_hgdc1, MAIN_CLOCK/5);
 	m_hgdc1->set_addrmap(0, &mz3500_state::upd7220_1_map);

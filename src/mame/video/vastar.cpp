@@ -79,19 +79,19 @@ void vastar_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(vastar_state::fgvideoram_w)
+void vastar_state::fgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(vastar_state::bg1videoram_w)
+void vastar_state::bg1videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg1videoram[offset] = data;
 	m_bg1_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(vastar_state::bg2videoram_w)
+void vastar_state::bg2videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg2videoram[offset] = data;
 	m_bg2_tilemap->mark_tile_dirty(offset & 0x3ff);

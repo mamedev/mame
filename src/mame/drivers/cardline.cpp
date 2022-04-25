@@ -76,8 +76,8 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 
-	uint8_t m_video;
-	uint8_t m_hsync_q;
+	uint8_t m_video = 0;
+	uint8_t m_hsync_q = 0;
 
 	required_device<i80c32_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -136,9 +136,9 @@ MC6845_UPDATE_ROW( cardline_state::crtc_update_row )
 			int fg_col = gfx[fg_tile * 64 + ra * 8 + i];
 
 			if (fg_col == 1)
-				bitmap.pix32(y, x) = palette[bg_pal_ofs + bg_col];
+				bitmap.pix(y, x) = palette[bg_pal_ofs + bg_col];
 			else
-				bitmap.pix32(y, x) = palette[fg_pal_ofs + fg_col];
+				bitmap.pix(y, x) = palette[fg_pal_ofs + fg_col];
 
 			x++;
 		}

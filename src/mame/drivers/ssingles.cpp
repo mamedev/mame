@@ -30,7 +30,7 @@ Computer Quiz Atama no Taisou
 
 -----------------------------------------
 TZU-093
-CPU: Z80(IC9) surface scrached Z80?(IC28)
+CPU: Z80(IC9) surface scratched Z80?(IC28)
 Sound: AY-3-8910 x2
 OSC: 14.000MHz
 RAMs:
@@ -50,7 +50,7 @@ CC.48        [209cab0d]  |
 CB.47        [8bc85c0c]  |
 CD.46        [22e8d103] /
 
-IC36.BIN     [643e3077] (surface scrached, 27C256)
+IC36.BIN     [643e3077] (surface scratched, 27C256)
 IC35.BIN     [fe0302a0]  |
 IC34.BIN     [06e7c7da]  |
 IC33.BIN     [323a70e7] /
@@ -178,10 +178,10 @@ protected:
 private:
 	uint8_t m_videoram[VMEM_SIZE];
 	uint8_t m_colorram[VMEM_SIZE];
-	uint8_t m_prot_data;
+	uint8_t m_prot_data = 0;
 	pen_t m_pens[NUM_PENS];
 
-	uint8_t m_atamanot_prot_state;
+	uint8_t m_atamanot_prot_state = 0;
 
 	required_device<cpu_device> m_maincpu;
 
@@ -218,20 +218,18 @@ static constexpr rgb_t ssingles_colors[NUM_PENS] =
 
 MC6845_UPDATE_ROW( ssingles_state::ssingles_update_row )
 {
-	uint32_t tile_address;
-	uint16_t cell, palette;
-	uint8_t b0, b1;
-	const uint8_t *gfx = memregion("gfx1")->base();
+	uint8_t const *const gfx = memregion("gfx1")->base();
 
 	for (int cx = 0; cx < x_count; ++cx)
 	{
 		int address = ((ma >> 1) + (cx >> 1)) & 0xff;
 
-		cell = m_videoram[address] + (m_colorram[address] << 8);
+		uint16_t cell = m_videoram[address] + (m_colorram[address] << 8);
 
-		tile_address = ((cell & 0x3ff) << 4) + ra;
-		palette = (cell >> 10) & 0x1c;
+		uint32_t tile_address = ((cell & 0x3ff) << 4) + ra;
+		uint16_t palette = (cell >> 10) & 0x1c;
 
+		uint8_t b0, b1;
 		if (cx & 1)
 		{
 			b0 = gfx[tile_address + 0x0000]; /*  9.bin */
@@ -245,7 +243,7 @@ MC6845_UPDATE_ROW( ssingles_state::ssingles_update_row )
 
 		for (int x = 7; x >= 0; --x)
 		{
-			bitmap.pix32(y, (cx << 3) | x) = m_pens[palette + ((b1 & 1) | ((b0 & 1) << 1))];
+			bitmap.pix(y, (cx << 3) | x) = m_pens[palette + ((b1 & 1) | ((b0 & 1) << 1))];
 			b0 >>= 1;
 			b1 >>= 1;
 		}
@@ -254,20 +252,18 @@ MC6845_UPDATE_ROW( ssingles_state::ssingles_update_row )
 
 MC6845_UPDATE_ROW( ssingles_state::atamanot_update_row )
 {
-	uint32_t tile_address;
-	uint16_t cell, palette;
-	uint8_t b0, b1;
 	const uint8_t *gfx = memregion("gfx1")->base();
 
 	for (int cx = 0; cx < x_count; ++cx)
 	{
 		int address = ((ma >> 1) + (cx >> 1)) & 0xff;
 
-		cell = m_videoram[address] + (m_colorram[address] << 8);
+		uint16_t cell = m_videoram[address] + (m_colorram[address] << 8);
 
-		tile_address = ((cell & 0x1ff) << 4) + ra;
-		palette = (cell >> 10) & 0x1c;
+		uint32_t tile_address = ((cell & 0x1ff) << 4) + ra;
+		uint16_t palette = (cell >> 10) & 0x1c;
 
+		uint8_t b0, b1;
 		if (cx & 1)
 		{
 			b0 = gfx[tile_address + 0x0000]; /*  9.bin */
@@ -281,7 +277,7 @@ MC6845_UPDATE_ROW( ssingles_state::atamanot_update_row )
 
 		for (int x = 7; x >= 0; --x)
 		{
-			bitmap.pix32(y, (cx << 3) | x) = m_pens[palette + ((b1 & 1) | ((b0 & 1) << 1))];
+			bitmap.pix(y, (cx << 3) | x) = m_pens[palette + ((b1 & 1) | ((b0 & 1) << 1))];
 			b0 >>= 1;
 			b1 >>= 1;
 		}

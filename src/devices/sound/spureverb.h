@@ -29,12 +29,12 @@ struct spu_device::reverb_preset
 
 class spu_device::reverb
 {
-	signed short
-			*y[2][4],
-			*x[2],
-			*ax[2],
-			*ay[2],
-			bx1[2][2],by1[2];
+	std::unique_ptr<signed short []>
+			y[2][4],
+			x[2],
+			ax[2],
+			ay[2];
+	signed short bx1[2][2],by1[2];
 	int yp, max_delay, sound_hz;
 	typedef int comb_param[2][4];
 

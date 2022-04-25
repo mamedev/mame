@@ -10,8 +10,8 @@ license:CC0
 	</element>
 	<view name="No screens attached">
 		<bounds left="0" top="0" right="280" bottom="150" />
-		<bezel name="warning_txt" element="warning">
+		<element name="warning_txt" ref="warning">
 			<bounds left="50" right="230" top="50" bottom="65" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

@@ -214,7 +214,7 @@ private:
 	required_device<palette_device> m_palette;
 
 	std::unique_ptr<uint8_t[]> m_videoram;
-	uint8_t m_videobank;
+	uint8_t m_videobank = 0;
 
 	uint8_t vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint8_t data);
@@ -288,7 +288,7 @@ uint32_t cocoloco_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 				color |= ((m_videoram[count|0x6000] >> (xi)) & 1) << 3;
 
 				if (cliprect.contains(x + xi, 256 - y))
-					bitmap.pix16(256 - y, x + xi) = m_palette->pen(color & 0x0f);
+					bitmap.pix(256 - y, x + xi) = m_palette->pen(color & 0x0f);
 			}
 
 			count++;
@@ -503,7 +503,7 @@ void cocoloco_state::cocoloco(machine_config &config)
 	NETLIST_STREAM_INPUT(config, "snd_nl:cin1", 1, "R_AY1_2.R");
 	NETLIST_STREAM_INPUT(config, "snd_nl:cin2", 2, "R_AY1_3.R");
 
-	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "RAMP.1").set_mult_offset(30000.0 * 1.5, 0);
+	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "RAMP.1").set_mult_offset(30000.0 * 1.5 / 32768.0, 0);
 }
 
 

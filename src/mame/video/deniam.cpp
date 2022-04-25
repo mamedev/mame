@@ -236,9 +236,9 @@ void deniam_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 						{
 							if (cliprect.contains(sx + x, y))
 							{
-								if ((screen.priority().pix8(y, sx + x) & primask) == 0)
-									bitmap.pix16(y, sx + x) = color * 16 + (rom[i] & 0x0f);
-								screen.priority().pix8(y, sx + x) = 8;
+								if ((screen.priority().pix(y, sx + x) & primask) == 0)
+									bitmap.pix(y, sx + x) = color * 16 + (rom[i] & 0x0f);
+								screen.priority().pix(y, sx + x) = 8;
 							}
 						}
 						x++;
@@ -255,9 +255,9 @@ void deniam_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 						{
 							if (cliprect.contains(sx + x, y))
 							{
-								if ((screen.priority().pix8(y, sx + x) & primask) == 0)
-									bitmap.pix16(y, sx + x) = color * 16+(rom[i] >> 4);
-								screen.priority().pix8(y, sx + x) = 8;
+								if ((screen.priority().pix(y, sx + x) & primask) == 0)
+									bitmap.pix(y, sx + x) = color * 16+(rom[i] >> 4);
+								screen.priority().pix(y, sx + x) = 8;
 							}
 						}
 						x++;
@@ -278,9 +278,9 @@ void deniam_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 						{
 							if (cliprect.contains(sx + x, y))
 							{
-								if ((screen.priority().pix8(y, sx + x) & primask) == 0)
-									bitmap.pix16(y, sx + x) = color * 16 + (rom[i] >> 4);
-								screen.priority().pix8(y, sx + x) = 8;
+								if ((screen.priority().pix(y, sx + x) & primask) == 0)
+									bitmap.pix(y, sx + x) = color * 16 + (rom[i] >> 4);
+								screen.priority().pix(y, sx + x) = 8;
 							}
 						}
 						x++;
@@ -297,9 +297,9 @@ void deniam_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 						{
 							if (cliprect.contains(sx + x, y))
 							{
-								if ((screen.priority().pix8(y, sx + x) & primask) == 0)
-									bitmap.pix16(y, sx + x) = color * 16 + (rom[i] & 0x0f);
-								screen.priority().pix8(y, sx + x) = 8;
+								if ((screen.priority().pix(y, sx + x) & primask) == 0)
+									bitmap.pix(y, sx + x) = color * 16 + (rom[i] & 0x0f);
+								screen.priority().pix(y, sx + x) = 8;
 							}
 						}
 						x++;

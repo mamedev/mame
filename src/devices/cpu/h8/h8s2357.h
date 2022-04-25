@@ -38,8 +38,8 @@ class h8s2357_device : public h8s2000_device {
 public:
 	h8s2357_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(syscr_r);
-	DECLARE_WRITE8_MEMBER(syscr_w);
+	uint8_t syscr_r();
+	void syscr_w(uint8_t data);
 
 protected:
 	required_device<h8s_intc_device> intc;

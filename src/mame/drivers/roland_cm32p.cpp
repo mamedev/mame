@@ -39,7 +39,6 @@ Notes:
 
 TODO:
 - figure out how "freeing a voice" works - right now the firmware gets stuck when playing the 32th note.
-- add PCM card support
 
 
 PCB Layout
@@ -116,6 +115,34 @@ Parts:
 | X1                           | Crystal 12MHz                          |
 | X2                           | Crystal 32.768MHz                      |
 |-----------------------------------------------------------------------|
+
+
+PCM ROM address/data line scrambling:
+
+     address              data
+external internal   external internal
+   A0 - - -  A0        D0 - - - D2
+   A1 - - -  A5        D1 - - - D7
+   A2 - - -  A4        D2 - - - D6
+   A3 - - -  A6        D3 - - - D4
+   A4 - - -  A1        D4 - - - D1
+   A5 - - -  A2        D5 - - - D3
+   A6 - - -  A3        D6 - - - D0
+   A7 - - -  A8        D7 - - - D5
+   A8 - - - A10
+   A9 - - - A13
+  A10 - - -  A9
+  A11 - - -  A7
+  A12 - - - A11
+  A13 - - - A12
+  A14 - - - A16
+  A15 - - - A14
+  A16 - - - A15
+  A17 - - - A17
+  A18 - - - A18
+
+Line scramling of A0..A6 and D0..D7 matches the SN-U110 cards.
+For A7..A16 they changed the scrambling.
 
 
 PCM ROM Tables
@@ -231,17 +258,24 @@ Some routine locations
 #include "machine/timer.h"
 #include "sound/rolandpcm.h"
 #include "video/msm6222b.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
 // unscramble address: ROM dump offset -> proper (descrambled) offset
-#define UNSCRAMBLE_ADDRESS(_offset) \
+#define UNSCRAMBLE_ADDR_INT(_offset) \
 	bitswap<19>(_offset,18,17,15,14,16,12,11, 7, 9,13,10, 8, 3, 2, 1, 6, 4, 5, 0)
 // scramble address: proper offset -> ROM dump offset
-#define SCRAMBLE_ADDRESS(_offset) \
+#define SCRAMBLE_ADDR_INT(_offset) \
 	bitswap<19>(_offset,18,17,14,16,15, 9,13,12, 8,10, 7,11, 3, 1, 2, 6, 5, 4, 0)
+
+// PCM cards use a different address line scrambling
+#define UNSCRAMBLE_ADDR_EXT(_offset) \
+	bitswap<19>(_offset,18,17, 8, 9,16,11,12, 7,14,10,13,15, 3, 2, 1, 6, 4, 5, 0)
 
 #define UNSCRAMBLE_DATA(_data) \
 	bitswap<8>(_data,1,2,7,3,5,0,4,6)
@@ -254,7 +288,7 @@ static INPUT_PORTS_START( cm32p )
 	PORT_START("SERVICE")   // connected to Port 0 of the P8098 CPU.
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test Switch") PORT_TOGGLE PORT_CODE(KEYCODE_F2) // SW A (checked during boot)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test: Check/Tune") PORT_CODE(KEYCODE_B) // SW B
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PCM card inserted") PORT_TOGGLE PORT_CODE(KEYCODE_C)
+	//PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PCM card inserted") PORT_TOGGLE PORT_CODE(KEYCODE_C)
 
 	PORT_START("SW")    // test switches, accessed by reading from address 0x1300
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test: MSB Adj.") PORT_CODE(KEYCODE_1)   // SW 1
@@ -283,6 +317,7 @@ protected:
 private:
 	required_device<i8x9x_device> cpu;
 	required_device<mb87419_mb87420_device> pcm;
+	required_device<generic_slot_device> pcmcard;
 	required_device<msm6222b_device> lcd;
 	required_device<timer_device> midi_timer;
 	required_device<ram_device> some_ram;
@@ -309,8 +344,15 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(midi_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(samples_timer_cb);
 
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(card_load);
+	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(card_unload);
+
 	void cm32p_map(address_map &map);
 
+	void descramble_rom_internal(u8* dst, const u8* src);
+	void descramble_rom_external(u8* dst, const u8* src);
+
+	bool pcmard_loaded;
 	u8 midi;
 	int midi_pos;
 	u8 sound_io_buffer[0x100];
@@ -321,6 +363,7 @@ cm32p_state::cm32p_state(const machine_config &mconfig, device_type type, const 
 	: driver_device(mconfig, type, tag)
 	, cpu(*this, "maincpu")
 	, pcm(*this, "pcm")
+	, pcmcard(*this, "cardslot")
 	, lcd(*this, "lcd")
 	, midi_timer(*this, "midi_timer")
 	, some_ram(*this, "some_ram")
@@ -333,20 +376,19 @@ cm32p_state::cm32p_state(const machine_config &mconfig, device_type type, const 
 // screen update function from Roland D-110
 uint32_t cm32p_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 y,ra,gfx;
-	uint16_t sy=0,x;
-	const u8 *data = lcd->render();
+	u16 sy=0;
+	u8 const *const data = lcd->render();
 	bitmap.fill(0);
 
-	for (y = 0; y < 2; y++)
+	for (u8 y = 0; y < 2; y++)
 	{
-		for (ra = 0; ra < 9; ra++)
+		for (u8 ra = 0; ra < 9; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			u16 *p = &bitmap.pix(sy++);
 
-			for (x = 0; x < 16; x++)
+			for (u16 x = 0; x < 16; x++)
 			{
-				gfx = 0;
+				u8 gfx = 0;
 				if (ra < 8)
 					gfx = data[x*16 + y*640 + ra];
 
@@ -378,6 +420,46 @@ void cm32p_state::machine_reset()
 {
 	midi_timer->adjust(attotime::from_hz(1));
 	midi_pos = 0;
+}
+
+DEVICE_IMAGE_LOAD_MEMBER(cm32p_state::card_load)
+{
+	uint32_t size = pcmcard->common_get_size("rom");
+	if (size > 0x080000)
+	{
+		image.seterror(image_error::INVALIDIMAGE, "Invalid size: Only up to 512K is supported");
+		return image_init_result::FAIL;
+	}
+
+	pcmcard->rom_alloc(0x080000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);    // cards are up to 512K
+	pcmcard->common_load_rom(pcmcard->get_rom_base(), size, "rom");
+	u8* base = pcmcard->get_rom_base();
+	if (size < 0x080000)
+	{
+		uint32_t mirror = (1 << (31 - count_leading_zeros_32(size)));
+		if (mirror < 0x020000)  // due to how address descrambling works, we can currently only do mirroring for 128K pages
+			mirror = 0x020000;
+		for (uint32_t ofs = mirror; ofs < 0x080000; ofs += mirror)
+			memcpy(base + ofs, base, mirror);
+	}
+
+	u8* src = static_cast<u8*>(memregion("pcmorg")->base());
+	u8* dst = static_cast<u8*>(memregion("pcm")->base());
+	memcpy(&src[0x080000], base, 0x080000);
+	// descramble PCM card ROM
+	descramble_rom_external(&dst[0x080000], &src[0x080000]);
+	pcmard_loaded = true;
+
+	return image_init_result::PASS;
+}
+
+DEVICE_IMAGE_UNLOAD_MEMBER(cm32p_state::card_unload)
+{
+	u8* src = static_cast<u8*>(memregion("pcmorg")->base());
+	u8* dst = static_cast<u8*>(memregion("pcm")->base());
+	memset(&src[0x080000], 0xFF, 0x080000);
+	memset(&dst[0x080000], 0xFF, 0x080000);
+	pcmard_loaded = false;
 }
 
 void cm32p_state::lcd_ctrl_w(u8 data)
@@ -415,7 +497,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cm32p_state::midi_timer_cb)
 
 u16 cm32p_state::port0_r()
 {
-	return service_port->read();
+	return service_port->read() | (pcmard_loaded ? 0x10 : 0x00);
 }
 
 u8 cm32p_state::pcmrom_r(offs_t offset)
@@ -566,10 +648,13 @@ void cm32p_state::cm32p(machine_config &config)
 	screen.set_size(16*6-1, (16*6-1)*3/4);
 	screen.set_visarea(0, 16*6-2, 0, (16*6-1)*3/4-1);
 	screen.set_palette("palette");
-
 	PALETTE(config, "palette", FUNC(cm32p_state::mt32_palette), 2);
-
 	MSM6222B_01(config, lcd, 0);
+
+	generic_cartslot_device &cardslot(GENERIC_CARTSLOT(config, "cardslot", generic_romram_plain_slot, "u110_card", "bin"));
+	cardslot.set_device_load(FUNC(cm32p_state::card_load));
+	cardslot.set_device_unload(FUNC(cm32p_state::card_unload));
+	SOFTWARE_LIST(config, "card_list").set_original("u110_card");
 
 	TIMER(config, midi_timer).configure_generic(FUNC(cm32p_state::midi_timer_cb));
 
@@ -579,19 +664,36 @@ void cm32p_state::cm32p(machine_config &config)
 void cm32p_state::init_cm32p()
 {
 	// Roland did a fair amount of scrambling on the address and data lines.
-	// Only the first 0x20 bytes of the ROMs are readable text in a raw dump.
+	// Only the first 0x80 bytes of the ROMs are readable text in a raw dump.
+	// The CM-32P actually checks some of these header bytes, but it uses post-scrambling variants of offsets/values.
 	u8* src = static_cast<u8*>(memregion("pcmorg")->base());
 	u8* dst = static_cast<u8*>(memregion("pcm")->base());
-	for (offs_t bank_ofs = 0x00; bank_ofs < 0x400000; bank_ofs += 0x080000)
+	// descramble internal ROMs
+	descramble_rom_internal(&dst[0x000000], &src[0x000000]);
+	descramble_rom_internal(&dst[0x100000], &src[0x100000]);
+	descramble_rom_internal(&dst[0x200000], &src[0x200000]);
+	// descramble PCM card ROM
+	descramble_rom_external(&dst[0x080000], &src[0x080000]);
+}
+
+void cm32p_state::descramble_rom_internal(u8* dst, const u8* src)
+{
+	for (offs_t srcpos = 0x00; srcpos < 0x80000; srcpos ++)
 	{
-		offs_t dstpos;
-		for (offs_t srcpos = 0x00; srcpos < 0x80000; srcpos ++)
-		{
-			dstpos = UNSCRAMBLE_ADDRESS(srcpos);
-			dst[bank_ofs + dstpos] = UNSCRAMBLE_DATA(src[bank_ofs + srcpos]);
-		}
+		offs_t dstpos = UNSCRAMBLE_ADDR_INT(srcpos);
+		dst[dstpos] = UNSCRAMBLE_DATA(src[srcpos]);
 	}
 }
+
+void cm32p_state::descramble_rom_external(u8* dst, const u8* src)
+{
+	for (offs_t srcpos = 0x00; srcpos < 0x80000; srcpos ++)
+	{
+		offs_t dstpos = UNSCRAMBLE_ADDR_EXT(srcpos);
+		dst[dstpos] = UNSCRAMBLE_DATA(src[srcpos]);
+	}
+}
+
 
 ROM_START( cm32p )
 	ROM_REGION( 0x10000, "maincpu", 0 )

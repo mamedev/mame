@@ -17,7 +17,7 @@
 
 #include "colorbus.h"
 
-namespace bus { namespace ti99 { namespace colorbus {
+namespace bus::ti99::colorbus {
 
 class v9938_busmouse_device : public device_t, public device_v9938_colorbus_interface
 {
@@ -37,7 +37,8 @@ private:
 	int m_last_y;
 	int m_bstate;
 };
-} } } // end namespace bus::ti99::colorbus
+
+} // end namespace bus::ti99::colorbus
 
 DECLARE_DEVICE_TYPE_NS(V9938_BUSMOUSE, bus::ti99::colorbus, v9938_busmouse_device)
 

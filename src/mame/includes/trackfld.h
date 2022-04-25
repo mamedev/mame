@@ -59,15 +59,15 @@ public:
 	void init_trackfldnz();
 
 private:
-	DECLARE_WRITE8_MEMBER(questions_bank_w);
-	DECLARE_WRITE8_MEMBER(trackfld_videoram_w);
-	DECLARE_WRITE8_MEMBER(trackfld_colorram_w);
-	DECLARE_WRITE8_MEMBER(atlantol_gfxbank_w);
-	DECLARE_READ8_MEMBER(trackfld_SN76496_r);
-	DECLARE_READ8_MEMBER(trackfld_speech_r);
-	DECLARE_WRITE8_MEMBER(trackfld_VLM5030_control_w);
-	DECLARE_WRITE8_MEMBER( konami_SN76496_latch_w ) { m_SN76496_latch = data; };
-	DECLARE_WRITE8_MEMBER( konami_SN76496_w ) { m_sn->write(m_SN76496_latch); };
+	void questions_bank_w(uint8_t data);
+	void trackfld_videoram_w(offs_t offset, uint8_t data);
+	void trackfld_colorram_w(offs_t offset, uint8_t data);
+	void atlantol_gfxbank_w(uint8_t data);
+	uint8_t trackfld_SN76496_r();
+	uint8_t trackfld_speech_r();
+	void trackfld_VLM5030_control_w(uint8_t data);
+	void konami_SN76496_latch_w(uint8_t data) { m_SN76496_latch = data; }
+	void konami_SN76496_w(uint8_t data) { m_sn->write(m_SN76496_latch); }
 
 	void hyprolyb_sound_map(address_map &map);
 	void main_map(address_map &map);
@@ -101,17 +101,17 @@ private:
 	required_device<palette_device> m_palette;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	int      m_bg_bank;
-	int      m_sprite_bank1;
-	int      m_sprite_bank2;
-	int      m_old_gfx_bank;                    // needed by atlantol
-	int      m_sprites_gfx_banked;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	int      m_bg_bank = 0;
+	int      m_sprite_bank1 = 0;
+	int      m_sprite_bank2 = 0;
+	int      m_old_gfx_bank = 0;                    // needed by atlantol
+	int      m_sprites_gfx_banked = 0;
 
-	bool     m_irq_mask;
-	bool     m_nmi_mask;
+	bool     m_irq_mask = false;
+	bool     m_nmi_mask = false;
 
-	uint8_t m_SN76496_latch;
+	uint8_t m_SN76496_latch = 0;
 
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);

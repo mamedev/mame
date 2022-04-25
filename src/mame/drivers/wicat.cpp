@@ -35,6 +35,7 @@ Wicat - various systems.
 #include "video/i8275.h"
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 
 #include "wicat.lh"
 
@@ -109,7 +110,7 @@ private:
 	required_device<fd1795_device> m_fdc;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return 0; }
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void main_mem(address_map &map);
 	void video_io(address_map &map);
@@ -180,6 +181,7 @@ void wicat_state::video_io(address_map &map)
 	map(0x0400, 0x047f).rw(m_videosram, FUNC(x2210_device::read), FUNC(x2210_device::write)).umask16(0xff00);  // XD2210  4-bit NOVRAM
 	map(0x0500, 0x0500).w(FUNC(wicat_state::videosram_recall_w));
 	map(0x0600, 0x0600).w(FUNC(wicat_state::videosram_store_w));
+	map(0x0700, 0x0701).nopw(); // vestigial SN76496 initialization?
 	map(0x0800, 0x0807).w("videoctrl", FUNC(ls259_device::write_d0)).umask16(0xffff);
 	map(0x0a00, 0x0a1f).rw(m_videodma, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask16(0xff00); // AM9517A DMA
 	map(0x0b00, 0x0b03).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write)).umask16(0xff00);  // i8275 CRTC
@@ -303,7 +305,7 @@ void wicat_state::machine_reset()
 		elem = 0;
 }
 
-void wicat_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void wicat_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -623,13 +625,13 @@ WRITE_LINE_MEMBER(wicat_state::crtc_irq_clear_w)
 I8275_DRAW_CHARACTER_MEMBER(wicat_state::wicat_display_pixels)
 {
 	uint8_t romdata = vsp ? 0 : m_chargen->base()[(charcode << 4) | linecount];
-	const pen_t *pen = m_palette->pens();
+	pen_t const *const pen = m_palette->pens();
 
 	for (int i = 0; i < 10; i++)
 	{
 		int color = ((romdata & 0xc0) != 0) ^ rvv;
 
-		bitmap.pix32(y, x + i) = pen[color];
+		bitmap.pix(y, x + i) = pen[color];
 		romdata <<= 1;
 	}
 }
@@ -639,7 +641,7 @@ void wicat_state::wicat(machine_config &config)
 	M68000(config, m_maincpu, 8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &wicat_state::main_mem);
 
-	VIA6522(config, m_via, 8_MHz_XTAL);
+	MOS6522(config, m_via, 8_MHz_XTAL);
 	m_via->writepa_handler().set(FUNC(wicat_state::via_a_w));
 	m_via->writepb_handler().set(FUNC(wicat_state::via_b_w));
 	m_via->irq_handler().set_inputline(m_maincpu, M68K_IRQ_1);
@@ -756,12 +758,14 @@ void wicat_state::wicat(machine_config &config)
 	wd1kcpu.set_addrmap(AS_IO, &wicat_state::wd1000_io);
 
 	FD1795(config, m_fdc, 8_MHz_XTAL);
-	FLOPPY_CONNECTOR(config, "fdc:0", wicat_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", wicat_floppies, nullptr, floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:2", wicat_floppies, nullptr, floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:3", wicat_floppies, nullptr, floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", wicat_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", wicat_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:2", wicat_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:3", wicat_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("wicat");
+
+	// TODO: beeper (part of keyboard)
 }
 
 /* ROM definition */
@@ -850,4 +854,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY               FULLNAME            FLAGS
-COMP( 1982, wicat, 0,      0,      wicat,   wicat, wicat_state, empty_init, "Millennium Systems", "Wicat System 150", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1982, wicat, 0,      0,      wicat,   wicat, wicat_state, empty_init, "Millennium Systems", "Wicat System 150", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

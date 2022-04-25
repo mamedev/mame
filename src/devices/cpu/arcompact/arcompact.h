@@ -72,14 +72,14 @@ public:
 	// construction/destruction
 	arcompact_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ32_MEMBER( arcompact_auxreg002_LPSTART_r);
-	DECLARE_WRITE32_MEMBER(arcompact_auxreg002_LPSTART_w);
-	DECLARE_READ32_MEMBER( arcompact_auxreg003_LPEND_r);
-	DECLARE_WRITE32_MEMBER(arcompact_auxreg003_LPEND_w);
+	uint32_t arcompact_auxreg002_LPSTART_r();
+	void arcompact_auxreg002_LPSTART_w(uint32_t data);
+	uint32_t arcompact_auxreg003_LPEND_r();
+	void arcompact_auxreg003_LPEND_w(uint32_t data);
 
-	DECLARE_READ32_MEMBER( arcompact_auxreg00a_STATUS32_r);
-	DECLARE_READ32_MEMBER( arcompact_auxreg025_INTVECTORBASE_r);
-	DECLARE_WRITE32_MEMBER( arcompact_auxreg025_INTVECTORBASE_w);
+	uint32_t arcompact_auxreg00a_STATUS32_r();
+	uint32_t arcompact_auxreg025_INTVECTORBASE_r();
+	void arcompact_auxreg025_INTVECTORBASE_w(uint32_t data);
 
 
 	void arcompact_auxreg_map(address_map &map);

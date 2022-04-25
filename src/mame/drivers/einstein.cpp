@@ -21,6 +21,7 @@
 #include "bus/rs232/rs232.h"
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
+#include "imagedev/snapquik.h"
 #include "machine/adc0844.h"
 #include "machine/i8251.h"
 #include "machine/ram.h"
@@ -33,7 +34,7 @@
 #include "video/v9938.h"
 #include "sound/ay8910.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -89,6 +90,7 @@ public:
 		m_porta_joy(*this, "PORTA_JOY"),
 		m_portb_joy(*this, "PORTB_JOY"),
 		m_dips(*this, "DIPS"),
+		m_alpha_lock_led(*this, "alpha_lock_led"),
 		m_rom_enabled(0),
 		m_keyboard_line(0), m_keyboard_data(0xff),
 		m_centronics_ack(0), m_centronics_busy(0), m_centronics_perror(0), m_centronics_fault(0), m_strobe(-1),
@@ -99,6 +101,12 @@ public:
 	void einst256(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(joystick_button);
+
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_timer_callback);
@@ -137,9 +145,6 @@ private:
 	void einstein_mem(address_map &map);
 	void einst256_io(address_map &map);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
 	void einstein_scan_keyboard();
 
 	required_device<z80_device> m_maincpu;
@@ -165,6 +170,7 @@ private:
 	optional_ioport m_porta_joy;
 	optional_ioport m_portb_joy;
 	optional_ioport m_dips;
+	output_finder<> m_alpha_lock_led;
 
 	int m_rom_enabled;
 
@@ -178,7 +184,7 @@ private:
 	int m_centronics_perror;
 	int m_centronics_fault;
 	int m_strobe;
-	int m_alpha_lock_led;
+	int m_alpha_lock;
 
 	int m_int;
 };
@@ -450,11 +456,16 @@ void einstein_state::reset_w(uint8_t data)
 
 void einstein_state::machine_start()
 {
+	m_alpha_lock_led.resolve();
+
 	// initialize memory mapping
 	m_bank1->configure_entry(0, m_ram->pointer());
 	m_bank1->configure_entry(1, m_bios->base());
 	m_bank2->set_base(m_ram->pointer());
 	m_bank3->set_base(m_ram->pointer() + 0x8000);
+
+	// register save states
+	save_item(NAME(m_rom_enabled));
 }
 
 void einstein_state::machine_reset()
@@ -471,6 +482,7 @@ void einstein_state::machine_reset()
 	m_strobe = -1;
 
 	// enable Alpha Lock LED
+	m_alpha_lock = 1;
 	m_alpha_lock_led = 1;
 }
 
@@ -582,15 +594,18 @@ void einstein_state::pseudo_adc_w(uint8_t data)
 
 uint8_t einstein_state::alpha_lock_r()
 {
-	m_alpha_lock_led ^= 1;
-	output().set_value("alpha_lock_led", m_alpha_lock_led);
+	if (!machine().side_effects_disabled())
+	{
+		m_alpha_lock ^= 1;
+		m_alpha_lock_led = m_alpha_lock;
+	}
 	return 0xff;
 }
 
 void einstein_state::alpha_lock_w(uint8_t data)
 {
-	m_alpha_lock_led ^= 1;
-	output().set_value("alpha_lock_led", m_alpha_lock_led);
+	m_alpha_lock ^= 1;
+	m_alpha_lock_led = m_alpha_lock;
 }
 
 
@@ -608,7 +623,7 @@ void einstein_state::einstein_mem(address_map &map)
 void einstein_state::einstein_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0x00).mirror(0xff04).rw(FUNC(einstein_state::reset_r), FUNC(einstein_state::reset_w));
+	map(0x00, 0x01).mirror(0xff04).rw(FUNC(einstein_state::reset_r), FUNC(einstein_state::reset_w));
 	map(0x02, 0x02).mirror(0xff04).rw(m_psg, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 	map(0x03, 0x03).mirror(0xff04).w(m_psg, FUNC(ay8910_device::data_w));
 	map(0x08, 0x09).mirror(0xff06).rw("vdp", FUNC(tms9129_device::read), FUNC(tms9129_device::write));
@@ -627,7 +642,7 @@ void einstein_state::einstein_io(address_map &map)
 void einstein_state::einst256_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0x00).mirror(0xff04).rw(FUNC(einstein_state::reset_r), FUNC(einstein_state::reset_w));
+	map(0x00, 0x01).mirror(0xff04).rw(FUNC(einstein_state::reset_r), FUNC(einstein_state::reset_w));
 	map(0x02, 0x02).mirror(0xff04).rw(m_psg, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 	map(0x03, 0x03).mirror(0xff04).w(m_psg, FUNC(ay8910_device::data_w));
 	map(0x08, 0x0b).mirror(0xff04).rw("v9938", FUNC(v9938_device::read), FUNC(v9938_device::write));
@@ -807,6 +822,39 @@ INPUT_PORTS_END
 
 
 /***************************************************************************
+    QUICKLOAD
+***************************************************************************/
+
+QUICKLOAD_LOAD_MEMBER(einstein_state::quickload_cb)
+{
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
+
+	if (image.length() >= 0xfd00)
+		return image_init_result::FAIL;
+
+	/* disable rom */
+	m_rom_enabled = 0;
+	m_bank1->set_entry(m_rom_enabled);
+
+	/* load image */
+	uint16_t quickload_size = image.length();
+	for (uint16_t i = 0; i < quickload_size; i++)
+	{
+		uint8_t data;
+
+		if (image.fread(&data, 1) != 1)
+			return image_init_result::FAIL;
+		prog_space.write_byte(i + 0x100, data);
+	}
+
+	/* start program */
+	m_maincpu->set_pc(0x100);
+
+	return image_init_result::PASS;
+}
+
+
+/***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
 
@@ -889,40 +937,44 @@ void einstein_state::einstein(machine_config &config)
 
 	TIMER(config, m_strobe_timer).configure_generic(FUNC(einstein_state::strobe_callback));
 
-	// uart
+	/* uart */
 	i8251_device &ic_i060(I8251(config, IC_I060, XTAL_X002 / 4));
 	ic_i060.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	ic_i060.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	ic_i060.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 
-	// rs232 port
+	/* rs232 port */
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(IC_I060, FUNC(i8251_device::write_rxd));
 	rs232.dsr_handler().set(IC_I060, FUNC(i8251_device::write_dsr));
 	rs232.cts_handler().set(IC_I060, FUNC(i8251_device::write_cts));
 
-	// floppy
+	/* floppy */
 	WD1770(config, m_fdc, XTAL_X002);
 
-	FLOPPY_CONNECTOR(config, IC_I042 ":0", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, IC_I042 ":1", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, IC_I042 ":2", einstein_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, IC_I042 ":3", einstein_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, IC_I042 ":0", einstein_floppies, "3ss", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, IC_I042 ":1", einstein_floppies, "3ss", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, IC_I042 ":2", einstein_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, IC_I042 ":3", einstein_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "disk_list").set_original("einstein").set_filter("TC01");
+
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "com", attotime::from_seconds(2)));
+	quickload.set_load_callback(FUNC(einstein_state::quickload_cb));
+	quickload.set_interface("einstein_quik");
 
 	/* RAM is provided by 8k DRAM ICs i009, i010, i011, i012, i013, i014, i015 and i016 */
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");
 
-	// tatung pipe connector
+	/* tatung pipe connector */
 	TATUNG_PIPE(config, m_pipe, XTAL_X002 / 2, tatung_pipe_cards, nullptr);
 	m_pipe->set_program_space(m_maincpu, AS_PROGRAM);
 	m_pipe->set_io_space(m_maincpu, AS_IO);
 	m_pipe->nmi_handler().set_inputline(IC_I001, INPUT_LINE_NMI);
 
-	// user port
+	/* user port */
 	EINSTEIN_USERPORT(config, "user").bstb_handler().set(IC_I063, FUNC(z80pio_device::strobe_b));
 }
 
@@ -975,9 +1027,9 @@ void einstein_state::einst256(machine_config &config)
 ROM_START( einstein )
 	ROM_REGION(0x8000, "bios", ROMREGION_ERASEFF)
 	/* i023 */
-	ROM_SYSTEM_BIOS(0,  "mos12",  "MOS 1.2")
+	ROM_SYSTEM_BIOS(0, "mos12", "MOS 1.2")
 	ROMX_LOAD("mos12.i023", 0x0000, 0x2000, CRC(ec134953) SHA1(a02125d8ebcda48aa784adbb42a8b2d7ef3a4b77), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1,  "mos121",  "MOS 1.21")
+	ROM_SYSTEM_BIOS(1, "mos121", "MOS 1.21")
 	ROMX_LOAD("mos121.i023", 0x0000, 0x2000, CRC(a746eeb6) SHA1(f75aaaa777d0fd92225acba291f6bf428b341d3e), ROM_BIOS(1))
 	ROM_RELOAD(0x2000, 0x2000)
 ROM_END

@@ -1,10 +1,10 @@
 // license:LGPL-2.1+
 // copyright-holders:Angelo Salese, R. Belmont
 // TODO: make separate device when code is decoupled better
-//DECLARE_WRITE8_MEMBER( stv_SMPC_w );
-//DECLARE_READ8_MEMBER( stv_SMPC_r );
-//DECLARE_WRITE8_MEMBER( saturn_SMPC_w );
-//DECLARE_READ8_MEMBER( saturn_SMPC_r );
+//void stv_SMPC_w(offs_t offset, uint8_t data);
+//uint8_t stv_SMPC_r(offs_t offset);
+//void saturn_SMPC_w(offs_t offset, uint8_t data);
+//uint8_t saturn_SMPC_r(offs_t offset);
 
 #ifndef MAME_MACHINE_SMPC_HLE_H
 #define MAME_MACHINE_SMPC_HLE_H
@@ -86,7 +86,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual space_config_vector memory_space_config() const override;
 
 private:

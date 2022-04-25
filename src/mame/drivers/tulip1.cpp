@@ -77,7 +77,7 @@ void tulip1_state::mem_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).ram();
 	map(0x20000, 0xdffff).noprw();
-	map(0xe0000, 0xe0fff).ram().share("vram");;
+	map(0xe0000, 0xe0fff).ram().share("vram");
 	map(0xfe000, 0xfffff).rom().region("bios", 0);
 }
 
@@ -118,7 +118,7 @@ GFXDECODE_END
 
 MC6845_UPDATE_ROW( tulip1_state::crtc_update_row )
 {
-	const pen_t *pen = m_palette->pens();
+	pen_t const *const pen = m_palette->pens();
 
 	for (int i = 0; i < x_count; i++)
 	{
@@ -127,7 +127,7 @@ MC6845_UPDATE_ROW( tulip1_state::crtc_update_row )
 
 		// draw 8 pixels of the character
 		for (int x = 0; x < 8; x++)
-			bitmap.pix32(y, x + i*8) = pen[BIT(data, 7 - x)];
+			bitmap.pix(y, x + i*8) = pen[BIT(data, 7 - x)];
 	}
 }
 
@@ -176,8 +176,8 @@ void tulip1_state::tulip1(machine_config &config)
 	WD2793(config, m_fdc, 1000000); // unknown clock
 
 	// floppy drives
-	FLOPPY_CONNECTOR(config, "fdc:0", tulip1_floppies, "525qd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", tulip1_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", tulip1_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", tulip1_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
 }
 
 ROM_START( tulip1 )

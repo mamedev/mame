@@ -31,8 +31,8 @@ public:
 	sensorboard_device &set_max_id(u8 i) { m_maxid = i; return *this; } // maximum piece id (if larger than set_spawnpoints)
 	sensorboard_device &set_delay(attotime delay) { m_sensordelay = delay; return *this; } // delay when activating a sensor (like PORT_IMPULSE), set to attotime::never to disable
 	sensorboard_device &set_nvram_enable(bool b) { m_nvram_auto = b; return *this; } // load last board position on start
-	sensorboard_device &set_ui_enable(bool b) { if (!b) m_maxspawn = 0; m_ui_enabled = (b) ? 3 : 0; return *this; } // enable UI inputs
-	sensorboard_device &set_mod_enable(bool b) { if (b) m_ui_enabled |= 1; else m_ui_enabled &= 2; return *this; } // enable modifier keys
+	sensorboard_device &set_ui_enable(bool b) { if (!b) m_maxspawn = 0; m_ui_enabled = (b) ? 7 : 0; return *this; } // enable UI inputs
+	sensorboard_device &set_mod_enable(bool b) { if (b) m_ui_enabled |= 1; else m_ui_enabled &= ~1; return *this; } // enable modifier keys
 
 	auto init_cb() { return m_custom_init_cb.bind(); } // for setting pieces starting position
 	auto sensor_cb() { return m_custom_sensor_cb.bind(); } // x = offset & 0xf, y = offset >> 4 & 0xf
@@ -59,6 +59,7 @@ public:
 	// handle pieces
 	void cancel_hand();
 	void remove_hand();
+	int get_handpos() { return m_handpos; }
 	bool drop_piece(u8 x, u8 y);
 	bool pickup_piece(u8 x, u8 y);
 
@@ -85,9 +86,9 @@ protected:
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
-	virtual void nvram_read(emu_file &file) override;
-	virtual void nvram_write(emu_file &file) override;
-	virtual bool nvram_pre_write() override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
+	virtual bool nvram_can_write() override;
 
 private:
 	output_finder<0x10, 0x10> m_out_piece;

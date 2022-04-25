@@ -8,11 +8,13 @@
 
 *********************************************************************/
 
+#include "basicdsk.h"
+
+#include "opresolv.h"
+
 #include <cstdlib>
 #include <cstring>
 #include <cassert>
-
-#include "basicdsk.h"
 
 static floperr_t basicdsk_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen);
 static floperr_t basicdsk_write_sector(floppy_image_legacy *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam);
@@ -288,7 +290,7 @@ static floperr_t basicdsk_get_indexed_sector_info(floppy_image_legacy *floppy, i
 
 static void basicdsk_default_geometry(const struct FloppyFormat *format, struct basicdsk_geometry *geometry)
 {
-	int sector_length;
+	int sector_length = 0;
 	memset(geometry, 0, sizeof(*geometry));
 
 	auto err = util::option_resolution::get_default(format->param_guidelines, PARAM_HEADS,           &geometry->heads);

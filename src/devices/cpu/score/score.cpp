@@ -5,10 +5,15 @@
     Sunplus Technology S+core
     by Sandro Ronco
 
+    TODO:
+    - unemulated opcodes
+    - irq priority
+    - instruction cycles
+    - cache
+
 ******************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "score.h"
 #include "scoredsm.h"
 
@@ -120,7 +125,7 @@ void score7_cpu_device::device_reset()
 	memset(m_cr, 0, sizeof(m_cr));
 	memset(m_sr, 0, sizeof(m_sr));
 	memset(m_ce, 0, sizeof(m_ce));
-	memset(m_pending_interrupt, 0, sizeof(m_pending_interrupt));
+	m_pending_interrupt = 0;
 
 	REG_EXCPVEC = m_pc = 0x9f000000;
 }
@@ -174,7 +179,8 @@ void score7_cpu_device::execute_run()
 		m_ppc = m_pc;
 		debugger_instruction_hook(m_pc);
 
-		check_irq();
+		if (m_pending_interrupt)
+			check_irq();
 
 		uint32_t op = fetch();
 
@@ -201,7 +207,7 @@ void score7_cpu_device::execute_run()
 				break;
 		}
 
-		m_icount -= 3;  // FIXME: if available use correct cycles per instructions
+		m_icount -= 6;  // FIXME: if available use correct cycles per instructions
 	}
 	while (m_icount > 0);
 }
@@ -213,19 +219,11 @@ void score7_cpu_device::execute_run()
 
 void score7_cpu_device::execute_set_input(int inputnum, int state)
 {
-	switch (inputnum)
+	if (state)
 	{
-	case 0:
-		if(state)
-		{
-			int vector = standard_irq_callback(0);
-			if (vector > 0 && vector < 64)
-			{
-				if((REG_PSR & 0x01) && state)
-					m_pending_interrupt[vector] = true;
-			}
-		}
-		break;
+		standard_irq_callback(inputnum);
+		if (inputnum > 0 && inputnum < 64)
+			m_pending_interrupt |= 1ULL << inputnum;
 	}
 }
 
@@ -276,7 +274,7 @@ bool score7_cpu_device::check_condition(uint8_t bc)
 
 int32_t score7_cpu_device::sign_extend(uint32_t data, uint8_t len)
 {
-	data &= (1 << len) - 1;
+	data &= (1ULL << len) - 1;
 	uint32_t sign = 1 << (len - 1);
 	return (data ^ sign) - sign;
 }
@@ -322,9 +320,9 @@ void score7_cpu_device::check_irq()
 	{
 		for (int i=63; i>0; i--)
 		{
-			if (m_pending_interrupt[i])
+			if (m_pending_interrupt & (1ULL << i))
 			{
-				m_pending_interrupt[i] = false;
+				m_pending_interrupt &= ~(1ULL << i);
 				standard_irq_callback(i);
 				gen_exception(EXCEPTION_INTERRUPT, i);
 				return;
@@ -346,7 +344,7 @@ void score7_cpu_device::gen_exception(int cause, uint32_t param)
 	{
 		case EXCEPTION_P_EL:
 			REG_EMA = REG_EPC;
-			// intentional fallthrough
+			[[fallthrough]];
 		case EXCEPTION_NMI:
 		case EXCEPTION_CEE:
 		case EXCEPTION_SYSCALL:
@@ -1149,6 +1147,18 @@ void score7_cpu_device::op_rform1()
 		case 0x05:  // t!
 			SET_T(check_condition(rd));
 			break;
+		case 0x08:  // sll!
+			m_gpr[rd] = m_gpr[rd] << (m_gpr[ra] & 0x1f);
+			break;
+		case 0x09:  // addc!
+			m_gpr[rd] = m_gpr[rd] + m_gpr[ra] + GET_C;
+			break;
+		case 0x0a:  // srl!
+			m_gpr[rd] = m_gpr[rd] >> (m_gpr[ra] & 0x1f);
+			break;
+		case 0x0b:  // sra!
+			m_gpr[rd] = sign_extend(m_gpr[rd] >> (m_gpr[ra] & 0x1f), 32 - (m_gpr[ra] & 0x1f));
+			break;
 		case 0x0c:  // brl!
 			if (check_condition_branch(rd))
 			{
@@ -1275,7 +1285,12 @@ void score7_cpu_device::op_iform1a()
 	switch(GET_I16_FUNC3(m_op))
 	{
 		case 0x00:  // addei!
-			unemulated_op("addei!");
+			if (imm5 & 0x10)
+				m_gpr[rd] -= 1 << (imm5 & 0xf);
+			else
+				m_gpr[rd] += 1 << (imm5 & 0xf);
+
+			// condition flags are invalid after this instruction
 			break;
 		case 0x01:  // slli!
 			m_gpr[rd] <<= imm5;
@@ -1303,6 +1318,11 @@ void score7_cpu_device::op_iform1a()
 		case 0x06:  // bittst!
 			CHECK_N(m_gpr[rd]);
 			CHECK_Z(m_gpr[rd] & (1 << imm5));
+			break;
+		case 0x07:  // bittgl!
+			m_gpr[rd] ^= (1 << imm5);
+			CHECK_Z(m_gpr[rd]);
+			CHECK_N(m_gpr[rd]);
 			break;
 		default:
 			op_undef();

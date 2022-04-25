@@ -12,7 +12,7 @@
 #include "bus/generic/carts.h"
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -31,19 +31,19 @@ protected:
 	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 
 	// internal state
 	struct
 	{
-		uint32_t  count;
-		uint16_t  period;
-		uint8_t   val;
+		uint32_t  count = 0;
+		uint16_t  period = 0;
+		uint8_t   val = 0;
 	}       m_voice[4];
 
-	sound_stream    *m_sh_channel;
+	sound_stream    *m_sh_channel = nullptr;
 };
 
 DEFINE_DEVICE_TYPE(PV1000, pv1000_sound_device, "pv1000_sound", "NEC D65010G031")
@@ -60,7 +60,7 @@ pv1000_sound_device::pv1000_sound_device(const machine_config &mconfig, const ch
 
 void pv1000_sound_device::device_start()
 {
-	m_sh_channel = machine().sound().stream_alloc(*this, 0, 1, clock() / 1024);
+	m_sh_channel = stream_alloc(0, 1, clock() / 1024);
 
 	save_item(NAME(m_voice[0].count));
 	save_item(NAME(m_voice[0].period));
@@ -98,20 +98,20 @@ void pv1000_sound_device::voice_w(offs_t offset, uint8_t data)
  Note: the register periods are inverted.
  */
 
-void pv1000_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void pv1000_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *buffer = outputs[0];
+	auto &buffer = outputs[0];
 
-	while (samples > 0)
+	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 	{
-		*buffer=0;
+		s32 sum = 0;
 
 		for (int i = 0; i < 3; i++)
 		{
 			uint32_t per = (0x3f - (m_voice[i].period & 0x3f));
 
 			if (per != 0)   //OFF!
-				*buffer += m_voice[i].val * 8192;
+				sum += m_voice[i].val * 8192;
 
 			m_voice[i].count++;
 
@@ -122,8 +122,7 @@ void pv1000_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 			}
 		}
 
-		buffer++;
-		samples--;
+		buffer.put_int(sampindex, sum, 32768);
 	}
 }
 
@@ -151,17 +150,17 @@ private:
 	void io_w(offs_t offset, uint8_t data);
 	uint8_t io_r(offs_t offset);
 	void gfxram_w(offs_t offset, uint8_t data);
-	uint8_t   m_io_regs[8];
-	uint8_t   m_fd_data;
+	uint8_t   m_io_regs[8]{};
+	uint8_t   m_fd_data = 0;
 
-	emu_timer       *m_irq_on_timer;
-	emu_timer       *m_irq_off_timer;
-	uint8_t m_pcg_bank;
-	uint8_t m_force_pattern;
-	uint8_t m_fd_buffer_flag;
-	uint8_t m_border_col;
+	emu_timer       *m_irq_on_timer = nullptr;
+	emu_timer       *m_irq_off_timer = nullptr;
+	uint8_t m_pcg_bank = 0;
+	uint8_t m_force_pattern = 0;
+	uint8_t m_fd_buffer_flag = 0;
+	uint8_t m_border_col = 0;
 
-	uint8_t * m_gfxram;
+	uint8_t * m_gfxram = nullptr;
 	void pv1000_postload();
 
 	required_device<cpu_device> m_maincpu;
@@ -308,7 +307,7 @@ DEVICE_IMAGE_LOAD_MEMBER( pv1000_state::cart_load )
 
 	if (size != 0x2000 && size != 0x4000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 		return image_init_result::FAIL;
 	}
 

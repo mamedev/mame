@@ -28,7 +28,7 @@
 #include "includes/bw2.h"
 #include "bus/rs232/rs232.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 
 //**************************************************************************
@@ -309,14 +309,14 @@ static INPUT_PORTS_START( bw2 )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('@') PORT_CHAR('`')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C') PORT_CHAR(3)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3))
 
 	PORT_START("Y7")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('=')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\') PORT_CHAR('|')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
@@ -450,7 +450,7 @@ uint8_t bw2_state::ppi_pc_r()
 
 	*/
 
-	uint8_t data = 0;
+	uint8_t data = m_bank;
 
 	// centronics busy
 	data |= m_centronics_busy << 4;
@@ -459,7 +459,7 @@ uint8_t bw2_state::ppi_pc_r()
 	data |= m_mfdbk << 5;
 
 	// write protect
-	if (m_floppy) data |= m_floppy->wpt_r() << 7;
+	if (m_floppy) data |= !m_floppy->wpt_r() << 7;
 
 	return data;
 }
@@ -477,7 +477,7 @@ WRITE_LINE_MEMBER( bw2_state::mtron_w )
 }
 
 //-------------------------------------------------
-//  floppy_format_type floppy_formats
+//  floppy_formats
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( bw2_state::fdc_drq_w )
@@ -495,9 +495,11 @@ WRITE_LINE_MEMBER( bw2_state::fdc_drq_w )
 	}
 }
 
-FLOPPY_FORMATS_MEMBER( bw2_state::floppy_formats )
-	FLOPPY_BW2_FORMAT
-FLOPPY_FORMATS_END
+void bw2_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_BW2_FORMAT);
+}
 
 static void bw2_floppies(device_slot_interface &device)
 {

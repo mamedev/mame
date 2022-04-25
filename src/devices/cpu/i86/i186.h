@@ -27,8 +27,8 @@ public:
 	IRQ_CALLBACK_MEMBER(inta_callback);
 	DECLARE_WRITE_LINE_MEMBER(drq0_w) { m_dma[0].drq_state = state; }
 	DECLARE_WRITE_LINE_MEMBER(drq1_w) { m_dma[1].drq_state = state; }
-	DECLARE_WRITE_LINE_MEMBER(tmrin0_w) { if(state && (m_timer[0].control & 0x8004) == 0x8004) { inc_timer(0); } }
-	DECLARE_WRITE_LINE_MEMBER(tmrin1_w) { if(state && (m_timer[1].control & 0x8004) == 0x8004) { inc_timer(1); } }
+	DECLARE_WRITE_LINE_MEMBER(tmrin0_w) { external_tmrin(0, state); }
+	DECLARE_WRITE_LINE_MEMBER(tmrin1_w) { external_tmrin(1, state); }
 	DECLARE_WRITE_LINE_MEMBER(int0_w) { external_int(0, state); }
 	DECLARE_WRITE_LINE_MEMBER(int1_w) { external_int(1, state); }
 	DECLARE_WRITE_LINE_MEMBER(int2_w) { external_int(2, state); }
@@ -65,7 +65,7 @@ protected:
 	virtual void execute_run() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual uint32_t execute_input_lines() const noexcept override { return 1; }
 	virtual uint8_t fetch() override;
 	uint32_t update_pc() { return m_pc = (m_sregs[CS] << 4) + m_ip; }
@@ -86,13 +86,15 @@ private:
 	void update_interrupt_state();
 	void handle_eoi(int data);
 	void external_int(uint16_t intno, int state);
+	void restart_timer(int which);
 	void internal_timer_sync(int which);
 	void internal_timer_update(int which, int new_count, int new_maxA, int new_maxB, int new_control);
+	void external_tmrin(int which, int state);
 	void update_dma_control(int which, int new_control);
 	void drq_callback(int which);
 	void inc_timer(int which);
-	DECLARE_READ16_MEMBER(internal_port_r);
-	DECLARE_WRITE16_MEMBER(internal_port_w);
+	uint16_t internal_port_r(offs_t offset, uint16_t mem_mask = ~0);
+	void internal_port_w(offs_t offset, uint16_t data);
 
 	struct mem_state
 	{
@@ -108,7 +110,6 @@ private:
 		uint16_t      control;
 		uint16_t      maxA;
 		uint16_t      maxB;
-		bool        active_count;
 		uint16_t      count;
 		emu_timer   *int_timer;
 	};

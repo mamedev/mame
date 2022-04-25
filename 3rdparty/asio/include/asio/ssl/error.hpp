@@ -2,7 +2,7 @@
 // ssl/error.hpp
 // ~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -17,6 +17,7 @@
 
 #include "asio/detail/config.hpp"
 #include "asio/error_code.hpp"
+#include "asio/ssl/detail/openssl_types.hpp"
 
 #include "asio/detail/push_options.hpp"
 
@@ -31,7 +32,8 @@ enum ssl_errors
 extern ASIO_DECL
 const asio::error_category& get_ssl_category();
 
-static const asio::error_category& ssl_category
+static const asio::error_category&
+  ssl_category ASIO_UNUSED_VARIABLE
   = asio::error::get_ssl_category();
 
 } // namespace error
@@ -42,18 +44,33 @@ enum stream_errors
 {
 #if defined(GENERATING_DOCUMENTATION)
   /// The underlying stream closed before the ssl stream gracefully shut down.
-  stream_truncated
-#elif (OPENSSL_VERSION_NUMBER < 0x10100000L) && !defined(OPENSSL_IS_BORINGSSL)
-  stream_truncated = ERR_PACK(ERR_LIB_SSL, 0, SSL_R_SHORT_READ)
-#else
-  stream_truncated = 1
-#endif
+  stream_truncated,
+
+  /// The underlying SSL library returned a system error without providing
+  /// further information.
+  unspecified_system_error,
+
+  /// The underlying SSL library generated an unexpected result from a function
+  /// call.
+  unexpected_result
+#else // defined(GENERATING_DOCUMENTATION)
+# if (OPENSSL_VERSION_NUMBER < 0x10100000L) \
+    && !defined(OPENSSL_IS_BORINGSSL) \
+    && !defined(ASIO_USE_WOLFSSL)
+  stream_truncated = ERR_PACK(ERR_LIB_SSL, 0, SSL_R_SHORT_READ),
+# else
+  stream_truncated = 1,
+# endif
+  unspecified_system_error = 2,
+  unexpected_result = 3
+#endif // defined(GENERATING_DOCUMENTATION)
 };
 
 extern ASIO_DECL
 const asio::error_category& get_stream_category();
 
-static const asio::error_category& stream_category
+static const asio::error_category&
+  stream_category ASIO_UNUSED_VARIABLE
   = asio::ssl::error::get_stream_category();
 
 } // namespace error

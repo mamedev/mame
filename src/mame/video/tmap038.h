@@ -27,8 +27,8 @@ public:
 	void set_yoffs(int yoffs, int flipped_yoffs) { m_yoffs = yoffs; m_flipped_yoffs = flipped_yoffs; }
 
 	// call to do the rendering etc.
-	template<class _BitmapClass>
-	void draw_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, u32 flags, u8 pri = 0, u8 pri_mask = ~0);
+	template<class BitmapClass>
+	void draw_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, u32 flags, u8 pri = 0, u8 pri_mask = ~0);
 
 	void prepare();
 	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u32 flags, u8 pri = 0, u8 pri_mask = ~0);
@@ -54,7 +54,7 @@ public:
 	u16 vregs_r(offs_t offset) { return m_vregs[offset]; }
 	void vregs_w(offs_t offset, u16 data, u16 mem_mask = ~0) { COMBINE_DATA(&m_vregs[offset]); }
 
-	void mark_all_dirty() { m_tmap->mark_all_dirty(); };
+	void mark_all_dirty() { m_tmap->mark_all_dirty(); }
 	void set_flip(u32 attributes) { m_tmap->set_flip(attributes); }
 	void set_palette_offset(u32 offset) { m_tmap->set_palette_offset(offset); }
 	void set_scroll_rows(u32 scroll_rows) { m_tmap->set_scroll_rows(scroll_rows); }
@@ -102,7 +102,7 @@ private:
 	u16 m_gfxno;
 
 	tmap038_cb_delegate m_038_cb;
-	tilemap_t* m_tmap;
+	tilemap_t* m_tmap = nullptr;
 
 	int m_xoffs, m_flipped_xoffs;
 	int m_yoffs, m_flipped_yoffs;

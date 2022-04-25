@@ -6,6 +6,12 @@
 
     driver by Jarek Burczynski
 
+    TODO:
+    - complete MCU simulation, several gameplay elements not properly right;
+    - sprites are probably banked differently (no way to be sure until MCU dump is available)
+    - TA7630 emulation needs filter support (characteristics depend on the frequency)
+    - TA7630 volume table is hand tuned to match the sample, but still slightly off.
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -18,14 +24,6 @@
 #include "speaker.h"
 
 
-/*
-TO DO:
-  - sprites are probably banked differently (no way to be sure until MCU dump is available)
-  - TA7630 emulation needs filter support (characteristics depend on the frequency)
-  - TA7630 volume table is hand tuned to match the sample, but still slightly off.
-*/
-
-
 TIMER_CALLBACK_MEMBER(msisaac_state::nmi_callback)
 {
 	if (m_sound_nmi_enable)
@@ -34,18 +32,18 @@ TIMER_CALLBACK_MEMBER(msisaac_state::nmi_callback)
 		m_pending_nmi = 1;
 }
 
-WRITE8_MEMBER(msisaac_state::sound_command_w)
+void msisaac_state::sound_command_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(msisaac_state::nmi_callback),this), data);
 }
 
-WRITE8_MEMBER(msisaac_state::nmi_disable_w)
+void msisaac_state::nmi_disable_w(uint8_t data)
 {
 	m_sound_nmi_enable = 0;
 }
 
-WRITE8_MEMBER(msisaac_state::nmi_enable_w)
+void msisaac_state::nmi_enable_w(uint8_t data)
 {
 	m_sound_nmi_enable = 1;
 	if (m_pending_nmi)
@@ -56,18 +54,18 @@ WRITE8_MEMBER(msisaac_state::nmi_enable_w)
 }
 
 #if 0
-WRITE8_MEMBER(msisaac_state::flip_screen_w)
+void msisaac_state::flip_screen_w(uint8_t data)
 {
 	flip_screen_set(data);
 }
 
-WRITE8_MEMBER(msisaac_state::msisaac_coin_counter_w)
+void msisaac_state::msisaac_coin_counter_w(offs_t offset, uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(offset,data);
 }
 #endif
 
-WRITE8_MEMBER(msisaac_state::ms_unknown_w)
+void msisaac_state::ms_unknown_w(uint8_t data)
 {
 	if (data != 0x08)
 		popmessage("CPU #0 write to 0xf0a3 data=%2x", data);
@@ -82,7 +80,7 @@ WRITE8_MEMBER(msisaac_state::ms_unknown_w)
 
 
 
-READ8_MEMBER(msisaac_state::msisaac_mcu_r)
+uint8_t msisaac_state::msisaac_mcu_r(offs_t offset)
 {
 #ifdef USE_MCU
 	return m_bmcu->buggychl_mcu_r(offset);
@@ -154,7 +152,7 @@ MCU simulation TODO:
 #endif
 }
 
-READ8_MEMBER(msisaac_state::msisaac_mcu_status_r)
+uint8_t msisaac_state::msisaac_mcu_status_r(offs_t offset)
 {
 #ifdef USE_MCU
 	return m_bmcu->buggychl_mcu_status_r(offset);
@@ -163,7 +161,7 @@ READ8_MEMBER(msisaac_state::msisaac_mcu_status_r)
 #endif
 }
 
-WRITE8_MEMBER(msisaac_state::msisaac_mcu_w)
+void msisaac_state::msisaac_mcu_w(offs_t offset, uint8_t data)
 {
 #ifdef USE_MCU
 	m_bmcu->buggychl_mcu_w(offset,data);
@@ -214,7 +212,7 @@ void msisaac_state::msisaac_map(address_map &map)
 //  map(0xfc03, 0xfc04).w(FUNC(msisaac_state::msisaac_coin_counter_w));
 }
 
-WRITE8_MEMBER(msisaac_state::sound_control_0_w)
+void msisaac_state::sound_control_0_w(uint8_t data)
 {
 	m_snd_ctrl0 = data & 0xff;
 	//popmessage("SND0 0=%2x 1=%2x", m_snd_ctrl0, m_snd_ctrl1);
@@ -235,7 +233,7 @@ WRITE8_MEMBER(msisaac_state::sound_control_0_w)
 //  m_msm->set_output_gain(6, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group2 from msm5232 */
 //  m_msm->set_output_gain(7, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group2 from msm5232 */
 }
-WRITE8_MEMBER(msisaac_state::sound_control_1_w)
+void msisaac_state::sound_control_1_w(uint8_t data)
 {
 	m_snd_ctrl1 = data & 0xff;
 	//popmessage("SND1 0=%2x 1=%2x", m_snd_ctrl0, m_snd_ctrl1);
@@ -515,13 +513,13 @@ ROM_START( msisaac )
 	ROM_LOAD( "a34_01.bin", 0x0000, 0x4000, CRC(545e45e7) SHA1(18ddb1ec8809bb62ae1c1068cd16cd3c933bf6ba) )
 
 	ROM_REGION( 0x0800,  "cpu2", 0 )    /* 2k for the microcontroller */
-	ROM_LOAD( "a34.mcu"       , 0x0000, 0x0800, NO_DUMP )
+	ROM_LOAD( "a34_14.mcu", 0x0000, 0x0800, NO_DUMP )
 
 // I tried following MCUs; none of them work with this game:
-//  ROM_LOAD( "a30-14"    , 0x0000, 0x0800, CRC(c4690279) ) //40love
-//  ROM_LOAD( "a22-19.31",  0x0000, 0x0800, CRC(06a71df0) )     //buggy challenge
-//  ROM_LOAD( "a45-19",     0x0000, 0x0800, CRC(5378253c) )     //flstory
-//  ROM_LOAD( "a54-19",     0x0000, 0x0800, CRC(e08b8846) )     //lkage
+//  ROM_LOAD( "a30-14"    , 0x0000, 0x0800, CRC(c4690279) SHA1(60bc77e03b9be434bb97a374a2fedeb8d049a660) ) //40love
+//  ROM_LOAD( "a22-19.31",  0x0000, 0x0800, CRC(06a71df0) SHA1(28183e6769e1471e7f28dc2a9f5b54e14b7ef339) ) //buggy challenge
+//  ROM_LOAD( "a45-19",     0x0000, 0x0800, CRC(5378253c) SHA1(e1ae1ab01e470b896c1d74ad4088928602a21a1b) ) //flstory
+//  ROM_LOAD( "a54-19",     0x0000, 0x0800, CRC(0e8b8846) SHA1(a4a105462b0127229bb7edfadd2e581c7e40f1cc) ) //lkage
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
 	ROM_LOAD( "a34_02.bin", 0x0000, 0x2000, CRC(50da1a81) SHA1(8aa5a896f3e1173155d4574f5e1c2703e334cf44) )

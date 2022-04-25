@@ -9,7 +9,7 @@
 //! [noise_example]
 #include "netlist/devices/net_lib.h"
 
-// ./nltool -t 1 -l X.3 -l X.4 -n oscillator src/lib/netlist/examples/noise.cpp
+// ./nltool -t 1 -l R1.2 -n noise src/lib/netlist/examples/noise.cpp
 //  X.3 : Square out
 //  X.4 : Triangle out
 
@@ -19,7 +19,7 @@ NETLIST_START(noise)
 
 	CLOCK(nclk, 2000)
 
-	SYS_NOISE_MT_N(noise, 0.5)
+	SYS_NOISE_MT_U(noise, 2.5)
 
 	RES(R1,1000)
 	RES(R2,1000)

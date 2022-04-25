@@ -731,17 +731,6 @@ uint8_t freekick_state::snd_rom_r()
  *
  *************************************/
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
-	{ 0,1,2,3, 4,5,6,7 },
-	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 },
-	8*8
-};
-
 static const gfx_layout spritelayout =
 {
 	16,16,
@@ -758,8 +747,8 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_freekick )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x000, 32 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x100, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar,   0x000, 32 )
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       0x100, 32 )
 GFXDECODE_END
 
 /*************************************
@@ -1599,10 +1588,10 @@ void freekick_state::init_gigasb()
 
 void freekick_state::init_pbillrds()
 {
-	uint8_t *decrypted_opcodes = auto_alloc_array(machine(), uint8_t, 0x10000);
-	downcast<mc8123_device &>(*m_maincpu).decode(memregion("maincpu")->base(), decrypted_opcodes, 0x10000);
-	membank("bank0d")->set_base(decrypted_opcodes);
-	m_bank1d->configure_entries(0, 2, decrypted_opcodes + 0x8000, 0x4000);
+	m_decrypted_opcodes = std::make_unique<uint8_t[]>(0x10000);
+	downcast<mc8123_device &>(*m_maincpu).decode(memregion("maincpu")->base(), m_decrypted_opcodes.get(), 0x10000);
+	membank("bank0d")->set_base(m_decrypted_opcodes.get());
+	m_bank1d->configure_entries(0, 2, &m_decrypted_opcodes[0x8000], 0x4000);
 }
 
 
@@ -1615,10 +1604,10 @@ void freekick_state::init_pbillrdbl()
 
 void freekick_state::init_gigas()
 {
-	uint8_t *decrypted_opcodes = auto_alloc_array(machine(), uint8_t, 0xc000);
-	downcast<mc8123_device &>(*m_maincpu).decode(memregion("maincpu")->base(), decrypted_opcodes, 0xc000);
-	membank("bank0d")->set_base(decrypted_opcodes);
-	m_bank1d->set_base(decrypted_opcodes + 0x8000);
+	m_decrypted_opcodes = std::make_unique<uint8_t[]>(0xc000);
+	downcast<mc8123_device &>(*m_maincpu).decode(memregion("maincpu")->base(), m_decrypted_opcodes.get(), 0xc000);
+	membank("bank0d")->set_base(m_decrypted_opcodes.get());
+	m_bank1d->set_base(&m_decrypted_opcodes[0x8000]);
 }
 
 

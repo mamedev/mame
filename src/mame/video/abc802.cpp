@@ -127,7 +127,7 @@ MC6845_UPDATE_ROW( abc802_state::abc802_update_row )
 					int x = hbp + ((column + 3) * ABC800_CHAR_WIDTH) + bit;
 					int color = (BIT(data, 7) ^ ri) && de;
 
-					bitmap.pix32(y, x) = pen[color];
+					bitmap.pix(y, x) = pen[color];
 
 					data <<= 1;
 				}
@@ -139,8 +139,8 @@ MC6845_UPDATE_ROW( abc802_state::abc802_update_row )
 					int x = hbp + ((column + 3) * ABC800_CHAR_WIDTH) + (bit << 1);
 					int color = (BIT(data, 7) ^ ri) && de;
 
-					bitmap.pix32(y, x) = pen[color];
-					bitmap.pix32(y, x + 1) = pen[color];
+					bitmap.pix(y, x) = pen[color];
+					bitmap.pix(y, x + 1) = pen[color];
 
 					data <<= 1;
 				}
@@ -176,9 +176,6 @@ WRITE_LINE_MEMBER( abc802_state::vs_w )
 
 void abc802_state::video_start()
 {
-	// allocate memory
-	m_char_ram.allocate(m_char_ram_size);
-
 	// register for state saving
 	save_item(NAME(m_flshclk_ctr));
 	save_item(NAME(m_flshclk));

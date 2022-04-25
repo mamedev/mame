@@ -72,7 +72,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(skullxbo_state::scanline_timer)
 }
 
 
-WRITE16_MEMBER(skullxbo_state::skullxbo_halt_until_hblank_0_w)
+void skullxbo_state::skullxbo_halt_until_hblank_0_w(uint16_t data)
 {
 	halt_until_hblank_0(*m_maincpu, *m_screen);
 }
@@ -95,7 +95,7 @@ void skullxbo_state::machine_start()
  *
  *************************************/
 
-WRITE16_MEMBER(skullxbo_state::skullxbo_mobwr_w)
+void skullxbo_state::skullxbo_mobwr_w(offs_t offset, uint16_t data)
 {
 	logerror("MOBWR[%02X] = %04X\n", offset, data);
 }
@@ -272,7 +272,7 @@ void skullxbo_state::skullxbo(machine_config &config)
 	ATARI_JSA_II(config, m_jsa, 0);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
 	m_jsa->test_read_cb().set_ioport("FF5802").bit(7);
-	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_jsa->add_route(ALL_OUTPUTS, "mono", 0.8);
 }
 
 

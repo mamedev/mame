@@ -18,13 +18,15 @@
 #include "machine/mb87078.h"
 #include "machine/mb8421.h"
 
-class taito_en_device : public device_t
+class taito_en_device : public device_t, public device_mixer_interface
 
 {
 public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
 	taito_en_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	m68000_device &audiocpu() { return *m_audiocpu; }
 
 	void set_bank(int bank, int entry) { m_cpubank[bank]->set_entry(entry); }
 
@@ -36,10 +38,11 @@ protected:
 
 private:
 	void en_sound_map(address_map &map);
+	void en_otis_map(address_map &map);
 	void fc7_map(address_map &map);
 
 	// inherited devices/pointers
-	required_device<cpu_device> m_audiocpu;
+	required_device<m68000_device> m_audiocpu;
 	required_device<es5505_device> m_ensoniq;
 	required_device<es5510_device> m_esp;
 	required_device<esq_5505_5510_pump_device> m_pump;
@@ -47,11 +50,16 @@ private:
 	required_device<mb87078_device> m_mb87078;
 
 	required_shared_ptr<uint16_t> m_osram;
+	required_shared_ptr<uint16_t> m_otisbank;
+	required_region_ptr<uint16_t> m_otisrom;
 
 	required_memory_region m_osrom;
 	required_memory_bank_array<3> m_cpubank;
 
-	uint32_t m_bankmask;
+	uint32_t m_bankmask = 0;
+	uint32_t m_old_clock = ~0;
+
+	std::unique_ptr<offs_t[]> m_calculated_otisbank;
 
 	IRQ_CALLBACK_MEMBER(duart_iack);
 	void duart_output(uint8_t data);

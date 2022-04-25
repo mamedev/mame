@@ -70,26 +70,26 @@ void snk6502_state::snk6502_palette(palette_device &palette)
 	}
 }
 
-WRITE8_MEMBER(snk6502_state::videoram_w)
+void snk6502_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(snk6502_state::videoram2_w)
+void snk6502_state::videoram2_w(offs_t offset, uint8_t data)
 {
 	m_videoram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(snk6502_state::colorram_w)
+void snk6502_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(snk6502_state::charram_w)
+void snk6502_state::charram_w(offs_t offset, uint8_t data)
 {
 	if (m_charram[offset] != data)
 	{
@@ -99,7 +99,7 @@ WRITE8_MEMBER(snk6502_state::charram_w)
 }
 
 
-WRITE8_MEMBER(snk6502_state::flipscreen_w)
+void snk6502_state::flipscreen_w(uint8_t data)
 {
 	/* bits 0-2 select background color */
 
@@ -130,18 +130,18 @@ WRITE8_MEMBER(snk6502_state::flipscreen_w)
 	}
 }
 
-WRITE8_MEMBER(fantasy_state::fantasy_flipscreen_w)
+void fantasy_state::fantasy_flipscreen_w(offs_t offset, uint8_t data)
 {
 	m_sound->sound_w(offset | 0x03, data);
-	flipscreen_w(space, offset, data, mem_mask);
+	flipscreen_w(data);
 }
 
-WRITE8_MEMBER(snk6502_state::scrollx_w)
+void snk6502_state::scrollx_w(uint8_t data)
 {
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
-WRITE8_MEMBER(snk6502_state::scrolly_w)
+void snk6502_state::scrolly_w(uint8_t data)
 {
 	m_bg_tilemap->set_scrolly(0, data);
 }
@@ -242,7 +242,7 @@ void snk6502_state::satansat_palette(palette_device &palette)
 	}
 }
 
-WRITE8_MEMBER(snk6502_state::satansat_b002_w)
+void snk6502_state::satansat_b002_w(uint8_t data)
 {
 	/* bit 0 flips screen */
 
@@ -258,7 +258,7 @@ WRITE8_MEMBER(snk6502_state::satansat_b002_w)
 	/* other bits unused */
 }
 
-WRITE8_MEMBER(snk6502_state::satansat_backcolor_w)
+void snk6502_state::satansat_backcolor_w(uint8_t data)
 {
 	/* bits 0-1 select background color. Other bits unused. */
 

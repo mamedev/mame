@@ -24,7 +24,7 @@ rom 5 and 6 are prg roms
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/timer.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -52,8 +52,8 @@ protected:
 	virtual void video_start() override;
 
 private:
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_bg_2_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_bg_2_tilemap = nullptr;
 
 	required_shared_ptr<uint16_t> m_bg_videoram;
 	required_shared_ptr<uint16_t> m_bg_2_videoram;
@@ -71,7 +71,7 @@ private:
 	void fresh_attr_2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_fresh_bg_2_tile_info);
 
-	uint16_t m_d30000_value;
+	uint16_t m_d30000_value = 0;
 
 	void d30000_write(uint16_t data)
 	{
@@ -200,8 +200,8 @@ void fresh_state::fresh_map(address_map &map)
 	map(0xc40000, 0xc417ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xc50000, 0xc517ff).ram().w(m_palette, FUNC(palette_device::write16_ext)).share("palette_ext");
 
-	map(0xd00001, 0xd00001).w("ymsnd", FUNC(ym2413_device::register_port_w));
-	map(0xd10001, 0xd10001).w("ymsnd", FUNC(ym2413_device::data_port_w));
+	map(0xd00001, 0xd00001).w("ymsnd", FUNC(ym2413_device::address_w));
+	map(0xd10001, 0xd10001).w("ymsnd", FUNC(ym2413_device::data_w));
 
 	map(0xd30000, 0xd30001).w(FUNC(fresh_state::d30000_write));
 	map(0xd40000, 0xd40001).portr("IN0"); //.nopw(); // checks for 0x10

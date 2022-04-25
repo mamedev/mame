@@ -32,7 +32,7 @@ INPUT_PORTS_END
 
 void vanguardmk1_state::vanguardmk1(machine_config &config)
 {
-	mc68hc11a1_device &mcu(MC68HC11A1(config, "mcu", 8000000)); // actually MC68HC811E2, unknown clock
+	mc68hc811e2_device &mcu(MC68HC811E2(config, "mcu", 8000000)); // unknown clock
 	mcu.set_addrmap(AS_PROGRAM, &vanguardmk1_state::mcu_map);
 }
 

@@ -18,6 +18,7 @@ public:
 	auto si_callback() { return m_si.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER( reset );
+	WRITE_LINE_MEMBER( chip_select );
 	void write(uint8_t data);
 
 protected:
@@ -26,8 +27,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	TIMER_CALLBACK_MEMBER( latch_callback );
-	TIMER_CALLBACK_MEMBER( irq_clear );
+	TIMER_CALLBACK_MEMBER( write_sync );
 	TIMER_CALLBACK_MEMBER( external_clock_pulse );
 
 private:

@@ -8,8 +8,6 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/sf7000_dsk.h"
 
 sf7000_format::sf7000_format() : upd765_format(formats)
@@ -44,4 +42,4 @@ const sf7000_format::format sf7000_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_SF7000_FORMAT = &floppy_image_format_creator<sf7000_format>;
+const sf7000_format FLOPPY_SF7000_FORMAT;

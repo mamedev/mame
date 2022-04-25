@@ -378,17 +378,6 @@ static INPUT_PORTS_START( ron )
 	PORT_BIT( 0x12, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static const gfx_layout charlayout_1bpp =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	1,
-	{ RGN_FRAC(0,1) },
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	8*8
-};
-
 static const gfx_layout charlayout_2bpp =
 {
 	8,8,
@@ -401,7 +390,7 @@ static const gfx_layout charlayout_2bpp =
 };
 
 static GFXDECODE_START( gfx_ron )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout_1bpp,     0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x1,     0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout_2bpp,     4, 1 )
 GFXDECODE_END
 

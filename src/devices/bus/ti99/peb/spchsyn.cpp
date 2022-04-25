@@ -36,9 +36,9 @@
 #define VERBOSE ( LOG_CONFIG | LOG_WARN )
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_SPEECH, bus::ti99::peb, ti_speech_synthesizer_device, "ti99_speech", "TI-99 Speech synthesizer (on adapter card)")
+DEFINE_DEVICE_TYPE(TI99_SPEECH, bus::ti99::peb::ti_speech_synthesizer_device, "ti99_speech", "TI-99 Speech synthesizer (on adapter card)")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 /****************************************************************************/
 
@@ -56,7 +56,7 @@ ti_speech_synthesizer_device::ti_speech_synthesizer_device(const machine_config 
     Memory read
 */
 
-READ8Z_MEMBER( ti_speech_synthesizer_device::readz )
+void ti_speech_synthesizer_device::readz(offs_t offset, uint8_t *value)
 {
 	if (machine().side_effects_disabled()) return;
 
@@ -88,7 +88,7 @@ void ti_speech_synthesizer_device::write(offs_t offset, uint8_t data)
 	}
 }
 
-SETADDRESS_DBIN_MEMBER( ti_speech_synthesizer_device::setaddress_dbin )
+void ti_speech_synthesizer_device::setaddress_dbin(offs_t offset, int state)
 {
 	// 1001 00xx xxxx xxx0   DBIN=1
 	// 1001 01xx xxxx xxx0   DBIN=0
@@ -189,5 +189,5 @@ const tiny_rom_entry *ti_speech_synthesizer_device::device_rom_region() const
 	return ROM_NAME( ti99_speech );
 }
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb
 

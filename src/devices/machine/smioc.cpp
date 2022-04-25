@@ -129,7 +129,6 @@ void smioc_device::smioc_mem(address_map &map)
 static DEVICE_INPUT_DEFAULTS_START(terminal)
 	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_9600)
 	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_9600)
-	DEVICE_INPUT_DEFAULTS("RS232_STARTBITS", 0xff, RS232_STARTBITS_1)
 	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_7)
 	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_EVEN)
 	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)
@@ -215,8 +214,8 @@ smioc_device::smioc_device(const machine_config &mconfig, const char *tag, devic
 
 void smioc_device::device_start()
 {
-	m_dma_timer = timer_alloc(0, nullptr);
-	m_451_timer = timer_alloc(1, nullptr);
+	m_dma_timer = timer_alloc(0);
+	m_451_timer = timer_alloc(1);
 
 	/* Resolve callbacks */
 	m_m68k_r_cb.resolve_safe(0);
@@ -247,7 +246,7 @@ void smioc_device::SoftReset()
 }
 
 
-void smioc_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void smioc_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
 {
 	switch (tid)
 	{

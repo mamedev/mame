@@ -16,11 +16,14 @@
 
 ***************************************************************************/
 
+#include "jedparse.h"
+
+#include "ioprocs.h"
+
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <cctype>
-#include "jedparse.h"
 
 
 
@@ -187,52 +190,68 @@ static void process_field(jed_data *data, const uint8_t *cursrc, const uint8_t *
     loaded raw into memory
 -------------------------------------------------*/
 
-int jed_parse(const void *data, size_t length, jed_data *result)
+int jed_parse(util::random_read &src, jed_data *result)
 {
-	const auto *cursrc = (const uint8_t *)data;
-	const uint8_t *srcend = cursrc + length;
-	const uint8_t *scan;
 	jed_parse_info pinfo;
-	uint16_t checksum;
 	int i;
+	std::size_t actual;
 
 	/* initialize the output and the intermediate info struct */
 	memset(result, 0, sizeof(*result));
 	memset(&pinfo, 0, sizeof(pinfo));
 
 	/* first scan for the STX character; ignore anything prior */
-	while (cursrc < srcend && *cursrc != 0x02)
-		cursrc++;
-	if (cursrc >= srcend)
-		return JEDERR_INVALID_DATA;
+	uint8_t ch;
+	do
+	{
+		if (src.read(&ch, 1, actual) || actual != 1)
+			return JEDERR_INVALID_DATA;
+	}
+	while (ch != 0x02);
 
 	/* then scan to see if we have an ETX */
-	scan = cursrc;
-	checksum = 0;
-	while (scan < srcend && *scan != 0x03)
-		checksum += *scan++ & 0x7f;
-	if (scan >= srcend)
+	uint64_t startpos = 0;
+	uint16_t checksum = ch;
+	do
+	{
+		if (src.read(&ch, 1, actual) || actual != 1)
+			return JEDERR_INVALID_DATA;
+		checksum += ch & 0x7f;
+
+		/* mark end of comment field */
+		if (ch == '*' && startpos == 0)
+		{
+			if (src.tell(startpos))
+				return JEDERR_INVALID_DATA;
+		}
+	}
+	while (ch != 0x03);
+
+	/* the ETX becomes the real srcend */
+	uint64_t endpos;
+	if (src.tell(endpos))
 		return JEDERR_INVALID_DATA;
+	endpos--;
 
 	/* see if there is a transmission checksum at the end */
-	checksum += *scan;
-	if (scan + 4 < srcend && ishex(scan[1]) && ishex(scan[2]) && ishex(scan[3]) && ishex(scan[4]))
+	uint8_t sumbuf[4];
+	if (!src.read(&sumbuf[0], 4, actual) && actual == 4 && ishex(sumbuf[0]) && ishex(sumbuf[1]) && ishex(sumbuf[2]) && ishex(sumbuf[3]))
 	{
-		uint16_t dessum = (hexval(scan[1]) << 12) | (hexval(scan[2]) << 8) | (hexval(scan[3]) << 4) | hexval(scan[4] << 0);
+		uint16_t dessum = (hexval(sumbuf[0]) << 12) | (hexval(sumbuf[1]) << 8) | (hexval(sumbuf[2]) << 4) | hexval(sumbuf[3] << 0);
 		if (dessum != 0 && dessum != checksum)
 			return JEDERR_BAD_XMIT_SUM;
 	}
 
-	/* the ETX becomes the real srcend */
-	srcend = scan;
-
 	/* blast through the comment field */
-	cursrc++;
-	while (cursrc < srcend && *cursrc != '*')
-		cursrc++;
+	if (startpos == 0 || src.seek(startpos, SEEK_SET))
+		return JEDERR_INVALID_DATA;
+	auto srcdata = std::make_unique<uint8_t[]>(endpos - startpos);
+	if (src.read(&srcdata[0], endpos - startpos, actual) || actual != endpos - startpos)
+		return JEDERR_INVALID_DATA;
+	const uint8_t *cursrc = &srcdata[0];
+	const uint8_t *const srcend = &srcdata[endpos - startpos];
 
 	/* now loop over fields and decide which ones go in the file output */
-	cursrc++;
 	while (cursrc < srcend)
 	{
 		/* skip over delimiters */
@@ -242,7 +261,7 @@ int jed_parse(const void *data, size_t length, jed_data *result)
 			break;
 
 		/* end of field is an asterisk -- find it */
-		scan = cursrc;
+		const uint8_t *scan = cursrc;
 		while (scan < srcend && *scan != '*')
 			scan++;
 		if (scan >= srcend)
@@ -255,11 +274,13 @@ int jed_parse(const void *data, size_t length, jed_data *result)
 		cursrc = scan + 1;
 	}
 
+	srcdata.reset();
+
 	/* if we got an explicit fuse count, override our computed count */
 	if (pinfo.explicit_numfuses != 0)
 		result->numfuses = pinfo.explicit_numfuses;
 
-	/* clear out leftover bits */
+	/* clear out leftover bits g*/
 	if (result->numfuses % 8 != 0)
 		result->fusemap[result->numfuses / 8] &= (1 << (result->numfuses % 8)) - 1;
 	memset(&result->fusemap[(result->numfuses + 7) / 8], 0, sizeof(result->fusemap) - (result->numfuses + 7) / 8);
@@ -377,29 +398,26 @@ size_t jed_output(const jed_data *data, void *result, size_t length)
     has been loaded raw into memory
 -------------------------------------------------*/
 
-int jedbin_parse(const void *data, size_t length, jed_data *result)
+int jedbin_parse(util::read_stream &src, jed_data *result)
 {
-	const auto *cursrc = (const uint8_t *)data;
-
 	/* initialize the output */
 	memset(result, 0, sizeof(*result));
 
 	/* need at least 4 bytes */
-	if (length < 4)
+	uint8_t buf[4];
+	std::size_t actual;
+	if (src.read(&buf[0], 4, actual) || actual != 4)
 		return JEDERR_INVALID_DATA;
 
 	/* first unpack the number of fuses */
-	result->numfuses = (cursrc[0] << 24) | (cursrc[1] << 16) | (cursrc[2] << 8) | cursrc[3];
-	cursrc += 4;
+	result->numfuses = (buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3];
 	if (result->numfuses == 0 || result->numfuses > JED_MAX_FUSES)
 		return JEDERR_INVALID_DATA;
 
 	/* now make sure we have enough data in the source */
-	if (length < 4 + (result->numfuses + 7) / 8)
-		return JEDERR_INVALID_DATA;
-
 	/* copy in the data */
-	memcpy(result->fusemap, cursrc, (result->numfuses + 7) / 8);
+	if (src.read(result->fusemap, (result->numfuses + 7) / 8, actual) || actual != (result->numfuses + 7) / 8)
+		return JEDERR_INVALID_DATA;
 	return JEDERR_NONE;
 }
 

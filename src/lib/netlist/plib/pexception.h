@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Couriersud
 
 #ifndef PEXCEPTION_H_
@@ -39,11 +39,11 @@ namespace plib {
 	public:
 		explicit pexception(const pstring &text);
 
-		const pstring &text() const noexcept { return m_text; }
+		const putf8string &text() const noexcept { return m_text; }
 		const char* what() const noexcept override { return m_text.c_str(); }
 
 	private:
-		pstring m_text;
+		putf8string m_text;
 	};
 
 	class file_e : public plib::pexception
@@ -125,7 +125,7 @@ namespace plib {
 	private:
 		int m_last_enabled;
 
-		static bool m_enable;
+		static bool m_enable; // NOLINT
 	};
 
 

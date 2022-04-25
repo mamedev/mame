@@ -99,28 +99,28 @@ private:
 	void sub_map(address_map &map);
 	void handle_int_to_main();
 
-	u8 m_irq_mask;
-	u8 m_slot_num;
-	u8 m_kbd_row;
-	u8 m_col_border;
-	u8 m_col_cursor;
-	u8 m_col_display;
-	u8 m_centronics_busy;
-	u8 m_cass_data[4];
-	bool m_bank_sel;
-	bool m_main_irq_status;
-	bool m_sub_irq_status;
-	bool m_cassbit;
-	bool m_cassold;
+	u8 m_irq_mask = 0;
+	u8 m_slot_num = 0;
+	u8 m_kbd_row = 0;
+	u8 m_col_border = 0;
+	u8 m_col_cursor = 0;
+	u8 m_col_display = 0;
+	u8 m_centronics_busy = 0;
+	u8 m_cass_data[4]{};
+	bool m_bank_sel = false;
+	bool m_main_irq_status = false;
+	bool m_sub_irq_status = false;
+	bool m_cassbit = false;
+	bool m_cassold = false;
 
 	struct {
-		u8 id;
+		u8 id = 0;
 	}m_slot[8];
 
 	struct {
-		u8 porta;
-		u8 portb;
-		u8 portc;
+		u8 porta = 0;
+		u8 portb = 0;
+		u8 portc = 0;
 	}m_upd7801;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -137,7 +137,7 @@ private:
 MC6845_UPDATE_ROW( fp1100_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	u32 *p = &bitmap.pix32(y);
+	u32 *p = &bitmap.pix(y);
 
 	if (BIT(m_upd7801.porta, 4))
 	{ // green screen

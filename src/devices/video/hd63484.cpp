@@ -535,6 +535,8 @@ inline void hd63484_device::recompute_parameters()
 	visarea.set(hbend, hbend + (m_hdw * ppmc) - 1, m_vds, vbstart - 1);
 	attoseconds_t frame_period = screen().frame_period().attoseconds(); // TODO: use clock() to calculate the frame_period
 	screen().configure(m_hc * ppmc, m_vc, visarea, frame_period);
+	if (LOG)
+		logerror("ACRTC: full %dx%d vis (%d, %d)-(%d, %d)\n", m_hc * ppmc, m_vc, visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
 }
 
 
@@ -2107,7 +2109,7 @@ void hd63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &c
 			if (!m_display_cb.isnull())
 				m_display_cb(bitmap, cliprect, y, px, data & mask);
 			else if (cliprect.contains(px, y))
-				bitmap.pix16(y, px) = data & mask;
+				bitmap.pix(y, px) = data & mask;
 
 			data >>= bpp;
 		}

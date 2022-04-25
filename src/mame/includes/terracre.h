@@ -26,6 +26,7 @@ public:
 	{ }
 
 	void amazon_base(machine_config &config);
+	void horekidb2(machine_config &config);
 	void ym2203(machine_config &config);
 	void ym3526(machine_config &config);
 
@@ -43,17 +44,17 @@ private:
 	required_shared_ptr<uint16_t> m_bg_videoram;
 	required_shared_ptr<uint16_t> m_fg_videoram;
 
-	uint16_t m_xscroll;
-	uint16_t m_yscroll;
-	tilemap_t *m_background;
-	tilemap_t *m_foreground;
-	DECLARE_WRITE16_MEMBER(amazon_sound_w);
-	DECLARE_READ8_MEMBER(soundlatch_clear_r);
-	DECLARE_WRITE16_MEMBER(amazon_background_w);
-	DECLARE_WRITE16_MEMBER(amazon_foreground_w);
-	DECLARE_WRITE16_MEMBER(amazon_flipscreen_w);
-	DECLARE_WRITE16_MEMBER(amazon_scrolly_w);
-	DECLARE_WRITE16_MEMBER(amazon_scrollx_w);
+	uint16_t m_xscroll = 0;
+	uint16_t m_yscroll = 0;
+	tilemap_t *m_background = nullptr;
+	tilemap_t *m_foreground = nullptr;
+	void amazon_sound_w(uint16_t data);
+	uint8_t soundlatch_clear_r();
+	void amazon_background_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void amazon_foreground_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void amazon_flipscreen_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void amazon_scrolly_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void amazon_scrollx_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void video_start() override;
@@ -61,6 +62,7 @@ private:
 	uint32_t screen_update_amazon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 
+	void horekidb2_map(address_map &map);
 	void sound_2203_io_map(address_map &map);
 	void sound_3526_io_map(address_map &map);
 	void sound_map(address_map &map);

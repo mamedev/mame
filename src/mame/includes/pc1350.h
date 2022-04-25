@@ -21,7 +21,9 @@ public:
 		: pocketc_state(mconfig, type, tag)
 		, m_ram(*this, RAM_TAG)
 		, m_keys(*this, "KEY%u", 0U)
-	{ }
+	{
+		std::fill(std::begin(m_reg), std::end(m_reg), 0);
+	}
 
 	void pc1350(machine_config &config);
 
@@ -37,15 +39,15 @@ protected:
 
 	uint8_t in_a_r();
 	uint8_t in_b_r();
-	DECLARE_READ8_MEMBER(lcd_read);
-	DECLARE_WRITE8_MEMBER(lcd_write);
+	uint8_t lcd_read(offs_t offset);
+	void lcd_write(offs_t offset, uint8_t data);
 	uint8_t keyboard_line_r();
 
 private:
 	required_device<ram_device> m_ram;
 	required_ioport_array<12> m_keys;
 
-	uint8_t m_reg[0x1000];
+	uint8_t m_reg[0x1000]{};
 
 	static const char* const s_def[5];
 	static const char* const s_shift[5];

@@ -11,6 +11,8 @@
     General rule seems to be that TC0140SYT supports a YM2610,
     whereas PC060HA goes with a YM2203 or YM2151.
 
+    The PC060HA has been decapped and verified to be a ULA.
+
 **********************************************************************************************/
 
 #include "emu.h"

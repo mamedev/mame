@@ -78,7 +78,7 @@ void roland_mc50_state::mc300(machine_config &config)
 	m_wdfdc->intrq_wr_callback().set_inputline(m_mpu, Z180_INPUT_LINE_IRQ1);
 	m_wdfdc->drq_wr_callback().set_inputline(m_mpu, Z180_INPUT_LINE_DREQ0);
 
-	FLOPPY_CONNECTOR(config, m_wdfdd, mc50_floppies, "35dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_wdfdd, mc50_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats);
 }
 
 void roland_mc50_state::mc50(machine_config &config)
@@ -95,7 +95,7 @@ void roland_mc50_state::mc50(machine_config &config)
 	m_wdfdc->drq_wr_callback().set_inputline(m_mpu, Z180_INPUT_LINE_DREQ0);
 	m_wdfdc->dden_w(0);
 
-	FLOPPY_CONNECTOR(config, m_wdfdd, mc50_floppies, "35dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_wdfdd, mc50_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats);
 
 	// TODO: LCD unit (EA-D20225PX-1)
 }

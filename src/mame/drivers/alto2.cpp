@@ -11,8 +11,9 @@
 #include "sound/spkrdev.h"
 #include "emupal.h"
 #include "screen.h"
-#include "rendlay.h"
 #include "speaker.h"
+
+namespace {
 
 class alto2_state : public driver_device
 {
@@ -26,11 +27,13 @@ public:
 	{ }
 
 	void init_alto2();
-	DECLARE_MACHINE_RESET(alto2);
 
 	void alto2(machine_config &config);
 
 protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+private:
 	u16 kb_r(offs_t offset);
 	void utilout_w(u16 data);
 
@@ -40,7 +43,6 @@ protected:
 	optional_ioport m_io_config;
 	static const device_timer_id TIMER_VBLANK = 0;
 	emu_timer* m_vblank_timer;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 /* Input Ports */
@@ -304,7 +306,7 @@ void alto2_state::init_alto2()
 	m_vblank_timer->adjust(attotime::from_hz(2*30),0,attotime::from_hz(30*2));
 }
 
-void alto2_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void alto2_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	alto2_cpu_device* cpu = downcast<alto2_cpu_device *>(m_maincpu.target());
 	switch (id) {
@@ -313,6 +315,8 @@ void alto2_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		break;
 	}
 }
+
+} // Anonymous namespace
 
 /* Game Drivers */
 

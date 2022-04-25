@@ -99,10 +99,10 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
+	tilemap_t  *m_bg_tilemap = nullptr;
 
 	/* misc */
-	uint16_t m_cmd;
+	uint16_t m_cmd = 0;
 	void olibochu_videoram_w(offs_t offset, uint8_t data);
 	void olibochu_colorram_w(offs_t offset, uint8_t data);
 	void olibochu_flipscreen_w(uint8_t data);
@@ -257,7 +257,7 @@ void olibochu_state::sound_command_w(offs_t offset, uint8_t data)
 	else
 		m_cmd = (m_cmd & 0xff00) | uint16_t(data);
 
-	unsigned c = count_leading_zeros(uint32_t(m_cmd)) - 16;
+	unsigned c = count_leading_zeros_32(uint32_t(m_cmd)) - 16;
 	if (c < 16)
 		m_soundlatch->write(c);
 }

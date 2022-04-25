@@ -15,6 +15,7 @@
 #include "emu.h"
 #include "omti8621.h"
 #include "image.h"
+#include "imagedev/harddriv.h"
 #include "formats/pc_dsk.h"
 #include "formats/naslite_dsk.h"
 #include "formats/apollo_dsk.h"
@@ -47,25 +48,17 @@ static int verbose = VERBOSE;
 // forward declaration of image class
 DECLARE_DEVICE_TYPE(OMTI_DISK, omti_disk_image_device)
 
-class omti_disk_image_device :  public device_t,
-								public device_image_interface
+class omti_disk_image_device : public harddisk_image_base_device
 {
 public:
 	// construction/destruction
 	omti_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const noexcept override { return IO_HARDDISK; }
-
-	virtual bool is_readable()  const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return true; }
-	virtual bool is_creatable() const noexcept override { return true; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
-	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual bool support_command_line_image_creation() const noexcept override { return true; }
 	virtual const char *file_extensions() const noexcept override { return "awd"; }
-	virtual const char *custom_instance_name() const noexcept override { return "winchester"; }
-	virtual const char *custom_brief_instance_name() const noexcept override { return "disk"; }
+	virtual const char *image_type_name() const noexcept override { return "winchester"; }
+	virtual const char *image_brief_type_name() const noexcept override { return "disk"; }
 
 	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 
@@ -204,11 +197,12 @@ static void pc_hd_floppies(device_slot_interface &device)
 	device.option_add("35dd", FLOPPY_35_DD);
 }
 
-FLOPPY_FORMATS_MEMBER( omti8621_device::floppy_formats )
-	FLOPPY_APOLLO_FORMAT,
-	FLOPPY_PC_FORMAT,
-	FLOPPY_NASLITE_FORMAT
-FLOPPY_FORMATS_END
+void omti8621_device::floppy_formats(format_registration &fr)
+{
+	fr.add_pc_formats();
+	fr.add(FLOPPY_APOLLO_FORMAT);
+	fr.add(FLOPPY_NASLITE_FORMAT);
+}
 
 // this card has two EPROMs: a program for the on-board Z8 CPU,
 // and a PC BIOS to make the card bootable on a PC.
@@ -253,8 +247,15 @@ void omti8621_device::device_add_mconfig(machine_config &config)
 	m_fdc->intrq_wr_callback().set(FUNC(omti8621_device::fdc_irq_w));
 	m_fdc->drq_wr_callback().set(FUNC(omti8621_device::fdc_drq_w));
 	FLOPPY_CONNECTOR(config, m_floppy[0], pc_hd_floppies, "525hd", omti8621_device::floppy_formats);
-// Apollo workstations never have more then 1 floppy drive
-//  FLOPPY_CONNECTOR(config, m_floppy[1], pc_hd_floppies, nullptr, omti8621_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], pc_hd_floppies, nullptr, omti8621_device::floppy_formats);
+}
+
+void omti8621_apollo_device::device_add_mconfig(machine_config &config)
+{
+	omti8621_device::device_add_mconfig(config);
+
+	// Apollo workstations never have more then 1 floppy drive
+	config.device_remove(OMTI_FDC_TAG":1");
 }
 
 const tiny_rom_entry *omti8621_device::device_rom_region() const
@@ -288,7 +289,7 @@ void omti8621_device::device_start()
 
 	sector_buffer.resize(OMTI_DISK_SECTOR_SIZE*OMTI_MAX_BLOCK_COUNT);
 
-	m_timer = timer_alloc(0, nullptr);
+	m_timer = timer_alloc(0);
 
 	our_disks[0] = subdevice<omti_disk_image_device>(OMTI_DISK0_TAG);
 	our_disks[1] = subdevice<omti_disk_image_device>(OMTI_DISK1_TAG);
@@ -409,7 +410,7 @@ void omti8621_device::set_interrupt(enum line_state line_state)
 	m_isa->irq14_w(line_state);
 }
 
-void omti8621_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void omti8621_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	set_interrupt(ASSERT_LINE);
 }
@@ -1326,8 +1327,7 @@ void omti8621_device::fd_moten_w(uint8_t data)
 
 	m_moten = data;
 
-	if (!BIT(data, 2))
-		m_fdc->soft_reset();
+	m_fdc->reset_w(!BIT(data, 2));
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -1342,8 +1342,11 @@ void omti8621_device::fd_moten_w(uint8_t data)
 
 void omti8621_device::fd_rate_w(uint8_t data)
 {
-	// Bit 1 = FD_MINI (TODO)
-	// Bit 0 = FD_RATE (TODO)
+	// Bit 1 = FD_MINI (connects to pin 3 of FDC9239)
+	// Bit 0 = FD_RATE (inverted output connects to pin 4 of 74F163)
+	u32 fdc_clk = (48_MHz_XTAL / (BIT(data, 0) ? 5 : 3) / (BIT(data, 1) ? 4 : 2)).value();
+	m_fdc->set_unscaled_clock(fdc_clk);
+	m_fdc->set_rate(fdc_clk / 16);
 }
 
 void omti8621_device::fd_extra_w(uint8_t data)
@@ -1373,8 +1376,7 @@ uint8_t omti8621_device::fd_disk_chg_r()
 DEFINE_DEVICE_TYPE(OMTI_DISK, omti_disk_image_device, "omti_disk_image", "OMTI 8621 ESDI disk")
 
 omti_disk_image_device::omti_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, OMTI_DISK, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	: harddisk_image_base_device(mconfig, OMTI_DISK, tag, owner, clock)
 	, m_type(0), m_cylinders(0), m_heads(0), m_sectors(0), m_sectorbytes(0), m_sector_count(0), m_image(nullptr)
 {
 }
@@ -1448,9 +1450,9 @@ void omti_disk_image_device::device_reset()
 {
 	logerror("device_reset_omti_disk\n");
 
-	if (exists() && fseek(0, SEEK_END) == 0)
+	if (exists() && !fseek(0, SEEK_END))
 	{
-		uint32_t disk_size = (uint32_t)(ftell() / OMTI_DISK_SECTOR_SIZE);
+		uint32_t disk_size = uint32_t(ftell() / OMTI_DISK_SECTOR_SIZE);
 		uint16_t disk_type = disk_size >= 300000 ? OMTI_DISK_TYPE_348_MB : OMTI_DISK_TYPE_155_MB;
 		if (disk_type != m_type) {
 			logerror("device_reset_omti_disk: disk size=%d blocks, disk type=%x\n", disk_size, disk_type);
@@ -1467,12 +1469,10 @@ image_init_result omti_disk_image_device::call_create(int format_type, util::opt
 {
 	logerror("device_create_omti_disk: creating OMTI Disk with %d blocks\n", m_sector_count);
 
-	int x;
 	unsigned char sectordata[OMTI_DISK_SECTOR_SIZE]; // empty block data
-
-
 	memset(sectordata, 0x55, sizeof(sectordata));
-	for (x = 0; x < m_sector_count; x++)
+
+	for (int x = 0; x < m_sector_count; x++)
 	{
 		if (fwrite(sectordata, OMTI_DISK_SECTOR_SIZE)
 				< OMTI_DISK_SECTOR_SIZE)
@@ -1480,5 +1480,6 @@ image_init_result omti_disk_image_device::call_create(int format_type, util::opt
 			return image_init_result::FAIL;
 		}
 	}
+
 	return image_init_result::PASS;
 }

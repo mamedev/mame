@@ -30,7 +30,7 @@
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/tvc_cas.h"
@@ -76,15 +76,15 @@ protected:
 	required_device<palette_device> m_palette;
 	required_ioport_array<16> m_keyboard;
 
-	uint8_t     *m_vram_base;
-	uint8_t     m_video_mode;
-	uint8_t     m_keyline;
-	uint8_t     m_active_slot;
-	uint8_t     m_int_flipflop;
-	uint8_t     m_col[4];
-	uint8_t     m_vram_bank;
-	uint8_t     m_cassette_ff;
-	uint8_t     m_centronics_ff;
+	uint8_t     *m_vram_base = nullptr;
+	uint8_t     m_video_mode = 0;
+	uint8_t     m_keyline = 0;
+	uint8_t     m_active_slot = 0;
+	uint8_t     m_int_flipflop = 0;
+	uint8_t     m_col[4]{};
+	uint8_t     m_vram_bank = 0;
+	uint8_t     m_cassette_ff = 0;
+	uint8_t     m_centronics_ff = 0;
 
 	void bank_w(uint8_t data);
 	void palette_w(offs_t offset, uint8_t data);
@@ -575,19 +575,17 @@ void tvc_state::machine_start()
 
 	m_int_flipflop = 0;
 
-	uint8_t *ptr = static_cast<uint8_t *>(m_ram->pointer());
-	memset(&ptr[0], 0, m_ram->size());
-
-	m_bank1->space(0).install_ram(0x8000, 0xbfff, &ptr[0x0000]);
-	m_maincpu->space(AS_PROGRAM).install_ram(0x4000, 0x7fff, &ptr[0x4000]);
+	u8 *r = m_ram->pointer();
+	m_bank1->space(0).install_ram(0x8000, 0xbfff, r);
+	m_maincpu->space(AS_PROGRAM).install_ram(0x4000, 0x7fff, r+0x4000);
 	if (m_ram->size() > 0x8000)
 	{
-		m_bank3->space(0).install_ram(0x4000, 0x7fff, &ptr[0x8000]);
-		m_bank4->space(0).install_ram(0x8000, 0xbfff, &ptr[0xc000]);
+		m_bank3->space(0).install_ram(0x4000, 0x7fff, r+0x8000);
+		m_bank4->space(0).install_ram(0x8000, 0xbfff, r+0xc000);
 	}
 
 	memory_share *vram = memshare("vram");
-	if (vram != nullptr)
+	if (vram)
 		m_vram_base = static_cast<uint8_t *>(vram->ptr());
 	m_vram_bank = 0;
 
@@ -598,6 +596,15 @@ void tvc_state::machine_start()
 		m_bank1->space(0).install_rom(0x4000, 0x7fff, cart_rom->base());
 		m_bank4->space(0).install_rom(0x0000, 0x3fff, cart_rom->base());
 	}
+
+	save_item(NAME(m_video_mode));
+	save_item(NAME(m_keyline));
+	save_item(NAME(m_active_slot));
+	save_item(NAME(m_int_flipflop));
+	save_item(NAME(m_col));
+	save_item(NAME(m_vram_bank));
+	save_item(NAME(m_cassette_ff));
+	save_item(NAME(m_centronics_ff));
 }
 
 void tvc64p_state::machine_start()
@@ -628,18 +635,17 @@ void tvc64p_state::machine_reset()
 
 MC6845_UPDATE_ROW( tvc_state::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t  *p = &bitmap.pix32(y);
-	uint8_t *vram = &m_vram_base[(m_vram_bank & 0x30)<<10];
-	uint16_t offset = ((ma*4 + ra*0x40) & 0x3fff);
-	int i;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix(y);
+	uint8_t const *const vram = &m_vram_base[(m_vram_bank & 0x30)<<10];
+	uint16_t const offset = ((ma*4 + ra*0x40) & 0x3fff);
 
 	switch(m_video_mode) {
 		case 0 :
 				//  2 colors mode
-				for ( i = 0; i < x_count; i++ )
+				for ( int i = 0; i < x_count; i++ )
 				{
-					uint8_t data = vram[offset + i];
+					uint8_t const data = vram[offset + i];
 					*p++ = palette[m_col[BIT(data,7)]];
 					*p++ = palette[m_col[BIT(data,6)]];
 					*p++ = palette[m_col[BIT(data,5)]];
@@ -653,9 +659,9 @@ MC6845_UPDATE_ROW( tvc_state::crtc_update_row )
 		case 1 :
 				// 4 colors mode
 				// a0 b0 c0 d0 a1 b1 c1 d1
-				for ( i = 0; i < x_count; i++ )
+				for ( int i = 0; i < x_count; i++ )
 				{
-					uint8_t data = vram[offset + i];
+					uint8_t const data = vram[offset + i];
 					*p++ = palette[m_col[BIT(data,3)*2 + BIT(data,7)]];
 					*p++ = palette[m_col[BIT(data,3)*2 + BIT(data,7)]];
 					*p++ = palette[m_col[BIT(data,2)*2 + BIT(data,6)]];
@@ -669,11 +675,11 @@ MC6845_UPDATE_ROW( tvc_state::crtc_update_row )
 		default:
 				// 16 colors mode
 				// IIGG RRBB
-				for ( i = 0; i < x_count; i++ )
+				for ( int i = 0; i < x_count; i++ )
 				{
-					uint8_t data = vram[offset + i];
-					uint8_t col0 = ((data & 0x80)>>4) | ((data & 0x20)>>3) | ((data & 0x08)>>2) | ((data & 0x02)>>1);
-					uint8_t col1 = ((data & 0x40)>>3) | ((data & 0x10)>>2) | ((data & 0x04)>>1) | (data & 0x01);
+					uint8_t const data = vram[offset + i];
+					uint8_t const col0 = ((data & 0x80)>>4) | ((data & 0x20)>>3) | ((data & 0x08)>>2) | ((data & 0x02)>>1);
+					uint8_t const col1 = ((data & 0x40)>>3) | ((data & 0x10)>>2) | ((data & 0x04)>>1) | (data & 0x01);
 					*p++ = palette[col0];
 					*p++ = palette[col0];
 					*p++ = palette[col0];
@@ -798,7 +804,7 @@ void tvc_state::tvc(machine_config &config)
 	crtc.out_cur_callback().set(FUNC(tvc_state::int_ff_set));
 
 	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("32K");
+	RAM(config, RAM_TAG).set_default_value(0x00).set_default_size("64K").set_extra_options("32K");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

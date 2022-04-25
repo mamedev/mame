@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+copyright-holders:Patrick Mackinlay
+
+National Semiconductor DB23016.
+-->
+<mamelayout version="2">
+	<element name="led" defstate="1">
+		<disk state="1">
+			<color red="0.2" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="label_ds1"><text string="DS1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_ds2"><text string="DS2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_ds3"><text string="DS3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_ds4"><text string="DS4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+
+	<view name="Terminal">
+		<screen index="0">
+			<bounds x="0" y="0" width="640" height="240" />
+		</screen>
+
+		<element ref="label_ds1"><bounds x="540" y="240" width="20" height="10" /></element>
+		<element ref="led" name="DS1"><bounds x="545" y="250" width="10" height="10" /></element>
+		<element ref="label_ds2"><bounds x="560" y="240" width="20" height="10" /></element>
+		<element ref="led" name="DS2"><bounds x="565" y="250" width="10" height="10" /></element>
+		<element ref="label_ds3"><bounds x="580" y="240" width="20" height="10" /></element>
+		<element ref="led" name="DS3"><bounds x="585" y="250" width="10" height="10" /></element>
+		<element ref="label_ds4"><bounds x="600" y="240" width="20" height="10" /></element>
+		<element ref="led" name="DS4"><bounds x="605" y="250" width="10" height="10" /></element>
+	</view>
+</mamelayout>

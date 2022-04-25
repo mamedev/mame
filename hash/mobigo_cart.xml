@@ -21,7 +21,19 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="braveg" supported="no">
+	<software name="brave" supported="no">
+		<description>Disney/Pixar Brave (USA)</description>
+		<year>2012</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-252600(US)"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-252600 - Brave (US).bin" size="0x1000000" crc="cbf91103" sha1="39ba554528ff070e39d737233ad4b85937ccb9e8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="braveg" cloneof="brave" supported="no">
 		<description>Disney/Pixar Merida - Legende der Highlands (Germany)</description>
 		<year>2012</year>
 		<publisher>VTech</publisher>
@@ -33,7 +45,20 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="cars2g" supported="no">
+	<!-- offset 0x12 is '0x02' is this a version number? cartridge was still only marked as 80-251900(US) -->
+	<software name="cars2" supported="no">
+		<description>Disney/Pixar Cars 2 (USA, rev 2?)</description>
+		<year>2011</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-251900(US)"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="mobigo_251900_2.bin" size="0x1000000" crc="9d0da1ef" sha1="2fc4e5e4251508b391067541fcca0230b6cf5b16"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cars2g" cloneof="cars2" supported="no">
 		<description>Disney/Pixar Cars 2 (Germany)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
@@ -81,26 +106,14 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="penmad" supported="no">
-		<description>DreamWorks/Nickelodeon The Penguins of Madagascar - Mission Madness (USA)</description>
-		<year>2010</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-250300(US)"/>
-		<part name="cart" interface="mobigo_cart">
-			<dataarea name="rom" size="0x1000000">
-				<rom name="mobigo_250300_2.bin" size="0x1000000" crc="b3f0fd02" sha1="ef896a26820ea6f4f79e0c7d9debf6f23c6d10fb"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="penmadg" cloneof="penmad" supported="no">
-		<description>DreamWorks/Nickelodeon Die Pinguine aus Madagascar - Operation Krone (Germany)</description>
+	<software name="elmoabby" supported="no">
+		<description>Sesame Street - Elmo and Abby - Nature Explorers (USA)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
-		<info name="serial" value="80-250304(GER)"/>
+		<info name="serial" value="80-251400(US)"/>
 		<part name="cart" interface="mobigo_cart">
 			<dataarea name="rom" size="0x1000000">
-				<rom name="80-250304 - die pinguine aus madagascar - operation krone (ger).bin" size="0x1000000" crc="847620f3" sha1="0cc8449ba6fabb1b5dc6045171e978d25fcff1c8"/>
+				<rom name="80-251400 - Sesame Street - Elmo and Abby - Nature Explorers (US).bin" size="0x1000000" crc="73095ec6" sha1="884b7025f19b1a566d76ccac144b7be19e1e7c0d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -124,7 +137,7 @@ license:CC0
 		<info name="serial" value="80-251100(US)"/>
 		<part name="cart" interface="mobigo_cart">
 			<dataarea name="rom" size="0x1000000">
-				<rom name="mobigo_251100.bin" size="0x1000000" crc="5d9d8f5f" sha1="359ba58fe4266b31aefa8397121069ce2ec33318"/>
+				<rom name="80-251100 - Disney Princess (US).bin" size="0x1000000" crc="fd9d04fc" sha1="af9ae160faf3087eb4d3a375c484e569465d4fc4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -149,18 +162,6 @@ license:CC0
 		<part name="cart" interface="mobigo_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="80-250804 - dora - tag des zwillings (ger).bin" size="0x1000000" crc="4d38d6be" sha1="fe6ec3c4febb91f7f5d2450ce1a8a78956e2c453"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="fishrekg" supported="no">
-		<description>DreamWorks Für immer Shrek (Germany)</description>
-		<year>201?</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-250004(GER)"/>
-		<part name="cart" interface="mobigo_cart">
-			<dataarea name="rom" size="0x1000000">
-				<rom name="80-250004 - fur immer shrek (ger).bin" size="0x1000000" crc="812a3f90" sha1="1cbd4728201c76b4fb26a8523b080330515153d5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -260,6 +261,30 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="penmad" supported="no">
+		<description>DreamWorks/Nickelodeon The Penguins of Madagascar - Mission Madness (USA)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-250300(US)"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="mobigo_250300_2.bin" size="0x1000000" crc="b3f0fd02" sha1="ef896a26820ea6f4f79e0c7d9debf6f23c6d10fb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="penmadg" cloneof="penmad" supported="no">
+		<description>DreamWorks/Nickelodeon Die Pinguine aus Madagascar - Operation Krone (Germany)</description>
+		<year>2011</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-250304(GER)"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-250304 - die pinguine aus madagascar - operation krone (ger).bin" size="0x1000000" crc="847620f3" sha1="0cc8449ba6fabb1b5dc6045171e978d25fcff1c8"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="planesg" supported="no">
 		<description>Disney Planes (Germany)</description>
 		<year>2013</year>
@@ -292,6 +317,30 @@ license:CC0
 		<part name="cart" interface="mobigo_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="80-251603 - Scooby-Doo - Mystery Town (UK).bin" size="0x1000000" crc="dcc4a1ee" sha1="678e4c83bb120db028ffdd170f4bcfb3aa9d5229"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shrekfa" supported="no">
+		<description>Dreamworks Shrek - Forever After (US)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-250000(US)"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-250000 - Shrek - Forever After (US).bin" size="0x1000000" crc="c8bdb5f6" sha1="f376884717907cfd96d23085a26350bc5589bdb7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shrekfag" cloneof="shrekfa" supported="no">
+		<description>DreamWorks Für immer Shrek (Germany)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-250004(GER)"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-250004 - fur immer shrek (ger).bin" size="0x1000000" crc="812a3f90" sha1="1cbd4728201c76b4fb26a8523b080330515153d5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -379,14 +428,28 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- offset 0x12 is '0x01' is this a version number? cartridge was still only marked as 80-252700(US) -->
 	<software name="thomas" supported="no">
-		<description>Thomas &amp; Friends - Really Useful Engines (USA)</description>
+		<description>Thomas &amp; Friends - Really Useful Engines (USA, rev 1?)</description>
 		<year>2012</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-252700(US)"/>
 		<part name="cart" interface="mobigo_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="mobigo_252700.bin" size="0x1000000" crc="a5e6e828" sha1="cf33feca9ea8cf6716524546c6c10a6048eadda6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- offset 0x12 is '0x02' is this a version number? cartridge was still only marked as 80-252700(US) -->
+	<software name="thomasa" cloneof="thomas" supported="no">
+		<description>Thomas &amp; Friends - Really Useful Engines (USA, rev 2?)</description>
+		<year>2012</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-252700(US)"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="mobigo_252700_2.bin" size="0x1000000" crc="a5515438" sha1="3a9896c28479aff95d43692da2562e97f974c44d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -410,7 +473,7 @@ license:CC0
 		<info name="serial" value="80-250900(US)"/>
 		<part name="cart" interface="mobigo_cart">
 			<dataarea name="rom" size="0x1000000">
-				<rom name="mobigo_250522.bin" size="0x1000000" crc="40b659c4" sha1="8e864ed29c3e3f4d5f1904082e920e92ceeb37fd"/>
+				<rom name="mobigo_250900.bin" size="0x1000000" crc="0e26b761" sha1="a0f1ccb048990e4144801f05c143d4f38f9cbf44"/>
 			</dataarea>
 		</part>
 	</software>
@@ -472,6 +535,30 @@ license:CC0
 		<part name="cart" interface="mobigo_cart">
 			<dataarea name="rom" size="0x2000000">
 				<rom name="mobigo kiosk cartridge (ger).bin" size="0x2000000" crc="8026b80d" sha1="ded9e5dcf89f30b6011e826da466f7cd6bbd5a2d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- these have downloaded games on them, they do however appear to be tied to the machine that downloaded them, on other units they appear as blank -->
+	<software name="user1" supported="no">
+		<description>NAND User Cartridge (unknown data, set 1)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x8400000">
+				<rom name="80-201401.bin" size="0x8400000" crc="ea99f4d7" sha1="a9f8a7f05de21d971895e3385621112461a0a339"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="user2" supported="no">
+		<description>NAND User Cartridge (unknown data, set 2)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x8400000">
+				<rom name="80-201404.bin" size="0x8400000" crc="a776ff2b" sha1="a154ad9bd58d14128752236fee5385aace3717e1"/>
+				<rom name="80-201404_Console.bin" size="0x8400000" crc="ed3388f5" sha1="583d7eab0bf2a0e9bb90a28d1fdda701f0a7f32b"/>
 			</dataarea>
 		</part>
 	</software>

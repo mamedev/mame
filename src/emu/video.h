@@ -19,6 +19,8 @@
 
 #include "recording.h"
 
+#include <system_error>
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -51,19 +53,17 @@ public:
 	bool throttled() const { return m_throttled; }
 	float throttle_rate() const { return m_throttle_rate; }
 	bool fastforward() const { return m_fastforward; }
-	bool is_recording() const;
 
 	// setters
 	void set_frameskip(int frameskip);
-	void set_throttled(bool throttled = true) { m_throttled = throttled; }
+	void set_throttled(bool throttled) { m_throttled = throttled; }
 	void set_throttle_rate(float throttle_rate) { m_throttle_rate = throttle_rate; }
-	void set_fastforward(bool ffwd = true) { m_fastforward = ffwd; }
+	void set_fastforward(bool ffwd) { m_fastforward = ffwd; }
 	void set_output_changed() { m_output_changed = true; }
 
 	// misc
-	void toggle_throttle();
 	void toggle_record_movie(movie_recording::format format);
-	osd_file::error open_next(emu_file &file, const char *extension, uint32_t index = 0);
+	std::error_condition open_next(emu_file &file, const char *extension, uint32_t index = 0);
 	void compute_snapshot_size(s32 &width, s32 &height);
 	void pixels(u32 *buffer);
 
@@ -76,29 +76,21 @@ public:
 	int effective_frameskip() const;
 
 	// snapshots
-	void save_snapshot(screen_device *screen, emu_file &file);
+	bool snap_native() const { return m_snap_native; }
+	render_target &snapshot_target() { return *m_snap_target; }
+	void save_snapshot(screen_device *screen, util::core_file &file);
 	void save_active_screen_snapshots();
-	void save_input_timecode();
 
 	// movies
 	void begin_recording(const char *name, movie_recording::format format);
 	void end_recording();
 	void add_sound_to_recording(const s16 *sound, int numsamples);
-
-	void set_timecode_enabled(bool value) { m_timecode_enabled = value; }
-	bool get_timecode_enabled() { return m_timecode_enabled; }
-	bool get_timecode_write() { return m_timecode_write; }
-	void set_timecode_write(bool value) { m_timecode_write = value; }
-	void set_timecode_text(std::string &str) { m_timecode_text = str; }
-	void set_timecode_start(attotime time) { m_timecode_start = time; }
-	void add_to_total_time(attotime time) { m_timecode_total += time; }
-	std::string &timecode_text(std::string &str);
-	std::string &timecode_total_text(std::string &str);
+	bool is_recording() const { return !m_movie_recordings.empty(); }
 
 private:
 	// internal helpers
 	void exit();
-	void screenless_update_callback(void *ptr, int param);
+	void screenless_update_callback(int param);
 	void postload();
 
 	// effective value helpers
@@ -156,6 +148,7 @@ private:
 
 	// frameskipping
 	u8                  m_empty_skip_count;         // number of empty frames we have skipped
+	u8                  m_frameskip_max;            // maximum frameskip level
 	u8                  m_frameskip_level;          // current frameskip level
 	u8                  m_frameskip_counter;        // counter that counts through the frameskip steps
 	s8                  m_frameskip_adjust;
@@ -176,12 +169,6 @@ private:
 
 	static const attoseconds_t ATTOSECONDS_PER_SPEED_UPDATE = ATTOSECONDS_PER_SECOND / 4;
 	static const int PAUSED_REFRESH_RATE = 30;
-
-	bool                m_timecode_enabled;     // inp.timecode record enabled
-	bool                m_timecode_write;       // Show/hide timer at right (partial time)
-	std::string         m_timecode_text;        // Message for that video part (intro, gameplay, extra)
-	attotime            m_timecode_start;       // Starting timer for that video part (intro, gameplay, extra)
-	attotime            m_timecode_total;       // Show/hide timer at left (total elapsed on resulting video preview)
 };
 
 #endif // MAME_EMU_VIDEO_H

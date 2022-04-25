@@ -11,16 +11,19 @@
 #include "emu.h"
 #include "ui/optsmenu.h"
 
-#include "ui/ui.h"
-#include "ui/submenu.h"
-#include "ui/selector.h"
 #include "ui/custui.h"
-#include "ui/sndmenu.h"
-#include "ui/inputmap.h"
 #include "ui/dirmenu.h"
+#include "ui/inputmap.h"
+#include "ui/miscmenu.h"
+#include "ui/selector.h"
+#include "ui/sndmenu.h"
+#include "ui/submenu.h"
+#include "ui/ui.h"
 
 #include "mame.h"
 #include "mameopts.h"
+
+#include "fileio.h"
 #include "rendfont.h"
 
 
@@ -37,6 +40,7 @@ menu_simple_game_options::menu_simple_game_options(
 	: menu(mui, container)
 	, m_handler(std::move(handler))
 {
+	set_process_flags(PROCESS_LR_REPEAT);
 }
 
 //-------------------------------------------------
@@ -54,12 +58,11 @@ menu_simple_game_options::~menu_simple_game_options()
 //  handle
 //-------------------------------------------------
 
-void menu_simple_game_options::handle()
+void menu_simple_game_options::handle(event const *ev)
 {
 	// process the menu
-	event const *const menu_event(process(PROCESS_LR_REPEAT));
-	if (menu_event && menu_event->itemref)
-		handle_item_event(*menu_event);
+	if (ev && ev->itemref)
+		handle_item_event(*ev);
 }
 
 //-------------------------------------------------
@@ -68,14 +71,16 @@ void menu_simple_game_options::handle()
 
 void menu_simple_game_options::populate(float &customtop, float &custombottom)
 {
-	item_append(_(submenu::video_options[0].description), "", 0, (void *)(uintptr_t)DISPLAY_MENU);
-	item_append(_("Sound Options"), "", 0, (void *)(uintptr_t)SOUND_MENU);
-	item_append(_(submenu::misc_options[0].description), "", 0, (void *)(uintptr_t)MISC_MENU);
-	item_append(_(submenu::control_options[0].description), "", 0, (void *)(uintptr_t)CONTROLLER_MENU);
-	item_append(_("General Inputs"), "", 0, (void *)(uintptr_t)CGI_MENU);
-	item_append(_(submenu::advanced_options[0].description), "", 0, (void *)(uintptr_t)ADVANCED_MENU);
+	item_append(_(submenu::video_options()[0].description), 0, (void *)(uintptr_t)DISPLAY_MENU);
+	item_append(_("Sound Options"), 0, (void *)(uintptr_t)SOUND_MENU);
+	item_append(_(submenu::misc_options()[0].description), 0, (void *)(uintptr_t)MISC_MENU);
+	item_append(_(submenu::control_options()[0].description), 0, (void *)(uintptr_t)CONTROLLER_MENU);
+	item_append(_("General Inputs"), 0, (void *)(uintptr_t)CGI_MENU);
+	item_append(_(submenu::advanced_options()[0].description), 0, (void *)(uintptr_t)ADVANCED_MENU);
+	if (machine().options().plugins())
+		item_append(_("Plugins"), 0, (void *)(uintptr_t)PLUGINS_MENU);
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Save Configuration"), "", 0, (void *)(uintptr_t)SAVE_CONFIG);
+	item_append(_("Save Configuration"), 0, (void *)(uintptr_t)SAVE_CONFIG);
 
 	custombottom = 2.0f * ui().get_line_height() + 3.0f * ui().box_tb_border();
 	customtop = ui().get_line_height() + 3.0f * ui().box_tb_border();
@@ -92,7 +97,7 @@ void menu_simple_game_options::handle_item_event(event const &menu_event)
 	case MISC_MENU:
 		if (menu_event.iptkey == IPT_UI_SELECT)
 		{
-			menu::stack_push<submenu>(ui(), container(), submenu::misc_options);
+			menu::stack_push<submenu>(ui(), container(), submenu::misc_options());
 			ui_globals::reset = true;
 		}
 		break;
@@ -106,13 +111,13 @@ void menu_simple_game_options::handle_item_event(event const &menu_event)
 	case DISPLAY_MENU:
 		if (menu_event.iptkey == IPT_UI_SELECT)
 		{
-			menu::stack_push<submenu>(ui(), container(), submenu::video_options);
+			menu::stack_push<submenu>(ui(), container(), submenu::video_options());
 			ui_globals::reset = true;
 		}
 		break;
 	case CONTROLLER_MENU:
 		if (menu_event.iptkey == IPT_UI_SELECT)
-			menu::stack_push<submenu>(ui(), container(), submenu::control_options);
+			menu::stack_push<submenu>(ui(), container(), submenu::control_options());
 		break;
 	case CGI_MENU:
 		if (menu_event.iptkey == IPT_UI_SELECT)
@@ -121,9 +126,13 @@ void menu_simple_game_options::handle_item_event(event const &menu_event)
 	case ADVANCED_MENU:
 		if (menu_event.iptkey == IPT_UI_SELECT)
 		{
-			menu::stack_push<submenu>(ui(), container(), submenu::advanced_options);
+			menu::stack_push<submenu>(ui(), container(), submenu::advanced_options());
 			ui_globals::reset = true;
 		}
+		break;
+	case PLUGINS_MENU:
+		if (menu_event.iptkey == IPT_UI_SELECT)
+			menu::stack_push<menu_plugins_configure>(ui(), container());
 		break;
 	case SAVE_CONFIG:
 		if (menu_event.iptkey == IPT_UI_SELECT)
@@ -142,7 +151,7 @@ void menu_simple_game_options::custom_render(void *selectedref, float top, float
 	draw_text_box(
 			std::begin(toptext), std::end(toptext),
 			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
 			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 }
 
@@ -160,6 +169,7 @@ menu_game_options::menu_game_options(
 	, m_filter_data(filter_data)
 	, m_main_filter(filter_data.get_current_filter_type())
 {
+	set_process_flags(PROCESS_LR_REPEAT);
 }
 
 //-------------------------------------------------
@@ -175,13 +185,11 @@ menu_game_options::~menu_game_options()
 //  handle
 //-------------------------------------------------
 
-void menu_game_options::handle()
+void menu_game_options::handle(event const *ev)
 {
 	// process the menu
-	process_parent();
-	event const *const menu_event(process(PROCESS_LR_REPEAT | PROCESS_NOIMAGE));
-	if (menu_event && menu_event->itemref)
-		handle_item_event(*menu_event);
+	if (ev && ev->itemref)
+		handle_item_event(*ev);
 }
 
 //-------------------------------------------------
@@ -201,16 +209,15 @@ void menu_game_options::populate(float &customtop, float &custombottom)
 	// add subitem if the filter wants it
 	if (active_filter.wants_adjuster())
 	{
-		std::string name("^!");
-		convert_command_glyph(name);
+		std::string name(convert_command_glyph("^!"));
 		item_append(name, active_filter.adjust_text(), active_filter.arrow_flags(), (void *)(FILTER_ADJUST));
 	}
 
 	item_append(menu_item_type::SEPARATOR);
 
 	// add options items
-	item_append(_("Customize UI"), "", 0, (void *)(uintptr_t)CUSTOM_MENU);
-	item_append(_("Configure Directories"), "", 0, (void *)(uintptr_t)CONF_DIR);
+	item_append(_("Customize UI"), 0, (void *)(uintptr_t)CUSTOM_MENU);
+	item_append(_("Configure Directories"), 0, (void *)(uintptr_t)CONF_DIR);
 
 	// add the options that don't relate to the UI
 	menu_simple_game_options::populate(customtop, custombottom);
@@ -266,7 +273,7 @@ void menu_game_options::handle_item_event(event const &menu_event)
 						if (machine_filter::CUSTOM == filter.get_type())
 						{
 							emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-							if (file.open(util::string_format("custom_%s_filter.ini", emulator_info::get_configname())) == osd_file::error::NONE)
+							if (!file.open(util::string_format("custom_%s_filter.ini", emulator_info::get_configname())))
 							{
 								filter.save_ini(file, 0);
 								file.close();

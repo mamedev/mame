@@ -48,30 +48,42 @@ static const double unknown_game_angles[3] = {0,0.16666666, 0.33333333};
 
 
 
-void vectrex_base_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void vectrex_base_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_VECTREX_IMAGER_CHANGE_COLOR:
-		vectrex_imager_change_color(ptr, param);
+		vectrex_imager_change_color(param);
 		break;
 	case TIMER_UPDATE_LEVEL:
-		update_level(ptr, param);
+		update_level(param);
 		break;
 	case TIMER_VECTREX_IMAGER_EYE:
-		vectrex_imager_eye(ptr, param);
+		vectrex_imager_eye(param);
 		break;
 	case TIMER_LIGHTPEN_TRIGGER:
-		lightpen_trigger(ptr, param);
+		lightpen_trigger(param);
 		break;
 	case TIMER_VECTREX_REFRESH:
-		vectrex_refresh(ptr, param);
+		vectrex_refresh(param);
 		break;
 	case TIMER_VECTREX_ZERO_INTEGRATORS:
-		vectrex_zero_integrators(ptr, param);
+		vectrex_zero_integrators(param);
 		break;
-	case TIMER_UPDATE_SIGNAL:
-		update_signal(ptr, param);
+	case TIMER_UPDATE_ANALOG:
+		update_vector();
+		m_analog[param] = m_via_out[PORTA];
+		break;
+	case TIMER_UPDATE_BLANK:
+		update_vector();
+		m_blank = param;
+		break;
+	case TIMER_UPDATE_MUX_ENABLE:
+		update_vector();
+		break;
+	case TIMER_UPDATE_RAMP:
+		update_vector();
+		m_ramp = param;
 		break;
 	default:
 		fatalerror("Unknown id in vectrex_base_state::device_timer");
@@ -232,8 +244,7 @@ TIMER_CALLBACK_MEMBER(vectrex_base_state::vectrex_imager_change_color)
 
 TIMER_CALLBACK_MEMBER(vectrex_base_state::update_level)
 {
-	if (ptr)
-		* (uint8_t *) ptr = param;
+	m_imager_pinlevel = param;
 }
 
 
@@ -258,7 +269,7 @@ TIMER_CALLBACK_MEMBER(vectrex_base_state::vectrex_imager_eye)
 			m_via6522_0->write_ca1(1);
 			m_via6522_0->write_ca1(0);
 			m_imager_pinlevel |= 0x80;
-			timer_set(attotime::from_double(rtime / 360.0), TIMER_UPDATE_LEVEL, 0, &m_imager_pinlevel);
+			timer_set(attotime::from_double(rtime / 360.0), TIMER_UPDATE_LEVEL, 0);
 		}
 	}
 }

@@ -2,7 +2,18 @@
 // copyright-holders:Sandro Ronco
 /***************************************************************************
 
-    Ice Cold Beer mechanical arcade game (c) Taito 1983
+Ice Cold Beer mechanical arcade game (c) Taito 1983
+
+How to play
+1. Insert coin (it says Cr 1)
+2. Press Start
+3. Wait for Play light
+4. Press num-1 which corresponds to the first light on the top row.
+5. Continue steps 3 and 4, but pressing num-2, etc as the light advances.
+   For the last light, press num-0.
+6. To miss, press the wrong button, it says OOPS.
+7. After 3 misses, the game ends.
+
 
 ****************************************************************************/
 
@@ -73,17 +84,17 @@ private:
 	output_finder<> m_tilt_output;
 	output_finder<> m_start_output;
 
-	uint8_t   m_digit;            // scanlines from i8279
-	uint8_t   m_sound_latch;      // sound bus latch
-	uint8_t   m_ay_ctrl;          // ay controls line
-	uint8_t   m_motors_ctrl;      // motors control
-	int     m_sint;             // SINT line
-	int     m_motenbl;          // /MOTENBL line
-	int     m_ball_gate_sw;     // ball gate switch
+	uint8_t   m_digit = 0;            // scanlines from i8279
+	uint8_t   m_sound_latch = 0;      // sound bus latch
+	uint8_t   m_ay_ctrl = 0;          // ay controls line
+	uint8_t   m_motors_ctrl = 0;      // motors control
+	int     m_sint = 0;             // SINT line
+	int     m_motenbl = 0;          // /MOTENBL line
+	int     m_ball_gate_sw = 0;     // ball gate switch
 
 	// motors positions
-	int     m_rmotor;           // right motor position (0-100)
-	int     m_lmotor;           // left motor position (0-100)
+	int     m_rmotor = 0;           // right motor position (0-100)
+	int     m_lmotor = 0;           // left motor position (0-100)
 	TIMER_DEVICE_CALLBACK_MEMBER(icecold_sint_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(icecold_motors_timer);
 	void icecold_map(address_map &map);
@@ -422,6 +433,12 @@ ROM_START(icecold)
 	ROM_LOAD("icb24.bin",  0xc000, 0x2000, CRC(2d1e7282) SHA1(6f170e24f71d1504195face5f67176b55c933eef))
 ROM_END
 
+ROM_START(icecoldf)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("icb23b_f.bin", 0xe000, 0x2000, CRC(6fe73c9d) SHA1(24b60da1fc791844601bd9a7628fde195e9e9644) )
+	ROM_LOAD("icb24.bin",  0xc000, 0x2000, CRC(2d1e7282) SHA1(6f170e24f71d1504195face5f67176b55c933eef))
+ROM_END
+
 /*-------------------------------------------------------------------
 / Zeke's Peak
 /-------------------------------------------------------------------*/
@@ -432,5 +449,6 @@ ROM_START(zekepeak)
 ROM_END
 
 
-GAME( 1983, icecold,  0,       icecold, icecold, icecold_state, empty_init, ROT0, "Taito", "Ice Cold Beer", MACHINE_NOT_WORKING | MACHINE_MECHANICAL)
+GAME( 1983, icecold,  0,       icecold, icecold, icecold_state, empty_init, ROT0, "Taito", "Ice Cold Beer (set 1)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL)
+GAME( 1983, icecoldf, icecold, icecold, icecold, icecold_state, empty_init, ROT0, "Taito", "Ice Cold Beer (set 2)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL)
 GAME( 1983, zekepeak, icecold, icecold, icecold, icecold_state, empty_init, ROT0, "Taito", "Zeke's Peak",   MACHINE_NOT_WORKING | MACHINE_MECHANICAL)

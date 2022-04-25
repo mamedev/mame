@@ -9,7 +9,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "m6502.h"
 #include "m6502d.h"
 
@@ -31,7 +30,7 @@ m6502_device::m6502_device(const machine_config &mconfig, device_type type, cons
 	sync_w(*this),
 	program_config("program", ENDIANNESS_LITTLE, 8, 16),
 	sprogram_config("decrypted_opcodes", ENDIANNESS_LITTLE, 8, 16), PPC(0), NPC(0), PC(0), SP(0), TMP(0), TMP2(0), A(0), X(0), Y(0), P(0), IR(0), inst_state_base(0), mintf(nullptr),
-	inst_state(0), inst_substate(0), icount(0), nmi_state(false), irq_state(false), apu_irq_state(false), v_state(false), irq_taken(false), sync(false), inhibit_interrupts(false)
+	inst_state(0), inst_substate(0), icount(0), nmi_state(false), irq_state(false), apu_irq_state(false), v_state(false), nmi_pending(false), irq_taken(false), sync(false), inhibit_interrupts(false)
 {
 }
 
@@ -43,7 +42,7 @@ void m6502_device::device_start()
 }
 
 void m6502_device::init()
-{	
+{
 	space(AS_PROGRAM).cache(mintf->cprogram);
 	space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).cache(mintf->csprogram);
 	if(space(AS_PROGRAM).addr_width() > 14)
@@ -57,7 +56,6 @@ void m6502_device::init()
 
 	state_add(STATE_GENPC,     "GENPC",     XPC).callexport().noshow();
 	state_add(STATE_GENPCBASE, "CURPC",     XPC).callexport().noshow();
-	state_add(STATE_GENSP,     "GENSP",     SP).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  P).callimport().formatstr("%6s").noshow();
 	state_add(M6502_PC,        "PC",        NPC).callimport();
 	state_add(M6502_A,         "A",         A);
@@ -82,10 +80,11 @@ void m6502_device::init()
 	save_item(NAME(irq_state));
 	save_item(NAME(apu_irq_state));
 	save_item(NAME(v_state));
+	save_item(NAME(nmi_pending));
+	save_item(NAME(irq_taken));
 	save_item(NAME(inst_state));
 	save_item(NAME(inst_substate));
 	save_item(NAME(inst_state_base));
-	save_item(NAME(irq_taken));
 	save_item(NAME(inhibit_interrupts));
 
 	set_icountptr(icount);
@@ -103,8 +102,9 @@ void m6502_device::init()
 	nmi_state = false;
 	irq_state = false;
 	apu_irq_state = false;
-	irq_taken = false;
 	v_state = false;
+	nmi_pending = false;
+	irq_taken = false;
 	inst_state = STATE_RESET;
 	inst_substate = 0;
 	inst_state_base = 0;
@@ -118,11 +118,12 @@ void m6502_device::device_reset()
 	inst_state = STATE_RESET;
 	inst_substate = 0;
 	inst_state_base = 0;
-	nmi_state = false;
 	irq_state = false;
+	nmi_state = false;
 	apu_irq_state = false;
-	irq_taken = false;
 	v_state = false;
+	nmi_pending = false;
+	irq_taken = false;
 	sync = false;
 	sync_w(CLEAR_LINE);
 	inhibit_interrupts = false;
@@ -410,7 +411,11 @@ void m6502_device::execute_set_input(int inputnum, int state)
 	switch(inputnum) {
 	case IRQ_LINE: irq_state = state == ASSERT_LINE; break;
 	case APU_IRQ_LINE: apu_irq_state = state == ASSERT_LINE; break;
-	case NMI_LINE: nmi_state = nmi_state || (state == ASSERT_LINE); break;
+	case NMI_LINE:
+		if(!nmi_state && state == ASSERT_LINE)
+			nmi_pending = true;
+		nmi_state = state == ASSERT_LINE;
+		break;
 	case V_LINE:
 		if(!v_state && state == ASSERT_LINE)
 			P |= F_V;
@@ -484,7 +489,7 @@ void m6502_device::prefetch()
 	sync = false;
 	sync_w(CLEAR_LINE);
 
-	if((nmi_state || ((irq_state || apu_irq_state) && !(P & F_I))) && !inhibit_interrupts) {
+	if((nmi_pending || ((irq_state || apu_irq_state) && !(P & F_I))) && !inhibit_interrupts) {
 		irq_taken = true;
 		IR = 0x00;
 	} else

@@ -169,7 +169,7 @@ void asic65_device::reset_line(int state)
  *
  *************************************/
 
-void asic65_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void asic65_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

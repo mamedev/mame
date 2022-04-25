@@ -84,7 +84,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	u8 keyboard_read();
@@ -149,7 +149,7 @@ void olyboss_state::machine_reset()
 	m_timer->adjust(attotime::from_hz(30), 0, attotime::from_hz(30)); // unknown timer freq, possibly com2651 BRCLK
 }
 
-void olyboss_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void olyboss_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_timstate = !m_timstate;
 	if(m_pic)
@@ -172,7 +172,7 @@ void olyboss_state::olyboss_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x0, 0x8).rw(m_dma, FUNC(i8257_device::read), FUNC(i8257_device::write));
+	map(0x00, 0x08).rw(m_dma, FUNC(i8257_device::read), FUNC(i8257_device::write));
 	map(0x10, 0x11).m(m_fdc, FUNC(upd765a_device::map));
 	//map(0x20, 0x20) //beeper?
 	map(0x30, 0x30).rw(m_uic, FUNC(am9519_device::data_r), FUNC(am9519_device::data_w));
@@ -262,18 +262,15 @@ UPD3301_DRAW_CHARACTER_MEMBER( olyboss_state::olyboss_display_pixels )
 		data = m_vchrram[(data << 4) | lc];
 	else
 		data = m_char_rom->base()[(data << 4) | lc];
-	int i;
 
 	//if (lc >= 8) return;
 	if (csr)
-	{
 		data = 0xff;
-	}
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
-		int color = BIT(data, 7) ^ rvv;
-		bitmap.pix32(y, (sx * 8) + i) = color?0xffffff:0;
+		int color = BIT(data, 7);
+		bitmap.pix(y, (sx * 8) + i) = color ? 0xffffff : 0;
 		data <<= 1;
 	}
 }
@@ -446,7 +443,7 @@ void olyboss_state::olybossd(machine_config &config)
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set(m_uic, FUNC(am9519_device::ireq2_w)).invert();
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq0_w));
-	FLOPPY_CONNECTOR(config, m_fdd0, bosscd_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_fdd0, bosscd_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
 	m_fdd0->enable_sound(true);
 
 	I8257(config, m_dma, XTAL(4'000'000));
@@ -461,6 +458,7 @@ void olyboss_state::olybossd(machine_config &config)
 	UPD3301(config, m_crtc, XTAL(14'318'181));
 	m_crtc->set_character_width(8);
 	m_crtc->set_display_callback(FUNC(olyboss_state::olyboss_display_pixels));
+	m_crtc->set_attribute_fetch_callback(m_crtc, FUNC(upd3301_device::default_attr_fetch));
 	m_crtc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
 	m_crtc->int_wr_callback().set(m_uic, FUNC(am9519_device::ireq0_w)).invert();
 	m_crtc->set_screen(SCREEN_TAG);
@@ -478,14 +476,14 @@ void olyboss_state::olybossb(machine_config &config)
 {
 	olybossd(config);
 	config.device_remove("fdc:0");
-	FLOPPY_CONNECTOR(config, "fdc:0", bossb_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", bossb_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", bossb_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", bossb_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 
 void olyboss_state::olybossc(machine_config &config)
 {
 	olybossd(config);
-	FLOPPY_CONNECTOR(config, "fdc:1", bosscd_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", bosscd_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 
 void olyboss_state::bossb85(machine_config &config)
@@ -512,8 +510,8 @@ void olyboss_state::bossb85(machine_config &config)
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, I8085_RST65_LINE);
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq0_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", bossb_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", bossb_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", bossb_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", bossb_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	I8257(config, m_dma, XTAL(4'000'000));
 	m_dma->out_hrq_cb().set(FUNC(olyboss_state::hrq_w));
@@ -527,6 +525,7 @@ void olyboss_state::bossb85(machine_config &config)
 	UPD3301(config, m_crtc, XTAL(14'318'181));
 	m_crtc->set_character_width(8);
 	m_crtc->set_display_callback(FUNC(olyboss_state::olyboss_display_pixels));
+	m_crtc->set_attribute_fetch_callback(m_crtc, FUNC(upd3301_device::default_attr_fetch));
 	m_crtc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
 	m_crtc->int_wr_callback().set_inputline("maincpu", I8085_RST75_LINE);
 	m_crtc->set_screen(SCREEN_TAG);
@@ -539,8 +538,8 @@ void olyboss_state::bossb85(machine_config &config)
 void olyboss_state::bossa85(machine_config &config)
 {
 	bossb85(config);
-	FLOPPY_CONNECTOR(config.replace(), "fdc:0", bossa_floppies, "525ssdd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config.replace(), "fdc:1", bossa_floppies, "525ssdd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config.replace(), "fdc:0", bossa_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config.replace(), "fdc:1", bossa_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 
 //**************************************************************************

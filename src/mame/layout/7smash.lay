@@ -64,20 +64,20 @@ license:CC0
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
 
-		<bezel name="lamp0" element="start" inputtag="IN0" inputmask="0x01">
+		<element name="lamp0" ref="start" inputtag="IN0" inputmask="0x01">
 			<bounds x="0" y="3.02" width="0.55" height="0.24" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp6" element="stop1" inputtag="IN0" inputmask="0x08">
+		<element name="lamp6" ref="stop1" inputtag="IN0" inputmask="0x08">
 			<bounds x="0.65" y="3.02" width="0.55" height="0.24" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp4" element="stop2" inputtag="IN0" inputmask="0x04">
+		<element name="lamp4" ref="stop2" inputtag="IN0" inputmask="0x04">
 			<bounds x="1.30" y="3.02" width="0.55" height="0.24" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp2" element="stop3" inputtag="IN0" inputmask="0x02">
+		<element name="lamp2" ref="stop3" inputtag="IN0" inputmask="0x02">
 			<bounds x="1.95" y="3.02" width="0.55" height="0.24" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

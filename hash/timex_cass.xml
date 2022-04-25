@@ -16,7 +16,8 @@ license:CC0
 
 
     Known software without a TZX or TAP dump:
-        Geovideo 4  (198x)(Paulo Sergio Coelho)     ->  https://www.worldofspectrum.org/infoseekid.cgi?id=4000104
+        Geovideo 4  (198x)(Paulo Sergio Coelho)  ->  https://spectrumcomputing.co.uk/entry/4000104
+        Interface RS232 (Portugal)  ->  https://spectrumcomputing.co.uk/entry/25400
 
     Current bad dumps:
         Cozinheiro (198x)(TMX Portugal Ltda)
@@ -659,19 +660,6 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-
-<!--
-    <software name="intrs232p" cloneof="intrs232">
-        <description>Interface RS232 (Portugal)</description>
-        <year>198?</year>
-        <publisher>TMX Portugal Ltda</publisher>
-        <part name="cass" interface="spectrum_cass">
-            <dataarea name="cass" size="">
-                <rom name="interface rs232 (198x)(tmx portugal ltda).tzx" size="" crc="" sha1=""/>
-            </dataarea>
-        </part>
-    </software>
--->
 
 	<software name="invasore">
 		<description>Invasores Lunares</description>

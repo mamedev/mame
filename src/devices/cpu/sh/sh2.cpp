@@ -96,7 +96,6 @@
 #include "sh2.h"
 #include "sh2comn.h"
 #include "sh_dasm.h"
-#include "debugger.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -113,7 +112,7 @@ DEFINE_DEVICE_TYPE(SH2A, sh2a_device, "sh21", "Hitachi SH-2A")
     SH2 internal map
 -------------------------------------------------*/
 
-READ32_MEMBER(sh2_device::sh2_internal_a5)
+uint32_t sh2_device::sh2_internal_a5()
 {
 	return 0xa5a5a5a5;
 }
@@ -861,7 +860,6 @@ void sh2_device::sh2_exception(const char *message, int irqline)
 #include "sh2.h"
 #include "sh2comn.h"
 #include "cpu/drcumlsh.h"
-#include "debugger.h"
 
 
 const opcode_desc* sh2_device::get_desclist(offs_t pc)

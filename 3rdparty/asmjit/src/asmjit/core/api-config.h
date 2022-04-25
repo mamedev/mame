@@ -1,89 +1,139 @@
-// AsmJit - Machine code generation for C++
+// This file is part of AsmJit project <https://asmjit.com>
 //
-//  * Official AsmJit Home Page: https://asmjit.com
-//  * Official Github Repository: https://github.com/asmjit/asmjit
-//
-// Copyright (c) 2008-2020 The AsmJit Authors
-//
-// This software is provided 'as-is', without any express or implied
-// warranty. In no event will the authors be held liable for any damages
-// arising from the use of this software.
-//
-// Permission is granted to anyone to use this software for any purpose,
-// including commercial applications, and to alter it and redistribute it
-// freely, subject to the following restrictions:
-//
-// 1. The origin of this software must not be misrepresented; you must not
-//    claim that you wrote the original software. If you use this software
-//    in a product, an acknowledgment in the product documentation would be
-//    appreciated but is not required.
-// 2. Altered source versions must be plainly marked as such, and must not be
-//    misrepresented as being the original software.
-// 3. This notice may not be removed or altered from any source distribution.
+// See asmjit.h or LICENSE.md for license and copyright information
+// SPDX-License-Identifier: Zlib
 
 #ifndef ASMJIT_CORE_API_CONFIG_H_INCLUDED
 #define ASMJIT_CORE_API_CONFIG_H_INCLUDED
 
-// ============================================================================
-// [asmjit::Version]
-// ============================================================================
+// AsmJit Library & ABI Version
+// ============================
 
-#define ASMJIT_LIBRARY_VERSION 0x010200 /* 1.2.0 */
+//! \addtogroup asmjit_core
+//! \{
 
-// ============================================================================
-// [asmjit::Options]
-// ============================================================================
+//! AsmJit library version in `(Major << 16) | (Minor << 8) | (Patch)` format.
+#define ASMJIT_LIBRARY_VERSION 0x010900 /* 1.9.0 */
 
-// AsmJit Static Builds and Embedding
-// ----------------------------------
-//
-// These definitions can be used to enable static library build. Embed is used
-// when AsmJit's source code is embedded directly in another project, implies
-// static build as well.
-//
-// #define ASMJIT_EMBED              // Asmjit is embedded (implies ASMJIT_BUILD_STATIC).
-#define ASMJIT_STATIC             // Enable static-library build.
+//! \def ASMJIT_ABI_NAMESPACE
+//!
+//! AsmJit ABI namespace is an inline namespace within \ref asmjit namespace.
+//!
+//! It's used to make sure that when user links to an incompatible version of AsmJit, it won't link. It has also some
+//! additional properties as well. When `ASMJIT_ABI_NAMESPACE` is defined by the user it would override the AsmJit
+//! default, which makes it possible to use use multiple AsmJit libraries within a single project, totally controlled
+//! by the users. This is useful especially in cases in which some of such library comes from a third party.
+#ifndef ASMJIT_ABI_NAMESPACE
+  #define ASMJIT_ABI_NAMESPACE _abi_1_9
+#endif
 
-// AsmJit Build Mode
-// -----------------
-//
-// These definitions control the build mode and tracing support. The build mode
-// should be auto-detected at compile time, but it's possible to override it in
-// case that the auto-detection fails.
-//
-// Tracing is a feature that is never compiled by default and it's only used to
-// debug AsmJit itself.
-//
-// #define ASMJIT_BUILD_DEBUG        // Always use debug-mode   (ASMJIT_ASSERT enabled).
-// #define ASMJIT_BUILD_RELEASE      // Always use release-mode (ASMJIT_ASSERT disabled).
+//! \}
 
-// AsmJit Build Backends
-// ---------------------
-//
-// These definitions control which backends to compile. If none of these is
-// defined AsmJit will use host architecture by default (for JIT code generation).
-//
-// #define ASMJIT_BUILD_X86          // Enable X86 targets (X86 and X86_64).
-// #define ASMJIT_BUILD_ARM          // Enable ARM targets (ARM and AArch64).
-// #define ASMJIT_BUILD_HOST         // Enable targets based on target arch (default).
+// Global Dependencies
+// ===================
 
-// AsmJit Build Options
-// --------------------
-//
-// Flags can be defined to disable standard features. These are handy especially
-// when building AsmJit statically and some features are not needed or unwanted
-// (like BaseCompiler).
-//
-// AsmJit features are enabled by default.
-// #define ASMJIT_NO_BUILDER         // Disable Builder (completely).
-// #define ASMJIT_NO_COMPILER        // Disable Compiler (completely).
-// #define ASMJIT_NO_JIT             // Disable JIT memory manager and JitRuntime.
-// #define ASMJIT_NO_LOGGING         // Disable logging and formatting (completely).
-// #define ASMJIT_NO_TEXT            // Disable everything that contains text
-//                                   // representation (instructions, errors, ...).
-// #define ASMJIT_NO_VALIDATION      // Disable validation API and options.
-// #define ASMJIT_NO_INTROSPECTION   // Disable API related to instruction database.
-//                                   // (validation, cpu features, rw-info, etc).
+#include <stdarg.h>
+#include <stddef.h>
+#include <stdint.h> // We really want std types as globals, not under 'std' namespace.
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <iterator>
+#include <limits>
+#include <new>
+#include <type_traits>
+#include <utility>
+
+#if !defined(_WIN32) && !defined(__EMSCRIPTEN__)
+  #include <pthread.h>
+#endif
+
+// Build Options
+// =============
+
+#define ASMJIT_STATIC
+
+// NOTE: Doxygen cannot document macros that are not defined, that's why we have to define them and then undefine
+// them immediately, so it won't use the macros with its own preprocessor.
+#ifdef _DOXYGEN
+namespace asmjit {
+
+//! \addtogroup asmjit_build
+//! \{
+
+//! Asmjit is embedded, implies \ref ASMJIT_STATIC.
+#define ASMJIT_EMBED
+
+//! Enables static-library build.
+#define ASMJIT_STATIC
+
+//! Defined when AsmJit's build configuration is 'Debug'.
+//!
+//! \note Can be defined explicitly to bypass autodetection.
+#define ASMJIT_BUILD_DEBUG
+
+//! Defined when AsmJit's build configuration is 'Release'.
+//!
+//! \note Can be defined explicitly to bypass autodetection.
+#define ASMJIT_BUILD_RELEASE
+
+//! Disables X86/X64 backends.
+#define ASMJIT_NO_X86
+
+//! Disables AArch32 backends (both ARM and Thumb).
+#define ASMJIT_NO_AARCH32
+
+//! Disables AArch64 backend.
+#define ASMJIT_NO_AARCH64
+
+//! Disables non-host backends entirely (useful for JIT compilers to minimize the library size).
+#define ASMJIT_NO_FOREIGN
+
+//! Disables deprecated API at compile time (deprecated API won't be available).
+#define ASMJIT_NO_DEPRECATED
+
+//! Disables \ref asmjit_builder functionality completely.
+#define ASMJIT_NO_BUILDER
+
+//! Disables \ref asmjit_compiler functionality completely.
+#define ASMJIT_NO_COMPILER
+
+//! Disables JIT memory management and \ref asmjit::JitRuntime.
+#define ASMJIT_NO_JIT
+
+//! Disables \ref asmjit::Logger and \ref asmjit::Formatter.
+#define ASMJIT_NO_LOGGING
+
+//! Disables everything that contains text.
+#define ASMJIT_NO_TEXT
+
+//! Disables instruction validation API.
+#define ASMJIT_NO_VALIDATION
+
+//! Disables instruction introspection API.
+#define ASMJIT_NO_INTROSPECTION
+
+// Avoid doxygen preprocessor using feature-selection definitions.
+#undef ASMJIT_BUILD_EMBNED
+#undef ASMJIT_BUILD_STATIC
+#undef ASMJIT_BUILD_DEBUG
+#undef ASMJIT_BUILD_RELEASE
+#undef ASMJIT_NO_X86
+#undef ASMJIT_NO_FOREIGN
+// (keep ASMJIT_NO_DEPRECATED defined, we don't document deprecated APIs).
+#undef ASMJIT_NO_BUILDER
+#undef ASMJIT_NO_COMPILER
+#undef ASMJIT_NO_JIT
+#undef ASMJIT_NO_LOGGING
+#undef ASMJIT_NO_TEXT
+#undef ASMJIT_NO_VALIDATION
+#undef ASMJIT_NO_INTROSPECTION
+
+//! \}
+
+} // {asmjit}
+#endif // _DOXYGEN
 
 // ASMJIT_NO_BUILDER implies ASMJIT_NO_COMPILER.
 #if defined(ASMJIT_NO_BUILDER) && !defined(ASMJIT_NO_COMPILER)
@@ -92,57 +142,17 @@
 
 // Prevent compile-time errors caused by misconfiguration.
 #if defined(ASMJIT_NO_TEXT) && !defined(ASMJIT_NO_LOGGING)
-  #pragma "ASMJIT_NO_TEXT can only be defined when ASMJIT_NO_LOGGING is defined."
+  #pragma message("'ASMJIT_NO_TEXT' can only be defined when 'ASMJIT_NO_LOGGING' is defined.")
   #undef ASMJIT_NO_TEXT
 #endif
 
 #if defined(ASMJIT_NO_INTROSPECTION) && !defined(ASMJIT_NO_COMPILER)
-  #pragma message("ASMJIT_NO_INTROSPECTION can only be defined when ASMJIT_NO_COMPILER is defined")
+  #pragma message("'ASMJIT_NO_INTROSPECTION' can only be defined when 'ASMJIT_NO_COMPILER' is defined")
   #undef ASMJIT_NO_INTROSPECTION
 #endif
 
-// ============================================================================
-// [asmjit::Dependencies]
-// ============================================================================
-
-// We really want std-types as globals.
-#include <stdarg.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include <new>
-#include <limits>
-#include <type_traits>
-#include <utility>
-
-#if !defined(_WIN32) && !defined(__EMSCRIPTEN__)
-  #include <pthread.h>
-#endif
-
-// ============================================================================
-// [asmjit::Build - Globals - Deprecated]
-// ============================================================================
-
-// DEPRECATED: Will be removed in the future.
-#if defined(ASMJIT_BUILD_EMBED) || defined(ASMJIT_BUILD_STATIC)
-  #if defined(ASMJIT_BUILD_EMBED)
-    #pragma message("'ASMJIT_BUILD_EMBED' is deprecated, use 'ASMJIT_STATIC'")
-  #endif
-  #if defined(ASMJIT_BUILD_STATIC)
-    #pragma message("'ASMJIT_BUILD_STATIC' is deprecated, use 'ASMJIT_STATIC'")
-  #endif
-
-  #if !defined(ASMJIT_STATIC)
-    #define ASMJIT_STATIC
-  #endif
-#endif
-
-// ============================================================================
-// [asmjit::Build - Globals - Build Mode]
-// ============================================================================
+// Build Mode
+// ==========
 
 // Detect ASMJIT_BUILD_DEBUG and ASMJIT_BUILD_RELEASE if not defined.
 #if !defined(ASMJIT_BUILD_DEBUG) && !defined(ASMJIT_BUILD_RELEASE)
@@ -153,9 +163,8 @@
   #endif
 #endif
 
-// ============================================================================
-// [asmjit::Build - Globals - Target Architecture]
-// ============================================================================
+// Target Architecture Detection
+// =============================
 
 #if defined(_M_X64) || defined(__x86_64__)
   #define ASMJIT_ARCH_X86 64
@@ -181,7 +190,7 @@
   #define ASMJIT_ARCH_MIPS 0
 #endif
 
-#define ASMJIT_ARCH_BITS       (ASMJIT_ARCH_X86 | ASMJIT_ARCH_ARM | ASMJIT_ARCH_MIPS)
+#define ASMJIT_ARCH_BITS (ASMJIT_ARCH_X86 | ASMJIT_ARCH_ARM | ASMJIT_ARCH_MIPS)
 #if ASMJIT_ARCH_BITS == 0
   #undef ASMJIT_ARCH_BITS
   #if defined (__LP64__) || defined(_LP64)
@@ -201,40 +210,28 @@
   #define ASMJIT_ARCH_BE 0
 #endif
 
-// Build host architecture if no architecture is selected.
-#if !defined(ASMJIT_BUILD_HOST) && \
-    !defined(ASMJIT_BUILD_X86)  && \
-    !defined(ASMJIT_BUILD_ARM)
-  #define ASMJIT_BUILD_HOST
+#if defined(ASMJIT_NO_FOREIGN)
+  #if !ASMJIT_ARCH_X86 && !defined(ASMJIT_NO_X86)
+    #define ASMJIT_NO_X86
+  #endif
+
+  #if !ASMJIT_ARCH_ARM && !defined(ASMJIT_NO_AARCH64)
+    #define ASMJIT_NO_AARCH64
+  #endif
 #endif
 
-// Detect host architecture if building only for host.
-#if ASMJIT_ARCH_X86 && defined(ASMJIT_BUILD_HOST) && !defined(ASMJIT_BUILD_X86)
-  #define ASMJIT_BUILD_X86
-#endif
 
-#if ASMJIT_ARCH_ARM && defined(ASMJIT_BUILD_HOST) && !defined(ASMJIT_BUILD_ARM)
-  #define ASMJIT_BUILD_ARM
-#endif
+// C++ Compiler and Features Detection
+// ===================================
 
-// ============================================================================
-// [asmjit::Build - Globals - C++ Compiler and Features Detection]
-// ============================================================================
-
-#define ASMJIT_CXX_CLANG 0
-#define ASMJIT_CXX_GNU   0
-#define ASMJIT_CXX_INTEL 0
-#define ASMJIT_CXX_MSC   0
-#define ASMJIT_CXX_MAKE_VER(MAJOR, MINOR, PATCH) ((MAJOR) * 10000000 + (MINOR) * 100000 + (PATCH))
+#define ASMJIT_CXX_GNU 0
+#define ASMJIT_CXX_MAKE_VER(MAJOR, MINOR) ((MAJOR) * 1000 + (MINOR))
 
 // Intel Compiler [pretends to be GNU or MSC, so it must be checked first]:
 //   - https://software.intel.com/en-us/articles/c0x-features-supported-by-intel-c-compiler
 //   - https://software.intel.com/en-us/articles/c14-features-supported-by-intel-c-compiler
 //   - https://software.intel.com/en-us/articles/c17-features-supported-by-intel-c-compiler
 #if defined(__INTEL_COMPILER)
-
-  #undef ASMJIT_CXX_INTEL
-  #define ASMJIT_CXX_INTEL ASMJIT_CXX_MAKE_VER(__INTEL_COMPILER / 100, (__INTEL_COMPILER / 10) % 10, __INTEL_COMPILER % 10)
 
 // MSC Compiler:
 //   - https://msdn.microsoft.com/en-us/library/hh567368.aspx
@@ -247,75 +244,32 @@
 //   - 19.10.0 == VS2017
 #elif defined(_MSC_VER) && defined(_MSC_FULL_VER)
 
-  #undef ASMJIT_CXX_MSC
-  #if _MSC_VER == _MSC_FULL_VER / 10000
-    #define ASMJIT_CXX_MSC ASMJIT_CXX_MAKE_VER(_MSC_VER / 100, _MSC_VER % 100, _MSC_FULL_VER % 10000)
-  #else
-    #define ASMJIT_CXX_MSC ASMJIT_CXX_MAKE_VER(_MSC_VER / 100, (_MSC_FULL_VER / 100000) % 100, _MSC_FULL_VER % 100000)
-  #endif
-
 // Clang Compiler [Pretends to be GNU, so it must be checked before]:
 //   - https://clang.llvm.org/cxx_status.html
 #elif defined(__clang_major__) && defined(__clang_minor__) && defined(__clang_patchlevel__)
-
-  #undef ASMJIT_CXX_CLANG
-  #define ASMJIT_CXX_CLANG ASMJIT_CXX_MAKE_VER(__clang_major__, __clang_minor__, __clang_patchlevel__)
 
 // GNU Compiler:
 //   - https://gcc.gnu.org/projects/cxx-status.html
 #elif defined(__GNUC__) && defined(__GNUC_MINOR__) && defined(__GNUC_PATCHLEVEL__)
 
   #undef ASMJIT_CXX_GNU
-  #define ASMJIT_CXX_GNU ASMJIT_CXX_MAKE_VER(__GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__)
+  #define ASMJIT_CXX_GNU ASMJIT_CXX_MAKE_VER(__GNUC__, __GNUC_MINOR__)
 
 #endif
 
 // Compiler features detection macros.
-#if ASMJIT_CXX_CLANG && defined(__has_builtin)
-  #define ASMJIT_CXX_HAS_BUILTIN(NAME, CHECK) (__has_builtin(NAME))
-#else
-  #define ASMJIT_CXX_HAS_BUILTIN(NAME, CHECK) (!(!(CHECK)))
-#endif
-
-#if ASMJIT_CXX_CLANG && defined(__has_extension)
-  #define ASMJIT_CXX_HAS_FEATURE(NAME, CHECK) (__has_extension(NAME))
-#elif ASMJIT_CXX_CLANG && defined(__has_feature)
-  #define ASMJIT_CXX_HAS_FEATURE(NAME, CHECK) (__has_feature(NAME))
-#else
-  #define ASMJIT_CXX_HAS_FEATURE(NAME, CHECK) (!(!(CHECK)))
-#endif
-
-#if ASMJIT_CXX_CLANG && defined(__has_attribute)
+#if defined(__clang__) && defined(__has_attribute)
   #define ASMJIT_CXX_HAS_ATTRIBUTE(NAME, CHECK) (__has_attribute(NAME))
 #else
   #define ASMJIT_CXX_HAS_ATTRIBUTE(NAME, CHECK) (!(!(CHECK)))
 #endif
 
-#if ASMJIT_CXX_CLANG && defined(__has_cpp_attribute)
-  #define ASMJIT_CXX_HAS_CPP_ATTRIBUTE(NAME, CHECK) (__has_cpp_attribute(NAME))
-#else
-  #define ASMJIT_CXX_HAS_CPP_ATTRIBUTE(NAME, CHECK) (!(!(CHECK)))
-#endif
+// API Decorators & C++ Extensions
+// ===============================
 
-// Compiler features by vendor.
-#if defined(_MSC_VER) && !defined(_NATIVE_WCHAR_T_DEFINED)
-  #define ASMJIT_CXX_HAS_NATIVE_WCHAR_T 0
-#else
-  #define ASMJIT_CXX_HAS_NATIVE_WCHAR_T 1
-#endif
-
-#if ASMJIT_CXX_HAS_FEATURE(cxx_unicode_literals, ( \
-                          (ASMJIT_CXX_INTEL >= ASMJIT_CXX_MAKE_VER(14, 0, 0)) || \
-                          (ASMJIT_CXX_MSC   >= ASMJIT_CXX_MAKE_VER(19, 0, 0)) || \
-                          (ASMJIT_CXX_GNU   >= ASMJIT_CXX_MAKE_VER(4 , 5, 0) && __cplusplus >= 201103L) ))
-  #define ASMJIT_CXX_HAS_UNICODE_LITERALS 1
-#else
-  #define ASMJIT_CXX_HAS_UNICODE_LITERALS 0
-#endif
-
-// ============================================================================
-// [asmjit::Build - Globals - API Decorators & Language Extensions]
-// ============================================================================
+//! \def ASMJIT_API
+//!
+//! A decorator that is used to decorate API that AsmJit exports when built as a shared library.
 
 // API (Export / Import).
 #if !defined(ASMJIT_STATIC)
@@ -344,12 +298,12 @@
   #define ASMJIT_VARAPI extern ASMJIT_API
 #endif
 
-// This is basically a workaround. When using MSVC and marking class as DLL
-// export everything gets exported, which is unwanted in most projects. MSVC
-// automatically exports typeinfo and vtable if at least one symbol of the
-// class is exported. However, GCC has some strange behavior that even if
-// one or more symbol is exported it doesn't export typeinfo unless the
-// class itself is decorated with "visibility(default)" (i.e. ASMJIT_API).
+//! \def ASMJIT_VIRTAPI
+//!
+//! This is basically a workaround. When using MSVC and marking class as DLL export everything gets exported, which
+//! is unwanted in most projects. MSVC automatically exports typeinfo and vtable if at least one symbol of the class
+//! is exported. However, GCC has some strange behavior that even if one or more symbol is exported it doesn't export
+//! typeinfo unless the class itself is decorated with "visibility(default)" (i.e. ASMJIT_API).
 #if !defined(_WIN32) && defined(__GNUC__)
   #define ASMJIT_VIRTAPI ASMJIT_API
 #else
@@ -358,11 +312,11 @@
 
 // Function attributes.
 #if !defined(ASMJIT_BUILD_DEBUG) && defined(__GNUC__)
-  #define ASMJIT_INLINE inline __attribute__((__always_inline__))
+  #define ASMJIT_FORCE_INLINE inline __attribute__((__always_inline__))
 #elif !defined(ASMJIT_BUILD_DEBUG) && defined(_MSC_VER)
-  #define ASMJIT_INLINE __forceinline
+  #define ASMJIT_FORCE_INLINE __forceinline
 #else
-  #define ASMJIT_INLINE inline
+  #define ASMJIT_FORCE_INLINE inline
 #endif
 
 #if defined(__GNUC__)
@@ -394,6 +348,14 @@
   #define ASMJIT_REGPARM(N)
 #endif
 
+#if ASMJIT_ARCH_X86 && defined(_WIN32) && defined(_MSC_VER)
+  #define ASMJIT_VECTORCALL __vectorcall
+#elif ASMJIT_ARCH_X86 && defined(_WIN32)
+  #define ASMJIT_VECTORCALL __attribute__((__vectorcall__))
+#else
+  #define ASMJIT_VECTORCALL
+#endif
+
 // Type alignment (not allowed by C++11 'alignas' keyword).
 #if defined(__GNUC__)
   #define ASMJIT_ALIGN_TYPE(TYPE, N) __attribute__((__aligned__(N))) TYPE
@@ -403,13 +365,69 @@
   #define ASMJIT_ALIGN_TYPE(TYPE, N) TYPE
 #endif
 
+//! \def ASMJIT_MAY_ALIAS
+//!
+//! Expands to `__attribute__((__may_alias__))` if supported.
 #if defined(__GNUC__)
   #define ASMJIT_MAY_ALIAS __attribute__((__may_alias__))
 #else
   #define ASMJIT_MAY_ALIAS
 #endif
 
-// Annotations.
+//! \def ASMJIT_MAYBE_UNUSED
+//!
+//! Expands to `[[maybe_unused]]` if supported or a compiler attribute instead.
+#if __cplusplus >= 201703L
+  #define ASMJIT_MAYBE_UNUSED [[maybe_unused]]
+#elif defined(__GNUC__)
+  #define ASMJIT_MAYBE_UNUSED __attribute__((unused))
+#else
+  #define ASMJIT_MAYBE_UNUSED
+#endif
+
+#if defined(__clang_major__) && __clang_major__ >= 4 && !defined(_DOXYGEN)
+  // NOTE: Clang allows to apply this attribute to function arguments, which is what we want. Once GCC decides to
+  // support this use, we will enable it for GCC as well. However, until that, it will be clang only, which is
+  // what we need for static analysis.
+  #define ASMJIT_NONNULL(FUNCTION_ARGUMENT) FUNCTION_ARGUMENT __attribute__((__nonnull__))
+#else
+  #define ASMJIT_NONNULL(FUNCTION_ARGUMENT) FUNCTION_ARGUMENT
+#endif
+
+//! \def ASMJIT_NOEXCEPT_TYPE
+//!
+//! Defined to `noexcept` in C++17 mode or nothing otherwise. Used by function typedefs.
+#if __cplusplus >= 201703L
+  #define ASMJIT_NOEXCEPT_TYPE noexcept
+#else
+  #define ASMJIT_NOEXCEPT_TYPE
+#endif
+
+//! \def ASMJIT_ASSUME(...)
+//!
+//! Macro that tells the C/C++ compiler that the expression `...` evaluates to true.
+//!
+//! This macro has two purposes:
+//!
+//!   1. Enable optimizations that would not be possible without the assumption.
+//!   2. Hint static analysis tools that a certain condition is true to prevent false positives.
+#if defined(__clang__)
+  #define ASMJIT_ASSUME(...) __builtin_assume(__VA_ARGS__)
+#elif defined(__GNUC__)
+  #define ASMJIT_ASSUME(...) do { if (!(__VA_ARGS__)) __builtin_unreachable(); } while (0)
+#elif defined(_MSC_VER)
+  #define ASMJIT_ASSUME(...) __assume(__VA_ARGS__)
+#else
+  #define ASMJIT_ASSUME(...) (void)0
+#endif
+
+//! \def ASMJIT_LIKELY(...)
+//!
+//! Condition is likely to be taken (mostly error handling and edge cases).
+
+//! \def ASMJIT_UNLIKELY(...)
+//!
+//! Condition is unlikely to be taken (mostly error handling and edge cases).
 #if defined(__GNUC__)
   #define ASMJIT_LIKELY(...) __builtin_expect(!!(__VA_ARGS__), 1)
   #define ASMJIT_UNLIKELY(...) __builtin_expect(!!(__VA_ARGS__), 0)
@@ -418,78 +436,92 @@
   #define ASMJIT_UNLIKELY(...) (__VA_ARGS__)
 #endif
 
+//! \def ASMJIT_FALLTHROUGH
+//!
+//! Portable [[fallthrough]] attribute.
 #if defined(__clang__) && __cplusplus >= 201103L
   #define ASMJIT_FALLTHROUGH [[clang::fallthrough]]
-#elif ASMJIT_CXX_GNU >= ASMJIT_CXX_MAKE_VER(7, 0, 0)
+#elif defined(__GNUC__) && __GNUC__ >= 7
   #define ASMJIT_FALLTHROUGH __attribute__((__fallthrough__))
 #else
   #define ASMJIT_FALLTHROUGH ((void)0) /* fallthrough */
+#endif
+
+//! \def ASMJIT_DEPRECATED
+//!
+//! Marks function, class, struct, enum, or anything else as deprecated.
+#if defined(__GNUC__)
+  #define ASMJIT_DEPRECATED(MESSAGE) __attribute__((__deprecated__(MESSAGE)))
+  #if defined(__clang__)
+    #define ASMJIT_DEPRECATED_STRUCT(MESSAGE) __attribute__((__deprecated__(MESSAGE)))
+  #else
+    #define ASMJIT_DEPRECATED_STRUCT(MESSAGE) /* not usable if a deprecated function uses it */
+  #endif
+#elif defined(_MSC_VER)
+  #define ASMJIT_DEPRECATED(MESSAGE) __declspec(deprecated(MESSAGE))
+  #define ASMJIT_DEPRECATED_STRUCT(MESSAGE) /* not usable if a deprecated function uses it */
+#else
+  #define ASMJIT_DEPRECATED(MESSAGE)
+  #define ASMJIT_DEPRECATED_STRUCT(MESSAGE)
 #endif
 
 // Utilities.
 #define ASMJIT_OFFSET_OF(STRUCT, MEMBER) ((int)(intptr_t)((const char*)&((const STRUCT*)0x100)->MEMBER) - 0x100)
 #define ASMJIT_ARRAY_SIZE(X) uint32_t(sizeof(X) / sizeof(X[0]))
 
-#if ASMJIT_CXX_HAS_ATTRIBUTE(attribute_deprecated_with_message, ASMJIT_CXX_GNU >= ASMJIT_CXX_MAKE_VER(4, 5, 0))
-  #define ASMJIT_DEPRECATED(DECL, MESSAGE) DECL __attribute__((__deprecated__(MESSAGE)))
-#elif ASMJIT_CXX_MSC
-  #define ASMJIT_DEPRECATED(DECL, MESSAGE) __declspec(deprecated(MESSAGE)) DECL
-#else
-  #define ASMJIT_DEPRECATED(DECL, MESSAGE) DECL
-#endif
-
 #if ASMJIT_CXX_HAS_ATTRIBUTE(no_sanitize, 0)
   #define ASMJIT_ATTRIBUTE_NO_SANITIZE_UNDEF __attribute__((__no_sanitize__("undefined")))
-#elif ASMJIT_CXX_GNU >= ASMJIT_CXX_MAKE_VER(4, 9, 0)
+#elif ASMJIT_CXX_GNU >= ASMJIT_CXX_MAKE_VER(4, 9)
   #define ASMJIT_ATTRIBUTE_NO_SANITIZE_UNDEF __attribute__((__no_sanitize_undefined__))
 #else
   #define ASMJIT_ATTRIBUTE_NO_SANITIZE_UNDEF
 #endif
 
-// ============================================================================
-// [asmjit::Build - Globals - Begin-Namespace / End-Namespace]
-// ============================================================================
+// Begin-Namespace & End-Namespace Macros
+// ======================================
 
-#if defined(__clang__)
+#if defined _DOXYGEN
+  #define ASMJIT_BEGIN_NAMESPACE namespace asmjit {
+  #define ASMJIT_END_NAMESPACE }
+#elif defined(__clang__)
   #define ASMJIT_BEGIN_NAMESPACE                                              \
-    namespace asmjit {                                                        \
+    namespace asmjit { inline namespace ASMJIT_ABI_NAMESPACE {                \
       _Pragma("clang diagnostic push")                                        \
       _Pragma("clang diagnostic ignored \"-Wconstant-logical-operand\"")      \
       _Pragma("clang diagnostic ignored \"-Wunnamed-type-template-args\"")
   #define ASMJIT_END_NAMESPACE                                                \
       _Pragma("clang diagnostic pop")                                         \
-    }
-#elif ASMJIT_CXX_GNU >= ASMJIT_CXX_MAKE_VER(4, 0, 0) && \
-      ASMJIT_CXX_GNU <  ASMJIT_CXX_MAKE_VER(5, 0, 0)
+    }}
+#elif defined(__GNUC__) && __GNUC__ == 4
   #define ASMJIT_BEGIN_NAMESPACE                                              \
-    namespace asmjit {                                                        \
+    namespace asmjit { inline namespace ASMJIT_ABI_NAMESPACE {                \
       _Pragma("GCC diagnostic push")                                          \
       _Pragma("GCC diagnostic ignored \"-Wmissing-field-initializers\"")
   #define ASMJIT_END_NAMESPACE                                                \
       _Pragma("GCC diagnostic pop")                                           \
-    }
-#elif ASMJIT_CXX_GNU >= ASMJIT_CXX_MAKE_VER(8, 0, 0)
+    }}
+#elif defined(__GNUC__) && __GNUC__ >= 8
   #define ASMJIT_BEGIN_NAMESPACE                                              \
-    namespace asmjit {                                                        \
+    namespace asmjit { inline namespace ASMJIT_ABI_NAMESPACE {                \
       _Pragma("GCC diagnostic push")                                          \
       _Pragma("GCC diagnostic ignored \"-Wclass-memaccess\"")
   #define ASMJIT_END_NAMESPACE                                                \
       _Pragma("GCC diagnostic pop")                                           \
-    }
+    }}
 #elif defined(_MSC_VER) && !defined(__INTEL_COMPILER)
   #define ASMJIT_BEGIN_NAMESPACE                                              \
-    namespace asmjit {                                                        \
+    namespace asmjit { inline namespace ASMJIT_ABI_NAMESPACE {                \
       __pragma(warning(push))                                                 \
-      __pragma(warning(disable: 4127)) /* conditional expression is constant*/\
-      __pragma(warning(disable: 4201)) /* nameless struct/union             */
+      __pragma(warning(disable: 4127))  /* conditional expression is const */ \
+      __pragma(warning(disable: 4201))  /* nameless struct/union */
   #define ASMJIT_END_NAMESPACE                                                \
       __pragma(warning(pop))                                                  \
-    }
+    }}
 #endif
 
 #if !defined(ASMJIT_BEGIN_NAMESPACE) && !defined(ASMJIT_END_NAMESPACE)
-  #define ASMJIT_BEGIN_NAMESPACE namespace asmjit {
-  #define ASMJIT_END_NAMESPACE }
+  #define ASMJIT_BEGIN_NAMESPACE namespace asmjit { inline namespace ASMJIT_ABI_NAMESPACE {
+  #define ASMJIT_END_NAMESPACE }}
 #endif
 
 #define ASMJIT_BEGIN_SUB_NAMESPACE(NAMESPACE)                                 \
@@ -500,34 +532,84 @@
   }                                                                           \
   ASMJIT_END_NAMESPACE
 
-// ============================================================================
-// [asmjit::Build - Globals - Utilities]
-// ============================================================================
+// C++ Utilities
+// =============
 
-#define ASMJIT_NONCOPYABLE(...)                                               \
-  private:                                                                    \
-    __VA_ARGS__(const __VA_ARGS__& other) = delete;                           \
-    __VA_ARGS__& operator=(const __VA_ARGS__& other) = delete;                \
-  public:
+#define ASMJIT_NONCOPYABLE(Type)                                              \
+    Type(const Type& other) = delete;                                         \
+    Type& operator=(const Type& other) = delete;
 
-#define ASMJIT_NONCONSTRUCTIBLE(...)                                          \
-  private:                                                                    \
-    __VA_ARGS__() = delete;                                                   \
-    __VA_ARGS__(const __VA_ARGS__& other) = delete;                           \
-    __VA_ARGS__& operator=(const __VA_ARGS__& other) = delete;                \
-  public:
+#define ASMJIT_NONCONSTRUCTIBLE(Type)                                         \
+    Type() = delete;                                                          \
+    Type(const Type& other) = delete;                                         \
+    Type& operator=(const Type& other) = delete;
 
-// ============================================================================
-// [asmjit::Build - Globals - Cleanup]
-// ============================================================================
-
-// Try to cleanup things not used in other public headers.
-#ifndef ASMJIT_EXPORTS
-  #undef ASMJIT_CXX_CLANG
-  #undef ASMJIT_CXX_GNU
-  #undef ASMJIT_CXX_INTEL
-  #undef ASMJIT_CXX_MSC
-  #undef ASMJIT_CXX_MAKE_VER
+//! \def ASMJIT_DEFINE_ENUM_FLAGS(T)
+//!
+//! Defines bit operations for enumeration flags.
+#ifdef _DOXYGEN
+  #define ASMJIT_DEFINE_ENUM_FLAGS(T)
+#else
+  #define ASMJIT_DEFINE_ENUM_FLAGS(T)                                         \
+    static ASMJIT_FORCE_INLINE constexpr T operator~(T a) noexcept {          \
+      return T(~(std::underlying_type<T>::type)(a));                          \
+    }                                                                         \
+                                                                              \
+    static ASMJIT_FORCE_INLINE constexpr T operator|(T a, T b) noexcept {     \
+      return T((std::underlying_type<T>::type)(a) |                           \
+              (std::underlying_type<T>::type)(b));                            \
+    }                                                                         \
+    static ASMJIT_FORCE_INLINE constexpr T operator&(T a, T b) noexcept {     \
+      return T((std::underlying_type<T>::type)(a) &                           \
+              (std::underlying_type<T>::type)(b));                            \
+    }                                                                         \
+    static ASMJIT_FORCE_INLINE constexpr T operator^(T a, T b) noexcept {     \
+      return T((std::underlying_type<T>::type)(a) ^                           \
+              (std::underlying_type<T>::type)(b));                            \
+    }                                                                         \
+                                                                              \
+    static ASMJIT_FORCE_INLINE T& operator|=(T& a, T b) noexcept {            \
+      a = T((std::underlying_type<T>::type)(a) |                              \
+            (std::underlying_type<T>::type)(b));                              \
+      return a;                                                               \
+    }                                                                         \
+    static ASMJIT_FORCE_INLINE T& operator&=(T& a, T b) noexcept {            \
+      a = T((std::underlying_type<T>::type)(a) &                              \
+            (std::underlying_type<T>::type)(b));                              \
+      return a;                                                               \
+    }                                                                         \
+    static ASMJIT_FORCE_INLINE T& operator^=(T& a, T b) noexcept {            \
+      a = T((std::underlying_type<T>::type)(a) ^                              \
+            (std::underlying_type<T>::type)(b));                              \
+      return a;                                                               \
+    }
 #endif
+
+//! \def ASMJIT_DEFINE_ENUM_COMPARE(T)
+//!
+//! Defines comparison operations for enumeration flags.
+#ifdef _DOXYGEN
+  #define ASMJIT_DEFINE_ENUM_COMPARE(T)
+#else
+  #define ASMJIT_DEFINE_ENUM_COMPARE(T)                                                \
+    static ASMJIT_FORCE_INLINE bool operator<(T a, T b) noexcept {                     \
+      return (std::underlying_type<T>::type)(a) < (std::underlying_type<T>::type)(b);  \
+    }                                                                                  \
+    static ASMJIT_FORCE_INLINE bool operator<=(T a, T b) noexcept {                    \
+      return (std::underlying_type<T>::type)(a) <= (std::underlying_type<T>::type)(b); \
+    }                                                                                  \
+    static ASMJIT_FORCE_INLINE bool operator>(T a, T b) noexcept {                     \
+      return (std::underlying_type<T>::type)(a) > (std::underlying_type<T>::type)(b);  \
+    }                                                                                  \
+    static ASMJIT_FORCE_INLINE bool operator>=(T a, T b) noexcept {                    \
+      return (std::underlying_type<T>::type)(a) >= (std::underlying_type<T>::type)(b); \
+    }
+#endif
+
+// Cleanup Api-Config Specific Macros
+// ==================================
+
+#undef ASMJIT_CXX_GNU
+#undef ASMJIT_CXX_MAKE_VER
 
 #endif // ASMJIT_CORE_API_CONFIG_H_INCLUDED

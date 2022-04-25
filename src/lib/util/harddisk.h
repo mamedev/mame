@@ -8,45 +8,48 @@
 
 ***************************************************************************/
 
-#ifndef MAME_UTIL_HARDDISK_H
-#define MAME_UTIL_HARDDISK_H
+#ifndef MAME_LIB_UTIL_HARDDISK_H
+#define MAME_LIB_UTIL_HARDDISK_H
 
 #pragma once
 
-#include "osdcore.h"
 #include "chd.h"
+#include "utilfwd.h"
+
+#include "osdcore.h"
 
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+class hard_disk_file {
+public:
+	struct info
+	{
+		uint32_t          cylinders;
+		uint32_t          heads;
+		uint32_t          sectors;
+		uint32_t          sectorbytes;
+	};
 
-struct hard_disk_file;
+	hard_disk_file(chd_file *chd);
+	hard_disk_file(util::random_read_write &corefile, uint32_t skipoffs);
 
-struct hard_disk_info
-{
-	uint32_t          cylinders;
-	uint32_t          heads;
-	uint32_t          sectors;
-	uint32_t          sectorbytes;
-	uint32_t          fileoffset;       // offset in the file where the HDD image starts.  not valid for CHDs.
+	~hard_disk_file();
+
+	const info &get_info() const { return hdinfo; }
+
+	bool set_block_size(uint32_t blocksize);
+
+	bool read(uint32_t lbasector, void *buffer);
+	bool write(uint32_t lbasector, const void *buffer);
+
+	std::error_condition get_inquiry_data(std::vector<uint8_t> &data) const;
+	std::error_condition get_cis_data(std::vector<uint8_t> &data) const;
+	std::error_condition get_disk_key_data(std::vector<uint8_t> &data) const;
+
+private:
+	chd_file *                  chd;        // CHD file
+	util::random_read_write *   fhandle;    // file if not a CHD
+	info                        hdinfo;     // hard disk info
+	uint32_t                    fileoffset; // offset in the file where the HDD image starts.  not valid for CHDs.
 };
 
-
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-hard_disk_file *hard_disk_open(chd_file *chd);
-hard_disk_file *hard_disk_open(util::core_file &corefile, uint32_t skipoffs);
-
-void hard_disk_close(hard_disk_file *file);
-
-chd_file *hard_disk_get_chd(hard_disk_file *file);
-hard_disk_info *hard_disk_get_info(hard_disk_file *file);
-
-uint32_t hard_disk_read(hard_disk_file *file, uint32_t lbasector, void *buffer);
-uint32_t hard_disk_write(hard_disk_file *file, uint32_t lbasector, const void *buffer);
-
-#endif // MAME_UTIL_HARDDISK_H
+#endif // MAME_LIB_UTIL_HARDDISK_H

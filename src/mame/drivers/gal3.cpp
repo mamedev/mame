@@ -132,7 +132,7 @@ better notes (complete chip lists) for each board still needed
 #include "cpu/tms32025/tms32025.h"
 #include "machine/nvram.h"
 #include "sound/c140.h"
-#include "rendlay.h"
+#include "layout/generic.h"
 #include "speaker.h"
 #include "video/namco_c355spr.h"
 #include "machine/namcos21_dsp_c67.h"
@@ -170,8 +170,8 @@ private:
 	required_device_array<namcos21_3d_device, 2> m_namcos21_3d;
 	required_device_array<namcos21_dsp_c67_device, 2> m_namcos21_dsp_c67;
 
-	uint32_t m_led_mst;
-	uint32_t m_led_slv;
+	uint32_t m_led_mst = 0;
+	uint32_t m_led_slv = 0;
 
 	uint32_t led_mst_r();
 	void led_mst_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -208,7 +208,8 @@ uint32_t gal3_state::screen_update_left(screen_device &screen, bitmap_ind16 &bit
 {
 	bitmap.fill(0xff, cliprect); // TODO : actually laserdisc layer
 	screen.priority().fill(0, cliprect);
-	m_c355spr[0]->get_sprites(cliprect); // TODO : buffered?
+
+	m_c355spr[0]->build_sprite_list_and_render_sprites(cliprect); // TODO : buffered?
 
 	int i;
 	char mst[18], slv[18];
@@ -262,7 +263,7 @@ uint32_t gal3_state::screen_update_right(screen_device &screen, bitmap_ind16 &bi
 {
 	bitmap.fill(0xff, cliprect); // TODO : actually laserdisc layer
 	screen.priority().fill(0, cliprect);
-	m_c355spr[1]->get_sprites(cliprect); // TODO : buffered?
+	m_c355spr[1]->build_sprite_list_and_render_sprites(cliprect); // TODO : buffered?
 
 	static int pivot = 15;
 	int pri;

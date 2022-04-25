@@ -29,7 +29,7 @@
  *
  * You can observe sounds at XU1.14 by doing
  *
- * NL_LOGS=XU1.14 ./mame64 kidniki
+ * NL_LOGS=XU1.14 ./mame kidniki
  * nlwav -o x.wav log_XU1.14.log
  * play x.wav
  *
@@ -367,7 +367,7 @@ NETLIST_START(kidniki)
 	PARAM(Solver.FPTYPE, "DOUBLE")
 	//PARAM(Solver.METHOD, "MAT")
 	//PARAM(Solver.PIVOT, 1)
-	//PARAM(Solver.METHOD, "GMRES")
+	//PARAM(Solver.Solver_0.METHOD, "GMRES")
 	PARAM(Solver.SOR_FACTOR, 1.313)
 	PARAM(Solver.DYNAMIC_TS, 0)
 	PARAM(Solver.DYNAMIC_LTE, 5e-4)

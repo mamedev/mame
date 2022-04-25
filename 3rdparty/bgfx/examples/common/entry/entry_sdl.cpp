@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -10,7 +10,7 @@
 #if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
 #	if ENTRY_CONFIG_USE_WAYLAND
 #		include <wayland-egl.h>
-#	endif 
+#	endif
 #elif BX_PLATFORM_WINDOWS
 #	define SDL_MAIN_HANDLED
 #endif
@@ -65,12 +65,12 @@ namespace entry
 #		else
 		return (void*)wmi.info.x11.window;
 #		endif
-#	elif BX_PLATFORM_OSX
+#	elif BX_PLATFORM_OSX || BX_PLATFORM_IOS
 		return wmi.info.cocoa.window;
 #	elif BX_PLATFORM_WINDOWS
 		return wmi.info.win.window;
-#	elif BX_PLATFORM_STEAMLINK
-		return wmi.info.vivante.window;
+#   elif BX_PLATFORM_ANDROID
+		return wmi.info.android.window;
 #	endif // BX_PLATFORM_
 	}
 
@@ -90,12 +90,8 @@ namespace entry
 #		else
 		pd.ndt          = wmi.info.x11.display;
 #		endif
-#	elif BX_PLATFORM_OSX
+#	else
 		pd.ndt          = NULL;
-#	elif BX_PLATFORM_WINDOWS
-		pd.ndt          = NULL;
-#	elif BX_PLATFORM_STEAMLINK
-		pd.ndt          = wmi.info.vivante.display;
 #	endif // BX_PLATFORM_
 		pd.nwh          = sdlNativeWindowHandle(_window);
 
@@ -109,7 +105,7 @@ namespace entry
 
 	static void sdlDestroyWindow(SDL_Window* _window)
 	{
-		if(!_window) 
+		if(!_window)
 			return;
 #	if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
 #		if ENTRY_CONFIG_USE_WAYLAND
@@ -161,7 +157,7 @@ namespace entry
 
 	static void initTranslateKey(uint16_t _sdl, Key::Enum _key)
 	{
-		BX_CHECK(_sdl < BX_COUNTOF(s_translateKey), "Out of bounds %d.", _sdl);
+		BX_ASSERT(_sdl < BX_COUNTOF(s_translateKey), "Out of bounds %d.", _sdl);
 		s_translateKey[_sdl&0xff] = (uint8_t)_key;
 	}
 

@@ -68,6 +68,7 @@ public:
 	void qcrayon2(machine_config &config);
 	void qtorimon(machine_config &config);
 	void driftout(machine_config &config);
+	void driftoutct(machine_config &config);
 	void solfigtr(machine_config &config);
 	void qzquest(machine_config &config);
 	void liquidk(machine_config &config);
@@ -105,11 +106,11 @@ protected:
 
 	struct f2_tempsprite
 	{
-		u32 code, color;
-		bool flipx, flipy;
-		int x, y;
-		int zoomx, zoomy;
-		u64 primask;
+		u32 code = 0, color = 0;
+		bool flipx = false, flipy = false;
+		int x = 0, y = 0;
+		int zoomx = 0, zoomy = 0;
+		u64 primask = 0;
 	};
 	/* memory pointers */
 	optional_shared_ptr<u16> m_sprite_extension;
@@ -118,46 +119,47 @@ protected:
 	std::unique_ptr<u16[]>   m_spriteram_delayed;
 
 	/* video-related */
-	std::unique_ptr<struct f2_tempsprite[]> m_spritelist;
-	int           m_sprite_type;
+	std::unique_ptr<f2_tempsprite[]> m_spritelist;
+	int           m_sprite_type = 0;
 
-	u16           m_spritebank[8];
-//  u16           m_spritebank_eof[8];
-	u16           m_spritebank_buffered[8];
+	u16           m_spritebank[8]{};
+//  u16           m_spritebank_eof[8]{};
+	u16           m_spritebank_buffered[8]{};
 
-	bool          m_sprites_disabled;
-	s32           m_sprites_active_area;
-	s32           m_sprites_master_scrollx;
-	s32           m_sprites_master_scrolly;
+	bool          m_sprites_disabled = false;
+	s32           m_sprites_active_area = 0;
+	s32           m_sprites_master_scrollx = 0;
+	s32           m_sprites_master_scrolly = 0;
 	/* remember flip status over frames because driftout can fail to set it */
-	bool          m_sprites_flipscreen;
+	bool          m_sprites_flipscreen = false;
 
 	/* On the left hand screen edge (assuming horiz screen, no
 	   screenflip: in screenflip it is the right hand edge etc.)
 	   there may be 0-3 unwanted pixels in both tilemaps *and*
 	   sprites. To erase this we use f2_hide_pixels (0 to +3). */
 
-	s32           m_hide_pixels;
-	s32           m_flip_hide_pixels; /* Different in some games */
+	s32           m_hide_pixels = 0;
+	s32           m_flip_hide_pixels = 0; /* Different in some games */
 
-	s32           m_pivot_xdisp;  /* Needed in games with a pivot layer */
-	s32           m_pivot_ydisp;
+	s32           m_pivot_xdisp = 0;  /* Needed in games with a pivot layer */
+	s32           m_pivot_ydisp = 0;
 
-	s32           m_game;
+	s32           m_game = 0;
 
-	u8            m_tilepri[6]; // todo - move into taitoic.c
-	u8            m_spritepri[6]; // todo - move into taitoic.c
-	u8            m_spriteblendmode; // todo - move into taitoic.c
+	u8            m_tilepri[6]{}; // todo - move into taitoic.c
+	u8            m_spritepri[6]{}; // todo - move into taitoic.c
+	u8            m_spriteblendmode = 0; // todo - move into taitoic.c
 
-	int           m_prepare_sprites;
-	u8            m_gfxbank;
+	int           m_prepare_sprites = 0;
+	u8            m_gfxbank = 0;
 
 	/* misc */
-	s32           m_mjnquest_input;
-	int           m_last[2];
-	int           m_nibble;
-	s32           m_driveout_sound_latch;
-	emu_timer     *m_int6_timer;
+	s32           m_mjnquest_input = 0;
+	int           m_last[2]{};
+	int           m_nibble = 0;
+	s32           m_driveout_sound_latch = 0;
+	emu_timer     *m_int6_timer = nullptr;
+	std::unique_ptr<u8[]> m_decoded_gfx;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -258,6 +260,7 @@ protected:
 	void dinorex_map(address_map &map);
 	void dondokod_map(address_map &map);
 	void driftout_map(address_map &map);
+	void driftoutct_map(address_map &map);
 	void driveout_map(address_map &map);
 	void driveout_oki_map(address_map &map);
 	void driveout_sound_map(address_map &map);
@@ -286,7 +289,7 @@ protected:
 	void yesnoj_map(address_map &map);
 	void yuyugogo_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 #endif // MAME_INCLUDES_TAITO_F2_H

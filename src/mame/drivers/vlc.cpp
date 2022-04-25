@@ -138,6 +138,8 @@ nevada TYPE2 :  64       45      51       06       32      02        31     31  
 #include "tilemap.h"
 
 
+namespace {
+
 #define MASTER_CLOCK    XTAL(16'000'000)
 #define MASTER_CPU      ((MASTER_CLOCK)/2)    // 8mhz
 #define SOUND_CLOCK     ((MASTER_CLOCK) /8)   // 2mhz
@@ -174,6 +176,7 @@ public:
 	void init_nevada();
 
 protected:
+	virtual void machine_start() override;
 	virtual void video_start() override;
 
 private:
@@ -190,11 +193,11 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 
 
-	//uint8_t* m_videoram;
-	//uint8_t* m_colorram;
+	//uint8_t* m_videoram = nullptr;
+	//uint8_t* m_colorram = nullptr;
 
-	tilemap_t *m_tilemap;
-	uint16_t  m_datA40000;
+	tilemap_t *m_tilemap = nullptr;
+	uint16_t  m_datA40000 = 0U;
 
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 	uint32_t screen_update_nevada(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -210,8 +213,6 @@ private:
 	uint16_t nevada_sec_r();
 	void nevada_sec_w(uint16_t data);
 	void vram_w(offs_t offset, uint16_t data);
-
-	DECLARE_MACHINE_START(nevada);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
@@ -560,7 +561,7 @@ INPUT_PORTS_END
 *     Machine start      *
 *************************/
 
-MACHINE_START_MEMBER(nevada_state, nevada)
+void nevada_state::machine_start()
 {
 	m_nvram->set_base(m_ram62256, 0x1000);
 }
@@ -578,8 +579,6 @@ void nevada_state::nevada(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nevada_state::nevada_map);
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_msec(150));   /* 150ms Ds1232 TD to Ground */
-
-	MCFG_MACHINE_START_OVERRIDE(nevada_state, nevada)
 
 	NVRAM(config, "nvram").set_custom_handler(FUNC(nevada_state::nvram_init));
 
@@ -672,6 +671,9 @@ void nevada_state::init_nevada()
 
 }
 /***************************************************************************/
+
+} // Anonymous namespace
+
 
 /*************************
 *      Game Drivers      *

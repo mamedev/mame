@@ -56,7 +56,7 @@ private:
 
 	void softbox_io(address_map &map);
 	void softbox_mem(address_map &map);
-	int m_ifc;  // Tracks previous state of IEEE-488 IFC line
+	int m_ifc = 0;  // Tracks previous state of IEEE-488 IFC line
 
 	virtual void machine_start() override;
 	virtual void device_reset_after_children() override;

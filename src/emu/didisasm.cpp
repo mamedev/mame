@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    didisasm.c
+    didisasm.cpp
 
     Device disasm interfaces.
 

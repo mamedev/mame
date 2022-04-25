@@ -25,13 +25,13 @@ private:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
 
 private:
 	void check_bankswitch(offs_t offset);
 
-	DECLARE_READ8_MEMBER(read8_r);
+	uint8_t read8_r(offs_t offset);
 
 	void harmony_arm7_map(address_map &map);
 

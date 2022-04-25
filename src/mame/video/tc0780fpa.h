@@ -18,7 +18,7 @@ struct tc0780fpa_polydata
 };
 
 
-class tc0780fpa_renderer : public poly_manager<float, tc0780fpa_polydata, 6, 10000>
+class tc0780fpa_renderer : public poly_manager<float, tc0780fpa_polydata, 6>
 {
 public:
 	tc0780fpa_renderer(device_t &parent, screen_device &screen, const uint8_t *texture_ram);
@@ -49,11 +49,11 @@ public:
 
 	void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ16_MEMBER(tex_addr_r);
-	DECLARE_WRITE16_MEMBER(tex_addr_w);
-	DECLARE_WRITE16_MEMBER(tex_w);
-	DECLARE_WRITE16_MEMBER(poly_fifo_w);
-	DECLARE_WRITE16_MEMBER(render_w);
+	uint16_t tex_addr_r();
+	void tex_addr_w(uint16_t data);
+	void tex_w(uint16_t data);
+	void poly_fifo_w(uint16_t data);
+	void render_w(uint16_t data);
 
 protected:
 	// device-level overrides
@@ -64,14 +64,14 @@ protected:
 private:
 	std::unique_ptr<uint8_t[]> m_texture;
 	std::unique_ptr<uint16_t[]> m_poly_fifo;
-	int m_poly_fifo_ptr;
+	int m_poly_fifo_ptr = 0;
 
 	std::unique_ptr<tc0780fpa_renderer> m_renderer;
 
-	uint16_t m_tex_address;
-	uint16_t m_tex_offset;
-	int m_texbase_x;
-	int m_texbase_y;
+	uint16_t m_tex_address = 0;
+	uint16_t m_tex_offset = 0;
+	int m_texbase_x = 0;
+	int m_texbase_y = 0;
 };
 
 DECLARE_DEVICE_TYPE(TC0780FPA, tc0780fpa_device)

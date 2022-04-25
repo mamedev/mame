@@ -69,10 +69,10 @@ public:
 	required_shared_ptr<uint8_t> m_cram;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	uint8_t *m_iplrom;
-	uint8_t m_keyb_input[10];
-	uint8_t m_keyb_c0_c7;
-	uint8_t m_keyb_c8_c9;
+	uint8_t *m_iplrom = nullptr;
+	uint8_t m_keyb_input[10]{};
+	uint8_t m_keyb_c0_c7 = 0U;
+	uint8_t m_keyb_c8_c9 = 0U;
 
 	uint8_t vic4567_dummy_r(offs_t offset);
 	void vic4567_dummy_w(offs_t offset, uint8_t data);
@@ -108,15 +108,15 @@ protected:
 
 	virtual void video_start() override;
 private:
-	uint8_t m_VIC2_IRQPend, m_VIC2_IRQMask;
+	uint8_t m_VIC2_IRQPend = 0U, m_VIC2_IRQMask = 0U;
 	/* 0x20: border color (TODO: different thread?) */
-	uint8_t m_VIC2_EXTColor;
-	uint8_t m_VIC2_VS_CB_Base;
-	uint8_t m_VIC2_BK0_Color;
+	uint8_t m_VIC2_EXTColor = 0U;
+	uint8_t m_VIC2_VS_CB_Base = 0U;
+	uint8_t m_VIC2_BK0_Color = 0U;
 	/* 0x30: banking + PAL + EXT SYNC */
-	uint8_t m_VIC3_ControlA;
+	uint8_t m_VIC3_ControlA = 0U;
 	/* 0x31: video modes */
-	uint8_t m_VIC3_ControlB;
+	uint8_t m_VIC3_ControlB = 0U;
 	void PalEntryFlush(uint8_t offset);
 	void DMAgicExecute(address_space &space,uint32_t address);
 	void IRQCheck(uint8_t irq_cause);
@@ -178,7 +178,7 @@ uint32_t c65_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 			if (attr & 0x10) enable_dot = 0;
 
 			//if(cliprect.contains(x, y))
-			bitmap.pix16(y, x) = m_palette->pen(highlight_color + ((enable_dot) ? foreground_color : background_color));
+			bitmap.pix(y, x) = m_palette->pen(highlight_color + ((enable_dot) ? foreground_color : background_color));
 
 
 			//gfx->opaque(bitmap,cliprect,tile,0,0,0,x*8,y*8);

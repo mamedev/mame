@@ -160,8 +160,7 @@ void trident_vga_device::device_start()
 {
 	zero();
 
-	int i;
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 		set_pen_color(i, 0, 0, 0);
 
 	// Avoid an infinite loop when displaying.  0 is not possible anyway.
@@ -170,11 +169,10 @@ void trident_vga_device::device_start()
 
 	// copy over interfaces
 	vga.read_dipswitch.set(nullptr); //read_dipswitch;
-	vga.svga_intf.vram_size = 0x200000;
-
-	vga.memory.resize(vga.svga_intf.vram_size);
+	vga.memory = std::make_unique<uint8_t []>(vga.svga_intf.vram_size);
 	memset(&vga.memory[0], 0, vga.svga_intf.vram_size);
-	save_item(NAME(vga.memory));
+
+	save_pointer(NAME(vga.memory), vga.svga_intf.vram_size);
 	save_pointer(vga.crtc.data,"CRTC Registers",0x100);
 	save_pointer(vga.sequencer.data,"Sequencer Registers",0x100);
 	save_pointer(vga.attribute.data,"Attribute Registers", 0x15);
@@ -212,29 +210,22 @@ void trident_vga_device::device_reset()
 
 uint32_t trident_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t cur_mode;
-
 	svga_device::screen_update(screen,bitmap,cliprect);
-	cur_mode = pc_vga_choosevideomode();
+	uint8_t const cur_mode = pc_vga_choosevideomode();
 
 	// draw hardware graphics cursor
 	if(tri.cursor_ctrl & 0x80)  // if cursor is enabled
 	{
-		uint32_t src;
-		uint32_t* dst;
-		uint8_t val;
-		int x,y;
-		uint16_t cx = tri.cursor_x & 0x0fff;
-		uint16_t cy = tri.cursor_y & 0x0fff;
-		uint32_t bg_col;
-		uint32_t fg_col;
-		uint8_t cursor_size = (tri.cursor_ctrl & 0x01) ? 64 : 32;
+		uint16_t const cx = tri.cursor_x & 0x0fff;
+		uint16_t const cy = tri.cursor_y & 0x0fff;
+		uint8_t const cursor_size = (tri.cursor_ctrl & 0x01) ? 64 : 32;
 
 		if(cur_mode == SCREEN_OFF || cur_mode == TEXT_MODE || cur_mode == MONO_MODE || cur_mode == CGA_MODE || cur_mode == EGA_MODE)
 			return 0;  // cursor only works in VGA or SVGA modes
 
-		src = tri.cursor_loc * 1024;  // start address is in units of 1024 bytes
+		uint32_t src = tri.cursor_loc * 1024;  // start address is in units of 1024 bytes
 
+		uint32_t bg_col, fg_col;
 		if(cur_mode == RGB16_MODE)
 		{
 			bg_col = tri.cursor_bg;
@@ -246,11 +237,11 @@ uint32_t trident_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &
 			fg_col = pen(tri.cursor_fg & 0xff);
 		}
 
-		for(y=0;y<cursor_size;y++)
+		for(int y=0;y<cursor_size;y++)
 		{
 			uint8_t bitcount = 31;
-			dst = &bitmap.pix32(cy + y, cx);
-			for(x=0;x<cursor_size;x++)
+			uint32_t *const dst = &bitmap.pix(cy + y, cx);
+			for(int x=0;x<cursor_size;x++)
 			{
 				uint32_t bitb = (vga.memory[(src+3) % vga.svga_intf.vram_size]
 							| ((vga.memory[(src+2) % vga.svga_intf.vram_size]) << 8)
@@ -260,7 +251,7 @@ uint32_t trident_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &
 							| ((vga.memory[(src+6) % vga.svga_intf.vram_size]) << 8)
 							| ((vga.memory[(src+5) % vga.svga_intf.vram_size]) << 16)
 							| ((vga.memory[(src+4) % vga.svga_intf.vram_size]) << 24));
-				val = (BIT(bita << 1,bitcount+1) << 1 | BIT(bitb,bitcount));
+				uint8_t const val = (BIT(bita << 1,bitcount+1) << 1 | BIT(bitb,bitcount));
 				if(tri.cursor_ctrl & 0x40)
 				{  // X11 mode
 					switch(val)

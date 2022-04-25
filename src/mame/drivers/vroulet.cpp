@@ -72,7 +72,7 @@ private:
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_ball;
 
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	void paletteram_w(offs_t offset, uint8_t data);
 	void videoram_w(offs_t offset, uint8_t data);

@@ -20,7 +20,6 @@ TODO:
 
 #include "emu.h"
 #include "hmcs40.h"
-#include "debugger.h"
 #include "hmcs40d.h"
 
 #define IS_PMOS 0
@@ -199,12 +198,6 @@ std::unique_ptr<util::disasm_interface> hmcs40_cpu_device::create_disassembler()
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-enum
-{
-	HMCS40_PC=1, HMCS40_A, HMCS40_B,
-	HMCS40_X, HMCS40_SPX, HMCS40_Y, HMCS40_SPY
-};
-
 void hmcs40_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
@@ -282,17 +275,18 @@ void hmcs40_cpu_device::device_start()
 	save_item(NAME(m_d));
 
 	// register state for debugger
-	state_add(HMCS40_PC,  "PC",  m_pc).formatstr("%04X");
-	state_add(HMCS40_A,   "A",   m_a).formatstr("%01X");
-	state_add(HMCS40_B,   "B",   m_b).formatstr("%01X");
-	state_add(HMCS40_X,   "X",   m_x).formatstr("%01X");
-	state_add(HMCS40_SPX, "SPX", m_spx).formatstr("%01X");
-	state_add(HMCS40_Y,   "Y",   m_y).formatstr("%01X");
-	state_add(HMCS40_SPY, "SPY", m_spy).formatstr("%01X");
-
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_s).formatstr("%2s").noshow();
+
+	m_state_count = 0;
+	state_add(++m_state_count, "PC", m_pc).formatstr("%04X"); // 1
+	state_add(++m_state_count, "A", m_a).formatstr("%01X"); // 2
+	state_add(++m_state_count, "B", m_b).formatstr("%01X"); // 3
+	state_add(++m_state_count, "X", m_x).formatstr("%01X"); // 4
+	state_add(++m_state_count, "SPX", m_spx).formatstr("%01X"); // 5
+	state_add(++m_state_count, "Y", m_y).formatstr("%01X"); // 6
+	state_add(++m_state_count, "SPY", m_spy).formatstr("%01X"); // 7
 
 	set_icountptr(m_icount);
 }
@@ -376,7 +370,7 @@ u8 hmcs43_cpu_device::read_r(int index)
 	index &= 7;
 
 	if (index >= 2)
-		logerror("%s read from %s port R%d at $%04X\n", tag(), (index >= 4) ? "unknown" : "output", index, m_prev_pc);
+		logerror("read from %s port R%d at $%04X\n", (index >= 4) ? "unknown" : "output", index, m_prev_pc);
 
 	return hmcs40_cpu_device::read_r(index);
 }
@@ -388,7 +382,7 @@ void hmcs43_cpu_device::write_r(int index, u8 data)
 	if (index != 0 && index < 4)
 		hmcs40_cpu_device::write_r(index, data);
 	else
-		logerror("%s ineffective write to port R%d = $%X at $%04X\n", tag(), index, data & 0xf, m_prev_pc);
+		logerror("ineffective write to port R%d = $%X at $%04X\n", index, data & 0xf, m_prev_pc);
 }
 
 int hmcs43_cpu_device::read_d(int index)
@@ -396,7 +390,7 @@ int hmcs43_cpu_device::read_d(int index)
 	index &= 15;
 
 	if (index >= 4)
-		logerror("%s read from output pin D%d at $%04X\n", tag(), index, m_prev_pc);
+		logerror("read from output pin D%d at $%04X\n", index, m_prev_pc);
 
 	return hmcs40_cpu_device::read_d(index);
 }
@@ -410,7 +404,7 @@ u8 hmcs44_cpu_device::read_r(int index)
 	index &= 7;
 
 	if (index >= 6)
-		logerror("%s read from unknown port R%d at $%04X\n", tag(), index, m_prev_pc);
+		logerror("read from unknown port R%d at $%04X\n", index, m_prev_pc);
 
 	return hmcs40_cpu_device::read_r(index);
 }
@@ -422,7 +416,7 @@ void hmcs44_cpu_device::write_r(int index, u8 data)
 	if (index < 6)
 		hmcs40_cpu_device::write_r(index, data);
 	else
-		logerror("%s ineffective write to port R%d = $%X at $%04X\n", tag(), index, data & 0xf, m_prev_pc);
+		logerror("ineffective write to port R%d = $%X at $%04X\n", index, data & 0xf, m_prev_pc);
 }
 
 // HMCS45:
@@ -434,7 +428,7 @@ u8 hmcs45_cpu_device::read_r(int index)
 	index &= 7;
 
 	if (index >= 6)
-		logerror("%s read from %s port R%d at $%04X\n", tag(), (index == 7) ? "unknown" : "output", index, m_prev_pc);
+		logerror("read from %s port R%d at $%04X\n", (index == 7) ? "unknown" : "output", index, m_prev_pc);
 
 	return hmcs40_cpu_device::read_r(index);
 }
@@ -446,7 +440,7 @@ void hmcs45_cpu_device::write_r(int index, u8 data)
 	if (index != 7)
 		hmcs40_cpu_device::write_r(index, data);
 	else
-		logerror("%s ineffective write to port R%d = $%X at $%04X\n", tag(), index, data & 0xf, m_prev_pc);
+		logerror("ineffective write to port R%d = $%X at $%04X\n", index, data & 0xf, m_prev_pc);
 }
 
 

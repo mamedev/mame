@@ -95,29 +95,29 @@ private:
 	required_device<pic8259_device> m_pic8259;
 	required_device<i8257_device> m_dma8257;
 
-	uint8_t m_rest55;
-	uint8_t m_rest65;
-	uint8_t m_trap;
-	uint8_t m_ar;
-	uint8_t m_av;
-	uint8_t m_prom[256];
-	uint8_t m_riga_sup;
-	uint8_t m_scudi;
-	uint8_t m_cannone;
-	uint8_t m_riga_inf;
+	uint8_t m_rest55 = 0;
+	uint8_t m_rest65 = 0;
+	uint8_t m_trap = 0;
+	uint8_t m_ar = 0;
+	uint8_t m_av = 0;
+	uint8_t m_prom[256]{};
+	uint8_t m_riga_sup = 0;
+	uint8_t m_scudi = 0;
+	uint8_t m_cannone = 0;
+	uint8_t m_riga_inf = 0;
 
-	uint8_t m_irq0;
-	uint8_t m_irq1;
-	uint8_t m_irq2;
-	uint8_t m_irq3;
-	uint8_t m_irq4;
-	uint8_t m_irq5;
-	uint8_t m_irq6;
+	uint8_t m_irq0 = 0;
+	uint8_t m_irq1 = 0;
+	uint8_t m_irq2 = 0;
+	uint8_t m_irq3 = 0;
+	uint8_t m_irq4 = 0;
+	uint8_t m_irq5 = 0;
+	uint8_t m_irq6 = 0;
 
-	uint8_t m_start2_value;
-	uint8_t m_dma1;
-	uint8_t m_io_40;
-	uint8_t m_hsync;
+	uint8_t m_start2_value = 0;
+	uint8_t m_dma1 = 0;
+	uint8_t m_io_40 = 0;
+	uint8_t m_hsync = 0;
 };
 
 
@@ -757,7 +757,7 @@ ROM_START( fi6845 )
 	ROM_LOAD( "r1.5a",     0x1000, 0x0200, CRC(9ada6666) SHA1(f965a08c75fa87e8e3fd7595dcd98231e976e072) )
 	ROM_LOAD( "r1.5b",     0x1200, 0x0200, CRC(0f617215) SHA1(b342c783335ab26c036ae77f63a2e932a590c2fa) )
 	ROM_LOAD( "r1.6a",     0x1400, 0x0200, CRC(75ea69ae) SHA1(edd9bf686c169ca64373ea87ba92fab4e8c6ee4d) )
-	//ROM_LOAD( "r1.6b",   0x1600, 0x0200, CRC(11111111) SHA1(1111111111111111111111111111111111111111) ) // not populated
+	//ROM_LOAD( "r1.6b",   0x1600, 0x0200, NO_DUMP) ) // not populated
 	ROM_LOAD( "r1.7a",     0x1800, 0x0200, CRC(6e12538f) SHA1(aa08a2db2e5570b431afc967ea5fd749c4f82e33) )
 	ROM_LOAD( "r1.7b",     0x1a00, 0x0200, CRC(7270d194) SHA1(7cef9c420c3c3cbc5846bd22137213a78506a8d3) )
 

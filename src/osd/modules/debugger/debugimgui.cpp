@@ -142,7 +142,7 @@ private:
 
 	struct image_type_entry
 	{
-		floppy_image_format_t* format;
+		const floppy_image_format_t* format;
 		std::string shortname;
 		std::string longname;
 	};
@@ -225,11 +225,7 @@ static void view_list_remove(debug_area* item)
 
 static debug_area *dview_alloc(running_machine &machine, debug_view_type type)
 {
-	debug_area *dv;
-
-	dv = global_alloc(debug_area(machine, type));
-
-	return dv;
+	return new debug_area(machine, type);
 }
 
 static inline void map_attr_to_fg_bg(unsigned char attr, rgb_t *fg, rgb_t *bg)
@@ -270,6 +266,9 @@ void debug_imgui::handle_mouse()
 {
 	m_prev_mouse_button = m_mouse_button;
 	m_machine->ui_input().find_mouse(&m_mouse_x, &m_mouse_y, &m_mouse_button);
+	ImGuiIO& io = ImGui::GetIO();
+	io.MousePos = ImVec2(m_mouse_x,m_mouse_y);
+	io.MouseDown[0] = m_mouse_button;
 }
 
 void debug_imgui::handle_mouse_views()
@@ -328,8 +327,9 @@ void debug_imgui::handle_keys()
 			focus_view = *view_ptr;
 
 	// check views in main views also (only the disassembler view accepts inputs)
-	if(view_main_disasm->has_focus)
-		focus_view = view_main_disasm;
+	if(view_main_disasm != nullptr)
+		if(view_main_disasm->has_focus)
+			focus_view = view_main_disasm;
 
 	if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
 		io.KeyCtrl = true;
@@ -357,7 +357,7 @@ void debug_imgui::handle_keys()
 	{
 		switch (event.event_type)
 		{
-			case ui_event::IME_CHAR:
+		case ui_event::type::IME_CHAR:
 			m_key_char = event.ch;
 			if(focus_view != nullptr)
 				focus_view->view->process_char(m_key_char);
@@ -430,8 +430,9 @@ void debug_imgui::handle_keys_views()
 			focus_view = *view_ptr;
 
 	// check views in main views also (only the disassembler view accepts inputs)
-	if(view_main_disasm->has_focus)
-		focus_view = view_main_disasm;
+	if(view_main_disasm != nullptr)
+		if(view_main_disasm->has_focus)
+			focus_view = view_main_disasm;
 
 	// if no view has focus, then there's nothing to do
 	if(focus_view == nullptr)
@@ -848,23 +849,39 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 				auto* mem = downcast<debug_view_memory*>(view_ptr->view);
 				bool physical = mem->physical();
 				bool rev = mem->reverse();
-				int format = mem->get_data_format();
+				debug_view_memory::data_format format = mem->get_data_format();
 				uint32_t chunks = mem->chunks_per_row();
+				int radix = mem->address_radix();
 
-				if(ImGui::MenuItem("1-byte chunks", nullptr,(format == 1) ? true : false))
-					mem->set_data_format(1);
-				if(ImGui::MenuItem("2-byte chunks", nullptr,(format == 2) ? true : false))
-					mem->set_data_format(2);
-				if(ImGui::MenuItem("4-byte chunks", nullptr,(format == 4) ? true : false))
-					mem->set_data_format(4);
-				if(ImGui::MenuItem("8-byte chunks", nullptr,(format == 8) ? true : false))
-					mem->set_data_format(8);
-				if(ImGui::MenuItem("32-bit floating point", nullptr,(format == 9) ? true : false))
-					mem->set_data_format(9);
-				if(ImGui::MenuItem("64-bit floating point", nullptr,(format == 10) ? true : false))
-					mem->set_data_format(10);
-				if(ImGui::MenuItem("80-bit floating point", nullptr,(format == 11) ? true : false))
-					mem->set_data_format(11);
+				if(ImGui::MenuItem("1-byte hexadecimal", nullptr,(format == debug_view_memory::data_format::HEX_8BIT) ? true : false))
+					mem->set_data_format(debug_view_memory::data_format::HEX_8BIT);
+				if(ImGui::MenuItem("2-byte hexadecimal", nullptr,(format == debug_view_memory::data_format::HEX_16BIT) ? true : false))
+					mem->set_data_format(debug_view_memory::data_format::HEX_16BIT);
+				if(ImGui::MenuItem("4-byte hexadecimal", nullptr,(format == debug_view_memory::data_format::HEX_32BIT) ? true : false))
+					mem->set_data_format(debug_view_memory::data_format::HEX_32BIT);
+				if(ImGui::MenuItem("8-byte hexadecimal", nullptr,(format == debug_view_memory::data_format::HEX_64BIT) ? true : false))
+					mem->set_data_format(debug_view_memory::data_format::HEX_64BIT);
+				if(ImGui::MenuItem("1-byte octal", nullptr,(format == debug_view_memory::data_format::OCTAL_8BIT) ? true : false))
+					mem->set_data_format(debug_view_memory::data_format::OCTAL_8BIT);
+				if(ImGui::MenuItem("2-byte octal", nullptr,(format == debug_view_memory::data_format::OCTAL_16BIT) ? true : false))
+					mem->set_data_format(debug_view_memory::data_format::OCTAL_16BIT);
+				if(ImGui::MenuItem("4-byte octal", nullptr,(format == debug_view_memory::data_format::OCTAL_32BIT) ? true : false))
+					mem->set_data_format(debug_view_memory::data_format::OCTAL_32BIT);
+				if(ImGui::MenuItem("8-byte octal", nullptr,(format == debug_view_memory::data_format::OCTAL_64BIT) ? true : false))
+					mem->set_data_format(debug_view_memory::data_format::OCTAL_64BIT);
+				if(ImGui::MenuItem("32-bit floating point", nullptr,(format == debug_view_memory::data_format::FLOAT_32BIT) ? true : false))
+					mem->set_data_format(debug_view_memory::data_format::FLOAT_32BIT);
+				if(ImGui::MenuItem("64-bit floating point", nullptr,(format == debug_view_memory::data_format::FLOAT_64BIT) ? true : false))
+					mem->set_data_format(debug_view_memory::data_format::FLOAT_64BIT);
+				if(ImGui::MenuItem("80-bit floating point", nullptr,(format == debug_view_memory::data_format::FLOAT_80BIT) ? true : false))
+					mem->set_data_format(debug_view_memory::data_format::FLOAT_80BIT);
+				ImGui::Separator();
+				if(ImGui::MenuItem("Hexadecimal Addresses", nullptr,(radix == 16)))
+					mem->set_address_radix(16);
+				if(ImGui::MenuItem("Decimal Addresses", nullptr,(radix == 10)))
+					mem->set_address_radix(10);
+				if(ImGui::MenuItem("Octal Addresses", nullptr,(radix == 8)))
+					mem->set_address_radix(8);
 				ImGui::Separator();
 				if(ImGui::MenuItem("Logical addresses", nullptr,!physical))
 					mem->set_physical(false);
@@ -942,7 +959,7 @@ void debug_imgui::mount_image()
 {
 	if(m_selected_file != nullptr)
 	{
-		osd_file::error err;
+		std::error_condition err;
 		switch(m_selected_file->type)
 		{
 			case file_entry_type::DRIVE:
@@ -951,7 +968,7 @@ void debug_imgui::mount_image()
 					util::zippath_directory::ptr dir;
 					err = util::zippath_directory::open(m_selected_file->fullpath, dir);
 				}
-				if(err == osd_file::error::NONE)
+				if(!err)
 				{
 					m_filelist_refresh = true;
 					strcpy(m_path,m_selected_file->fullpath.c_str());
@@ -960,6 +977,7 @@ void debug_imgui::mount_image()
 			case file_entry_type::FILE:
 				m_dialog_image->load(m_selected_file->fullpath);
 				ImGui::CloseCurrentPopup();
+				m_mount_open = false;
 				break;
 		}
 	}
@@ -969,9 +987,9 @@ void debug_imgui::create_image()
 {
 	image_init_result res;
 
-	if(m_dialog_image->image_type() == IO_FLOPPY)
+	auto *fd = dynamic_cast<floppy_image_device *>(m_dialog_image);
+	if(fd != nullptr)
 	{
-		auto *fd = static_cast<floppy_image_device *>(m_dialog_image);
 		res = fd->create(m_path,nullptr,nullptr);
 		if(res == image_init_result::PASS)
 			fd->setup_write(m_typelist.at(m_format_sel).format);
@@ -992,18 +1010,17 @@ void debug_imgui::refresh_filelist()
 	m_filelist_refresh = false;
 
 	util::zippath_directory::ptr dir;
-	osd_file::error const err = util::zippath_directory::open(m_path,dir);
-	if(err == osd_file::error::NONE)
+	std::error_condition const err = util::zippath_directory::open(m_path,dir);
+	if(!err)
 	{
 		int x = 0;
 		// add drives
-		const char *volume_name;
-		while((volume_name = osd_get_volume_name(x))!=nullptr)
+		for(std::string const &volume_name : osd_get_volume_names())
 		{
 			file_entry temp;
 			temp.type = file_entry_type::DRIVE;
-			temp.basename = std::string(volume_name);
-			temp.fullpath = std::string(volume_name);
+			temp.basename = volume_name;
+			temp.fullpath = volume_name;
 			m_filelist.emplace_back(std::move(temp));
 			x++;
 		}
@@ -1044,8 +1061,7 @@ void debug_imgui::refresh_typelist()
 	if(fd == nullptr)
 		return;
 
-	floppy_image_format_t* format_list = fd->get_formats();
-	for(floppy_image_format_t* flist = format_list; flist; flist = flist->next)
+	for(const floppy_image_format_t* flist : fd->get_formats())
 	{
 		if(flist->supports_save())
 		{
@@ -1063,7 +1079,7 @@ void debug_imgui::draw_images_menu()
 	if(ImGui::BeginMenu("Images"))
 	{
 		int x = 0;
-		for (device_image_interface &img : image_interface_iterator(m_machine->root_device()))
+		for (device_image_interface &img : image_interface_enumerator(m_machine->root_device()))
 		{
 			x++;
 			std::string str = string_format(" %s : %s##%i",img.device().name(),img.exists() ? img.filename() : "[Empty slot]",x);
@@ -1113,8 +1129,13 @@ void debug_imgui::draw_mount_dialog(const char* label)
 		if(ImGui::InputText("##mountpath",m_path,1024,ImGuiInputTextFlags_EnterReturnsTrue))
 			m_filelist_refresh = true;
 		ImGui::Separator();
+
+		ImVec2 listbox_size;
+		listbox_size.x = 0.0f;
+		listbox_size.y = ImGui::GetTextLineHeightWithSpacing() * 15.25f;
+
+		if(ImGui::BeginListBox("##filelist",listbox_size))
 		{
-			ImGui::ListBoxHeader("##filelist",m_filelist.size(),15);
 			for(auto f = m_filelist.begin();f != m_filelist.end();++f)
 			{
 				std::string txt_name;
@@ -1138,14 +1159,19 @@ void debug_imgui::draw_mount_dialog(const char* label)
 				{
 					m_selected_file = &(*f);
 					if(ImGui::IsMouseDoubleClicked(0))
+					{
 						mount_image();
+					}
 				}
 			}
-			ImGui::ListBoxFooter();
+			ImGui::EndListBox();
 		}
 		ImGui::Separator();
 		if(ImGui::Button("Cancel##mount"))
+		{
 			ImGui::CloseCurrentPopup();
+			m_mount_open = false;
+		}
 		ImGui::SameLine();
 		if(ImGui::Button("OK##mount"))
 			mount_image();
@@ -1173,7 +1199,8 @@ void debug_imgui::draw_create_dialog(const char* label)
 		}
 
 		// format combo box for floppy devices
-		if(m_dialog_image->image_type() == IO_FLOPPY)
+		auto *fd = dynamic_cast<floppy_image_device *>(m_dialog_image);
+		if(fd != nullptr)
 		{
 			std::string combo_str;
 			combo_str.clear();
@@ -1205,7 +1232,10 @@ void debug_imgui::draw_create_dialog(const char* label)
 		{
 			ImGui::Separator();
 			if(ImGui::Button("Cancel##mount"))
+			{
 				ImGui::CloseCurrentPopup();
+				m_create_open = false;
+			}
 			ImGui::SameLine();
 			if(ImGui::Button("OK##mount"))
 			{
@@ -1216,6 +1246,7 @@ void debug_imgui::draw_create_dialog(const char* label)
 				if(file_type == osd::directory::entry::entry_type::FILE)
 					m_create_confirm_wait = true;
 				// cannot overwrite a directory, so nothing will be none in that case.
+				m_create_open = false;
 			}
 		}
 		ImGui::EndPopup();
@@ -1225,6 +1256,10 @@ void debug_imgui::draw_create_dialog(const char* label)
 void debug_imgui::draw_console()
 {
 	ImGuiWindowFlags flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
+	bool show_menu = false;
+
+	if(view_main_disasm == nullptr || view_main_regs == nullptr || view_main_console == nullptr)
+		return;
 
 	ImGui::SetNextWindowSize(ImVec2(view_main_regs->width + view_main_disasm->width,view_main_disasm->height + view_main_console->height + ImGui::GetTextLineHeight()*3),ImGuiCond_Once);
 	if(ImGui::Begin(view_main_console->title.c_str(), nullptr,flags))
@@ -1235,6 +1270,7 @@ void debug_imgui::draw_console()
 		{
 			if(ImGui::BeginMenu("Debug"))
 			{
+				show_menu = true;
 				if(ImGui::MenuItem("New disassembly window", "Ctrl+D"))
 					add_disasm(++m_win_count);
 				if(ImGui::MenuItem("New memory window", "Ctrl+M"))
@@ -1280,6 +1316,7 @@ void debug_imgui::draw_console()
 			}
 			if(ImGui::BeginMenu("Window"))
 			{
+				show_menu = true;
 				if(ImGui::MenuItem("Show all"))
 				{
 					for(auto view_ptr = view_list.begin();view_ptr != view_list.end();++view_ptr)
@@ -1298,7 +1335,10 @@ void debug_imgui::draw_console()
 				ImGui::EndMenu();
 			}
 			if(m_has_images)
+			{
+				show_menu = true;
 				draw_images_menu();
+			}
 			ImGui::EndMenuBar();
 		}
 
@@ -1329,20 +1369,18 @@ void debug_imgui::draw_console()
 		ImGui::PushItemWidth(-1.0f);
 		if(ImGui::InputText("##console_input",view_main_console->console_input,512,flags,history_set))
 			view_main_console->exec_cmd = true;
-		if ((ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) && !ImGui::IsAnyItemActive() && !ImGui::IsMouseClicked(0)))
+		if ((ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) && !ImGui::IsAnyItemActive() && !ImGui::IsMouseClicked(0) && !show_menu))
 			ImGui::SetKeyboardFocusHere(-1); // Auto focus previous widget
 		if(m_mount_open)
 		{
 			ImGui::OpenPopup("Mount Image");
-			m_mount_open = false;
+			draw_mount_dialog("Mount Image");  // draw mount image dialog if open
 		}
 		if(m_create_open)
 		{
 			ImGui::OpenPopup("Create Image");
-			m_create_open = false;
+			draw_create_dialog("Create Image");  // draw create image dialog if open
 		}
-		draw_mount_dialog("Mount Image");  // draw mount image dialog if open
-		draw_create_dialog("Create Image");  // draw create image dialog if open
 		ImGui::PopItemWidth();
 		ImGui::EndChild();
 		ImGui::End();
@@ -1406,7 +1444,7 @@ void debug_imgui::update()
 	if(to_delete != nullptr)
 	{
 		view_list_remove(to_delete);
-		global_free(to_delete);
+		delete to_delete;
 	}
 
 	ImGui::PopStyleColor(12);
@@ -1421,7 +1459,7 @@ void debug_imgui::init_debugger(running_machine &machine)
 		fatalerror("Error: ImGui debugger requires the BGFX renderer.\n");
 
 	// check for any image devices (cassette, floppy, etc...)
-	image_interface_iterator iter(m_machine->root_device());
+	image_interface_enumerator iter(m_machine->root_device());
 	if (iter.first() != nullptr)
 		m_has_images = true;
 
@@ -1496,23 +1534,27 @@ void debug_imgui::wait_for_debugger(device_t &device, bool firststop)
 		m_running = false;
 	}
 	m_hide = false;
-//  m_machine->ui_input().frame_update();
+	//m_machine->ui_input().frame_update();
 	handle_mouse();
 	handle_keys();
 	handle_console(m_machine);
 	update_cpu_view(&device);
 	imguiBeginFrame(m_mouse_x,m_mouse_y,m_mouse_button ? IMGUI_MBUT_LEFT : 0, 0, width, height,m_key_char);
-	update();
-	imguiEndFrame();
 	handle_mouse_views();
 	handle_keys_views();
+	update();
+	imguiEndFrame();
 	m_machine->ui_input().reset();  // clear remaining inputs, so they don't fall through to the UI
 	device.machine().osd().update(false);
+	osd_sleep(osd_ticks_per_second() / 1000 * 50);
 }
 
 
 void debug_imgui::debugger_update()
 {
+	if(view_main_disasm == nullptr || view_main_regs == nullptr || view_main_console == nullptr)
+		return;
+
 	if (m_machine && (m_machine->phase() == machine_phase::RUNNING) && !m_machine->debugger().cpu().is_stopped() && !m_hide)
 	{
 		uint32_t width = m_machine->render().ui_target().width();

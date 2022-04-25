@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    mconfig.c
+    mconfig.cpp
 
     Machine configuration macros and functions.
 
@@ -51,7 +51,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 	device_add("root", gamedrv.type, 0);
 
 	// intialize slot devices - make sure that any required devices have been allocated
-	for (device_slot_interface &slot : slot_interface_iterator(root_device()))
+	for (device_slot_interface &slot : slot_interface_enumerator(root_device()))
 	{
 		device_t &owner = slot.device();
 		const char *slot_option_name = owner.tag() + 1;
@@ -104,7 +104,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 	}
 
 	// then notify all devices that their configuration is complete
-	for (device_t &device : device_iterator(root_device()))
+	for (device_t &device : device_enumerator(root_device()))
 		if (!device.configured())
 			device.config_complete();
 }
@@ -143,7 +143,7 @@ device_execute_interface *machine_config::perfect_quantum_device() const
 	if (!m_perfect_quantum_device.first)
 		return nullptr;
 
-	device_t *const found(m_perfect_quantum_device.first->subdevice(m_perfect_quantum_device.second.c_str()));
+	device_t *const found(m_perfect_quantum_device.first->subdevice(m_perfect_quantum_device.second));
 	if (!found)
 	{
 		throw emu_fatalerror(
@@ -239,7 +239,7 @@ device_t *machine_config::device_remove(const char *tag)
 		remove_references(*device);
 
 		// let the device's owner do the work
-		owner->subdevices().m_list.remove(*device);
+		owner->subdevices().remove(*device);
 	}
 	return nullptr;
 }
@@ -257,25 +257,23 @@ std::pair<const char *, device_t *> machine_config::resolve_owner(const char *ta
 	device_t *owner(m_current_device);
 
 	// if the device path is absolute, start from the root
-	if (tag[0] == ':')
-	{
-		tag++;
-		owner = m_root_device.get();
-	}
+	if (!*tag || (':' == *tag) || ('^' == *tag))
+		throw emu_fatalerror("Attempting to add device with tag containing parent references '%s'\n", orig_tag);
 
 	// go down the path until we're done with it
-	std::string part;
-	while (strchr(tag, ':'))
+	char const *next;
+	while ((next = strchr(tag, ':')) != nullptr)
 	{
-		const char *next = strchr(tag, ':');
 		assert(next != tag);
-		part.assign(tag, next - tag);
+		std::string_view part(tag, next - tag);
 		owner = owner->subdevices().find(part);
 		if (!owner)
-			throw emu_fatalerror("Could not find %s when looking up path for device %s\n", part.c_str(), orig_tag);
-		tag = next+1;
+			throw emu_fatalerror("Could not find '%s' when looking up path for device '%s'\n", part, orig_tag);
+		tag = next + 1;
+		if ('^' == *tag)
+			throw emu_fatalerror("Attempting to add device with tag containing parent references '%s'\n", orig_tag);
 	}
-	assert(tag[0] != '\0');
+	assert(*tag != '\0');
 
 	return std::make_pair(tag, owner);
 }
@@ -297,7 +295,7 @@ std::tuple<const char *, device_t *, device_t *> machine_config::prepare_replace
 	if (old_device)
 		remove_references(*old_device);
 	else
-		osd_printf_warning("Warning: attempting to replace non-existent device '%s'\n", tag);
+		throw emu_fatalerror("Attempting to replace non-existent device '%s'\n", tag);
 
 	return std::make_tuple(owner.first, owner.second, old_device);
 }
@@ -314,7 +312,7 @@ device_t &machine_config::add_device(std::unique_ptr<device_t> &&device, device_
 	if (owner)
 	{
 		// allocate the new device and append it to the owner's list
-		device_t &result(owner->subdevices().m_list.append(*device.release()));
+		device_t &result(owner->subdevices().append(std::move(device)));
 		result.add_machine_configuration(*this);
 		return result;
 	}
@@ -338,8 +336,8 @@ device_t &machine_config::replace_device(std::unique_ptr<device_t> &&device, dev
 {
 	current_device_stack const context(*this);
 	device_t &result(existing
-			? owner.subdevices().m_list.replace_and_remove(*device.release(), *existing)
-			: owner.subdevices().m_list.append(*device.release()));
+			? owner.subdevices().replace_and_remove(std::move(device), *existing)
+			: owner.subdevices().append(std::move(device)));
 	result.add_machine_configuration(*this);
 	return result;
 }
@@ -378,10 +376,6 @@ void machine_config::remove_references(device_t &device)
 		else
 			++it;
 	}
-
-	// iterate over all devices and remove any references
-	for (device_t &scan : device_iterator(root_device()))
-		scan.subdevices().m_tagmap.clear();
 }
 
 

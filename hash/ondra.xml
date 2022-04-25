@@ -2,14 +2,18 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0
+
+These tapes only work on ondrav. Load the tape and press Enter. Tape will load and then the program will run by itself.
+If asked for numbers, press letters: Q = 1, W = 2, E = 3, etc.
+
 -->
 <softwarelist name="ondra" description="Ondra &amp; Ondra ViLi cassettes">
 
 	<software name="copyfile">
-		<description>COPYFILE</description>
+		<description>Copyfile Utility</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Works only on the Ondra ViLi" />
+		<info name="usage" value="Ondrav only. Hit enter to load and run." />
 		<part name="cass" interface="ondra_cass">
 			<dataarea name="cass" size="112800">
 				<rom name="copyfile.wav" size="112800" crc="b3049df0" sha1="9172a09b22d2e532c96f87ffab098f8b292fecf3"/>
@@ -18,10 +22,10 @@ license:CC0
 	</software>
 
 	<software name="editasm">
-		<description>EDITASM</description>
+		<description>Microsoft Editor/Assembler 10.0</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Works only on the Ondra ViLi" />
+		<info name="usage" value="Ondrav only. Hit enter to load and run." />
 		<part name="cass" interface="ondra_cass">
 			<dataarea name="cass" size="1015968">
 				<rom name="editasm.wav" size="1015968" crc="62b18cc1" sha1="71850e204e17c44d3dcd7cda9e9d8717d96063a8"/>
@@ -33,7 +37,7 @@ license:CC0
 		<description>GALAXIANS</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Works only on the Ondra ViLi" />
+		<info name="usage" value="Ondrav only. Hit enter to load and run. Arrows to move, Space to fire." />
 		<part name="cass" interface="ondra_cass">
 			<dataarea name="cass" size="1449244">
 				<rom name="galaxians.wav" size="1449244" crc="e9245841" sha1="bc24392a6ac9db4730363cea8efda4f090d3d1b1"/>
@@ -42,10 +46,10 @@ license:CC0
 	</software>
 
 	<software name="jetpac">
-		<description>JETPAC</description>
+		<description>Jetpac</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Works only on the Ondra ViLi" />
+		<info name="usage" value="Ondrav only. Hit enter to load and run. Arrows to move and fly, Space to fire." />
 		<part name="cass" interface="ondra_cass">
 			<dataarea name="cass" size="1304736">
 				<rom name="jetpac.wav" size="1304736" crc="d69d30d2" sha1="9919166ce9b954188af163bcfe52db6df4da8df6"/>
@@ -54,10 +58,10 @@ license:CC0
 	</software>
 
 	<software name="jetset">
-		<description>JETSETWILLY</description>
+		<description>Jet Set Willy</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Works only on the Ondra ViLi" />
+		<info name="usage" value="Ondrav only. Hit enter to load. Press enter a few times to start. Arrows to move, Space to jump." />
 		<part name="cass" interface="ondra_cass">
 			<dataarea name="cass" size="2308256">
 				<rom name="jetsetwilly.wav" size="2308256" crc="753c51fd" sha1="4342dc96eb60fe5ee92222542c714dc22eda77a0"/>
@@ -69,7 +73,7 @@ license:CC0
 		<description>KAREL</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Works only on the Ondra ViLi" />
+		<info name="usage" value="Ondrav only. Hit enter to load and run." />
 		<part name="cass" interface="ondra_cass">
 			<dataarea name="cass" size="385184">
 				<rom name="karel.wav" size="385184" crc="c10354de" sha1="e640e63e5fc4fe34af33ecfaf57196cc00917b71"/>
@@ -78,10 +82,10 @@ license:CC0
 	</software>
 
 	<software name="mikos">
-		<description>MIKOS</description>
+		<description>MIKOS v0.5</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Works only on the Ondra ViLi" />
+		<info name="usage" value="Ondrav only. Hit enter to load and run. Emulates ondrat." />
 		<part name="cass" interface="ondra_cass">
 			<dataarea name="cass" size="297120">
 				<rom name="mikos.wav" size="297120" crc="4ba186d4" sha1="56e15d9e064afa2196a235ff25f504256779ca5a"/>
@@ -90,10 +94,10 @@ license:CC0
 	</software>
 
 	<software name="pascal">
-		<description>PASCAL</description>
+		<description>Hisoft Pascal System</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Works only on the Ondra ViLi" />
+		<info name="usage" value="Ondrav only. Hit enter to load and run." />
 		<part name="cass" interface="ondra_cass">
 			<dataarea name="cass" size="1732768">
 				<rom name="pascal.wav" size="1732768" crc="e9b74b24" sha1="6ba4fd152e8c2e60483f7725ab73f8e5bf39445d"/>
@@ -105,7 +109,7 @@ license:CC0
 		<description>PLANETOIDS</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Works only on the Ondra ViLi" />
+		<info name="usage" value="Ondrav only. Hit enter to load and run. Arrows to turn, Space to fire." />
 		<part name="cass" interface="ondra_cass">
 			<dataarea name="cass" size="1355936">
 				<rom name="planetoids.wav" size="1355936" crc="8d517fd8" sha1="e34600276d188018b66a1077697c9a63b9565692"/>
@@ -117,7 +121,7 @@ license:CC0
 		<description>PSSST</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Works only on the Ondra ViLi" />
+		<info name="usage" value="Ondrav only. Hit enter to load and run. Arrows to move, get the spray can, Space to fire." />
 		<part name="cass" interface="ondra_cass">
 			<dataarea name="cass" size="1380112">
 				<rom name="pssst.wav" size="1380112" crc="745ed80b" sha1="2bab363cc8efbac52c46d1ecc09184a667c9c1f3"/>

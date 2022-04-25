@@ -2,8 +2,6 @@
 // copyright-holders:Kevin Thacker,Sandro Ronco
 /******************************************************************************
 
-        avigo.c
-
         TI "Avigo" PDA
 
 
@@ -63,8 +61,6 @@
             driver has been written using educated guesswork and a lot of help
             from an existing emulation written by Hans Pufal. Hans's emulator
             is also written from educated guesswork.
-
-        MESS Driver by Kevin Thacker and Sandro Ronco
 
  ******************************************************************************/
 

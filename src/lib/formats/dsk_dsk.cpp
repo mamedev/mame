@@ -8,11 +8,13 @@
 
 *********************************************************************/
 
-#include <cstring>
-#include <cassert>
-
+#include "dsk_dsk.h"
+#include "flopimg_legacy.h"
 #include "imageutl.h"
-#include "flopimg.h"
+
+#include "ioprocs.h"
+
+#include <cstring>
 
 #define MV_CPC      "MV - CPC"
 #define EXTENDED    "EXTENDED"
@@ -270,7 +272,8 @@ FLOPPY_CONSTRUCT( dsk_dsk_construct )
 	return FLOPPY_ERROR_SUCCESS;
 }
 
-#include "dsk_dsk.h"
+
+
 
 #define DSK_FORMAT_HEADER   "MV - CPC"
 #define EXT_FORMAT_HEADER   "EXTENDED CPC DSK"
@@ -299,16 +302,17 @@ bool dsk_format::supports_save() const
 	return false;
 }
 
-int dsk_format::identify(io_generic *io, uint32_t form_factor)
+int dsk_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t header[16];
 
-	io_generic_read(io, &header, 0, sizeof(header));
+	size_t actual;
+	io.read_at(0, &header, sizeof(header), actual);
 	if ( memcmp( header, DSK_FORMAT_HEADER, 8 ) ==0) {
-		return 100;
+		return FIFID_SIGN;
 	}
 	if ( memcmp( header, EXT_FORMAT_HEADER, 16 ) ==0) {
-		return 100;
+		return FIFID_SIGN;
 	}
 	return 0;
 }
@@ -344,14 +348,18 @@ struct sector_header
 
 #pragma pack()
 
-bool dsk_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
+	size_t actual;
+
 	uint8_t header[0x100];
 	bool extendformat = false;
 
-	uint64_t image_size = io_generic_size(io);
+	uint64_t image_size;
+	if (io.length(image_size))
+		return false;
 
-	io_generic_read(io, &header, 0, sizeof(header));
+	io.read_at(0, &header, sizeof(header), actual);
 	if ( memcmp( header, EXT_FORMAT_HEADER, 16 ) ==0) {
 		extendformat = true;
 	}
@@ -418,7 +426,7 @@ bool dsk_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 			if(track_offsets[(track<<1)+side] >= image_size)
 				continue;
 			track_header tr;
-			io_generic_read(io, &tr,track_offsets[(track<<1)+side],sizeof(tr));
+			io.read_at(track_offsets[(track<<1)+side], &tr, sizeof(tr), actual);
 
 			// skip if there are no sectors in this track
 			if (tr.number_of_sector == 0)
@@ -428,7 +436,7 @@ bool dsk_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 			int first_sector_code = -1;
 			for(int j=0;j<tr.number_of_sector;j++) {
 				sector_header sector;
-				io_generic_read(io, &sector,track_offsets[(track<<1)+side]+sizeof(tr)+(sizeof(sector)*j),sizeof(sector));
+				io.read_at(track_offsets[(track<<1)+side]+sizeof(tr)+(sizeof(sector)*j), &sector, sizeof(sector), actual);
 
 				if (j == 0)
 					first_sector_code = sector.sector_size_code;
@@ -447,7 +455,7 @@ bool dsk_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 
 			for(int j=0;j<tr.number_of_sector;j++) {
 				sector_header sector;
-				io_generic_read(io, &sector,track_offsets[(track<<1)+side]+sizeof(tr)+(sizeof(sector)*j),sizeof(sector));
+				io.read_at(track_offsets[(track<<1)+side]+sizeof(tr)+(sizeof(sector)*j), &sector, sizeof(sector), actual);
 
 				sects[j].track       = sector.track;
 				sects[j].head        = sector.side;
@@ -470,7 +478,7 @@ bool dsk_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 
 				if(!(sector.fdc_status_reg1 & 0x04)) {
 					sects[j].data = sect_data + sdatapos;
-					io_generic_read(io, sects[j].data, pos, sects[j].actual_size);
+					io.read_at(pos, sects[j].data, sects[j].actual_size, actual);
 					sdatapos += sects[j].actual_size;
 
 				} else
@@ -489,4 +497,4 @@ bool dsk_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 	return true;
 }
 
-const floppy_format_type FLOPPY_DSK_FORMAT = &floppy_image_format_creator<dsk_format>;
+const dsk_format FLOPPY_DSK_FORMAT;

@@ -247,9 +247,9 @@ Stephh's log (2006.09.20) :
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "machine/upd4701.h"
-#include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "sound/qsound.h"
+#include "sound/ymopm.h"
 #include "machine/kabuki.h"
 #include "speaker.h"
 
@@ -712,6 +712,7 @@ void cps_state::varthb2_map(address_map &map)
              INPUT PORTS, DIPs
 ***********************************************************/
 
+
 #define CPS1_COINAGE_1(diploc) \
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) ) PORT_DIPLOCATION(diploc ":1,2,3") \
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) \
@@ -956,10 +957,75 @@ static INPUT_PORTS_START( forgottn )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DIAL0")
-	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_RESET PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_PLAYER(1)
+	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_PLAYER(1)
 
 	PORT_START("DIAL1")
-	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_RESET PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2)
+	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2)
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( forgottnj ) // Where's the Demo Sound????
+	PORT_INCLUDE( cps1_1b )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSWC")                                  // The manual only mentions two DIP switch banks.
+	PORT_DIPNAME( 0x01, 0x01, "Slow Motion" )           PORT_DIPLOCATION("DIP-C:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Slowest Motion" )        PORT_DIPLOCATION("DIP-C:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DIP-C:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DIP-C:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DIP-C:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DIP-C:6" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Freeze" )                    PORT_DIPLOCATION("DIP-C:7,8")
+	PORT_DIPSETTING(    0xc0, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) ) // Gs only takes effect when Freeze is ON
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, "On with Alignment Character" ) // Shows a column of "G" on the leftside of the screen
+
+	PORT_START("DSWA") // DSW banks A & B in reverse order?
+	CPS1_DIFFICULTY_1( "DIP-A" ) // Not verified, going by other sets
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DIP-A:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DIP-A:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DIP-A:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DIP-A:7" )
+	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "DIP-A:8" )
+
+	PORT_START("DSWB") // DSW banks A & B in reverse order?
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("DIP-B:1,2,3")
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x06, "2 Coins / 2 Credits" ) // Must insert 2 coins to get a credit, but credits come in 2s
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("DIP-B:4,5,6")
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x30, "2 Coins / 2 Credits" ) // Must insert 2 coins to get a credit, but credits come in 2s
+	PORT_DIPSETTING(    0x28, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x40, 0x40, "Speed up" )       PORT_DIPLOCATION("DIP-B:7") // Everything is faster including title screen / score wait times
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("DIP-B:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DIAL0")
+	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_PLAYER(1)
+
+	PORT_START("DIAL1")
+	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ghouls )
@@ -1894,17 +1960,53 @@ INPUT_PORTS_START( sf2 )
 	PORT_DIPNAME( 0x80, 0x80, "Game Mode")                          PORT_DIPLOCATION("SW(C):8")
 	PORT_DIPSETTING(    0x80, "Game" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Test ) )
-
 INPUT_PORTS_END
 
-/* Needs further checking */
 static INPUT_PORTS_START( sf2j )
 	PORT_INCLUDE( sf2 )
 
 	PORT_MODIFY("DSWB")
 	PORT_DIPNAME( 0x08, 0x00, "2 Players Game" )                    PORT_DIPLOCATION("SW(B):4")
-	PORT_DIPSETTING(    0x08, "1 Credit/No Continue" )
+	PORT_DIPSETTING(    0x08, "1 Credit/No Continue" ) // 1 Credit for versus play, and "Here comes a new challenger" option is disabled
 	PORT_DIPSETTING(    0x00, "2 Credits/Winner Continue" ) //Winner stays, loser pays, in other words.
+INPUT_PORTS_END
+
+/* Same as sf2j but options are inverted. Default position here is 2 Credits for versus play */
+static INPUT_PORTS_START( sf2cej )
+	PORT_INCLUDE( sf2 )
+
+	PORT_MODIFY("DSWB")
+	PORT_DIPNAME( 0x08, 0x08, "2 Players Game" )                    PORT_DIPLOCATION("SW(B):4")
+	PORT_DIPSETTING(    0x08, "2 Credits/Winner Continue" ) //Winner stays, loser pays, in other words.
+	PORT_DIPSETTING(    0x00, "1 Credit/No Continue" )  // 1 Credit for versus play, and "Here comes a new challenger" option is disabled
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( sf2rb )
+	PORT_INCLUDE( sf2 )
+
+	PORT_MODIFY("DSWB")
+	PORT_DIPNAME( 0xf0, 0xf0, "Turbo Vs CPU" )                      PORT_DIPLOCATION("SW(B):5,6,7,8")
+	PORT_DIPSETTING(    0xf0, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0xe0, "Fixed 1" )
+	PORT_DIPSETTING(    0xd0, "Fixed 2" )
+	PORT_DIPSETTING(    0xc0, "Fixed 3" )
+	PORT_DIPSETTING(    0xb0, "Fixed 4" )
+	PORT_DIPSETTING(    0xa0, "Fixed 5" )
+	PORT_DIPSETTING(    0x90, "Fixed 6" )
+	PORT_DIPSETTING(    0x80, "Fixed 7" )
+	PORT_DIPSETTING(    0x70, "Progressive 1" )
+	PORT_DIPSETTING(    0x60, "Progressive 2" )
+	PORT_DIPSETTING(    0x50, "Progressive 3" )
+	PORT_DIPSETTING(    0x40, "Progressive 4" )
+	PORT_DIPSETTING(    0x30, "Progressive 5" )
+	PORT_DIPSETTING(    0x20, "Progressive 6" )
+	PORT_DIPSETTING(    0x10, "Progressive 7" )
+	PORT_DIPSETTING(    0x00, "Progressive 8" )
+
+	PORT_MODIFY("DSWC")
+	PORT_DIPNAME( 0x01, 0x01, "Projectile Path" )                   PORT_DIPLOCATION("SW(C):1")
+	PORT_DIPSETTING(    0x01, "Homing" )
+	PORT_DIPSETTING(    0x00, "Zigzag" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sf2hack )
@@ -2979,6 +3081,70 @@ static INPUT_PORTS_START( pang3b )
 	PORT_DIPUNUSED( 0x80, 0x80 )
 INPUT_PORTS_END
 
+/* The bootleggers hacked main code (@ 0x300 and 0xe0000) to use dip switches instead of the usual pang3 93C46 serial EPROM */
+static INPUT_PORTS_START( pang3b4 )
+  // Though service mode shows diagonal inputs, the flyer and manual both specify 4-way joysticks
+  PORT_INCLUDE( cps1_2b_4way )
+
+  PORT_MODIFY("IN0")
+  PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
+
+  // As manual states, "Push 2 is not used," and is not even shown in service mode
+  PORT_MODIFY("IN1")
+  PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Shot")
+  PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+  PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Shot")
+  PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+  PORT_START("DSWA")
+  CPS1_COINAGE_2( "DIP-A" )
+  PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "DIP-A:4" )
+  PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "DIP-A:5" )
+  PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "DIP-A:6" )
+  PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "DIP-A:7" )
+  PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "DIP-A:8" )
+
+  PORT_START("DSWB")
+  PORT_DIPNAME( 0x07, 0x04, "Game level" )                      PORT_DIPLOCATION("DIP-B:1,2,3")
+  PORT_DIPSETTING(    0x07, "Easy 3" )
+  PORT_DIPSETTING(    0x06, "Easy 2" )
+  PORT_DIPSETTING(    0x05, "Easy 1" )
+  PORT_DIPSETTING(    0x04, "Normal" )
+  PORT_DIPSETTING(    0x03, "Hard 1" )
+  PORT_DIPSETTING(    0x02, "Hard 2" )
+  PORT_DIPSETTING(    0x01, "Hard 3" )
+  PORT_DIPSETTING(    0x00, "Hard 4" )
+  PORT_DIPNAME( 0x18, 0x18, "Player" )                          PORT_DIPLOCATION("DIP-B:4,5")
+  PORT_DIPSETTING(    0x08, "1" )
+  PORT_DIPSETTING(    0x10, "2" )
+  PORT_DIPSETTING(    0x18, "3" )
+  PORT_DIPSETTING(    0x00, "4" )
+  PORT_DIPNAME( 0x60, 0x20, "Extend" )                          PORT_DIPLOCATION("DIP-B:6,7")
+  PORT_DIPSETTING(    0x00, "30K, 250K, 1M, 3M, 7M" )
+  PORT_DIPSETTING(    0x20, "80K, 500k, 2M, 5M, 10M" )
+  PORT_DIPSETTING(    0x40, "250K, 1M, 3M, 7M, 15M" )
+  PORT_DIPSETTING(    0x60, "Not extend" )
+  PORT_DIPNAME( 0x80, 0x80, "Free play" )                         PORT_DIPLOCATION("DIP-B:8")
+  PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+  PORT_START("DSWC")
+  PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "DIP-C:1" )
+  PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "DIP-C:2" )
+  PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "DIP-C:3" )
+  PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "DIP-C:4" )                  // Missing freeze code @ 0x020B74
+  PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )              PORT_DIPLOCATION("DIP-C:5")
+  PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+  PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )              PORT_DIPLOCATION("DIP-C:6")
+  PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+  PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )           PORT_DIPLOCATION("DIP-C:7")
+  PORT_DIPSETTING(    0x40, DEF_STR( No ) )
+  PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+  PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "DIP-C:8" )
+INPUT_PORTS_END
+
 // Note: if you have service mode stuck then start button doesn't get recognized on title screen.
 static INPUT_PORTS_START( gulunpa )
 	PORT_INCLUDE( cps1_2b )
@@ -4009,6 +4175,48 @@ ROM_START( forgottnuaa ) /* 1 byte difference to parent set. Region byte or poin
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "lw-03u.14c", 0x00000, 0x20000, CRC(807d051f) SHA1(720e4733787b9b11f4d1cdce0892b69475802844) )
+	ROM_LOAD( "lw-04u.13c", 0x20000, 0x20000, CRC(e6cd098e) SHA1(667f6e5736f76a1c4c450c4e2035574ea89d7910) )
+
+	ROM_REGION( 0x0200, "aboardplds", 0 )
+	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
+	ROM_LOAD( "ioa1",         0x0000, 0x0117, CRC(59c7ee3b) SHA1(fbb887c5b4f5cb8df77cec710eaac2985bc482a6) )
+	ROM_LOAD( "prg1",         0x0000, 0x0117, CRC(f1129744) SHA1(a5300f301c1a08a7da768f0773fa0fe3f683b237) )
+	ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
+	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
+
+	ROM_REGION( 0x0200, "bboardplds", 0 )
+	ROM_LOAD( "lwchr.3a",     0x0000, 0x0117, CRC(54ed4c39) SHA1(961309335dc1c84482ebe99ea938b32d3a6ae9a8) )
+	ROM_LOAD( "lwio.15e",     0x0000, 0x0117, CRC(ad52b90c) SHA1(f0fd6aeea515ee449320fe15684e6b3ab7f97bf4) )
+ROM_END
+
+/* B-Board 88618B-2 */
+ROM_START( forgottnj ) // comes from a PCB with a very early serial number:  LW00022
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "11.14f",         0x00000, 0x20000, CRC(c9a6b319) SHA1(152f65658af6333f10a0608a90330e1cc074d1b2) )
+	ROM_LOAD16_BYTE( "15.14g",         0x00001, 0x20000, CRC(524f920e) SHA1(9c3ad6c8009ff55f81cc859c2e47fa6d6ede112b) )
+	ROM_LOAD16_BYTE( "10.13f",         0x40000, 0x20000, CRC(ff7e41d9) SHA1(6fc0c9692233ce68068a515c000a976f82585f8b) )
+	ROM_LOAD16_BYTE( "14.13g",         0x40001, 0x20000, CRC(80c3a813) SHA1(7d50a6de8a2634e4300985c459e190d1b4eddb10) )
+	ROM_LOAD16_WORD_SWAP( "lw-07.13e", 0x80000, 0x80000, CRC(fd252a26) SHA1(5cfb097984912a5167a8c7ec4c2e119b642f9970) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD64_WORD( "lw-01.9d",  0x000000, 0x80000, CRC(0318f298) SHA1(178ffd6da7bf845e30abf1bfc38a469cd319a73f) )
+	ROM_LOAD64_WORD( "lw-08.9f",  0x000002, 0x80000, CRC(25a8e43c) SHA1(d57cee1fc508db2677e84882fb814e4d9ad20543) )
+	ROM_LOAD64_WORD( "lw-05.9e",  0x000004, 0x80000, CRC(e4552fd7) SHA1(11147afc475904848458425661473586dd6f60cc) )
+	ROM_LOAD64_WORD( "lw-12.9g",  0x000006, 0x80000, CRC(8e6a832b) SHA1(d63a1331fda2365f090fa31950098f321a720ea8) )
+	ROM_LOAD64_WORD( "lw-02.12d", 0x200000, 0x80000, CRC(43e6c5c8) SHA1(d3e6c971de0477ec4e178adc82508208dd8b397f) )
+	ROM_LOAD64_WORD( "lw-09.12f", 0x200002, 0x80000, CRC(899cb4ad) SHA1(95e61af338945e690f2a82746feba3871ea224eb) )
+	ROM_LOAD64_WORD( "lw-06.12e", 0x200004, 0x80000, CRC(5b9edffc) SHA1(6fd8f4a3ab070733b52365ab1945bf86acb2bf62) )
+	ROM_LOAD64_WORD( "lw-13.12g", 0x200006, 0x80000, CRC(8e058ef5) SHA1(00f2c0050fd106276ea5398511c5861ebfbc0d10) )
+
+	ROM_REGION( 0x8000, "stars", 0 )
+	ROM_COPY( "gfx", 0x200000, 0x000000, 0x8000 )
+
+	ROM_REGION( 0x18000, "audiocpu", 0 )
+	ROM_LOAD( "00.14a", 0x00000, 0x08000, CRC(3bc962ea) SHA1(d61240a4512c4b27a9d89758e05aeebef6326fec) )
+	ROM_CONTINUE(       0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "lw-03u.14c", 0x00000, 0x20000, CRC(807d051f) SHA1(720e4733787b9b11f4d1cdce0892b69475802844) ) // these 2 were mask ROMs
 	ROM_LOAD( "lw-04u.13c", 0x20000, 0x20000, CRC(e6cd098e) SHA1(667f6e5736f76a1c4c450c4e2035574ea89d7910) )
 
 	ROM_REGION( 0x0200, "aboardplds", 0 )
@@ -8067,10 +8275,90 @@ ROM_START( sf2re ) // combines sf2m8 program ROMs with sf2cems6a ROMs for most G
 	ROM_LOAD( "27c020.u210", 0x00000, 0x40000, CRC(6cfffb11) SHA1(995526183ffd35f92e9096500a3fe6237faaa2dd) )
 ROM_END
 
+// PCB is marked: "100P003" and "054-034" on solder side
+// PCB is labelled: "10037SI 7", "STREET FIGHTER 2" and "STREET FIGHTER II MAGIC TURBO" on component side
+ROM_START( sf2mkot )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "u222.bin", 0x000000, 0x80000, CRC(b01a94b6) SHA1(a23682ccb463d766fd81a53cbc29b31f3fd4e5e0) )
+	ROM_LOAD16_BYTE( "u196.bin", 0x000001, 0x80000, CRC(20461c47) SHA1(485aa19d4d0a4a849f81b0d3e29137e461129fd6) )
+	ROM_LOAD16_BYTE( "u221.bin", 0x100000, 0x20000, CRC(64e6e091) SHA1(32ec05db955e538d4ada26d19ee50926f74b684f) )
+	ROM_LOAD16_BYTE( "u195.bin", 0x100001, 0x20000, CRC(c95e4443) SHA1(28417dee9ccdfa65b0f4a92aa29b90279fe8cd85) )
+
+	ROM_REGION( 0x600000, "gfx", 0 )
+	ROM_LOAD64_WORD( "d21.u70", 0x000000, 0x80000, CRC(baa0f81f) SHA1(5e55a5c4ad64be17089670a3d73c1c0d9082351b) )
+	ROM_CONTINUE(               0x000004, 0x80000)
+	ROM_LOAD64_WORD( "d24.u68", 0x000002, 0x80000, CRC(8edff95a) SHA1(8db35c5940dcc1f09f11be26051b2f98445d10e7) )
+	ROM_CONTINUE(               0x000006, 0x80000)
+	ROM_LOAD64_WORD( "d22.u69", 0x200000, 0x80000, CRC(468962b1) SHA1(fdfd2a7cbbcafaa37e972da425446d471e1e1dae) )
+	ROM_CONTINUE(               0x200004, 0x80000)
+	ROM_LOAD64_WORD( "d25.u64", 0x200002, 0x80000, CRC(8165f536) SHA1(8178fe2240c73c7283592aa31dd24aec5bf9429b) )
+	ROM_CONTINUE(               0x200006, 0x80000)
+	ROM_LOAD64_WORD( "d23.u19", 0x400000, 0x80000, CRC(39d763d3) SHA1(a2a0bddecaca6046785ccddfd20b8356a6ec36f0) )
+	ROM_CONTINUE(               0x400004, 0x80000)
+	ROM_LOAD64_WORD( "d26.u18", 0x400002, 0x80000, CRC(93ec42ae) SHA1(7c8b481d61a4e9977cac35236835f4aa5badf992) )
+	ROM_CONTINUE(               0x400006, 0x80000)
+	// extra gfx layer roms loaded over the former ones
+	ROM_LOAD64_WORD( "moon-1.c173.u30", 0x400004, 0x20000, CRC(7e36ec84) SHA1(ab6ad48726ca3649db77b9971105374a10e0aa22) )
+	ROM_CONTINUE(                       0x400000, 0x20000)
+	ROM_LOAD64_WORD( "moon-2.c132.u29", 0x400006, 0x20000, CRC(66403570) SHA1(fbd276784df8754bf4f2c6a72060e14af4cc5729) )
+	ROM_CONTINUE(                       0x400002, 0x20000)
+	// end of extra gfx layer roms
+
+	ROM_REGION( 0x18000, "audiocpu", 0 )
+	ROM_LOAD( "conv2.u191", 0x00000, 0x08000, CRC(08f6b60e) SHA1(8258fcaca4ac419312531eec67079b97f471179c) )
+	ROM_CONTINUE(                  0x10000, 0x08000 )
+
+	ROM_REGION( 0x20000, "user1", 0 ) // unknown (bootleg priority?)
+	ROM_LOAD( "u133.bin", 0x00000, 0x10000, CRC(13ea1c44) SHA1(5b05fe4c3920e33d94fac5f59e09ff14b3e427fe) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "voice.u210", 0x00000, 0x40000, CRC(6cfffb11) SHA1(995526183ffd35f92e9096500a3fe6237faaa2dd) )
+
+	ROM_REGION( 0x4000, "plds", ROMREGION_ERASE00 ) // all read-protected
+	ROM_LOAD( "gal16v8a-25lp.u6",   0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.u15",  0x0200, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.n03",  0x0400, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.n04",  0x0600, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.n05",  0x0800, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.n06",  0x0a00, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.u95",  0x0c00, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.u96",  0x0e00, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.u107", 0x1000, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.u125", 0x1200, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.u139", 0x1400, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.u151", 0x1600, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.u173", 0x1800, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.u176", 0x1a00, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.u177", 0x1c00, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.u178", 0x1e00, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.u183", 0x2000, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.u198", 0x2200, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.u218", 0x2400, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal20v8a-25lp.u20",  0x2600, 0x0157, NO_DUMP )
+	ROM_LOAD( "gal20v8a-25lp.u21",  0x2800, 0x0157, NO_DUMP )
+	ROM_LOAD( "gal20v8a-25lp.u34",  0x2a00, 0x0157, NO_DUMP )
+	ROM_LOAD( "gal20v8a-25lp.u35",  0x2c00, 0x0157, NO_DUMP )
+	ROM_LOAD( "gal20v8a-25lp.u39",  0x2e00, 0x0157, NO_DUMP )
+	ROM_LOAD( "gal20v8a-25lp.n07",  0x3000, 0x0157, NO_DUMP )
+	ROM_LOAD( "gal20v8a-25lp.n08",  0x3200, 0x0157, NO_DUMP )
+	ROM_LOAD( "gal20v8a-25lp.u104", 0x3400, 0x0157, NO_DUMP )
+	ROM_LOAD( "gal20v8a-25lp.u131", 0x3600, 0x0157, NO_DUMP )
+	ROM_LOAD( "gal20v8a-25lp.u135", 0x3800, 0x0157, NO_DUMP )
+	ROM_LOAD( "gal20v8a-25lp.u140", 0x3a00, 0x0157, NO_DUMP )
+	ROM_LOAD( "gal22v10-25lp.u134", 0x3c00, 0x02e5, NO_DUMP )
+ROM_END
+
 ROM_START( sf2rk )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
-	ROM_LOAD16_BYTE( "w6.u222",          0x000000, 0x80000, CRC(49422b6f) SHA1(69fe9147c7ee3f6fa29077df16f4ef1224495be3) )
-	ROM_LOAD16_BYTE( "w5.u196",          0x000001, 0x80000, CRC(7e9c8c2f) SHA1(3d34a3920a771e1d62a41c104c8b16e3c6ac9405) )
+	ROM_LOAD16_BYTE( "w6.u222", 0x000000, 0x80000, CRC(49422b6f) SHA1(69fe9147c7ee3f6fa29077df16f4ef1224495be3) )
+	ROM_LOAD16_BYTE( "w5.u196", 0x000001, 0x80000, CRC(7e9c8c2f) SHA1(3d34a3920a771e1d62a41c104c8b16e3c6ac9405) )
+
+	/* The dark screen issue is present on the real pcb, although much less noticeable than in mame.
+	   The bootleggers have patched out the code which modifies the brightness/fade component of the palette word.
+	   This is somewhat strange as unlike some bootlegs, this board DOES have the brightness circuitry (2x 7407's, 12x resistor dac) populated!
+	   The below patch fixes the issue:   (for pcb fix burn a 27c040 of w6.u222 with 0x8f7=0x6b)
+	*/
+	//ROM_FILL( 0x11ee, 1, 0x6b)
 
 	ROM_REGION( 0x600000, "gfx", 0 )
 	ROM_LOAD64_WORD( "01 rk098", 0x000000, 0x80000, CRC(4296de4d) SHA1(2bd5a0ebe2a20c745b11da9c7dc4f13f20efdda7) )
@@ -8085,16 +8373,16 @@ ROM_START( sf2rk )
 	ROM_CONTINUE(                0x400004, 0x80000)
 	ROM_LOAD64_WORD( "06 rk077", 0x400002, 0x80000, CRC(ec949f8c) SHA1(34ea3d6d85486a5ff25c774dbc6a4b16037a7347) )
 	ROM_CONTINUE(                0x400006, 0x80000)
-	/* extra gfx layer roms loaded over the former ones to remove the capcom copyright logo */
+	/* extra sprite roms loaded over the former ones (identical data) */
 	ROM_LOAD64_BYTE( "w-1",      0x400004, 0x10000, CRC(6de44671) SHA1(dc6abba639e0c27033e391c7438d88dc89a93351) )
 	ROM_CONTINUE(                0x400000, 0x10000 )
-	ROM_LOAD64_BYTE( "w-3",      0x400006, 0x10000, CRC(bf0cd819) SHA1(f04a098fce07949277268327871c5e5520e3bb3c) )
-	ROM_CONTINUE(                0x400002, 0x10000 )
-	ROM_LOAD64_BYTE( "w-2",      0x400005, 0x10000, CRC(e8f14362) SHA1(a20eb75e322011e2a8d8bf2acebe713bef3d3941) )
+	ROM_LOAD64_BYTE( "w-3",      0x400005, 0x10000, CRC(bf0cd819) SHA1(f04a098fce07949277268327871c5e5520e3bb3c) )
 	ROM_CONTINUE(                0x400001, 0x10000 )
+	ROM_LOAD64_BYTE( "w-2",      0x400006, 0x10000, CRC(e8f14362) SHA1(a20eb75e322011e2a8d8bf2acebe713bef3d3941) )
+	ROM_CONTINUE(                0x400002, 0x10000 )
 	ROM_LOAD64_BYTE( "w-4",      0x400007, 0x10000, CRC(76f9f91f) SHA1(58a34062d2c8378558a7f1629140330279af9a43) )
 	ROM_CONTINUE(                0x400003, 0x10000 )
-	/* end of extra gfx layer roms */
+	/* end of extra sprite roms */
 
 	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
 	ROM_LOAD( "1.rk", 0x00000, 0x08000, CRC(a4823a1b) SHA1(7b6bf59dfd578bfbbdb64c27988796783442d659) )
@@ -11484,7 +11772,7 @@ ROM_START( varthb2 )
 	// pcb picture shows 4x 42-pin mask roms which suggests 4x 27c800 (4MB) for gfx vs originals 4x 27c400 (2MB)
 	// roms u18,19 might just be duplicates of u68,70 (although markings are different?) or just half empty
 	// games expects sprites to start at 0x8000 so reloading in upper region
-	ROM_REGION( 0x600000, "gfx", 0 )
+	ROM_REGION( 0x600000, "gfx", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "va-5m.7a", 0x000000, 0x80000, BAD_DUMP CRC(b1fb726e) SHA1(5ac0876b6c49d0a99710dda68653664f4d8c1167) )
 	ROM_RELOAD(                  0x400000, 0x80000)
 	ROM_LOAD64_WORD( "va-7m.9a", 0x000002, 0x80000, BAD_DUMP CRC(4c6588cd) SHA1(d14e8cf051ac934ccc989d8c571c6cc9eed34af5) )
@@ -13070,6 +13358,131 @@ ROM_START( pang3b3 )
 	ROM_LOAD( "cp1b9k.9k",    0x0000, 0x0117, CRC(a754bdc3) SHA1(9267b24cbddee4858b219468cc92f9df8f5fd0ef) )
 ROM_END
 
+/* This bootleg uses a bootlegged B board nearly identical to that used in sf2ceblp.
+   In my set:
+     - Board-A is missing so I don't know if a normal or a dash board was used.
+     - Board-C is an hacked 88622-C-5 with an unusual CPS-B-12 and clearly it's not its C-board because
+       code analisys led to identify the CPS_B_21_DEF as the right configuration.
+     - Board-B has some missing components:
+      - audio cpu code EPROM @B13 (pang3b pa3_11.11f used instead)
+      - 28 pin DIP component @F8, probably a PIC16C55/7 looking the pinout (VCC on pin2, GND on pin 4, ...)
+
+   The program code is almost the same as of pang3b with some minor, yet interesting, hacks:
+      - Dip switch use for board configuration (code@ 0x000300, 0xe0000) instead of a serial EPROM
+      - Removed freeze from dip switch (code@ 020B74)
+      - Some code to handle the PIC (protection?).
+        Read and write to addresses 0x5762b0 and 0x57a2b0 occurs in the code but the return value is never really used (nop or bra skips relevant parts)
+        and so seems that the PIC protection is ineffective.
+      - Read and write to port 0x80017a (EEPROM in pang3) still are present in the code, but are filtered by the PAL16V8 @ E13 so there is no need to
+        create a port for that address here in mame (altough this causes a popmessage "CPS-B read port 3A contact MAMEDEV" to occurr at startup if compiled with
+        DEBUG=1)
+
+   Board-B has five PALs:
+      - PALCE16V8  @A2
+      - PAL16L8    @E11
+      - PALCE16V8  @E13
+      - PAL16L8    @J8
+      - PALCE22V10 @J8
+
+*/
+ROM_START( pang3b4 )
+  ROM_REGION( CODE_SIZE, "maincpu", 0 ) /* 68000 code */
+  ROM_LOAD16_BYTE( "22.u30", 0x00000, 0x20000, CRC(bf3ebe68) SHA1(10f3eb3f6e747eaed1821c611fa19350c3528362) )
+  ROM_LOAD16_BYTE( "26.u35", 0x00001, 0x20000, CRC(d20db83c) SHA1(ac97ad76848bb6069e6d07d1f2feb2c328578228) )
+  ROM_LOAD16_BYTE( "23.u31", 0x40000, 0x20000, CRC(94d494c2) SHA1(33a2c1ea041a68655b7c3c44b1c5d58dec3add89) )
+  ROM_LOAD16_BYTE( "27.u36", 0x40001, 0x20000, CRC(38e43390) SHA1(ae346c5e21b3aad86b118a0c99a550304916debf) )
+  ROM_LOAD16_BYTE( "20.u28", 0x80000, 0x20000, CRC(8daf3814) SHA1(a83a0434b9f281c70dae35362741f52a8b3ea622) )
+  ROM_LOAD16_BYTE( "24.u33", 0x80001, 0x20000, CRC(bb34e444) SHA1(2cfb135dbd763f327fe3c5ed2d8d291fd97118c2) )
+  ROM_LOAD16_BYTE( "21.u29", 0xC0000, 0x20000, CRC(54d0b680) SHA1(5527673286dc9db82eed357cda1f53ccdd3e2d1f) )
+  ROM_LOAD16_BYTE( "25.u34", 0xC0001, 0x20000, CRC(d666ec70) SHA1(3305fa5c6c78bdfc5ef5393f001e710ce3c4d28a) )
+
+
+  ROM_REGION( 0x400000, "gfx", 0 )
+  ROM_LOAD64_BYTE( "14.u25",  0x000000, 0x40000, CRC(d2b764a9) SHA1(bb13821a1a3059c2f98d5c36f830116b87583312) )
+  ROM_LOAD64_BYTE( "06.u15",  0x000001, 0x40000, CRC(fb68be4e) SHA1(5d7e34bfa5427a1b05b64e174dd26e2153b56ec0) )
+  ROM_LOAD64_BYTE( "13.u24",  0x200000, 0x40000, CRC(0c73a1c7) SHA1(c3d3f9115b24805f038bb4b808beef342c87eff3) )
+  ROM_LOAD64_BYTE( "05.u14",  0x200001, 0x40000, CRC(475a5ef1) SHA1(0dcd8d747a84037e27c5b360733a4c3d03cc43fa) )
+
+  ROM_LOAD64_BYTE( "10.u21",  0x000004, 0x40000, CRC(79673708) SHA1(9b4d972d7ef6592763271976349d65519e0d0dfa) )
+  ROM_LOAD64_BYTE( "02.u11",  0x000005, 0x40000, CRC(f706b466) SHA1(ecdfe160bdfa9c5d4533c43f52868f4e71ee6c8b) )
+  ROM_LOAD64_BYTE( "09.u20",  0x200004, 0x40000, CRC(6e36e963) SHA1(2e46c57516603322ee16e7a7ffa4792c3569f087) )
+  ROM_LOAD64_BYTE( "01.u10",  0x200005, 0x40000, CRC(7d15b9d7) SHA1(b6b39bffb2440c4cfedcdda19e6bcb0a85038ee3) )
+
+  ROM_LOAD64_BYTE( "16.u27",  0x000002, 0x40000, CRC(3e293482) SHA1(c5896b92126f05cfcef46a1d6e4a8986c054d1db) )
+  ROM_LOAD64_BYTE( "08.u17",  0x000003, 0x40000, CRC(7e0ca927) SHA1(eee7df6f8fc11dda0d403b7d43934e3233cf257e) )
+  ROM_LOAD64_BYTE( "15.u26",  0x200002, 0x40000, CRC(a933434f) SHA1(60807e16b87f3e07f59fd14d29a5c54efe54f4af) )
+  ROM_LOAD64_BYTE( "07.u16",  0x200003, 0x40000, CRC(83b3fa5e) SHA1(95c79cfe88902a36a60ebd73490b435c57c9d60e) )
+
+  ROM_LOAD64_BYTE( "12.u23",  0x000006, 0x40000, CRC(3c4dfb4f) SHA1(638078080d49edb8c711dfb10ee6029c58e82801) )
+  ROM_LOAD64_BYTE( "04.u13",  0x000007, 0x40000, CRC(44cd5e95) SHA1(53ba6dd7ab2313b5a0ee1210a1ec24e57d1d5d86) )
+  ROM_LOAD64_BYTE( "11.u22",  0x200006, 0x40000, CRC(29194b90) SHA1(479bbfbc26cd18440fdf9b71f85e3776add61cc4) )
+  ROM_LOAD64_BYTE( "03.u12",  0x200007, 0x40000, CRC(7e28974e) SHA1(d1eb177fe37784c6bcd5cb7df3b06b55c4d069b8) )
+
+  ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+  ROM_LOAD( "pa3_11.11f",  0x00000, 0x08000, BAD_DUMP CRC(cb1423a2) SHA1(3191bf5d340168647881738cb2aed09b1d86146e) ) // 19.u9 missing, used pang3b audio code instead
+  ROM_IGNORE( 0x18000 )
+
+  ROM_REGION( 0x40000, "oki", 0 )  /* Samples */
+  ROM_LOAD( "pa3_05.10d",  0x00000, 0x20000, CRC(73a10d5d) SHA1(999465e4fbc35a34746d2db61ad49f61403d5af7) ) // 18.u18 has the same content of pa3_05.10d from pang3 romset
+  ROM_LOAD( "pa3_06.11d",  0x20000, 0x20000, CRC(affa4f82) SHA1(27b9292bbc121cf585f53297a79fe8f0d0a729ae) ) // 17.u19 has the same content of pa3_06.11d from pang3 romset
+
+  ROM_REGION( 0x0400, "bboardplds", 0 )
+  ROM_LOAD( "pal16l8.11e", 0x0000, 0x0117, CRC(27617943) SHA1(eb34cfba18fcc2b67ee214c681ea86bfe1bb75e0) ) // Bruteforced
+  ROM_LOAD( "pal16v8.1a",  0x0000, 0x0117, CRC(78c3161f) SHA1(7ae85dfca59387f4874b0ef1218bfd14c393fb85) ) // Bruteforced
+  ROM_LOAD( "pal16v8.13e", 0x0000, 0x0117, CRC(5406caf1) SHA1(6bebafd4a4bad9ed766abce2fef9c30cbf61772e) ) // Bruteforced
+  ROM_LOAD( "pal22v10.j8", 0x0000, 0x02dd, CRC(a9445f88) SHA1(caacee5f3d5502cd51060c0769914cad4317838c) ) // Bruteforced
+  ROM_LOAD( "pal16l8.j8",  0x0000, 0x0117, NO_DUMP ) // Bad PAL, all outputs are fixed high
+ROM_END
+
+/* B-Board Mitchell 94916-10 */
+/* This set comes from an encrypted bootleg that uses a very well reproduced Mitchell 94916-10 B-Board surmounted by an
+   original Capcom 90631C-5 C-Board taken from a Knights of the round board (there's a sticker on it).
+   Protection chip MACH215 is present. */
+ROM_START( pang3b5 )
+  ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+  ROM_LOAD16_WORD_SWAP( "pa3e_17.11l", 0x00000, 0x80000, CRC(d7041d32) SHA1(b021f3defe7fc58030ba907125c713f987724187) ) // 17.11l has the same content of pa3e_17.11l from pang3r1 romset
+  ROM_LOAD16_WORD_SWAP( "pa3e_16.10l", 0x80000, 0x80000, CRC(1be9a483) SHA1(6cff1dd15ca163237bc82fb4a3e1d469d35e7be8) ) // 16.10l has the same content of pa3e_16.10l from pang3r1 romset
+
+  ROM_REGION( 0x400000, "gfx", 0 )
+  ROM_LOAD64_WORD( "1.2c",  0x000000, 0x80000, CRC(22c934c4) SHA1(93a3c3cfdbfd1321b785f08d1da30d9b1445e14b) )
+  ROM_LOAD64_WORD( "7.2f",  0x000002, 0x80000, CRC(51031180) SHA1(a38a77da2ca452843a3b0cb02baaaf7df2e3d9a4) )
+  ROM_LOAD64_WORD( "3.4c",  0x000004, 0x80000, CRC(ac119a46) SHA1(e8a07349b6106f712a7543ab52e9d5ced756fdbd) )
+  ROM_LOAD64_WORD( "9.4f",  0x000006, 0x80000, CRC(2e1d35f2) SHA1(1b4a9cf9ed91fed532d44582c598982dae06253c) )
+  ROM_LOAD64_WORD( "2.3c",  0x200000, 0x80000, CRC(07c85e9b) SHA1(5b9bc1f5708d03c2458a1dbb781084c2af8f91ee) )
+  ROM_LOAD64_WORD( "8.3f",  0x200002, 0x80000, CRC(325cc0b7) SHA1(ef464abfbadb680eac51daab4adf0bb239785679) )
+  ROM_LOAD64_WORD( "4.5c",  0x200004, 0x80000, CRC(4ad13297) SHA1(59565f9819e1cdd405103d5e3621c747116f653c) )
+  ROM_LOAD64_WORD( "10.5f", 0x200006, 0x80000, CRC(026d0cd2) SHA1(44f7718851e0b1f43682afafcbd844e6b1ce3430) )
+
+
+  ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+  ROM_LOAD( "pa3_11.11f",  0x00000, 0x08000, CRC(cb1423a2) SHA1(3191bf5d340168647881738cb2aed09b1d86146e) )  // == 11.11f has the same content of pa3w_16.10l from pang3 romset
+  ROM_IGNORE( 0x18000 )
+
+  ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+  ROM_LOAD( "pa3_05.10d",  0x00000, 0x20000, CRC(73a10d5d) SHA1(999465e4fbc35a34746d2db61ad49f61403d5af7) ) // 5.10c has the same content of pa3_05.10d from pang3 romset
+  ROM_LOAD( "pa3_06.11d",  0x20000, 0x20000, CRC(affa4f82) SHA1(27b9292bbc121cf585f53297a79fe8f0d0a729ae) ) // 6.11c has the same content of pa3_06.11d from pang3 romset
+
+  ROM_REGION( 0x0200, "aboardplds", 0 )
+  ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
+  ROM_LOAD( "ioa1",         0x0000, 0x0117, CRC(59c7ee3b) SHA1(fbb887c5b4f5cb8df77cec710eaac2985bc482a6) )
+  ROM_LOAD( "prg1",         0x0000, 0x0117, CRC(f1129744) SHA1(a5300f301c1a08a7da768f0773fa0fe3f683b237) )
+  ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
+  ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
+
+  ROM_REGION( 0x0200, "bboardplds", 0 )
+  ROM_LOAD( "cp1b1f_boot.1f", 0x0000, 0x0117, CRC(658849dc) SHA1(4fc386fa33322ce52334dee1391d617e0754bde0) )
+  ROM_LOAD( "cp1b8k.8k",      0x0000, 0x0117, CRC(8a52ea7a) SHA1(47a59abc54a83292cfd6faa2d293c8f948c7ea03) ) // I was not able to dump the original PAL. Tryied to swap it with a legit CP1B8K on real hw
+																											 // and it's working, so I suppose they're functionally equivalent
+  ROM_LOAD( "cp1b9ka.9k",     0x0000, 0x0117, CRC(238d3ff4) SHA1(597f429d6a0ea485746322592604188c1ec87595) ) // The PAL @ 9k was bruteforced and verified to be to be functionally equivalent to a standard cp1b9ka
+
+  ROM_REGION( 0x0200, "cboardplds", 0 )
+  ROM_LOAD( "ioc1.ic7",     0x0000, 0x0104, CRC(a399772d) SHA1(55471189db573dd61e3087d12c55564291672c77) )
+  ROM_LOAD( "c632.ic1",     0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )
+ROM_END
+
+
+
+
 /* B-Board 91635B-2 */
 /* Note that this USA set seems to be the only one where GFX are stored into EPROMs instead of the usual mask ROMs. */
 ROM_START( megaman )
@@ -13586,9 +13999,9 @@ void cps_state::init_sf2rk()
 		gfx[i] = bitswap(x, 0, 6 ,5, 4, 3, 2, 1, 7);
 	}
 
-	// the 0x400000 - 0x440000 range is covered by the extra GFX layer ROMs, which aren't scrambled
+	// the 0x400000 - 0x480000 range is covered by the extra GFX layer ROMs, which aren't scrambled
 
-	for (int i = 0x440000; i < 0x600000; i++)
+	for (int i = 0x480000; i < 0x600000; i++)
 	{
 		uint8_t x = gfx[i];
 		gfx[i] = bitswap(x, 0, 6 ,5, 4, 3, 2, 1, 7);
@@ -13617,16 +14030,16 @@ void cps_state::init_sf2dongb()
 
 uint16_t cps_state::sf2ceblp_prot_r()
 {
-	if (sf2ceblp_prot == 0x0)
+	if (m_sf2ceblp_prot == 0x0)
 		return 0x1992;
-	if (sf2ceblp_prot == 0x04)
+	if (m_sf2ceblp_prot == 0x04)
 		return 0x0408;
 	return 0xffff;
 }
 
 void cps_state::sf2ceblp_prot_w(uint16_t data)
 {
-	sf2ceblp_prot = data;
+	m_sf2ceblp_prot = data;
 }
 
 
@@ -13732,6 +14145,68 @@ void cps_state::init_pang3()
 	init_pang3b();
 }
 
+/*
+Pang 3b4 - code accesso to $5762b0 and $57a2b0 (PIC)
+
+--------- Dip switch decoding ---------
+0E001A: move.b  $80001c.l, D0    ; !Dip switch B
+0E0020: not.b   D0               ; Dip switch B
+0E0022: move.b  D0, D1           ; D1 = D0  - Save DSWB for later use
+0E0024: andi.b  #$7, D0          ; D0 = D0 & $7 - first 3 bits - Game level -- 7<= D0 <= 0
+0E0028: move.w  D0, $5762b0.l    ; [$5762b0] = D0
+0E002E: nop                      ;
+0E0030: move.w  $57a2b0.l, D2    ; D2 = [$57a2b0]
+0E0036: move.b  D1, D0           ; D0 = D1 - restore value read from DSWB
+0E0038: andi.w  #$60, D0         ; D0 = D0 & $60 - bit 5, 6
+
+--------- Copy protection ? ---------
+000300: move.w  #$17, $5762b0.l  ; [5762B0] = 17 (Pic?)
+000308: nop                      ;
+00030A: move.w  #$3, D2          ; D2 = 3
+00030E: move.w  $57a2b0.l, D0    ; D0 = [$57A2B0]
+000314: cmpi.w  #$7321, D0       ; DO <= $7321 (not used?)
+000318: bra     $360             ; jmp 360
+; unused code
+00031A: dbra    D2, $30e         ; loop until D2=0 to $30E
+00031E: move.l  #$0, $ff10fa.l   ; [$ff10fa] = 0 ; reset values initialized at 238F0-23922
+000328: move.l  #$0, $ff113a.l   ; [$ff113a] = 0 ; reset values initialized at 238F0-23922
+000332: move.l  #$0, $ff10fe.l   ; [$ff10fe] = 0 ; reset values initialized at 238F0-23922
+00033C: move.l  #$0, $ff113e.l   ; [$ff113e] = 0 ; reset values initialized at 238F0-23922
+000346: move.l  #$0, $ff10d2.l   ; [$ff10d2] = 0 ; reset values initialized at 238F0-23922
+000350: move.l  #$0, $ff1112.l   ; [$ff1112] = 0 ; reset values initialized at 238F0-23922
+00035A: jmp     $20acc.l         ; jmp $20ACC
+; unused code [END]
+000360: jmp     $e0000.l         ; jmp $E0000
+*/
+uint16_t cps_state::pang3b4_prot_r()
+{
+	if ((m_pang3b4_prot & 0xff) <=7)
+		  return (m_pang3b4_prot & 0xff) + 0x20;  // Game level + extend
+	if (m_pang3b4_prot == 0x17)
+		  return 0x7321;                      // Guessed from code @0x314
+	return 0xffff;
+}
+
+void cps_state::pang3b4_prot_w(uint16_t data)
+{
+	m_pang3b4_prot = data;
+}
+
+
+void cps_state::init_pang3b4()
+{
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x5762b0, 0x5762b1, write16smo_delegate(*this, FUNC(cps_state::pang3b4_prot_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x57a2b0, 0x57a2b1, read16smo_delegate(*this, FUNC(cps_state::pang3b4_prot_r)));
+
+	/* In pang3 the Mach215 security chip outputs 2 control signals (pins 4, 6) which switch the eeprom in/out serial data lines onto the main 68k data bus when required
+	   They're mapped in the CPS-B address range but there is not the EPROM on the board
+	   Read and write to port 0x80017a still are present in the code, but they are filtered by the PAL16V8 @ E13 */
+	m_maincpu->space(AS_PROGRAM).nop_readwrite(0x80017a, 0x80017b);
+
+	init_cps1();
+}
+
+
 uint16_t cps_state::ganbare_ram_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t result = 0xffff;
@@ -13819,7 +14294,7 @@ void cps_state::varthb2_cps_a_w(offs_t offset, uint16_t data)
 
 /*
     A note regarding bootlegs:
-    In order to keep the cps source in some sort of order, the idea is to group similar bootleg hardware into seperate
+    In order to keep the cps source in some sort of order, the idea is to group similar bootleg hardware into separate
     derived classes and source files.
 
     Rom swaps, hacks etc.  (on original Capcom hardware)  ->  cps1.cpp
@@ -13832,8 +14307,8 @@ void cps_state::varthb2_cps_a_w(offs_t offset, uint16_t data)
     *2 this is original configuration, but non-Capcom (usually single-board) hardware.
 
 
-    This file currently contains games in first and last catergories.
-    Eventually only official/genuine/non-bootleg Capcom-hardware games and those in first catergory will remain here.
+    This file currently contains games in first and last categories.
+    Eventually only official/genuine/non-bootleg Capcom-hardware games and those in first category will remain here.
 */
 
 
@@ -13846,6 +14321,7 @@ GAME( 1988, forgottnue,  forgottn, forgottn,   forgottn, cps_state, init_cps1,  
 GAME( 1988, forgottnuc,  forgottn, forgottn,   forgottn, cps_state, init_cps1,     ROT0,   "Capcom", "Forgotten Worlds (USA, B-Board 88618B-2, Rev. C)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, forgottnua,  forgottn, forgottn,   forgottn, cps_state, init_cps1,     ROT0,   "Capcom", "Forgotten Worlds (USA, B-Board 88618B-2, Rev. A)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, forgottnuaa, forgottn, forgottn,   forgottn, cps_state, init_cps1,     ROT0,   "Capcom", "Forgotten Worlds (USA, B-Board 88618B-2, Rev. AA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, forgottnj,   forgottn, forgottn,   forgottnj,cps_state, init_cps1,     ROT0,   "Capcom", "Forgotten Worlds (Japan) (English prototype)", MACHINE_SUPPORTS_SAVE ) // shows a Japan warning but runs an English localized version of the game, many changes, unfinished levels, ends abruptly.
 GAME( 1988, lostwrld,    forgottn, forgottn,   forgottn, cps_state, init_cps1,     ROT0,   "Capcom", "Lost Worlds (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, lostwrldo,   forgottn, forgottn,   forgottn, cps_state, init_cps1,     ROT0,   "Capcom", "Lost Worlds (Japan Old Ver.)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, ghouls,      0,        cps1_10MHz, ghouls,   cps_state, init_cps1,     ROT0,   "Capcom", "Ghouls'n Ghosts (World)", MACHINE_SUPPORTS_SAVE )   // "EXPORT" // Wed.26.10.1988 in the ROMs
@@ -13933,7 +14409,7 @@ GAME( 1992, sf2ebbl,     sf2,      cps1_10MHz, sf2hack,  cps_state, init_sf2hack
 GAME( 1992, sf2ebbl2,    sf2,      cps1_10MHz, sf2hack,  cps_state, init_sf2hack,  ROT0,   "bootleg", "Street Fighter II: The World Warrior (TAB Austria, bootleg, set 3)", MACHINE_SUPPORTS_SAVE )       // 910214 - based on World version
 GAME( 1992, sf2ebbl3,    sf2,      cps1_10MHz, sf2hack,  cps_state, init_sf2hack,  ROT0,   "bootleg", "Street Fighter II: The World Warrior (TAB Austria, bootleg, set 4)", MACHINE_SUPPORTS_SAVE )       // 910214 - based on World version
 GAME( 1992, sf2stt,      sf2,      cps1_10MHz, sf2hack,  cps_state, init_sf2hack,  ROT0,   "bootleg", "Street Fighter II: The World Warrior (TAB Austria, bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    // 910214 - based on World version
-GAME( 1992, sf2rk,       sf2,      cps1_10MHz, sf2hack,  cps_state, init_sf2rk,    ROT0,   "bootleg", "Street Fighter II: The World Warrior (RK, bootleg)", MACHINE_SUPPORTS_SAVE )    // 920214 - based on World version
+GAME( 1992, sf2rk,       sf2,      cps1_10MHz, sf2hack,  cps_state, init_sf2rk,    ROT0,   "bootleg", "Street Fighter II: The World Warrior (RK, bootleg)", MACHINE_SUPPORTS_SAVE )               // 910214 - based on World version, dark screen issue confirmed present on real pcb
 GAME( 1991, sf2qp1,      sf2,      cps1_10MHz, sf2,      cps_state, init_cps1,     ROT0,   "bootleg", "Street Fighter II: The World Warrior (Quicken Pt-I, bootleg)", MACHINE_SUPPORTS_SAVE )     // 910214 - based on World version
 GAME( 1991, sf2qp2,      sf2,      cps1_10MHz, sf2,      cps_state, init_cps1,     ROT0,   "bootleg", "Street Fighter II: The World Warrior (Quicken, bootleg)", MACHINE_SUPPORTS_SAVE )          // 910522 - based on USA Rev.I? version
 GAME( 1991, sf2thndr,    sf2,      cps1_10MHz, sf2,      cps_state, init_sf2thndr, ROT0,   "bootleg", "Street Fighter II: The World Warrior (Thunder Edition, bootleg, set 1)", MACHINE_SUPPORTS_SAVE )  // 910214 - based on World version
@@ -13968,14 +14444,14 @@ GAME( 1992, sf2ceua,     sf2ce,    cps1_12MHz, sf2,      cps_state, init_cps1,  
 GAME( 1992, sf2ceub,     sf2ce,    cps1_12MHz, sf2,      cps_state, init_cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (USA 920513)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, sf2ceuc,     sf2ce,    cps1_12MHz, sf2,      cps_state, init_cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (USA 920803)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, sf2cet,      sf2ce,    cps1_12MHz, sf2,      cps_state, init_cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (Taiwan 920313)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sf2ceja,     sf2ce,    cps1_12MHz, sf2,      cps_state, init_cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (Japan 920322)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sf2cejb,     sf2ce,    cps1_12MHz, sf2,      cps_state, init_cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (Japan 920513)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sf2cejc,     sf2ce,    cps1_12MHz, sf2,      cps_state, init_cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (Japan 920803)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sf2ceja,     sf2ce,    cps1_12MHz, sf2cej,   cps_state, init_cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (Japan 920322)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sf2cejb,     sf2ce,    cps1_12MHz, sf2cej,   cps_state, init_cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (Japan 920513)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sf2cejc,     sf2ce,    cps1_12MHz, sf2cej,   cps_state, init_cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (Japan 920803)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, sf2bhh,      sf2ce,    cps1_12MHz, sf2bhh,   cps_state, init_sf2rb,    ROT0,   "bootleg", "Street Fighter II': Champion Edition (Hung Hsi, bootleg)", MACHINE_SUPPORTS_SAVE ) // derived from sf2cet, was on actual Capcom hw with changed, unlabeled ROMs. Has turbo mode.
 GAME( 1992, sf2cebltw,   sf2ce,    cps1_12MHz, sf2bhh,   cps_state, init_cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition ('Taiwan' bootleg with PAL)", MACHINE_SUPPORTS_SAVE ) // 'Taiwan', similar to sf2bhh but without Hung Hsi copyright
-GAME( 1992, sf2rb,       sf2ce,    cps1_12MHz, sf2,      cps_state, init_sf2rb,    ROT0,   "bootleg", "Street Fighter II': Champion Edition (Rainbow, bootleg, set 1)", MACHINE_SUPPORTS_SAVE )           // 920322 - based on World version
-GAME( 1992, sf2rb2,      sf2ce,    cps1_12MHz, sf2,      cps_state, init_sf2rb2,   ROT0,   "bootleg", "Street Fighter II': Champion Edition (Rainbow, bootleg, set 2)", MACHINE_SUPPORTS_SAVE )           // 920322 - based on World version
-GAME( 1992, sf2rb3,      sf2ce,    cps1_12MHz, sf2,      cps_state, init_cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Rainbow, bootleg, set 3)", MACHINE_SUPPORTS_SAVE )           // 920322 - based on World version
+GAME( 1992, sf2rb,       sf2ce,    cps1_12MHz, sf2rb,    cps_state, init_sf2rb,    ROT0,   "bootleg", "Street Fighter II': Champion Edition (Rainbow, bootleg, set 1)", MACHINE_SUPPORTS_SAVE )           // 920322 - based on World version
+GAME( 1992, sf2rb2,      sf2ce,    cps1_12MHz, sf2rb,    cps_state, init_sf2rb2,   ROT0,   "bootleg", "Street Fighter II': Champion Edition (Rainbow, bootleg, set 2)", MACHINE_SUPPORTS_SAVE )           // 920322 - based on World version
+GAME( 1992, sf2rb3,      sf2ce,    cps1_12MHz, sf2rb,    cps_state, init_cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Rainbow, bootleg, set 3)", MACHINE_SUPPORTS_SAVE )           // 920322 - based on World version
 GAME( 1992, sf2red,      sf2ce,    cps1_12MHz, sf2,      cps_state, init_cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Red Wave, bootleg)", MACHINE_SUPPORTS_SAVE )         // 920313 - based on World version
 GAME( 1992?,sf2redp2,    sf2ce,    cps1_12MHz, sf2,      cps_state, init_cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Red Wave PtII, bootleg)", MACHINE_SUPPORTS_SAVE )    // 920313 - further modification of sf2red program
 GAME( 1992, sf2v004,     sf2ce,    cps1_12MHz, sf2,      cps_state, init_cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (V004, bootleg)", MACHINE_SUPPORTS_SAVE )             // 102092 !!! - based on (heavily modified) World version
@@ -14005,6 +14481,7 @@ GAME( 1992, sf2cems6b,   sf2ce,    sf2cems6,   sf2bhh,   cps_state, init_cps1,  
 GAME( 1992, sf2cems6c,   sf2ce,    sf2cems6,   sf2bhh,   cps_state, init_cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Mstreet-6, bootleg, set 3)", MACHINE_SUPPORTS_SAVE ) // 920322 USA
 GAME( 1992, sf2ceds6,    sf2ce,    sf2cems6,   sf2,      cps_state, init_cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Dstreet-6, bootleg)", MACHINE_SUPPORTS_SAVE ) // 920313 USA
 GAME( 1992, sf2re,       sf2,      sf2m3,      sf2,      cps_state, init_cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (RE, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )    // 920313 - based on USA version, glitch on title screen confirmed not to happen on PCB so MIG
+GAME( 1992, sf2mkot,     sf2,      cps1_10MHz, sf2hack,  cps_state, init_sf2hack,  ROT0,   "bootleg", "Street Fighter II': Magic KO Turbo!! - Nightmare Crack", MACHINE_SUPPORTS_SAVE ) // 920313 - based on World version
 GAME( 1992, cworld2j,    0,        cps1_12MHz, cworld2j, cps_state, init_cps1,     ROT0,   "Capcom", "Adventure Quiz Capcom World 2 (Japan 920611)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, cworld2ja,   cworld2j, cps1_12MHz, cworld2j, cps_state, init_cps1,     ROT0,   "Capcom", "Adventure Quiz Capcom World 2 (Japan 920611, B-Board 90629B-3, no battery)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, cworld2jb,   cworld2j, cps1_12MHz, cworld2j, cps_state, init_cps1,     ROT0,   "Capcom", "Adventure Quiz Capcom World 2 (Japan 920611, B-Board 91634B-2)", MACHINE_SUPPORTS_SAVE )
@@ -14024,7 +14501,7 @@ GAME( 1992, wofj,        wof,      qsound,     wof,      cps_state, init_wof,   
 GAME( 1999, wofhfh,      wof,      wofhfh,     wofhfh,   cps_state, init_cps1,     ROT0,   "bootleg", "Huo Feng Huang (Chinese bootleg of Sangokushi II)", MACHINE_SUPPORTS_SAVE )    // 921005 - based on Asia version
 GAME( 1992, sf2hf,       0,        cps1_12MHz, sf2,      cps_state, init_cps1,     ROT0,   "Capcom", "Street Fighter II': Hyper Fighting (World 921209)", MACHINE_SUPPORTS_SAVE ) // "ETC"
 GAME( 1992, sf2hfu,      sf2hf,    cps1_12MHz, sf2,      cps_state, init_cps1,     ROT0,   "Capcom", "Street Fighter II': Hyper Fighting (USA 921209)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sf2hfj,      sf2hf,    cps1_12MHz, sf2j,     cps_state, init_cps1,     ROT0,   "Capcom", "Street Fighter II' Turbo: Hyper Fighting (Japan 921209)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sf2hfj,      sf2hf,    cps1_12MHz, sf2cej,   cps_state, init_cps1,     ROT0,   "Capcom", "Street Fighter II' Turbo: Hyper Fighting (Japan 921209)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, dino,        0,        qsound,     dino,     cps_state, init_dino,     ROT0,   "Capcom", "Cadillacs and Dinosaurs (World 930201)", MACHINE_SUPPORTS_SAVE )    // "ETC"
 GAME( 1993, dinou,       dino,     qsound,     dino,     cps_state, init_dino,     ROT0,   "Capcom", "Cadillacs and Dinosaurs (USA 930201)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, dinoa,       dino,     qsound,     dino,     cps_state, init_dino,     ROT0,   "Capcom", "Cadillacs and Dinosaurs (Asia TW 930223)", MACHINE_SUPPORTS_SAVE ) // Title screen shows "distributed by Hung Hsi Enterprise".
@@ -14057,6 +14534,8 @@ GAME( 1995, pang3j,      pang3,    pang3,      pang3,    cps_state,   init_pang3
 GAME( 1995, pang3b,      pang3,    pang3,      pang3b,   cps_state,   init_pang3b,   ROT0,   "bootleg",  "Pang! 3 (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )    // 950511 - based on Euro version
 GAME( 1995, pang3b2,     pang3,    pang3,      pang3,    cps_state,   init_pang3,    ROT0,   "bootleg",  "Pang! 3 (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )    // 950601 - based on Euro version
 GAME( 1995, pang3b3,     pang3,    pang3,      pang3,    cps_state,   init_pang3,    ROT0,   "bootleg",  "Pang! 3 (bootleg, set 3)", MACHINE_SUPPORTS_SAVE )    // 950511 - based on Euro version, hacked to use cps-b-17
+GAME( 1995, pang3b4,     pang3,    cps1_12MHz, pang3b4,  cps_state,   init_pang3b4,  ROT0,   "bootleg",  "Pang! 3 (bootleg, set 4)", MACHINE_SUPPORTS_SAVE )    // 950601 - based on Euro version, unencrypted, protection PIC, no serial EPROM
+GAME( 1995, pang3b5,     pang3,    pang3,      pang3,    cps_state,   init_pang3,    ROT0,   "bootleg",  "Pang! 3 (bootleg, set 5)", MACHINE_SUPPORTS_SAVE )    // 950511 - based on Euro version
 
 /* Home 'CPS Changer' Unit */
 

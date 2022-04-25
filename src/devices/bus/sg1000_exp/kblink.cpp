@@ -117,7 +117,7 @@ void sk1100_link_cable_device::device_add_mconfig(machine_config &config)
 }
 
 
-void sk1100_link_cable_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void sk1100_link_cable_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

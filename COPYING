@@ -10,7 +10,7 @@ distributions.
 
 
 MAME
-Copyright (c) 1997-2020 MAMEdev and contributors
+Copyright (c) 1997-2022 MAMEdev and contributors
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License version 2, as provided
@@ -154,9 +154,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 Expat
-Copyright (c) 1998, 1999, 2000 Thai Open Source Software Center Ltd
-and Clark Cooper
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Expat maintainers
+Copyright (c) 1998-2000 Thai Open Source Software Center Ltd and
+Clark Cooper
+Copyright (c) 2001-2019 Expat maintainers
 
 Lua - a powerful, fast, lightweight, embeddable scripting language
 Copyright (c) 1994-2017 Lua.org, PUC-Rio
@@ -184,13 +184,13 @@ Copyright (c) 1999-2000 Ross Bencina and Phil Burk
 Copyright (c) 2001-2009 Roger B. Dannenberg
 
 pugixml - a C++ XML processing library
-Copyright (c) 2006-2016 Arseny Kapoulkine
+Copyright (c) 2006-2019 Arseny Kapoulkine
 
 RapidJSON - A fast JSON parser/generator for C++ with both SAX/DOM style API
 Copyright (c) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 
 Sol - a C++ library binding to Lua
-Copyright (c) 2013-2016 Rapptz and contributors
+Copyright (c) 2013-2020 Rapptz, ThePhD and contributors
 
 tap-windows.h
 Copyright (C) 2002-2014 OpenVPN Technologies, Inc.
@@ -237,7 +237,10 @@ LZMA SDK code is compatible with open source licenses, for example, you
 can include it to GNU GPL or GNU LGPL code.
 
 
-Nano SVG = Simple stupid SVG parser
+AsmJit - a lightweight library for machine code generation.
+Copyright (c) 2008-2021 The AsmJit Authors
+
+Nano SVG - Simple stupid SVG parser
 Copyright (c) 2013-14 Mikko Mononen memon@inside.org
 
 Simple DirectMedia Layer
@@ -248,7 +251,7 @@ Copyright (c) 2006 and later Cockos Incorporated
 Copyright (c) 1999 D. J. Bernstein
 
 zlib data compression library
-Copyright (c) 1995-2017 Jean-loup Gailly and Mark Adler
+Copyright (C) 1995-2022 Jean-loup Gailly and Mark Adler
 
 This software is provided 'as-is', without any express or implied
 warranty.  In no event will the authors be held liable for any damages

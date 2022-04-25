@@ -84,9 +84,9 @@ This was pointed out by Bart Puype
 #include "cpu/z80/lz8420m.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/pic16c5x/pic16c5x.h"
-#include "sound/2610intf.h"
-#include "sound/ymf278b.h"
 #include "sound/okim6295.h"
+#include "sound/ymopl.h"
+#include "sound/ymopn.h"
 #include "speaker.h"
 
 
@@ -115,7 +115,8 @@ READ_LINE_MEMBER(psikyo_state::mcu_status_r)
 	if (m_mcu_status)
 		ret = 0x01;
 
-	m_mcu_status = !m_mcu_status;   /* hack */
+	if (!machine().side_effects_disabled())
+		m_mcu_status = !m_mcu_status;   /* hack */
 
 	return ret;
 }
@@ -201,18 +202,20 @@ void psikyo_state::s1945_mcu_command_w(uint8_t data)
 }
 
 // TODO: make this handler 8-bit
-uint32_t psikyo_state::s1945_mcu_data_r()
+u32 psikyo_state::s1945_mcu_data_r()
 {
 	u32 res;
 	if (m_s1945_mcu_control & 16)
 	{
 		res = m_s1945_mcu_latching & 4 ? 0x0000ff00 : m_s1945_mcu_latch1 << 8;
-		m_s1945_mcu_latching |= 4;
+		if (!machine().side_effects_disabled())
+			m_s1945_mcu_latching |= 4;
 	}
 	else
 	{
 		res = m_s1945_mcu_latching & 1 ? 0x0000ff00 : m_s1945_mcu_latch2 << 8;
-		m_s1945_mcu_latching |= 1;
+		if (!machine().side_effects_disabled())
+			m_s1945_mcu_latching |= 1;
 	}
 	res |= m_s1945_mcu_bctrl & 0xf0;
 	return res;
@@ -255,8 +258,8 @@ void psikyo_state::psikyo_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();                                                                 // ROM (not all used)
 	map(0x400000, 0x401fff).ram().share("spriteram");       // Sprites, buffered by two frames (list buffered + fb buffered)
 	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");    // Palette
-	map(0x800000, 0x801fff).rw(FUNC(psikyo_state::vram_r<0>), FUNC(psikyo_state::vram_w<0>)).share("vram_0");                // Layer 0
-	map(0x802000, 0x803fff).rw(FUNC(psikyo_state::vram_r<1>), FUNC(psikyo_state::vram_w<1>)).share("vram_1");                // Layer 1
+	map(0x800000, 0x801fff).rw(FUNC(psikyo_state::vram_r<0>), FUNC(psikyo_state::vram_w<0>));      // Layer 0
+	map(0x802000, 0x803fff).rw(FUNC(psikyo_state::vram_r<1>), FUNC(psikyo_state::vram_w<1>));      // Layer 1
 	map(0x804000, 0x807fff).ram().share("vregs");                                                  // RAM + Vregs
 //  map(0xc00000, 0xc0000b).r(FUNC(psikyo_state::input_r));                                        // Depends on board
 //  map(0xc00004, 0xc0000b).w(FUNC(psikyo_state::s1945_mcu_w));                                    // MCU on sh404
@@ -265,12 +268,12 @@ void psikyo_state::psikyo_map(address_map &map)
 }
 
 template<int Shift>
-WRITE8_MEMBER(psikyo_state::sound_bankswitch_w)
+void psikyo_state::sound_bankswitch_w(u8 data)
 {
 	m_audiobank->set_entry((data >> Shift) & 0x03);
 }
 
-WRITE8_MEMBER(psikyo_state::s1945bl_okibank_w)
+void psikyo_state::s1945bl_okibank_w(u8 data)
 {
 	// not at all sure about this, it seems to write 0 too often
 	if (data < 5)
@@ -290,8 +293,8 @@ void psikyo_state::psikyo_bootleg_map(address_map &map)
 
 	map(0x400000, 0x401fff).ram().share("spriteram");       // Sprites, buffered by two frames (list buffered + fb buffered)
 	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");    // Palette
-	map(0x800000, 0x801fff).rw(FUNC(psikyo_state::vram_r<0>), FUNC(psikyo_state::vram_w<0>)).share("vram_0");                // Layer 0
-	map(0x802000, 0x803fff).rw(FUNC(psikyo_state::vram_r<1>), FUNC(psikyo_state::vram_w<1>)).share("vram_1");                // Layer 1
+	map(0x800000, 0x801fff).rw(FUNC(psikyo_state::vram_r<0>), FUNC(psikyo_state::vram_w<0>));      // Layer 0
+	map(0x802000, 0x803fff).rw(FUNC(psikyo_state::vram_r<1>), FUNC(psikyo_state::vram_w<1>));      // Layer 1
 	map(0x804000, 0x807fff).ram().share("vregs");                                                  // RAM + Vregs
 	map(0xc00000, 0xc0000b).r(FUNC(psikyo_state::gunbird_input_r));                                // input ports
 
@@ -306,7 +309,7 @@ void psikyo_state::psikyo_bootleg_map(address_map &map)
                         Sengoku Ace / Samurai Aces
 ***************************************************************************/
 
-READ32_MEMBER(psikyo_state::sngkace_input_r)
+u32 psikyo_state::sngkace_input_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -346,7 +349,7 @@ void psikyo_state::sngkace_sound_io_map(address_map &map)
                                 Gun Bird
 ***************************************************************************/
 
-READ32_MEMBER(psikyo_state::gunbird_input_r)
+u32 psikyo_state::gunbird_input_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -391,7 +394,7 @@ void psikyo_state::gunbird_sound_io_map(address_map &map)
                         Strikers 1945 / Tengai
 ***************************************************************************/
 
-READ32_MEMBER(psikyo_state::s1945_input_r)
+u32 psikyo_state::s1945_input_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -442,7 +445,8 @@ READ_LINE_MEMBER(psikyo_state::z80_nmi_r)
 
 		/* main CPU might be waiting for sound CPU to finish NMI,
 		   so set a timer to give sound CPU a chance to run */
-		machine().scheduler().synchronize();
+		if (!machine().side_effects_disabled())
+			machine().scheduler().synchronize();
 //      logerror("%s - Read coin port during Z80 NMI\n", machine().describe_context());
 	}
 
@@ -1007,6 +1011,9 @@ GFXDECODE_END
 
 void psikyo_state::machine_start()
 {
+	// assumes it can make an address mask with m_spritelut.length() - 1
+	assert(!(m_spritelut.length() & (m_spritelut.length() - 1)));
+
 	save_item(NAME(m_mcu_status));
 	save_item(NAME(m_tilemap_bank));
 }
@@ -1100,7 +1107,7 @@ void psikyo_state::gunbird(machine_config &config)
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16_MHz_XTAL / 2));
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
-	ymsnd.add_route(ALL_OUTPUTS, "mono",  1.0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono",  0.55);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
@@ -1231,7 +1238,7 @@ ROM_START( samuraia )
 	ROM_LOAD16_WORD_SWAP( "u34.bin",  0x000000, 0x100000, CRC(e6a75bd8) SHA1(1aa84ea54584b6c8b2846194b48bf6d2afa67fee) )
 	ROM_LOAD16_WORD_SWAP( "u35.bin",  0x100000, 0x100000, CRC(c4ca0164) SHA1(c75422de2e0127cdc23d8c223b674a5bd85b00fb) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* Samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* Samples */
 	ROM_LOAD( "u68.bin",  0x000000, 0x100000, CRC(9a7f6c34) SHA1(c549b209bce1d2c6eeb512db198ad20c3f5fb0ea) )
 
 	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* Sprites LUT */
@@ -1254,7 +1261,7 @@ ROM_START( sngkace )
 	ROM_LOAD16_WORD_SWAP( "u34.bin",  0x000000, 0x100000, CRC(e6a75bd8) SHA1(1aa84ea54584b6c8b2846194b48bf6d2afa67fee) )
 	ROM_LOAD16_WORD_SWAP( "u35.bin",  0x100000, 0x100000, CRC(c4ca0164) SHA1(c75422de2e0127cdc23d8c223b674a5bd85b00fb) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* Samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* Samples */
 	ROM_LOAD( "u68.bin",  0x000000, 0x100000, CRC(9a7f6c34) SHA1(c549b209bce1d2c6eeb512db198ad20c3f5fb0ea) )
 
 	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* Sprites LUT */
@@ -1277,7 +1284,7 @@ ROM_START( sngkacea ) // the roms have a very visible "." symbol after the numbe
 	ROM_LOAD16_WORD_SWAP( "u34.bin",  0x000000, 0x100000, CRC(e6a75bd8) SHA1(1aa84ea54584b6c8b2846194b48bf6d2afa67fee) )
 	ROM_LOAD16_WORD_SWAP( "u35.bin",  0x100000, 0x100000, CRC(c4ca0164) SHA1(c75422de2e0127cdc23d8c223b674a5bd85b00fb) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* Samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* Samples */
 	ROM_LOAD( "u68.bin",  0x000000, 0x100000, CRC(9a7f6c34) SHA1(c549b209bce1d2c6eeb512db198ad20c3f5fb0ea) )
 
 	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* Sprites LUT */
@@ -1320,10 +1327,10 @@ ROM_START( gunbird )
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layers 0 + 1 */
 	ROM_LOAD16_WORD_SWAP( "u33.bin",  0x000000, 0x200000, CRC(54494e6b) SHA1(f5d090d2d34d908b56b53a246def194929eba990) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM Samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(9e07104d) SHA1(3bc54cb755bb3194197706965b532d62b48c4d12) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* DELTA-T Samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )   /* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(e187ed4f) SHA1(05060723d89b1d05714447a14b5f5888ff3c2306) )
 
 	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* Sprites LUT */
@@ -1351,10 +1358,10 @@ ROM_START( gunbirdk )
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layers 0 + 1 */
 	ROM_LOAD16_WORD_SWAP( "u33.bin",  0x000000, 0x200000, CRC(54494e6b) SHA1(f5d090d2d34d908b56b53a246def194929eba990) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM Samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(9e07104d) SHA1(3bc54cb755bb3194197706965b532d62b48c4d12) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* DELTA-T Samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )   /* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(e187ed4f) SHA1(05060723d89b1d05714447a14b5f5888ff3c2306) )
 
 	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* Sprites LUT */
@@ -1378,10 +1385,10 @@ ROM_START( gunbirdj )
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layers 0 + 1 */
 	ROM_LOAD16_WORD_SWAP( "u33.bin",  0x000000, 0x200000, CRC(54494e6b) SHA1(f5d090d2d34d908b56b53a246def194929eba990) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM Samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(9e07104d) SHA1(3bc54cb755bb3194197706965b532d62b48c4d12) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* DELTA-T Samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )   /* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(e187ed4f) SHA1(05060723d89b1d05714447a14b5f5888ff3c2306) )
 
 	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* Sprites LUT */
@@ -1406,10 +1413,10 @@ ROM_START( btlkroad )
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layers 0 + 1 */
 	ROM_LOAD16_WORD_SWAP( "u33.bin",  0x000000, 0x200000, CRC(4c8577f1) SHA1(d27043514632954a06667ac63f4a4e4a31870511) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM Samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(51d73682) SHA1(562038d08e9a4389ffa39f3a659b2a29b94dc156) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* DELTA-T Samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )   /* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(0f33049f) SHA1(ca4fd5f3906685ace1af40b75f5678231d7324e8) )
 
 	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* Sprites LUT */
@@ -1438,10 +1445,10 @@ ROM_START( btlkroadk )
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layers 0 + 1 */
 	ROM_LOAD16_WORD_SWAP( "u33.bin",  0x000000, 0x200000, CRC(4c8577f1) SHA1(d27043514632954a06667ac63f4a4e4a31870511) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM Samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(51d73682) SHA1(562038d08e9a4389ffa39f3a659b2a29b94dc156) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* DELTA-T Samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )   /* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(0f33049f) SHA1(ca4fd5f3906685ace1af40b75f5678231d7324e8) )
 
 	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* Sprites LUT */
@@ -1485,10 +1492,10 @@ ROM_START( s1945n )
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 0 + 1 */
 	ROM_LOAD16_WORD_SWAP( "u34.bin",  0x000000, 0x200000, CRC(aaf83e23) SHA1(1c75d09ff42c0c215f8c66c699ca75688c95a05e) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM Samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(fe1312c2) SHA1(8339a96a0885518d6e22cb3bdb9c2f82d011d86d) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* DELTA-T Samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )   /* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(a44a4a9b) SHA1(5378256752d709daed0b5f4199deebbcffe84e10) )
 
 	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* */
@@ -1512,10 +1519,10 @@ ROM_START( s1945nj )
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 0 + 1 */
 	ROM_LOAD16_WORD_SWAP( "u34.bin",  0x000000, 0x200000, CRC(aaf83e23) SHA1(1c75d09ff42c0c215f8c66c699ca75688c95a05e) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM Samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(fe1312c2) SHA1(8339a96a0885518d6e22cb3bdb9c2f82d011d86d) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* DELTA-T Samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )   /* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(a44a4a9b) SHA1(5378256752d709daed0b5f4199deebbcffe84e10) )
 
 	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* */
@@ -1825,8 +1832,8 @@ ROM_END
 void psikyo_state::init_sngkace()
 {
 	{
-		u8 *RAM = memregion("ymsnd")->base();
-		int len = memregion("ymsnd")->bytes();
+		u8 *RAM = memregion("ymsnd:adpcma")->base();
+		int len = memregion("ymsnd:adpcma")->bytes();
 
 		/* Bit 6&7 of the samples are swapped. Naughty, naughty... */
 		for (int i = 0; i < len; i++)
@@ -1953,24 +1960,24 @@ void psikyo_state::init_s1945bl()
 
 ***************************************************************************/
 
-GAME( 1993, samuraia,  0,        sngkace,  samuraia,  psikyo_state, init_sngkace,  ROT270, "Psikyo",  "Samurai Aces (World)",       MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING ) // Banpresto?
-GAME( 1993, sngkace,   samuraia, sngkace,  sngkace,   psikyo_state, init_sngkace,  ROT270, "Psikyo",  "Sengoku Ace (Japan, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING ) // Banpresto?
-GAME( 1993, sngkacea,  samuraia, sngkace,  sngkace,   psikyo_state, init_sngkace,  ROT270, "Psikyo",  "Sengoku Ace (Japan, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING ) // Banpresto?
+GAME( 1993, samuraia,  0,        sngkace,  samuraia,  psikyo_state, init_sngkace,  ROT270, "Psikyo (Banpresto license)",  "Samurai Aces (World)",                       MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+GAME( 1993, sngkace,   samuraia, sngkace,  sngkace,   psikyo_state, init_sngkace,  ROT270, "Psikyo (Banpresto license)",  "Sengoku Ace (Japan, set 1)",                 MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+GAME( 1993, sngkacea,  samuraia, sngkace,  sngkace,   psikyo_state, init_sngkace,  ROT270, "Psikyo (Banpresto license)",  "Sengoku Ace (Japan, set 2)",                 MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
 
-GAME( 1994, gunbird,   0,        gunbird,  gunbird,   psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Gunbird (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
-GAME( 1994, gunbirdk,  gunbird,  gunbird,  gunbirdj,  psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Gunbird (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
-GAME( 1994, gunbirdj,  gunbird,  gunbird,  gunbirdj,  psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Gunbird (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+GAME( 1994, gunbird,   0,        gunbird,  gunbird,   psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Gunbird (World)",                                                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+GAME( 1994, gunbirdk,  gunbird,  gunbird,  gunbirdj,  psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Gunbird (Korea)",                                                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+GAME( 1994, gunbirdj,  gunbird,  gunbird,  gunbirdj,  psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Gunbird (Japan)",                                                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
 
-GAME( 1994, btlkroad,  0,        gunbird,  btlkroad,  psikyo_state, init_gunbird,  ROT0,   "Psikyo",  "Battle K-Road",         MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
-GAME( 1994, btlkroadk, btlkroad, gunbird,  btlkroadk, psikyo_state, init_gunbird,  ROT0,   "Psikyo",  "Battle K-Road (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING ) // game code is still multi-region, but sound rom appears to be Korea specific at least
+GAME( 1994, btlkroad,  0,        gunbird,  btlkroad,  psikyo_state, init_gunbird,  ROT0,   "Psikyo",  "Battle K-Road",                                                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+GAME( 1994, btlkroadk, btlkroad, gunbird,  btlkroadk, psikyo_state, init_gunbird,  ROT0,   "Psikyo",  "Battle K-Road (Korea)",                                          MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING ) // game code is still multi-region, but sound rom appears to be Korea specific at least
 
-GAME( 1995, s1945,     0,        s1945,    s1945,     psikyo_state, init_s1945,    ROT270, "Psikyo",  "Strikers 1945 (World)",              MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
-GAME( 1995, s1945a,    s1945,    s1945,    s1945a,    psikyo_state, init_s1945a,   ROT270, "Psikyo",  "Strikers 1945 (Japan / World)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING ) // Region dip - 0x0f=Japan, anything else=World
-GAME( 1995, s1945j,    s1945,    s1945,    s1945j,    psikyo_state, init_s1945j,   ROT270, "Psikyo",  "Strikers 1945 (Japan)",              MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
-GAME( 1995, s1945n,    s1945,    s1945n,   s1945,     psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Strikers 1945 (World, unprotected)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
-GAME( 1995, s1945nj,   s1945,    s1945n,   s1945j,    psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Strikers 1945 (Japan, unprotected)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
-GAME( 1995, s1945k,    s1945,    s1945,    s1945j,    psikyo_state, init_s1945,    ROT270, "Psikyo",  "Strikers 1945 (Korea)",              MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
-GAME( 1995, s1945bl,   s1945,    s1945bl,  s1945bl,   psikyo_state, init_s1945bl,  ROT270, "bootleg", "Strikers 1945 (Hong Kong, bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+GAME( 1995, s1945,     0,        s1945,    s1945,     psikyo_state, init_s1945,    ROT270, "Psikyo",  "Strikers 1945 (World)",                                          MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+GAME( 1995, s1945a,    s1945,    s1945,    s1945a,    psikyo_state, init_s1945a,   ROT270, "Psikyo",  "Strikers 1945 (Japan / World)",                                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING ) // Region dip - 0x0f=Japan, anything else=World
+GAME( 1995, s1945j,    s1945,    s1945,    s1945j,    psikyo_state, init_s1945j,   ROT270, "Psikyo",  "Strikers 1945 (Japan)",                                          MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+GAME( 1995, s1945n,    s1945,    s1945n,   s1945,     psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Strikers 1945 (World, unprotected)",                             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+GAME( 1995, s1945nj,   s1945,    s1945n,   s1945j,    psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Strikers 1945 (Japan, unprotected)",                             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+GAME( 1995, s1945k,    s1945,    s1945,    s1945j,    psikyo_state, init_s1945,    ROT270, "Psikyo",  "Strikers 1945 (Korea)",                                          MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+GAME( 1995, s1945bl,   s1945,    s1945bl,  s1945bl,   psikyo_state, init_s1945bl,  ROT270, "bootleg", "Strikers 1945 (Hong Kong, bootleg)",                             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
 
-GAME( 1996, tengai,    0,        s1945,    tengai,    psikyo_state, init_tengai,   ROT0,   "Psikyo",  "Tengai (World)",                                 MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
-GAME( 1996, tengaij,   tengai,   s1945,    tengaij,   psikyo_state, init_tengai,   ROT0,   "Psikyo",  "Sengoku Blade: Sengoku Ace Episode II / Tengai", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING ) // Region dip - 0x0f=Japan, anything else=World
+GAME( 1996, tengai,    0,        s1945,    tengai,    psikyo_state, init_tengai,   ROT0,   "Psikyo",  "Tengai (World)",                                                 MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+GAME( 1996, tengaij,   tengai,   s1945,    tengaij,   psikyo_state, init_tengai,   ROT0,   "Psikyo",  "Sengoku Blade: Sengoku Ace Episode II (Japan) / Tengai (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING ) // Region dip - 0x0f=Japan, anything else=World

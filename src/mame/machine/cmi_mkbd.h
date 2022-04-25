@@ -38,7 +38,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	void cmi10_u20_a_w(u8 data);
@@ -76,6 +76,7 @@ private:
 
 	required_ioport m_keypad_a_port;
 	required_ioport m_keypad_b_port;
+	required_ioport m_analog;
 
 	required_ioport_array<3> m_key_mux_ports[4];
 

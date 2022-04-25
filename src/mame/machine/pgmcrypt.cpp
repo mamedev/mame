@@ -1663,3 +1663,27 @@ void amazoni2_decrypt(running_machine &machine)
 		src[i] = x;
 	}
 }
+
+void pgm_dwpc_decrypt(running_machine &machine)
+{
+	uint16_t *src = (uint16_t *)(machine.root_device().memregion("user1")->base());
+
+	int rom_size = 0x80000;
+
+	for(int i=0; i<rom_size/2; i++) {
+		uint16_t x = src[i];
+
+		IGS27_CRYPT1_ALT
+		IGS27_CRYPT2
+		IGS27_CRYPT3
+		IGS27_CRYPT4_ALT
+		IGS27_CRYPT5_ALT
+		IGS27_CRYPT6
+		IGS27_CRYPT7_ALT
+		IGS27_CRYPT8
+
+		x ^= mm_tab[(i>> 1) & 0xff] << 8;
+
+		src[i] = x;
+	}
+}

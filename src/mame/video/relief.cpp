@@ -108,9 +108,9 @@ uint32_t relief_state::screen_update_relief(screen_device &screen, bitmap_ind16 
 	for (const sparse_dirty_rect *rect = m_vad->mob().first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->top(); y <= rect->bottom(); y++)
 		{
-			uint16_t *mo = &mobitmap.pix16(y);
-			uint16_t *pf = &bitmap.pix16(y);
-			uint8_t *pri = &priority_bitmap.pix8(y);
+			uint16_t const *const mo = &mobitmap.pix(y);
+			uint16_t *const pf = &bitmap.pix(y);
+			uint8_t const *const pri = &priority_bitmap.pix(y);
 			for (int x = rect->left(); x <= rect->right(); x++)
 				if (mo[x] != 0xffff)
 				{
@@ -136,13 +136,13 @@ uint32_t relief_state::screen_update_relief(screen_device &screen, bitmap_ind16 
 					 *
 					 *      --- CRA8-1 are the low 8 bits of the color RAM index; set as expected
 					 */
-					int cs0 = 0;
-					int cs1 = 1;
 
 					/* compute the CS0 signal */
+					int cs0 = 0;
 					cs0 = ((mo[x] & 0x0f) == 0);
 
 					/* compute the CS1 signal */
+					int cs1 = 1;
 					if ((!cs0 && (mo[x] & 0xe0) == 0xe0) ||
 						((mo[x] & 0xf0) == 0xe0) ||
 						(!pri[x] && !cs0) ||

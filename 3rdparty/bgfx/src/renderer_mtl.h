@@ -23,9 +23,9 @@
 		BGFX_PROFILER_BEGIN(s_viewName[view], _abgr); \
 	BX_MACRO_BLOCK_END
 
-#define BGFX_MTL_PROFILER_BEGIN_LITERAL(_name, _abgr)   \
-	BX_MACRO_BLOCK_BEGIN                                \
-		BGFX_PROFILER_BEGIN_LITERAL("" # _name, _abgr); \
+#define BGFX_MTL_PROFILER_BEGIN_LITERAL(_name, _abgr) \
+	BX_MACRO_BLOCK_BEGIN                              \
+		BGFX_PROFILER_BEGIN_LITERAL("" _name, _abgr); \
 	BX_MACRO_BLOCK_END
 
 #define BGFX_MTL_PROFILER_END() \
@@ -66,8 +66,6 @@ namespace bgfx { namespace mtl
 	// c++ wrapper
 	// objects with creation functions starting with 'new' has a refcount 1 after creation, object must be destroyed with release.
 	// commandBuffer, commandEncoders are autoreleased objects. Needs AutoreleasePool!
-
-#define MTL_MAX_FRAMES_IN_FLIGHT (3)
 
 #define MTL_CLASS(name)                                   \
 	class name                                            \
@@ -877,9 +875,9 @@ namespace bgfx { namespace mtl
 			: m_vshConstantBuffer(NULL)
 			, m_fshConstantBuffer(NULL)
 			, m_vshConstantBufferSize(0)
-			, m_vshConstantBufferAlignmentMask(0)
+			, m_vshConstantBufferAlignment(0)
 			, m_fshConstantBufferSize(0)
-			, m_fshConstantBufferAlignmentMask(0)
+			, m_fshConstantBufferAlignment(0)
 			, m_numPredefined(0)
 			, m_rps(NULL)
 			, m_cps(NULL)
@@ -913,9 +911,9 @@ namespace bgfx { namespace mtl
 		UniformBuffer* m_fshConstantBuffer;
 
 		uint32_t m_vshConstantBufferSize;
-		uint32_t m_vshConstantBufferAlignmentMask;
+		uint32_t m_vshConstantBufferAlignment;
 		uint32_t m_fshConstantBufferSize;
-		uint32_t m_fshConstantBufferAlignmentMask;
+		uint32_t m_fshConstantBufferAlignment;
 
 		enum
 		{
@@ -968,12 +966,22 @@ namespace bgfx { namespace mtl
 
 		void destroy()
 		{
-			MTL_RELEASE(m_ptr);
+			if (0 == (m_flags & BGFX_SAMPLER_INTERNAL_SHARED))
+			{
+				MTL_RELEASE(m_ptr);
+			}
 			MTL_RELEASE(m_ptrStencil);
 			for (uint32_t ii = 0; ii < m_numMips; ++ii)
 			{
 				MTL_RELEASE(m_ptrMips[ii]);
 			}
+		}
+
+		void overrideInternal(uintptr_t _ptr)
+		{
+			destroy();
+			m_flags |= BGFX_SAMPLER_INTERNAL_SHARED;
+			m_ptr = id<MTLTexture>(_ptr);
 		}
 
 		void update(
@@ -1028,7 +1036,7 @@ namespace bgfx { namespace mtl
 		~SwapChainMtl();
 
 		void init(void* _nwh);
-		void resize(FrameBufferMtl &_frameBuffer, uint32_t _width, uint32_t _height, uint32_t _flags);
+		void resize(FrameBufferMtl &_frameBuffer, uint32_t _width, uint32_t _height, uint32_t _flags, uint32_t _maximumDrawableCount);
 
 		id <MTLTexture> 	currentDrawableTexture();
 
@@ -1039,6 +1047,7 @@ namespace bgfx { namespace mtl
 		Texture m_backBufferDepth;
 		Texture m_backBufferStencil;
 		uint32_t m_maxAnisotropy;
+		void* m_nwh;
 	};
 
 	struct FrameBufferMtl
@@ -1104,7 +1113,7 @@ namespace bgfx { namespace mtl
 		int m_releaseWriteIndex;
 		int m_releaseReadIndex;
 		typedef stl::vector<NSObject*> ResourceArray;
-		ResourceArray m_release[MTL_MAX_FRAMES_IN_FLIGHT];
+		ResourceArray m_release[BGFX_CONFIG_MAX_FRAME_LATENCY];
 	};
 
 	struct TimerQueryMtl

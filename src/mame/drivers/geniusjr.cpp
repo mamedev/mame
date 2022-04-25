@@ -7,8 +7,6 @@ VTech Genius Junior series
 CPU is 68HC05 derived?
 
 Other known undumped international versions:
-- Genius 4000 (French version of Genius Leader 4000)
-- Genius 5000 (French version of Genius Leader 5000)
 - Genius PRO (French version of Genius Leader Select)
 - Pitagorín Plus (Spanish version of Genius Junior Redstar 3)
 - PreComputer Notebook (alternate English version of Genius Leader Notebook)
@@ -25,6 +23,7 @@ Undumped VTech laptops possibly on similar hardware:
 - Genius Einstein (French version of Genius Leader Action)
 - Genius Explorations (French version; German version unknown)
 - Genius Junior Profi 2
+- Genius Junior Profi 3
 - Genius Leader Action
 - Genius Leader Notebook Plus
 - Genius Master Notebook MM
@@ -36,9 +35,12 @@ Undumped VTech laptops possibly on similar hardware:
 - Smart Start Future (alternate English version of Genius Junior Profi 2)
 - Talking Einstein (English version of Genius Leader Action)
 - Talking Whiz-Kid Explorer (alternate English version of Genius Leader Action)
+- Talking Whiz-Kid Honors (alternate English version of Genius Junior Notebook Plus)
 - Talking Whiz-Kid Laptop (English version of Genius Junior Profi 2)
+- Talking Whiz-Kid Lessons (English version of Genius Master Power Maus)
 - Talking Whiz-Kid Major Mouse (alternate English version of Genius Explorations)
 - Talking Whiz-Kid Notebook 2000 (English version of Genius Master Notebook MM)
+- Talking Whiz-Kid Notebook 3000 (alternate English version of Genius Master Notebook MM)
 - Talking Whiz-Kid Power Mouse Deluxe (English version of Genius Explorations)
 
 */
@@ -316,6 +318,18 @@ ROM_START( gj4000 )
 	ROM_LOAD( "27-05886-000-000.u4", 0x000000, 0x40000, CRC(5f6db95b) SHA1(fe683154e33a82ea38696096616d11e850e0c7a3))
 ROM_END
 
+// VTech PCB 35-21205. "C.Q.F.D" is a VTech brand, and the Scientus is a straight clone of the "Genius Junior 4000".
+ROM_START( scientus )
+	ROM_REGION( 0x2000, "maincpu", 0 )
+	ROM_LOAD( "hc05_internal.bin", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0x80000, "extrom", 0 )
+	ROM_LOAD( "54-6050-00-0.u2",  0x000000, 0x80000, CRC(dbcfebaa) SHA1(863697d144857fab45aad493b812ed607ad7e1d0)) // AMD AM27C010
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD( "27-05992-0-0.u3", 0x0000, 0x2000, NO_DUMP ) // TI speech chip
+ROM_END
+
 ROM_START( gj5000 )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "hc05_internal.bin", 0x0000, 0x2000, NO_DUMP )
@@ -388,21 +402,22 @@ ROM_END
 
 ROM_START( gls )
 	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_LOAD( "hc05_internal.bin", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "hc05_internal.bin", 0x0000, 0x2000, NO_DUMP ) // As per decap, confirmed to be a Motorola 68HC05 CSIC (Customer Specification Integrated Circuit)
 
 	ROM_REGION( 0x40000, "extrom", 0 )
 	ROM_LOAD( "27-5635-00.u2", 0x000000, 0x40000, CRC(bc3c0587) SHA1(fe98f162bd80d96ce3264087b5869f4505955464))
 ROM_END
 
 
-//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY   FULLNAME                             FLAGS
-COMP( 1996, gj4000,   0,       0,      gj4000,   geniusjr, geniusjr_state, empty_init, "VTech",  "Genius Junior 4000 (Germany)",      MACHINE_IS_SKELETON )
-COMP( 1993, gjmovie,  0,       0,      gjmovie,  geniusjr, geniusjr_state, empty_init, "VTech",  "Genius Junior Movie (Germany)",     MACHINE_IS_SKELETON )
-COMP( 199?, pitagjr,  gjmovie, 0,      gjmovie,  geniusjr, geniusjr_state, empty_init, "VTech",  "Pitagorin Junior",                  MACHINE_IS_SKELETON )
-COMP( 1996, gjrstar,  0,       0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",  "Genius Junior Redstar (Germany)",   MACHINE_IS_SKELETON )
-COMP( 1996, gjrstar2, gjrstar, 0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",  "Genius Junior Redstar 2 (Germany)", MACHINE_IS_SKELETON )
-COMP( 1998, gjrstar3, 0,       0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",  "Genius Junior Redstar 3 (Germany)", MACHINE_IS_SKELETON )
-COMP( 1998, gj5000,   0,       0,      gj5000,   geniusjr, geniusjr_state, empty_init, "VTech",  "Genius Junior 5000 (Germany)",      MACHINE_IS_SKELETON )
-COMP( 1993, gln,      0,       0,      gln,      geniusjr, geniusjr_state, empty_init, "VTech",  "Genius Leader Notebook",            MACHINE_IS_SKELETON )
-COMP( 1993, pitagor,  gln,     0,      gln,      geniusjr, geniusjr_state, empty_init, "VTech",  "Pitagorin",                         MACHINE_IS_SKELETON )
-COMP( 1995, gls,      0,       0,      gls,      geniusjr, geniusjr_state, empty_init, "VTech",  "Genius Leader Select",              MACHINE_IS_SKELETON )
+//    YEAR   NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY    FULLNAME                             FLAGS
+COMP( 1996,  gj4000,   0,       0,      gj4000,   geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior 4000 (Germany)",      MACHINE_IS_SKELETON )
+COMP( 1999?, scientus, gj4000,  0,      gj4000,   geniusjr, geniusjr_state, empty_init, "C.Q.F.D", "Scientus (France)",                 MACHINE_IS_SKELETON )
+COMP( 1993,  gjmovie,  0,       0,      gjmovie,  geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior Movie (Germany)",     MACHINE_IS_SKELETON )
+COMP( 199?,  pitagjr,  gjmovie, 0,      gjmovie,  geniusjr, geniusjr_state, empty_init, "VTech",   "Pitagorin Junior",                  MACHINE_IS_SKELETON )
+COMP( 1996,  gjrstar,  0,       0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior Redstar (Germany)",   MACHINE_IS_SKELETON )
+COMP( 1996,  gjrstar2, gjrstar, 0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior Redstar 2 (Germany)", MACHINE_IS_SKELETON )
+COMP( 1998,  gjrstar3, 0,       0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior Redstar 3 (Germany)", MACHINE_IS_SKELETON )
+COMP( 1998,  gj5000,   0,       0,      gj5000,   geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior 5000 (Germany)",      MACHINE_IS_SKELETON )
+COMP( 1993,  gln,      0,       0,      gln,      geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Leader Notebook",            MACHINE_IS_SKELETON )
+COMP( 1993,  pitagor,  gln,     0,      gln,      geniusjr, geniusjr_state, empty_init, "VTech",   "Pitagorin",                         MACHINE_IS_SKELETON )
+COMP( 1995,  gls,      0,       0,      gls,      geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Leader Select",              MACHINE_IS_SKELETON )

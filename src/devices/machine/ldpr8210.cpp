@@ -316,7 +316,7 @@ void pioneer_pr8210_device::device_reset()
 //  device
 //-------------------------------------------------
 
-void pioneer_pr8210_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pioneer_pr8210_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -374,7 +374,7 @@ void pioneer_pr8210_device::device_timer(emu_timer &timer, device_timer_id id, i
 
 		// pass everything else onto the parent
 		default:
-			laserdisc_device::device_timer(timer, id, param, ptr);
+			laserdisc_device::device_timer(timer, id, param);
 			break;
 	}
 }
@@ -784,12 +784,12 @@ void pioneer_pr8210_device::overlay_draw_group(bitmap_yuy16 &bitmap, const uint8
 
 void pioneer_pr8210_device::overlay_erase(bitmap_yuy16 &bitmap, float xstart, float xend)
 {
-	uint32_t xmin = (uint32_t)(xstart * 256.0f * float(bitmap.width()));
-	uint32_t xmax = (uint32_t)(xend * 256.0f * float(bitmap.width()));
+	uint32_t xmin = uint32_t(xstart * 256.0f * float(bitmap.width()));
+	uint32_t xmax = uint32_t(xend * 256.0f * float(bitmap.width()));
 
 	for (uint32_t y = OVERLAY_Y; y < (OVERLAY_Y + (OVERLAY_Y_PIXELS + 2) * OVERLAY_PIXEL_HEIGHT); y++)
 	{
-		uint16_t *dest = &bitmap.pix16(y, xmin >> 8);
+		uint16_t *dest = &bitmap.pix(y, xmin >> 8);
 		uint16_t ymax = *dest >> 8;
 		uint16_t ymin = ymax * 3 / 8;
 		uint16_t yres = ymin + ((ymax - ymin) * (xmin & 0xff)) / 256;
@@ -819,8 +819,8 @@ void pioneer_pr8210_device::overlay_erase(bitmap_yuy16 &bitmap, float xstart, fl
 
 void pioneer_pr8210_device::overlay_draw_char(bitmap_yuy16 &bitmap, uint8_t ch, float xstart)
 {
-	uint32_t xminbase = (uint32_t)(xstart * 256.0f * float(bitmap.width()));
-	uint32_t xsize = (uint32_t)(OVERLAY_PIXEL_WIDTH * 256.0f * float(bitmap.width()));
+	uint32_t xminbase = uint32_t(xstart * 256.0f * float(bitmap.width()));
+	uint32_t xsize = uint32_t(OVERLAY_PIXEL_WIDTH * 256.0f * float(bitmap.width()));
 
 	// iterate over pixels
 	const uint8_t *chdataptr = &text_bitmap[ch & 0x3f][0];
@@ -835,7 +835,7 @@ void pioneer_pr8210_device::overlay_draw_char(bitmap_yuy16 &bitmap, uint8_t ch, 
 				uint32_t xmax = xmin + xsize;
 				for (uint32_t yy = 0; yy < OVERLAY_PIXEL_HEIGHT; yy++)
 				{
-					uint16_t *dest = &bitmap.pix16(OVERLAY_Y + (y + 1) * OVERLAY_PIXEL_HEIGHT + yy, xmin >> 8);
+					uint16_t *dest = &bitmap.pix(OVERLAY_Y + (y + 1) * OVERLAY_PIXEL_HEIGHT + yy, xmin >> 8);
 					uint16_t ymax = 0xff;
 					uint16_t ymin = *dest >> 8;
 					uint16_t yres = ymin + ((ymax - ymin) * (~xmin & 0xff)) / 256;
@@ -986,7 +986,7 @@ void simutrek_special_device::device_reset()
 //  device
 //-------------------------------------------------
 
-void simutrek_special_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void simutrek_special_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -1003,7 +1003,7 @@ void simutrek_special_device::device_timer(emu_timer &timer, device_timer_id id,
 
 		// pass everything else onto the parent
 		default:
-			pioneer_pr8210_device::device_timer(timer, id, param, ptr);
+			pioneer_pr8210_device::device_timer(timer, id, param);
 			break;
 	}
 }

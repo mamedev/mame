@@ -17,13 +17,13 @@ Custom ICs:
 ----------
 98XX        lamp/coin output
 99XX        sound volume
-CUS27       clock divider
+CUS27       ULA clock divider
 CUS30       sound control
-CUS35/CUS48 sprite address generator [1]
-CUS39       sprite generator
+CUS35/CUS48 ULA sprite address generator [1]
+CUS39       ULA sprite generator
 CUS41       address decoder [2] [3]
 CUS42(x2)   dual scrolling tilemap address generator
-CUS43(x2)   dual tilemap generator
+CUS43(x2)   ULA dual tilemap generator
 CUS47       address decoder
 CUS60       MCU (63701) [2]
 CUS115      expansion board ROM banking [4]
@@ -178,12 +178,12 @@ TODO:
 #include "includes/namcos86.h"
 
 #include "cpu/m6809/m6809.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-WRITE8_MEMBER(namcos86_state::bankswitch1_w)
+void namcos86_state::bankswitch1_w(uint8_t data)
 {
 	/* if the ROM expansion module is available, don't do anything. This avoids conflict */
 	/* with bankswitch1_ext_w() in wndrmomo */
@@ -193,7 +193,7 @@ WRITE8_MEMBER(namcos86_state::bankswitch1_w)
 	membank("bank1")->set_entry(data & 0x03);
 }
 
-WRITE8_MEMBER(namcos86_state::bankswitch1_ext_w)
+void namcos86_state::bankswitch1_ext_w(uint8_t data)
 {
 	if (!m_user1_ptr)
 		return;
@@ -201,13 +201,13 @@ WRITE8_MEMBER(namcos86_state::bankswitch1_ext_w)
 	membank("bank1")->set_entry(data & 0x1f);
 }
 
-WRITE8_MEMBER(namcos86_state::bankswitch2_w)
+void namcos86_state::bankswitch2_w(uint8_t data)
 {
 	membank("bank2")->set_entry(data & 0x03);
 }
 
 /* Stubs to pass the correct Dip Switch setup to the MCU */
-READ8_MEMBER(namcos86_state::dsw0_r)
+uint8_t namcos86_state::dsw0_r()
 {
 	int rhi, rlo;
 
@@ -223,7 +223,7 @@ READ8_MEMBER(namcos86_state::dsw0_r)
 	return rhi | rlo;
 }
 
-READ8_MEMBER(namcos86_state::dsw1_r)
+uint8_t namcos86_state::dsw1_r()
 {
 	int rhi, rlo;
 
@@ -241,18 +241,18 @@ READ8_MEMBER(namcos86_state::dsw1_r)
 }
 
 
-WRITE8_MEMBER(namcos86_state::int_ack1_w)
+void namcos86_state::int_ack1_w(uint8_t data)
 {
 	m_cpu1->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(namcos86_state::int_ack2_w)
+void namcos86_state::int_ack2_w(uint8_t data)
 {
 	m_cpu2->set_input_line(0, CLEAR_LINE);
 }
 
 
-WRITE8_MEMBER(namcos86_state::watchdog1_w)
+void namcos86_state::watchdog1_w(uint8_t data)
 {
 	m_wdog |= 1;
 	if (m_wdog == 3)
@@ -262,7 +262,7 @@ WRITE8_MEMBER(namcos86_state::watchdog1_w)
 	}
 }
 
-WRITE8_MEMBER(namcos86_state::watchdog2_w)
+void namcos86_state::watchdog2_w(uint8_t data)
 {
 	m_wdog |= 2;
 	if (m_wdog == 3)
@@ -287,7 +287,7 @@ void namcos86_state::led_w(uint8_t data)
 }
 
 
-WRITE8_MEMBER(namcos86_state::cus115_w)
+void namcos86_state::cus115_w(offs_t offset, uint8_t data)
 {
 	/* make sure the expansion board is present */
 	if (!m_user1_ptr)
@@ -306,7 +306,7 @@ WRITE8_MEMBER(namcos86_state::cus115_w)
 			break;
 
 		case 4:
-			bankswitch1_ext_w(space,0,data);
+			bankswitch1_ext_w(data);
 			break;
 
 		case 5: // not used?
@@ -1010,17 +1010,6 @@ INPUT_PORTS_END
 
 /*******************************************************************/
 
-static const gfx_layout tilelayout =
-{
-	8,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
 static const gfx_layout spritelayout =
 {
 	32,32,
@@ -1039,9 +1028,9 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_namcos86 )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,   2048*0, 256 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   2048*0, 256 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 2048*1, 128 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar,   2048*0, 256 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x3_planar,   2048*0, 256 )
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,       2048*1, 128 )
 GFXDECODE_END
 
 /*******************************************************************/

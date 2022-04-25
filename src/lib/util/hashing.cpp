@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "hashing.h"
+#include "strformat.h"
 
 #include <zlib.h>
 
@@ -115,6 +116,7 @@ const crc16_t crc16_t::null = { 0 };
 const crc32_t crc32_t::null = { 0 };
 const md5_t md5_t::null = { { 0 } };
 const sha1_t sha1_t::null = { { 0 } };
+const sum16_t sum16_t::null = { 0 };
 
 
 
@@ -126,23 +128,22 @@ const sha1_t sha1_t::null = { { 0 } };
 //  from_string - convert from a string
 //-------------------------------------------------
 
-bool sha1_t::from_string(const char *string, int length)
+bool sha1_t::from_string(std::string_view string)
 {
 	// must be at least long enough to hold everything
 	memset(m_raw, 0, sizeof(m_raw));
-	if (length == -1)
-		length = strlen(string);
-	if (length < 2 * sizeof(m_raw))
+	if (string.length() < 2 * sizeof(m_raw))
 		return false;
 
 	// iterate through our raw buffer
 	for (auto & elem : m_raw)
 	{
-		int upper = char_to_hex(*string++);
-		int lower = char_to_hex(*string++);
+		int upper = char_to_hex(string[0]);
+		int lower = char_to_hex(string[1]);
 		if (upper == -1 || lower == -1)
 			return false;
 		elem = (upper << 4) | lower;
+		string.remove_prefix(2);
 	}
 	return true;
 }
@@ -245,23 +246,22 @@ sha1_t sha1_creator::finish()
 //  from_string - convert from a string
 //-------------------------------------------------
 
-bool md5_t::from_string(const char *string, int length)
+bool md5_t::from_string(std::string_view string)
 {
 	// must be at least long enough to hold everything
 	memset(m_raw, 0, sizeof(m_raw));
-	if (length == -1)
-		length = strlen(string);
-	if (length < 2 * sizeof(m_raw))
+	if (string.length() < 2 * sizeof(m_raw))
 		return false;
 
 	// iterate through our raw buffer
 	for (auto & elem : m_raw)
 	{
-		int upper = char_to_hex(*string++);
-		int lower = char_to_hex(*string++);
+		int upper = char_to_hex(string[0]);
+		int lower = char_to_hex(string[1]);
 		if (upper == -1 || lower == -1)
 			return false;
 		elem = (upper << 4) | lower;
+		string.remove_prefix(2);
 	}
 	return true;
 }
@@ -291,23 +291,22 @@ std::string md5_t::as_string() const
 //  from_string - convert from a string
 //-------------------------------------------------
 
-bool crc32_t::from_string(const char *string, int length)
+bool crc32_t::from_string(std::string_view string)
 {
 	// must be at least long enough to hold everything
 	m_raw = 0;
-	if (length == -1)
-		length = strlen(string);
-	if (length < 2 * sizeof(m_raw))
+	if (string.length() < 2 * sizeof(m_raw))
 		return false;
 
 	// iterate through our raw buffer
 	m_raw = 0;
 	for (int bytenum = 0; bytenum < sizeof(m_raw) * 2; bytenum++)
 	{
-		int nibble = char_to_hex(*string++);
+		int nibble = char_to_hex(string[0]);
 		if (nibble == -1)
 			return false;
 		m_raw = (m_raw << 4) | nibble;
+		string.remove_prefix(1);
 	}
 	return true;
 }
@@ -343,23 +342,22 @@ void crc32_creator::append(const void *data, uint32_t length)
 //  from_string - convert from a string
 //-------------------------------------------------
 
-bool crc16_t::from_string(const char *string, int length)
+bool crc16_t::from_string(std::string_view string)
 {
 	// must be at least long enough to hold everything
 	m_raw = 0;
-	if (length == -1)
-		length = strlen(string);
-	if (length < 2 * sizeof(m_raw))
+	if (string.length() < 2 * sizeof(m_raw))
 		return false;
 
 	// iterate through our raw buffer
 	m_raw = 0;
 	for (int bytenum = 0; bytenum < sizeof(m_raw) * 2; bytenum++)
 	{
-		int nibble = char_to_hex(*string++);
+		int nibble = char_to_hex(string[0]);
 		if (nibble == -1)
 			return false;
 		m_raw = (m_raw << 4) | nibble;
+		string.remove_prefix(1);
 	}
 	return true;
 }
@@ -435,6 +433,73 @@ void crc16_creator::append(const void *data, uint32_t length)
 	while (length-- != 0)
 		crc = (crc << 8) ^ s_table[(crc >> 8) ^ *src++];
 	m_accum.m_raw = crc;
+}
+
+
+
+//**************************************************************************
+//  SUM-16 HELPERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  from_string - convert from a string
+//-------------------------------------------------
+
+bool sum16_t::from_string(std::string_view string)
+{
+	// must be at least long enough to hold everything
+	m_raw = 0;
+	if (string.length() < 2 * sizeof(m_raw))
+		return false;
+
+	// iterate through our raw buffer
+	m_raw = 0;
+	for (int bytenum = 0; bytenum < sizeof(m_raw) * 2; bytenum++)
+	{
+		int nibble = char_to_hex(string[0]);
+		if (nibble == -1)
+			return false;
+		m_raw = (m_raw << 4) | nibble;
+		string.remove_prefix(1);
+	}
+	return true;
+}
+
+/**
+ * @fn  std::string sum16_t::as_string() const
+ *
+ * @brief   -------------------------------------------------
+ *            as_string - convert to a string
+ *          -------------------------------------------------.
+ *
+ * @return  a std::string.
+ */
+
+std::string sum16_t::as_string() const
+{
+	return string_format("%04x", m_raw);
+}
+
+/**
+ * @fn  void sum16_creator::append(const void *data, uint32_t length)
+ *
+ * @brief   -------------------------------------------------
+ *            append - sum a block of data, appending to the currently-accumulated value
+ *          -------------------------------------------------.
+ *
+ * @param   data    The data.
+ * @param   length  The length.
+ */
+
+void sum16_creator::append(const void *data, uint32_t length)
+{
+	const auto *src = reinterpret_cast<const uint8_t *>(data);
+
+	// fetch the current value into a local and rip through the source data
+	uint16_t sum = m_accum.m_raw;
+	while (length-- != 0)
+		sum += *src++;
+	m_accum.m_raw = sum;
 }
 
 } // namespace util

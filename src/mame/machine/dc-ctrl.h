@@ -36,10 +36,10 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
-	const char *model, *license, *versions;
-	uint32_t id;
-	uint32_t electric_current;
-	uint32_t region;
+	const char *model = nullptr, *license = nullptr, *versions = nullptr;
+	uint32_t id = 0;
+	uint32_t electric_current = 0;
+	uint32_t region = 0;
 
 	optional_ioport_array<8> port;
 

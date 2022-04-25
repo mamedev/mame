@@ -23,10 +23,12 @@ DEFINE_DEVICE_TYPE(CMS_FDC, cms_fdc_device, "cms_fdc", "CMS Floppy Disc Controll
 //  MACHINE_DRIVER( cms_fdc )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER(cms_fdc_device::floppy_formats )
-	FLOPPY_ACORN_SSD_FORMAT,
-	FLOPPY_ACORN_DSD_FORMAT
-FLOPPY_FORMATS_END
+void cms_fdc_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ACORN_SSD_FORMAT);
+	fr.add(FLOPPY_ACORN_DSD_FORMAT);
+}
 
 static void cms_floppies(device_slot_interface &device)
 {

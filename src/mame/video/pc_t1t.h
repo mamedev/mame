@@ -112,7 +112,7 @@ private:
 	void vga_data_w(int data);
 	void bank_w(int data);
 	void mode_control_w(int data);
-	bool m_disable;
+	bool m_disable = false;
 
 	DECLARE_WRITE_LINE_MEMBER( t1000_vsync_changed );
 };
@@ -127,6 +127,7 @@ public:
 
 	void write(offs_t offset, uint8_t data);
 
+	DECLARE_WRITE_LINE_MEMBER( de_changed );
 	MC6845_UPDATE_ROW( pcjx_text_update_row );
 	MC6845_UPDATE_ROW( pcjr_gfx_2bpp_high_update_row );
 

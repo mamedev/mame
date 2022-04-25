@@ -34,7 +34,7 @@
         * Galileo GT64010 system controller
         * National Semiconductor PC87415 IDE controller
         * 3dfx FBI with 2MB frame buffer
-        * 3dfx TMU with 4MB txture memory
+        * 3dfx TMU with 4MB texture memory
         * Midway I/O ASIC
         * 4MB DRAM for main CPU
         * 512KB boot ROM
@@ -48,7 +48,7 @@
         * Galileo GT64010 system controller
         * National Semiconductor PC87415 IDE controller
         * 3dfx FBI with 2MB frame buffer
-        * 3dfx TMU with 4MB txture memory
+        * 3dfx TMU with 4MB texture memory
         * Midway I/O ASIC
         * 8MB DRAM for main CPU
         * 512KB boot ROM
@@ -64,7 +64,7 @@
         * SMC91C94 ethernet controller
         * ADC0848 8 x A-to-D converters
         * 3dfx FBI with 2MB frame buffer
-        * 2 x 3dfx TMU with 4MB txture memory
+        * 2 x 3dfx TMU with 4MB texture memory
         * Midway I/O ASIC
         * 8MB DRAM for main CPU
         * 512KB boot ROM
@@ -89,7 +89,7 @@
         1x ADSP-2115
         1x Midway security PIC Blitz 99 25" 481xxxxxx (U96)
         1x mid sized QFP (Galileo?) has heatsink (u86)
-        1x mid sized QFP (PixelFX?) heakstink (u17)
+        1x mid sized QFP (PixelFX?) heatsink (u17)
         1x mid sized QFP, smaller (TexelFX?) heatsink (u87)
         12x v53c16258hk40 256Kx16 RAM (near Voodoo section)
         1x PC87415VCG IDE controller
@@ -185,25 +185,31 @@
 **************************************************************************/
 
 #include "emu.h"
+
 #include "audio/cage.h"
 #include "audio/dcs.h"
+#include "machine/midwayic.h"
 
+#include "bus/ata/idehd.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/mips/mips3.h"
-#include "machine/midwayic.h"
-#include "machine/nvram.h"
-#include "machine/smc91c9x.h"
-
-#include "machine/pci.h"
 #include "machine/gt64xxx.h"
+#include "machine/nvram.h"
 #include "machine/pci-ide.h"
+#include "machine/pci.h"
+#include "machine/smc91c9x.h"
 #include "video/voodoo_pci.h"
+
 #include "screen.h"
+#include "speaker.h"
 
 #include "calspeed.lh"
 #include "vaportrx.lh"
 #include "hyprdriv.lh"
 #include "sfrush.lh"
+
+
+namespace {
 
 /*************************************
  *
@@ -223,9 +229,9 @@
 
 #define SYSTEM_CLOCK            50000000
 
-#define PCI_ID_GALILEO  ":pci:00.0"
-#define PCI_ID_VIDEO    ":pci:08.0"
-#define PCI_ID_IDE      ":pci:09.0"
+#define PCI_ID_GALILEO  "pci:00.0"
+#define PCI_ID_VIDEO    "pci:08.0"
+#define PCI_ID_IDE      "pci:09.0"
 
 // various board configurations
 #define PHOENIX_CONFIG          (0)
@@ -263,21 +269,11 @@
 *  Structures
 *************************************/
 
-struct widget_data
-{
-	// ethernet register address
-	uint8_t           ethernet_addr;
-
-	// IRQ information
-	uint8_t           irq_num;
-	uint8_t           irq_mask;
-};
-
 class seattle_state : public driver_device
 {
 public:
-	seattle_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	seattle_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_nvram(*this, "nvram"),
 		m_maincpu(*this, "maincpu"),
 		m_galileo(*this, PCI_ID_GALILEO),
@@ -288,11 +284,15 @@ public:
 		m_ethernet(*this, "ethernet"),
 		m_ioasic(*this, "ioasic"),
 		m_io_analog(*this, "AN%u", 0U),
+		m_io_p4_8way(*this, "8WAY_P4"),
+		m_io_49way_x(*this, "49WAYX_P%u", 1U),
+		m_io_49way_y(*this, "49WAYY_P%u", 1U),
 		m_io_gun_x(*this, "LIGHT%u_X", 0U),
 		m_io_gun_y(*this, "LIGHT%u_Y", 0U),
 		m_io_fake(*this, "FAKE"),
 		m_io_gearshift(*this, "GEAR"),
 		m_io_system(*this, "SYSTEM"),
+		m_io_dips(*this, "DIPS"),
 		m_wheel_driver(*this, "wheel"),
 		m_lamps(*this, "lamp%u", 0U),
 		m_leds(*this, "led%u", 0U)
@@ -332,7 +332,13 @@ public:
 	void init_mace();
 	void init_blitz99();
 
+	DECLARE_CUSTOM_INPUT_MEMBER(blitz_49way_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(i40_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(gearshift_r);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	required_device<nvram_device> m_nvram;
@@ -345,14 +351,30 @@ private:
 	optional_device<smc91c94_device> m_ethernet;
 	required_device<midway_ioasic_device> m_ioasic;
 	optional_ioport_array<8> m_io_analog;
+	optional_ioport m_io_p4_8way;
+	optional_ioport_array<4> m_io_49way_x;
+	optional_ioport_array<4> m_io_49way_y;
 	optional_ioport_array<2> m_io_gun_x;
 	optional_ioport_array<2> m_io_gun_y;
 	optional_ioport m_io_fake;
 	optional_ioport m_io_gearshift;
 	optional_ioport m_io_system;
+	optional_ioport m_io_dips;
 	output_finder<1> m_wheel_driver;
 	output_finder<16> m_lamps;
 	output_finder<24> m_leds;
+
+	static const uint8_t translate49[7];
+
+	struct widget_data
+	{
+		// ethernet register address
+		uint8_t           ethernet_addr;
+
+		// IRQ information
+		uint8_t           irq_num;
+		uint8_t           irq_mask;
+	};
 
 	widget_data m_widget;
 	uint32_t m_interrupt_enable;
@@ -370,6 +392,7 @@ private:
 	uint32_t m_cmos_write_enabled;
 	uint16_t m_output_last;
 	uint8_t m_output_mode;
+	uint32_t m_i40_data;
 	uint32_t m_gear;
 	int8_t m_wheel_force;
 	int m_wheel_offset;
@@ -401,14 +424,12 @@ private:
 	void output_w(uint32_t data);
 	uint32_t widget_r(offs_t offset, uint32_t mem_mask = ~0);
 	void widget_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void i40_w(uint32_t data);
 	void wheel_board_w(offs_t offset, uint32_t data);
 
 
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	DECLARE_WRITE_LINE_MEMBER(ethernet_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(ioasic_irq);
@@ -425,8 +446,9 @@ private:
 	void widget_cs3_map(address_map &map);
 	void carnevil_cs3_map(address_map &map);
 	void flagstaff_cs3_map(address_map &map);
-};
 
+	static void hdd_config(device_t *device);
+};
 
 /*************************************
  *
@@ -437,11 +459,11 @@ private:
 void seattle_state::machine_start()
 {
 	// set the fastest DRC options, but strict verification
-	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
+	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS | MIPS3DRC_STRICT_VERIFY);
 
 	// configure fast RAM regions
-//	m_maincpu->add_fastram(0x00000000, 0x007fffff, FALSE, m_rambase);
-//	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
+//  m_maincpu->add_fastram(0x00000000, 0x007fffff, FALSE, m_rambase);
+//  m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
 
 	save_item(NAME(m_widget.ethernet_addr));
 	save_item(NAME(m_widget.irq_num));
@@ -460,12 +482,20 @@ void seattle_state::machine_start()
 	save_item(NAME(m_cmos_write_enabled));
 	save_item(NAME(m_output_last));
 	save_item(NAME(m_output_mode));
+	save_item(NAME(m_i40_data));
 	save_item(NAME(m_gear));
 	save_item(NAME(m_wheel_calibrated));
 
 	m_wheel_driver.resolve();
 	m_lamps.resolve();
 	m_leds.resolve();
+
+	m_pending_analog_read = 0;
+	m_ethernet_irq_state = 0;
+
+	m_widget.ethernet_addr = 0;
+	m_widget.irq_num = 0;
+	m_widget.irq_mask = 0;
 }
 
 
@@ -479,6 +509,7 @@ void seattle_state::machine_reset()
 	m_wheel_force = 0;
 	m_wheel_offset = 0;
 	m_wheel_calibrated = false;
+	m_ethernet_irq_num = 0;
 	// reset either the DCS2 board or the CAGE board
 	if (m_dcs != nullptr)
 	{
@@ -696,7 +727,7 @@ void seattle_state::analog_port_w(uint32_t data)
 	// Declare calibration finished as soon as a SYSTEM button is hit
 	if (!m_wheel_calibrated && ((~m_io_system->read()) & 0xffff)) {
 		m_wheel_calibrated = true;
-		//osd_printf_info("wheel calibration comlete wheel: %02x\n", currValue);
+		//osd_printf_info("wheel calibration complete system: %04x wheel: %02x\n", m_io_system->read(), currValue);
 	}
 }
 
@@ -720,7 +751,7 @@ void seattle_state::wheel_board_w(offs_t offset, uint32_t data)
 		}
 		else if (BIT(data, 9) || BIT(data, 8))
 		{
-			logerror("%08X:wheel_board_w(%d) = %08X\n", m_maincpu->pc(), offset, data);
+			//logerror("%08X:wheel_board_w(%d) = %08X\n", m_maincpu->pc(), offset, data);
 		}
 		else
 		{
@@ -729,6 +760,83 @@ void seattle_state::wheel_board_w(offs_t offset, uint32_t data)
 		}
 	}
 	m_output_last = data;
+}
+
+/*************************************
+* 49 Way translation matrix
+*************************************/
+const uint8_t seattle_state::translate49[7] = { 0x8, 0xc, 0xe, 0xf, 0x3, 0x1, 0x0 };
+
+/*************************************
+* 2 player 49 Way Joystick on Blitz
+*************************************/
+CUSTOM_INPUT_MEMBER(seattle_state::blitz_49way_r)
+{
+	return  (translate49[m_io_49way_y[1]->read() >> 4] << 12) | (translate49[m_io_49way_x[1]->read() >> 4] << 8) |
+		(translate49[m_io_49way_y[0]->read() >> 4] << 4) | (translate49[m_io_49way_x[0]->read() >> 4] << 0);
+}
+
+/*************************************
+* Optical 49 Way Joystick I40 Board
+*************************************/
+void seattle_state::i40_w(uint32_t data)
+{
+	//printf("i40_w: data = %08x\n", data);
+	//logerror("i40_w: data = %08x\n", data);
+	m_i40_data = data;
+}
+
+CUSTOM_INPUT_MEMBER(seattle_state::i40_r)
+{
+	if (m_io_dips->read() & 0x100) {
+		// 8 way joysticks
+		return m_io_p4_8way->read();
+	}
+	else {
+		// 49 way joysticks via i40 adapter board
+		int index = m_i40_data & 0xf;
+		uint8_t data = 0;
+		switch (index) {
+		case 0:
+			data = translate49[m_io_49way_x[0]->read() >> 4];
+			break;
+		case 1:
+			data = translate49[m_io_49way_y[0]->read() >> 4];
+			break;
+		case 2:
+			data = translate49[m_io_49way_x[1]->read() >> 4];
+			break;
+		case 3:
+			data = translate49[m_io_49way_y[1]->read() >> 4];
+			break;
+		case 4:
+			data = translate49[m_io_49way_x[2]->read() >> 4];
+			break;
+		case 5:
+			data = translate49[m_io_49way_y[2]->read() >> 4];
+			break;
+		case 6:
+			data = translate49[m_io_49way_x[3]->read() >> 4];
+			break;
+		case 7:
+			data = translate49[m_io_49way_y[3]->read() >> 4];
+			break;
+		case 10:
+		case 11:
+		case 12:
+			// I40 Detection
+			data = ~index & 0xf;
+			break;
+		default:
+			//logerror("%s: i40_r: select: %x index: %d data: %x\n", machine().describe_context(), m_i40_data, index, data);
+			break;
+		}
+		//logerror("%s: i40_r: select: %x index: %d data: %x\n", machine().describe_context(), m_i40_data, index, data);
+		//if (m_i40_data & 0x1000)
+		//  printf("%s: i40_r: select: %x index: %d data: %x\n", machine().describe_context().c_str(), m_i40_data, index, data);
+		//m_i40_data &= ~0x1000;
+		return data;
+	}
 }
 
 /*************************************
@@ -802,7 +910,7 @@ uint32_t seattle_state::carnevil_gun_r(offs_t offset)
 
 void seattle_state::carnevil_gun_w(offs_t offset, uint32_t data)
 {
-	logerror("carnevil_gun_w(%d) = %02X\n", offset, data);
+	//logerror("carnevil_gun_w(%d) = %02X\n", offset, data);
 }
 
 /*************************************
@@ -910,7 +1018,7 @@ void seattle_state::output_w(uint32_t data)
 	}
 	else if (!BIT(data, 9) || !BIT(data, 8))
 	{
-		logerror("%08X:output_w = %04X\n", m_maincpu->pc(), data);
+		//logerror("%08X:output_w = %04X\n", m_maincpu->pc(), data);
 	}
 }
 
@@ -1247,8 +1355,8 @@ static INPUT_PORTS_START( seattle_common )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START3 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START4 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_VOLUME_UP )
 	PORT_BIT( 0x6000, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1271,20 +1379,8 @@ static INPUT_PORTS_START( seattle_common )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_START("IN2")
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( seattle_4p )
-	PORT_INCLUDE(seattle_common)
-
-	PORT_MODIFY("SYSTEM")
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START3 )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START4 )
-
-	PORT_MODIFY("IN2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
@@ -1301,15 +1397,18 @@ static INPUT_PORTS_START( seattle_4p )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( seattle_analog )
 	PORT_INCLUDE(seattle_common)
-	
+
 	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start Button")
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0620, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("AN0") PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 	PORT_START("AN1") PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
@@ -1328,13 +1427,13 @@ INPUT_PORTS_END
  *************************************/
 
 static INPUT_PORTS_START( wg3dh )
-	PORT_INCLUDE(seattle_4p)
+	PORT_INCLUDE(seattle_common)
 
 	PORT_MODIFY("DIPS")
 	PORT_DIPNAME( 0x0002, 0x0002, "Boot ROM Test" )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	
+
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Shoot/Block")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Pass/Steal")
@@ -1344,7 +1443,7 @@ static INPUT_PORTS_START( wg3dh )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Pass/Steal")
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Burst/Turbo")
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("P3 Shoot/Block")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) PORT_NAME("P3 Pass/Steal")
@@ -1377,6 +1476,9 @@ static INPUT_PORTS_START( mace )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Evade")
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 Kick")
 
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
 INPUT_PORTS_END
 
 
@@ -1391,6 +1493,7 @@ static INPUT_PORTS_START( sfrush )
 	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Abort")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Reverse")
+	PORT_BIT( 0x1e00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("View 1")
@@ -1402,7 +1505,9 @@ static INPUT_PORTS_START( sfrush )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON15 ) PORT_NAME("Track 3")
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON16 ) PORT_NAME("Track 4")
 	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(seattle_state, gearshift_r)
-	PORT_BIT( 0xe000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_VOLUME_UP )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
+	PORT_BIT( 0xc000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("GEAR")
 	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("1st Gear")
@@ -1457,9 +1562,9 @@ static INPUT_PORTS_START( calspeed )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Radio")
 	PORT_BIT( 0x000c, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("View 1") //road cam
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("View 2") //tailgate cam
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("View 3") //sky cam
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("View 1") // road cam
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("View 2") // tailgate cam
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("View 3") // sky cam
 	PORT_BIT( 0x0f80, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(seattle_state, gearshift_r)
 
@@ -1547,7 +1652,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( blitz )
-	PORT_INCLUDE(seattle_4p)
+	PORT_INCLUDE(seattle_common)
 
 	PORT_MODIFY("DIPS")
 	PORT_DIPNAME( 0x0001, 0x0000, "Coinage Source" )
@@ -1604,14 +1709,21 @@ static INPUT_PORTS_START( blitz )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 A")
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 B")
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Turbo")
-	
+
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("P3 A")
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("P3 B")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) PORT_NAME("P3 Turbo")
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_NAME("P4 A")
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4) PORT_NAME("P4 B")
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4) PORT_NAME("P4 Turbo")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_CUSTOM_MEMBER(seattle_state, blitz_49way_r)
+
+	PORT_START("49WAYX_P1")
+	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("49WAYY_P1")
+	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("49WAYX_P2")
+	PORT_BIT(0xff, 0x38, IPT_AD_STICK_X) PORT_MINMAX(0x00, 0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2)
+
+	PORT_START("49WAYY_P2")
+	PORT_BIT(0xff, 0x38, IPT_AD_STICK_Y) PORT_MINMAX(0x00, 0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
 INPUT_PORTS_END
 
@@ -1662,6 +1774,39 @@ static INPUT_PORTS_START( blitz99 )
 	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Players ) )
 	PORT_DIPSETTING(      0x2000, "2" )
 	PORT_DIPSETTING(      0x0000, "4" )
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("P3 A")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("P3 B")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) PORT_NAME("P3 Turbo")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(seattle_state, i40_r)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_NAME("P4 A")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4) PORT_NAME("P4 B")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4) PORT_NAME("P4 Turbo")
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("8WAY_P4")
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_PLAYER(4) PORT_8WAY
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(4) PORT_8WAY
+	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(4) PORT_8WAY
+	PORT_BIT( 0x8, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(4) PORT_8WAY
+
+	PORT_START("49WAYX_P3")
+	PORT_BIT(0xff, 0x38, IPT_AD_STICK_X) PORT_MINMAX(0x00, 0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(3)
+
+	PORT_START("49WAYY_P3")
+	PORT_BIT(0xff, 0x38, IPT_AD_STICK_Y) PORT_MINMAX(0x00, 0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(3)
+
+	PORT_START("49WAYX_P4")
+	PORT_BIT(0xff, 0x38, IPT_AD_STICK_X) PORT_MINMAX(0x00, 0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(4)
+
+	PORT_START("49WAYY_P4")
+	PORT_BIT(0xff, 0x38, IPT_AD_STICK_Y) PORT_MINMAX(0x00, 0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(4)
 
 INPUT_PORTS_END
 
@@ -1736,6 +1881,9 @@ static INPUT_PORTS_START( carnevil )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED  )
 
 	PORT_START("LIGHT0_X") //fake analog X
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
@@ -1861,7 +2009,6 @@ INPUT_PORTS_END
  *************************************/
 void seattle_state::seattle_common(machine_config &config)
 {
-
 	// basic machine hardware
 	R5000LE(config, m_maincpu, SYSTEM_CLOCK * 3);
 	m_maincpu->set_icache_size(16384);
@@ -1869,7 +2016,7 @@ void seattle_state::seattle_common(machine_config &config)
 	m_maincpu->set_system_clock(SYSTEM_CLOCK);
 
 	// PCI Bus Devices
-	PCI_ROOT(config, ":pci", 0);
+	PCI_ROOT(config, "pci", 0);
 
 	GT64010(config, m_galileo, SYSTEM_CLOCK, m_maincpu, GALILEO_IRQ_NUM);
 	m_galileo->set_map(0, address_map_constructor(&seattle_state::seattle_cs0_map, "seattle_cs0_map", this), this);
@@ -1881,14 +2028,16 @@ void seattle_state::seattle_common(machine_config &config)
 	ide_pci_device &ide(IDE_PCI(config, PCI_ID_IDE, 0, 0x100b0002, 0x01, 0x0));
 	ide.irq_handler().set_inputline(m_maincpu, IDE_IRQ_NUM);
 	ide.set_legacy_top(0x0a0);
+	ide.subdevice<bus_master_ide_controller_device>("ide")->slot(0).set_option_machine_config("hdd", hdd_config);
 
 	// video hardware
 	VOODOO_1_PCI(config, m_voodoo, 0, m_maincpu, m_screen);
 	m_voodoo->set_fbmem(2);
 	m_voodoo->set_tmumem(4, 0);
+	m_voodoo->set_status_cycles(1000); // optimization to consume extra cycles when polling status
 
-	subdevice<voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(seattle_state::vblank_assert));
-	subdevice<voodoo_device>(PCI_ID_VIDEO":voodoo")->stall_callback().set(m_galileo, FUNC(gt64xxx_device::pci_stall));
+	subdevice<generic_voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(seattle_state::vblank_assert));
+	subdevice<generic_voodoo_device>(PCI_ID_VIDEO":voodoo")->stall_callback().set(m_galileo, FUNC(gt64xxx_device::pci_stall));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -1901,6 +2050,11 @@ void seattle_state::seattle_common(machine_config &config)
 	m_screen->set_screen_update(PCI_ID_VIDEO, FUNC(voodoo_1_pci_device::screen_update));
 }
 
+void seattle_state::hdd_config(device_t *device)
+{
+	// Set the disk dma transfer speed
+	dynamic_cast<ide_hdd_device *>(device)->set_dma_transfer_time(attotime::from_usec(15));
+}
 
 void seattle_state::phoenix(machine_config &config)
 {
@@ -1948,7 +2102,7 @@ void seattle_state::seattle200_widget(machine_config &config)
 	seattle200(config);
 
 	m_galileo->set_map(3, address_map_constructor(&seattle_state::widget_cs3_map, "widget_cs3_map", this), this);
-	
+
 	SMC91C94(config, m_ethernet, 0);
 	m_ethernet->irq_handler().set(FUNC(seattle_state::ethernet_interrupt));
 }
@@ -1964,6 +2118,7 @@ void seattle_state::flagstaff(machine_config &config)
 
 	m_voodoo->set_fbmem(2);
 	m_voodoo->set_tmumem(4, 4);
+	m_voodoo->set_status_cycles(1000); // optimization to consume extra cycles when polling status
 }
 
 // Per game configurations
@@ -1977,11 +2132,10 @@ void seattle_state::wg3dh(machine_config &config)
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
-	m_ioasic->set_upper(310); // others?
+	m_ioasic->set_upper(310); // no alternates
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
 }
-
 
 void seattle_state::mace(machine_config &config)
 {
@@ -1992,7 +2146,7 @@ void seattle_state::mace(machine_config &config)
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_MACE);
-	m_ioasic->set_upper(319); // others?
+	m_ioasic->set_upper(319); // or 314
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
 }
@@ -2000,9 +2154,21 @@ void seattle_state::mace(machine_config &config)
 void seattle_state::sfrush(machine_config &config)
 {
 	flagstaff(config);
+	// 5 Channel output (4 Channel input connected to Quad Amp PCB)
+	SPEAKER(config, "flspeaker").front_left();
+	SPEAKER(config, "frspeaker").front_right();
+	SPEAKER(config, "rlspeaker").headrest_left();
+	SPEAKER(config, "rrspeaker").headrest_right();
+	//SPEAKER(config, "subwoofer").seat(); Not implemented, Quad Amp PCB output;
+
 	atari_cage_seattle_device &cage(ATARI_CAGE_SEATTLE(config, "cage", 0));
 	cage.set_speedup(0x5236);
 	cage.irq_handler().set(m_ioasic, FUNC(midway_ioasic_device::cage_irq_handler));
+	// TODO: copied from atarigt.cpp; Same configurations as T-Mek?
+	cage.add_route(0, "frspeaker", 1.0); // Foward Right
+	cage.add_route(1, "rlspeaker", 1.0); // Back Left
+	cage.add_route(2, "flspeaker", 1.0); // Foward Left
+	cage.add_route(3, "rrspeaker", 1.0); // Back Right
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
@@ -2015,13 +2181,26 @@ void seattle_state::sfrush(machine_config &config)
 void seattle_state::sfrushrk(machine_config &config)
 {
 	flagstaff(config);
+	// 5 Channel output (4 Channel input connected to Quad Amp PCB)
+	SPEAKER(config, "flspeaker").front_left();
+	SPEAKER(config, "frspeaker").front_right();
+	SPEAKER(config, "rlspeaker").headrest_left();
+	SPEAKER(config, "rrspeaker").headrest_right();
+	//SPEAKER(config, "subwoofer").seat(); Not implemented, Quad Amp PCB output;
+
 	atari_cage_seattle_device &cage(ATARI_CAGE_SEATTLE(config, "cage", 0));
 	cage.set_speedup(0x5329);
 	cage.irq_handler().set(m_ioasic, FUNC(midway_ioasic_device::cage_irq_handler));
+	// TODO: copied from atarigt.cpp; Same configurations as T-Mek?
+	cage.add_route(0, "frspeaker", 1.0); // Foward Right
+	cage.add_route(1, "rlspeaker", 1.0); // Back Left
+	cage.add_route(2, "flspeaker", 1.0); // Foward Left
+	cage.add_route(3, "rrspeaker", 1.0); // Back Right
+
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_SFRUSHRK);
-	m_ioasic->set_upper(331); // unknown
+	m_ioasic->set_upper(331); // no alternates
 	m_ioasic->set_yearoffs(100);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
 	m_ioasic->aux_output_handler().set(FUNC(seattle_state::wheel_board_w));
@@ -2042,7 +2221,7 @@ void seattle_state::calspeed(machine_config &config)
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_CALSPEED);
-	m_ioasic->set_upper(328); // others?
+	m_ioasic->set_upper(328); // 328 = 27"; may or may not have a 31" ID
 	m_ioasic->set_yearoffs(100);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
 	m_ioasic->set_auto_ack(1);
@@ -2057,7 +2236,7 @@ void seattle_state::vaportrx(machine_config &config)
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_VAPORTRX);
-	m_ioasic->set_upper(324); // 334? unknown
+	m_ioasic->set_upper(324); // or 334
 	m_ioasic->set_yearoffs(100);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
 }
@@ -2071,7 +2250,7 @@ void seattle_state::biofreak(machine_config &config)
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
-	m_ioasic->set_upper(231); // unknown
+	m_ioasic->set_upper(231); // no alternates
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
 }
@@ -2088,6 +2267,7 @@ void seattle_state::blitz(machine_config &config)
 	m_ioasic->set_upper(444); // or 528
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
+	m_ioasic->aux_output_handler().set(FUNC(seattle_state::i40_w));
 }
 
 void seattle_state::blitz99(machine_config &config)
@@ -2102,6 +2282,7 @@ void seattle_state::blitz99(machine_config &config)
 	m_ioasic->set_upper(481); // or 484 or 520
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
+	m_ioasic->aux_output_handler().set(FUNC(seattle_state::i40_w));
 }
 
 void seattle_state::blitz2k(machine_config &config)
@@ -2116,20 +2297,21 @@ void seattle_state::blitz2k(machine_config &config)
 	m_ioasic->set_upper(494); // or 498
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
+	m_ioasic->aux_output_handler().set(FUNC(seattle_state::i40_w));
 }
 
 void seattle_state::carnevil(machine_config &config)
 {
 	seattle150(config);
 	m_galileo->set_map(3, address_map_constructor(&seattle_state::carnevil_cs3_map, "carnevil_cs3_map", this), this);
-	
+
 	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x0af7);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_CARNEVIL);
-	m_ioasic->set_upper(469); // or 486 or 528
+	m_ioasic->set_upper(469); // 469 = 25"; 486 = 39";
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
 }
@@ -2143,7 +2325,7 @@ void seattle_state::hyprdriv(machine_config &config)
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_HYPRDRIV);
-	m_ioasic->set_upper(469); //unknown
+	m_ioasic->set_upper(471); // 471 = 25"; 479 = 31"
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
 }
@@ -2154,17 +2336,39 @@ void seattle_state::hyprdriv(machine_config &config)
  *
  *************************************/
 
+#define WG3DH_BIOS \
+		ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) \
+		ROM_SYSTEM_BIOS( 0, "l01", "Boot Code L0.1?" ) \
+		ROMX_LOAD( "l0.1_gretzky_video_system_boot_u32.u32", 0x000000, 0x80000, CRC(80fb6dfd) SHA1(b78d1c8abdb875196c5cd9afc986f54865a90aba), ROM_BIOS(0) ) /* Boot Code Version ? (Aug 13 1996 16:59:47 @ 0x599D0 in ROM) */ \
+		ROM_SYSTEM_BIOS( 1, "l12", "Boot Code L1.2" ) \
+		ROMX_LOAD( "l1.2_gretzky_video_system_boot_u32.u32", 0x000000, 0x80000, CRC(15e4cea2) SHA1(72c0db7dc53ce645ba27a5311b5ce803ad39f131), ROM_BIOS(1) ) /* Boot Code Version L1.2 (Oct  8 1996 12:55:39 @ 0x5CDE0 in ROM) */
+
 ROM_START( wg3dh )
-	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) // Boot Code Version L1.2 (10/8/96)
-	ROM_LOAD( "wg3dh_12.u32", 0x000000, 0x80000, CRC(15e4cea2) SHA1(72c0db7dc53ce645ba27a5311b5ce803ad39f131) )
+	WG3DH_BIOS
+	ROM_DEFAULT_BIOS("l12")
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version 1.3 (Guts 10/15/96, Main 10/15/96)
-	DISK_IMAGE( "wg3dh", 0, SHA1(4fc6f25d7f043d9bcf8743aa8df1d9be3cbc375b) )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version 1.3 (Guts: Oct 15 1996 16:57:13, Main: Oct 15 1996 17:36:39)
+	DISK_IMAGE( "wg3dh", 0, SHA1(4fc6f25d7f043d9bcf8743aa8df1d9be3cbc375b) ) // ST94420AG hard drive
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version L1.1
-	ROM_LOAD16_BYTE( "soundl11.u95", 0x000000, 0x8000, CRC(c589458c) SHA1(0cf970a35910a74cdcf3bd8119bfc0c693e19b00) )
+	ROM_LOAD16_BYTE( "l1.1_gretzky_video_system_boot_u95.u95", 0x000000, 0x8000, CRC(c589458c) SHA1(0cf970a35910a74cdcf3bd8119bfc0c693e19b00) )
+ROM_END
+
+
+ROM_START( wg3dhfe ) // Original PCB board with PIC security chip labeled as  310  Gretzky Hockey  U96   *310300003*   (IE: serial number 00003)
+	WG3DH_BIOS
+	ROM_DEFAULT_BIOS("l01") // disk was paired with a board populated with this early boot ROM
+
+	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
+
+	// Disk caddy stickered:  3DHOCKEY FATALITY EDITION, another sticker stated:  PHX-HDsisk -0006    <-- Yes, it's "HDsisk" and not HDisk
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version ? (Guts: Feb 4 1997 17:08:22, Main: Mar 21 1997 12:15:39)
+	DISK_IMAGE( "wg3dhfe", 0, SHA1(49b72e7e76036b119bfc8b9a0ef8b9acd346d0be) ) // ST94420AG hard drive
+
+	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version L1.1
+	ROM_LOAD16_BYTE( "l0.1_gretzky_video_system_boot_u95.u95", 0x000000, 0x8000, CRC(c589458c) SHA1(0cf970a35910a74cdcf3bd8119bfc0c693e19b00) ) // labeled as L0.1 == l1.1_gretzky_video_system_boot_u95.u95
 ROM_END
 
 
@@ -2179,6 +2383,9 @@ ROM_START( mace )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version L1.1, Labeled as Version 1.0
 	ROM_LOAD16_BYTE( "soundl11.u95", 0x000000, 0x8000, CRC(c589458c) SHA1(0cf970a35910a74cdcf3bd8119bfc0c693e19b00) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "314_mace.u96", 0x0000, 0x2000, CRC(65943e82) SHA1(984a1938f43671fc8f6394677396451dab7f042b) )
 ROM_END
 
 
@@ -2193,6 +2400,9 @@ ROM_START( macea )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version L1.1
 	ROM_LOAD16_BYTE( "soundl11.u95", 0x000000, 0x8000, CRC(c589458c) SHA1(0cf970a35910a74cdcf3bd8119bfc0c693e19b00) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "314_mace.u96", 0x0000, 0x2000, CRC(65943e82) SHA1(984a1938f43671fc8f6394677396451dab7f042b) )
 ROM_END
 
 
@@ -2213,7 +2423,11 @@ ROM_START( sfrush )
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version L1.06
 	DISK_IMAGE( "sfrush", 0, SHA1(e2db0270a707fb2115207f988d5751081d6b4994) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", ROMREGION_ERASEFF ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "315_sf_rush.u96", 0x0000, 0x1000, CRC(e3527a3a) SHA1(5e556e6dfd87df5a895bdf4bd7f77708ac327db7) )
 ROM_END
+
 
 ROM_START( sfrusha )
 	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) // Boot Code Version L1.06A
@@ -2232,8 +2446,10 @@ ROM_START( sfrusha )
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version L1.06
 	DISK_IMAGE( "sfrush", 0, SHA1(e2db0270a707fb2115207f988d5751081d6b4994) )
-ROM_END
 
+	ROM_REGION( 0x2000, "serial_security_pic", ROMREGION_ERASEFF ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "315_sf_rush.u96", 0x0000, 0x1000, CRC(e3527a3a) SHA1(5e556e6dfd87df5a895bdf4bd7f77708ac327db7) )
+ROM_END
 
 
 ROM_START( sfrushrk )
@@ -2253,6 +2469,9 @@ ROM_START( sfrushrk )
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version 1.2
 	DISK_IMAGE( "sfrushrk", 0, SHA1(e763f26aca67ebc17fe8b8df4fba91d492cf7837) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", ROMREGION_ERASEFF ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "331_rush_the_rock.u96", 0x0000, 0x1000, CRC(425155b6) SHA1(4ec5471d8ede6154322e9dc6de372b8f4686e11b) )
 ROM_END
 
 
@@ -2273,7 +2492,11 @@ ROM_START( sfrushrkw )
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version 1.2
 	DISK_IMAGE( "sfrushrk", 0, SHA1(e763f26aca67ebc17fe8b8df4fba91d492cf7837) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", ROMREGION_ERASEFF ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "331_rush_the_rock.u96", 0x0000, 0x1000, CRC(425155b6) SHA1(4ec5471d8ede6154322e9dc6de372b8f4686e11b) )
 ROM_END
+
 
 ROM_START( sfrushrkwo )
 	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) // Boot Code
@@ -2292,7 +2515,11 @@ ROM_START( sfrushrkwo )
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version 1.2
 	DISK_IMAGE( "sfrushrk", 0, SHA1(e763f26aca67ebc17fe8b8df4fba91d492cf7837) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", ROMREGION_ERASEFF ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "331_rush_the_rock.u96", 0x0000, 0x1000, CRC(425155b6) SHA1(4ec5471d8ede6154322e9dc6de372b8f4686e11b) )
 ROM_END
+
 
 ROM_START( calspeed )
 	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) // Boot Code Version 1.2 (2/18/98)
@@ -2306,6 +2533,7 @@ ROM_START( calspeed )
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version 1.02
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 ROM_END
+
 
 ROM_START( calspeeda )
 	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 )  /* Boot Code Version 1.2 (2/18/98) */
@@ -2332,6 +2560,7 @@ ROM_START( calspeeda )
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 ROM_END
 
+
 ROM_START( calspeedb )
 	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 )  // Boot Code Version 1.2 (2/18/98)
 	ROM_LOAD( "caspd1_2.u32", 0x000000, 0x80000, CRC(0a235e4e) SHA1(b352f10fad786260b58bd344b5002b6ea7aaf76d) )
@@ -2344,6 +2573,7 @@ ROM_START( calspeedb )
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version 1.02
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 ROM_END
+
 
 ROM_START( vaportrx )
 	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 )
@@ -2386,6 +2616,13 @@ ROM_START( biofreak )
 	DISK_IMAGE( "biofreak", 0, SHA1(711241642f92ded8eaf20c418ea748989183fe10) )
 ROM_END
 
+#define BLITZ_BIOS \
+		ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) \
+		ROM_DEFAULT_BIOS("l12") \
+		ROM_SYSTEM_BIOS( 0, "l11", "Boot Code L1.1" ) \
+		ROMX_LOAD( "blitz1_1.u32", 0x000000, 0x80000, CRC(8163ce02) SHA1(89b432d8879052f6c5534ee49599f667f50a010f), ROM_BIOS(0) ) \
+		ROM_SYSTEM_BIOS( 1, "l12", "Boot Code L1.2" ) \
+		ROMX_LOAD( "blitz1_2.u32", 0x000000, 0x80000, CRC(38dbecf5) SHA1(7dd5a5b3baf83a7f8f877ff4cd3f5e8b5201b36f), ROM_BIOS(1) )
 
 ROM_START( blitz )
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version 1.02
@@ -2393,22 +2630,7 @@ ROM_START( blitz )
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 
-	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) // Boot Code Version 1.2
-	ROM_LOAD( "blitz1_2.u32", 0x000000, 0x80000, CRC(38dbecf5) SHA1(7dd5a5b3baf83a7f8f877ff4cd3f5e8b5201b36f) )
-
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version 1.21
-	DISK_IMAGE( "blitz", 0, SHA1(9131c7888e89b3c172780156ed3fe1fe46f78b0a) )
-ROM_END
-
-
-ROM_START( blitz11 )
-	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version 1.02
-	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
-
-	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
-
-	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) // Boot Code Version 1.1
-	ROM_LOAD( "blitz1_1.u32", 0x000000, 0x80000, CRC(8163ce02) SHA1(89b432d8879052f6c5534ee49599f667f50a010f) )
+	BLITZ_BIOS
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version 1.21
 	DISK_IMAGE( "blitz", 0, SHA1(9131c7888e89b3c172780156ed3fe1fe46f78b0a) )
@@ -2426,7 +2648,11 @@ ROM_START( blitz99 )
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version 1.30
 	DISK_IMAGE( "blitz99", 0, SHA1(19877e26ffce81dd525031e9e2b4f83ff982e2d9) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "481_blitz-99.u96", 0x0000, 0x2000, CRC(f58df548) SHA1(5bda123035f49f06b4721ab4a1577a115470aa02) )
 ROM_END
+
 
 ROM_START( blitz99a )
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version 1.02
@@ -2442,6 +2668,9 @@ ROM_START( blitz99a )
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version 1.30
 	DISK_IMAGE( "blitz99a", 0, SHA1(43f834727ce01d7a63b482fc28cbf292477fc6f2) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "481_blitz-99.u96", 0x0000, 0x2000, CRC(f58df548) SHA1(5bda123035f49f06b4721ab4a1577a115470aa02) )
 ROM_END
 
 
@@ -2470,6 +2699,9 @@ ROM_START( carnevil )
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive v1.0.3  Diagnostics v3.4 / Feb 1 1999 16:00:07
 	DISK_IMAGE( "carnevil", 0, SHA1(5cffb0de63ad36eb01c5951bab04d3f8a9e23e16) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "486_carnevil.u96", 0x0000, 0x2000, CRC(40eea9d4) SHA1(60a5f5c4de716722fa2ff55dccfc5fbbd7cd02e1) )
 ROM_END
 
 
@@ -2479,11 +2711,14 @@ ROM_START( carnevil1 )
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 
-	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) // Boot Rom Version 1.9 
+	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) // Boot Rom Version 1.9
 	ROM_LOAD( "carnevil1_9.u32", 0x000000, 0x80000, CRC(82c07f2e) SHA1(fa51c58022ce251c53bad12fc6ffadb35adb8162) )
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive v1.0.1  Diagnostics v3.3 / Oct 20 1998 11:44:41
 	DISK_IMAGE( "carnevi1", 0, BAD_DUMP SHA1(94532727512280930a100fe473bf3a938fe2d44f) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "486_carnevil.u96", 0x0000, 0x2000, CRC(40eea9d4) SHA1(60a5f5c4de716722fa2ff55dccfc5fbbd7cd02e1) )
 ROM_END
 
 
@@ -2506,7 +2741,7 @@ ROM_START( hyprdriv )
 
 	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 )
 	ROM_LOAD( "hyperdrive1.1.u32", 0x000000, 0x80000, CRC(3120991e) SHA1(8e47888a5a23c9d3c0d0c64497e1cfb4e46c2cd6) )  // Boot Rom Version 2. Doesn't work, maybe for older drive?
-	ROM_LOAD( "hyprdrve.u32", 0x000000, 0x80000, CRC(3e18cb80) SHA1(b18cc4253090ee1d65d72a7ec0c426ed08c4f238) )  // Boot Rom Version 9. 
+	ROM_LOAD( "hyprdrve.u32", 0x000000, 0x80000, CRC(3e18cb80) SHA1(b18cc4253090ee1d65d72a7ec0c426ed08c4f238) )  // Boot Rom Version 9.
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Version 1.40  Oct 23 1998  15:16:00
 	DISK_IMAGE( "hyprdriv", 0, SHA1(8cfa343797575b32f46cc24150024be48963a03e) )
@@ -2668,10 +2903,11 @@ void seattle_state::init_hyprdriv()
 	// speedups
 	m_maincpu->mips3drc_add_hotspot(0x801643BC, 0x3C03801B, 250); // confirmed
 	m_maincpu->mips3drc_add_hotspot(0x80011FB8, 0x8E020018, 250); // confirmed
-//	m_maincpu->mips3drc_add_hotspot(0x80136A80, 0x3C02801D, 250); // potential
+//  m_maincpu->mips3drc_add_hotspot(0x80136A80, 0x3C02801D, 250); // potential
 }
 
 
+} // Anonymous namespace
 
 /*************************************
  *
@@ -2681,6 +2917,7 @@ void seattle_state::init_hyprdriv()
 
 // Atari
 GAME(  1996, wg3dh,      0,        wg3dh,     wg3dh,    seattle_state, init_wg3dh,    ROT0, "Atari Games",  "Wayne Gretzky's 3D Hockey (ver 1.3)", MACHINE_SUPPORTS_SAVE )
+GAME(  1996, wg3dhfe,    wg3dh,    wg3dh,     wg3dh,    seattle_state, init_wg3dh,    ROT0, "Atari Games",  "Wayne Gretzky's 3D Hockey Fatality Edition (prototype)", MACHINE_SUPPORTS_SAVE )
 GAME(  1996, mace,       0,        mace,      mace,     seattle_state, init_mace,     ROT0, "Atari Games",  "Mace: The Dark Age (boot ROM 1.0ce, HDD 1.0b)", MACHINE_SUPPORTS_SAVE )
 GAME(  1997, macea,      mace,     mace,      mace,     seattle_state, init_mace,     ROT0, "Atari Games",  "Mace: The Dark Age (HDD 1.0a)", MACHINE_SUPPORTS_SAVE )
 GAMEL( 1996, sfrush,     0,        sfrush,    sfrush,   seattle_state, init_sfrush,   ROT0, "Atari Games",  "San Francisco Rush (boot rom L 1.0)", MACHINE_SUPPORTS_SAVE, layout_sfrush )
@@ -2699,8 +2936,7 @@ GAMEL( 1998, vaportrxp,  vaportrx, vaportrx,  vaportrx, seattle_state, init_vapo
 
 // Midway
 GAME(  1997, biofreak,   0,        biofreak,  biofreak, seattle_state, init_biofreak, ROT0, "Midway Games", "Bio F.R.E.A.K.S (prototype, boot ROM 0.1i)", MACHINE_SUPPORTS_SAVE )
-GAME(  1997, blitz,      0,        blitz,     blitz,    seattle_state, init_blitz,    ROT0, "Midway Games", "NFL Blitz (boot ROM 1.2)", MACHINE_SUPPORTS_SAVE )
-GAME(  1997, blitz11,    blitz,    blitz,     blitz,    seattle_state, init_blitz,    ROT0, "Midway Games", "NFL Blitz (boot ROM 1.1)", MACHINE_SUPPORTS_SAVE )
+GAME(  1997, blitz,      0,        blitz,     blitz,    seattle_state, init_blitz,    ROT0, "Midway Games", "NFL Blitz (ver 1.21, Dec 5 1987)", MACHINE_SUPPORTS_SAVE )
 GAME(  1998, blitz99,    0,        blitz99,   blitz99,  seattle_state, init_blitz99,  ROT0, "Midway Games", "NFL Blitz '99 (ver 1.30, Sep 22 1998)", MACHINE_SUPPORTS_SAVE )
 GAME(  1998, blitz99a,   blitz99,  blitz99,   blitz99,  seattle_state, init_blitz99,  ROT0, "Midway Games", "NFL Blitz '99 (ver 1.2, Aug 28 1998)", MACHINE_SUPPORTS_SAVE )
 GAME(  1999, blitz2k,    0,        blitz2k,   blitz99,  seattle_state, init_blitz2k,  ROT0, "Midway Games", "NFL Blitz 2000 Gold Edition (ver 1.2, Sep 22 1999)", MACHINE_SUPPORTS_SAVE )

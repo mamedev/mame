@@ -2644,7 +2644,7 @@ B-2007 : Innovative Computing
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
-				<rom name="sargon ii chess (commodore)(1982)(vic-1919)(ju).a0" size="0x2000" crc="cd1ca8ec" sha1="3c1b6c2068d036aee40dbc31f075d0b789a503aa" offset="0x0000" />
+				<rom name="sargon ii chess (commodore)(1982)(vic-1919)(ju).a0" size="0x2000" crc="f7a9f922" sha1="9fd24fb75f85746190d740fd895bff9b5ca704d7" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>

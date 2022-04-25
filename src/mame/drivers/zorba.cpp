@@ -66,14 +66,14 @@ ToDo:
 #include "machine/pit8253.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
 void zorba_state::zorba_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).bankr(m_read_bank).bankw("bankw0");
-	map(0x4000, 0xffff).ram();
+	map(0x0000, 0xffff).ram().share("mainram");
+	map(0x0000, 0x3fff).bankr("bank1");
 }
 
 
@@ -225,8 +225,8 @@ void zorba_state::zorba(machine_config &config)
 	FD1793(config, m_fdc, 24_MHz_XTAL / 24);
 	m_fdc->intrq_wr_callback().set("irq2", FUNC(input_merger_device::in_w<0>));
 	m_fdc->drq_wr_callback().set("irq2", FUNC(input_merger_device::in_w<1>));
-	FLOPPY_CONNECTOR(config, m_floppy0, zorba_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, zorba_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy0, zorba_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, zorba_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	// J1 IEEE-488
 	IEEE488(config, m_ieee);
@@ -266,12 +266,6 @@ void zorba_state::zorba(machine_config &config)
 
 void zorba_state::machine_start()
 {
-	uint8_t *main = memregion("maincpu")->base();
-
-	m_read_bank->configure_entry(0, &main[0x0000]);
-	m_read_bank->configure_entry(1, &main[0x10000]);
-	membank("bankw0")->configure_entry(0, &main[0x0000]);
-
 	save_item(NAME(m_intmask));
 	save_item(NAME(m_tx_rx_rdy));
 	save_item(NAME(m_irq));
@@ -285,6 +279,8 @@ void zorba_state::machine_start()
 	m_printer_prowriter = false;
 	m_printer_fault = 0;
 	m_printer_select = 0;
+	m_bank1->configure_entry(0, m_ram);
+	m_bank1->configure_entry(1, m_rom);
 }
 
 void zorba_state::machine_reset()
@@ -298,8 +294,7 @@ void zorba_state::machine_reset()
 	m_printer_prowriter = BIT(m_config_port->read(), 0);
 	m_pia0->cb1_w(m_printer_prowriter ? m_printer_select : m_printer_fault);
 
-	m_read_bank->set_entry(1); // point at rom
-	membank("bankw0")->set_entry(0); // always write to RAM
+	m_bank1->set_entry(1);
 
 	m_maincpu->reset();
 }
@@ -312,25 +307,25 @@ void zorba_state::machine_reset()
 uint8_t zorba_state::ram_r()
 {
 	if (!machine().side_effects_disabled())
-		m_read_bank->set_entry(0);
+		m_bank1->set_entry(0);
 	return 0;
 }
 
 void zorba_state::ram_w(uint8_t data)
 {
-	m_read_bank->set_entry(0);
+	m_bank1->set_entry(0);
 }
 
 uint8_t zorba_state::rom_r()
 {
 	if (!machine().side_effects_disabled())
-		m_read_bank->set_entry(1);
+		m_bank1->set_entry(1);
 	return 0;
 }
 
 void zorba_state::rom_w(uint8_t data)
 {
-	m_read_bank->set_entry(1);
+	m_bank1->set_entry(1);
 }
 
 
@@ -495,8 +490,7 @@ void zorba_state::pia1_portb_w(uint8_t data)
 
 I8275_DRAW_CHARACTER_MEMBER( zorba_state::zorba_update_chr )
 {
-	int i;
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
 	uint8_t gfx = m_p_chargen[(linecount & 15) + (charcode << 4) + ((gpa & 1) << 11)];
 
@@ -510,8 +504,8 @@ I8275_DRAW_CHARACTER_MEMBER( zorba_state::zorba_update_chr )
 	if (lten)
 		gfx = 0xff;
 
-	for(i=0;i<8;i++)
-		bitmap.pix32(y, x + 7 - i) = palette[BIT(gfx, i) ? (hlgt ? 2 : 1) : 0];
+	for (int i = 0; i < 8; i++)
+		bitmap.pix(y, x + 7 - i) = palette[BIT(gfx, i) ? (hlgt ? 2 : 1) : 0];
 }
 
 
@@ -543,8 +537,8 @@ INPUT_CHANGED_MEMBER( zorba_state::printer_type )
 
 
 ROM_START( zorba )
-	ROM_REGION( 0x14000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "780000.u47", 0x10000, 0x1000, CRC(6d58f2c5) SHA1(7763f08c801cd36e5a761c6dc9f30a50b3bc482d) )
+	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "780000.u47", 0x0000, 0x1000, CRC(6d58f2c5) SHA1(7763f08c801cd36e5a761c6dc9f30a50b3bc482d) )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "773000.u5", 0x0000, 0x1000, CRC(d0a2f8fc) SHA1(29aee7ee657778c46e9800abd4955e6d4b33ef68) )

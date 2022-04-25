@@ -121,7 +121,7 @@ anything in hardware. No cartridge has been found which uses them.
 
 #include "emu.h"
 #include "includes/arcadia.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 void arcadia_state::arcadia_mem(address_map &map)
@@ -208,7 +208,6 @@ static INPUT_PORTS_START( arcadia )
 	PORT_CODE_DEC(JOYCODE_1_LEFT)
 	PORT_CODE_INC(JOYCODE_1_RIGHT)
 	PORT_PLAYER(1)
-	PORT_RESET
 
 	PORT_START("controller1_joy_y")
 	PORT_BIT( 0x1fe,0x10,IPT_AD_STICK_Y)
@@ -220,7 +219,6 @@ static INPUT_PORTS_START( arcadia )
 	PORT_CODE_DEC(JOYCODE_1_UP)
 	PORT_CODE_INC(JOYCODE_1_DOWN)
 	PORT_PLAYER(1)
-	PORT_RESET
 
 	PORT_START("controller2_joy_x")
 	PORT_BIT( 0x1ff,0x10,IPT_AD_STICK_X)
@@ -232,7 +230,6 @@ static INPUT_PORTS_START( arcadia )
 	PORT_CODE_DEC(JOYCODE_2_LEFT)
 	PORT_CODE_INC(JOYCODE_2_RIGHT)
 	PORT_PLAYER(2)
-	PORT_RESET
 
 	PORT_START("controller2_joy_y")
 	PORT_BIT( 0x1ff,0x10,IPT_AD_STICK_Y)
@@ -244,7 +241,6 @@ static INPUT_PORTS_START( arcadia )
 	PORT_CODE_DEC(JOYCODE_2_UP)
 	PORT_CODE_INC(JOYCODE_2_DOWN)
 	PORT_PLAYER(2)
-	PORT_RESET
 #else
 	PORT_START("joysticks")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_8WAY
@@ -347,7 +343,6 @@ static INPUT_PORTS_START( plldium )
 	PORT_CODE_DEC(JOYCODE_1_LEFT)
 	PORT_CODE_INC(JOYCODE_1_RIGHT)
 	PORT_PLAYER(1)
-	PORT_RESET
 
 	PORT_START("controller1_joy_y")
 	PORT_BIT( 0x1fe,0x10,IPT_AD_STICK_Y)
@@ -359,7 +354,6 @@ static INPUT_PORTS_START( plldium )
 	PORT_CODE_DEC(JOYCODE_1_UP)
 	PORT_CODE_INC(JOYCODE_1_DOWN)
 	PORT_PLAYER(1)
-	PORT_RESET
 
 	PORT_START("controller2_joy_x")
 	PORT_BIT( 0x1ff,0x10,IPT_AD_STICK_X)
@@ -371,7 +365,6 @@ static INPUT_PORTS_START( plldium )
 	PORT_CODE_DEC(JOYCODE_2_LEFT)
 	PORT_CODE_INC(JOYCODE_2_RIGHT)
 	PORT_PLAYER(2)
-	PORT_RESET
 
 	PORT_START("controller2_joy_y")
 	PORT_BIT( 0x1ff,0x10,IPT_AD_STICK_Y)
@@ -383,7 +376,6 @@ static INPUT_PORTS_START( plldium )
 	PORT_CODE_DEC(JOYCODE_2_UP)
 	PORT_CODE_INC(JOYCODE_2_DOWN)
 	PORT_PLAYER(2)
-	PORT_RESET
 #else
 	PORT_START("joysticks")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )     PORT_PLAYER(1) PORT_8WAY
@@ -491,14 +483,14 @@ void arcadia_state::arcadia(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_arcadia);
-	PALETTE(config, m_palette, FUNC(arcadia_state::palette_init), ARRAY_LENGTH(arcadia_palette), 8);
+	PALETTE(config, m_palette, FUNC(arcadia_state::palette_init), std::size(arcadia_palette), 8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	ARCADIA_SOUND(config, m_custom).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* cartridge */
-	EA2001_CART_SLOT(config, "cartslot", arcadia_cart, nullptr);
+	EA2001_CART_SLOT(config, "cartslot", arcadia_cart, nullptr).set_must_be_loaded(true);
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("arcadia");
@@ -795,10 +787,10 @@ void arcadia_state::init_arcadia()
 		};
 #if 1
 		FILE *f = fopen("chartest.bin","wb");
-		fwrite(prog, ARRAY_LENGTH(prog), sizeof(prog[0]), f);
+		fwrite(prog, std::size(prog), sizeof(prog[0]), f);
 		fclose(f);
 #endif
-		for (int i = 0; i < ARRAY_LENGTH(prog); i++) rom[i] = prog[i];
+		for (int i = 0; i < std::size(prog); i++) rom[i] = prog[i];
 
 	}
 #endif

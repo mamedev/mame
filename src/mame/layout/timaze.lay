@@ -10,7 +10,7 @@ license:CC0
 
 	<view name="Internal Layout">
 		<bounds left="0" right="10" top="0" bottom="15" />
-		<bezel name="digit0" element="digit"><bounds x="0" y="0" width="10" height="15" /></bezel>
+		<element name="digit0" ref="digit"><bounds x="0" y="0" width="10" height="15" /></element>
 
 	</view>
 </mamelayout>

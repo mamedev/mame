@@ -127,7 +127,7 @@ uint8_t bublbobl_state::tokiob_mcu_r()
 }
 
 
-void bublbobl_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void bublbobl_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -153,6 +153,11 @@ uint8_t bublbobl_state::common_sound_semaphores_r()
 	return ret;
 }
 
+IRQ_CALLBACK_MEMBER(bublbobl_state::mcram_vect_r)
+{
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	return m_mcu_sharedram[0];
+}
 
 
 /***************************************************************************
@@ -160,53 +165,6 @@ uint8_t bublbobl_state::common_sound_semaphores_r()
 Bubble Bobble MCU
 
 ***************************************************************************/
-
-uint8_t bublbobl_state::bublbobl_mcu_ddr1_r()
-{
-	return m_ddr1;
-}
-
-void bublbobl_state::bublbobl_mcu_ddr1_w(uint8_t data)
-{
-	m_ddr1 = data;
-}
-
-uint8_t bublbobl_state::bublbobl_mcu_ddr2_r()
-{
-	return m_ddr2;
-}
-
-void bublbobl_state::bublbobl_mcu_ddr2_w(uint8_t data)
-{
-	m_ddr2 = data;
-}
-
-uint8_t bublbobl_state::bublbobl_mcu_ddr3_r()
-{
-	return m_ddr3;
-}
-
-void bublbobl_state::bublbobl_mcu_ddr3_w(uint8_t data)
-{
-	m_ddr3 = data;
-}
-
-uint8_t bublbobl_state::bublbobl_mcu_ddr4_r()
-{
-	return m_ddr4;
-}
-
-void bublbobl_state::bublbobl_mcu_ddr4_w(uint8_t data)
-{
-	m_ddr4 = data;
-}
-
-uint8_t bublbobl_state::bublbobl_mcu_port1_r()
-{
-	//logerror("%04x: 6801U4 port 1 read\n", m_mcu->pc());
-	m_port1_in = ioport("IN0")->read();
-	return (m_port1_out & m_ddr1) | (m_port1_in & ~m_ddr1);
-}
 
 void bublbobl_state::bublbobl_mcu_port1_w(uint8_t data)
 {
@@ -222,19 +180,11 @@ void bublbobl_state::bublbobl_mcu_port1_w(uint8_t data)
 	if ((m_port1_out & 0x40) && (~data & 0x40))
 	{
 		// logerror("triggering IRQ on main CPU\n");
-		m_maincpu->set_input_line_vector(0, m_mcu_sharedram[0]); // Z80
-		m_maincpu->set_input_line(0, HOLD_LINE);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 	}
 
 	// bit 7: select read or write shared RAM
-
 	m_port1_out = data;
-}
-
-uint8_t bublbobl_state::bublbobl_mcu_port2_r()
-{
-	//logerror("%04x: 6801U4 port 2 read\n", m_mcu->pc());
-	return (m_port2_out & m_ddr2) | (m_port2_in & ~m_ddr2);
 }
 
 void bublbobl_state::bublbobl_mcu_port2_w(uint8_t data)
@@ -274,7 +224,7 @@ void bublbobl_state::bublbobl_mcu_port2_w(uint8_t data)
 uint8_t bublbobl_state::bublbobl_mcu_port3_r()
 {
 	//logerror("%04x: 6801U4 port 3 read\n", m_mcu->pc());
-	return (m_port3_out & m_ddr3) | (m_port3_in & ~m_ddr3);
+	return m_port3_in;
 }
 
 void bublbobl_state::bublbobl_mcu_port3_w(uint8_t data)
@@ -283,18 +233,11 @@ void bublbobl_state::bublbobl_mcu_port3_w(uint8_t data)
 	m_port3_out = data;
 }
 
-uint8_t bublbobl_state::bublbobl_mcu_port4_r()
-{
-	//logerror("%04x: 6801U4 port 4 read\n", m_mcu->pc());
-	return (m_port4_out & m_ddr4) | (m_port4_in & ~m_ddr4);
-}
-
 void bublbobl_state::bublbobl_mcu_port4_w(uint8_t data)
 {
 	//logerror("%04x: 6801U4 port 4 write %02x\n", m_mcu->pc(), data);
 
 	// bits 0-7 of shared RAM address
-
 	m_port4_out = data;
 }
 
@@ -473,8 +416,7 @@ void bub68705_state::port_b_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 		/* hack to get random EXTEND letters (who is supposed to do this? 68705? PAL?) */
 		m_mcu_sharedram[0x7c] = machine().rand() % 6;
 
-		m_maincpu->set_input_line_vector(0, m_mcu_sharedram[0]); // Z80
-		m_maincpu->set_input_line(0, HOLD_LINE);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 	}
 
 	if (BIT(mem_mask, 6) && !BIT(data, 6) && BIT(m_port_b_out, 6))

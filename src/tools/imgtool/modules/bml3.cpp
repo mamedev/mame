@@ -18,11 +18,16 @@
    -   (used with MP-1802 floppy disk controller card)
 */
 
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
 #include "imgtool.h"
+#include "filter.h"
 #include "iflopimg.h"
+
+#include "corestr.h"
+#include "opresolv.h"
+
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 #define MAX_SECTOR_SIZE 256
 
@@ -604,8 +609,8 @@ eof:
 
 		get_dirent_fname(fname, &rsent);
 
-		snprintf(ent.filename, ARRAY_LENGTH(ent.filename), "%s", fname);
-		snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "%d %c", (int) rsent.ftype, (char) (rsent.asciiflag + 'B'));
+		snprintf(ent.filename, std::size(ent.filename), "%s", fname);
+		snprintf(ent.attr, std::size(ent.attr), "%d %c", (int) rsent.ftype, (char) (rsent.asciiflag + 'B'));
 	}
 	return IMGTOOLERR_SUCCESS;
 }

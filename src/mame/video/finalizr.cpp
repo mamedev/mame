@@ -35,7 +35,7 @@
 
 ***************************************************************************/
 
-void finalizr_state::finalizr_palette(palette_device &palette) const
+void finalizr_state::palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static constexpr int resistances[4] = { 2200, 1000, 470, 220 };
@@ -94,8 +94,8 @@ void finalizr_state::finalizr_palette(palette_device &palette) const
 
 TILE_GET_INFO_MEMBER(finalizr_state::get_bg_tile_info)
 {
-	int attr = m_colorram[tile_index];
-	int code = m_videoram[tile_index] + ((attr & 0xc0) << 2) + (m_charbank << 10);
+	int attr = m_colorram[0][tile_index];
+	int code = m_videoram[0][tile_index] + ((attr & 0xc0) << 2) + (m_charbank << 10);
 	int color = attr & 0x0f;
 	int flags = TILE_FLIPYX((attr & 0x30) >> 4);
 
@@ -104,8 +104,8 @@ TILE_GET_INFO_MEMBER(finalizr_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(finalizr_state::get_fg_tile_info)
 {
-	int attr = m_colorram2[tile_index];
-	int code = m_videoram2[tile_index] + ((attr & 0xc0) << 2);
+	int attr = m_colorram[1][tile_index];
+	int code = m_videoram[1][tile_index] + ((attr & 0xc0) << 2);
 	int color = attr & 0x0f;
 	int flags = TILE_FLIPYX((attr & 0x30) >> 4);
 
@@ -127,22 +127,20 @@ void finalizr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	gfx_element *gfx1 = m_gfxdecode->gfx(1);
 	gfx_element *gfx2 = m_gfxdecode->gfx(2);
 
-	uint8_t *sr = m_spriterambank ? m_spriteram_2 : m_spriteram;
+	uint8_t *sr = m_spriterambank ? m_spriteram[1] : m_spriteram[0];
 
-	for (int offs = 0; offs <= m_spriteram.bytes() - 5; offs += 5)
+	for (int offs = 0; offs <= m_spriteram[0].bytes() - 5; offs += 5)
 	{
-		int sx, sy, flipx, flipy, code, color, size;
-
-		sx = 32 + 1 + sr[offs + 3] - ((sr[offs + 4] & 0x01) << 8);
-		sy = sr[offs + 2];
-		flipx = sr[offs + 4] & 0x20;
-		flipy = sr[offs + 4] & 0x40;
-		code = sr[offs] + ((sr[offs + 1] & 0x0f) << 8);
-		color = ((sr[offs + 1] & 0xf0) >> 4);
+		int sx = 32 + 1 + sr[offs + 3] - ((sr[offs + 4] & 0x01) << 8);
+		int sy = sr[offs + 2];
+		int flipx = sr[offs + 4] & 0x20;
+		int flipy = sr[offs + 4] & 0x40;
+		int code = sr[offs] + ((sr[offs + 1] & 0x0f) << 8);
+		int color = ((sr[offs + 1] & 0xf0) >> 4);
 
 //      (sr[offs + 4] & 0x02) is used, meaning unknown
 
-		size = sr[offs + 4] & 0x1c;
+		int size = sr[offs + 4] & 0x1c;
 
 		if (size >= 0x10)
 		{
@@ -202,7 +200,7 @@ void finalizr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 }
 
 
-uint32_t finalizr_state::screen_update_finalizr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t finalizr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->mark_all_dirty();
 	m_fg_tilemap->mark_all_dirty();

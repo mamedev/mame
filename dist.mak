@@ -67,10 +67,8 @@ else
 endif
 
 ifeq ($(PTR64),1)
-  MAINBINARCH := 64
   BUILDARCH := x64
 else
-  MAINBINARCH :=
   BUILDARCH := x32
 endif
 
@@ -97,7 +95,7 @@ ifndef TARGET
   TARGET := mame
 endif
 
-MAINBIN := $(TARGET)$(MAINBINARCH)$(MAINBINVARIANT)
+MAINBIN := $(TARGET)$(MAINBINVARIANT)
 BINDIR := build/$(PROJECTTYPE)/bin/$(BUILDARCH)/$(BUILDVARIANT)
 STAGEDIR := build/release/$(BUILDARCH)/$(BUILDVARIANT)/$(TARGET)
 
@@ -111,7 +109,7 @@ GEN_FOLDERS := $(addprefix $(STAGEDIR)/,$(CREATED_DIRS))
 COPY_BINARIES := $(addprefix $(STAGEDIR)/,$(addsuffix $(EXE),$(BINARIES)))
 COPY_FILES := $(addprefix $(STAGEDIR)/,$(COPIED_FILES))
 
-all: $(COPY_BINARIES) $(COPY_FILES)
+all: $(COPY_BINARIES) $(COPY_FILES) $(STAGEDIR)/docs/MAME.pdf
 
 clean:
 	$(SILENT) rm -rf $(STAGEDIR)
@@ -125,5 +123,11 @@ $(STAGEDIR)/%: $(BINDIR)/% | $(GEN_FOLDERS)
 
 $(STAGEDIR)/%: % | $(GEN_FOLDERS)
 	$(call COPY,$<,$@)
+
+$(STAGEDIR)/docs/MAME.pdf: docs/build/latex/MAME.pdf | $(GEN_FOLDERS)
+	$(call COPY,$<,$@)
+
+docs/build/latex/MAME.pdf:
+	$(MAKE) -C docs latexpdf
 
 .PHONY: all clean

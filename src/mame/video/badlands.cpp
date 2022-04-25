@@ -68,7 +68,7 @@ const atari_motion_objects_config badlands_state::s_mob_config =
 	0,                  /* resulting value to indicate "special" */
 };
 
-VIDEO_START_MEMBER(badlands_state,badlands)
+void badlands_state::video_start()
 {
 	/* save states */
 	save_item(NAME(m_playfield_tile_bank));
@@ -114,13 +114,12 @@ uint32_t badlands_state::screen_update_badlands(screen_device &screen, bitmap_in
 	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->top(); y <= rect->bottom(); y++)
 		{
-			uint16_t *mo = &mobitmap.pix16(y);
-			uint16_t *pf = &bitmap.pix16(y);
+			uint16_t const *const mo = &mobitmap.pix(y);
+			uint16_t *const pf = &bitmap.pix(y);
 			for (int x = rect->left(); x <= rect->right(); x++)
 				if (mo[x] != 0xffff)
 				{
-					/* not yet verified
-					*/
+					// not yet verified
 					if ((mo[x] & atari_motion_objects_device::PRIORITY_MASK) || !(pf[x] & 8))
 						pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
 				}

@@ -317,7 +317,7 @@ void set_tape_bit(int position, int data)
 }
 #endif
 
-#if defined(LATER)
+#if 0
 int intvkbd_tape_init(int id)
 {
 	FILE *tapefile;
@@ -682,7 +682,7 @@ INTERRUPT_GEN_MEMBER(intv_state::intv_interrupt)
 	m_stic->screenrefresh();
 }
 
-#if defined(LATER)
+#if 0
 
 INTERRUPT_GEN( intvkbd_interrupt2 )
 {

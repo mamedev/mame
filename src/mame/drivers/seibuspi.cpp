@@ -220,7 +220,7 @@ Notes:
       4560      - Japan Radio Co. JRC4560 Op Amp IC (DIP8)
       YAC513-W  - Yamaha YAC513-M DAC (SOIC16)
       HA13118   - Audio Power AMP IC (ZIP15)
-      JP121     - Jumper used when swapping game board cartridges
+      JP121     - Jumper to set sound output to mono or stereo
       JP051     - Slide Switch to flip screen
       CN121     - Output connector for left/right speakers
       EXCN1/2   - Connectors for player 3 & 4 controls
@@ -1008,8 +1008,8 @@ void seibuspi_state::base_map(address_map &map)
 	map(0x00000604, 0x00000607).portr("INPUTS");
 	map(0x00000608, 0x0000060b).portr("EXCH");
 	map(0x0000060c, 0x0000060f).portr("SYSTEM");
-	map(0x00200000, 0x003fffff).rom().share("share1");
-	map(0xffe00000, 0xffffffff).rom().region("maincpu", 0).share("share1"); // ROM location in real-mode
+	map(0x00200000, 0x003fffff).rom().region("maincpu", 0);
+	map(0xffe00000, 0xffffffff).rom().region("maincpu", 0); // ROM location in real-mode
 }
 
 void seibuspi_state::sei252_map(address_map &map)
@@ -1119,8 +1119,8 @@ void seibuspi_state::sys386f_map(address_map &map)
 	map(0x00000494, 0x00000497).w(FUNC(seibuspi_state::video_dma_address_w));
 	map(0x00000600, 0x00000607).r("ymz", FUNC(ymz280b_device::read)).umask32(0x000000ff);
 	map(0x0000060c, 0x0000060f).r(FUNC(seibuspi_state::ejsakura_keyboard_r));
-	map(0x00200000, 0x003fffff).rom().share("share1");
-	map(0xffe00000, 0xffffffff).rom().region("maincpu", 0).share("share1"); // ROM location in real-mode
+	map(0x00200000, 0x003fffff).rom().region("maincpu", 0);
+	map(0xffe00000, 0xffffffff).rom().region("maincpu", 0); // ROM location in real-mode
 }
 
 
@@ -1183,7 +1183,7 @@ void seibuspi_state::spi_soundmap(address_map &map)
 {
 	sxx2e_soundmap(map);
 	map(0x4008, 0x4008).w("soundfifo2", FUNC(fifo7200_device::data_byte_w));
-	map(0x400a, 0x400a).portr("JUMPERS"); // TO DO: get these to actually work
+	map(0x400a, 0x400a).portr("JUMPERS"); // TODO: get these to actually work (only on SXX2C)
 }
 
 void seibuspi_state::spi_ymf271_map(address_map &map)
@@ -1233,7 +1233,7 @@ CUSTOM_INPUT_MEMBER(seibuspi_state::ejanhs_encode)
 	static const u8 encoding[] = { 6, 5, 4, 3, 2, 7 };
 	ioport_value state = ~m_key[N]->read();
 
-	for (int bit = 0; bit < ARRAY_LENGTH(encoding); bit++)
+	for (int bit = 0; bit < std::size(encoding); bit++)
 		if (state & (1 << bit))
 			return encoding[bit];
 	return 0;
@@ -1241,6 +1241,16 @@ CUSTOM_INPUT_MEMBER(seibuspi_state::ejanhs_encode)
 
 
 /*****************************************************************************/
+
+// JP1 is for SXX2C only
+static INPUT_PORTS_START( sxx2c )
+	PORT_START("JUMPERS")
+	PORT_DIPNAME( 0x03, 0x03, "JP1" ) // "Only used when game-board is changed with a new game" in manual
+	PORT_DIPSETTING(    0x03, "Update" ) // "Changing game" in manual
+	PORT_DIPSETTING(    0x00, "Normal" )
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( sxx2e )
 	PORT_START("INPUTS")
@@ -1286,13 +1296,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( spi_3button )
 	PORT_INCLUDE( sxx2e )
-
-	PORT_START("JUMPERS")
-	PORT_DIPNAME( 0x03, 0x03, "JP1" )
-	PORT_DIPSETTING(    0x03, "Update" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_INCLUDE( sxx2c )
 INPUT_PORTS_END
 
 
@@ -1380,6 +1384,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( spi_ejanhs )
 	PORT_INCLUDE( spi_mahjong_keyboard )
+	PORT_INCLUDE( sxx2c )
 
 	PORT_START("INPUTS")
 	PORT_BIT( 0x00000007, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(seibuspi_state, ejanhs_encode<3>)
@@ -1405,13 +1410,6 @@ static INPUT_PORTS_START( spi_ejanhs )
 
 	PORT_START("EXCH") // Another set of mahjong inputs is decoded from here but not used
 	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("JUMPERS")
-	PORT_DIPNAME( 0x03, 0x03, "JP1" )
-	PORT_DIPSETTING(    0x03, "Update" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1778,6 +1776,12 @@ MACHINE_RESET_MEMBER(seibuspi_state,spi)
 	m_z80_bank->set_entry(0);
 	m_z80_lastbank = 0;
 	m_z80_prg_transfer_pos = 0;
+
+	// fix the magic ID byte so users can't "brick" the machine
+	if (m_soundflash1 && m_soundflash1_region)
+	{
+		m_soundflash1->write_raw(0, m_soundflash1_region[0]);
+	}
 }
 
 void seibuspi_state::spi(machine_config &config)
@@ -1999,7 +2003,7 @@ void seibuspi_state::sys386f(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(seibuspi_state, sys386f)
 
 	/* sound hardware */
-	 // Single PCBs only output mono sound
+	// Single PCBs only output mono sound
 	SPEAKER(config, "mono").front_center();
 
 	YMZ280B(config, "ymz", XTAL(16'384'000)).add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -2010,50 +2014,50 @@ void seibuspi_state::sys386f(machine_config &config)
 
 void seibuspi_state::init_senkyu()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018cb4, 0x0018cb7, read32_delegate(*this, FUNC(seibuspi_state::senkyu_speedup_r)));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018cb4, 0x0018cb7, read32smo_delegate(*this, FUNC(seibuspi_state::senkyu_speedup_r)));
 	init_sei252();
 }
 
 void seibuspi_state::init_senkyua()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018c9c, 0x0018c9f, read32_delegate(*this, FUNC(seibuspi_state::senkyua_speedup_r)));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018c9c, 0x0018c9f, read32smo_delegate(*this, FUNC(seibuspi_state::senkyua_speedup_r)));
 	init_sei252();
 }
 
 void seibuspi_state::init_batlball()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018db4, 0x0018db7, read32_delegate(*this, FUNC(seibuspi_state::batlball_speedup_r)));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018db4, 0x0018db7, read32smo_delegate(*this, FUNC(seibuspi_state::batlball_speedup_r)));
 	init_sei252();
 }
 
 void seibuspi_state::init_viprp1()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x001e2e0, 0x001e2e3, read32_delegate(*this, FUNC(seibuspi_state::viprp1_speedup_r)));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x001e2e0, 0x001e2e3, read32smo_delegate(*this, FUNC(seibuspi_state::viprp1_speedup_r)));
 	init_sei252();
 }
 
 void seibuspi_state::init_viprp1o()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x001d49c, 0x001d49f, read32_delegate(*this, FUNC(seibuspi_state::viprp1o_speedup_r)));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x001d49c, 0x001d49f, read32smo_delegate(*this, FUNC(seibuspi_state::viprp1o_speedup_r)));
 	init_sei252();
 }
 
 void seibuspi_state::init_ejanhs()
 {
-//  idle skip doesn't work properly?
-//  if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x002d224, 0x002d227, read32_delegate(*this, FUNC(seibuspi_state::ejanhs_speedup_r)));
+	// idle skip doesn't work properly?
+	if (false && ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x002d224, 0x002d227, read32smo_delegate(*this, FUNC(seibuspi_state::ejanhs_speedup_r)));
 	init_sei252();
 }
 
 void seibuspi_state::init_rdft()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x00298d0, 0x00298d3, read32_delegate(*this, FUNC(seibuspi_state::rdft_speedup_r)));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x00298d0, 0x00298d3, read32smo_delegate(*this, FUNC(seibuspi_state::rdft_speedup_r)));
 	init_sei252();
 }
 
 void seibuspi_state::init_rdft2()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x00282ac, 0x00282af, read32_delegate(*this, FUNC(seibuspi_state::rf2_speedup_r)));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x00282ac, 0x00282af, read32smo_delegate(*this, FUNC(seibuspi_state::rf2_speedup_r)));
 
 	rdft2_text_decrypt(memregion("chars")->base());
 	rdft2_bg_decrypt(memregion("tiles")->base(), memregion("tiles")->bytes());
@@ -2063,7 +2067,7 @@ void seibuspi_state::init_rdft2()
 
 void seibuspi_state::init_rfjet()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x002894c, 0x002894f, read32_delegate(*this, FUNC(seibuspi_state::rfjet_speedup_r)));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x002894c, 0x002894f, read32smo_delegate(*this, FUNC(seibuspi_state::rfjet_speedup_r)));
 
 	rfjet_text_decrypt(memregion("chars")->base());
 	rfjet_bg_decrypt(memregion("tiles")->base(), memregion("tiles")->bytes());
@@ -2072,21 +2076,21 @@ void seibuspi_state::init_rfjet()
 }
 
 
-READ32_MEMBER(seibuspi_state::senkyu_speedup_r)
+u32 seibuspi_state::senkyu_speedup_r()
 {
 	if (m_maincpu->pc()==0x00305bb2) m_maincpu->spin_until_interrupt(); // idle
 
 	return m_mainram[0x0018cb4/4];
 }
 
-READ32_MEMBER(seibuspi_state::senkyua_speedup_r)
+u32 seibuspi_state::senkyua_speedup_r()
 {
 	if (m_maincpu->pc()== 0x30582e) m_maincpu->spin_until_interrupt(); // idle
 
 	return m_mainram[0x0018c9c/4];
 }
 
-READ32_MEMBER(seibuspi_state::batlball_speedup_r)
+u32 seibuspi_state::batlball_speedup_r()
 {
 //  printf("m_maincpu->pc() %06x\n", m_maincpu->pc());
 
@@ -2099,7 +2103,7 @@ READ32_MEMBER(seibuspi_state::batlball_speedup_r)
 	return m_mainram[0x0018db4/4];
 }
 
-READ32_MEMBER(seibuspi_state::viprp1_speedup_r)
+u32 seibuspi_state::viprp1_speedup_r()
 {
 	/* viprp1 */
 	if (m_maincpu->pc()==0x0202769) m_maincpu->spin_until_interrupt(); // idle
@@ -2115,7 +2119,7 @@ READ32_MEMBER(seibuspi_state::viprp1_speedup_r)
 	return m_mainram[0x001e2e0/4];
 }
 
-READ32_MEMBER(seibuspi_state::viprp1o_speedup_r)
+u32 seibuspi_state::viprp1o_speedup_r()
 {
 	/* viperp1o */
 	if (m_maincpu->pc()==0x0201f99) m_maincpu->spin_until_interrupt(); // idle
@@ -2123,17 +2127,15 @@ READ32_MEMBER(seibuspi_state::viprp1o_speedup_r)
 	return m_mainram[0x001d49c/4];
 }
 
-#ifdef UNUSED_FUNCTION
 // causes input problems?
-READ32_MEMBER(seibuspi_state::ejanhs_speedup_r)
+u32 seibuspi_state::ejanhs_speedup_r()
 {
-// osd_printf_debug("%08x\n",m_maincpu->pc());
 	if (m_maincpu->pc()==0x03032c7) m_maincpu->spin_until_interrupt(); // idle
+//  osd_printf_debug("%08x\n",m_maincpu->pc());
 	return m_mainram[0x002d224/4];
 }
-#endif
 
-READ32_MEMBER(seibuspi_state::rdft_speedup_r)
+u32 seibuspi_state::rdft_speedup_r()
 {
 	/* rdft */
 	if (m_maincpu->pc()==0x0203f06) m_maincpu->spin_until_interrupt(); // idle
@@ -2161,7 +2163,7 @@ READ32_MEMBER(seibuspi_state::rdft_speedup_r)
 	return m_mainram[0x00298d0/4];
 }
 
-READ32_MEMBER(seibuspi_state::rf2_speedup_r)
+u32 seibuspi_state::rf2_speedup_r()
 {
 	/* rdft22kc */
 	if (m_maincpu->pc()==0x0203926) m_maincpu->spin_until_interrupt(); // idle
@@ -2180,7 +2182,7 @@ READ32_MEMBER(seibuspi_state::rf2_speedup_r)
 	return m_mainram[0x0282ac/4];
 }
 
-READ32_MEMBER(seibuspi_state::rfjet_speedup_r)
+u32 seibuspi_state::rfjet_speedup_r()
 {
 	/* rfjet, rfjetu, rfjeta */
 	if (m_maincpu->pc()==0x0206082) m_maincpu->spin_until_interrupt(); // idle

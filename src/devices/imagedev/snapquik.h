@@ -13,14 +13,12 @@
 
 #pragma once
 
-#include "softlist_dev.h"
-
 // ======================> snapshot_image_device
 class snapshot_image_device :   public device_t,
 								public device_image_interface
 {
 public:
-	typedef device_delegate<image_init_result (device_image_interface &, const char *, int)> load_delegate;
+	typedef device_delegate<image_init_result (device_image_interface &)> load_delegate;
 
 	// construction/destruction
 	snapshot_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const char* extensions, attotime delay = attotime::zero)
@@ -36,15 +34,15 @@ public:
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
-	virtual iodevice_t image_type() const noexcept override { return IO_SNAPSHOT; }
 
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return false; }
 	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *image_interface() const noexcept override { return m_interface; }
 	virtual const char *file_extensions() const noexcept override { return m_file_extensions; }
+	virtual const char *image_type_name() const noexcept override { return "snapshot"; }
+	virtual const char *image_brief_type_name() const noexcept override { return "dump"; }
 
 	void set_extensions(const char *ext) { m_file_extensions = ext; }
 	void set_delay(attotime delay) { m_delay = delay; }
@@ -57,7 +55,7 @@ protected:
 	virtual void device_start() override;
 
 	// device_image_interface implementation
-	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
+	virtual const software_list_loader &get_software_list_loader() const override;
 
 	TIMER_CALLBACK_MEMBER(process_snapshot_or_quickload);
 
@@ -85,7 +83,8 @@ public:
 	}
 	quickload_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
 
-	virtual iodevice_t image_type() const noexcept override { return IO_QUICKLOAD; }
+	virtual const char *image_type_name() const noexcept override { return "quickload"; }
+	virtual const char *image_brief_type_name() const noexcept override { return "quik"; }
 };
 
 // device type definition
@@ -94,10 +93,10 @@ DECLARE_DEVICE_TYPE(QUICKLOAD, quickload_image_device)
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
-#define SNAPSHOT_LOAD_MEMBER(_name)                 image_init_result _name(device_image_interface &image, const char *file_type, int snapshot_size)
+#define SNAPSHOT_LOAD_MEMBER(_name)                 image_init_result _name(device_image_interface &image)
 #define DECLARE_SNAPSHOT_LOAD_MEMBER(_name)         SNAPSHOT_LOAD_MEMBER(_name)
 
-#define QUICKLOAD_LOAD_MEMBER(_name)                image_init_result _name(device_image_interface &image, const char *file_type, int quickload_size)
+#define QUICKLOAD_LOAD_MEMBER(_name)                image_init_result _name(device_image_interface &image)
 #define DECLARE_QUICKLOAD_LOAD_MEMBER(_name)        QUICKLOAD_LOAD_MEMBER(_name)
 
 #endif // MAME_DEVICES_IMAGEDEV_SNAPQUIK_H

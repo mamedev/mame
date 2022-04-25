@@ -93,6 +93,8 @@ public:
 	void mcr_90010(machine_config &config);
 	void cpu_90009_map(address_map &map);
 	void cpu_90009_portmap(address_map &map);
+	void cpu_90009_dp_map(address_map &map);
+	void cpu_90009_dp_portmap(address_map &map);
 	void cpu_90010_map(address_map &map);
 	void cpu_90010_portmap(address_map &map);
 	void cpu_91490_map(address_map &map);
@@ -111,12 +113,12 @@ protected:
 	void render_sprites_91464(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int sprmask, int colormask);
 	void mcr_init(int cpuboard, int vidboard, int ssioboard);
 
-	int8_t m_mcr12_sprite_xoffs_flip;
-	uint8_t m_input_mux;
-	uint8_t m_last_op4;
-	tilemap_t *m_bg_tilemap;
+	int8_t m_mcr12_sprite_xoffs_flip = 0;
+	uint8_t m_input_mux = 0;
+	uint8_t m_last_op4 = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
 
-	uint8_t m_mcr_cocktail_flip;
+	uint8_t m_mcr_cocktail_flip = 0;
 
 	required_device<z80_device> m_maincpu;
 	optional_shared_ptr<uint8_t> m_spriteram;
@@ -134,10 +136,10 @@ protected:
 	required_device<palette_device> m_palette;
 
 private:
-	uint32_t m_mcr_cpu_board;
-	uint32_t m_mcr_sprite_board;
+	uint32_t m_mcr_cpu_board = 0;
+	uint32_t m_mcr_sprite_board = 0;
 
-	int8_t m_mcr12_sprite_xoffs;
+	int8_t m_mcr12_sprite_xoffs = 0;
 };
 
 class mcr_dpoker_state : public mcr_state
@@ -147,7 +149,8 @@ public:
 		mcr_state(mconfig, type, tag),
 		m_coin_in_timer(*this, "coinin"),
 		m_hopper_timer(*this, "hopper"),
-		m_lamps(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U),
+		m_meter_ram(*this, "meter", 0x200, ENDIANNESS_LITTLE)
 	{ }
 
 	uint8_t ip0_r();
@@ -175,6 +178,7 @@ private:
 	required_device<timer_device> m_coin_in_timer;
 	required_device<timer_device> m_hopper_timer;
 	output_finder<14> m_lamps;
+	memory_share_creator<uint8_t> m_meter_ram;
 };
 
 class mcr_nflfoot_state : public mcr_state
@@ -209,9 +213,9 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	int m_ipu_sio_txda;
-	int m_ipu_sio_txdb;
-	emu_timer *m_ipu_watchdog_timer;
+	int m_ipu_sio_txda = 0;
+	int m_ipu_sio_txdb = 0;
+	emu_timer *m_ipu_watchdog_timer = nullptr;
 
 	required_device<z80_device> m_ipu;
 	required_device<z80sio_device> m_ipu_sio;

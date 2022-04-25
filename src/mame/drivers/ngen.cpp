@@ -77,6 +77,7 @@
 #include "machine/wd_fdc.h"
 #include "machine/z80sio.h"
 #include "video/mc6845.h"
+#include "memarray.h"
 #include "screen.h"
 
 
@@ -99,7 +100,7 @@ public:
 		m_hdc_timer(*this,"hdc_timer"),
 		m_disk_rom(*this,"disk"),
 		m_fd0(*this,"fdc:0"),
-		m_hd_buffer(*this,"hd_buffer_ram")
+		m_hd_buffer(*this,"hd_buffer_ram", 1024*8, ENDIANNESS_LITTLE)
 	{
 	}
 
@@ -185,7 +186,7 @@ private:
 	memory_array m_vram;
 	memory_array m_fontram;
 	optional_device<floppy_connector> m_fd0;
-	optional_shared_ptr<uint8_t> m_hd_buffer;
+	memory_share_creator<uint8_t> m_hd_buffer;
 
 	void set_dma_channel(int channel, int state);
 
@@ -767,9 +768,9 @@ MC6845_UPDATE_ROW( ngen_state::crtc_update_row )
 		for(int z=0;z<9;z++)
 		{
 			if(BIT(m_fontram.read16(ch*16+ra),8-z))
-				bitmap.pix32(y,x+z) = rgb_t(0,0xff,0);
+				bitmap.pix(y,x+z) = rgb_t(0,0xff,0);
 			else
-				bitmap.pix32(y,x+z) = rgb_t(0,0,0);
+				bitmap.pix(y,x+z) = rgb_t(0,0,0);
 		}
 	}
 }
@@ -842,7 +843,6 @@ void ngen_state::machine_start()
 {
 	memory_share* vidshare = memshare("vram");
 	memory_share* fontshare = memshare("fontram");
-	m_hd_buffer.allocate(1024*8);  // 8kB buffer RAM for HD controller
 	if(vidshare == nullptr || fontshare == nullptr)
 		fatalerror("VRAM not found\n");
 	m_vram.set(*vidshare,2);
@@ -1038,7 +1038,7 @@ void ngen_state::ngen(machine_config &config)
 	PIT8253(config, m_hdc_timer, 0);
 	m_hdc_timer->set_clk<2>(20_MHz_XTAL / 10);  // 2MHz
 
-	FLOPPY_CONNECTOR(config, "fdc:0", ngen_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", ngen_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
 	HARDDISK(config, "hard0", 0);
 }
 
@@ -1151,7 +1151,7 @@ void ngen386_state::ngen386(machine_config &config)
 	PIT8253(config, m_hdc_timer, 0);
 	m_hdc_timer->set_clk<2>(20_MHz_XTAL / 10);  // 2MHz
 
-	FLOPPY_CONNECTOR(config, "fdc:0", ngen_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", ngen_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
 	HARDDISK(config, "hard0", 0);
 }
 

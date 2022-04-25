@@ -46,9 +46,13 @@ f5d6    print 7 digit BCD number: d0.l to (a1)+ color $3000
                                 To Do
                                 -----
 
-- game doesn't init paletteram / tilemaps properly, ending up with MAME
+- Game doesn't init paletteram / tilemaps properly, ending up with MAME
   palette defaults at start-up and missing text layer if you coin it up
   too soon.
+- In later levels a couple sprites lingers on top of screen;
+- Sometimes a credit sample also gets overwritten with additional spurious
+  playback of all samples;
+^ all these might be just BTANBs ...
 
 ***************************************************************************/
 
@@ -59,7 +63,7 @@ f5d6    print 7 digit BCD number: d0.l to (a1)+ color $3000
 #include "cpu/m6809/m6809.h"
 #include "machine/6840ptm.h"
 #include "sound/ay8910.h"
-#include "sound/8950intf.h"
+#include "sound/ymopl.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -78,8 +82,9 @@ f5d6    print 7 digit BCD number: d0.l to (a1)+ color $3000
 
 void ginganin_state::main_map(address_map &map)
 {
-/* The ROM area: 10000-13fff is written with: 0000 0000 0000 0001, at startup only. Why? */
-	map(0x000000, 0x01ffff).rom();
+	// PC=0x408 ROM area 10000-13fff is written at POST with: 0000 0000 0000 0001,
+	// looks a debugging left-over for GFX patching (causes state garbage if hooked as RAM write mirror)
+	map(0x000000, 0x01ffff).rom().nopw();
 	map(0x020000, 0x023fff).ram();
 	map(0x030000, 0x0307ff).ram().w(FUNC(ginganin_state::txtram_w)).share("txtram");
 	map(0x040000, 0x0407ff).ram().share("spriteram");
@@ -200,22 +205,11 @@ static const gfx_layout layout16x16 =
 	16*16*4
 };
 
-static const gfx_layout layout8x8 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4) },
-	{ STEP8(0,4*8) },
-	8*8*4
-};
-
 static GFXDECODE_START( gfx_ginganin )
-	GFXDECODE_ENTRY( "gfx1", 0, layout16x16, 256*3, 16 ) /* [0] bg */
-	GFXDECODE_ENTRY( "gfx2", 0, layout16x16, 256*2, 16 ) /* [1] fg */
-	GFXDECODE_ENTRY( "gfx3", 0, layout8x8,   256*0, 16 ) /* [2] txt */
-	GFXDECODE_ENTRY( "gfx4", 0, layout16x16, 256*1, 16 ) /* [3] sprites */
+	GFXDECODE_ENTRY( "gfx1", 0, layout16x16,          256*3, 16 ) /* [0] bg */
+	GFXDECODE_ENTRY( "gfx2", 0, layout16x16,          256*2, 16 ) /* [1] fg */
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_packed_msb, 256*0, 16 ) /* [2] txt */
+	GFXDECODE_ENTRY( "gfx4", 0, layout16x16,          256*1, 16 ) /* [3] sprites */
 GFXDECODE_END
 
 
@@ -353,11 +347,12 @@ ROM_END
 
 void ginganin_state::init_ginganin()
 {
+	// pending full removal of this patch ...
 	/* main cpu patches */
-	u16 *rom = (u16 *)memregion("maincpu")->base();
+//  u16 *rom = (u16 *)memregion("maincpu")->base();
 	/* avoid writes to rom getting to the log */
-	rom[0x408 / 2] = 0x6000;
-	rom[0x40a / 2] = 0x001c;
+//  rom[0x408 / 2] = 0x6000;
+//  rom[0x40a / 2] = 0x001c;
 }
 
 

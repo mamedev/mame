@@ -7,11 +7,6 @@
     preliminary driver by Angelo Salese
 
 
-11/09/2011 - modernised. The portable doesn't seem to have
-             scroll registers, and it sets the palette to black.
-             I've added a temporary video output so that you can get
-             an idea of what the screen should look like. [Robbbert]
-
 ****************************************************************************/
 
 /*
@@ -84,15 +79,15 @@ public:
 		, m_centronics(*this, CENTRONICS_TAG)
 		, m_cent_data_out(*this, "cent_data_out")
 		, m_irqs(*this, "irqs")
-		, m_p_scrollram(*this, "p_scrollram")
-		, m_p_paletteram(*this, "p_paletteram")
+		, m_p_scrollram(*this, "scrollram")
+		, m_p_paletteram(*this, "paletteram")
 		, m_palette(*this, "palette")
 	{ }
 
 	void act_f1(machine_config &config);
 
 private:
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	virtual void machine_start() override;
 
@@ -118,8 +113,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
 	void m1_w(u8 data);
 
-	int m_40_80;
-	int m_200_256;
+	int m_40_80 = 0;
+	int m_200_256 = 0;
 
 	void act_f1_io(address_map &map);
 	void act_f1_mem(address_map &map);
@@ -149,7 +144,7 @@ u32 f1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const r
 				{
 					int color = (BIT(data, 15) << 1) | BIT(data, 7);
 
-					bitmap.pix16(y, (sx * 8) + x) = color;
+					bitmap.pix(y, (sx * 8) + x) = color;
 
 					data <<= 1;
 				}
@@ -160,8 +155,8 @@ u32 f1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const r
 				{
 					int color = (BIT(data, 15) << 3) | (BIT(data, 14) << 2) | (BIT(data, 7) << 1) | BIT(data, 6);
 
-					bitmap.pix16(y, (sx * 8) + (x * 2)) = color;
-					bitmap.pix16(y, (sx * 8) + (x * 2) + 1) = color;
+					bitmap.pix(y, (sx * 8) + (x * 2)) = color;
+					bitmap.pix(y, (sx * 8) + (x * 2) + 1) = color;
 
 					data <<= 2;
 				}
@@ -272,9 +267,9 @@ void f1_state::act_f1_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000, 0x01dff).ram();
-	map(0x01e00, 0x01fff).ram().share("p_scrollram");
+	map(0x01e00, 0x01fff).ram().share("scrollram");
 	map(0x02000, 0x3ffff).ram();
-	map(0xe0000, 0xe001f).rw(FUNC(f1_state::palette_r), FUNC(f1_state::palette_w)).share("p_paletteram");
+	map(0xe0000, 0xe001f).rw(FUNC(f1_state::palette_r), FUNC(f1_state::palette_w)).share("paletteram");
 	map(0xf8000, 0xfffff).rom().region(I8086_TAG, 0);
 }
 
@@ -338,9 +333,12 @@ void f1_state::m1_w(u8 data)
 //  floppy
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( f1_state::floppy_formats )
-	FLOPPY_APRIDISK_FORMAT
-FLOPPY_FORMATS_END
+void f1_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+
+	fr.add(FLOPPY_APRIDISK_FORMAT);
+}
 
 void apricotf_floppies(device_slot_interface &device)
 {

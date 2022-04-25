@@ -35,7 +35,9 @@ void isa8_svga_et4k_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(tseng_vga_device::screen_update));
 
-	TSENG_VGA(config, m_vga, 0).set_screen("screen");
+	TSENG_VGA(config, m_vga, 0);
+	m_vga->set_screen("screen");
+	m_vga->set_vram_size(0x100000);
 }
 
 //-------------------------------------------------
@@ -114,5 +116,5 @@ void isa8_svga_et4k_device::map_ram()
 
 void isa8_svga_et4k_device::map_rom()
 {
-	m_isa->install_rom(this, 0xc0000, 0xc7fff, "et4000", "et4000");
+	m_isa->install_rom(this, 0xc0000, 0xc7fff, "et4000");
 }

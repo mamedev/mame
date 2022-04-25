@@ -33,7 +33,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="unix">
+	<software name="unix10">
 		<description>WICAT Unix System 156 (Ver. 1.0)</description>
 		<year>198?</year>
 		<publisher>UniSoft Corp.</publisher>
@@ -75,6 +75,179 @@ license:CC0
 		<part name="flop8" interface="floppy_5_25">
 			<dataarea name="flop" size="406742">
 				<rom name="unx8.imd" size="406742" crc="6f729e47" sha1="a95dd5754135f3cf684136f28bc68b5a6d318933"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="unix20">
+		<description>WICAT Unix (Ver. 2.0)</description>
+		<year>198?</year>
+		<publisher>UniSoft Corp.</publisher>
+		<!-- boot disk? -->
+		<part name="boot" interface="floppy_5_25">
+			<dataarea name="flop" size="581732">
+				<rom name="cmi15bt.imd" size="581732" crc="a6cb08e8" sha1="5e0602b1f9ecb3fde1d5fb6c39c08f0aabc6b9af"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="585846">
+				<rom name="1.imd" size="585846" crc="e70d7e0e" sha1="a8951cd277972814b03778910e33765c37a2dad3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="540809">
+				<rom name="2.imd" size="540809" crc="378927d4" sha1="9600aa66408f826d0ff79f584e413f873669d5ae"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="551039">
+				<rom name="3.imd" size="551039" crc="5e8cbce6" sha1="f2a07d0811c8dc57192b9cc38e40048826602209"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="555131">
+				<rom name="4.imd" size="555131" crc="586cb44f" sha1="cd10602e9957e7a223e07c1f5c0cb2bc5dbe6869"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="545924">
+				<rom name="5.imd" size="545924" crc="97b89552" sha1="88ccd039544d3f7d13bcdcf630d12ad944263385"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="542855">
+				<rom name="6.imd" size="542855" crc="479c8172" sha1="45fef1bc5bd8010ca2140e9bbdd8ba920f45f696"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size="534671">
+				<rom name="7.imd" size="534671" crc="a1c67ba5" sha1="adc9cdc8c73cd8a6fd80ae2a3acb75afe9c84227"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size="545924">
+				<rom name="8.imd" size="545924" crc="9219e9d3" sha1="cd82c88d45d85eab4e99d024723d9ba9e5c32687"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<dataarea name="flop" size="557177">
+				<rom name="9.imd" size="557177" crc="b184c5c9" sha1="9b886c537551faa2cb21f8c7b9a54261fda5fba8"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
+			<dataarea name="flop" size="553086">
+				<rom name="10.imd" size="553086" crc="ac10277d" sha1="71607cba07dc7d608a9c1ce2fa3ad908b765732a"/>
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_5_25">
+			<dataarea name="flop" size="516258">
+				<rom name="11.imd" size="516258" crc="e5f02ba6" sha1="476362a94b9e008201137dcbb142964b2679cffb"/>
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_5_25">
+			<dataarea name="flop" size="511143">
+				<rom name="12.imd" size="511143" crc="0177499a" sha1="58e4778220dc71816ed738548576c41c93827f1a"/>
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_5_25">
+			<dataarea name="flop" size="246186">
+				<rom name="13.imd" size="246186" crc="addbeb4a" sha1="e11791dbbe79d3b108bc35afc1e73c7859a617cb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="unix220">
+		<description>WICAT Unix (Ver. 2.2.0)</description>
+		<year>198?</year>
+		<publisher>UniSoft Corp.</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="589935">
+				<rom name="1.imd" size="589935" crc="33876315" sha1="c343ebfdda97c950d1b2301dc468f0593d528d93"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="557182">
+				<rom name="2.imd" size="557182" crc="d5102dd7" sha1="eb9107930d0d4f9cb33e8f6b9e03b868f6382049"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="553090">
+				<rom name="3.imd" size="553090" crc="1c439b72" sha1="b1e40c0c3efbe886315608f3bfbfff1b724e9a32"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="542860">
+				<rom name="4.imd" size="542860" crc="4f1896fd" sha1="8c30bdbc0ef01ec9e12bb2bc56a4199571bb64d9"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="533653">
+				<rom name="5.imd" size="533653" crc="b925f59f" sha1="c0c7a5864686fb7c1d9ba54ef816e4e9f5633492"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="530584">
+				<rom name="6.imd" size="530584" crc="dcf3d15b" sha1="2288d62202553ad193a440457cad313a95b09eb5"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size="547975">
+				<rom name="7.imd" size="547975" crc="c3bb9588" sha1="803937d06bb9ec151f3acc127165b318a5b7a247"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size="557181">
+				<rom name="8.imd" size="557181" crc="cc9e2def" sha1="5727e5d441e9a82a1edf78bb2e9c974331c0be75"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<dataarea name="flop" size="546952">
+				<rom name="9.imd" size="546952" crc="e9a90af8" sha1="602453cfca3cea695ae5f1b90bdfb7ef9e55e058"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
+			<dataarea name="flop" size="554114">
+				<rom name="10.imd" size="554114" crc="554fe252" sha1="c78cda458afe28c46ed827b08cd1d31166396c11"/>
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_5_25">
+			<dataarea name="flop" size="409871">
+				<rom name="11.imd" size="409871" crc="6773fe89" sha1="46b32411c8118f7808374715f43033762695ba1a"/>
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_5_25">
+			<dataarea name="flop" size="478412">
+				<rom name="12.imd" size="478412" crc="1d729a5d" sha1="569ea825b2745ed87c497cf843ab2c9f6f7a0b25"/>
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_5_25">
+			<dataarea name="flop" size="528539">
+				<rom name="13.imd" size="528539" crc="7cbdf4c1" sha1="14d19de0afb3ff37a323e12f9614a804b8e2a427"/>
+			</dataarea>
+		</part>
+		<part name="flop14" interface="floppy_5_25">
+			<dataarea name="flop" size="508078">
+				<rom name="14.imd" size="508078" crc="651f755a" sha1="53a588f8c3d9f62dcb24efdbc144e8460ed3ca43"/>
+			</dataarea>
+		</part>
+		<part name="flop15" interface="floppy_5_25">
+			<dataarea name="flop" size="541767">
+				<rom name="15.imd" size="541767" crc="e9d1ae39" sha1="5aed5e67265bc1083763ae6d15a4c817914bd17a"/>
+			</dataarea>
+		</part>
+		<part name="flop16" interface="floppy_5_25">
+			<dataarea name="flop" size="463067">
+				<rom name="16.imd" size="463067" crc="5d226f01" sha1="745c0a64280e0800c59ed82735f83acb4aa90eda"/>
+			</dataarea>
+		</part>
+		<part name="flop17" interface="floppy_5_25">
+			<dataarea name="flop" size="470228">
+				<rom name="17.imd" size="470228" crc="51608dc8" sha1="ae1c33bb3817ae392e7fd3f71dc7667b07d3cbdf"/>
+			</dataarea>
+		</part>
+		<part name="flop18" interface="floppy_5_25">
+			<dataarea name="flop" size="216524">
+				<rom name="18.imd" size="216524" crc="a507a971" sha1="4a0c70adc2bbd1d3d57bf1c3d93503d1a162d1c3"/>
 			</dataarea>
 		</part>
 	</software>

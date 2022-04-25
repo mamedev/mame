@@ -32,7 +32,7 @@
 
     There's a 15-word "cache" that the DSP can execute from without the
     cost of instruction fetches.  There's an instruction to cache the
-    next N instructions and repeat them M times, and in instruction to
+    next N instructions and repeat them M times, and an instruction to
     execute the currently cached instructions M times.  Interrupts are
     not serviced while executing from cache, and not all instructions
     can be cached.
@@ -79,8 +79,6 @@
 #include "dsp16.h"
 #include "dsp16core.ipp"
 #include "dsp16rc.h"
-
-#include "debugger.h"
 
 #include <functional>
 #include <limits>
@@ -130,7 +128,7 @@ WRITE_LINE_MEMBER(dsp16_device_base::exm_w)
     high-level passive parallel I/O handlers
 ***********************************************************************/
 
-READ16_MEMBER(dsp16_device_base::pio_r)
+u16 dsp16_device_base::pio_r()
 {
 	if (!pio_pods_active())
 	{
@@ -148,7 +146,7 @@ READ16_MEMBER(dsp16_device_base::pio_r)
 	}
 }
 
-WRITE16_MEMBER(dsp16_device_base::pio_w)
+void dsp16_device_base::pio_w(u16 data)
 {
 	if (!pio_pids_active())
 	{
@@ -639,7 +637,7 @@ dsp16_disassembler::cpu::predicate dsp16_device_base::check_branch(offs_t pc) co
 		return predicate::INDETERMINATE;
 }
 
-template <offs_t Base> READ16_MEMBER(dsp16_device_base::external_memory_r)
+template <offs_t Base> u16 dsp16_device_base::external_memory_r(offs_t offset, u16 mem_mask)
 {
 	return m_spaces[AS_IO]->read_word(Base + offset, mem_mask);
 }
@@ -854,7 +852,7 @@ template <bool Debugger, bool Caching> inline void dsp16_device_base::execute_so
 				m_phase = phase::OP2;
 				break;
 
-			case 0x0e: // do K { instr1...instrIN } # redo K
+			case 0x0e: // do K { instr1...instrNI } # redo K
 				{
 					u16 const ni(op_ni(op));
 					if (ni)
@@ -1601,7 +1599,7 @@ inline bool dsp16_device_base::op_interruptible(u16 op)
 		return true;
 	case 0x00: // goto JA
 	case 0x01:
-	case 0x0e: // do K { instre1...instrNI } # redo K
+	case 0x0e: // do K { instr1...instrNI } # redo K
 	case 0x10: // call JA
 	case 0x11:
 	case 0x18: // goto B
@@ -1778,7 +1776,7 @@ s64 dsp16_device_base::dau_saturate(u16 a) const
 	if (m_core->dau_auc_sat(a))
 		return m_core->dau_a[a];
 	else
-		return std::min<s64>(std::max<s64>(m_core->dau_a[a], std::numeric_limits<s32>::min()), std::numeric_limits<s32>::max());
+		return std::clamp<s64>(m_core->dau_a[a], std::numeric_limits<s32>::min(), std::numeric_limits<s32>::max());
 }
 
 inline bool dsp16_device_base::op_dau_con(u16 op, bool inc)
@@ -2082,7 +2080,7 @@ dsp16_device::dsp16_device(machine_config const &mconfig, char const *tag, devic
 			mconfig, DSP16, tag, owner, clock,
 			9,
 			address_map_constructor(FUNC(dsp16_device::data_map), this))
-	, m_rom(*this, DEVICE_SELF, 0x0800)
+	, m_rom(*this, DEVICE_SELF)
 {
 }
 
@@ -2092,7 +2090,7 @@ void dsp16_device::external_memory_enable(address_space &space, bool enable)
 	// this assumes internal ROM is mirrored above 2KiB, but actual hardware behaviour is unknown
 	space.unmap_read(0x0000, 0xffff);
 	if (enable)
-		space.install_read_handler(0x0000, 0xffff, read16_delegate(*this, FUNC(dsp16_device::external_memory_r<0x0000>)));
+		space.install_read_handler(0x0000, 0xffff, read16s_delegate(*this, FUNC(dsp16_device::external_memory_r<0x0000>)));
 	else
 		space.install_rom(0x0000, 0x07ff, 0xf800, &m_rom[0]);
 }
@@ -2114,7 +2112,7 @@ dsp16a_device::dsp16a_device(machine_config const &mconfig, char const *tag, dev
 			mconfig, DSP16A, tag, owner, clock,
 			16,
 			address_map_constructor(FUNC(dsp16a_device::data_map), this))
-	, m_rom(*this, DEVICE_SELF, 0x1000)
+	, m_rom(*this, DEVICE_SELF)
 {
 }
 
@@ -2123,12 +2121,12 @@ void dsp16a_device::external_memory_enable(address_space &space, bool enable)
 	space.unmap_read(0x0000, 0xffff);
 	if (enable)
 	{
-		space.install_read_handler(0x0000, 0xffff, read16_delegate(*this, FUNC(dsp16a_device::external_memory_r<0x0000>)));
+		space.install_read_handler(0x0000, 0xffff, read16s_delegate(*this, FUNC(dsp16a_device::external_memory_r<0x0000>)));
 	}
 	else
 	{
 		space.install_rom(0x0000, 0x0fff, &m_rom[0]);
-		space.install_read_handler(0x1000, 0xffff, read16_delegate(*this, FUNC(dsp16a_device::external_memory_r<0x1000>)));
+		space.install_read_handler(0x1000, 0xffff, read16s_delegate(*this, FUNC(dsp16a_device::external_memory_r<0x1000>)));
 	}
 }
 

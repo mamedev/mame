@@ -5,9 +5,10 @@
 //  input_windows.h - Common code used by Windows input modules
 //
 //============================================================
+#ifndef MAME_OSD_INPUT_INPUT_WINDOWS_H
+#define MAME_OSD_INPUT_INPUT_WINDOWS_H
 
-#ifndef INPUT_WIN_H_
-#define INPUT_WIN_H_
+#pragma once
 
 // standard windows headers
 #include <windows.h>
@@ -40,14 +41,10 @@ struct mouse_state
 class wininput_module : public input_module_base
 {
 protected:
-	bool  m_global_inputs_enabled;
+	bool  m_global_inputs_enabled = false;
 
 public:
-	wininput_module(const char * type, const char * name)
-		: input_module_base(type, name),
-			m_global_inputs_enabled(false)
-	{
-	}
+	wininput_module(const char *type, const char *name) : input_module_base(type, name) { }
 
 	virtual ~wininput_module() { }
 
@@ -84,4 +81,4 @@ protected:
 	}
 };
 
-#endif
+#endif // MAME_OSD_INPUT_INPUT_WINDOWS_H

@@ -49,6 +49,7 @@ public:
 	void ready_w(bool val);
 
 	DECLARE_WRITE_LINE_MEMBER(tc_line_w) { tc_w(state == ASSERT_LINE); }
+	DECLARE_WRITE_LINE_MEMBER(reset_w);
 
 	void set_rate(int rate); // rate in bps, to be used when the fdc is externally frequency-controlled
 
@@ -63,7 +64,7 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	enum {
 		TIMER_DRIVE_READY_POLLING = 4
@@ -231,7 +232,7 @@ protected:
 
 	static constexpr int rates[4] = { 500000, 300000, 250000, 1000000 };
 
-	bool ready_connected, ready_polled, select_connected, select_multiplexed;
+	bool ready_connected, ready_polled, select_connected, select_multiplexed, has_dor;
 
 	bool external_ready;
 
@@ -250,7 +251,7 @@ protected:
 	bool fifo_write;
 	uint8_t dor, dsr, msr, fifo[16], command[16], result[16];
 	uint8_t st1, st2, st3;
-	uint8_t fifocfg, dor_reset;
+	uint8_t fifocfg;
 	uint8_t precomp;
 	uint16_t spec;
 	int sector_size;
@@ -259,7 +260,6 @@ protected:
 
 	emu_timer *poll_timer;
 
-	static std::string tts(attotime t);
 	std::string results() const;
 	std::string ttsn() const;
 
@@ -287,6 +287,8 @@ protected:
 		C_INVALID,
 		C_INCOMPLETE
 	};
+
+	void end_reset();
 
 	void delay_cycles(emu_timer *tm, int cycles);
 	void check_irq();
@@ -349,7 +351,7 @@ protected:
 	bool write_one_bit(const attotime &limit);
 
 	virtual u8 get_drive_busy() const { return 0; }
-	virtual void clr_drive_busy() { };
+	virtual void clr_drive_busy() { }
 };
 
 class upd765a_device : public upd765_family_device {
@@ -417,8 +419,8 @@ protected:
 	virtual void execute_command(int cmd) override;
 	virtual void command_end(floppy_info &fi, bool data_completion) override;
 	virtual void index_callback(floppy_image_device *floppy, int state) override;
-	virtual u8 get_drive_busy() const override { return drive_busy; };
-	virtual void clr_drive_busy() override { drive_busy = 0; };
+	virtual u8 get_drive_busy() const override { return drive_busy; }
+	virtual void clr_drive_busy() override { drive_busy = 0; }
 
 	void motor_control(int fid, bool start_motor);
 
@@ -510,6 +512,9 @@ public:
 	dp8473_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void map(address_map &map) override;
+
+protected:
+	virtual void soft_reset() override;
 };
 
 class pc8477a_device : public ps2_fdc_device {

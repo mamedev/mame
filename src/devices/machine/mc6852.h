@@ -64,6 +64,11 @@ public:
 	DECLARE_READ_LINE_MEMBER( sm_dtr_r ) { return m_sm_dtr; }
 	DECLARE_READ_LINE_MEMBER( tuf_r ) { return m_tuf; }
 
+	// These are to allow integration of this driver with code
+	// controlling floppy disks.
+	void receive_byte(uint8_t data);
+	uint8_t get_tx_byte(int *tuf);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -148,6 +153,7 @@ private:
 	int m_dcd;              // data carrier detect
 	int m_sm_dtr;           // sync match/data terminal ready
 	int m_tuf;              // transmitter underflow
+	int m_in_sync;
 };
 
 

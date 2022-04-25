@@ -8,6 +8,7 @@
 
 #include "cpu/z80/z80.h"
 #include "machine/timer.h"
+#include "machine/ram.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
 #include "machine/coleco.h"
@@ -20,7 +21,6 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_cart(*this, COLECOVISION_CARTRIDGE_SLOT_TAG),
-			m_ram(*this, "ram"),
 			m_ctrlsel(*this, "CTRLSEL"),
 			m_std_keypad1(*this, "STD_KEYPAD1"),
 			m_std_joy1(*this, "STD_JOY1"),
@@ -69,20 +69,19 @@ public:
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<colecovision_cartridge_slot_device> m_cart;
-	required_shared_ptr<uint8_t> m_ram;
 
-	int m_joy_mode;
-	int m_last_nmi_state;
+	int m_joy_mode = 0;
+	int m_last_nmi_state = 0;
 
 	// analog controls
-	attotime m_joy_pulse_reload[2];
-	emu_timer *m_joy_pulse_timer[2];
-	emu_timer *m_joy_irq_timer[2];
-	emu_timer *m_joy_d7_timer[2];
-	int m_joy_irq_state[2];
-	int m_joy_d7_state[2];
-	uint8_t m_joy_analog_state[2];
-	uint8_t m_joy_analog_reload[2];
+	attotime m_joy_pulse_reload[2]{};
+	emu_timer *m_joy_pulse_timer[2]{};
+	emu_timer *m_joy_irq_timer[2]{};
+	emu_timer *m_joy_d7_timer[2]{};
+	int m_joy_irq_state[2]{};
+	int m_joy_d7_state[2]{};
+	uint8_t m_joy_analog_state[2]{};
+	uint8_t m_joy_analog_reload[2]{};
 
 	optional_ioport m_ctrlsel;
 	required_ioport m_std_keypad1;
@@ -109,6 +108,7 @@ public:
 	bit90_state(const machine_config &mconfig, device_type type, const char *tag)
 		: coleco_state(mconfig, type, tag),
 			m_bank(*this, "bank"),
+			m_ram(*this, RAM_TAG),
 			m_io_keyboard(*this, {"ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7"})
 		{}
 
@@ -122,16 +122,19 @@ public:
 	uint8_t keyboard_r(address_space &space);
 	void u32_w(uint8_t data);
 
+	void init();
+
 protected:
 	required_memory_bank m_bank;
+	required_device<ram_device> m_ram;
 	required_ioport_array<8> m_io_keyboard;
 
 private:
 	void bit90_map(address_map &map);
 	void bit90_io_map(address_map &map);
 
-	uint8_t m_keyselect;
-	uint8_t m_unknown;
+	uint8_t m_keyselect = 0U;
+	uint8_t m_unknown = 0U;
 };
 
 #endif

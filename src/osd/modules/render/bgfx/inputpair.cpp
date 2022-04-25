@@ -42,6 +42,7 @@ bgfx_input_pair::bgfx_input_pair(int index, std::string sampler, std::string tex
 
 bgfx_input_pair::~bgfx_input_pair()
 {
+	m_slider_state.reset();
 }
 
 void bgfx_input_pair::bind(bgfx_effect *effect, const int32_t screen) const
@@ -58,23 +59,18 @@ void bgfx_input_pair::bind(bgfx_effect *effect, const int32_t screen) const
 	bgfx_uniform *tex_size = effect->uniform("u_tex_size" + std::to_string(m_index));
 	if (tex_size && provider)
 	{
-		float values[2] = { float(provider->width()), float(provider->height()) };
+		float values[2] = { float(provider->rowpixels()), float(provider->height()) };
 		tex_size->set(values, sizeof(float) * 2);
 	}
 
 	bgfx_uniform *inv_tex_size = effect->uniform("u_inv_tex_size" + std::to_string(m_index));
 	if (inv_tex_size && provider)
 	{
-		float values[2] = { 1.0f / float(provider->width()), 1.0f / float(provider->height()) };
+		float values[2] = { 1.0f / float(provider->rowpixels()), 1.0f / float(provider->height()) };
 		inv_tex_size->set(values, sizeof(float) * 2);
 	}
 
 	bgfx::setTexture(m_index, effect->uniform(m_sampler)->handle(), chains().textures().handle(name));
-}
-
-int32_t bgfx_input_pair::slider_changed(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
-{
-	return texture_changed(id, str, newval);
 }
 
 int32_t bgfx_input_pair::texture_changed(int32_t id, std::string *str, int32_t newval)
@@ -103,7 +99,7 @@ int32_t bgfx_input_pair::texture_changed(int32_t id, std::string *str, int32_t n
 			file_name = file.substr(0, last_dot);
 		}
 
-		*str = string_format("%s", file_name.c_str());
+		*str = file_name;
 	}
 
 	return m_current_texture;
@@ -111,25 +107,19 @@ int32_t bgfx_input_pair::texture_changed(int32_t id, std::string *str, int32_t n
 
 void bgfx_input_pair::create_selection_slider(uint32_t screen_index)
 {
-	m_slider_state = make_unique_clear<slider_state>();
+	int32_t minval = 0;
+	int32_t defval = m_current_texture;
+	int32_t maxval = m_available_textures.size() - 1;
+	int32_t incval = 1;
 
-	m_slider_state->minval = 0;
-	m_slider_state->defval = m_current_texture;
-	m_slider_state->maxval = m_available_textures.size() - 1;
-	m_slider_state->incval = 1;
+	std::string description = "Window " + std::to_string(chains().window_index()) + ", Screen " + std::to_string(screen_index) + " " + m_selection + ":";
 
 	using namespace std::placeholders;
-	m_slider_state->update = std::bind(&bgfx_input_pair::slider_changed, this, _1, _2, _3, _4, _5);
-	m_slider_state->arg = this;
-	m_slider_state->id = screen_index;
-	m_slider_state->description = "Window " + std::to_string(chains().window_index()) + ", Screen " + std::to_string(screen_index) + " " + m_selection + ":";
+	m_slider_state = std::make_unique<slider_state>(std::move(description), minval, defval, maxval, incval,
+													std::bind(&bgfx_input_pair::texture_changed, this, screen_index, _1, _2));
 
-	ui::menu_item item;
-	item.text = m_slider_state->description;
-	item.subtext = "";
-	item.flags = 0;
-	item.ref = m_slider_state.get();
-	item.type = ui::menu_item_type::SLIDER;
+	ui::menu_item item(ui::menu_item_type::SLIDER, m_slider_state.get());
+	item.set_text(m_slider_state->description);
 	m_selection_slider = item;
 }
 

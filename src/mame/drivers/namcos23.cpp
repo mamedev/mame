@@ -1256,6 +1256,7 @@ Notes:
 */
 
 #include "emu.h"
+#include "cpu/f2mc16/mb9061x.h"
 #include "cpu/h8/h83002.h"
 #include "cpu/h8/h83337.h"
 #include "cpu/mips/mips3.h"
@@ -1266,6 +1267,7 @@ Notes:
 #include "sound/c352.h"
 #include "video/poly.h"
 #include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
 
@@ -1327,7 +1329,7 @@ struct namcos23_render_data
 
 class namcos23_state;
 
-class namcos23_renderer : public poly_manager<float, namcos23_render_data, 4, POLY_MAX_ENTRIES>
+class namcos23_renderer : public poly_manager<float, namcos23_render_data, 4>
 {
 public:
 	namcos23_renderer(namcos23_state &state);
@@ -1337,7 +1339,7 @@ public:
 
 private:
 	namcos23_state& m_state;
-	float* m_zBuffer;
+	float* m_zBuffer = nullptr;
 };
 
 typedef namcos23_renderer::vertex_t poly_vertex;
@@ -1444,6 +1446,7 @@ public:
 	void s23(machine_config &config);
 	void gmen(machine_config &config);
 	void timecrs2(machine_config &config);
+	void motoxgo(machine_config &config);
 
 	void init_s23();
 
@@ -1552,6 +1555,7 @@ private:
 	void s23h8rwmap(address_map &map);
 	void s23iobrdiomap(address_map &map);
 	void s23iobrdmap(address_map &map);
+	void motoxgo_exio_map(address_map &map);
 	void timecrs2iobrdmap(address_map &map);
 
 	virtual void machine_start() override;
@@ -1652,7 +1656,7 @@ uint16_t namcos23_state::nthword(const uint32_t *pSource, int offs)
 ***************************************************************************/
 
 namcos23_renderer::namcos23_renderer(namcos23_state &state)
-	: poly_manager<float, namcos23_render_data, 4, POLY_MAX_ENTRIES>(state.machine()),
+	: poly_manager<float, namcos23_render_data, 4>(state.machine()),
 		m_state(state)
 {
 }
@@ -2060,16 +2064,16 @@ void namcos23_renderer::render_scanline(int32_t scanline, const extent_t& extent
 	float u = extent.param[1].start;
 	float v = extent.param[2].start;
 	float l = extent.param[3].start;
-	float dw = extent.param[0].dpdx;
-	float du = extent.param[1].dpdx;
-	float dv = extent.param[2].dpdx;
-	float dl = extent.param[3].dpdx;
+	const float dw = extent.param[0].dpdx;
+	const float du = extent.param[1].dpdx;
+	const float dv = extent.param[2].dpdx;
+	const float dl = extent.param[3].dpdx;
 
-	uint32_t *img = &object.bitmap->pix32(scanline, extent.startx);
+	uint32_t *img = &object.bitmap->pix(scanline, extent.startx);
 
 	for(int x = extent.startx; x < extent.stopx; x++) {
-		float z = w ? 1/w : 0;
-		uint32_t pcol = rd.texture_lookup(*rd.machine, rd.pens, u*z, v*z);
+		const float z = w ? 1/w : 0;
+		const uint32_t pcol = rd.texture_lookup(*rd.machine, rd.pens, u*z, v*z);
 		float ll = l*z;
 		*img = (light(pcol >> 16, ll) << 16) | (light(pcol >> 8, ll) << 8) | light(pcol, ll);
 
@@ -2222,7 +2226,7 @@ void namcos23_state::render_one_model(const namcos23_render_entry *re)
 		namcos23_poly_entry *p = render.polys + render.poly_count;
 
 		// Should be unnecessary now that frustum clipping happens, but this still culls polys behind the camera
-		p->vertex_count = render.polymgr->zclip_if_less(ne, pv, p->pv, 4, 0.00001f);
+		p->vertex_count = render.polymgr->zclip_if_less<4>(ne, pv, p->pv, 0.00001f);
 
 		// Project if you don't clip on the near plane
 		if(p->vertex_count >= 3) {
@@ -2310,19 +2314,19 @@ void namcos23_renderer::render_flush(bitmap_rgb32& bitmap)
 
 	for(int i=0; i<render.poly_count; i++) {
 		const namcos23_poly_entry *p = render.poly_order[i];
-		namcos23_render_data& extra = render.polymgr->object_data_alloc();
+		namcos23_render_data& extra = render.polymgr->object_data().next();
 		extra = p->rd;
 		extra.bitmap = &bitmap;
 
 		// We should probably split the polygons into triangles ourselves to insure everything is being rendered properly
 		if (p->vertex_count == 3)
-			render_triangle(scissor, render_delegate(&namcos23_renderer::render_scanline, this), 4, p->pv[0], p->pv[1], p->pv[2]);
+			render_triangle<4>(scissor, render_delegate(&namcos23_renderer::render_scanline, this), p->pv[0], p->pv[1], p->pv[2]);
 		else if (p->vertex_count == 4)
-			render_polygon<4>(scissor, render_delegate(&namcos23_renderer::render_scanline, this), 4, p->pv);
+			render_polygon<4, 4>(scissor, render_delegate(&namcos23_renderer::render_scanline, this), p->pv);
 		else if (p->vertex_count == 5)
-			render_polygon<5>(scissor, render_delegate(&namcos23_renderer::render_scanline, this), 4, p->pv);
+			render_polygon<5, 4>(scissor, render_delegate(&namcos23_renderer::render_scanline, this), p->pv);
 		else if (p->vertex_count == 6)
-			render_polygon<6>(scissor, render_delegate(&namcos23_renderer::render_scanline, this), 4, p->pv);
+			render_polygon<6, 4>(scissor, render_delegate(&namcos23_renderer::render_scanline, this), p->pv);
 	}
 	render.poly_count = 0;
 }
@@ -3220,6 +3224,17 @@ void namcos23_state::s23iobrdiomap(address_map &map)
 }
 
 
+void namcos23_state::motoxgo_exio_map(address_map &map)
+{
+	map(0x000003, 0x000003).nopr();
+	map(0x000008, 0x000009).noprw();
+	map(0x000036, 0x000037).nopw();
+	map(0x0000c8, 0x0000c8).nopw();
+	map(0xfc0000, 0xfcffff).ram();
+	map(0xfe0000, 0xffffff).rom().region("exioboard", 0);
+}
+
+
 // Time Crisis lightgun
 
 uint8_t namcos23_state::iob_gun_r(offs_t offset)
@@ -3551,6 +3566,7 @@ void namcos23_state::init_s23()
 	if((!strcmp(machine().system().name, "motoxgo")) ||
 		(!strcmp(machine().system().name, "panicprk")) ||
 		(!strcmp(machine().system().name, "panicprkj")) ||
+		(!strcmp(machine().system().name, "panicprkj2")) ||
 		(!strcmp(machine().system().name, "rapidrvr")) ||
 		(!strcmp(machine().system().name, "rapidrvrv2c")) ||
 		(!strcmp(machine().system().name, "rapidrvrp")) ||
@@ -3558,6 +3574,7 @@ void namcos23_state::init_s23()
 		(!strcmp(machine().system().name, "gunwars")) ||
 		(!strcmp(machine().system().name, "gunwarsa")) ||
 		(!strcmp(machine().system().name, "downhill")) ||
+		(!strcmp(machine().system().name, "downhillu")) ||
 		(!strcmp(machine().system().name, "finfurl2")) ||
 		(!strcmp(machine().system().name, "finfurl2j")) ||
 		(!strcmp(machine().system().name, "raceon")) ||
@@ -3726,6 +3743,14 @@ void namcos23_state::s23(machine_config &config)
 	c352.add_route(3, "lspeaker", 1.00);
 }
 
+void namcos23_state::motoxgo(machine_config &config)
+{
+	s23(config);
+
+	mb90611_device &amccpu(MB90611A(config, "amccpu", 4.9152_MHz_XTAL));
+	amccpu.set_addrmap(AS_PROGRAM, &namcos23_state::motoxgo_exio_map);
+}
+
 void namcos23_state::timecrs2(machine_config &config)
 {
 	s23(config);
@@ -3832,7 +3857,9 @@ void namcos23_state::ss23e2(machine_config &config)
 	m_subcpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("iocpu:sci0", FUNC(h8_sci_device::rx_w));
 }
 
-
+// a note about "user1" ROMs:
+// serial number data is at offset 0x201 (interleaved) and it's the only difference between sets marked as 'set 1' and 'set 2'
+// TODO: verify if it's better to just keep one set and note the alternate serial numbers
 
 ROM_START( rapidrvr )
 	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
@@ -4853,6 +4880,53 @@ ROM_START( panicprkj )
 ROM_END
 
 
+ROM_START( panicprkj2 )
+	ROM_REGION32_BE( 0x400000, "user1", 0 ) // 4 megs for main R4650 code
+	ROM_LOAD16_BYTE( "pnp1verb.ic2", 0x000000, 0x200000, CRC(59748d7d) SHA1(f7677ec9027439a7352c88494873861e78ae9a41) )
+	ROM_LOAD16_BYTE( "pnp1verb.ic1", 0x000001, 0x200000, CRC(718ff346) SHA1(0f631fe32e864623455d9bc39cdfa80b34c6dbb0) )
+
+	ROM_REGION( 0x80000, "subcpu", 0 )  // Hitachi H8/3002 MCU code
+	ROM_LOAD16_WORD_SWAP( "pnp1vera.ic3", 0x000000, 0x080000, CRC(fe4bc6f4) SHA1(2114dc4bc63d589e6c3b26a73dbc60924f3b1765) )
+
+	ROM_REGION( 0x40000, "iocpu", 0 )   // I/O board HD643334 H8/3334 MCU code
+	ROM_LOAD( "asca-3a.ic14", 0x000000, 0x040000, CRC(8e9266e5) SHA1(ffa8782ca641d71d57df23ed1c5911db05d3df97) )
+
+	ROM_REGION32_BE( 0x2000000, "data", 0 )
+	ROM_LOAD16_BYTE( "pnp1mtah.2j",  0x000000, 0x800000, CRC(37addddd) SHA1(3032989653304417df80606bc3fde6e9425d8cbb) )
+	ROM_LOAD16_BYTE( "pnp1mtal.2h",  0x000001, 0x800000, CRC(6490faaa) SHA1(03443746009b434e5d4074ea6314910418907360) )
+
+	ROM_REGION( 0x2000000, "textile", 0 )
+	ROM_LOAD( "pnp1cgll.4m",  0x0000000, 0x800000, CRC(d03932cf) SHA1(49240e44923cc6e815e9457b6290fd18466658af) )
+	ROM_LOAD( "pnp1cglm.5k",  0x0800000, 0x800000, CRC(abf4ccf2) SHA1(3848e26d0ba6c872bbc6d5e0eb23a9d4b34152d5) )
+	ROM_LOAD( "pnp1cgum.4j",  0x1000000, 0x800000, CRC(206217ca) SHA1(9c095bba7764f3405c3fab10513b9b78981ec44d) )
+	ROM_LOAD( "pnp1cguu.5f",  0x1800000, 0x800000, CRC(cd64f57f) SHA1(8780270298e0823db1acbbf79396788df0c3c19c) )
+
+	ROM_REGION16_LE( 0x200000, "textilemapl", 0 )
+	ROM_LOAD( "pnp1ccrl.7f",  0x000000, 0x200000, CRC(b7bc43c2) SHA1(f4b470540194486ca6822f438fc1d4700cfb2ab1) )
+
+	ROM_REGION( 0x200000, "textilemaph", 0 )
+	ROM_LOAD( "pnp1ccrh.7e",  0x000000, 0x200000, CRC(caaf1b73) SHA1(b436992817ab4e4dad05e7429eb102d4fb57fa6a) )
+
+	ROM_REGION32_BE( 0x2000000, "pointrom", 0 )
+	ROM_LOAD32_WORD_SWAP( "pnp1pt0h.7a",  0x000000, 0x400000, CRC(43fc2246) SHA1(301d321cd4a01ebd7ccfa6f295d6c3daf0a19efe) )
+	ROM_LOAD32_WORD_SWAP( "pnp1pt0l.7c",  0x000002, 0x400000, CRC(26af5fa1) SHA1(12fcf98c2a59643e0fdfdd7186f9f16baf54a9cf) )
+	ROM_LOAD32_WORD_SWAP( "pnp1pt1h.5a",  0x800000, 0x400000, CRC(1ff470c0) SHA1(ca8fad90743589744939d681b0ce94f368337b3f) )
+	ROM_LOAD32_WORD_SWAP( "pnp1pt1l.5c",  0x800002, 0x400000, CRC(15c6f236) SHA1(e8c393359a91cdce6e9110a48c0a80708f8fc132) )
+
+	ROM_REGION( 0x1000000, "c352", 0 )
+	ROM_LOAD( "pnp1wavel.2c", 0x000000, 0x800000, CRC(35c6a9bd) SHA1(4b56fdc37525c15e57d93091e6609d6a6905fc5c) )
+	ROM_LOAD( "pnp1waveh.2a", 0x800000, 0x800000, CRC(6fa1826a) SHA1(20a5af49e65ae2bc57c016b5cd9bafa5a5220d35) )
+
+	ROM_REGION( 0x800000, "dups", 0 )   // duplicate ROMs
+	ROM_LOAD( "pnp1cguu.4f",  0x000000, 0x800000, CRC(cd64f57f) SHA1(8780270298e0823db1acbbf79396788df0c3c19c) )
+	ROM_LOAD( "pnp1cgum.5j",  0x000000, 0x800000, CRC(206217ca) SHA1(9c095bba7764f3405c3fab10513b9b78981ec44d) )
+	ROM_LOAD( "pnp1cgll.5m",  0x000000, 0x800000, CRC(d03932cf) SHA1(49240e44923cc6e815e9457b6290fd18466658af) )
+	ROM_LOAD( "pnp1cglm.4k",  0x000000, 0x800000, CRC(abf4ccf2) SHA1(3848e26d0ba6c872bbc6d5e0eb23a9d4b34152d5) )
+	ROM_LOAD( "pnp1ccrl.7m",  0x000000, 0x200000, CRC(b7bc43c2) SHA1(f4b470540194486ca6822f438fc1d4700cfb2ab1) )
+	ROM_LOAD( "pnp1ccrh.7k",  0x000000, 0x200000, CRC(caaf1b73) SHA1(b436992817ab4e4dad05e7429eb102d4fb57fa6a) )
+ROM_END
+
+
 ROM_START( gunwars )
 	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
 	ROM_LOAD16_BYTE( "gm1verb.ic2",  0x000000, 0x200000, CRC(401f8264) SHA1(281f245ae0fbc2b82248c7aacaa5dfcdb114e2ee) )
@@ -4945,7 +5019,56 @@ ROM_START( gunwarsa )
 ROM_END
 
 
-ROM_START( downhill )
+ROM_START( downhill ) // Dump has been reprogrammed on blank flash ROMs and tested working on real PCB
+	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
+	ROM_LOAD16_BYTE( "dh2vera.ic2",  0x000000, 0x200000, CRC(81bca744) SHA1(0335960126e41f02442828213990f0d30af86696) )
+	ROM_LOAD16_BYTE( "dh2vera.ic1",  0x000001, 0x200000, CRC(ea7dcf68) SHA1(fd5110e3dab04f8c8503fd6fe9edbfc7c5a22aaf) )
+
+	ROM_REGION( 0x80000, "subcpu", 0 )  /* Hitachi H8/3002 MCU code */
+	ROM_LOAD16_WORD_SWAP( "dh3vera.ic3",  0x000000, 0x080000, CRC(98f9fc8b) SHA1(5152b9e11773033a26da11d1f3774a261e61a2c5) )
+
+	ROM_REGION( 0x40000, "iocpu", 0 )   /* I/O board HD643334 H8/3334 MCU code. "ASCA-3;Ver 2.04;JPN,Multipurpose + Rotary Encoder" */
+	ROM_LOAD( "asc3_io-c.ic14", 0x000000, 0x020000, CRC(2f272a7b) SHA1(9d7ebe274c0d26f5f38747224d42d0375e2ed14c) )
+
+	ROM_REGION32_BE( 0x2000000, "data", 0 ) /* data ROMs */
+	ROM_LOAD16_BYTE( "dh1mtah.2j",   0x000000, 0x800000, CRC(3b56faa7) SHA1(861db7f549bedbb2b837516fcc966ad5890007ce) )
+	ROM_LOAD16_BYTE( "dh1mtal.2h",   0x000001, 0x800000, CRC(9fa07bfe) SHA1(a6b847ff7d5eadbf60b434a0d905051ea4227113) )
+
+	ROM_REGION( 0x2000000, "textile", 0 )   /* texture tiles */
+	ROM_LOAD( "dh1cgll.4m",   0x0000000, 0x800000, CRC(c0d5ad87) SHA1(bc1992516c63aebdae0322def77f082d799a327a) )
+	ROM_LOAD( "dh1cglm.4k",   0x0800000, 0x800000, CRC(5d9a5e35) SHA1(d746abb45f04aa4eb9d43d9c79051e71bf024e38) )
+	ROM_LOAD( "dh1cgum.4j",   0x1000000, 0x800000, CRC(1044d0a0) SHA1(e0bf843616e166495fcdc76f076eb53a28287d30) )
+	ROM_LOAD( "dh1cguu.5f",   0x1800000, 0x800000, CRC(66cb0dd7) SHA1(1f67320f150f1b55c97eae4b9fe4890fabc8dc7e) )
+
+	ROM_REGION16_LE( 0x400000, "textilemapl", 0 )   /* texture tilemap 0-15 */
+	ROM_LOAD( "dh1ccrl.7f",   0x000000, 0x400000, CRC(65c857df) SHA1(5d67b17cf272f042b4264d9871d6e4088c20b788) )
+
+	ROM_REGION( 0x200000, "textilemaph", 0 )        /* texture tilemap 16-17 + attr */
+	ROM_LOAD( "dh1ccrh.7e",   0x000000, 0x200000, CRC(f21c482d) SHA1(bfcead2ff3d10f996ac0bf81470d050bd6374156) )
+
+	ROM_REGION32_BE( 0x2000000, "pointrom", 0 ) /* 3D model data */
+	ROM_LOAD32_WORD_SWAP( "dh1pt0h.7a", 0x0000000, 0x400000, CRC(0e84a5d8) SHA1(28559f978b86d88bb18c3e58e28a97ecfb5f7fa9) )
+	ROM_LOAD32_WORD_SWAP( "dh1pt0l.7c", 0x0000002, 0x400000, CRC(d120eee5) SHA1(fa1269d891f4e0510491aa70c4abd5f36852e691) )
+	ROM_LOAD32_WORD_SWAP( "dh1pt1h.5a", 0x0800000, 0x400000, CRC(88cd4c90) SHA1(94016c72a9da983e55c74cbdd3691b596ea50c31) )
+	ROM_LOAD32_WORD_SWAP( "dh1pt1l.5c", 0x0800002, 0x400000, CRC(dee2f2bf) SHA1(258f9a6e324502550d27b8feaf36244766fa19da) )
+	ROM_LOAD32_WORD_SWAP( "dh1pt2h.4a", 0x1000000, 0x400000, CRC(7e167c65) SHA1(018bf6aea4c1640ef728cf7b8e491f11742ede0d) )
+	ROM_LOAD32_WORD_SWAP( "dh1pt2l.4c", 0x1000002, 0x400000, CRC(714e3090) SHA1(39827f645dacbb57c7c40193f3f58e879899a4f3) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* C352 PCM samples */
+	ROM_LOAD( "dh1wavel.2c",  0x000000, 0x800000, CRC(10954726) SHA1(50ee0346c46194dada7b5c0d8b1efe9a7f211b90) )
+	ROM_LOAD( "dh1waveh.2a",  0x800000, 0x800000, CRC(2adfa312) SHA1(d01a46af2c95d1ea64e9778979ae147298d921e3) )
+
+	ROM_REGION( 0x800000, "dups", 0 )   /* duplicate ROMs */
+	ROM_LOAD( "dh1cguu.4f",   0x000000, 0x800000, CRC(66cb0dd7) SHA1(1f67320f150f1b55c97eae4b9fe4890fabc8dc7e) )
+	ROM_LOAD( "dh1cgum.5j",   0x000000, 0x800000, CRC(1044d0a0) SHA1(e0bf843616e166495fcdc76f076eb53a28287d30) )
+	ROM_LOAD( "dh1cgll.5m",   0x000000, 0x800000, CRC(c0d5ad87) SHA1(bc1992516c63aebdae0322def77f082d799a327a) )
+	ROM_LOAD( "dh1cglm.5k",   0x000000, 0x800000, CRC(5d9a5e35) SHA1(d746abb45f04aa4eb9d43d9c79051e71bf024e38) )
+	ROM_LOAD( "dh1ccrl.7m",   0x000000, 0x400000, CRC(65c857df) SHA1(5d67b17cf272f042b4264d9871d6e4088c20b788) )
+	ROM_LOAD( "dh1ccrh.7k",   0x000000, 0x200000, CRC(f21c482d) SHA1(bfcead2ff3d10f996ac0bf81470d050bd6374156) )
+ROM_END
+
+
+ROM_START( downhillu )
 	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
 	ROM_LOAD16_BYTE( "dh3vera.ic2",  0x000000, 0x200000, CRC(5d9952e9) SHA1(d38422330bd708c247b9968429fbff36fe706598) )
 	ROM_LOAD16_BYTE( "dh3vera.ic1",  0x000001, 0x200000, CRC(64a236f3) SHA1(aac59e0db5cfefc4b442e6c3a5189a8418742201) )
@@ -5319,19 +5442,21 @@ GAME( 1997, rapidrvr,    0,        gorgon,      rapidrvr,  namcos23_state, init_
 GAME( 1997, rapidrvrv2c, rapidrvr, gorgon,      rapidrvr,  namcos23_state, init_s23, ROT0, "Namco", "Rapid River (World, RD2 Ver. C)",     GAME_FLAGS ) // 97/11/27, Europe
 GAME( 1997, rapidrvrp,   rapidrvr, gorgon,      rapidrvrp, namcos23_state, init_s23, ROT0, "Namco", "Rapid River (prototype)",      GAME_FLAGS ) // 97/11/10, USA
 GAME( 1997, finfurl,     0,        gorgon,      finfurl,   namcos23_state, init_s23, ROT0, "Namco", "Final Furlong (World, FF2 Ver. A)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1997, downhill,    0,        s23,         downhill,  namcos23_state, init_s23, ROT0, "Namco", "Downhill Bikers (US, DH3 Ver. A)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1997, motoxgo,     0,        s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (US, MG3 Ver. A)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1997, motoxgov2a,  motoxgo,  s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (World, MG2 Ver. A, set 1)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1997, motoxgov2a2, motoxgo,  s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (World, MG2 Ver. A, set 2)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1997, motoxgov1a,  motoxgo,  s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (Japan, MG1 Ver. A, set 1)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1997, motoxgov1a2, motoxgo,  s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (Japan, MG1 Ver. A, set 2)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, downhill,    0,        s23,         downhill,  namcos23_state, init_s23, ROT0, "Namco", "Downhill Bikers (World, DH2 Ver. A)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, downhillu,   downhill, s23,         downhill,  namcos23_state, init_s23, ROT0, "Namco", "Downhill Bikers (US, DH3 Ver. A)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, motoxgo,     0,        motoxgo,     s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (US, MG3 Ver. A)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, motoxgov2a,  motoxgo,  motoxgo,     s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (World, MG2 Ver. A, set 1)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, motoxgov2a2, motoxgo,  motoxgo,     s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (World, MG2 Ver. A, set 2)",   GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, motoxgov1a,  motoxgo,  motoxgo,     s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (Japan, MG1 Ver. A, set 1)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1997, motoxgov1a2, motoxgo,  motoxgo,     s23,       namcos23_state, init_s23, ROT0, "Namco", "Motocross Go! (Japan, MG1 Ver. A, set 2)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, timecrs2,    0,        timecrs2,    timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (US, TSS3 Ver. B)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, timecrs2v2b, timecrs2, timecrs2,    timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (World, TSS2 Ver. B)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, timecrs2v1b, timecrs2, timecrs2,    timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (Japan, TSS1 Ver. B)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, timecrs2v4a, timecrs2, timecrs2v4a, timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (World, TSS4 Ver. A)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, timecrs2v5a, timecrs2, timecrs2v4a, timecrs2,  namcos23_state, init_s23, ROT0, "Namco", "Time Crisis II (US, TSS5 Ver. A)", GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1997, panicprk,    0,        s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Panic Park (World, PNP2 Ver. A)",     GAME_FLAGS )
-GAME( 1997, panicprkj,   panicprk, s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Panic Park (Japan, PNP1 Ver. B)",     GAME_FLAGS )
+GAME( 1997, panicprk,    0,        s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Panic Park (World, PNP2 Ver. A)",            GAME_FLAGS )
+GAME( 1997, panicprkj,   panicprk, s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Panic Park (Japan, PNP1 Ver. B, set 1)",     GAME_FLAGS )
+GAME( 1997, panicprkj2,  panicprk, s23,         s23,       namcos23_state, init_s23, ROT0, "Namco", "Panic Park (Japan, PNP1 Ver. B, set 2)",     GAME_FLAGS )
 GAME( 1998, gunwars,     0,        gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Gunmen Wars (Japan, GM1 Ver. B)",     GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1998, gunwarsa,    gunwars,  gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Gunmen Wars (Japan, GM1 Ver. A)",     GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1998, raceon,      0,        gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Race On! (World, RO2 Ver. A)",        GAME_FLAGS | MACHINE_NODEVICE_LAN )

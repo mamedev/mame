@@ -55,27 +55,26 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram2;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
+	tilemap_t  *m_bg_tilemap = nullptr;
 
 	/* misc */
-	uint8_t    m_nmi_enable;
-	bool    m_video_enable;
+	uint8_t    m_nmi_enable = 0;
+	bool    m_video_enable = false;
 
 	/* common */
-	DECLARE_WRITE8_MEMBER(mainlatch_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	DECLARE_READ8_MEMBER(scanline_r);
+	uint8_t scanline_r();
 
 	/* all but psurge */
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(video_enable_w);
 
 	/* psurge */
-	DECLARE_READ8_MEMBER(psurge_protection_r);
+	uint8_t psurge_protection_r();
 
 	/* chkun */
 	void chkun_sound_w(uint8_t data);

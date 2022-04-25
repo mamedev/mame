@@ -14,8 +14,7 @@
 
 // ======================> dio16_98544_device
 
-namespace bus {
-	namespace hp_dio {
+namespace bus::hp_dio {
 
 class dio16_98544_device :
 	public device_t,
@@ -26,8 +25,8 @@ public:
 	// construction/destruction
 	dio16_98544_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER(rom_r);
-	DECLARE_WRITE16_MEMBER(rom_w);
+	uint16_t rom_r(offs_t offset);
+	void rom_w(offs_t offset, uint16_t data);
 
 	required_device<topcat_device> m_topcat;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -59,7 +58,6 @@ private:
 };
 
 } // namespace bus::hp_dio
-} // namespace bus
 
 // device type definition
 DECLARE_DEVICE_TYPE_NS(HPDIO_98544, bus::hp_dio, dio16_98544_device)

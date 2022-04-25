@@ -22,7 +22,7 @@ class axc51core_disassembler : public mcs51_disassembler
 public:
 	axc51core_disassembler();
 
-	axc51core_disassembler(const mem_info* names) : mcs51_disassembler(names) {};
+	axc51core_disassembler(const mem_info* names) : mcs51_disassembler(names) {}
 
 	virtual ~axc51core_disassembler() = default;
 

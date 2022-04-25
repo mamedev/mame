@@ -26,7 +26,7 @@ public:
 
 	void set_auto_ack(int state);
 
-	void set_fifo_callbacks(read16smo_delegate fifo_data_r, read16_delegate fifo_status_r, write_line_delegate fifo_reset_w);
+	void set_fifo_callbacks(read16smo_delegate fifo_data_r, read16mo_delegate fifo_status_r, write_line_delegate fifo_reset_w);
 	void set_io_callbacks(write_line_delegate output_full_cb, write_line_delegate input_empty_cb);
 
 	uint16_t data_r();
@@ -44,8 +44,8 @@ public:
 	uint32_t dsio_idma_data_r();
 	void dmovlay_remap_memory();
 	void dmovlay_callback(uint32_t data);
-	void denver_postload(void);
-	void install_speedup(void);
+	void denver_postload();
+	void install_speedup();
 
 	// non public
 	void dcs_boot();
@@ -63,7 +63,7 @@ public:
 	void dsio_reset();
 	uint16_t dsio_r(offs_t offset);
 	void dsio_w(offs_t offset, uint16_t data);
-	void denver_alloc_dmadac(void);
+	void denver_alloc_dmadac();
 	void denver_reset();
 	uint16_t denver_r(offs_t offset);
 	void denver_w(offs_t offset, uint16_t data);
@@ -181,9 +181,9 @@ protected:
 	uint16_t      m_size;
 	uint16_t      m_incs;
 	dmadac_sound_device *m_dmadac[6];
-	timer_device *m_reg_timer;
-	timer_device *m_sport0_timer;
-	timer_device *m_internal_timer;
+	required_device<timer_device> m_reg_timer;
+	optional_device<timer_device> m_sport0_timer;
+	required_device<timer_device> m_internal_timer;
 	int32_t       m_ireg;
 	uint16_t      m_ireg_base;
 	uint16_t      m_control_regs[32];
@@ -199,8 +199,8 @@ protected:
 
 	optional_device<address_map_bank_device> m_ram_map;
 	optional_memory_bank    m_data_bank;
-	memory_bank *           m_rom_page;
-	memory_bank *           m_dram_page;
+	memory_bank_creator     m_rom_page;
+	memory_bank_creator     m_dram_page;
 
 	/* I/O with the host */
 	uint8_t       m_auto_ack;
@@ -218,7 +218,7 @@ protected:
 	write_line_delegate m_input_empty_cb;
 
 	read16smo_delegate m_fifo_data_r;
-	read16_delegate m_fifo_status_r;
+	read16mo_delegate m_fifo_status_r;
 	write_line_delegate m_fifo_reset_w;
 
 	/* timers */

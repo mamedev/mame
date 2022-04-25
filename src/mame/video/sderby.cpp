@@ -15,7 +15,7 @@ TILE_GET_INFO_MEMBER(sderby_state::get_sderby_tile_info)
 	tileinfo.set(1,tileno,colour,0);
 }
 
-WRITE16_MEMBER(sderby_state::sderby_videoram_w)
+void sderby_state::sderby_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_tilemap->mark_tile_dirty(offset/2);
@@ -33,7 +33,7 @@ TILE_GET_INFO_MEMBER(sderby_state::get_sderby_md_tile_info)
 	tileinfo.set(1,tileno,colour+16,0);
 }
 
-WRITE16_MEMBER(sderby_state::sderby_md_videoram_w)
+void sderby_state::sderby_md_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_md_videoram[offset]);
 	m_md_tilemap->mark_tile_dirty(offset/2);
@@ -51,7 +51,7 @@ TILE_GET_INFO_MEMBER(sderby_state::get_sderby_fg_tile_info)
 	tileinfo.set(0,tileno,colour+32,0);
 }
 
-WRITE16_MEMBER(sderby_state::sderby_fg_videoram_w)
+void sderby_state::sderby_fg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset/2);
@@ -117,7 +117,7 @@ uint32_t sderby_state::screen_update_pmroulet(screen_device &screen, bitmap_ind1
 }
 
 
-WRITE16_MEMBER(sderby_state::sderby_scroll_w)
+void sderby_state::sderby_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_scroll[offset]);
 
