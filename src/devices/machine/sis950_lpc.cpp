@@ -37,7 +37,7 @@
 #define LOG_MAP    (1U << 3) // log full remaps
 #define LOG_LPC    (1U << 4) // log LPC legacy regs
 
-#define VERBOSE (LOG_GENERAL | LOG_IO | LOG_TODO | LOG_MAP)
+#define VERBOSE (LOG_GENERAL | LOG_IO | LOG_TODO)
 //#define LOG_OUTPUT_FUNC osd_printf_warning
 
 #include "logmacro.h"
@@ -316,13 +316,30 @@ u8 sis950_lpc_device::init_enable_r()
 	return m_init_reg;
 }
 
+/*
+ * 11-- ---- HW (fast?) reset
+ * --x- ---- INIT enable
+ * ---x ---- Fast Gate A20 emulation
+ * ---- x--- Fast Reset latency control
+ * ---- -x-- Fast Reset emulation
+ * ---- --x- (0) enable A20M# (1) A20M# always high (?)
+ * ---- ---x Keyboard HW reset
+ */
 void sis950_lpc_device::init_enable_w(u8 data)
 {
 	LOGIO("Write INIT enable [$46] %02x\n", data);
-	m_init_reg = data;
+	// HW fast reset
+	// TODO: is 0->1 implementation correct?
+	// it will otherwise keep resetting itself, which may be a side effect of something else
+	// (PS/2 controller can intercept this?)
+	if ((data & 0xc0) == 0xc0 && (m_init_reg & 0xc0) == 0)
+	{
+		const int fast_reset_time = BIT(data, 3) ? 6 : 2;
+		LOGIO("Fast reset issued\n");
+		m_host_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::from_usec(fast_reset_time));
+	}
 
-//	TODO: add HW reset here
-//	bits 7-6 ON, both on 0->1 transition
+	m_init_reg = data;
 }
 
 u8 sis950_lpc_device::keybc_reg_r()
@@ -331,6 +348,16 @@ u8 sis950_lpc_device::keybc_reg_r()
 	return m_keybc_reg;
 }
 
+/*
+ * x--- ---- legacy USB (ports $60-$64 overrides)
+ * -x-- ---- PS/2 mouse lock enable
+ * --x- ---- Keyboard controller clock select (0) PCI Clock / 4 (1) 7.159 MHz
+ * ---x ---- Keyboard lock enable
+ * ---- x--- Integrated keyboard controller enable
+ * ---- -x-- Integrated PS/2 mouse enable (needs bit 3 enabled)
+ * ---- --x- Keyboard hot key status (needs bit 3 enabled, ctrl+alt+backspace)
+ * ---- ---x Keyboard hot key control
+ */
 void sis950_lpc_device::keybc_reg_w(u8 data)
 {
 	LOGIO("Write keyboard register [$47] %02x\n", data);

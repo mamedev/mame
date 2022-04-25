@@ -20,8 +20,6 @@
 
     TODO:
     - Very preliminary, enough to make it to draw basic VGA primary screen and not much else;
-    - Legacy BIOS (disable shadow RAM in host) draws in MDA mode, which doesn't work with this
-      implementation;
     - Understand how exactly 630 selects between the SVGA and extended register sets;
     - Backward port 630 GUI/PCI implementation to 300;
     - Confirm PCI IDs (they aren't well formed);
