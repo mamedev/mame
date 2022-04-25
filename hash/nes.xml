@@ -64614,7 +64614,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 <!-- nointro -->
-	<software name="decathln">
+	<software name="decathln" supported="partial"> <!-- major graphics glitches in javelin and 1500m -->
 		<description>Decathlon (Tw)</description>
 		<year>1992</year>
 		<publisher>Computer &amp; Entertainment</publisher>
@@ -69425,10 +69425,11 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 	<software name="fuunsfds">
 		<description>Fuuun Shaolin Kyo (Asia, FDS conversion)</description>
 		<year>19??</year>
-		<publisher>Kaiser</publisher>
+		<publisher>Whirlwind Manu</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="unl_lh10" />
 			<feature name="pcb" value="UNL-LH10" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="fuuun shaolin kyo (fds conversion) (unl).prg" size="131072" crc="120d5a6c" sha1="4c499a857087e6c121522435786792a2e4105ac1" offset="00000" status="baddump" />
 			</dataarea>
