@@ -20760,8 +20760,10 @@ altaten                         // 1999 unknown
 @source:magicard.cpp
 belslots                        // (c) 1999 Impera
 bigdeal0                        // (c) 2001 Impera
-dallaspk                        // unknown
+dallaspk                        // 1993, unknown
 hotslots                        // (c) 2002 Impera
+kajotcrd                        // (c) 1993 Amatic
+lucky7i                         // (c) 199? Impera
 magicard                        // (c) 199? Impera
 magicarda                       // (c) 199? Impera
 magicardb                       // (c) 199? Impera
@@ -20772,9 +20774,8 @@ magicardw                       // (c) 1993 Impera
 magicle                         // (c) 2001 Impera
 puzzleme                        // (c) 199? Impera
 quingo                          // (c) 1999 Impera
-unkpkr_w                        // unknown
+unkpkr_w                        // 1993, unknown
 unkte06                         // (c) 199? Impera
-lucky7i                         // (c) 199? Impera
 
 @source:magiceyes_pollux_vr3520f.cpp
 didj                            // (c) 2008 Leapfrog
