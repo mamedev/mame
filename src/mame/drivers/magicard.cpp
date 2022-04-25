@@ -44,8 +44,8 @@
   * Puzzle Me!,                                 Impera, 199?.
   * unknown 'TE06',                             Impera, 199?.
   * Lucky 7 (Impera),                           Impera, 199?.
-  * unknown Poker W,                            Unknown, 1993.
-  * Dallas Poker,                               Unknown, 1993.
+  * unknown Poker 'W',                          unknown, 1993.
+  * Dallas Poker,                               unknown, 1993.
   * Kajot Card (Version 1.01, Wien Euro),       Amatic, 1993.
 
 
@@ -1221,8 +1221,69 @@ ROM_END
 
 
 /*
+  Unknown 'TE06'
 
-  Unknown TE06
+  PCB layout:
+   ________________________________________________________________________________________________________________
+  |                                                                                                                |
+  |      __________                          _____________               ___________        ___                    |                            
+  |     |  74LS04  |                        |LC324256BP-70|             |     C     |      |   |     ___           |__ 
+  |     |__________|                        |_____________|             |___________|      |EMP|    |. .|           __|           
+  |                                          _____________                                 |TY |    |. .|           __|
+  |            ____                         |LC324256BP-70|                                |   |    |. .|           __|
+  |           | A  |                        |_____________|                                |SOC|    |. .|           __|
+  |           |____|                         _____________                                 |KET|    |. .|           __|
+  |                                         |LC324256BP-70|                                |___|    |. .|           __|
+  |                                         |_____________|           __________________            |. .|           __|
+  |                                          _____________           |   ADV476KN35E    |           |. .|           __|    
+  |                                         |LC324256BP-70|          |                  |           |___|           __|
+  | _______                                 |_____________|          |     OF19802.3    |                          |
+  ||DS1207 |                                                         |__________________|                          |
+  ||_______|                                                                                                       |                       
+  |         ___                       XTAL2                              __________                                |   
+  |        |   |        ________          ________________              | PIC16C54 |                               |        
+  |   ___  |PC7|       |        |        |                |             |__________|                               |__
+  |  |   | |4HC|       |        |        |    IMPERA 8    |                   XTAL3                                 __|
+  |  |HEF| |273|       |HYUNDAI |        |                |                                                         __|
+  |  |400| |P  |       |        |        |                |                                                         __|
+  |  |98B| |   |       |HY6264AL|        |     209751     |                                                         __|
+  |  |P  | |   |       |P_10    |        |                |                                                         __|
+  |  |   | |   |       |        |        |  DfD0922713 Y  |                                                         __|
+  |  |___| |___|       |        |        |                |                                ___   ___                __|
+  |                    | 9218A  |        |________________|              _____________    |   | |   |               __|
+  |   _______          |        |                                       |  74HC245N   |   |PC7| |ULN|               __|    
+  |  |       |         | KOREA  |                                       |_____________|   |4HC| |280|               __| 
+  |  |BATTERY|         |________|                                                         |273| |3A |               __|
+  |  |       |                                                                            |P  | |   |               __|
+  |  |_______|     ________   ________                                                    |   | |   |               __|
+  |               |        | |        |                                                   |   | |   |               __|
+  |               |        | |        |                                  _____________    |___| |___|               __|
+  |   ___         |        | |        |     XTAL1                       |  74HC245N   |    ___   ___                __|                                
+  |  | B |        |        | |        |    __________________           |_____________|   |   | |   |               __|
+  |  |___|        |        | |        |   |                  |                            |PC7| |ULN|               __|
+  |               | EMPTY  | |        |   |    IMPERA 7      |                            |4HC| |280|               __|
+  |               | SOCKET | |27C4002 |   |                  |                            |273| |3A |               __|
+  |               |        | |        |   |     230031       |           _____________    |P  | |   |               __|   
+  |   ___   ___   |        | |        |   |                  |          |  74HC245N   |   |   | |   |               __|
+  |  |   | |   |  |        | |        |   |   DfD9249V3 Y    |          |_____________|   |   | |   |               __|   
+  |  |PAL| |PAL|  |        | |        |   |                  |                            |___| |___|               __|
+  |  |CE | |CE |  |        | |        |   |                  |                             __________               __|
+  |  |   | |   |  |        | |        |   |                  |                            | CNY 74-4 |              __|
+  |  |   | |   |  |        | |        |   |__________________|           _____________    |__________|              __|                     
+  |  |   | |   |  |        | |        |                                 |  74HC245N   |                             __|
+  |  |   | |   |  |        | |        |                                 |_____________|                             __|
+  |  |___| |___|  |________| |________|                                                    ___________              __|
+  |                                                                                       |   DIP 1   |            |
+  | IMPERA BOARD REV V1.05                                                                |___________|            |
+  |________________________________________________________________________________________________________________|
+
+  A = TL7705ACP
+  B = DS1210
+  C = Cover scratched - unreadable
+
+  XTAL1 = 19.6608
+  XTAL2 = 30.000
+  XTAL3 = 3.686JB
 
 */
 ROM_START( unkte06 )
@@ -1307,7 +1368,7 @@ ROM_END
 
 
 /*
-  Unknown W
+  Unknown 'W'
   Poker Game.
   Version: 1.2 200/93
 
@@ -1591,6 +1652,6 @@ GAME( 2001, bigdeal0,  0,        hotslots, magicard, magicard_state, init_magica
 GAME( 199?, puzzleme,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Puzzle Me!",                                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 199?, unkte06,   0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera",    "unknown Poker 'TE06'",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // strings in ROM
 GAME( 199?, lucky7i,   0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Lucky 7 (Impera)",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1993, unkpkr_w,  0,        magicard, magicard, magicard_state, init_magicard, ROT0, "<unknown>", "unknown Poker W",                            MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1993, unkpkr_w,  0,        magicard, magicard, magicard_state, init_magicard, ROT0, "<unknown>", "unknown Poker 'W'",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1993, dallaspk,  0,        magicard, magicard, magicard_state, init_magicard, ROT0, "<unknown>", "Dallas Poker",                               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1993, kajotcrd,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Amatic",    "Kajot Card (Version 1.01, Wien Euro)",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
