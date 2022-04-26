@@ -95,6 +95,8 @@ cat702_device::cat702_device(const machine_config &mconfig, const char *tag, dev
 	m_select(1),
 	m_clock(1),
 	m_datain(1),
+	m_state(0),
+	m_bit(0),
 	m_dataout_handler(*this)
 {
 }
