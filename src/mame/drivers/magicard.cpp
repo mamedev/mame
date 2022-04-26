@@ -818,7 +818,7 @@ ROM_END
 */
 ROM_START( magicarde )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
-	ROM_LOAD16_WORD_SWAP( "27c4002_a63d.ic21", 0x00000, 0x80000, CRC(b5f24412) SHA1(73ff05c19132932a419fef0d5dc985440ce70e83) )
+	ROM_LOAD16_WORD_SWAP( "27c4002_v2.11a_a63d.ic21", 0x00000, 0x80000, CRC(b5f24412) SHA1(73ff05c19132932a419fef0d5dc985440ce70e83) )
 
 	ROM_REGION( 0x2000, "pic16c54", 0 )  // decapped
 	ROM_LOAD("pic16c54.ic29",   0x0000, 0x1fff, CRC(9c225a49) SHA1(249c12d23d1a85de828652c55a1a19ef8ec378ef) )
@@ -847,13 +847,33 @@ ROM_END
 */
 ROM_START( magicardea )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
-	ROM_LOAD16_WORD_SWAP( "27c4002_9505.ic21", 0x00000, 0x80000, CRC(24c69c01) SHA1(0928800b9cfc2ae358f90b3f79c08acd2b2aa7d8) )
+	ROM_LOAD16_WORD_SWAP( "27c4002_v2.11a_9505.ic21", 0x00000, 0x80000, CRC(24c69c01) SHA1(0928800b9cfc2ae358f90b3f79c08acd2b2aa7d8) )
 
 	ROM_REGION( 0x2000, "pic16c54", 0 )  // decapped
 	ROM_LOAD("pic16c54.ic29",   0x0000, 0x1fff, CRC(9c225a49) SHA1(249c12d23d1a85de828652c55a1a19ef8ec378ef) )
 
 	ROM_REGION( 0x0100, "sereeprom", 0 )  // Serial EPROM
 	ROM_LOAD("st24c02.ic26",    0x0000, 0x0100, CRC(98287c67) SHA1(ad34e55c1ce4f77c27049dac88050ed3c94af1a0) )
+ROM_END
+
+/*
+  Magic Card Export 94
+  Clubversion Export v2.9a
+  Vnr.02.08.94    CHECKSUM: 5B64
+
+  1x Philips SCC66470CAB 383610
+  1x Philips SCC68070 CCA84 347141
+
+  Other components are unreadable
+  in the PCB picture.
+  
+*/
+ROM_START( magicardeb )
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
+	ROM_LOAD16_WORD_SWAP( "27c4002_v2.9a_5b64.ic21", 0x00000, 0x80000, CRC(81ad0437) SHA1(117e2681541f786874cd0bce7f8bfb2bffb0b548) )
+
+	// PIC undumped
+	// Serial EPROM undumped
 ROM_END
 
 /*
@@ -1709,8 +1729,9 @@ void magicard_state::init_magicard()
 GAME( 199?, magicard,   0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card (set 1)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 199?, magicarda,  magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card (set 2)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 199?, magicardb,  magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card (set 3)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1994, magicarde,  magicard, hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card Export 94 (set 1)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1994, magicardea, magicard, hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card Export 94 (set 2)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1994, magicarde,  magicard, hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card Export 94 (v2.11a, set 1)",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1994, magicardea, magicard, hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card Export 94 (v2.11a, set 2)",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1994, magicardeb, magicard, hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card Export 94 (v2.9a)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1994, magicardf,  magicard, hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Export (V.211A)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1998, magicardj,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card III Jackpot (4.01)",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1993, magicardw,  magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card - Wien (Sicherheitsversion 1.2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
