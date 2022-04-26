@@ -158,8 +158,6 @@ void iwm_device::flush_write(u64 when)
 		for(u32 i=0; i != m_flux_write_count; i++)
 			fluxes[i] = cycles_to_time(m_flux_write[i]);
 
-		for(int i=0; i != 50; i++)
-			logerror("ctt %d %d\n", m_flux_write[i], m_flux_write[i+1] - m_flux_write[i]);
 		if(m_floppy)
 			m_floppy->write_flux(start, end, m_flux_write_count, m_flux_write_count ? &fluxes[0] : nullptr);
 
@@ -172,18 +170,10 @@ void iwm_device::flush_write(u64 when)
 		m_flux_write_count = 0;
 }
 
-static int zz = 0;
-static int dd = 0;
-
 u8 iwm_device::control(int offset, u8 data)
 {
 	sync();
 
-	if(m_flux_write_start && offset == 0xd) {
-		int xx = machine().time().as_ticks(1022727) - zz;
-		logerror("ctrl %6d %3d - %02x\n", xx, xx-dd, data);
-		dd = xx;
-	}
 	if(offset < 8) {
 		if(offset & 1)
 			m_phases |= 1 << (offset >> 1);
@@ -226,8 +216,6 @@ u8 iwm_device::control(int offset, u8 data)
 				m_whd |= 0x40;
 				m_next_state_change = 0;
 				m_flux_write_start = m_last_sync;
-				zz = machine().time().as_ticks(1022727);
-				dd = 0;
 				m_flux_write_count = 0;
 				if(m_floppy)
 					m_floppy->set_write_splice(cycles_to_time(m_flux_write_start));

@@ -1265,32 +1265,9 @@ void floppy_image_device::write_flux(const attotime &start, const attotime &end,
 	wspans[0].start = find_position(base, start);
 	wspans[0].end   = find_position(base, end);
 
-	logerror("write track %02d.%d.%d span %9d-%09d\n", cyl, subcyl, ss, wspans[0].start, wspans[0].end);
-
 	for(int i=0; i != transition_count; i++)
 		wspans[0].flux_change_positions.push_back(find_position(base, transitions[i]));
 
-	for(int i=0; i != 100; i++)
-		logerror("t %9d %4d %s\n", wspans[0].flux_change_positions[i], wspans[0].flux_change_positions[i+1] - wspans[0].flux_change_positions[i], (transitions[i+1] - transitions[i]).to_string());
-
-	unsigned int pp = 0;
-	u8 v = 0;
-	std::string r;
-	for(int pos = wspans[0].start; pos < wspans[0].end; pos++) {
-		v <<= 1;
-		int nw = pos + 3912;
-		if(pp != wspans[0].flux_change_positions.size() && nw > wspans[0].flux_change_positions[pp]) {
-			v |= 1;
-			nw = wspans[0].flux_change_positions[pp] + 3912/2;
-			pp ++;
-		}
-		pos = nw;
-		if(v & 0x80) {
-			r += util::string_format(" %02x", v);
-			v = 0;
-		}
-	}
-	logerror("%s\n", r);
 	wspan_split_on_wrap(wspans);
 
 	std::vector<uint32_t> &buf = image->get_buffer(cyl, ss, subcyl);
