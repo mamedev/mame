@@ -366,10 +366,11 @@ void xavix2_state::gpu_update(u16 count, u16 adr)
 					avail = 64;
 				}
 				u32 color = m_palette[palette | (v & mask)];
-				if(color)
-				for(u32 yyy = 0; yyy<scaley; yyy++) {
-					for(u32 xxx = 0; xxx < scalex; xxx++) {
-						m_sd[y+(yy*scaley)+yyy][x+(xx*scalex)+xxx] = color;
+				if(color) {
+					for(u32 yyy = 0; yyy<scaley; yyy++) {
+						for(u32 xxx = 0; xxx < scalex; xxx++) {
+							m_sd[y+(yy*scaley)+yyy][x+(xx*scalex)+xxx] = color;
+						}
 					}
 				}
 				v >>= bpp;
