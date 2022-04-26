@@ -877,6 +877,26 @@ ROM_START( magicardeb )
 ROM_END
 
 /*
+  Magic Card Export
+  Version 4.01
+  Vnr.07.03.98    CHECKSUM: AF18
+
+  1x Philips SCC66470CAB 383610
+  1x Philips SCC68070 CCA84 347141
+
+  Other components are unreadable
+  in the PCB picture.
+  
+*/
+ROM_START( magicardec )
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
+	ROM_LOAD16_WORD_SWAP( "27c4002_v4.01_af18.ic21", 0x00000, 0x80000, CRC(7700fd22) SHA1(0555c08c82f56e6399a89f6408e52d9d0beba2ac) )
+
+	// PIC undumped
+	// Serial EPROM undumped
+ROM_END
+
+/*
   Magic Export.
   Ver 211A.
 
@@ -1732,6 +1752,7 @@ GAME( 199?, magicardb,  magicard, magicard, magicard, magicard_state, init_magic
 GAME( 1994, magicarde,  magicard, hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card Export 94 (v2.11a, set 1)",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1994, magicardea, magicard, hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card Export 94 (v2.11a, set 2)",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1994, magicardeb, magicard, hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card Export 94 (v2.9a)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1998, magicardec, magicard, hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card Export (v4.01)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1994, magicardf,  magicard, hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Export (V.211A)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1998, magicardj,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card III Jackpot (4.01)",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1993, magicardw,  magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card - Wien (Sicherheitsversion 1.2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
