@@ -218,7 +218,7 @@ void sis950_lpc_device::device_add_mconfig(machine_config &config)
 	m_keybc->kbd_irq().set(m_pic_master, FUNC(pic8259_device::ir1_w));
 	m_keybc->kbd_clk().set(m_pc_kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
 	m_keybc->kbd_data().set(m_pc_kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
-	m_keybc->aux_irq().set(m_pic_master, FUNC(pic8259_device::ir1_w));
+	m_keybc->aux_irq().set(m_pic_slave, FUNC(pic8259_device::ir4_w));
 	m_keybc->aux_clk().set(aux_con, FUNC(pc_kbdc_device::clock_write_from_mb));
 	m_keybc->aux_data().set(aux_con, FUNC(pc_kbdc_device::data_write_from_mb));
 
