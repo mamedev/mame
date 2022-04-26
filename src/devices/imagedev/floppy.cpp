@@ -1265,12 +1265,11 @@ void floppy_image_device::write_flux(const attotime &start, const attotime &end,
 	wspans[0].start = find_position(base, start);
 	wspans[0].end   = find_position(base, end);
 
-	//	logerror("write track %02d.%d.%d span %9d-%09d\n", cyl, subcyl, ss, wspans[0].start, wspans[0].end);
+	logerror("write track %02d.%d.%d span %9d-%09d\n", cyl, subcyl, ss, wspans[0].start, wspans[0].end);
 
 	for(int i=0; i != transition_count; i++)
 		wspans[0].flux_change_positions.push_back(find_position(base, transitions[i]));
 
-	if(0)
 	for(int i=0; i != 100; i++)
 		logerror("t %9d %4d %s\n", wspans[0].flux_change_positions[i], wspans[0].flux_change_positions[i+1] - wspans[0].flux_change_positions[i], (transitions[i+1] - transitions[i]).to_string());
 

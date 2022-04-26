@@ -158,8 +158,8 @@ void iwm_device::flush_write(u64 when)
 		for(u32 i=0; i != m_flux_write_count; i++)
 			fluxes[i] = cycles_to_time(m_flux_write[i]);
 
-		for(int i=1; i != m_flux_write_count; i++)
-			logerror("ctt %d %d\n", m_flux_write[i], i ? m_flux_write[i] - m_flux_write[i-1] : m_flux_write[0] - m_flux_write_start);
+		for(int i=0; i != 50; i++)
+			logerror("ctt %d %d\n", m_flux_write[i], m_flux_write[i+1] - m_flux_write[i]);
 		if(m_floppy)
 			m_floppy->write_flux(start, end, m_flux_write_count, m_flux_write_count ? &fluxes[0] : nullptr);
 
