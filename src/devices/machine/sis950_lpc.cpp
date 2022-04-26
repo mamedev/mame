@@ -117,6 +117,7 @@ WRITE_LINE_MEMBER(sis950_lpc_device::cpu_reset_w)
 
 void sis950_lpc_device::device_add_mconfig(machine_config &config)
 {
+	// confirmed 82C54
 	PIT8254(config, m_pit, 0);
 	m_pit->set_clk<0>(4772720/4); // heartbeat IRQ
 	m_pit->out_handler<0>().set(FUNC(sis950_lpc_device::pit_out0));
@@ -394,7 +395,7 @@ void sis950_lpc_device::io_map(address_map &map)
 	map(0x0040, 0x0043).rw(m_pit, FUNC(pit8254_device::read), FUNC(pit8254_device::write));
 	map(0x0060, 0x0060).rw(m_keybc, FUNC(ps2_keyboard_controller_device::data_r), FUNC(ps2_keyboard_controller_device::data_w));
 	// map(0x0061, 0x0061) NMI Status Register
-	map(0x0061, 0x0061).rw(FUNC(sis950_lpc_device::at_portb_r), FUNC(sis950_lpc_device::at_portb_w));
+	map(0x0061, 0x0061).rw(FUNC(sis950_lpc_device::nmi_status_r), FUNC(sis950_lpc_device::nmi_control_w));
 	// undocumented but read, assume LPC complaint
 	map(0x0064, 0x0064).rw(m_keybc, FUNC(ps2_keyboard_controller_device::status_r), FUNC(ps2_keyboard_controller_device::command_w));
 	// map(0x0070, 0x0070) CMOS and NMI Mask
@@ -424,8 +425,8 @@ void sis950_lpc_device::io_map(address_map &map)
 
 	// Intel LPC interface specs (legacy host decode ranges, not necessarily present on '950)
 
-	// map(0x002e, 0x002f) Super I/O config
-	// map(0x004e, 0x004f) alt Super I/O config
+	// map(0x002e, 0x002f) Super I/O config (config-index & data ports)
+	// map(0x004e, 0x004f) alt Super I/O config (ISA converter index-data ports)
 	// map(0x0062, 0x0062) - ACPI embedded controller
 	// map(0x0066, 0x0066) /
 
@@ -551,7 +552,14 @@ WRITE_LINE_MEMBER( sis950_lpc_device::pit_out2 )
 	m_speaker->level_w(m_at_spkrdata & m_pit_out2);
 }
 
-uint8_t sis950_lpc_device::at_portb_r()
+/*
+ * x--- ---- Set if a PCI device or main memory module asserts PERR#/SERR# line
+ * -x-- ---- Set when IOCHK# is asserted on ISA bus
+ * --x- ---- Counter 2 out signal state (PIT ch. 2)
+ * ---x ---- Refresh bit toggle (PIT ch. 1)
+ * ---- xxxx <reads back NMI control enable>
+ */
+uint8_t sis950_lpc_device::nmi_status_r()
 {
 	uint8_t data = m_at_speaker;
 	data &= ~0xd0; // AT BIOS don't likes this being set
@@ -572,7 +580,14 @@ void sis950_lpc_device::at_speaker_set_spkrdata(uint8_t data)
 	m_speaker->level_w(m_at_spkrdata & m_pit_out2);
 }
 
-void sis950_lpc_device::at_portb_w(uint8_t data)
+/*
+ * xxxx ---- <must be zero when writing to this port>
+ * ---- x--- (0) enable IOCHK# NMI (1) clear and disable IOCHK# NMI
+ * ---- -x-- (0) enable PCI SERR# (1) clear and disable PCI SERR#
+ * ---- --x- Speaker output enable
+ * ---- ---x Timer counter 2 enable
+ */
+void sis950_lpc_device::nmi_control_w(uint8_t data)
 {
 	m_at_speaker = data;
 	m_pit->write_gate2(BIT(data, 0));

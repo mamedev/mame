@@ -157,8 +157,8 @@ private:
 	
 	uint8_t at_page8_r(offs_t offset);
 	void at_page8_w(offs_t offset, uint8_t data);
-	u8 at_portb_r();
-	void at_portb_w(uint8_t data);
+	u8 nmi_status_r();
+	void nmi_control_w(uint8_t data);
 
 	void at_speaker_set_spkrdata(uint8_t data);
 };

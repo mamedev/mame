@@ -102,16 +102,25 @@ void sis630_state::sis630(machine_config &config)
 	// documentation doesn't mention modem part #, derived from Shuttle MS11 MB manual
 //  SIS7013_MODEM_AC97(config, "pci:01.6"
 
+	// TODO: is the "virtual bridge" actually for expansion PCI slots?
 	SIS301_VIDEO_BRIDGE(config, "pci:02.0", 0);
-	// TODO: 3 expansion PCI slots
+
+	// optional stuff (according to Kontron 786LCD manual)
+//	"pci:08.0" SCSI controller (vendor=1000 NCR / LSI Logic / Symbios Logic device=0012 53C895A)
+//	"pci:09.0" IEEE1394 controller (vendor=1033 NEC device=00ce uPD72872 / μPD72872)
+
+	// TODO: 3 expansion PCI slots (PC104+)
+	// "pci:09.x" to "pci:12.x"
+	// (PIC-MG)
+	// "pci:20.x" to "pci:17.x"
 
 	// TODO: 1 parallel + 2 serial ports
 	// TODO: 1 game port
 	// TODO: move keyboard/mouse PS/2 connectors in here
 
 	// TODO: AMR (Audio/modem riser) + UPT (?), assume EISA complaint, needs specific slot options
-	ISA16_SLOT(config, "isa1", 0, "pci:01.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa2", 0, "pci:01.0:isabus", pc_isa16_cards, nullptr, false);
+//	ISA16_SLOT(config, "isa1", 0, "pci:01.0:isabus", pc_isa16_cards, nullptr, false);
+//	ISA16_SLOT(config, "isa2", 0, "pci:01.0:isabus", pc_isa16_cards, nullptr, false);
 }
 
 ROM_START(shutms11)

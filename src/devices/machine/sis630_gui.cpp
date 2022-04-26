@@ -396,6 +396,10 @@ void sis630_gui_device::space_io_map(address_map &map)
 	// RIO + 0x14: 301 VGA regs
 	// RIO + 0x16: 301 RAMDAC
 	// RIO + 0x30/+0x40/+0x50: omitted, legacy '300/'630 VGA regs?
+	// (gamecstl definitely tries to access 0x44 index 5 for readback extension ID)
+	map(0x30, 0x3f).rw(FUNC(sis630_gui_device::vga_3b0_r), FUNC(sis630_gui_device::vga_3b0_w));
+	map(0x40, 0x4f).rw(FUNC(sis630_gui_device::vga_3c0_r), FUNC(sis630_gui_device::vga_3c0_w));
+	map(0x50, 0x5f).rw(FUNC(sis630_gui_device::vga_3d0_r), FUNC(sis630_gui_device::vga_3d0_w));
 }
 
 void sis630_gui_device::legacy_memory_map(address_map &map)
