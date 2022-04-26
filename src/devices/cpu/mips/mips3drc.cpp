@@ -1164,14 +1164,15 @@ void mips3_device::generate_checksum_block(drcuml_block &block, compiler_state &
 		uint32_t sum = 0;
 		const void *base = m_prptr(seqhead->physpc);
 		const uint32_t data_bits_mask = (m_data_bits == 64 ? 4 : 0);
+		const uint32_t last_physpc = codelast->physpc;
 		uint32_t low_bits = (seqhead->physpc & data_bits_mask) ^ m_dword_xor;
 		UML_LOAD(block, I0, base, low_bits, SIZE_DWORD, SCALE_x1);             // load    i0,base,0,dword
 		sum += seqhead->opptr.l[0];
-		if ((m_drcoptions & MIPS3DRC_EXTRA_INSTR_CHECK) && !(codelast->flags & OPFLAG_VIRTUAL_NOOP) && codelast->physpc != seqhead->physpc)
+		if ((m_drcoptions & MIPS3DRC_EXTRA_INSTR_CHECK) && !(codelast->flags & OPFLAG_VIRTUAL_NOOP) && last_physpc != seqhead->physpc)
 		{
-			base = m_prptr(codelast->physpc);
+			base = m_prptr(last_physpc);
 			assert(base != nullptr);
-			low_bits = (codelast->physpc & data_bits_mask) ^ m_dword_xor;
+			low_bits = (last_physpc & data_bits_mask) ^ m_dword_xor;
 			UML_LOAD(block, I1, base, low_bits, SIZE_DWORD, SCALE_x1);     // load    i1,base,dword
 			UML_ADD(block, I0, I0, I1);                         // add     i0,i0,i1
 			sum += codelast->opptr.l[0];
@@ -1210,11 +1211,11 @@ void mips3_device::generate_checksum_block(drcuml_block &block, compiler_state &
 				if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 				{
 					// Skip the last if it was already included above
-					if (curdesc->physpc != codelast->physpc)
+					if (curdesc->physpc != last_physpc)
 					{
 						base = m_prptr(curdesc->physpc);
 						assert(base != nullptr);
-						low_bits = (curdesc->physpc & (m_data_bits == 64 ? 4 : 0)) ^ m_dword_xor;
+						low_bits = (curdesc->physpc & data_bits_mask) ^ m_dword_xor;
 						UML_LOAD(block, I1, base, low_bits, SIZE_DWORD, SCALE_x1);     // load    i1,base,dword
 						UML_ADD(block, I0, I0, I1);                         // add     i0,i0,i1
 						sum += curdesc->opptr.l[0];
@@ -1226,7 +1227,7 @@ void mips3_device::generate_checksum_block(drcuml_block &block, compiler_state &
 					{
 						base = m_prptr(curdesc->delay.first()->physpc);
 						assert(base != nullptr);
-						low_bits = (curdesc->delay.first()->physpc & (m_data_bits == 64 ? 4 : 0)) ^ m_dword_xor;
+						low_bits = (curdesc->delay.first()->physpc & data_bits_mask) ^ m_dword_xor;
 						UML_LOAD(block, I1, base, low_bits, SIZE_DWORD, SCALE_x1); // load    i1,base,dword
 						UML_ADD(block, I0, I0, I1);                     // add     i0,i0,i1
 						sum += curdesc->delay.first()->opptr.l[0];
@@ -1243,11 +1244,11 @@ void mips3_device::generate_checksum_block(drcuml_block &block, compiler_state &
 			uml::code_label check_failed = compiler.labelnum++;
 			uml::code_label check_passed = compiler.labelnum++;
 			// Check the last instruction
-			if (!(codelast->flags & OPFLAG_VIRTUAL_NOOP) && codelast->physpc != seqhead->physpc)
+			if (!(codelast->flags & OPFLAG_VIRTUAL_NOOP) && last_physpc != seqhead->physpc)
 			{
-				base = m_prptr(codelast->physpc);
+				base = m_prptr(last_physpc);
 				assert(base != nullptr);
-				low_bits = (codelast->physpc & (m_data_bits == 64 ? 4 : 0)) ^ m_dword_xor;
+				low_bits = (last_physpc & (m_data_bits == 64 ? 4 : 0)) ^ m_dword_xor;
 				UML_LOAD(block, I0, base, low_bits, SIZE_DWORD, SCALE_x1);     // load    i1,base,dword
 				sum = codelast->opptr.l[0];
 				UML_CMP(block, I0, sum);                                            // cmp     i0,sum
@@ -1255,7 +1256,7 @@ void mips3_device::generate_checksum_block(drcuml_block &block, compiler_state &
 				static const char text[] = "Last instr validation fail seq: %08X end: %08x\n";
 				UML_DMOV(block, mem(&m_core->format), (uintptr_t)text);          // mov     [format],text
 				UML_MOV(block, mem(&m_core->arg0), seqhead->pc);
-				UML_MOV(block, mem(&m_core->arg1), codelast->physpc);              // mov     [arg0],desc->pc
+				UML_MOV(block, mem(&m_core->arg1), last_physpc);              // mov     [arg0],desc->pc
 				UML_CALLC(block, cfunc_printf_debug, this);                            // callc   printf_debug
 				//UML_CALLC(block, cfunc_debug_break, this);
 				// Skip delay slot check
@@ -1263,7 +1264,7 @@ void mips3_device::generate_checksum_block(drcuml_block &block, compiler_state &
 				// Check the last instruction delay slot
 				UML_LABEL(block, check_second);
 				if (codelast->delay.first() != nullptr && !(codelast->delay.first()->flags & OPFLAG_VIRTUAL_NOOP)
-					&& codelast->physpc != seqhead->physpc)
+					&& last_physpc != seqhead->physpc)
 				{
 					base = m_prptr(codelast->delay.first()->physpc);
 					assert(base != nullptr);
@@ -1275,7 +1276,7 @@ void mips3_device::generate_checksum_block(drcuml_block &block, compiler_state &
 					static const char text[] = "Last delay slot validation fail seq: %08X end: %08x\n";
 					UML_DMOV(block, mem(&m_core->format), (uintptr_t)text);          // mov     [format],text
 					UML_MOV(block, mem(&m_core->arg0), seqhead->pc);
-					UML_MOV(block, mem(&m_core->arg1), codelast->physpc);              // mov     [arg0],desc->pc
+					UML_MOV(block, mem(&m_core->arg1), last_physpc);              // mov     [arg0],desc->pc
 					UML_CALLC(block, cfunc_printf_debug, this);                            // callc   printf_debug
 					//UML_CALLC(block, cfunc_debug_break, this);
 					UML_JMP(block, check_failed);
