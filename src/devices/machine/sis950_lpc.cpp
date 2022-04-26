@@ -482,7 +482,7 @@ void sis950_lpc_device::map_extra(uint64_t memory_window_start, uint64_t memory_
 		LOGMAP("- ACPI enable (%02x) %04x-%04x\n", m_bios_control, m_acpi_base, m_acpi_base + 0xff);
 		// shutms11 BIOS POST maps this at $5000
 		m_acpi->map_device(memory_window_start, memory_window_end, 0, memory_space, io_window_start, io_window_end, m_acpi_base, io_space);
-		m_smbus->map_device(memory_window_start, memory_window_end, 0, memory_space, io_window_start, io_window_end, m_acpi_base | 0x80, io_space);
+		io_space->install_device(m_acpi_base | 0x80, m_acpi_base | 0xff, *m_smbus, &sis950_smbus_device::map);
 	}
 
 	// TODO: disable flash access write thru reg $45

@@ -38,6 +38,7 @@
 #include "machine/sis7018_audio.h"
 #include "machine/sis900_eth.h"
 #include "machine/sis950_lpc.h"
+#include "machine/sis950_smbus.h"
 //#include "machine/fdc37c93x.h"
 
 class sis630_state : public driver_device
@@ -88,9 +89,9 @@ void sis630_state::sis630(machine_config &config)
 	m_ide->irq_sec().set("pci:01.0:pic_slave", FUNC(pic8259_device::ir7_w));
 		//FUNC(sis950_lpc_device::pc_mirq0_w));
 
-	SIS950_LPC (config, "pci:01.0", 0, "maincpu");
-	LPC_ACPI   (config, "pci:01.0:acpi", 0);
-	SMBUS      (config, "pci:01.0:smbus", 0);
+	SIS950_LPC  (config, "pci:01.0", 0, "maincpu");
+	LPC_ACPI    (config, "pci:01.0:acpi", 0);
+	SIS950_SMBUS(config, "pci:01.0:smbus", 0);
 
 	SIS900_ETH(config, "pci:01.1", 0);
 	// USB config: 2 on back, 3 on front. Front is fn 2

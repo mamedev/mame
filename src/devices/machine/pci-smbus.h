@@ -14,9 +14,6 @@ public:
 	}
 	smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void map_device(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
-							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
-
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;

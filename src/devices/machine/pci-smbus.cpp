@@ -117,25 +117,9 @@ uint8_t smbus_device::hst_cmd_r()
 	return hst_cmd;
 }
 
-/*
- * --x- ---- kill (reset state, TODO)
- * ---x ---- start transaction
- * ---- -xxx command protocol
- * ---- -000 quick command
- * ---- -001 send/receive byte
- * ---- -010 read/write byte data
- * ---- -011 read/write word data
- * ---- -100 process call
- * ---- -101 read/write block data
- * ---- -11x <reserved>
- */
 void smbus_device::hst_cmd_w(uint8_t data)
 {
 	hst_cmd = data;
-	// TODO: process commands properly
-	// For now we just reflect sis630 wanting bit 3 on after each transaction
-	if (BIT(data, 4))
-		hst_sts |= 8;
 	logerror("%s: hst_cmd = %02x\n", tag(), hst_cmd);
 }
 
@@ -295,10 +279,4 @@ uint8_t smbus_device::notify_dlow_r()
 uint8_t smbus_device::notify_dhigh_r()
 {
 	return notify_dhigh;
-}
-
-void smbus_device::map_device(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
-									uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
-{
-	io_space->install_device(io_offset, io_window_end, *this, &smbus_device::map);
 }

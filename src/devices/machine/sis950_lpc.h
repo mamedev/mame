@@ -12,7 +12,7 @@
 #include "bus/isa/isa.h"
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "lpc-acpi.h"
-#include "pci-smbus.h"
+#include "sis950_smbus.h"
 
 #include "cpu/i386/i386.h"
 
@@ -77,7 +77,7 @@ private:
 	required_device<ds12885_device> m_rtc;
 	required_device<pc_kbdc_device> m_pc_kbdc;
 	required_device<lpc_acpi_device> m_acpi;
-	required_device<smbus_device> m_smbus;
+	required_device<sis950_smbus_device> m_smbus;
 
 	// PCI interface
 	u8 bios_control_r();
