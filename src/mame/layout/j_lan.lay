@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <!--
+Lite A Nudge
 license:CC0
 -->
 <mamelayout version="2">
@@ -13,13 +14,37 @@ license:CC0
 			<color red="0.95" green="0.95" blue="0.43" />
 		</rect>
 	</element>
-	<element name="reel_bg">
+	<element name="rect_white">
 		<rect>
 			<color red="1.0" green="1.0" blue="1.0"/>
 		</rect>
 	</element>
-	<element name="reel" defstate="0">
-		<reel reelreversed="1" stateoffset="6540" numsymbolsvisible="5" symbollist="1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20">
+	<element name="rect_black">
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0"/>
+		</rect>
+	</element>
+	<element name="text_credits">
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0"/>
+		</rect>
+		<text string="Plays">
+			<color red="1.0" green="1.0" blue="1.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
+		</text>
+	</element>
+	<element name="Reel 1" defstate="0">
+		<reel reelreversed="1" stateoffset="6540" numsymbolsvisible="5" symbollist="Watermelon,Pear,Bell(1),Cherry,Bell,Pear(2),Cherry,Bell(2),Pear,Orange(1),Bell,Grapes,Cherry,Pear(2),Cherry,Orange(2),Pear(1),Bell,Plum,JPM">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</reel>
+	</element>
+	<element name="Reel 2" defstate="0">
+		<reel reelreversed="1" stateoffset="6540" numsymbolsvisible="5" symbollist="Orange,Plum(2),Watermelon,Plum(1),Grapes,Watermelon,Orange,Plum(1),Cherry,Grapes,Plum(2),Pear,Grapes,Watermelon,Bell,Plum(2),Watermelon,Plum(1),Grapes,JPM">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</reel>
+	</element>
+	<element name="Reel 3" defstate="0">
+		<reel reelreversed="1" stateoffset="6540" numsymbolsvisible="5" symbollist="Orange(2),Plum,Cherry,Orange,Cherry,Bell(2),Watermelon,Cherry,Orange(1),Cherry,Orange,Pear(1),Cherry,Pear(2),Plum,Orange(2),Grapes,Cherry,Bell(1),JPM">
 			<color red="0.0" green="0.0" blue="0.0" />
 		</reel>
 	</element>
@@ -30,29 +55,32 @@ license:CC0
 	</element>
 
 	<view name="AWP Simulated Video (No Artwork)">
-		<element ref="reel_bg">
+		<element ref="rect_white">
 			<bounds x="20" y="300" width="30" height="100"/>
 		</element>
-		<element name="sreel1" ref="reel" state="0">
+		<element name="sreel1" ref="Reel 1" state="0">
 			<bounds x="20" y="300" width="30" height="100"/>
 		</element>
-		<element ref="reel_bg">
+		<element ref="rect_white">
 			<bounds x="70" y="300" width="30" height="100"/>
 		</element>
-		<element name="sreel2" ref="reel" state="0">
+		<element name="sreel2" ref="Reel 2" state="0">
 			<bounds x="70" y="300" width="30" height="100"/>
 		</element>
-		<element ref="reel_bg">
+		<element ref="rect_white">
 			<bounds x="120" y="300" width="30" height="100"/>
 		</element>
-		<element name="sreel3" ref="reel" state="0">
+		<element name="sreel3" ref="Reel 3" state="0">
 			<bounds x="120" y="300" width="30" height="100"/>
 		</element>
-		<element name="sreel4" ref="reel" state="0">
-			<bounds x="170" y="300" width="30" height="100"/>
+		<element ref="rect_black">
+			<bounds x="20" y="350" width="150" height="1"/>
 		</element>
-		<element name="digit0" ref="LCD"><bounds x="170" y="350" width="24" height="40" /></element>
-		<element name="digit1" ref="LCD"><bounds x="194" y="350" width="24" height="40" /></element>
+		<element name="digit0" ref="LCD"><bounds x="170" y="390" width="18" height="30" /></element>
+		<element name="digit1" ref="LCD"><bounds x="194" y="390" width="18" height="30" /></element>
+		<element ref="text_credits">
+			<bounds x="170" y="420" width="36" height="15"/>
+		</element>
 		<element name="lamp0" ref="matrixlamp" state="0">
 			<bounds x="0" y="0" width="7" height="7"/>
 		</element>
@@ -64,12 +92,6 @@ license:CC0
 		</element>
 		<element name="lamp3" ref="matrixlamp" state="0">
 			<bounds x="24" y="0" width="7" height="7"/>
-		</element>
-		<element name="lamp4" ref="matrixlamp" state="0">
-			<bounds x="32" y="0" width="7" height="7"/>
-		</element>
-		<element name="lamp5" ref="matrixlamp" state="0">
-			<bounds x="40" y="0" width="7" height="7"/>
 		</element>
 		<element name="lamp6" ref="matrixlamp" state="0">
 			<bounds x="48" y="0" width="7" height="7"/>
@@ -83,65 +105,8 @@ license:CC0
 		<element name="lamp9" ref="matrixlamp" state="0">
 			<bounds x="8" y="8" width="7" height="7"/>
 		</element>
-		<element name="lamp10" ref="matrixlamp" state="0">
-			<bounds x="16" y="8" width="7" height="7"/>
-		</element>
-		<element name="lamp11" ref="matrixlamp" state="0">
-			<bounds x="24" y="8" width="7" height="7"/>
-		</element>
-		<element name="lamp12" ref="matrixlamp" state="0">
-			<bounds x="32" y="8" width="7" height="7"/>
-		</element>
-		<element name="lamp13" ref="matrixlamp" state="0">
-			<bounds x="40" y="8" width="7" height="7"/>
-		</element>
-		<element name="lamp14" ref="matrixlamp" state="0">
-			<bounds x="48" y="8" width="7" height="7"/>
-		</element>
-		<element name="lamp15" ref="matrixlamp" state="0">
-			<bounds x="56" y="8" width="7" height="7"/>
-		</element>
-		<element name="lamp16" ref="matrixlamp" state="0">
-			<bounds x="0" y="16" width="7" height="7"/>
-		</element>
-		<element name="lamp17" ref="matrixlamp" state="0">
-			<bounds x="8" y="16" width="7" height="7"/>
-		</element>
-		<element name="lamp18" ref="matrixlamp" state="0">
-			<bounds x="16" y="16" width="7" height="7"/>
-		</element>
-		<element name="lamp19" ref="matrixlamp" state="0">
-			<bounds x="24" y="16" width="7" height="7"/>
-		</element>
-		<element name="lamp20" ref="matrixlamp" state="0">
-			<bounds x="32" y="16" width="7" height="7"/>
-		</element>
-		<element name="lamp21" ref="matrixlamp" state="0">
-			<bounds x="40" y="16" width="7" height="7"/>
-		</element>
-		<element name="lamp22" ref="matrixlamp" state="0">
-			<bounds x="48" y="16" width="7" height="7"/>
-		</element>
-		<element name="lamp23" ref="matrixlamp" state="0">
-			<bounds x="56" y="16" width="7" height="7"/>
-		</element>
-		<element name="lamp24" ref="matrixlamp" state="0">
-			<bounds x="0" y="24" width="7" height="7"/>
-		</element>
 		<element name="lamp25" ref="matrixlamp" state="0">
 			<bounds x="8" y="24" width="7" height="7"/>
-		</element>
-		<element name="lamp26" ref="matrixlamp" state="0">
-			<bounds x="16" y="24" width="7" height="7"/>
-		</element>
-		<element name="lamp27" ref="matrixlamp" state="0">
-			<bounds x="24" y="24" width="7" height="7"/>
-		</element>
-		<element name="lamp28" ref="matrixlamp" state="0">
-			<bounds x="32" y="24" width="7" height="7"/>
-		</element>
-		<element name="lamp29" ref="matrixlamp" state="0">
-			<bounds x="40" y="24" width="7" height="7"/>
 		</element>
 		<element name="lamp30" ref="matrixlamp" state="0">
 			<bounds x="48" y="24" width="7" height="7"/>
@@ -163,15 +128,6 @@ license:CC0
 		</element>
 		<element name="lamp36" ref="matrixlamp" state="0">
 			<bounds x="32" y="32" width="7" height="7"/>
-		</element>
-		<element name="lamp37" ref="matrixlamp" state="0">
-			<bounds x="40" y="32" width="7" height="7"/>
-		</element>
-		<element name="lamp38" ref="matrixlamp" state="0">
-			<bounds x="48" y="32" width="7" height="7"/>
-		</element>
-		<element name="lamp39" ref="matrixlamp" state="0">
-			<bounds x="56" y="32" width="7" height="7"/>
 		</element>
 		<element name="lamp40" ref="matrixlamp" state="0">
 			<bounds x="0" y="40" width="7" height="7"/>

@@ -1,0 +1,158 @@
+<?xml version="1.0"?>
+<!--
+Nudge Double Up
+license:CC0
+-->
+<mamelayout version="2">
+	<element name="matrixlamp">
+		<rect state ="0">
+			<bounds x="0" y="0" width="7" height="7" />
+			<color red="0.7" green="0.7" blue="0.7" />
+		</rect>
+		<rect state ="1">
+			<bounds x="0" y="0" width="7" height="7" />
+			<color red="0.95" green="0.95" blue="0.43" />
+		</rect>
+	</element>
+	<element name="rect_white">
+		<rect>
+			<color red="1.0" green="1.0" blue="1.0"/>
+		</rect>
+	</element>
+	<element name="rect_black">
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0"/>
+		</rect>
+	</element>
+	<element name="text_credits">
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0"/>
+		</rect>
+		<text string="Plays">
+			<color red="1.0" green="1.0" blue="1.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
+		</text>
+	</element>
+	<element name="Reel 1" defstate="0">
+		<reel reelreversed="1" stateoffset="6540" numsymbolsvisible="5" symbollist="Watermelon,Pear,Bell,Cherry,Bell,Pear,Cherry,Bell,Pear,Orange,Bell,Grapes,Cherry,Pear,Cherry,Orange,Pear,Bell,Plum,JPM">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</reel>
+	</element>
+	<element name="Reel 2" defstate="0">
+		<reel reelreversed="1" stateoffset="6540" numsymbolsvisible="5" symbollist="Orange,Grapes,Watermelon,Plum,Grapes,Watermelon,Orange,Plum,Cherry,Grapes,Plum,Pear,Grapes,Watermelon,Bell,Plum,Watermelon,Plum,Grapes,JPM">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</reel>
+	</element>
+	<element name="Reel 3" defstate="0">
+		<reel reelreversed="1" stateoffset="6540" numsymbolsvisible="5" symbollist="Grapes,Plum,Cherry,Orange,Plum,Bell,Watermelon,Cherry,Orange,Watermelon,Bell,Pear,Cherry,Pear,Plum,Orange,Grapes,Cherry,Bell,JPM">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</reel>
+	</element>
+	<element name="LCD" defstate="0">
+		<led7seg>
+			<color red="0.9" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+
+	<view name="AWP Simulated Video (No Artwork)">
+		<element ref="rect_white">
+			<bounds x="20" y="300" width="30" height="100"/>
+		</element>
+		<element name="sreel1" ref="Reel 1" state="0">
+			<bounds x="20" y="300" width="30" height="100"/>
+		</element>
+		<element ref="rect_white">
+			<bounds x="70" y="300" width="30" height="100"/>
+		</element>
+		<element name="sreel2" ref="Reel 2" state="0">
+			<bounds x="70" y="300" width="30" height="100"/>
+		</element>
+		<element ref="rect_white">
+			<bounds x="120" y="300" width="30" height="100"/>
+		</element>
+		<element name="sreel3" ref="Reel 3" state="0">
+			<bounds x="120" y="300" width="30" height="100"/>
+		</element>
+		<element ref="rect_black">
+			<bounds x="20" y="350" width="150" height="1"/>
+		</element>
+		<element name="digit0" ref="LCD"><bounds x="170" y="390" width="18" height="30" /></element>
+		<element name="digit1" ref="LCD"><bounds x="194" y="390" width="18" height="30" /></element>
+		<element ref="text_credits">
+			<bounds x="170" y="420" width="36" height="15"/>
+		</element>
+		<element name="lamp0" ref="matrixlamp" state="0">
+			<bounds x="0" y="0" width="7" height="7"/>
+		</element>
+		<element name="lamp1" ref="matrixlamp" state="0">
+			<bounds x="8" y="0" width="7" height="7"/>
+		</element>
+		<element name="lamp2" ref="matrixlamp" state="0">
+			<bounds x="16" y="0" width="7" height="7"/>
+		</element>
+		<element name="lamp3" ref="matrixlamp" state="0">
+			<bounds x="24" y="0" width="7" height="7"/>
+		</element>
+		<element name="lamp4" ref="matrixlamp" state="0">
+			<bounds x="32" y="0" width="7" height="7"/>
+		</element>
+		<element name="lamp5" ref="matrixlamp" state="0">
+			<bounds x="40" y="0" width="7" height="7"/>
+		</element>
+		<element name="lamp6" ref="matrixlamp" state="0">
+			<bounds x="48" y="0" width="7" height="7"/>
+		</element>
+		<element name="lamp7" ref="matrixlamp" state="0">
+			<bounds x="56" y="0" width="7" height="7"/>
+		</element>
+		<element name="lamp8" ref="matrixlamp" state="0">
+			<bounds x="0" y="8" width="7" height="7"/>
+		</element>
+		<element name="lamp9" ref="matrixlamp" state="0">
+			<bounds x="8" y="8" width="7" height="7"/>
+		</element>
+		<element name="lamp10" ref="matrixlamp" state="0">
+			<bounds x="16" y="8" width="7" height="7"/>
+		</element>
+		<element name="lamp11" ref="matrixlamp" state="0">
+			<bounds x="24" y="8" width="7" height="7"/>
+		</element>
+		<element name="lamp12" ref="matrixlamp" state="0">
+			<bounds x="32" y="8" width="7" height="7"/>
+		</element>
+		<element name="lamp25" ref="matrixlamp" state="0">
+			<bounds x="8" y="24" width="7" height="7"/>
+		</element>
+		<element name="lamp26" ref="matrixlamp" state="0">
+			<bounds x="16" y="24" width="7" height="7"/>
+		</element>
+		<element name="lamp27" ref="matrixlamp" state="0">
+			<bounds x="24" y="24" width="7" height="7"/>
+		</element>
+		<element name="lamp28" ref="matrixlamp" state="0">
+			<bounds x="32" y="24" width="7" height="7"/>
+		</element>
+		<element name="lamp29" ref="matrixlamp" state="0">
+			<bounds x="40" y="24" width="7" height="7"/>
+		</element>
+		<element name="lamp30" ref="matrixlamp" state="0">
+			<bounds x="48" y="24" width="7" height="7"/>
+		</element>
+		<element name="lamp31" ref="matrixlamp" state="0">
+			<bounds x="56" y="24" width="7" height="7"/>
+		</element>
+		<element name="lamp32" ref="matrixlamp" state="0">
+			<bounds x="0" y="32" width="7" height="7"/>
+		</element>
+		<element name="lamp33" ref="matrixlamp" state="0">
+			<bounds x="8" y="32" width="7" height="7"/>
+		</element>
+		<element name="lamp35" ref="matrixlamp" state="0">
+			<bounds x="24" y="32" width="7" height="7"/>
+		</element>
+		<element name="lamp36" ref="matrixlamp" state="0">
+			<bounds x="32" y="32" width="7" height="7"/>
+		</element>
+	</view>
+</mamelayout>
+
