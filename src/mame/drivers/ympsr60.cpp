@@ -144,12 +144,12 @@ private:
 
 	attoseconds_t cv_handler(attotime const &curtime);
 
-	int m_acia_irq = CLEAR_LINE, m_ym_irq = CLEAR_LINE, m_drvif_irq = CLEAR_LINE, m_ym2154_irq = CLEAR_LINE;
-	u16 m_keyboard_select = 0;
-	u8 m_bbd_config = 0;
-	u8 m_drvif_data[2]{};
-	u8 m_drvif_select = 0;
-	u8 m_sustain_fuzz = 0;
+	int m_acia_irq, m_ym_irq, m_drvif_irq, m_ym2154_irq;
+	u16 m_keyboard_select;
+	u8 m_bbd_config;
+	u8 m_drvif_data[2];
+	u8 m_drvif_select;
+	u8 m_sustain_fuzz;
 
 	WRITE_LINE_MEMBER(write_acia_clock) { m_acia->write_txc(state); m_acia->write_rxc(state); }
 	WRITE_LINE_MEMBER(acia_irq_w) { m_acia_irq = state; recalc_irqs(); }

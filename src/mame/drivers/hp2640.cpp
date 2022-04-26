@@ -244,15 +244,15 @@ protected:
 	required_device<hp2640_tape_device> m_tapes;
 	memory_view m_io_view;
 
-	uint8_t m_mode_byte = 0;
-	bool m_timer_irq = false;
-	bool m_datacom_irq = false;
-	bool m_tape_irq = false;
+	uint8_t m_mode_byte;
+	bool m_timer_irq;
+	bool m_datacom_irq;
+	bool m_tape_irq;
 
 	// Character generators
 	required_region_ptr_array<uint8_t , 4> m_chargen;
 
-	const uint8_t m_chargen_set[ 4 ]{};
+	const uint8_t m_chargen_set[ 4 ];
 
 	// Video DMA
 	struct line_buffer {
@@ -260,27 +260,27 @@ protected:
 		uint8_t m_attrs[ VIDEO_VIS_COLS ];
 	};
 	struct line_buffer m_buffers[ 2 ];
-	bool m_even = false;
-	bool m_dma_on = false;  // U310-9
-	bool m_line_done = false;
-	uint16_t m_dma_addr = 0;
-	uint8_t m_row_counter = 0;
-	bool m_row_clock = false;   // U21-5
-	bool m_row_reset = false;   // U11-1
-	bool m_eop = false; // U311-9
-	bool m_eol = false; // U211-9
-	bool m_skipeol = false; // U311-5
-	bool m_en_skipeol = false;  // U211-5
+	bool m_even;
+	bool m_dma_on;  // U310-9
+	bool m_line_done;
+	uint16_t m_dma_addr;
+	uint8_t m_row_counter;
+	bool m_row_clock;   // U21-5
+	bool m_row_reset;   // U11-1
+	bool m_eop; // U311-9
+	bool m_eol; // U211-9
+	bool m_skipeol; // U311-5
+	bool m_en_skipeol;  // U211-5
 
 	// Video
 	bitmap_rgb32 m_bitmap;
-	uint8_t m_cursor_x = 0;
-	uint8_t m_cursor_y = 0;
-	bool m_cursor_blink_inh = false;
-	bool m_blanking = false;
+	uint8_t m_cursor_x;
+	uint8_t m_cursor_y;
+	bool m_cursor_blink_inh;
+	bool m_blanking;
 
 	// Async line interface
-	uint8_t m_async_control = 0;
+	uint8_t m_async_control;
 
 	void update_irq();
 	uint8_t video_dma_get();
@@ -351,7 +351,7 @@ void hp2640_base_state::machine_reset()
 
 IRQ_CALLBACK_MEMBER(hp2640_base_state::irq_callback)
 {
-	uint8_t res = 0;
+	uint8_t res;
 
 	// Encode interrupts in restart instruction (in order of decreasing priority)
 	if (m_tape_irq) {
@@ -722,7 +722,7 @@ void hp2640_base_state::video_render_buffer(unsigned video_scanline , unsigned l
 		if (BIT(ch , 6)) {
 			BIT_SET(ch_addr, 5);
 		}
-		uint8_t byte = 0;
+		uint8_t byte;
 		if ((ch <= 0x1f || ch >= 0x60) && (chargen_set & CHARGEN_C) == 0) {
 			if (m_chargen[ char_set ].bytes() >= 0x800) {
 				// Read from LC ROM
@@ -737,8 +737,8 @@ void hp2640_base_state::video_render_buffer(unsigned video_scanline , unsigned l
 		} else {
 			byte = 0;
 		}
-		uint16_t pixels_e = 0;
-		uint16_t pixels_o = 0;
+		uint16_t pixels_e;
+		uint16_t pixels_o;
 		bool microvector = chargen_set & CHARGEN_B;
 
 		if (cyen && (line_in_row == 11 || line_in_row == 12) && i == m_cursor_x) {
