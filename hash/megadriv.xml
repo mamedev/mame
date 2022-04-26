@@ -2179,6 +2179,7 @@ ROMs with Region lock listed at https://segaretro.org/Mega_Drive_region_coding#R
 		<description>Dr. Robotnik's Mean Bean Machine (Euro)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-16172-MX"/>  <!-- location not really marked on PCB, using u1 for consistency -->
@@ -2207,6 +2208,7 @@ ROMs with Region lock listed at https://segaretro.org/Mega_Drive_region_coding#R
 		<description>Dragon - The Bruce Lee Story (Euro)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-17028 W87"/>
@@ -2265,6 +2267,7 @@ ROMs with Region lock listed at https://segaretro.org/Mega_Drive_region_coding#R
 		<description>Dune II - Battle for Arrakis (Euro)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-16619-F"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -2395,7 +2398,7 @@ ROMs with Region lock listed at https://segaretro.org/Mega_Drive_region_coding#R
 		<description>Earthworm Jim 2 (Euro)</description>
 		<year>1995</year>
 		<publisher>Virgin Interactive</publisher>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="PAL,NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6570A"/>
 			<feature name="ic1" value="MPR-18589-MX"/>
@@ -14545,6 +14548,7 @@ but dumps still have to be confirmed.
 		<description>Doom Troopers - The Mutant Chronicles (USA)</description>
 		<year>1995</year>
 		<publisher>Playmates Interactive</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="doom troopers - the mutant chronicles (usa).bin" size="2097152" crc="11194414" sha1="aff5e0651fecbc07d718ed3cea225717ce18a7aa"/>
@@ -14606,6 +14610,7 @@ but dumps still have to be confirmed.
 		<description>Double Dragon V - The Shadow Falls (USA)</description>
 		<year>1994</year>
 		<publisher>Tradewest</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom name="double dragon v - the shadow falls (usa).bin" size="3145728" crc="27e59e35" sha1="53402b7c43cd20bf4cbaf40d1ba5062e3823f4bd"/>
@@ -14639,6 +14644,7 @@ but dumps still have to be confirmed.
 		<description>Dr. Robotnik's Mean Bean Machine (USA)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="dr. robotnik's mean bean machine (usa).bin" size="1048576" crc="c7ca517f" sha1="aa6b60103fa92bc95fcc824bf1675e411627c8d3"/>
@@ -14661,6 +14667,7 @@ but dumps still have to be confirmed.
 		<description>Dragon - The Bruce Lee Story (USA)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="dragon - the bruce lee story (usa).bin" size="2097152" crc="efe850e5" sha1="01b45b9865282124253264c5f2e3d3338858ff92"/>
@@ -14809,6 +14816,7 @@ but dumps still have to be confirmed.
 		<description>Dune - The Battle for Arrakis (USA)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U,NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="dune - the battle for arrakis (usa).bin" size="1048576" crc="4dea40ba" sha1="0f7c1c130cb39abc97f57545933e1ef6c481783d"/>
