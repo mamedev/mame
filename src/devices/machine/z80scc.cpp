@@ -2840,7 +2840,6 @@ void z80scc_channel::update_baudtimer()
 
 		if (m_wr15 & WR15_ZEROCOUNT)
 		{
-			printf("Adjusting to %dHz\n", rate);
 			m_baudtimer->adjust(attotime::from_hz(rate), 0, attotime::from_hz(rate));
 		}
 		else
