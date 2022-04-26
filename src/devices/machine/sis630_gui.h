@@ -17,6 +17,7 @@ public:
 	virtual uint8_t mem_r(offs_t offset) override;
 	virtual void mem_w(offs_t offset, uint8_t data) override;
 
+	virtual u8 port_03c0_r(offs_t offset) override;
 	virtual void port_03c0_w(offs_t offset, uint8_t data) override;
 
 protected:

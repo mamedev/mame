@@ -189,6 +189,17 @@ uint16_t sis630_svga_device::offset()
 	return svga_device::offset();
 }
 
+// read by gamecstl BIOS
+u8 sis630_svga_device::port_03c0_r(offs_t offset)
+{
+	if (offset == 0xd)
+		return m_svga_bank_reg_w;
+	if (offset == 0xb)
+		return m_svga_bank_reg_r;
+
+	return 	svga_device::port_03c0_r(offset);
+}
+
 void sis630_svga_device::port_03c0_w(offs_t offset, uint8_t data)
 {
 	// TODO: for '630 it's always with dual segment enabled?
