@@ -71,6 +71,7 @@ ________________________________________________________________________________
 |  YES  | Unknown     | Compumatic       | Compumatic ProSPDP-V3 PCB (Philips REF34VA + REF0096 + REF8032)     | Darts                      |
 |  YES  | Diana Olakoa| Compumatic/Olaoka| Compumatic Microdard-V5 PCB (REF0034 + REF0032 + REF0096)           | Darts                      |
 |  NO   | Champion    | Unknown          | ProSPDP PCB. https://www.recreativas.org/champion-6137-compumatic   | Darts                      |
+|  YES  | Covidarts   | Covielsa         | Not from Compumatic, but similar hardware. 80C31 (ROMless MCU)      | Darts                      |
 |_______|_____________|__________________|_____________________________________________________________________|____________________________|
 
 There's a later revision of the Compumatic Microdar, smaller, with a standard Atmel AT89S51 instead of the REF34 MCU.
@@ -95,6 +96,7 @@ public:
 	void microdar(machine_config &config);
 	void prospdp(machine_config &config);
 	void microdv5(machine_config &config);
+	void covidarts(machine_config &config);
 
 private:
 	void prog_map(address_map &map);
@@ -139,6 +141,14 @@ void microdar_state::microdv5(machine_config &config)
 {
 	microdar(config);
 	m_maincpu->set_clock(16_MHz_XTAL);
+}
+
+void microdar_state::covidarts(machine_config &config)
+{
+	I80C31(config, m_maincpu, 16'000'000); // Philips PCB80C31BH-3-16P (Internal MCU osc.)
+
+	//NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // HM6264ALP-12 + battery
+	I2C_24C04(config, m_eeprom); // Microchip 24LC04B
 }
 
 #define PHILIPS_REF34VA \
@@ -429,10 +439,46 @@ ROM_START(diola827)
 ROM_END
 
 
-GAME(199?, dibifuca, 0,        microdar, microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca (v9.25)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(199?, dibif743, dibifuca, microdar, microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca (v7.43)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(199?, dibif727, dibifuca, microdar, microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca (v7.27)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1997, cfarwest, 0,        microdar, microdar, microdar_state, empty_init, ROT0, "Compumatic",          "Far West (Compumatic)",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1997, prospdp,  0,        prospdp,  microdar, microdar_state, empty_init, ROT0, "Compumatic",          "unknown Compumatic ProSPDP based darts machine", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1997, diolakoa, 0,        microdv5, microdar, microdar_state, empty_init, ROT0, "Compumatic / Olakoa", "Diana Olakoa (v8.38)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1997, diola827, diolakoa, microdv5, microdar, microdar_state, empty_init, ROT0, "Compumatic / Olakoa", "Diana Olakoa (v8.27)",                           MACHINE_IS_SKELETON_MECHANICAL)
+/* Covielsa "Covidart".
+   Very similar to Compumatic hardware, but using a MCU without internal ROM and a slightly different PCB.
+
+ PCB labeled as "0095" (same text as on EPROM label).
+  ______________________________________________________________________________
+ |  ooooo oooooo oo OOOOOO  ····  ooooooooooooooo                             _|_
+ |                     __   __   __ <- H606014                               |   |
+ |     PALCE16V8H-25->| |  |_|  |_|  ________  ________   ________ ________  |   |
+ |                    | | 24LC04B   |ULN2803A |ULN2803A  HEF4094BP TD62783AP |   |
+74HC273N    74HC273N  |_|     _____  __  __  __           ________ ________  |   |
+ | __  __  __  __  ____      |    | | | | | | |          HEF4094BP TD62783AP |   | 
+ || | | | | | | | |   | _____80C31| | | | | | |           ________ ________  |   |
+ || | | | | | | | EPROM|    ||    | |_| |_| |_|          HEF4094BP TD62783AP |   |
+ ||_| |_| |_| |_| |   ||    ||    | 3 x 74HC273N          ________ ________  |   |
+ |  2 x 74HC244N  |   ||    ||    |      ______          HEF4094BP TD62783AP |   |
+ |                |   ||    ||    |     | BATT|        ___________           |   |
+ |                |___||____||____|     |_____|       |MC14514BCP|           |   |
+ |                   HM6264ALP-12                     |__________|    0095   |   |
+ |  oooooooooo ooooooooo ooooooooooooooooooo           OO      OOO           |___|
+ |_____CN7________CN8_________CN9_____________________CN10_____CN11_____________|
+
+  MCU: Philips PCB80C31BH-3-16P
+*/
+ROM_START(covidarts)
+	ROM_REGION(0x20000, "maincpu", 0)
+	ROM_LOAD("eprom_095.ic3", 0x00000, 0x20000, CRC(e42172f8) SHA1(667e2a79517af4e8344f8dccf12b83f7788841e3))
+
+	ROM_REGION(0x200, "eeprom", 0)
+	ROM_LOAD("24lc04.ic6", 0x000, 0x200, NO_DUMP) // Microchip 24LC04B
+
+	ROM_REGION(0x117, "plds", 0)
+	ROM_LOAD("palce16v8h-25.ic7", 0x000, 0x117, BAD_DUMP CRC(3a35a751) SHA1(e39fc8784d94ff09e0ff814f469ce23e52bb35fd)) // Bruteforced and verified OK
+ROM_END
+
+
+GAME(199?, dibifuca,  0,        microdar,  microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca (v9.25)",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(199?, dibif743,  dibifuca, microdar,  microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca (v7.43)",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(199?, dibif727,  dibifuca, microdar,  microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca (v7.27)",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1997, cfarwest,  0,        microdar,  microdar, microdar_state, empty_init, ROT0, "Compumatic",          "Far West (Compumatic)",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1997, prospdp,   0,        prospdp,   microdar, microdar_state, empty_init, ROT0, "Compumatic",          "unknown Compumatic ProSPDP based darts machine", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1997, diolakoa,  0,        microdv5,  microdar, microdar_state, empty_init, ROT0, "Compumatic / Olakoa", "Diana Olakoa (v8.38)",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1997, diola827,  diolakoa, microdv5,  microdar, microdar_state, empty_init, ROT0, "Compumatic / Olakoa", "Diana Olakoa (v8.27)",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1997, covidarts, 0,        covidarts, microdar, microdar_state, empty_init, ROT0, "Covielsa",            "Covidarts",                                      MACHINE_IS_SKELETON_MECHANICAL)
