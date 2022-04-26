@@ -21,7 +21,8 @@
     - Either move gamecstl.cpp to here or convert that driver to reuse the base interface
       declared here.
 	  \- Currently black screens before booting normal Windows, reading $5004 from the LPC ACPI
-	    (flip EAX to non-zero to bypass);
+	    (flip EAX to non-zero to bypass).
+		 NB: it also writes to $5048 once (devtrap_en_w), which should generate a SMI# event;
       \- Doesn't accept any PS/2 input, tries to install a "PCI standard CPU Host Bridge" (?),
 	     hangs there;
 
