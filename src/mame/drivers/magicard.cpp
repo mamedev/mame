@@ -32,7 +32,8 @@
   * Magic Card (set 1),                         Impera, 199?.
   * Magic Card (set 2),                         Impera, 199?.
   * Magic Card (set 3),                         Impera, 199?.
-  * Magic Card Export 94,                       Impera, 1994.
+  * Magic Card Export 94 (set 1),               Impera, 1994.
+  * Magic Card Export 94 (set 2),               Impera, 1994.
   * Magic Export (V.211A),                      Impera, 1994.
   * Magic Card Jackpot (4.01),                  Impera, 1998.
   * Magic Card - Wien (Sicherheitsversion 1.2), Impera, 1993.
@@ -799,7 +800,7 @@ ROM_END
 
 /*
   Magic Card Export 94
-  International Ver. 2.11a
+  International Ver. 2.11a (set 1)
   Vnr.29.07.94    CHECKSUM: A63D
 
   1x Philips SCC66470CAB 383610
@@ -817,7 +818,36 @@ ROM_END
 */
 ROM_START( magicarde )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
-	ROM_LOAD16_WORD_SWAP( "27c4002.ic21", 0x00000, 0x80000, CRC(b5f24412) SHA1(73ff05c19132932a419fef0d5dc985440ce70e83) )
+	ROM_LOAD16_WORD_SWAP( "27c4002_a63d.ic21", 0x00000, 0x80000, CRC(b5f24412) SHA1(73ff05c19132932a419fef0d5dc985440ce70e83) )
+
+	ROM_REGION( 0x2000, "pic16c54", 0 )  // decapped
+	ROM_LOAD("pic16c54.ic29",   0x0000, 0x1fff, CRC(9c225a49) SHA1(249c12d23d1a85de828652c55a1a19ef8ec378ef) )
+
+	ROM_REGION( 0x0100, "sereeprom", 0 )  // Serial EPROM
+	ROM_LOAD("st24c02.ic26",    0x0000, 0x0100, CRC(98287c67) SHA1(ad34e55c1ce4f77c27049dac88050ed3c94af1a0) )
+ROM_END
+
+/*
+  Magic Card Export 94
+  International Ver. 2.11a (set 2)
+  Vnr.29.07.94    CHECKSUM: 9505
+
+  1x Philips SCC66470CAB 383610
+  1x Philips SCC68070 CCA84 347141
+  1x ESI1 I9631
+  1x MUSIC TR9C1710-11PCA SA121X/9617
+  1x YAMAHA YM2149F 9614
+
+  XTAL:
+
+  Q1: 19.6608 Mhz
+  Q2: 30.000 Mhz
+  Q3: 3686.400  1Q08/95
+
+*/
+ROM_START( magicardea )
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
+	ROM_LOAD16_WORD_SWAP( "27c4002_9505.ic21", 0x00000, 0x80000, CRC(24c69c01) SHA1(0928800b9cfc2ae358f90b3f79c08acd2b2aa7d8) )
 
 	ROM_REGION( 0x2000, "pic16c54", 0 )  // decapped
 	ROM_LOAD("pic16c54.ic29",   0x0000, 0x1fff, CRC(9c225a49) SHA1(249c12d23d1a85de828652c55a1a19ef8ec378ef) )
@@ -1675,22 +1705,23 @@ void magicard_state::init_magicard()
 *                Game Drivers                *
 *********************************************/
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT    COMPANY      FULLNAME                                     FLAGS
-GAME( 199?, magicard,  0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card (set 1)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 199?, magicarda, magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card (set 2)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 199?, magicardb, magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card (set 3)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1994, magicarde, magicard, hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card Export 94",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1994, magicardf, magicard, hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Export (V.211A)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1998, magicardj, 0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card III Jackpot (4.01)",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1993, magicardw, magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card - Wien (Sicherheitsversion 1.2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2001, magicle,   0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Lotto Export (5.03)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2002, hotslots,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Hot Slots (6.00)",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1999, quingo,    0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Quingo Export (5.00)",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1999, belslots,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Bel Slots Export (5.01)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2001, bigdeal0,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Big Deal Belgien (5.04)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 199?, puzzleme,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Puzzle Me!",                                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 199?, unkte06,   0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera",    "unknown Poker 'TE06'",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // strings in ROM
-GAME( 199?, lucky7i,   0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Lucky 7 (Impera)",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1993, unkpkr_w,  0,        magicard, magicard, magicard_state, init_magicard, ROT0, "<unknown>", "unknown Poker 'W'",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1993, dallaspk,  0,        magicard, magicard, magicard_state, init_magicard, ROT0, "<unknown>", "Dallas Poker",                               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1993, kajotcrd,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Amatic",    "Kajot Card (Version 1.01, Wien Euro)",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME        PARENT    MACHINE   INPUT     STATE           INIT           ROT    COMPANY      FULLNAME                                     FLAGS
+GAME( 199?, magicard,   0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card (set 1)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, magicarda,  magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card (set 2)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, magicardb,  magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card (set 3)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1994, magicarde,  magicard, hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card Export 94 (set 1)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1994, magicardea, magicard, hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card Export 94 (set 2)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1994, magicardf,  magicard, hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Export (V.211A)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1998, magicardj,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card III Jackpot (4.01)",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1993, magicardw,  magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card - Wien (Sicherheitsversion 1.2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2001, magicle,    0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Lotto Export (5.03)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2002, hotslots,   0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Hot Slots (6.00)",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, quingo,     0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Quingo Export (5.00)",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, belslots,   0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Bel Slots Export (5.01)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2001, bigdeal0,   0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Big Deal Belgien (5.04)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, puzzleme,   0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Puzzle Me!",                                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, unkte06,    0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera",    "unknown Poker 'TE06'",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // strings in ROM
+GAME( 199?, lucky7i,    0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Lucky 7 (Impera)",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1993, unkpkr_w,   0,        magicard, magicard, magicard_state, init_magicard, ROT0, "<unknown>", "unknown Poker 'W'",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1993, dallaspk,   0,        magicard, magicard, magicard_state, init_magicard, ROT0, "<unknown>", "Dallas Poker",                               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1993, kajotcrd,   0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Amatic",    "Kajot Card (Version 1.01, Wien Euro)",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
