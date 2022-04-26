@@ -34,7 +34,7 @@ sis5513_ide_device::sis5513_ide_device(const machine_config &mconfig, const char
 	, m_irq_pri_callback(*this)
 	, m_irq_sec_callback(*this)
 {
-	// IDE controller with 0xd0 as programming i/f ATA Host Adapters standard
+	// IDE controller with 0xd0 as programming i/f "ATA Host Adapters standard"
 	set_ids(0x10395513, 0xd0, 0x010100, 0x00);
 }
 

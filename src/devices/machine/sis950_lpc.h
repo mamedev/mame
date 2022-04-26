@@ -21,7 +21,7 @@
 #include "machine/at_keybc.h"
 #include "machine/ds128x.h"
 #include "machine/ins8250.h"
-//#include "machine/intelfsh.h"
+#include "machine/intelfsh.h"
 #include "machine/pc_lpt.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
@@ -61,11 +61,12 @@ protected:
 
 	virtual void config_map(address_map &map) override;
 	
-	void memory_map(address_map &map);
+	template <unsigned N> void memory_map(address_map &map);
 	void io_map(address_map &map);
 	
 private:
 	required_device<cpu_device> m_host_cpu;
+	required_device<amd_29lv200t_device> m_flash_rom;
 	required_device<pic8259_device> m_pic_master;
 	required_device<pic8259_device> m_pic_slave;
 	required_device<am9517a_device> m_dmac_master;
@@ -74,7 +75,7 @@ private:
 	required_device<isa16_device> m_isabus;
 	required_device<ps2_keyboard_controller_device> m_keybc;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<ds12885_device> m_rtc;
+	required_device<ds12885ext_device> m_rtc;
 	required_device<pc_kbdc_device> m_pc_kbdc;
 	required_device<lpc_acpi_device> m_acpi;
 	required_device<sis950_smbus_device> m_smbus;
@@ -90,6 +91,11 @@ private:
 	void init_enable_w(u8 data);
 	u8 keybc_reg_r();
 	void keybc_reg_w(u8 data);
+	u8 rtc_reg_r();
+	void rtc_reg_w(u8 data);
+	void rtc_index_w(u8 data);
+	u8 rtc_data_r();
+	void rtc_data_w(u8 data);
 	u8 unmap_log_r(offs_t offset);
 	void unmap_log_w(offs_t offset, u8 data);
 	
@@ -98,6 +104,8 @@ private:
 	u16 m_acpi_base = 0x0000;
 	u8 m_init_reg = 0;
 	u8 m_keybc_reg = 0;
+	u8 m_rtc_reg = 0;
+	u8 m_rtc_index = 0;
 
 	// LPC vendor specific, verify if it's common for all
 	u8 lpc_fast_init_r();

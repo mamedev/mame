@@ -110,9 +110,9 @@ void sis630_state::sis630(machine_config &config)
 //	"pci:09.0" IEEE1394 controller (vendor=1033 NEC device=00ce uPD72872 / μPD72872)
 
 	// TODO: 3 expansion PCI slots (PC104+)
-	// "pci:09.x" to "pci:12.x"
+	// "pci:09.x" to "pci:12.x"?
 	// (PIC-MG)
-	// "pci:20.x" to "pci:17.x"
+	// "pci:20.x" to "pci:17.x"?
 
 	// TODO: 1 parallel + 2 serial ports
 	// TODO: 1 game port
@@ -124,7 +124,7 @@ void sis630_state::sis630(machine_config &config)
 }
 
 ROM_START(shutms11)
-	ROM_REGION32_LE(0x40000, "pci:01.0", 0)
+	ROM_REGION32_LE(0x40000, "pci:01.0:flash", 0)
 	ROM_SYSTEM_BIOS(0, "ms11s11d", "ms11s11d")
 	ROMX_LOAD( "ms11s11d.bin",     0x000000, 0x040000, CRC(27077a58) SHA1(32327ebf328cb0c2dec819c3710acc83527803c5), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "ms11s134", "ms11s134")

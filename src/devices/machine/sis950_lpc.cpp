@@ -52,6 +52,7 @@ DEFINE_DEVICE_TYPE(SIS950_LPC, sis950_lpc_device, "sis950_lpc", "SiS 950 LPC Sup
 sis950_lpc_device::sis950_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, SIS950_LPC, tag, owner, clock)
 	, m_host_cpu(*this, finder_base::DUMMY_TAG)
+	, m_flash_rom(*this, "flash")
 	, m_pic_master(*this, "pic_master")
 	, m_pic_slave(*this, "pic_slave")
 	, m_dmac_master(*this, "dmac_master")
@@ -96,6 +97,7 @@ void sis950_lpc_device::device_reset()
 	m_cur_eop = false;
 	m_dma_high_byte = 0;
 	m_init_reg = 0;
+	m_rtc_reg = 0x10;
 
 	m_lpc_legacy.fast_init = 0;
 	remap_cb();
@@ -117,6 +119,10 @@ WRITE_LINE_MEMBER(sis950_lpc_device::cpu_reset_w)
 
 void sis950_lpc_device::device_add_mconfig(machine_config &config)
 {
+	// TODO: unknown flash ROM type
+	// Needs a $40000 sized ROM
+	AMD_29LV200T(config, m_flash_rom);
+
 	// confirmed 82C54
 	PIT8254(config, m_pit, 0);
 	m_pit->set_clk<0>(4772720/4); // heartbeat IRQ
@@ -160,6 +166,7 @@ void sis950_lpc_device::device_add_mconfig(machine_config &config)
 	m_dmac_slave->out_dack_callback<2>().set(FUNC(sis950_lpc_device::pc_dack6_w));
 	m_dmac_slave->out_dack_callback<3>().set(FUNC(sis950_lpc_device::pc_dack7_w));
 
+	// Confirmed 82C59s
 	PIC8259(config, m_pic_master, 0);
 	m_pic_master->out_int_callback().set_inputline(m_host_cpu, 0);
 	m_pic_master->in_sp_callback().set_constant(1);
@@ -222,8 +229,9 @@ void sis950_lpc_device::device_add_mconfig(machine_config &config)
 	m_keybc->aux_clk().set(aux_con, FUNC(pc_kbdc_device::clock_write_from_mb));
 	m_keybc->aux_data().set(aux_con, FUNC(pc_kbdc_device::data_write_from_mb));
 
-	// TODO: unconfirmed RTC type
-	DS12885(config, m_rtc);
+	// TODO: unknown RTC type
+	// Has external RTC bank select at $48, using this one as convenience
+	DS12885EXT(config, m_rtc, XTAL(32'768));
 	m_rtc->irq().set(m_pic_slave, FUNC(pic8259_device::ir0_w));
 	m_rtc->set_century_index(0x32);
 
@@ -244,7 +252,7 @@ void sis950_lpc_device::config_map(address_map &map)
 	map(0x45, 0x45).rw(FUNC(sis950_lpc_device::flash_ctrl_r), FUNC(sis950_lpc_device::flash_ctrl_w));
 	map(0x46, 0x46).rw(FUNC(sis950_lpc_device::init_enable_r), FUNC(sis950_lpc_device::init_enable_w));
 	map(0x47, 0x47).rw(FUNC(sis950_lpc_device::keybc_reg_r), FUNC(sis950_lpc_device::keybc_reg_w));
-//	map(0x48, 0x48) RTC control
+	map(0x48, 0x48).rw(FUNC(sis950_lpc_device::rtc_reg_r), FUNC(sis950_lpc_device::rtc_reg_w));
 
 	// DMA control regs
 //	map(0x49, 0x49) Distributed DMA channel enable
@@ -332,8 +340,8 @@ void sis950_lpc_device::init_enable_w(u8 data)
 	// HW fast reset
 	// TODO: is 0->1 implementation correct?
 	// it will otherwise keep resetting itself, which may be a side effect of something else
-	// (PS/2 controller can intercept this?)
-	if ((data & 0xc0) == 0xc0 && (m_init_reg & 0xc0) == 0)
+	// (perhaps PS/2 controller can intercept this? Or it's a full on LPC reset like using an actual MAME soft reset implies?)
+	if ((data & 0xc0) == 0xc0)// && (m_init_reg & 0xc0) == 0)
 	{
 		const int fast_reset_time = BIT(data, 3) ? 6 : 2;
 		LOGIO("Fast reset issued\n");
@@ -365,6 +373,25 @@ void sis950_lpc_device::keybc_reg_w(u8 data)
 	m_keybc_reg = data;
 }
 
+u8 sis950_lpc_device::rtc_reg_r()
+{
+	LOGIO("Read RTC register [$48] %02x\n", m_keybc_reg);
+	return m_rtc_reg | 0x10;
+}
+
+/*
+ * x--- ---- RTC extended bank enable
+ * -x-- ---- APC enable
+ * --x- ---- Instant Power-Off enable (thru APC)
+ * ---x ---- Internal RTC status (r/o, always on?)
+ * ---- xxxx <reserved>
+ */
+void sis950_lpc_device::rtc_reg_w(u8 data)
+{
+	LOGIO("Write RTC register [$48] %02x\n", data);
+	m_rtc_reg = data;
+}
+
 u8 sis950_lpc_device::acpi_base_r()
 {
 	LOGIO("Read ACPI base [$75] %04x\n", m_acpi_base);
@@ -379,9 +406,12 @@ void sis950_lpc_device::acpi_base_w(u8 data)
 	remap_cb();
 }
 
-void sis950_lpc_device::memory_map(address_map &map)
+template <unsigned N> void sis950_lpc_device::memory_map(address_map &map)
 {
-//	map(0x00000000, 0x0003ffff).r(m_flash_rom, FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
+	map(0x00000000, 0x0001ffff).lrw8(
+		NAME([this] (offs_t offset) { return m_flash_rom->read(offset | N * 0x20000); }),
+		NAME([this] (offs_t offset, u8 data) { m_flash_rom->write(offset | N * 0x20000, data); })
+	);
 }
 
 void sis950_lpc_device::io_map(address_map &map)
@@ -399,7 +429,8 @@ void sis950_lpc_device::io_map(address_map &map)
 	// undocumented but read, assume LPC complaint
 	map(0x0064, 0x0064).rw(m_keybc, FUNC(ps2_keyboard_controller_device::status_r), FUNC(ps2_keyboard_controller_device::command_w));
 	// map(0x0070, 0x0070) CMOS and NMI Mask
-	map(0x0070, 0x007f).rw(m_rtc, FUNC(ds12885_device::read), FUNC(ds12885_device::write));
+	map(0x0070, 0x0070).w(FUNC(sis950_lpc_device::rtc_index_w));
+	map(0x0071, 0x0071).rw(FUNC(sis950_lpc_device::rtc_data_r), FUNC(sis950_lpc_device::rtc_data_w));
 	// map(0x0080, 0x008f) DMA low page registers
 	map(0x0080, 0x008f).rw(FUNC(sis950_lpc_device::at_page8_r), FUNC(sis950_lpc_device::at_page8_w));
 	// map(0x0092, 0x0092) INIT and A20
@@ -489,14 +520,18 @@ void sis950_lpc_device::map_extra(uint64_t memory_window_start, uint64_t memory_
 	// TODO: disable flash access write thru reg $45
 	// TODO: BIOS positive decode (?)
 
-	memory_space->install_ram(0x000e0000, 0x000fffff, m_region->base() + 0x20000);
+	memory_space->install_device(0x000e0000, 0x000fffff, *this, &sis950_lpc_device::memory_map<1>);
 	// extended BIOS enable
 	if (m_bios_control & 1)
 	{
 		LOGMAP("- Extend BIOS on\n");
-		memory_space->install_ram(0xfffc0000, 0xfffdffff, m_region->base());
+		memory_space->install_device(0xfffc0000, 0xfffdffff, *this, &sis950_lpc_device::memory_map<0>);
+
+	//	memory_space->install_ram(0xfffc0000, 0xfffdffff, m_region->base());
 	}
-	memory_space->install_ram(0xfffe0000, 0xffffffff, m_region->base() + 0x20000);
+//	memory_space->install_ram(0xfffe0000, 0xffffffff, m_region->base() + 0x20000);
+	memory_space->install_device(0xfffe0000, 0xffffffff, *this, &sis950_lpc_device::memory_map<1>);
+
 }
 
 u8 sis950_lpc_device::lpc_fast_init_r()
@@ -595,6 +630,24 @@ void sis950_lpc_device::nmi_control_w(uint8_t data)
 	m_channel_check = BIT(data, 3);
 	if (m_channel_check)
 		m_host_cpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+void sis950_lpc_device::rtc_index_w(uint8_t data)
+{
+	m_rtc_index = data & 0x7f;
+	// bit 7: NMI enable
+}
+
+u8 sis950_lpc_device::rtc_data_r()
+{
+	const u8 rtc_address = m_rtc_index | (m_rtc_reg & 0x80);
+	return m_rtc->read_direct(rtc_address);
+}
+
+void sis950_lpc_device::rtc_data_w(u8 data)
+{
+	const u8 rtc_address = m_rtc_index | (m_rtc_reg & 0x80);
+	m_rtc->write_direct(rtc_address, data);
 }
 
 uint8_t sis950_lpc_device::at_page8_r(offs_t offset)
