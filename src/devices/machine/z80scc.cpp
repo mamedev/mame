@@ -136,14 +136,8 @@ baud rate:
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
-/* LOCAL _BRG is set in z80scc.h, local timer based BRG is not complete and will be removed if not needed for synchrounous mode */
-#if Z80SCC_USE_LOCAL_BRG
-#define START_BIT_HUNT 1
-#define START_BIT_ADJUST 1
-#else
 #define START_BIT_HUNT 0
 #define START_BIT_ADJUST 0
-#endif
 
 #define CHANA_TAG   "cha"
 #define CHANB_TAG   "chb"
@@ -1078,8 +1072,7 @@ void z80scc_channel::device_start()
 	m_rxc   = 0x00;
 	m_txc   = 0x00;
 
-	// baudrate clocks and timers
-	m_baudtimer = timer_alloc(TIMER_ID_BAUD);
+	m_baudtimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z80scc_channel::brg_tick), this));
 
 	// state saving
 	save_item(NAME(m_rr0));
@@ -1192,33 +1185,10 @@ void z80scc_channel::device_reset()
 	m_brg_counter = 0;
 }
 
-void z80scc_channel::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(z80scc_channel::brg_tick)
 {
-//  LOG("%s %d\n", FUNCNAME, id);
-
-
-	switch(id)
-	{
-	case TIMER_ID_BAUD:
-		{
-			if (m_wr14 & WR14_BRG_ENABLE)
-			{
-#if Z80SCC_USE_LOCAL_BRG
-				txc_w(m_brg_counter & 1);
-				rxc_w(m_brg_counter & 1);
-#endif
-				m_brg_counter++; // Will just keep track of state in timer mode, not hardware counter value.
-
-				if (m_wr15 & WR15_ZEROCOUNT)
-					m_uart->trigger_interrupt(m_index, INT_EXTERNAL);
-			}
-			update_baudtimer();
-		}
-		break;
-	default:
-		logerror("Spurious timer %d event\n", id);
-		break;
-	}
+	// wr15 & WR15_ZEROCOUNT is implied by this timer being running at all
+	m_uart->trigger_interrupt(m_index, INT_EXTERNAL);
 }
 
 
@@ -1618,14 +1588,6 @@ uint8_t z80scc_channel::do_sccreg_rr7()
 	}
 	return m_rr3;
 }
-
-#if 0 // Short cutted in control_read()
-/* RR8 is the Receive Data register. */
-uint8_t z80scc_channel::do_sccreg_rr8()
-{
-	return data_read():
-}
-#endif
 
 /* (ESCC and 85C30 Only)
  On the ESCC, Read Register 9 reflects the contents of Write Register 3 provided the Extended
@@ -2290,14 +2252,6 @@ void z80scc_channel::do_sccreg_wr14(uint8_t data)
 	{
 		brg_change = true;
 		LOG("%s: Misc Control Bits Baudrate generator enabled with %s source\n", FUNCNAME, (data & WR14_BRG_SOURCE) ? "PCLK" : "external clock");
-		if (data & WR14_BRG_SOURCE) // Do we use the PCLK as baudrate source
-		{
-#if Z80SCC_USE_LOCAL_BRG
-#if START_BIT_HUNT
-			m_rcv_mode = RCV_SEEKING;
-#endif
-#endif
-		}
 	}
 	else if ( (m_wr14 & WR14_BRG_ENABLE) && !(data & WR14_BRG_ENABLE) ) // baud rate generator being disabled?
 	{
@@ -2332,7 +2286,13 @@ void z80scc_channel::do_sccreg_wr15(uint8_t data)
 	LOG("CTS ints           : %s\n", data & WR15_CTS         ? WR15EN : "disabled");
 	LOG("Tx underr./EOM ints: %s\n", data & WR15_TX_EOM      ? WR15NO : "disabled");
 	LOG("Break/Abort ints   : %s\n", data & WR15_BREAK_ABORT ? WR15NO : "disabled");
+
+	const bool old_reg = m_wr15;
 	m_wr15 = data;
+	if ((old_reg & WR15_ZEROCOUNT) != (m_wr15 & WR15_ZEROCOUNT))
+	{
+		update_baudtimer();
+	}
 }
 
 void z80scc_channel::scc_register_write(uint8_t reg, uint8_t data)
@@ -2773,34 +2733,7 @@ void z80scc_channel::sync_w(int state)
 //-------------------------------------------------
 void z80scc_channel::rxc_w(int state)
 {
-/* Support for external clock as source for BRG yet to be finished */
-#if 0
-	//LOG("Receiver Clock Pulse\n");
-	if ( ((m_wr3 & WR3_RX_ENABLE) | (m_wr5 & WR5_TX_ENABLE)) && m_wr14 & WR14_BRG_ENABLE)
-	{
-		if (!(m_wr14 & WR14_BRG_SOURCE)) // Is the Baud rate Generator driven by RTxC?
-		{
-			printf("x");
-			if (!m_brg_counter) // Zero crossing?!
-			{
-				printf(".");
-				m_brg_counter =  m_wr13 << 8 | m_wr12; // Reload BRG counter
-				if ((m_wr11 & WR11_TRACLK_SRC_MASK) == WR11_TRACLK_SRC_BR) // Is transmitt clock driven by BRG?
-				{
-					printf("+");
-					txc_w(state);
-				}
-			}
-			else
-			{
-				m_brg_counter--;
-				if ((m_wr11 & WR11_RCVCLK_SRC_MASK) == WR11_RCVCLK_SRC_BR) // Is receive clock driven by BRG and not zero cross
-					return;
-			}
-		}
-	}
-#endif
-
+	/* Support for external clock as source for BRG has not been added */
 	if (m_wr3 & WR3_RX_ENABLE)
 	{
 		int clocks = get_clock_mode();
@@ -2904,7 +2837,15 @@ void z80scc_channel::update_baudtimer()
 			unsigned int source = (m_index == z80scc_device::CHANNEL_A) ? m_uart->m_rxca : m_uart->m_rxcb;
 			rate = source / (brg_const == 0 ? 1 : brg_const);
 		}
-		m_baudtimer->adjust(attotime::from_hz(rate));
+
+		if (m_wr15 & WR15_ZEROCOUNT)
+		{
+			m_baudtimer->adjust(attotime::from_hz(rate), 0, attotime::from_hz(rate));
+		}
+		else
+		{
+			m_baudtimer->adjust(attotime::never);
+		}
 	}
 	else
 	{
