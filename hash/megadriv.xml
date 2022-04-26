@@ -251,7 +251,7 @@ ROMs with Region lock listed at https://segaretro.org/Mega_Drive_region_coding#R
 		<year>1993</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="T-15056-50"/>
-		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-16603-MX"/>  <!-- location not really marked on PCB, using u1 for consistency -->
@@ -267,6 +267,7 @@ ROMs with Region lock listed at https://segaretro.org/Mega_Drive_region_coding#R
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="T-15166-50"/>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-17303"/>
@@ -2432,6 +2433,7 @@ ROMs with Region lock listed at https://segaretro.org/Mega_Drive_region_coding#R
 		<description>Ecco - The Tides of Time (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-17064-H"/>
@@ -2547,6 +2549,7 @@ ROMs with Region lock listed at https://segaretro.org/Mega_Drive_region_coding#R
 		<description>Eternal Champions (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6570A"/>
 			<feature name="ic1" value="MPR-16212-SM"/>
@@ -2564,6 +2567,7 @@ ROMs with Region lock listed at https://segaretro.org/Mega_Drive_region_coding#R
 		<description>Eternal Champions (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6570A"/>
 			<feature name="ic1" value="MPR-16047-T"/>
@@ -2633,6 +2637,7 @@ ROMs with Region lock listed at https://segaretro.org/Mega_Drive_region_coding#R
 		<description>Exo Squad (USA)</description>
 		<year>1995</year>
 		<publisher>Playmates Interactive</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="800057-02"/>
 			<feature name="ic1" value="MPR-17992-F"/>
@@ -2696,6 +2701,7 @@ ROMs with Region lock listed at https://segaretro.org/Mega_Drive_region_coding#R
 		<description>F-15 Strike Eagle II (USA)</description>
 		<year>1993</year>
 		<publisher>Microprose</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-15919-MX"/>  <!-- location not really marked on PCB, using u1 for consistency -->
@@ -3057,6 +3063,7 @@ ROMs with Region lock listed at https://segaretro.org/Mega_Drive_region_coding#R
 		<description>Flashback - The Quest for Identity (USA)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-15463-T"/>
@@ -3147,6 +3154,7 @@ ROMs with Region lock listed at https://segaretro.org/Mega_Drive_region_coding#R
 		<description>Fun 'N Games (Euro)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-17016 T69"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -3407,7 +3415,7 @@ ROMs with Region lock listed at https://segaretro.org/Mega_Drive_region_coding#R
 		<description>Gods (Euro)</description>
 		<year>1993</year>
 		<publisher>Accolade</publisher>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="PAL,NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="ACSGPC291 REV.B"/>
 			<feature name="ic1" value="ACGOSG"/>
@@ -3429,6 +3437,7 @@ ROMs with Region lock listed at https://segaretro.org/Mega_Drive_region_coding#R
 		<description>Greatest Heavyweights (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_eeprom_mode1"/>
 			<feature name="pcb" value="171-6584A"/>
@@ -3448,6 +3457,7 @@ ROMs with Region lock listed at https://segaretro.org/Mega_Drive_region_coding#R
 		<description>Greatest Heavyweights (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_eeprom_mode1"/>
 			<feature name="pcb" value="171-6584A"/>
@@ -3958,6 +3968,7 @@ ROMs with Region lock listed at https://segaretro.org/Mega_Drive_region_coding#R
 		<info name="serial" value="G-5526"/>
 		<info name="release" value="19930618"/>
 		<info name="alt_title" value="Jリーグ・オフィシャルTVゲームプロストライカー ~ J.League Pro Striker (Box)"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="?? (Sega)"/>
 			<feature name="ic1" value="MPR-15554A W13"/>
@@ -4278,6 +4289,7 @@ ROMs with Region lock listed at https://segaretro.org/Mega_Drive_region_coding#R
 		<description>Jurassic Park (Euro)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-15679-U"/>
@@ -4295,6 +4307,7 @@ ROMs with Region lock listed at https://segaretro.org/Mega_Drive_region_coding#R
 		<info name="serial" value="G-4109"/>
 		<info name="release" value="19930827"/>
 		<info name="alt_title" value="ジュラシック・パーク"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-15767 W36"/>
@@ -4309,6 +4322,7 @@ ROMs with Region lock listed at https://segaretro.org/Mega_Drive_region_coding#R
 		<description>Jurassic Park (USA)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-15656-SM"/>
@@ -4494,6 +4508,7 @@ ROMs with Region lock listed at https://segaretro.org/Mega_Drive_region_coding#R
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="alt_title" value="Landstalker (Box)"/>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<feature name="pcb" value="171-6278A"/>
@@ -4614,7 +4629,7 @@ ROMs with Region lock listed at https://segaretro.org/Mega_Drive_region_coding#R
 		<description>Lethal Enforcers (USA)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
-		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<sharedfeat name="compatibility" value="NTSC-U,NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353490"/>
 			<feature name="u1" value="FV008A1"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -4644,6 +4659,7 @@ ROMs with Region lock listed at https://segaretro.org/Mega_Drive_region_coding#R
 		<description>Light Crusader (Euro)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<feature name="pcb" value="171-6278A"/>
@@ -4818,6 +4834,7 @@ ROMs with Region lock listed at https://segaretro.org/Mega_Drive_region_coding#R
 		<description>Marsupilami (Euro)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-18430-U"/>
@@ -4850,6 +4867,7 @@ ROMs with Region lock listed at https://segaretro.org/Mega_Drive_region_coding#R
 		<description>Mazin Wars (Euro)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL,NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-15661-S"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -4864,6 +4882,7 @@ ROMs with Region lock listed at https://segaretro.org/Mega_Drive_region_coding#R
 		<description>McDonald's Treasure Land Adventure (Euro)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-15803 W48"/> <!-- location not really marked on PCB, using u1 for consistency -->
@@ -4972,6 +4991,7 @@ ROMs with Region lock listed at https://segaretro.org/Mega_Drive_region_coding#R
 		<description>Mega Lo Mania (Euro)</description>
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-15230-H"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -5000,6 +5020,7 @@ ROMs with Region lock listed at https://segaretro.org/Mega_Drive_region_coding#R
 		<description>Mega Man - The Wily Wars (Euro)</description>
 		<year>1994</year>
 		<publisher>Capcom</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_eeprom_mode1"/>
 			<feature name="pcb" value="171-6584A"/>
@@ -5033,6 +5054,7 @@ ROMs with Region lock listed at https://segaretro.org/Mega_Drive_region_coding#R
 		<description>Mega Turrican (Euro)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-17346-F"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -5047,6 +5069,7 @@ ROMs with Region lock listed at https://segaretro.org/Mega_Drive_region_coding#R
 		<description>Mega Turrican (USA)</description>
 		<year>1994</year>
 		<publisher>Data East</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-16388-H"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -5130,6 +5153,7 @@ ROMs with Region lock listed at https://segaretro.org/Mega_Drive_region_coding#R
 		<year>1993</year>
 		<publisher>Virgin Games</publisher>
 		<info name="alt_title" value="Global Gladiators (Box)"/>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B"/>
 			<feature name="u1" value="MPR-15237-F"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -5204,6 +5228,7 @@ ROMs with Region lock listed at https://segaretro.org/Mega_Drive_region_coding#R
 		<description>Mighty Morphin Power Rangers - The Movie (Euro)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-18469-U"/>
@@ -8864,6 +8889,7 @@ ROMs with Region lock listed at https://segaretro.org/Mega_Drive_region_coding#R
 		<description>Tyrants - Fight Through Time (USA)</description>
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U,NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-15284-F"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -10347,6 +10373,7 @@ but dumps still have to be confirmed.
 		<description>Aero the Acro-Bat (USA)</description>
 		<year>1993</year>
 		<publisher>Sunsoft</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="aero the acro-bat (usa).bin" size="1048576" crc="a3a7a8b5" sha1="438fec09e05337a063f986632b52c9d60dd03ba1"/>
@@ -10358,6 +10385,7 @@ but dumps still have to be confirmed.
 		<description>Aero the Acro-Bat 2 (USA)</description>
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="aero the acro-bat 2 (usa).bin" size="2097152" crc="39eb74eb" sha1="6284a8a6c39137493b1ccc01fcd115cdfb775750"/>
@@ -13561,7 +13589,6 @@ but dumps still have to be confirmed.
 		<info name="serial" value="T-70013"/>
 		<info name="release" value="19940218"/>
 		<info name="alt_title" value="クールスポット"/>
-		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="cool spot (jpn, kor).bin" size="1048576" crc="e869efb1" sha1="e32826ca9ae5173d5ef9722b52bfcb4ad390a7bb"/>
@@ -15127,6 +15154,7 @@ but dumps still have to be confirmed.
 		<description>Ecco - The Tides of Time (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="ecco - the tides of time (usa).bin" size="2097152" crc="ccb21f98" sha1="82ec466a81b95942ad849c5e2f88781bef28acc8"/>
@@ -15427,6 +15455,7 @@ but dumps still have to be confirmed.
 		<description>ESPN National Hockey Night (USA)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -15455,6 +15484,7 @@ but dumps still have to be confirmed.
 		<description>ESPN Speedworld (USA)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -15469,6 +15499,7 @@ but dumps still have to be confirmed.
 		<description>ESPN Sunday Night NFL (USA)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -15511,6 +15542,7 @@ but dumps still have to be confirmed.
 		<info name="serial" value="G-4114"/>
 		<info name="release" value="19940218"/>
 		<info name="alt_title" value="エターナル チャンピオンズ"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom name="eternal champions (jpn, kor).bin" size="3145728" crc="66aa3c64" sha1="1b115e64e138ca045acfe64e2337fc68172be576"/>
@@ -15614,6 +15646,7 @@ but dumps still have to be confirmed.
 		<description>Exo Squad (Euro)</description>
 		<year>1995</year>
 		<publisher>Virgin Interactive</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="exo squad (euro).bin" size="1048576" crc="b599b9f9" sha1="672c12b9cdfb2c7d8e0b1c389627c02a7c970cb3"/>
@@ -16313,6 +16346,7 @@ but dumps still have to be confirmed.
 		<description>Mary Shelley's Frankenstein (USA)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="mary shelley's frankenstein (usa).bin" size="2097152" crc="48993dc3" sha1="2dd34478495a2988fe5839ef7281499f08bf7294"/>
@@ -16348,6 +16382,7 @@ but dumps still have to be confirmed.
 		<description>Frogger (USA)</description>
 		<year>1998</year>
 		<publisher>Majesco</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U,NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<!-- Dump To Be Confirmed -->
 			<feature name="pcb" value="171-5978B-8/16"/>
@@ -16362,6 +16397,7 @@ but dumps still have to be confirmed.
 		<description>Fun 'N' Games (USA)</description>
 		<year>1993</year>
 		<publisher>Tradewest</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="fun 'n' games (usa).bin" size="1048576" crc="b5ae351d" sha1="6085d3033edb32c468a63e0db95e5977e6853b48"/>
@@ -16479,6 +16515,7 @@ but dumps still have to be confirmed.
 		<description>Gargoyles (USA)</description>
 		<year>1995</year>
 		<publisher>Disney Interactive</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom name="gargoyles (usa).bin" size="3145728" crc="2d965364" sha1="2b76764ca1e5a26e406e42c5f8dbd5b8df915522"/>
@@ -16675,6 +16712,7 @@ but dumps still have to be confirmed.
 		<description>Mick &amp; Mack as the Global Gladiators (USA)</description>
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U,NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="mick &amp; mack as the global gladiators (usa).bin" size="1048576" crc="40f17bb3" sha1="4fd2818888a3c265e148e9be76525654e76347e4"/>
@@ -16812,6 +16850,7 @@ but dumps still have to be confirmed.
 		<description>Goofy's Hysterical History Tour (USA)</description>
 		<year>1993</year>
 		<publisher>Absolute Entertainment</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="goofy's hysterical history tour (usa).bin" size="1048576" crc="4e1cc833" sha1="caaeebc269b3b68e2a279864c44d518976d67d8b"/>
@@ -16918,6 +16957,7 @@ but dumps still have to be confirmed.
 		<info name="serial" value="G-5539"/>
 		<info name="release" value="19940527"/>
 		<info name="alt_title" value="グレイテスト ヘビーウェイツ"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_eeprom_mode1"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -16995,7 +17035,7 @@ but dumps still have to be confirmed.
 		<info name="serial" value="G-4103"/>
 		<info name="release" value="19930910"/>
 		<info name="alt_title" value="ガンスターヒーローズ"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="compatibility" value="NTSC-J,PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="gunstar heroes (jpn).bin" size="1048576" crc="1cfd0383" sha1="64ae3ef9d063d21b290849809902c221f6ab10d5"/>
@@ -17167,6 +17207,7 @@ but dumps still have to be confirmed.
 		<description>Home Alone 2 - Lost in New York (USA)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="home alone 2 - lost in new york (usa).bin" size="524288" crc="cbf87c14" sha1="24232a572b7eabc3e0ed5f483042a7085bd77c48"/>
@@ -17275,7 +17316,6 @@ but dumps still have to be confirmed.
 		<info name="serial" value="T-95083"/>
 		<info name="release" value="19940304"/>
 		<info name="alt_title" value="ハイパーダンク ザ プレイオフ エディション"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="fz009a1.bin" size="2097152" crc="5baf53d7" sha1="ef5c13926ee6eb32593b9e750ec342b98f48d1ef"/>
@@ -17382,6 +17422,7 @@ but dumps still have to be confirmed.
 		<description>Instruments of Chaos Starring Young Indiana Jones (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="instruments of chaos starring young indiana jones (usa).bin" size="1048576" crc="4e384ef0" sha1="7ffd31a8fd0f2111ef3dcce1b8493e6ea6e24deb"/>
@@ -17528,6 +17569,7 @@ but dumps still have to be confirmed.
 		<info name="serial" value="G-5526"/>
 		<info name="release" value="19930618"/>
 		<info name="alt_title" value="Jリーグ・オフィシャルTVゲームプロストライカー ~ J.League Pro Striker (Box)"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -17546,6 +17588,7 @@ but dumps still have to be confirmed.
 		<info name="serial" value="G-5540"/>
 		<info name="release" value="19940715"/>
 		<info name="alt_title" value="Jリーグ・オフィシャルTVゲームプロストライカー2"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -17673,6 +17716,7 @@ but dumps still have to be confirmed.
 		<description>Jammit (USA)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="jammit (usa).bin" size="2097152" crc="d91b52b8" sha1="2f43bfd04f563a67f4a2c8b8e36c541c19913a50"/>
@@ -18547,7 +18591,6 @@ but dumps still have to be confirmed.
 		<info name="serial" value="T-15063 (JPN)"/>
 		<info name="release" value="19921120 (JPN)"/>
 		<info name="alt_title" value="レミングス"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="lemmings (usa, jpn).bin" size="1048576" crc="f015c2ad" sha1="83aebf600069cf053282e813d3ab4910f586706e"/>
@@ -18664,6 +18707,7 @@ but dumps still have to be confirmed.
 		<info name="serial" value="G-5545"/>
 		<info name="release" value="19950526"/>
 		<info name="alt_title" value="ライト クルセイダー"/>
+		<sharedfeat name="compatibility" value="NTSC-J,PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -18678,6 +18722,7 @@ but dumps still have to be confirmed.
 		<description>Light Crusader (Kor)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -18706,6 +18751,7 @@ but dumps still have to be confirmed.
 		<description>Light Crusader (USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -19167,6 +19213,7 @@ but dumps still have to be confirmed.
 		<description>Marko (USA)</description>
 		<year>1994</year>
 		<publisher>Domark</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="marko's magic football (usa).bin" size="2097152" crc="2b8c8cce" sha1="b73d01599d8201dc3bd98fdc9cc262e14dbc52b4"/>
@@ -19178,6 +19225,7 @@ but dumps still have to be confirmed.
 		<description>Marsupilami (USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="marsupilami (usa).bin" size="2097152" crc="c76558df" sha1="3e761bdbf4ab8cb43d4a8d99e22b7de896884819"/>
@@ -19302,6 +19350,7 @@ but dumps still have to be confirmed.
 		<year>1993</year>
 		<publisher>Vic Tokai</publisher>
 		<info name="alt_title" value="Mazin Saga - Mutant Fighter (Box)"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="mazin saga - mutant fighter (usa).bin" size="1048576" crc="1bd9fef1" sha1="5cb87bb4efc8fa8754e687b62d0fd858e624997d"/>
@@ -19316,6 +19365,7 @@ but dumps still have to be confirmed.
 		<info name="serial" value="G-4102"/>
 		<info name="release" value="19930923"/>
 		<info name="alt_title" value="マクドナルド トレジャーランド アドベンチャー"/>
+		<sharedfeat name="compatibility" value="NTSC-J,PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="mcdonald's treasure land adventure (jpn).bin" size="1048576" crc="febcfd06" sha1="aee7fd6a08ec22f42159b188f23406cbe3229f3d"/>
@@ -19339,6 +19389,7 @@ but dumps still have to be confirmed.
 		<description>McDonald's Treasure Land Adventure (USA)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="mcdonald's treasure land adventure (usa).bin" size="1048576" crc="04ef4899" sha1="bcb77c10bc8f3322599269214e0f8dde32b01a5c"/>
@@ -19479,6 +19530,7 @@ but dumps still have to be confirmed.
 		<info name="serial" value="T-68053"/>
 		<info name="release" value="19930423"/>
 		<info name="alt_title" value="メガロマニア"/>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="mega-lo-mania (jpn).bin" size="1048576" crc="a60d8619" sha1="66e391c69dfbe7329654550ebf4464b4f426c5a0"/>
@@ -19557,6 +19609,7 @@ but dumps still have to be confirmed.
 		<info name="serial" value="G-4131"/>
 		<info name="release" value="19950331"/>
 		<info name="alt_title" value="ミッキーマニア"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="mickey mania - the timeless adventures of mickey mouse (jpn).bin" size="2097152" crc="23180cf7" sha1="afe3e1c9267e2a7f0bec5e3e951307ebea7f0b04"/>
@@ -19747,6 +19800,7 @@ but dumps still have to be confirmed.
 		<description>Mighty Morphin Power Rangers (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="mighty morphin power rangers (euro).bin" size="2097152" crc="7f96e663" sha1="7bad0db9a96eafa413562b6631487ca847b02466"/>
@@ -19758,6 +19812,7 @@ but dumps still have to be confirmed.
 		<description>Mighty Morphin Power Rangers (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="mighty morphin power rangers (usa).bin" size="2097152" crc="715158a9" sha1="dbe0c63c9e659255b091760889787001e85016a9"/>
@@ -19835,6 +19890,7 @@ but dumps still have to be confirmed.
 		<description>Mighty Morphin Power Rangers - The Movie (USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="mighty morphin power rangers - the movie (usa).bin" size="2097152" crc="aa941cbc" sha1="866d7ccc204e45d188594dde99c2ea836912a136"/>
@@ -20072,6 +20128,7 @@ but dumps still have to be confirmed.
 		<description>Mortal Kombat 3 (Euro)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<!-- Dump To Be Confirmed -->
 			<feature name="pcb" value="670128 REV 1"/>
@@ -20086,6 +20143,7 @@ but dumps still have to be confirmed.
 		<description>Mortal Kombat 3 (USA)</description>
 		<year>1995</year>
 		<publisher>Williams</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="mortal kombat 3 (usa).bin" size="4194304" crc="dd638af6" sha1="55cdcba77f7fcd9994e748524d40c98089344160"/>
@@ -21828,7 +21886,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="serial" value="G-4134 (JPN)"/>
 		<info name="release" value="19950922 (JPN)"/>
 		<info name="alt_title" value="ジ ウーズ"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="ooze, the (usa, jpn).bin" size="1048576" crc="1c0dd42f" sha1="dafcda90285e71151072ba36134f94f1e9d76a23"/>
@@ -25185,6 +25243,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="serial" value="T-133023"/>
 		<info name="release" value="19950428"/>
 		<info name="alt_title" value="テレビアニメ・スラムダンク強豪真っ向対決!"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="from tv animation slam dunk - kyougou makkou taiketsu (jpn).bin" size="2097152" crc="cdf5678f" sha1="7161a12c2a477cff8e29fa51403eea12c03180c7"/>
@@ -25385,7 +25444,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="serial" value="G-5536"/>
 		<info name="release" value="19940617"/>
 		<info name="alt_title" value="新創世紀ラグナセンティ"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="compatibility" value="NTSC-J,PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -25412,7 +25471,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Ragnacenty (Kor)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<sharedfeat name="compatibility" value="NTSC-J,PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -26746,7 +26805,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="alt_title" value="ストーリー オブ トア 〜光を継ぐ者〜"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1769472">
 				<rom name="story of thor, the (jpn) (beta) (bad dump).bin" size="1769472" crc="bfc11649" sha1="ac1952f2f7cd4109561376f3097c4daec2ae64ae" status="baddump"/>
@@ -26773,7 +26831,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>The Story of Thor (USA, Prototype, 19941004)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
-		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -26788,7 +26845,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>The Story of Thor (USA, Prototype, 19941017)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
-		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -26803,7 +26859,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Beyond Oasis (USA, Prototype, 19941101)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
-		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
