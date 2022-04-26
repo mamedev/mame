@@ -121,6 +121,8 @@ void cat702_device::device_start()
 	m_dataout_handler.resolve_safe();
 
 	save_item(NAME(m_select));
+	save_item(NAME(m_clock));
+	save_item(NAME(m_datain));
 	save_item(NAME(m_state));
 	save_item(NAME(m_bit));
 
