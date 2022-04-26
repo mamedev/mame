@@ -391,12 +391,12 @@ void sis950_lpc_device::io_map(address_map &map)
 	// map(0x0020, 0x0021) INT1
 	map(0x0020, 0x003f).rw(m_pic_master, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	// map(0x0040, 0x0043) PIT
-	map(0x0040, 0x005f).rw(m_pit, FUNC(pit8254_device::read), FUNC(pit8254_device::write));
-	map(0x0060, 0x0060).rw(m_keybc, FUNC(at_keyboard_controller_device::data_r), FUNC(at_keyboard_controller_device::data_w));
+	map(0x0040, 0x0043).rw(m_pit, FUNC(pit8254_device::read), FUNC(pit8254_device::write));
+	map(0x0060, 0x0060).rw(m_keybc, FUNC(ps2_keyboard_controller_device::data_r), FUNC(ps2_keyboard_controller_device::data_w));
 	// map(0x0061, 0x0061) NMI Status Register
 	map(0x0061, 0x0061).rw(FUNC(sis950_lpc_device::at_portb_r), FUNC(sis950_lpc_device::at_portb_w));
 	// undocumented but read, assume LPC complaint
-	map(0x0064, 0x0064).rw(m_keybc, FUNC(at_keyboard_controller_device::status_r), FUNC(at_keyboard_controller_device::command_w));
+	map(0x0064, 0x0064).rw(m_keybc, FUNC(ps2_keyboard_controller_device::status_r), FUNC(ps2_keyboard_controller_device::command_w));
 	// map(0x0070, 0x0070) CMOS and NMI Mask
 	map(0x0070, 0x007f).rw(m_rtc, FUNC(ds12885_device::read), FUNC(ds12885_device::write));
 	// map(0x0080, 0x008f) DMA low page registers
