@@ -113,7 +113,7 @@ protected:
 	optional_shared_ptr<uint8_t> m_video_ram;
 	uint8_t *m_screen_location;
 
-	int m_ROMSelection;
+	int m_ROMSelection = 0; // FIXME: this is used for various things in derived classes, but not by this base class, and should be removed
 	std::vector<u8> m_contention_pattern;
 
 	uint8_t m_ram_disabled_by_beta;
