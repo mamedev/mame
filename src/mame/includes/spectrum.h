@@ -52,6 +52,7 @@ public:
 	spectrum_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
+		m_scanline_timer(nullptr),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_cassette(*this, "cassette"),
@@ -113,7 +114,7 @@ protected:
 	optional_shared_ptr<uint8_t> m_video_ram;
 	uint8_t *m_screen_location;
 
-	int m_ROMSelection;
+	int m_ROMSelection = 0; // FIXME: this is used for various things in derived classes, but not by this base class, and should be removed
 
 	// Build up the screen bitmap line-by-line as the z80 uses CPU cycles.
 	// Eliminates sprite flicker on various games (E.g. Marauder and
