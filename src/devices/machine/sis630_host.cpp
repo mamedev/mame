@@ -7,6 +7,7 @@
     TODO:
     - AGP and VGA interfaces;
     - Is ACPI declared here shared with LPC or a different one?
+    \- shutms11 maps it to the exact same place (I/O $5000), may be interleaved?
     - HW trap control;
     - PCI-Hole;
     - Convert RAM to device;
