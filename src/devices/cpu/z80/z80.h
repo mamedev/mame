@@ -32,6 +32,7 @@ class z80_device : public cpu_device, public z80_daisy_chain_interface
 public:
 	z80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	int	cycles_from_irq() { return total_cycles() - m_irq_at; }
 	void z80_set_cycle_tables(const uint8_t *op, const uint8_t *cb, const uint8_t *ed, const uint8_t *xy, const uint8_t *xycb, const uint8_t *ex);
 	template <typename... T> void set_memory_map(T &&... args) { set_addrmap(AS_PROGRAM, std::forward<T>(args)...); }
 	template <typename... T> void set_m1_map(T &&... args) { set_addrmap(AS_OPCODES, std::forward<T>(args)...); }
@@ -154,7 +155,7 @@ protected:
 	void rm16(uint16_t addr, PAIR &r);
 	virtual void wm(uint16_t addr, uint8_t value);
 	void wm16(uint16_t addr, PAIR &r);
-	void wm16back(uint16_t addr, PAIR &r);
+	void wm16_sp(PAIR &r);
 	virtual uint8_t rop();
 	virtual uint8_t arg();
 	virtual uint16_t arg16();
@@ -282,6 +283,7 @@ protected:
 	uint8_t           m_after_ldair;        /* same, but for LD A,I or LD A,R */
 	uint32_t          m_ea;
 
+	int               m_irq_at;
 	int               m_icount;
 	int               m_icount_executing;
 	uint8_t           m_rtemp;

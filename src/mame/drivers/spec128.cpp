@@ -174,12 +174,13 @@ void spectrum_128_state::video_start()
 
 uint8_t spectrum_128_state::spectrum_128_pre_opcode_fetch_r(offs_t offset)
 {
+	if (is_contended(offset)) content_early();
+
 	/* this allows expansion devices to act upon opcode fetches from MEM addresses
 	   for example, interface1 detection fetches requires fetches at 0008 / 0708 to
 	   enable paged ROM and then fetches at 0700 to disable it
 	*/
 	m_exp->pre_opcode_fetch(offset);
-	if (is_contended(offset)) content_early();
 	uint8_t retval = m_maincpu->space(AS_PROGRAM).read_byte(offset);
 	m_exp->post_opcode_fetch(offset);
 	return retval;
