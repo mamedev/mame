@@ -185,6 +185,10 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_COMM_REMOTE_PORT,                           "15112",     OPTION_STRING,     "remote port to connect to" },
 	{ OPTION_COMM_FRAME_SYNC,                            "0",         OPTION_BOOLEAN,    "sync frames" },
 
+	// cps2 networking options
+	{ OPTION_CPS2SERVER,                                 "0",         OPTION_BOOLEAN,    "Configures instance as cps2 network server." },
+	{ OPTION_CPS2CLIENT,                                 nullptr,     OPTION_STRING,     "Client id, and the toward server ip address." },
+
 	// misc options
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "CORE MISC OPTIONS" },
 	{ OPTION_DRC,                                        "1",         OPTION_BOOLEAN,    "enable DRC CPU core if available" },

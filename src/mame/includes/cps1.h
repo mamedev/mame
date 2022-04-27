@@ -340,6 +340,11 @@ public:
 	void init_pzloop2();
 	void init_singbrd();
 	void init_ecofghtr();
+	void initcps2server(int ref, const std::vector<std::string>& params);
+	void initcps2client(int ref, const std::vector<std::string>& params);
+	void checkDataAvailable();
+	void init_cps2_network();
+	TIMER_DEVICE_CALLBACK_MEMBER(cps2_net_check_data);
 
 private:
 	void init_digital_volume();
@@ -359,6 +364,9 @@ private:
 	DECLARE_READ16_MEMBER(cps2_objram2_r);
 	DECLARE_WRITE16_MEMBER(cps2_objram1_w);
 	DECLARE_WRITE16_MEMBER(cps2_objram2_w);
+
+	DECLARE_READ16_MEMBER(cps2_network_r);
+	DECLARE_WRITE16_MEMBER(cps2_network_w);
 
 	void unshuffle(uint64_t *buf, int len);
 	void cps2_gfx_decode();

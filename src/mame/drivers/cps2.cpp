@@ -627,6 +627,7 @@ Stephh's inputs notes (based on some tests on the "parent" set) :
 #include "emu.h"
 #include "includes/cps1.h"
 #include "machine/cps2crypt.h"
+#include "machine/cps2network.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "cpu/m68000/m68000.h"
@@ -648,6 +649,16 @@ Stephh's inputs notes (based on some tests on the "parent" set) :
 #undef  CODE_SIZE
 #define CODE_SIZE   0x0400000
 
+
+/*************************************
+ *
+ *  Network Passthrough Polling
+ *
+ *************************************/
+
+TIMER_DEVICE_CALLBACK_MEMBER(cps2_state::cps2_net_check_data) {
+	checkDataAvailable();
+}
 
 /*************************************
  *
@@ -923,9 +934,7 @@ void cps2_state::cps2_map(address_map &map)
 	map(0x400000, 0x40000b).ram().share("output");                                                      /* CPS2 object output */
 	map(0x618000, 0x619fff).rw(FUNC(cps2_state::qsound_sharedram1_r), FUNC(cps2_state::qsound_sharedram1_w));                         /* Q RAM */
 	map(0x660000, 0x663fff).ram();                                                                         /* When bit 14 of 0x804030 equals 0 this space is available. Many games store highscores and other info here if available. */
-	//  map(0x662000, 0x662001).ram();                                                                         /* Network adapter related, accessed in SSF2TB */
-	//  map(0x662008, 0x662009).ram();                                                                         /* Network adapter related, accessed in SSF2TB */
-	//  map(0x662020, 0x662021).ram();                                                                         /* Network adapter related, accessed in SSF2TB */
+	map(0x620000, 0x6200ff).rw(FUNC(cps2_state::cps2_network_r), FUNC(cps2_state::cps2_network_w)); /* Network adapter related, accessed in SSF2TB */
 	map(0x664000, 0x664001).ram();                                                                         /* Unknown - Only used if 0x660000-0x663fff available (could be RAM enable?) */
 	map(0x700000, 0x701fff).w(FUNC(cps2_state::cps2_objram1_w)).share("objram1");                           /* Object RAM, no game seems to use it directly */
 	map(0x708000, 0x709fff).mirror(0x006000).rw(FUNC(cps2_state::cps2_objram2_r), FUNC(cps2_state::cps2_objram2_w)).share("objram2");           /* Object RAM */
@@ -956,9 +965,7 @@ void cps2_state::dead_cps2_map(address_map &map)
 	map(0x400000, 0x40000b).ram().share("output");                                                      /* CPS2 object output */
 	map(0x618000, 0x619fff).rw(FUNC(cps2_state::qsound_sharedram1_r), FUNC(cps2_state::qsound_sharedram1_w));                         /* Q RAM */
 	map(0x660000, 0x663fff).ram();                                                                         /* When bit 14 of 0x804030 equals 0 this space is available. Many games store highscores and other info here if available. */
-	//  map(0x662000, 0x662001).ram();                                                                         /* Network adapter related, accessed in SSF2TB */
-	//  map(0x662008, 0x662009).ram();                                                                         /* Network adapter related, accessed in SSF2TB */
-	//  map(0x662020, 0x662021).ram();                                                                         /* Network adapter related, accessed in SSF2TB */
+	map(0x620000, 0x6200ff).rw(FUNC(cps2_state::cps2_network_r), FUNC(cps2_state::cps2_network_w)); /* Network adapter related, accessed in SSF2TB */
 	map(0x664000, 0x664001).ram();                                                                         /* Unknown - Only used if 0x660000-0x663fff available (could be RAM enable?) */
 	map(0x700000, 0x701fff).w(FUNC(cps2_state::cps2_objram1_w)).share("objram1");                           /* Object RAM, no game seems to use it directly */
 	map(0x708000, 0x709fff).mirror(0x006000).rw(FUNC(cps2_state::cps2_objram2_r), FUNC(cps2_state::cps2_objram2_w)).share("objram2");           /* Object RAM */
@@ -1304,6 +1311,8 @@ void cps2_state::cps2(machine_config &config)
 	m_maincpu->disable_interrupt_mixer();
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(cps2_state::cps2_interrupt), "screen", 0, 1);
+
+	TIMER(config, "nettimer").configure_periodic(FUNC(cps2_state::cps2_net_check_data), attotime::from_hz(7200));
 
 	Z80(config, m_audiocpu, XTAL(8'000'000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cps2_state::qsound_sub_map);
@@ -9960,12 +9969,9 @@ void cps2_state::init_ssf2tb()
 {
 	init_cps2();
 
-	m_cps2networkpresent = 0;
+	m_cps2networkpresent = 1;
 
-	/* we don't emulate the network board, so don't say it's present for now, otherwise the game will
-	   attempt to boot in tournament mode and fail */
-	//m_cps2networkpresent = 1;
-
+	init_cps2_network();
 }
 
 void cps2_state::init_pzloop2()
@@ -11338,6 +11344,45 @@ ROM_START( ssf2tbd )
 	ROM_LOAD( "phoenix.key",  0x000000, 0x000014, CRC(2cf772b0) SHA1(eff33c65a4f3862c231f9e4d6fefa7b34398dbf2) )
 ROM_END
 
+ROM_START( ssf2xjtb )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "sfxjd.03c", 0x000000, 0x80000, CRC(d1432cf1) SHA1(665536bfd072e9fcc591742f5c654554ce53786e) )
+	ROM_LOAD16_WORD_SWAP( "sfxjd.04a", 0x080000, 0x80000, CRC(57110cd3) SHA1(b1b2cb28d80fef79787235423ad93c78e9e80ab9) )
+	ROM_LOAD16_WORD_SWAP( "sfxjd.05",  0x100000, 0x80000, CRC(c63358d0) SHA1(dde4d9e9adce4dee02322c0fd71615eed0af62e6) )
+	ROM_LOAD16_WORD_SWAP( "sfxjd.06a", 0x180000, 0x80000, CRC(ccb29808) SHA1(10e7b135a936409fe7c4d7959ea375634a8c68e4) )
+	ROM_LOAD16_WORD_SWAP( "sfxjd.07",  0x200000, 0x80000, CRC(61f94982) SHA1(d2f22f50c21393deda7d5838dbd2b265722acd38) )
+	ROM_LOAD16_WORD_SWAP( "sfxjd.08",  0x280000, 0x80000, CRC(d399c36c) SHA1(b4c4217843e5c3ef00ab04d58ca9368d2d734065) )
+	ROM_LOAD16_WORD_SWAP( "sfxd.09",   0x300000, 0x80000, CRC(642fae3f) SHA1(746df99b826b9837bba267104132161153c1daff) )
+	ROM_LOAD16_WORD_SWAP( "sfxjtb.10", 0x380000, 0x80000, CRC(2602dd2c) SHA1(4524e8a06156cfd11aafb631650c2bb37ef38ccf) )
+
+	ROM_REGION( 0x1000000, "gfx", 0 )
+	ROMX_LOAD( "sfx.13m",   0x000000, 0x200000, CRC(cf94d275) SHA1(bf2a6d98a656d1cb5734da7836686242d3211137) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "sfx.15m",   0x000002, 0x200000, CRC(5eb703af) SHA1(4b302dbb66e8a5c2ad92798699391e981bada427) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "sfx.17m",   0x000004, 0x200000, CRC(ffa60e0f) SHA1(b21b1c749a8241440879bf8e7cb33968ccef97e5) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "sfx.19m",   0x000006, 0x200000, CRC(34e825c5) SHA1(4d320fc96d1ef0b9928a8ce801734245a4c097a5) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "sfx.14m",   0x800000, 0x100000, CRC(b7cc32e7) SHA1(0f4d26af338dab5dce5b7b34d32ad0c573434ace) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "sfx.16m",   0x800002, 0x100000, CRC(8376ad18) SHA1(f4456833fb396e6501f4174c0fe5fd63ea40a188) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "sfx.18m",   0x800004, 0x100000, CRC(f5b1b336) SHA1(4b060501e56b9d61294748da5387cdae5280ec4d) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "sfx.20m",   0x800006, 0x100000, CRC(459d5c6b) SHA1(32b11ba7a12004aff810d719bff7508204c7b7c0) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "sfx.21m",   0xc00000, 0x100000, CRC(e32854af) SHA1(1a5e11e9caa2b96108d89ae660ef1f6bcb469a74) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "sfx.23m",   0xc00002, 0x100000, CRC(760f2927) SHA1(491e28e14ee06821fc9e709efa7b91313bc0c2db) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "sfx.25m",   0xc00004, 0x100000, CRC(1ee90208) SHA1(83df1d9953560edddc2951ea426d29fb014e6a8a) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "sfx.27m",   0xc00006, 0x100000, CRC(f814400f) SHA1(ad6921af36d0bd5dfb89b1fb53c3ca3fd92d7204) , ROM_GROUPWORD | ROM_SKIP(6) )
+
+	ROM_REGION( QSOUND_SIZE, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "sfx.01",   0x00000, 0x08000, CRC(b47b8835) SHA1(c8b2d50fe3a329bd0592ea160d505155d873dab1) )
+	ROM_CONTINUE(         0x10000, 0x18000 )
+	ROM_LOAD( "sfx.02",   0x28000, 0x20000, CRC(0022633f) SHA1(cab3afc79da53e3887eb1ccd1f4d19790728e6cd) )
+
+	ROM_REGION( 0x400000, "qsound", 0 ) /* QSound samples */
+	ROM_LOAD16_WORD_SWAP( "sfx.11m",   0x000000, 0x200000, CRC(9bdbd476) SHA1(a8520f77f30b97aae36408e0c4ca1ebbde1808a5) )
+	ROM_LOAD16_WORD_SWAP( "sfx.12m",   0x200000, 0x200000, CRC(a05e3aab) SHA1(d4eb9cae66c74e956569fea8b815156fbd420f83) )
+
+	ROM_REGION( 0x20, "key", 0 )
+	ROM_LOAD( "phoenix.key",  0x000000, 0x000014, CRC(2cf772b0) SHA1(eff33c65a4f3862c231f9e4d6fefa7b34398dbf2) )
+ROM_END
+
+
 ROM_START( ssf2xjr1d )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "sfxjd.03c", 0x000000, 0x80000, CRC(316de996) SHA1(4036539a554a9ccd8b5fc364dfc4c97f3d5efa96) )
@@ -11880,6 +11925,7 @@ GAME( 1994, dstlku1d,   dstlk,    dead_cps2, cps2_2p6b, cps2_state, init_cps2,  
 GAME( 1994, ringdstd,   ringdest, dead_cps2, cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "Ring of Destruction: Slammasters II (Euro 940902 Phoenix Edition) (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, ssf2tad,    ssf2t,    dead_cps2, cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "Super Street Fighter II Turbo (Asia 940223 Phoenix Edition) (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, ssf2xjr1d,  ssf2t,    dead_cps2, cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "Super Street Fighter II X: Grand Master Challenge (Japan 940223 Phoenix Edition) (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, ssf2xjtb,   ssf2t,    dead_cps2, cps2_2p6b, cps2_state, init_ssf2tb,   ROT0,   "bootleg", "Super Street Fighter II X: Tournament Battle (Japan 940223)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, xmcotar1d,  xmcota,   dead_cps2, cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "X-Men: Children of the Atom (Euro 950105 Phoenix Edition) (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, mshud,      msh,      dead_cps2, cps2_2p6b, cps2_state, init_cps2,     ROT0,   "bootleg", "Marvel Super Heroes (US 951024 Phoenix Edition) (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, cybotsud,   cybots,   dead_cps2, cybots,    cps2_state, init_cps2,     ROT0,   "bootleg", "Cyberbots: Fullmetal Madness (USA 950424 Phoenix Edition) (bootleg)", MACHINE_SUPPORTS_SAVE )

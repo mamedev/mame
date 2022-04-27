@@ -193,6 +193,9 @@
 #define OPTION_HTTP_PORT            "http_port"
 #define OPTION_HTTP_ROOT            "http_root"
 
+#define OPTION_CPS2SERVER           "cps2server"
+#define OPTION_CPS2CLIENT           "cps2client"
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -451,6 +454,8 @@ public:
 	const char *comm_remoteport() const { return value(OPTION_COMM_REMOTE_PORT); }
 	bool comm_framesync() const { return bool_value(OPTION_COMM_FRAME_SYNC); }
 
+	bool cps2server() const { return bool_value(OPTION_CPS2SERVER); }
+	const char *cps2client() const { return value(OPTION_CPS2CLIENT); }
 
 	bool confirm_quit() const { return bool_value(OPTION_CONFIRM_QUIT); }
 	bool ui_mouse() const { return bool_value(OPTION_UI_MOUSE); }
