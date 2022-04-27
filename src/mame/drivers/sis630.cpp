@@ -130,6 +130,7 @@
 #include "emu.h"
 #include "cpu/i386/i386.h"
 #include "bus/isa/isa_cards.h"
+#include "bus/pc_kbd/keyboards.h"
 #include "machine/intelfsh.h"
 #include "machine/pci.h"
 #include "machine/sis5513_ide.h"
@@ -222,7 +223,7 @@ void sis630_state::sis630(machine_config &config)
 	// TODO: 1 game port
 	// TODO: move keyboard/mouse PS/2 connectors in here
 
-	// TODO: AMR (Audio/modem riser) + UPT (?), assume EISA complaint, needs specific slot options
+	// TODO: AMR (Audio/modem riser) + UPT (?), assume [E]ISA complaint, needs specific slot options
 //	ISA16_SLOT(config, "isa1", 0, "pci:01.0:isabus", pc_isa16_cards, nullptr, false);
 //	ISA16_SLOT(config, "isa2", 0, "pci:01.0:isabus", pc_isa16_cards, nullptr, false);
 }
@@ -240,7 +241,9 @@ void sis630_state::gamecstl(machine_config &config)
 
 	// TODO: mapped RAM config
 	// TODO: add custom inputs
-	// TODO: eventually remove PS/2 connectors defaults
+	// TODO: eventually remove PS/2 connector defaults
+//	subdevice<pc_kbdc_device>("pci:01.0:ps2_con")->set_default_option(nullptr);
+//	subdevice<pc_kbdc_device>("pci:01.0:aux_con")->set_default_option(nullptr);
 }
 
 ROM_START(shutms11)
@@ -274,4 +277,4 @@ ROM_END
 COMP( 2000, shutms11, 0,      0,      sis630,  sis630, sis630_state, empty_init, "Shuttle", "MS11 PC", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 // Arcade based games
 GAME( 2002, gamecstl, 0,              gamecstl, sis630, sis630_state, empty_init, ROT0, "Cristaltec", "GameCristal",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2002, gamecst2, gamecstl,       gamecstl,  sis630, sis630_state, empty_init, ROT0, "Cristaltec", "GameCristal (version 2.613)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2002, gamecst2, gamecstl,       gamecstl, sis630, sis630_state, empty_init, ROT0, "Cristaltec", "GameCristal (version 2.613)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

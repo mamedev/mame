@@ -61,7 +61,8 @@ sis950_lpc_device::sis950_lpc_device(const machine_config &mconfig, const char *
 	, m_keybc(*this, "keybc")
 	, m_speaker(*this, "speaker")
 	, m_rtc(*this, "rtc")
-	, m_pc_kbdc(*this, "kbd")
+	, m_ps2_con(*this, "ps2_con")
+	, m_aux_con(*this, "aux_con")
 	, m_acpi(*this, "acpi")
 	, m_smbus(*this, "smbus")
 {
@@ -160,14 +161,13 @@ void sis950_lpc_device::device_add_mconfig(machine_config &config)
 
 	// TODO: EISA, from virtual bridge
 
-	// TODO: move connectors to client
-	PC_KBDC(config, m_pc_kbdc, pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL);
-	m_pc_kbdc->out_clock_cb().set(m_keybc, FUNC(ps2_keyboard_controller_device::kbd_clk_w));
-	m_pc_kbdc->out_data_cb().set(m_keybc, FUNC(ps2_keyboard_controller_device::kbd_data_w));
+	PC_KBDC(config, m_ps2_con, pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL);
+	m_ps2_con->out_clock_cb().set(m_keybc, FUNC(ps2_keyboard_controller_device::kbd_clk_w));
+	m_ps2_con->out_data_cb().set(m_keybc, FUNC(ps2_keyboard_controller_device::kbd_data_w));
 
-	pc_kbdc_device &aux_con(PC_KBDC(config, "aux", ps2_mice, STR_HLE_PS2_MOUSE));
-	aux_con.out_clock_cb().set(m_keybc, FUNC(ps2_keyboard_controller_device::aux_clk_w));
-	aux_con.out_data_cb().set(m_keybc, FUNC(ps2_keyboard_controller_device::aux_data_w));
+	PC_KBDC(config, m_aux_con, ps2_mice, STR_HLE_PS2_MOUSE);
+	m_aux_con->out_clock_cb().set(m_keybc, FUNC(ps2_keyboard_controller_device::aux_clk_w));
+	m_aux_con->out_data_cb().set(m_keybc, FUNC(ps2_keyboard_controller_device::aux_data_w));
 
 	// TODO: selectable between PCI clock / 4 (33 MHz) or 7.159 MHz, via reg $47 bit 5
 	PS2_KEYBOARD_CONTROLLER(config, m_keybc, XTAL(33'000'000) / 4);
@@ -176,11 +176,11 @@ void sis950_lpc_device::device_add_mconfig(machine_config &config)
 	m_keybc->hot_res().set(FUNC(sis950_lpc_device::cpu_reset_w));
 	m_keybc->gate_a20().set(FUNC(sis950_lpc_device::cpu_a20_w));
 	m_keybc->kbd_irq().set(m_pic_master, FUNC(pic8259_device::ir1_w));
-	m_keybc->kbd_clk().set(m_pc_kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
-	m_keybc->kbd_data().set(m_pc_kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
+	m_keybc->kbd_clk().set(m_ps2_con, FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_keybc->kbd_data().set(m_ps2_con, FUNC(pc_kbdc_device::data_write_from_mb));
 	m_keybc->aux_irq().set(m_pic_slave, FUNC(pic8259_device::ir4_w));
-	m_keybc->aux_clk().set(aux_con, FUNC(pc_kbdc_device::clock_write_from_mb));
-	m_keybc->aux_data().set(aux_con, FUNC(pc_kbdc_device::data_write_from_mb));
+	m_keybc->aux_clk().set(m_aux_con, FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_keybc->aux_data().set(m_aux_con, FUNC(pc_kbdc_device::data_write_from_mb));
 
 	// TODO: unknown RTC type
 	// Has external RTC bank select at $48, using this one as convenience

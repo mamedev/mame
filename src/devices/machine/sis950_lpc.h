@@ -76,7 +76,8 @@ private:
 	required_device<ps2_keyboard_controller_device> m_keybc;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ds12885ext_device> m_rtc;
-	required_device<pc_kbdc_device> m_pc_kbdc;
+	required_device<pc_kbdc_device> m_ps2_con;
+	required_device<pc_kbdc_device> m_aux_con;
 	required_device<lpc_acpi_device> m_acpi;
 	required_device<sis950_smbus_device> m_smbus;
 
