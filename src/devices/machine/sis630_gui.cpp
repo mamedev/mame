@@ -16,17 +16,19 @@
     \- Has macrovision regs;
     - GUI is the 630 PCI/AGP i/f
     \- it's actually internal to the rest of 630;
-    \- 301 is external but closely tied to it;
+    \- 301 is external but closely tied to it: the digital i/f ports (RIO+$4) selects where it
+	   should start drawing/sync etc. while the "VGA2 regs" (RIO+$14) seems to be a custom set
+	   rather than be related at all (i.e. it most likely be just capable to have VGA-like
+	   resolutions).
 
     TODO:
     - Very preliminary, enough to make it to draw basic VGA primary screen and not much else;
-    - Understand how exactly 630 selects between the SVGA and extended register sets;
-    - Backward port 630 GUI/PCI implementation to 300;
-    - Confirm PCI IDs (they aren't well formed);
+    - Backward port '630 GUI/PCI implementation to '300;
     - With current config it claims memory size to be 3MB instead of 64
       (regressed during development)
     - Hardware cursor is supposed to be extended reg $6 bit 6, but it's apparently not the
       right trigger by gamecstl Windows non-safe mode;
+    - Interface with '301;
 
 **************************************************************************************************/
 
@@ -404,7 +406,7 @@ void sis630_gui_device::space_io_map(address_map &map)
 	// RIO + 0x04: digital video interface (to '301 only?)
 	// RIO + 0x10: 301 TV encoder
 	// RIO + 0x12: 301 macrovision regs
-	// RIO + 0x14: 301 VGA regs
+	// RIO + 0x14: 301 VGA2 regs
 	// RIO + 0x16: 301 RAMDAC
 	// RIO + 0x30/+0x40/+0x50: omitted, legacy '300/'630 VGA regs?
 	// (gamecstl definitely tries to access 0x44 index 5 for readback extension ID)
@@ -465,7 +467,6 @@ uint8_t sis630_gui_device::vram_r(offs_t offset)
 
 void sis630_gui_device::vram_w(offs_t offset, uint8_t data)
 {
-//  printf("%08x %02x\n", offset, data);
 	downcast<sis630_svga_device *>(m_svga.target())->mem_w(offset, data);
 }
 
@@ -546,72 +547,4 @@ void sis630_gui_device::vga_3d0_w(offs_t offset, uint32_t data, uint32_t mem_mas
 		downcast<sis630_svga_device *>(m_svga.target())->port_03d0_w(offset * 4 + 2, data >> 16);
 	if (ACCESSING_BITS_24_31)
 		downcast<sis630_svga_device *>(m_svga.target())->port_03d0_w(offset * 4 + 3, data >> 24);
-}
-
-/*************************
-*
-* SiS 301 Virtual Bridge
-*
-*************************/
-
-DEFINE_DEVICE_TYPE(SIS301_VIDEO_BRIDGE, sis301_video_bridge_device, "sis630_bridge", "SiS 301 Virtual PCI-to-PCI Video Bridge")
-
-sis301_video_bridge_device::sis301_video_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_bridge_device(mconfig, SIS301_VIDEO_BRIDGE, tag, owner, clock)
-{
-	set_ids(0x10390001, 0x00, 0x060400, 0x00);
-}
-
-void sis301_video_bridge_device::device_add_mconfig(machine_config &config)
-{
-	// ...
-}
-
-void sis301_video_bridge_device::config_map(address_map &map)
-{
-	pci_bridge_device::config_map(map);
-	// shouldn't have any programming interface
-//  map(0x10, 0x4f).unmaprw();
-//  map(0x10, 0x3e).rw(FUNC(sis301_video_bridge_device::unmap_log_r), FUNC(sis301_video_bridge_device::unmap_log_w));
-}
-
-void sis301_video_bridge_device::memory_map(address_map &map)
-{
-	// TODO: how it access shared VRAM from GUI?
-}
-
-void sis301_video_bridge_device::io_map(address_map &map)
-{
-
-}
-
-
-void sis301_video_bridge_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
-							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
-{
-	// TODO: installs from GUI i/f via RIO
-	io_space->install_device(0, 0xffff, *this, &sis301_video_bridge_device::io_map);
-}
-
-void sis301_video_bridge_device::device_start()
-{
-	pci_device::device_start();
-
-#if 0
-	memory_window_start = 0;
-	memory_window_end   = 0xffffffff;
-	memory_offset       = 0;
-	io_window_start = 0;
-	io_window_end   = 0xffff;
-	io_offset       = 0;
-#endif
-}
-
-
-void sis301_video_bridge_device::device_reset()
-{
-	pci_device::device_reset();
-
-	command = 0x0000;
-	status = 0x0000;
 }

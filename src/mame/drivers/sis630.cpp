@@ -207,8 +207,8 @@ void sis630_state::sis630(machine_config &config)
 	// documentation doesn't mention modem part #, derived from Shuttle MS11 MB manual
 //  SIS7013_MODEM_AC97(config, "pci:01.6"
 
-	// TODO: is the "virtual bridge" actually for expansion PCI slots?
-	SIS301_VIDEO_BRIDGE(config, "pci:02.0", 0);
+	// "Virtual PCI-to-PCI Bridge"
+	PCI_BRIDGE(config, "pci:02.0", 0, 0x10396001, 0x00);
 
 	// optional stuff (according to Kontron 786LCD manual)
 //	"pci:08.0" SCSI controller (vendor=1000 NCR / LSI Logic / Symbios Logic device=0012 53C895A)
