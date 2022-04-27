@@ -54,7 +54,6 @@ private:
 	void map_shadowram(address_space *memory_space, offs_t start_offs, offs_t end_offs, bool read_enable, bool write_enable);
 
 	int m_ram_size = 0;
-	u32 m_gfx_window_base = 0;
 	u8 m_dram_status = 0;
 	u32 m_shadow_ram_ctrl = 0;
 	u8 m_vga_control = 0;
@@ -64,9 +63,6 @@ private:
 
 	u8 dram_status_r();
 	void dram_status_w(u8 data);
-
-	u32 gfx_window_base_r(offs_t offset, uint32_t mem_mask = ~0);
-	void gfx_window_base_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	u8 vga_control_r();
 	void vga_control_w(offs_t offset, u8 data);

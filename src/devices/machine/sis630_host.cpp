@@ -67,7 +67,6 @@ void sis630_host_device::device_reset()
 	command = 0x0005;
 	status = 0x0210;
 
-	m_gfx_window_base = 0;
 	m_shadow_ram_ctrl = 0;
 	m_vga_control = 0;
 	std::fill(std::begin(m_agp_mailbox), std::end(m_agp_mailbox), 0);
@@ -279,19 +278,6 @@ void sis630_host_device::map_extra(
  * I/O implemtation
  *
  */
-
-
-u32 sis630_host_device::gfx_window_base_r(offs_t offset, uint32_t mem_mask)
-{
-	LOGIO("Read Graphic Window Base Address [$10] %08x & %08x\n", m_gfx_window_base, mem_mask);
-	return m_gfx_window_base;
-}
-
-void sis630_host_device::gfx_window_base_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	COMBINE_DATA(&m_gfx_window_base);
-	LOGIO("Write Graphic Window Base Address [$10] %08x & %08x (%08x)\n", data, mem_mask, m_gfx_window_base);
-}
 
 u8 sis630_host_device::capptr_r()
 {
