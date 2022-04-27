@@ -531,7 +531,7 @@ WRITE_LINE_MEMBER( i2cmem_device::write_scl )
 				}
 			}
 			break;
-			
+
 		case STATE_RESET:
 			if( m_scl )
 			{
