@@ -64,8 +64,11 @@ private:
 	u8 dram_status_r();
 	void dram_status_w(u8 data);
 
+	u8 pci_hole_r();
+	void pci_hole_w(u8 data);
+
 	u8 vga_control_r();
-	void vga_control_w(offs_t offset, u8 data);
+	void vga_control_w(u8 data);
 
 	u32 shadow_ram_ctrl_r(offs_t offset, uint32_t mem_mask = ~0);
 	void shadow_ram_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -90,9 +93,6 @@ private:
 		bool enable = false;
 		u8 data_rate = 0;
 	} m_agp;
-
-	u8 unmap_log_r(offs_t offset);
-	void unmap_log_w(offs_t offset, u8 data);
 };
 
 DECLARE_DEVICE_TYPE(SIS630_HOST, sis630_host_device)

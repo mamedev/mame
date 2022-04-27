@@ -104,8 +104,8 @@ void sis630_host_device::config_map(address_map &map)
 //  map(0x6c, 0x6c) power management DRAM self refresh control
 
 //  Shadow RAM & PCI-Hole area
-	map(0x70, 0x73).rw(FUNC(sis630_host_device::shadow_ram_ctrl_r), FUNC(sis630_host_device::shadow_ram_ctrl_w));
-//  map(0x77, 0x77) PCI-Hole characteristics
+    map(0x70, 0x73).rw(FUNC(sis630_host_device::shadow_ram_ctrl_r), FUNC(sis630_host_device::shadow_ram_ctrl_w));
+    map(0x77, 0x77).rw(FUNC(sis630_host_device::pci_hole_r), FUNC(sis630_host_device::pci_hole_w));
 //  map(0x78, 0x79) PCI-Hole #1 allocation
 //  map(0x7a, 0x7b) PCI-Hole #2 allocation
 
@@ -327,13 +327,28 @@ void sis630_host_device::shadow_ram_ctrl_w(offs_t offset, uint32_t data, uint32_
 	remap_cb();
 }
 
+u8 sis630_host_device::pci_hole_r()
+{
+	LOGIO("Read PCI hole [$77]\n");
+	return 0;
+}
+
+void sis630_host_device::pci_hole_w(u8 data)
+{
+	LOGIO("Write PCI hole [$77] %02x\n", data);
+	if (data)
+		LOG("Warning: PCI hole area enabled! %02x\n", data);
+}
+
 u8 sis630_host_device::vga_control_r()
 {
+	LOGIO("Read integrated VGA control data [$9c] %02x\n", m_vga_control);
 	return m_vga_control;
 }
 
-void sis630_host_device::vga_control_w(offs_t offset, u8 data)
+void sis630_host_device::vga_control_w(u8 data)
 {
+	LOGIO("Write integrated VGA control data [$9c] %02x\n", data);
 	m_vga_control = data;
 	remap_cb();
 }
@@ -430,19 +445,4 @@ void sis630_host_device::agp_command_w(offs_t offset, uint32_t data, uint32_t me
 		if (data & 0x30)
 			LOG("Warning: AGP unsupported i/f set 4G=%d FW_Enable=%d\n", bool(BIT(data, 5)), bool(BIT(data, 4)));
 	}
-}
-
-/*
- * Debugging
- */
-
-u8 sis630_host_device::unmap_log_r(offs_t offset)
-{
-	LOGTODO("HOST Unemulated [%02x] R\n", offset + 0x10);
-	return 0;
-}
-
-void sis630_host_device::unmap_log_w(offs_t offset, u8 data)
-{
-	LOGTODO("HOST Unemulated [%02x] %02x W\n", offset + 0x10, data);
 }
