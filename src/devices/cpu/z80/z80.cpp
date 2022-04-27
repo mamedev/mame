@@ -33,12 +33,7 @@
  *    Now:
  *      + fetch opcode
  *      + call EXEC()
- *        + read cc_* value to m_icount_executing
- *          + execute instruction adjusting icount per each Read (arg(), recursive rop())
- *            + before M*Write use rest of m_icount_executing except count required for write
- *            + adjust write icount
- *    Next:
- *      If gracefully adjust icount for each operation after read and before write we can receive precise M timings without cc_* tables.
+          + execute instruction adjusting icount per each Read (arg(), recursive rop()) and Write
  *   Changes in 3.9:
  *    - Fixed cycle counts for LD IYL/IXL/IYH/IXH,n [Marshmellow]
  *    - Fixed X/Y flags in CCF/SCF/BIT, ZEXALL is happy now [hap]
@@ -337,7 +332,7 @@ static const uint8_t cc_ex[0x100] = {
 /***************************************************************
  * adjust cycle count by n T-states
  ***************************************************************/
-#define CC(prefix,opcode) do { m_icount_executing += m_cc_##prefix[opcode]; } while (0)
+#define CC(prefix,opcode) do { m_icount_executing += m_cc_##prefix == nullptr ? 0 : m_cc_##prefix[opcode]; } while (0)
 
 #define T(icount) do { \
 	m_icount -= icount; \
@@ -345,7 +340,7 @@ static const uint8_t cc_ex[0x100] = {
 } while (0)
 
 // T Memory Address
-#define MTM (m_cc_op[0]-1)
+#define MTM ((m_cc_op == nullptr ? 4 : m_cc_op[0])-1)
 
 #define EXEC(prefix,opcode) do { \
 	unsigned op = opcode; \
@@ -417,7 +412,7 @@ static const uint8_t cc_ex[0x100] = {
 	case 0xf8:prefix##_##f8();break; case 0xf9:prefix##_##f9();break; case 0xfa:prefix##_##fa();break; case 0xfb:prefix##_##fb();break; \
 	case 0xfc:prefix##_##fc();break; case 0xfd:prefix##_##fd();break; case 0xfe:prefix##_##fe();break; case 0xff:prefix##_##ff();break; \
 	} \
-	if(m_icount_executing) { T(m_icount_executing); } \
+	if(m_icount_executing > 0) T(m_icount_executing); else m_icount_executing = 0; \
 } while (0)
 
 /***************************************************************
@@ -512,14 +507,16 @@ inline void z80_device::wm16(uint16_t addr, PAIR &r)
 }
 
 /***************************************************************
- * Write a word to given memory location (backword)
+ * Write a word to (SP)
  ***************************************************************/
-inline void z80_device::wm16back(uint16_t addr, PAIR &r)
+inline void z80_device::wm16_sp(PAIR &r)
 {
+	SP--;
 	m_icount_executing -= MTM;
-	wm(addr+1, r.b.h);
+	wm(SPD, r.b.h);
 	m_icount_executing += MTM;
-	wm(addr, r.b.l);
+	SP--;
+	wm(SPD, r.b.l);
 }
 
 /***************************************************************
@@ -592,8 +589,7 @@ inline void z80_device::pop(PAIR &r)
 inline void z80_device::push(PAIR &r)
 {
 	nomreq_ir(1);
-	SP -= 2;
-	wm16back(SPD, r);
+	wm16_sp(r);
 }
 
 /***************************************************************
@@ -656,7 +652,7 @@ inline void z80_device::call()
 	m_ea = arg16();
 	nomreq_addr(PCD-1, 1);
 	WZ = m_ea;
-	push(m_pc);
+	wm16_sp(m_pc);
 	PCD = m_ea;
 }
 
@@ -671,7 +667,7 @@ inline void z80_device::call_cond(bool cond, uint8_t opcode)
 		m_ea = arg16();
 		nomreq_addr(PCD-1, 1);
 		WZ = m_ea;
-		push(m_pc);
+		wm16_sp(m_pc);
 		PCD = m_ea;
 	}
 	else
@@ -1002,10 +998,10 @@ inline void z80_device::exx()
 inline void z80_device::ex_sp(PAIR &r)
 {
 	PAIR tmp = { { 0, 0, 0, 0 } };
-	rm16(SPD, tmp);
-	nomreq_addr(SPD + 1, 1);
+	pop(tmp);
+	nomreq_addr(SPD - 1, 1);
 	m_icount_executing -= 2;
-	wm16back(SPD, r);
+	wm16_sp(r);
 	m_icount_executing += 2;
 	nomreq_addr(SPD, 2);
 	r = tmp;
@@ -3239,7 +3235,8 @@ void z80_device::take_nmi()
 	m_r++;
 
 	m_icount_executing = 11;
-	push(m_pc);
+	T(m_icount_executing - MTM * 2);
+	wm16_sp(m_pc);
 	PCD = 0x0066;
 	WZ=PCD;
 	m_nmi_pending = false;
@@ -3264,7 +3261,9 @@ void z80_device::take_interrupt()
 	LOG(("Z80 single int. irq_vector $%02x\n", irq_vector));
 
 	/* 'interrupt latency' cycles */
-	m_icount_executing = cc_ex[0xff];
+	m_icount_executing = 0;
+	CC(ex, 0xff); // 2
+	T(m_icount_executing);
 
 	/* Interrupt mode 2. Call [i:databyte] */
 	if( m_im == 2 )
@@ -3273,11 +3272,13 @@ void z80_device::take_interrupt()
 		// However, experiments have confirmed that IM 2 vectors do not have to be
 		// even, and all 8 bits will be used; even $FF is handled normally.
 		/* CALL opcode timing */
-		m_icount_executing += m_cc_op[0xcd];
+		CC(op, 0xcd); // 17+2=19
+		T(m_icount_executing - MTM * 4);
+		m_icount_executing -= MTM * 2; // save for rm16
+		wm16_sp(m_pc);
+		m_icount_executing += MTM * 2;
 		irq_vector = (irq_vector & 0xff) | (m_i << 8);
-		PAIR tmp = m_pc;
 		rm16(irq_vector, m_pc);
-		push(tmp);
 		LOG(("Z80 IM2 [$%04x] = $%04x\n", irq_vector, PCD));
 	}
 	else
@@ -3286,8 +3287,9 @@ void z80_device::take_interrupt()
 	{
 		LOG(("Z80 '%s' IM1 $0038\n", tag()));
 		/* RST $38 */
-		m_icount_executing += m_cc_op[0xff];
-		push(m_pc);
+		CC(op, 0xff); // 11+2=13
+		T(m_icount_executing - MTM * 2);
+		wm16_sp(m_pc);
 		PCD = 0x0038;
 	}
 	else
@@ -3304,19 +3306,22 @@ void z80_device::take_interrupt()
 			{
 				case 0xcd0000:  /* call */
 					/* CALL $xxxx cycles */
-					m_icount_executing += m_cc_op[0xcd];
-					push(m_pc);
+					CC(op, 0xcd);
+					T(m_icount_executing - MTM * 2);
+					wm16_sp(m_pc);
 					PCD = irq_vector & 0xffff;
 					break;
 				case 0xc30000:  /* jump */
 					/* JP $xxxx cycles */
-					m_icount_executing += m_cc_op[0xc3];
+					CC(op, 0xc3);
+					T(m_icount_executing);
 					PCD = irq_vector & 0xffff;
 					break;
 				default:        /* rst (or other opcodes?) */
 					/* RST $xx cycles */
-					m_icount_executing += m_cc_op[0xff];
-					push(m_pc);
+					CC(op, 0xff);
+					T(m_icount_executing - MTM * 2);
+					wm16_sp(m_pc);
 					PCD = irq_vector & 0x0038;
 					break;
 			}
@@ -3352,24 +3357,28 @@ void nsc800_device::take_interrupt_nsc800()
 	/* Clear both interrupt flip flops */
 	m_iff1 = m_iff2 = 0;
 
+	/* 'interrupt latency' cycles */
+	m_icount_executing = 0;
+	CC(op, 0xff);
+	CC(ex, 0xff); //2
+
+	T(m_icount_executing - MTM * 2);
 	if (m_nsc800_irq_state[NSC800_RSTA])
 	{
-		push(m_pc);
+		wm16_sp(m_pc);
 		PCD = 0x003c;
 	}
 	else if (m_nsc800_irq_state[NSC800_RSTB])
 	{
-		push(m_pc);
+		wm16_sp(m_pc);
 		PCD = 0x0034;
 	}
 	else if (m_nsc800_irq_state[NSC800_RSTC])
 	{
-		push(m_pc);
+		wm16_sp(m_pc);
 		PCD = 0x002c;
 	}
-
-	/* 'interrupt latency' cycles */
-	m_icount -= m_cc_op[0xff] + cc_ex[0xff];
+	T(m_icount_executing);
 
 	WZ=PCD;
 
@@ -3624,7 +3633,7 @@ void z80_device::execute_run()
 
 		// check for interrupts before each instruction
 		check_interrupts();
-		T(m_icount_executing);
+		m_icount_executing = 0;
 
 		m_after_ei = false;
 		m_after_ldair = false;
@@ -3668,6 +3677,7 @@ void z80_device::execute_set_input(int inputnum, int state)
 		break;
 
 	case INPUT_LINE_IRQ0:
+		if(state && !m_irq_state) m_irq_at = total_cycles() + m_icount;
 		/* update the IRQ state via the daisy chain */
 		m_irq_state = state;
 		if (daisy_chain_present())
