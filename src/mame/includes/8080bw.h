@@ -168,7 +168,6 @@ private:
 	uint8_t invrvnge_02_r();
 	void invrvnge_port03_w(uint8_t data);
 	void invrvnge_port05_w(uint8_t data);
-	uint8_t invasion_port_3_r();
 	void lupin3_00_w(uint8_t data);
 	void lupin3_sh_port_1_w(uint8_t data);
 	void lupin3_sh_port_2_w(uint8_t data);
