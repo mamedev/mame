@@ -769,7 +769,6 @@ void spectrum_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	case TIMER_IRQ_ON:
 		m_maincpu->set_input_line(0, HOLD_LINE);
 		timer_set(m_maincpu->clocks_to_attotime(32), TIMER_IRQ_OFF, 0);
-		m_irq_start_cycle = m_maincpu->total_cycles();
 		break;
 	case TIMER_IRQ_OFF:
 		m_maincpu->set_input_line(0, CLEAR_LINE);
