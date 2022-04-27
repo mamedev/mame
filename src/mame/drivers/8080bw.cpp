@@ -1360,7 +1360,7 @@ static INPUT_PORTS_START( invasion )
   /* Port 3 
       Bit 1 is checked one-shot, at start, in the first seven bytes of code. If set to low the code continues normally to the init code, if set to high the CPU is halted. 
             I don't know if this is some sort of protection. From PCB, I traced it to pin 12B on edge connector. That pin on the original SIDAM Invasion manual is marked as SPARE.
-      Bit 2 Coin counter protection: If coin counter is disconnected the game didn't start as described in the original SIDAM user manual:
+      Bit 2 Coin counter protection: If coin counter is disconnected the game stops as described in the original SIDAM user manual:
             "4. Protezione contatore: il microprocessore controlla che il contatore sia inserito e funzioni regolarmente. Nel caso il contatore venga staccato il
              programma si arresta e non riprende finchè il contatore non viene regolar-mente ricollegato."
             In hardware this value is driven by a transistor connected between pin 16A and pin 22A of the edge connector.
