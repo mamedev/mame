@@ -178,22 +178,18 @@ void sis630_state::sis630(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback("pci:01.0:pic_master", FUNC(pic8259_device::inta_cb));
 //  m_maincpu->smiact().set("pci:00.0", FUNC(sis950_lpc_device::smi_act_w));
 
+	// TODO: unknown flash ROM types
+	// Needs a $80000 sized ROM
+	AMD_29F400T(config,  "flash");
+
 	PCI_ROOT(config, "pci", 0);
 	// up to 512MB, 2 x DIMM sockets
-	SIS630_HOST(config, "pci:00.0", 0, "maincpu", "pci:03.0", 256*1024*1024);
+	SIS630_HOST(config, "pci:00.0", 0, "maincpu", "pci:02.0:00.0", 256*1024*1024);
 	SIS5513_IDE(config, m_ide, 0);
-	// TODO: this should be pci:00.0:00.0 but for some reason it won't work with current model
-	// (or bus #1 with 00.0)
-	// just install it on a different device # for the time being
-	SIS630_GUI (config, "pci:03.0", 0);
 	m_ide->irq_pri().set("pci:01.0:pic_slave", FUNC(pic8259_device::ir6_w));
 		//FUNC(sis950_lpc_device::pc_irq14_w));
 	m_ide->irq_sec().set("pci:01.0:pic_slave", FUNC(pic8259_device::ir7_w));
 		//FUNC(sis950_lpc_device::pc_mirq0_w));
-
-	// TODO: unknown flash ROM types
-	// Needs a $80000 sized ROM
-	AMD_29F400T(config,  "flash");
 
 	SIS950_LPC  (config, "pci:01.0", 0, "maincpu", "flash");
 	LPC_ACPI    (config, "pci:01.0:acpi", 0);
@@ -209,6 +205,9 @@ void sis630_state::sis630(machine_config &config)
 
 	// "Virtual PCI-to-PCI Bridge"
 	PCI_BRIDGE(config, "pci:02.0", 0, 0x10396001, 0x00);
+	// GUI must go under the virtual bridge
+	// This will be correctly identified as bus #1-dev #0-func #0 by the Award BIOS
+	SIS630_GUI(config, "pci:02.0:00.0", 0);
 
 	// optional stuff (according to Kontron 786LCD manual)
 //	"pci:08.0" SCSI controller (vendor=1000 NCR / LSI Logic / Symbios Logic device=0012 53C895A)
