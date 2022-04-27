@@ -10640,7 +10640,11 @@ ROM_START( super7 )
 	ROM_LOAD( "gal20v8.bin",   0x000, 0x114, NO_DUMP )
 ROM_END
 
-ROM_START( chthree )
+/*
+  Channel Three
+  Seems a modded version of Cherry Master.
+
+*/ROM_START( chthree )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.u40",   0x0000, 0x8000, CRC(3d677758) SHA1(d2d13e54d3b55460a05b0ca42e12d8a6d72954ba) ) // 1ST AND 2ND HALF IDENTICAL
 	ROM_IGNORE(0x8000)
@@ -10669,12 +10673,13 @@ ROM_START( chthree )
 	ROM_REGION( 0x200, "proms2", 0 )
 	ROM_LOAD( "82s129.u24", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 
-	ROM_REGION( 0x800, "plds", 0 ) // PALs dumps from a 27c020 adapter are available, need checking / conversion
-	ROM_LOAD( "16l8_u18.bin", 0x0000, 0x117, NO_DUMP )
-	ROM_LOAD( "16l8_u31.bin", 0x0200, 0x117, NO_DUMP )
-	ROM_LOAD( "16l8_u32.bin", 0x0400, 0x117, NO_DUMP )
-	ROM_LOAD( "16l8_u30.bin", 0x0600, 0x117, NO_DUMP )
+	ROM_REGION( 0x800, "plds", 0 ) // PALs were bruteforced and converted.
+	ROM_LOAD( "tibpal_16l8.u18", 0x0000, 0x117, CRC(374f878e) SHA1(3b3a66dd1addbd4a8678ef8000a5426651010ebd) )
+	ROM_LOAD( "tibpal_16l8.u30", 0x0200, 0x117, CRC(d3cfa978) SHA1(9aae06336be34818896c39d9af9c19d8b2035548) )
+	ROM_LOAD( "tibpal_16l8.u31", 0x0400, 0x117, CRC(97f1f441) SHA1(bc9e7bba675df363e7fcad18efad89f6a543b2a4) )
+	ROM_LOAD( "tibpal_16l8.u32", 0x0600, 0x117, CRC(8a5a8ded) SHA1(abb2bb51f0ead55606cc279ca4bef400d62730b0) )
 ROM_END
+
 
 /*
 2764.u10                m4.64                   IDENTICAL
