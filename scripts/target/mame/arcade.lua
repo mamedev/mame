@@ -3393,8 +3393,6 @@ files {
 createMAMEProjects(_target, _subtarget, "sanritsu")
 files {
 	MAME_DIR .. "src/mame/drivers/appoooh.cpp",
-	MAME_DIR .. "src/mame/includes/appoooh.h",
-	MAME_DIR .. "src/mame/video/appoooh.cpp",
 	MAME_DIR .. "src/mame/drivers/bankp.cpp",
 	MAME_DIR .. "src/mame/includes/bankp.h",
 	MAME_DIR .. "src/mame/video/bankp.cpp",
