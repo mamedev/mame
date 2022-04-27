@@ -792,7 +792,7 @@ ROM_END
 //    YEAR  NAME       PARENT    MACHINE    INPUT     CLASS            INIT        ROT    COMPANY                                      FULLNAME                            FLAGS
 GAME( 1991, 4enlinea,  0,        _4enlinea, 4enlinea, _4enlinea_state, empty_init, ROT0, "Compumatic / CIC Play",                     "Cuatro en Linea (rev. A-07)",       MACHINE_NOT_WORKING )
 GAME( 1991, 4enlineb,  4enlinea, _4enlinea, 4enlinea, _4enlinea_state, empty_init, ROT0, "Compumatic / CIC Play",                     "Cuatro en Linea (rev. A-06)",       MACHINE_NOT_WORKING )
-GAME( 1992, unkdarts,  0,        _4enlinea, 4enlinea, _4enlinea_state, empty_init, ROT0, "Oper Coin",                                 "Unknown darts game (487 System I)", MACHINE_NOT_WORKING )
+GAME( 1992, unkdarts,  0,        _4enlinea, 4enlinea, _4enlinea_state, empty_init, ROT0, "Oper Coin",                                 "unknown darts game (487 System I)", MACHINE_NOT_WORKING )
 GAME( 1994, k7_olym,   0,        k7_olym,   k7_olym,  _4enlinea_state, empty_init, ROT0, "K7 Kursaal / NMI Electronics",              "Olympic Darts K7 (v3.11)",          MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 GAME( 1994, k7_olym30, k7_olym,  k7_olym,   k7_olym,  _4enlinea_state, empty_init, ROT0, "K7 Kursaal / NMI Electronics",              "Olympic Darts K7 (v3.00)",          MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 GAME( 1993, sprtdart,  0,        k7_olym,   k7_olym,  _4enlinea_state, empty_init, ROT0, "Compumatic / Desarrollos y Recambios S.L.", "Sport Darts T.V.",                  MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
