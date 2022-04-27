@@ -2115,6 +2115,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/pcxt.cpp",
 	MAME_DIR .. "src/mame/drivers/quakeat.cpp",
 	MAME_DIR .. "src/mame/drivers/queen.cpp",
+	MAME_DIR .. "src/mame/drivers/sis630.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "igs")
@@ -4854,7 +4855,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/gambl186.cpp",
 	MAME_DIR .. "src/mame/drivers/galaxi.cpp",
 	MAME_DIR .. "src/mame/drivers/galgame.cpp",
-	MAME_DIR .. "src/mame/drivers/gamecstl.cpp",
 	MAME_DIR .. "src/mame/drivers/gamemasters.cpp",
 	MAME_DIR .. "src/mame/drivers/gammagic.cpp",
 	MAME_DIR .. "src/mame/drivers/gamtor.cpp",

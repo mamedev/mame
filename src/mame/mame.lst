@@ -14939,10 +14939,6 @@ gambl186d                       // EGD
 @source:gamecom.cpp
 gamecom                         // Tiger Game.com
 
-@source:gamecstl.cpp
-gamecst2                        // MAME based bootleg, version 2.613
-gamecstl                        // MAME based bootleg
-
 @source:gamecube.cpp
 gcjp                            // (c) 2001 Nintendo
 gcus                            // (c) 2001 Nintendo
@@ -38924,6 +38920,8 @@ simpsons4pa                     // GX072 (c) 1991 (Asia)
 simpsons4pe                     // GX072 (c) 1991 (World)
 
 @source:sis630.cpp
+gamecst2                        // MAME based bootleg, version 2.613
+gamecstl                        // MAME based bootleg
 shutms11						// (c) 2000
 
 @source:sitcom.cpp

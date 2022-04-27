@@ -36,13 +36,14 @@ class sis950_lpc_device : public pci_device
 public:
 	sis950_lpc_device(
 		const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, 
-		const char *cpu_tag
+		const char *cpu_tag, const char *flash_tag
 	) : sis950_lpc_device(mconfig, tag, owner, clock)
 	{
 		// Revision 0 -> A0
 		set_ids(0x10390008, 0x00, 0x060100, 0x00);
 		//set_multifunction_device(true);
 		m_host_cpu.set_tag(cpu_tag);
+		m_flash_rom.set_tag(flash_tag);
 	}
 	
 	sis950_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -66,7 +67,7 @@ protected:
 	
 private:
 	required_device<cpu_device> m_host_cpu;
-	required_device<amd_29lv200t_device> m_flash_rom;
+	required_device<intelfsh8_device> m_flash_rom;
 	required_device<pic8259_device> m_pic_master;
 	required_device<pic8259_device> m_pic_slave;
 	required_device<am9517a_device> m_dmac_master;

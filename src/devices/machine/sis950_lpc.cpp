@@ -119,10 +119,6 @@ WRITE_LINE_MEMBER(sis950_lpc_device::cpu_reset_w)
 
 void sis950_lpc_device::device_add_mconfig(machine_config &config)
 {
-	// TODO: unknown flash ROM type
-	// Needs a $40000 sized ROM
-	AMD_29LV200T(config, m_flash_rom);
-
 	// confirmed 82C54
 	PIT8254(config, m_pit, 0);
 	m_pit->set_clk<0>(4772720/4); // heartbeat IRQ
@@ -518,20 +514,19 @@ void sis950_lpc_device::map_extra(uint64_t memory_window_start, uint64_t memory_
 	}
 
 	// TODO: disable flash access write thru reg $45
-	// TODO: BIOS positive decode (?)
+	// TODO: BIOS positive decode 
+	// (bios_control bit 1), which should disable BIOS mapping to E and F segment
 
-	memory_space->install_device(0x000e0000, 0x000fffff, *this, &sis950_lpc_device::memory_map<1>);
+	memory_space->install_device(0x000e0000, 0x000fffff, *this, &sis950_lpc_device::memory_map<3>);
 	// extended BIOS enable
 	if (m_bios_control & 1)
 	{
 		LOGMAP("- Extend BIOS on\n");
-		memory_space->install_device(0xfffc0000, 0xfffdffff, *this, &sis950_lpc_device::memory_map<0>);
-
-	//	memory_space->install_ram(0xfffc0000, 0xfffdffff, m_region->base());
+		memory_space->install_device(0xfff80000, 0xfff9ffff, *this, &sis950_lpc_device::memory_map<0>);
+		memory_space->install_device(0xfffa0000, 0xfffbffff, *this, &sis950_lpc_device::memory_map<1>);
+		memory_space->install_device(0xfffc0000, 0xfffdffff, *this, &sis950_lpc_device::memory_map<2>);
 	}
-//	memory_space->install_ram(0xfffe0000, 0xffffffff, m_region->base() + 0x20000);
-	memory_space->install_device(0xfffe0000, 0xffffffff, *this, &sis950_lpc_device::memory_map<1>);
-
+	memory_space->install_device(0xfffe0000, 0xffffffff, *this, &sis950_lpc_device::memory_map<3>);
 }
 
 u8 sis950_lpc_device::lpc_fast_init_r()
