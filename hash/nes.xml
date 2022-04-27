@@ -49718,6 +49718,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="oekakids" />
 			<feature name="pcb" value="BANDAI-OEKAKIDS" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="oeka kids - anpanman no hiragana daisuki (japan).prg" size="131072" crc="c3c0811d" sha1="32d71dd6c5a8d78a918fe1b9d6d6c4a570d9652d" offset="00000" status="baddump" />
 			</dataarea>
@@ -56021,6 +56022,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="serial" value="MGC-002"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txc_22110" />
+			<feature name="mirroring" value="vertical" />
 			<feature name="peripheral" value="bandai_hypershot" />
 			<dataarea name="prg" size="262144">
 				<rom name="2-in-1 uzi lightgun (mgc-002).prg" size="262144" crc="7349c91a" sha1="00d0c7a423b9c8c18974022c619d9f3084c4fd8d" status="baddump" />
@@ -56377,6 +56379,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
 		</part>
 	</software>
 
@@ -56393,6 +56399,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -56412,8 +56422,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
-			<!-- 8k WRAM on cartridge -->
-			<dataarea name="wram" size="8192">
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -56431,8 +56442,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
-			<!-- 8k WRAM on cartridge -->
-			<dataarea name="wram" size="8192">
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -57642,6 +57654,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
 		</part>
 	</software>
 
@@ -58426,6 +58442,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="alt_title" value="荊軻新傳"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="jncota_kt1001" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="131072">
 				<rom name="[kt-1001] jing ke xin zhuan (c).chr" size="131072" crc="0024a801" sha1="ba7a408c852c5ec611851f3f1ae75ce6056837f2" offset="00000" status="baddump" />
 			</dataarea>
@@ -58448,6 +58465,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="alt_title" value="聖火列傳"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="jncota_kt1001" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="131072">
 				<rom name="[kt-1002] sheng huo lie zhuan (c).chr" size="131072" crc="7c6f37fc" sha1="3a4da287653ec929adac7362c38687f14ca42080" offset="00000" status="baddump" />
 			</dataarea>
@@ -58580,6 +58598,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="alt_title" value="战国风云"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="jncota_kt1001" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="131072">
 				<rom name="[kt-1013] zhan guo feng yun (c).chr" size="131072" crc="4026c277" sha1="31bca971eab6f2c3d9a3e58fd2441730d8e666e1" offset="00000" status="baddump" />
 			</dataarea>
@@ -58602,6 +58621,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="alt_title" value="侠客传奇"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="jncota_kt1001" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="131072">
 				<rom name="[kt-1014] xia ke chuan qi (c).chr" size="131072" crc="f6d312af" sha1="3261d2f7f8cf9bb366a9d0361251161dbce81033" offset="00000" status="baddump" />
 			</dataarea>
@@ -67344,6 +67364,10 @@ from the NEStopia source, hence they would require confirmation. -->
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
 		</part>
 	</software>
 
@@ -67361,6 +67385,10 @@ from the NEStopia source, hence they would require confirmation. -->
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
 		</part>
 	</software>
 
@@ -67376,6 +67404,10 @@ from the NEStopia source, hence they would require confirmation. -->
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -68626,6 +68658,10 @@ All musics were removed in this game.
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -84122,6 +84158,7 @@ be better to redump them properly. -->
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bmc_830425c" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="1048576">
 				<rom name="super hik 6-in-1 a-030.prg" size="1048576" crc="ee62ac32" sha1="6f7dbfdbdc1633e45c84d2e1b7f833d2ef7741c3" status="baddump" />
 			</dataarea>
@@ -86395,6 +86432,7 @@ be better to redump them properly. -->
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sgun20in1" />
 			<feature name="pcb" value="BMC-SUPERGUN-20IN1" />
+			<feature name="mirroring" value="vertical" />
 			<feature name="peripheral" value="zapper" />
 			<dataarea name="chr" size="32768">
 				<rom name="super gun 20-in-1 [p1].chr" size="32768" crc="2d5d160c" sha1="887efc66eca7af81b11c94874d15add6c156da09" offset="00000" status="baddump" />

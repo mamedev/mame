@@ -98,7 +98,6 @@ void nes_jy_typea_device::device_start()
 
 void nes_jy_typea_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
 	chr8(0, m_chr_source);
 
