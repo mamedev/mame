@@ -169,6 +169,8 @@ void sis630_svga_device::seq_reg_write(uint8_t index, uint8_t data)
 					{
 						if (BIT(data, 2))
 							svga.rgb15_en = 1;
+						if (BIT(data, 3))
+							svga.rgb16_en = 1;
 					}
 					break;
 				case 0x0b:

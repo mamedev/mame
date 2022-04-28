@@ -32,6 +32,11 @@
       \- Doesn't accept any PS/2 input, tries to install a "PCI standard CPU Host Bridge" (?),
 	     hangs there;
       \- GUI is never recognized no matter what, punts with DirectX not installed;
+    - windows xp sp3: tests HW then does an ACPI devtrap write, skipping that will BSoD with a
+	  STOP #7b (INACCESSIBLE_BOOT_DEVICE) with param #0 pointing at the CDROM
+    - xubuntu 10.10: detects EISA boards with a "@@@@0000" value (?), stalls pointlessly with both
+      tsc and notsc options (i.e. PIT ch.0 never gives a value bigger than the threshold),
+	  eventually throws a kernel panic.
 
 ===================================================================================================
 
