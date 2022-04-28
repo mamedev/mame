@@ -24,10 +24,7 @@ Bottom board - M75-B-A (all versions regardless of mask ROM/EPROM)
 Roberto Fresca 2022.04.23:
 Added Bowmen, from Ten-Level.  A very rare Spanish game.
 
-The game uses derivative hardware, and has some oddities, like lack of some
-music codes or clipped samples.  They may have finished development
-abruptly, without time for final polish.  Seems to finish in level 10
-(30 stages), but the game is so hard, testing is difficult.
+The game uses derivative hardware.
 
 ***************************************************************************/
 
@@ -151,7 +148,7 @@ void vigilant_state::bowmen_io_map(address_map &map)
 
 void vigilant_state::sound_map(address_map &map)
 {
-	map(0x0000, 0xbfff).rom();
+	map(0x0000, 0xefff).rom();
 	map(0xf000, 0xffff).ram();
 }
 
