@@ -42,7 +42,7 @@ protected:
 		// Provides interrupt status
 		uint32_t intstat = 0;
 
-		// Count of data to transfer or data recieved
+		// Count of data to transfer or data received
 		uint32_t count = 0;
 
 		void reset()
@@ -137,6 +137,22 @@ protected:
 
 	static constexpr int FIFO_CH_TOTAL = 4;
 	apfifo_channel fifo_channels[FIFO_CH_TOTAL];
+
+	// FIFO operations
+	uint32_t read_fifo_size(offs_t offset);
+	void write_fifo_size(offs_t offset, uint32_t data);
+	uint32_t read_address(offs_t offset);
+	void write_address(offs_t offset, uint32_t data);
+	uint32_t read_dma_mode(offs_t offset);
+	void write_dma_mode(offs_t offset, uint32_t data);
+	uint32_t read_intctrl(offs_t offset);
+	void write_intctrl(offs_t offset, uint32_t data);
+	uint32_t read_intstat(offs_t offset);
+	uint32_t read_count(offs_t offset);
+	uint8_t read_fifo_data(offs_t offset);
+	void write_fifo_data(offs_t offset, uint8_t data);
+	uint32_t read_fifo_ram(offs_t offset);
+	void write_fifo_ram(offs_t offset, uint32_t data, uint32_t mem_mask);
 };
 
 DECLARE_DEVICE_TYPE(CXD8442Q, cxd8442q_device)

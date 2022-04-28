@@ -9,7 +9,7 @@
  * documentation avaliable for these chips (that I have been able to find, anyways), so this implements the bare minimum
  * needed to satisfy the monitor ROM (for booting off of floppy drives) and NEWS-OS (for async serial communication).
  * I'm sure there is a lot of missing or hardware inaccurate functionality here - this was all derived from running stuff
- * and observing the debugger/ emulator log files. Additionally, the way this is coded makes it interrupt pretty much whenever
+ * and observing the debugger and emulator log files. Additionally, the way this is coded makes it interrupt pretty much whenever
  * data is avaliable. The real hardware probably buffers this more.
  *
  * The NWS-5000X uses two of these chips to drive the following peripherals:
@@ -35,8 +35,18 @@ namespace
 	// 128KiB used as the FIFO RAM (can be divided up to 4 regions, 1 per channel)
 	static constexpr int FIFO_MAX_RAM_SIZE = 0x20000;
 
-	// offset from one channel to the next
-	static constexpr int FIFO_REGION_OFFSET = 0x10000;
+	// offset shift counters for extracting the FIFO channel
+	static inline uint32_t dw_offset_to_channel(offs_t offset)
+	{
+		// u32 handlers get dword offsets
+		return offset >> 14;
+	}
+
+	static inline uint32_t byte_offset_to_channel(offs_t offset)
+	{
+		// u8 handlers get byte offsets
+		return offset >> 16;
+	}
 
 	// offset from the channel 0 control register to the RAM
 	static constexpr int FIFO_RAM_OFFSET = 0x80000;
@@ -48,7 +58,7 @@ namespace
 
 cxd8442q_device::cxd8442q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CXD8442Q, tag, owner, clock), out_irq(*this),
-	fifo_channels{apfifo_channel(*this), apfifo_channel(*this), apfifo_channel(*this), apfifo_channel(*this)}
+	  fifo_channels{apfifo_channel(*this), apfifo_channel(*this), apfifo_channel(*this), apfifo_channel(*this)}
 {
 }
 
@@ -56,80 +66,113 @@ void cxd8442q_device::map(address_map &map)
 {
 	// Each channel has the same structure
 	// The devices are mapped at the platform level, so this device only needs to handle the DMA and assorted details
-	for (int channel = 0; channel < FIFO_CH_TOTAL; ++channel)
-	{
-		int channel_base = FIFO_REGION_OFFSET * channel; // start of a channel's registers
+	map(0x0, 0x3).select(0x30000).rw(FUNC(cxd8442q_device::read_fifo_size), FUNC(cxd8442q_device::write_fifo_size));
+	map(0x04, 0x07).select(0x30000).rw(FUNC(cxd8442q_device::read_address), FUNC(cxd8442q_device::write_address));
+	map(0x0c, 0x0f).select(0x30000).rw(FUNC(cxd8442q_device::read_dma_mode), FUNC(cxd8442q_device::write_dma_mode));
+	map(0x18, 0x1b).select(0x30000).rw(FUNC(cxd8442q_device::read_intctrl), FUNC(cxd8442q_device::write_intctrl));
+	map(0x1c, 0x1f).select(0x30000).r(FUNC(cxd8442q_device::read_intstat));
+	map(0x30, 0x33).select(0x30000).r(FUNC(cxd8442q_device::read_count));
+	map(0x34, 0x37).select(0x30000).rw(FUNC(cxd8442q_device::read_fifo_data), FUNC(cxd8442q_device::write_fifo_data));
 
-		map(channel_base + 0x00, channel_base + 0x03).lrw32(NAME(([this, channel]()
-																  { return fifo_channels[channel].fifo_size; })),
-															NAME(([this, channel](uint32_t data)
-																  {
-																	  LOG("FIFO CH%d: Setting fifo_size to 0x%x\n", channel, data);
-																	  fifo_channels[channel].fifo_size = data;
-																  })));
-
-		map(channel_base + 0x04, channel_base + 0x07).lrw32(NAME(([this, channel]()
-																  { return fifo_channels[channel].address; })),
-															NAME(([this, channel](uint32_t data)
-																  {
-																	  LOG("FIFO CH%d: Setting address to 0x%x\n", channel, data);
-																	  fifo_channels[channel].address = data;
-																  })));
-
-		map(channel_base + 0x0c, channel_base + 0x0f).lrw32(NAME(([this, channel]()
-																  { return fifo_channels[channel].dma_mode; })),
-															NAME(([this, channel](uint32_t data)
-																  {
-																	  LOG("FIFO CH%d: Setting DMA mode to 0x%x (%s)\n", channel, data, machine().describe_context());
-																	  fifo_channels[channel].dma_mode = data;
-																	  if (data & apfifo_channel::DMA_EN)
-																	  {
-																		  fifo_timer->adjust(attotime::zero, 0, attotime::from_usec(DMA_TIMER));
-																	  }
-																  })));
-
-		map(channel_base + 0x18, channel_base + 0x1b).lrw32(NAME(([this, channel]()
-																  { return fifo_channels[channel].intctrl; })),
-															NAME(([this, channel](offs_t offset, uint32_t data)
-																  {
-																	  LOG("FIFO CH%d: Set intctrl = 0x%x (%s)\n", channel, data, machine().describe_context());
-																	  // It isn't 100% clear what the trigger for clearing intstat is
-																	  // but this seems like a reasonable place for it to go, and it works.
-																	  fifo_channels[channel].intstat = 0x0;
-																	  fifo_channels[channel].intctrl = data;
-																	  irq_check();
-																  })));
-
-		map(channel_base + 0x1c, channel_base + 0x1f).lr32(NAME(([this, channel]()
-																 {
-																	 // There seems to be more in this register, but this is the minimum to get the ESCCF working.
-																	 auto intstat = fifo_channels[channel].intstat;
-																	 auto mask = fifo_channels[channel].intctrl & 0x1;
-																	 return intstat & mask;
-																 })));
-
-		// These locations are written to a lot but not emulating them doesn't stop it from working for simple cases
-		map(channel_base + 0x20, channel_base + 0x2f).noprw();
-
-		map(channel_base + 0x30, channel_base + 0x33).lr32(NAME(([this, channel]()
-																 { return fifo_channels[channel].count; })));
-
-		map(channel_base + 0x34, channel_base + 0x37).lrw8(NAME(([this, channel]()
-																 { return fifo_channels[channel].read_data_from_fifo(); })),
-														   NAME(([this, channel](offs_t offset, uint8_t data)
-																 {
-																	 LOG("FIFO CH%d: Pushing 0x%x\n", channel, data, machine().describe_context());
-																	 fifo_channels[channel].write_data_to_fifo(data);
-																 })));
-	}
+	// These locations are written to a lot but not emulating them doesn't stop it from working for simple cases
+	map(0x20, 0x2f).mirror(0x30000).noprw();
 }
 
 void cxd8442q_device::map_fifo_ram(address_map &map)
 {
-	map(0x0, FIFO_MAX_RAM_SIZE - 1).lrw32(NAME(([this](offs_t offset)
-												{ return fifo_ram[offset]; })),
-										  NAME(([this](offs_t offset, uint32_t data, uint32_t mem_mask)
-												{ COMBINE_DATA(&fifo_ram[offset]); })));
+	map(0x0, FIFO_MAX_RAM_SIZE - 1).rw(FUNC(cxd8442q_device::read_fifo_ram), FUNC(cxd8442q_device::write_fifo_ram));
+}
+
+uint32_t cxd8442q_device::read_fifo_size(offs_t offset)
+{
+	return fifo_channels[dw_offset_to_channel(offset)].fifo_size;
+}
+
+void cxd8442q_device::write_fifo_size(offs_t offset, uint32_t data)
+{
+	uint32_t channel = dw_offset_to_channel(offset);
+	LOG("FIFO CH%d: Setting fifo_size to 0x%x\n", channel, data);
+	fifo_channels[channel].fifo_size = data;
+}
+
+uint32_t cxd8442q_device::read_address(offs_t offset)
+{
+	return fifo_channels[dw_offset_to_channel(offset)].address;
+}
+
+void cxd8442q_device::write_address(offs_t offset, uint32_t data)
+{
+	uint32_t channel = dw_offset_to_channel(offset);
+	LOG("FIFO CH%d: Setting address to 0x%x\n", channel, data);
+	fifo_channels[channel].address = data;
+}
+
+uint32_t cxd8442q_device::read_dma_mode(offs_t offset)
+{
+	return fifo_channels[dw_offset_to_channel(offset)].dma_mode;
+}
+
+void cxd8442q_device::write_dma_mode(offs_t offset, uint32_t data)
+{
+	uint32_t channel = dw_offset_to_channel(offset);
+	LOG("FIFO CH%d: Setting DMA mode to 0x%x (%s)\n", channel, data, machine().describe_context());
+	fifo_channels[channel].dma_mode = data;
+	if (data & apfifo_channel::DMA_EN)
+	{
+		fifo_timer->adjust(attotime::zero, 0, attotime::from_usec(DMA_TIMER));
+	}
+}
+
+uint32_t cxd8442q_device::read_intctrl(offs_t offset)
+{
+	return fifo_channels[dw_offset_to_channel(offset)].intctrl;
+}
+
+void cxd8442q_device::write_intctrl(offs_t offset, uint32_t data)
+{
+	uint32_t channel = dw_offset_to_channel(offset);
+	LOG("FIFO CH%d: Set intctrl = 0x%x (%s)\n", channel, data, machine().describe_context());
+	// It isn't 100% clear what the trigger for clearing intstat is
+	// but this seems like a reasonable place for it to go, and it works.
+	fifo_channels[channel].intstat = 0x0;
+	fifo_channels[channel].intctrl = data;
+	irq_check();
+}
+
+uint32_t cxd8442q_device::read_intstat(offs_t offset)
+{
+	uint32_t channel = dw_offset_to_channel(offset);
+	// There seems to be more in this register, but this is the minimum to get the ESCCF working.
+	auto intstat = fifo_channels[channel].intstat;
+	auto mask = fifo_channels[channel].intctrl & 0x1;
+	return intstat & mask;
+}
+
+uint32_t cxd8442q_device::read_count(offs_t offset)
+{
+	return fifo_channels[dw_offset_to_channel(offset)].count;
+}
+
+uint8_t cxd8442q_device::read_fifo_data(offs_t offset)
+{
+	return fifo_channels[byte_offset_to_channel(offset)].read_data_from_fifo();
+}
+
+void cxd8442q_device::write_fifo_data(offs_t offset, uint8_t data)
+{
+	uint32_t channel = byte_offset_to_channel(offset);
+	LOG("FIFO CH%d: Pushing 0x%x\n", channel, data, machine().describe_context());
+	fifo_channels[channel].write_data_to_fifo(data);
+}
+
+uint32_t cxd8442q_device::read_fifo_ram(offs_t offset)
+{
+	return fifo_ram[offset];
+}
+
+void cxd8442q_device::write_fifo_ram(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	COMBINE_DATA(&fifo_ram[offset]);
 }
 
 void cxd8442q_device::device_start()
