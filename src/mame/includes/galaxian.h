@@ -314,6 +314,7 @@ public:
 	void astroamb(machine_config &config);
 	void mimonkey(machine_config &config);
 	void mimonscr(machine_config &config);
+	void galartic(machine_config &config);
 
 	template <int Mask> CUSTOM_INPUT_MEMBER(ckongg_coinage_r);
 	template <int Mask> DECLARE_READ_LINE_MEMBER(ckongs_coinage_r);
@@ -351,6 +352,7 @@ protected:
 	void frogger_sound_portmap(address_map &map);
 	void froggeram_map(address_map &map);
 	void froggermc_map(address_map &map);
+	void galartic_map(address_map &map);
 	void galaxian_map(address_map &map);
 	void galaxian_map_base(address_map &map);
 	void galaxian_map_discrete(address_map &map);
@@ -412,10 +414,10 @@ protected:
 	int m_bullets_base = 0x60;
 	int m_sprites_base = 0x40;
 	int m_numspritegens = 1;
-	uint16_t m_protection_state;
-	uint8_t m_protection_result;
-	uint8_t m_konami_sound_control;
-	uint8_t m_irq_enabled;
+	uint16_t m_protection_state = 0;
+	uint8_t m_protection_result = 0;
+	uint8_t m_konami_sound_control = 0;
+	uint8_t m_irq_enabled = 0;
 	int m_irq_line = INPUT_LINE_NMI;
 	bool m_frogger_adjust = false;
 	uint8_t m_x_scale = GALAXIAN_XSCALE;
@@ -427,21 +429,21 @@ protected:
 	draw_bullet_delegate m_draw_bullet_ptr;
 	draw_background_delegate m_draw_background_ptr;
 
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_flipscreen_x;
-	uint8_t m_flipscreen_y;
-	uint8_t m_background_enable;
-	uint8_t m_background_red;
-	uint8_t m_background_green;
-	uint8_t m_background_blue;
-	uint32_t m_star_rng_origin;
-	uint32_t m_star_rng_origin_frame;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_flipscreen_x = 0;
+	uint8_t m_flipscreen_y = 0;
+	uint8_t m_background_enable = 0;
+	uint8_t m_background_red = 0;
+	uint8_t m_background_green = 0;
+	uint8_t m_background_blue = 0;
+	uint32_t m_star_rng_origin = 0;
+	uint32_t m_star_rng_origin_frame = 0;
 	rgb_t m_star_color[64];
 	std::unique_ptr<uint8_t[]> m_stars;
-	uint8_t m_stars_enabled;
-	uint8_t m_stars_blink_state;
+	uint8_t m_stars_enabled = 0;
+	uint8_t m_stars_blink_state = 0;
 	rgb_t m_bullet_color[8];
-	uint8_t m_gfxbank[5];
+	uint8_t m_gfxbank[5]{};
 	uint8_t m_leftspriteclip = 16;
 };
 
@@ -608,8 +610,8 @@ private:
 	required_device<dac_byte_interface> m_dac;
 	required_ioport m_mux_port;
 
-	uint8_t m_speech_dip;
-	uint8_t m_sound;
+	uint8_t m_speech_dip = 0;
+	uint8_t m_sound = 0;
 };
 
 
@@ -670,7 +672,7 @@ private:
 	required_ioport_array<10> m_game_dsw;
 	required_memory_bank m_mainbank;
 
-	uint8_t m_current_game;
+	uint8_t m_current_game = 0;
 };
 
 
@@ -902,7 +904,7 @@ private:
 	required_device<sp0250_device> m_sp0250;
 	required_memory_bank m_soundbank;
 
-	uint8_t m_p2;
+	uint8_t m_p2 = 0;
 };
 
 

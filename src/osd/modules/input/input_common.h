@@ -447,7 +447,7 @@ protected:
 public:
 
 	const osd_options *   options() const { return m_options; }
-	input_device_list *   devicelist() { return &m_devicelist; }
+	input_device_list &   devicelist() { return m_devicelist; }
 	bool                  input_enabled() const { return m_input_enabled; }
 	bool                  input_paused() const { return m_input_paused; }
 	bool                  mouse_enabled() const { return m_mouse_enabled; }
@@ -504,7 +504,7 @@ public:
 
 	virtual void exit() override
 	{
-		devicelist()->free_all_devices();
+		devicelist().free_all_devices();
 	}
 
 protected:

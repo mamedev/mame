@@ -47,8 +47,8 @@ private:
 	output_finder<> m_self_test;
 
 	/* misc */
-	uint8_t m_lut_gun1[0x100];
-	uint8_t m_lut_gun2[0x100];
+	uint8_t m_lut_gun1[0x100]{};
+	uint8_t m_lut_gun2[0x100]{};
 };
 
 /*----------- defined in audio/m79amb.c -----------*/

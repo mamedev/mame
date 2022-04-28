@@ -45,20 +45,20 @@ enum z80netape_speed
 
 struct z80ne_cass_data_t {
 	struct {
-		int length;     /* time cassette level is at input.level */
-		int level;      /* cassette level */
-		int bit;        /* bit being read */
+		int length = 0;     /* time cassette level is at input.level */
+		int level = 0;      /* cassette level */
+		int bit = 0;        /* bit being read */
 	} input;
 	struct {
-		int length;     /* time cassette level is at output.level */
-		int level;      /* cassette level */
-		int bit;        /* bit to output */
+		int length = 0;     /* time cassette level is at output.level */
+		int level = 0;      /* cassette level */
+		int bit = 0;        /* bit to output */
 	} output;
 	z80netape_speed speed;          /* 300 - 600 - 1200 */
-	int wave_filter;
-	int wave_length;
-	int wave_short;
-	int wave_long;
+	int wave_filter = 0;
+	int wave_length = 0;
+	int wave_short = 0;
+	int wave_long = 0;
 };
 
 
@@ -101,12 +101,12 @@ protected:
 
 	static void floppy_formats(format_registration &fr);
 
-	uint8_t m_lx383_scan_counter;
-	uint8_t m_lx383_key[LX383_KEYS];
-	int m_lx383_downsampler;
-	uint8_t m_lx385_ctrl;
-	emu_timer *m_cassette_timer;
-	emu_timer *m_kbd_timer;
+	uint8_t m_lx383_scan_counter = 0;
+	uint8_t m_lx383_key[LX383_KEYS]{};
+	int m_lx383_downsampler = 0;
+	uint8_t m_lx385_ctrl = 0;
+	emu_timer *m_cassette_timer = nullptr;
+	emu_timer *m_kbd_timer = nullptr;
 	z80ne_cass_data_t m_cass_data;
 
 	uint8_t lx383_r();
@@ -140,7 +140,7 @@ protected:
 	required_region_ptr<u8> m_rom;
 	optional_shared_ptr<u8> m_mram;
 
-	emu_timer *m_timer_nmi;
+	emu_timer *m_timer_nmi = nullptr;
 
 	cassette_image_device *cassette_device_image();
 
@@ -228,10 +228,10 @@ private:
 
 	struct wd17xx_state_t
 	{
-		int drq;
-		int intrq;
-		uint8_t drive; /* current drive */
-		uint8_t head;  /* current head */
+		int drq = 0;
+		int intrq = 0;
+		uint8_t drive = 0; /* current drive */
+		uint8_t head = 0;  /* current head */
 	};
 
 	void mem_map(address_map &map);

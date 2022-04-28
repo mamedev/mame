@@ -60,9 +60,9 @@ private:
 	optional_shared_ptr<uint8_t> m_pmcram;
 
 	/* misc */
-	int        m_priority;
-	uint8_t      m_1f98_latch;
-	emu_timer *m_thunderx_firq_timer;
+	int        m_priority = 0;
+	uint8_t      m_1f98_latch = 0;
+	emu_timer *m_thunderx_firq_timer = nullptr;
 
 	void scontra_bankswitch_w(uint8_t data);
 	void thunderx_videobank_w(uint8_t data);

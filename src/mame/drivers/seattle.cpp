@@ -185,20 +185,23 @@
 **************************************************************************/
 
 #include "emu.h"
+
 #include "audio/cage.h"
 #include "audio/dcs.h"
+#include "machine/midwayic.h"
 
+#include "bus/ata/idehd.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/mips/mips3.h"
-#include "machine/midwayic.h"
-#include "machine/nvram.h"
-#include "machine/smc91c9x.h"
-
-#include "machine/pci.h"
 #include "machine/gt64xxx.h"
+#include "machine/nvram.h"
 #include "machine/pci-ide.h"
+#include "machine/pci.h"
+#include "machine/smc91c9x.h"
 #include "video/voodoo_pci.h"
+
 #include "screen.h"
+#include "speaker.h"
 
 #include "calspeed.lh"
 #include "vaportrx.lh"
@@ -443,6 +446,8 @@ private:
 	void widget_cs3_map(address_map &map);
 	void carnevil_cs3_map(address_map &map);
 	void flagstaff_cs3_map(address_map &map);
+
+	static void hdd_config(device_t *device);
 };
 
 /*************************************
@@ -454,7 +459,7 @@ private:
 void seattle_state::machine_start()
 {
 	// set the fastest DRC options, but strict verification
-	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
+	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS | MIPS3DRC_STRICT_VERIFY);
 
 	// configure fast RAM regions
 //  m_maincpu->add_fastram(0x00000000, 0x007fffff, FALSE, m_rambase);
@@ -722,7 +727,7 @@ void seattle_state::analog_port_w(uint32_t data)
 	// Declare calibration finished as soon as a SYSTEM button is hit
 	if (!m_wheel_calibrated && ((~m_io_system->read()) & 0xffff)) {
 		m_wheel_calibrated = true;
-		//osd_printf_info("wheel calibration complete wheel: %02x\n", currValue);
+		//osd_printf_info("wheel calibration complete system: %04x wheel: %02x\n", m_io_system->read(), currValue);
 	}
 }
 
@@ -905,7 +910,7 @@ uint32_t seattle_state::carnevil_gun_r(offs_t offset)
 
 void seattle_state::carnevil_gun_w(offs_t offset, uint32_t data)
 {
-	logerror("carnevil_gun_w(%d) = %02X\n", offset, data);
+	//logerror("carnevil_gun_w(%d) = %02X\n", offset, data);
 }
 
 /*************************************
@@ -1013,7 +1018,7 @@ void seattle_state::output_w(uint32_t data)
 	}
 	else if (!BIT(data, 9) || !BIT(data, 8))
 	{
-		logerror("%08X:output_w = %04X\n", m_maincpu->pc(), data);
+		//logerror("%08X:output_w = %04X\n", m_maincpu->pc(), data);
 	}
 }
 
@@ -1400,7 +1405,7 @@ static INPUT_PORTS_START( seattle_analog )
 
 	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start Button")
-	PORT_BIT( 0x0620, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0620, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1488,8 +1493,7 @@ static INPUT_PORTS_START( sfrush )
 	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Abort")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Reverse")
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x1e00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("View 1")
@@ -2024,6 +2028,7 @@ void seattle_state::seattle_common(machine_config &config)
 	ide_pci_device &ide(IDE_PCI(config, PCI_ID_IDE, 0, 0x100b0002, 0x01, 0x0));
 	ide.irq_handler().set_inputline(m_maincpu, IDE_IRQ_NUM);
 	ide.set_legacy_top(0x0a0);
+	ide.subdevice<bus_master_ide_controller_device>("ide")->slot(0).set_option_machine_config("hdd", hdd_config);
 
 	// video hardware
 	VOODOO_1_PCI(config, m_voodoo, 0, m_maincpu, m_screen);
@@ -2045,6 +2050,11 @@ void seattle_state::seattle_common(machine_config &config)
 	m_screen->set_screen_update(PCI_ID_VIDEO, FUNC(voodoo_1_pci_device::screen_update));
 }
 
+void seattle_state::hdd_config(device_t *device)
+{
+	// Set the disk dma transfer speed
+	dynamic_cast<ide_hdd_device *>(device)->set_dma_transfer_time(attotime::from_usec(15));
+}
 
 void seattle_state::phoenix(machine_config &config)
 {
@@ -2144,9 +2154,21 @@ void seattle_state::mace(machine_config &config)
 void seattle_state::sfrush(machine_config &config)
 {
 	flagstaff(config);
+	// 5 Channel output (4 Channel input connected to Quad Amp PCB)
+	SPEAKER(config, "flspeaker").front_left();
+	SPEAKER(config, "frspeaker").front_right();
+	SPEAKER(config, "rlspeaker").headrest_left();
+	SPEAKER(config, "rrspeaker").headrest_right();
+	//SPEAKER(config, "subwoofer").seat(); Not implemented, Quad Amp PCB output;
+
 	atari_cage_seattle_device &cage(ATARI_CAGE_SEATTLE(config, "cage", 0));
 	cage.set_speedup(0x5236);
 	cage.irq_handler().set(m_ioasic, FUNC(midway_ioasic_device::cage_irq_handler));
+	// TODO: copied from atarigt.cpp; Same configurations as T-Mek?
+	cage.add_route(0, "frspeaker", 1.0); // Foward Right
+	cage.add_route(1, "rlspeaker", 1.0); // Back Left
+	cage.add_route(2, "flspeaker", 1.0); // Foward Left
+	cage.add_route(3, "rrspeaker", 1.0); // Back Right
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
@@ -2159,9 +2181,22 @@ void seattle_state::sfrush(machine_config &config)
 void seattle_state::sfrushrk(machine_config &config)
 {
 	flagstaff(config);
+	// 5 Channel output (4 Channel input connected to Quad Amp PCB)
+	SPEAKER(config, "flspeaker").front_left();
+	SPEAKER(config, "frspeaker").front_right();
+	SPEAKER(config, "rlspeaker").headrest_left();
+	SPEAKER(config, "rrspeaker").headrest_right();
+	//SPEAKER(config, "subwoofer").seat(); Not implemented, Quad Amp PCB output;
+
 	atari_cage_seattle_device &cage(ATARI_CAGE_SEATTLE(config, "cage", 0));
 	cage.set_speedup(0x5329);
 	cage.irq_handler().set(m_ioasic, FUNC(midway_ioasic_device::cage_irq_handler));
+	// TODO: copied from atarigt.cpp; Same configurations as T-Mek?
+	cage.add_route(0, "frspeaker", 1.0); // Foward Right
+	cage.add_route(1, "rlspeaker", 1.0); // Back Left
+	cage.add_route(2, "flspeaker", 1.0); // Foward Left
+	cage.add_route(3, "rrspeaker", 1.0); // Back Right
+
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_SFRUSHRK);

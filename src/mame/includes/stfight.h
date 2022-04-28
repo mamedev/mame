@@ -94,20 +94,20 @@ private:
 	required_region_ptr<uint8_t>     m_samples;
 	optional_shared_ptr<uint8_t>     m_decrypted_opcodes;
 
-	uint8_t     m_coin_state;
+	uint8_t     m_coin_state = 0;
 
-	uint8_t     m_fm_data;
+	uint8_t     m_fm_data = 0;
 
-	bool        m_cpu_to_mcu_empty;
-	uint8_t     m_cpu_to_mcu_data;
-	uint8_t     m_port_a_out;
-	uint8_t     m_port_c_out;
+	bool        m_cpu_to_mcu_empty = false;
+	uint8_t     m_cpu_to_mcu_data = 0;
+	uint8_t     m_port_a_out = 0;
+	uint8_t     m_port_c_out = 0;
 
-	bool        m_vck2;
-	bool        m_adpcm_reset;
-	uint16_t    m_adpcm_data_offs;
+	bool        m_vck2 = false;
+	bool        m_adpcm_reset = false;
+	uint16_t    m_adpcm_data_offs = 0;
 
-	emu_timer   *m_int1_timer;
+	emu_timer   *m_int1_timer = nullptr;
 };
 
 #endif // MAME_INCLUDES_STFIGHT_H

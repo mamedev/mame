@@ -56,9 +56,9 @@ protected:
 	required_ioport m_dsw0;
 	required_ioport m_extra;
 
-	uint8_t m_outa;
-	uint8_t m_outb;
-	int m_power;
+	uint8_t m_outa = 0;
+	uint8_t m_outb = 0;
+	int m_power = 0;
 	emu_timer *m_power_timer;
 
 	static const int colortable[8][2];

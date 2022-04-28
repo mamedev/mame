@@ -8,7 +8,27 @@
     Skeleton by R. Belmont
 
     TODO:
-    - currently asserts by selecting a s3 video bank above 1M (register 0x6a)z
+    - Needs proper AWE64 emulation defined as a slot option default, with
+      fallbacks to AWE32 and SB16;
+
+    - ISA bus needs IRQ and DMA hookups.
+      \- Will otherwise hang indefinitely after booting, waiting for sound card irqs.
+         There's a C:\sb16\diagnose.exe tool if you want to test this.
+
+    - Convert driver to the newest PCI model;
+
+    - Currently fails because it doesn't find the Voodoo card in the PCI model;
+
+    - When switching gfx mode during boot routine it still sets a terminal debug mode (with cut down screen portions)
+      instead of normal Voodoo drawing. Culprit may be an I/O port reading or a Voodoo bug;
+
+    - Aforementioned debug mode shows that it can't find several assets on loading;
+
+    - When game boots it does extensive CPUID checks, more copy protection tied to the CPU serial it has been installed on?
+
+    - Convert HASP dongle to a pc_lpt_device friendly device;
+
+    - currently asserts by selecting a s3 video bank above 1M (register 0x6a) Update: fixed?
 
     - The version is labeled "SQ05" in the filesystem but has the 1999 release year.
       Other components are labeled "v0.5", but the game doesn't boot far enough to see if
@@ -24,7 +44,7 @@
     - First two are PIIX4/4E/4M IDE Controller / PIIX4/4E/4M USB Interface
       Third is S3 trio64uv+
       Fourth is Voodoo 2 3D Accelerator
-    Sound Blaster is ISA/PNP
+      Sound Blaster is ISA/PnP
 
 ============================================================================
     H/W is a white-box PC consisting of:

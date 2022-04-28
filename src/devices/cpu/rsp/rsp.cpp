@@ -9,8 +9,6 @@
 #include "emu.h"
 #include "rsp.h"
 
-#include "debugger.h"
-
 #include "rspdefs.h"
 #include "rspdiv.h"
 

@@ -25,6 +25,8 @@ public:
 	void vigilant(machine_config &config);
 	void kikcubic(machine_config &config);
 	void buccanrs(machine_config &config);
+	void bowmen(machine_config &config);
+	void init_bowmen();
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -43,6 +45,7 @@ private:
 	int m_rear_color = 0;
 	int m_rear_disable = 0;
 	int m_rear_refresh = 0;
+	int m_rear_pages = 4;
 	std::unique_ptr<bitmap_ind16> m_bg_bitmap;
 
 	// common
@@ -54,6 +57,8 @@ private:
 	void vigilant_horiz_scroll_w(offs_t offset, uint8_t data);
 	void vigilant_rear_horiz_scroll_w(offs_t offset, uint8_t data);
 	void vigilant_rear_color_w(uint8_t data);
+	void bowmen_rear_horiz_scroll_w(offs_t offset, uint8_t data);
+	void bowmen_rear_color_w(uint8_t data);
 
 	// kikcubic
 	void kikcubic_coin_w(uint8_t data);
@@ -64,9 +69,13 @@ private:
 
 	uint32_t screen_update_vigilant(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_kikcubic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bowmen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_background();
+	void update_background_bowmen();
 	void draw_foreground(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int opaque );
+	void draw_foreground_bowmen(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int opaque );
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_background_bowmen(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void vigilant_postload();
 
@@ -77,6 +86,7 @@ private:
 	void sound_map(address_map &map);
 	void vigilant_io_map(address_map &map);
 	void vigilant_map(address_map &map);
+	void bowmen_io_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_VIGILANT_H

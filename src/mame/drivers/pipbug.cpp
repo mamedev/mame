@@ -77,7 +77,7 @@ private:
 	void data_map(address_map &map);
 	void mem_map(address_map &map);
 	u8 m_cass_data[4]{};
-	bool m_cassold = 0, m_cassinbit = 0;
+	bool m_cassold = false, m_cassinbit = false;
 };
 
 void pipbug_state::pipbug_ctrl_w(u8 data)

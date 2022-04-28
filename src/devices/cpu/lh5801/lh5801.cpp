@@ -18,8 +18,6 @@
 #include "lh5801.h"
 #include "5801dasm.h"
 
-#include "debugger.h"
-
 #define VERBOSE 0
 
 #include "logmacro.h"

@@ -178,8 +178,8 @@ public:
 	void mode80_to9_scandraw_8( uint8_t* vram, uint16_t* dst, uint16_t* pal, int org, int len );
 
 protected:
-	emu_timer* m_mo5_periodic_timer;
-	uint8_t m_mo5_reg_cart; /* 0xa7cb bank switch */
+	emu_timer* m_mo5_periodic_timer = nullptr;
+	uint8_t m_mo5_reg_cart = 0; /* 0xa7cb bank switch */
 
 	virtual void video_start() override;
 
@@ -242,7 +242,7 @@ protected:
 	void thom_palette(palette_device &palette);
 
 	int m_centronics_busy = 0;
-	int m_centronics_perror;
+	int m_centronics_perror = 0;
 
 	void to7_map(address_map &map);
 	void to770_map(address_map &map);
@@ -284,75 +284,75 @@ protected:
 	output_finder<> m_caps_led;
 
 	/* bank logging and optimisations */
-	int m_old_cart_bank;
-	int m_old_cart_bank_was_read_only;
-	int m_old_ram_bank;
+	int m_old_cart_bank = 0;
+	int m_old_cart_bank_was_read_only = 0;
+	int m_old_ram_bank = 0;
 	/* buffer storing demodulated bits, only for k7 and with speed hack */
-	uint32_t m_to7_k7_bitsize;
-	uint8_t* m_to7_k7_bits;
+	uint32_t m_to7_k7_bitsize = 0;
+	uint8_t* m_to7_k7_bits = 0;
 	/* ------------ cartridge ------------ */
-	uint8_t m_thom_cart_nb_banks; /* number of 16 KB banks (up to 4) */
-	uint8_t m_thom_cart_bank;     /* current bank */
-	uint8_t m_to7_lightpen_step;
-	uint8_t m_to7_lightpen;
-	uint8_t m_to7_modem_tx;
+	uint8_t m_thom_cart_nb_banks = 0; /* number of 16 KB banks (up to 4) */
+	uint8_t m_thom_cart_bank = 0;     /* current bank */
+	uint8_t m_to7_lightpen_step = 0;
+	uint8_t m_to7_lightpen = 0;
+	uint8_t m_to7_modem_tx = 0;
 	/* calls to7_game_update_cb periodically */
-	emu_timer* m_to7_game_timer;
-	uint8_t m_to7_game_sound;
-	uint8_t m_to7_game_mute;
+	emu_timer* m_to7_game_timer = nullptr;
+	uint8_t m_to7_game_sound = 0;
+	uint8_t m_to7_game_mute = 0;
 
 	/* We allow choosing dynamically:
 	   - the border size
 	   - whether we use 640 pixels or 320 pixels in an active row
 	   (now this is automatically chosen by default for each frame)
 	*/
-	uint16_t m_thom_bwidth;
-	uint16_t m_thom_bheight;
+	uint16_t m_thom_bwidth = 0;
+	uint16_t m_thom_bheight = 0;
 	/* border size */
-	uint8_t  m_thom_hires;
+	uint8_t  m_thom_hires = 0;
 	/* 0 = low res: 320x200 active area (faster)
 	   1 = hi res:  640x200 active area (can represent all video modes)
 	*/
-	uint8_t m_thom_hires_better;
+	uint8_t m_thom_hires_better = 0;
 	/* 1 = a 640 mode was used in the last frame */
 	/* we use our own video timing to precisely cope with VBLANK and HBLANK */
-	emu_timer* m_thom_video_timer; /* time elapsed from beginning of frame */
+	emu_timer* m_thom_video_timer = nullptr; /* time elapsed from beginning of frame */
 	/* number of lightpen call-backs per frame */
-	int m_thom_lightpen_nb;
+	int m_thom_lightpen_nb = 0;
 	/* called thom_lightpen_nb times */
-	emu_timer *m_thom_lightpen_timer;
+	emu_timer *m_thom_lightpen_timer = nullptr;
 	/* lightpen callback function to call from timer */
 	std::function<void (int)> m_thom_lightpen_cb;
-	uint8_t* m_thom_vram; /* pointer to video memory */
-	emu_timer* m_thom_scanline_timer; /* scan-line update */
-	uint16_t m_thom_last_pal[16];   /* palette at last scanline start */
-	uint16_t m_thom_pal[16];        /* current palette */
-	bool     m_thom_pal_changed;    /* whether pal != old_pal */
-	uint8_t  m_thom_border_index;   /* current border color index */
+	uint8_t* m_thom_vram = nullptr; /* pointer to video memory */
+	emu_timer* m_thom_scanline_timer = nullptr; /* scan-line update */
+	uint16_t m_thom_last_pal[16]{};   /* palette at last scanline start */
+	uint16_t m_thom_pal[16]{};        /* current palette */
+	bool     m_thom_pal_changed = false;    /* whether pal != old_pal */
+	uint8_t  m_thom_border_index = 0;   /* current border color index */
 	/* the left and right border color for each row (including top and bottom
 	   border rows); -1 means unchanged wrt last scanline
 	*/
-	int16_t m_thom_border_l[THOM_TOTAL_HEIGHT+1];
-	int16_t m_thom_border_r[THOM_TOTAL_HEIGHT+1];
+	int16_t m_thom_border_l[THOM_TOTAL_HEIGHT+1]{};
+	int16_t m_thom_border_r[THOM_TOTAL_HEIGHT+1]{};
 	/* active area, updated one scan-line at a time every 64us,
 	   then blitted in screen_update
 	*/
-	uint16_t m_thom_vbody[640*200];
-	uint8_t m_thom_vmode; /* current vide mode */
-	uint8_t m_thom_vpage; /* current video page */
+	uint16_t m_thom_vbody[640*200]{};
+	uint8_t m_thom_vmode = 0; /* current vide mode */
+	uint8_t m_thom_vpage = 0; /* current video page */
 	/* this stores the video mode & page at each GPL in the current line
 	   (-1 means unchanged)
 	*/
-	int16_t m_thom_vmodepage[41];
-	uint8_t m_thom_vmodepage_changed;
+	int16_t m_thom_vmodepage[41]{};
+	uint8_t m_thom_vmodepage_changed = 0;
 	/* one dirty flag for each video memory line */
-	bool m_thom_vmem_dirty[205];
+	bool m_thom_vmem_dirty[205]{};
 	/* set to 1 if undirty scanlines need to be redrawn due to other video state
 	   changes */
-	bool m_thom_vstate_dirty;
-	bool m_thom_vstate_last_dirty;
-	uint32_t m_thom_mode_point;
-	emu_timer *m_thom_init_timer;
+	bool m_thom_vstate_dirty = false;
+	bool m_thom_vstate_last_dirty = false;
+	uint32_t m_thom_mode_point = 0;
+	emu_timer *m_thom_init_timer = nullptr;
 	void (thomson_state::*m_thom_init_cb)( int init );
 
 	int to7_get_cassette();
@@ -452,24 +452,24 @@ protected:
 	optional_memory_bank m_datahibank;
 	optional_memory_bank m_biosbank;
 
-	uint8_t  m_to8_kbd_ack;       /* 1 = cpu inits / accepts transfers */
-	uint16_t m_to8_kbd_data;      /* data to transmit */
-	uint16_t m_to8_kbd_step;      /* transmission automaton state */
-	uint8_t  m_to8_kbd_last_key;  /* last key (for repetition) */
-	uint32_t m_to8_kbd_key_count; /* keypress time (for repetition)  */
-	uint8_t  m_to8_kbd_caps;      /* caps lock */
-	emu_timer* m_to8_kbd_timer;   /* bit-send */
-	emu_timer* m_to8_kbd_signal;  /* signal from CPU */
-	uint8_t m_to8_data_vpage;
-	uint8_t m_to8_cart_vpage;
-	uint8_t  m_to8_reg_ram;
-	uint8_t  m_to8_reg_cart;
-	uint8_t  m_to8_reg_sys1;
-	uint8_t  m_to8_reg_sys2;
-	uint8_t  m_to8_lightpen_intr;
-	uint8_t  m_to8_soft_select;
-	uint8_t  m_to8_soft_bank;
-	uint8_t  m_to8_bios_bank;
+	uint8_t  m_to8_kbd_ack = 0;       /* 1 = cpu inits / accepts transfers */
+	uint16_t m_to8_kbd_data = 0;      /* data to transmit */
+	uint16_t m_to8_kbd_step = 0;      /* transmission automaton state */
+	uint8_t  m_to8_kbd_last_key = 0;  /* last key (for repetition) */
+	uint32_t m_to8_kbd_key_count = 0; /* keypress time (for repetition)  */
+	uint8_t  m_to8_kbd_caps = 0;      /* caps lock */
+	emu_timer* m_to8_kbd_timer = nullptr;   /* bit-send */
+	emu_timer* m_to8_kbd_signal = nullptr;  /* signal from CPU */
+	uint8_t m_to8_data_vpage = 0;
+	uint8_t m_to8_cart_vpage = 0;
+	uint8_t  m_to8_reg_ram = 0;
+	uint8_t  m_to8_reg_cart = 0;
+	uint8_t  m_to8_reg_sys1 = 0;
+	uint8_t  m_to8_reg_sys2 = 0;
+	uint8_t  m_to8_lightpen_intr = 0;
+	uint8_t  m_to8_soft_select = 0;
+	uint8_t  m_to8_soft_bank = 0;
+	uint8_t  m_to8_bios_bank = 0;
 
 	TIMER_CALLBACK_MEMBER( to8_kbd_timer_cb );
 	void to8_update_ram_bank_postload();
@@ -534,23 +534,23 @@ protected:
 	void to9_map(address_map &map);
 	void to9p_map(address_map &map);
 
-	uint8_t m_to9_palette_data[32];
-	uint8_t m_to9_palette_idx;
-	uint8_t m_to9_soft_bank;
-	uint8_t  m_to9_kbd_parity;  /* 0=even, 1=odd, 2=no parity */
-	uint8_t  m_to9_kbd_intr;    /* interrupt mode */
-	uint8_t  m_to9_kbd_in;      /* data from keyboard */
-	uint8_t  m_to9_kbd_status;  /* status */
-	uint8_t  m_to9_kbd_overrun; /* character lost */
-	uint8_t  m_to9_kbd_periph;     /* peripheral mode */
-	uint8_t  m_to9_kbd_byte_count; /* byte-count in peripheral mode */
-	uint16_t m_to9_mouse_x;
-	uint16_t m_to9_mouse_y;
-	uint8_t  m_to9_kbd_last_key;  /* for key repetition */
-	uint16_t m_to9_kbd_key_count;
-	uint8_t  m_to9_kbd_caps;  /* caps-lock */
-	uint8_t  m_to9_kbd_pad;   /* keypad outputs special codes */
-	emu_timer* m_to9_kbd_timer;
+	uint8_t m_to9_palette_data[32]{};
+	uint8_t m_to9_palette_idx = 0;
+	uint8_t m_to9_soft_bank = 0;
+	uint8_t  m_to9_kbd_parity = 0;  /* 0=even, 1=odd, 2=no parity */
+	uint8_t  m_to9_kbd_intr = 0;    /* interrupt mode */
+	uint8_t  m_to9_kbd_in = 0;      /* data from keyboard */
+	uint8_t  m_to9_kbd_status = 0;  /* status */
+	uint8_t  m_to9_kbd_overrun = 0; /* character lost */
+	uint8_t  m_to9_kbd_periph = 0;     /* peripheral mode */
+	uint8_t  m_to9_kbd_byte_count = 0; /* byte-count in peripheral mode */
+	uint16_t m_to9_mouse_x = 0;
+	uint16_t m_to9_mouse_y = 0;
+	uint8_t  m_to9_kbd_last_key = 0;  /* for key repetition */
+	uint16_t m_to9_kbd_key_count = 0;
+	uint8_t  m_to9_kbd_caps = 0;  /* caps-lock */
+	uint8_t  m_to9_kbd_pad = 0;   /* keypad outputs special codes */
+	emu_timer* m_to9_kbd_timer = nullptr;
 
 	void to9_set_video_mode( uint8_t data, int style );
 	void to9_palette_init();
@@ -709,7 +709,7 @@ protected:
 private:
 	required_device<pia6821_device> m_pia_io;
 	required_device<rs232_port_device> m_rs232;
-	int m_last_low;
+	int m_last_low = 0;
 	int m_centronics_busy = 0;
 	int m_rxd = 0;
 	int m_cts = 0;

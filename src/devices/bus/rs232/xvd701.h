@@ -28,13 +28,45 @@ protected:
 private:
 	static constexpr int TIMER_RESPONSE = 1;
 
+	enum jvc_xvd701_media_type : uint32_t
+	{
+		JVC_MEDIA_VCD = 0,
+		JVC_MEDIA_DVD = 1,
+	};
+
+	enum jvc_xvd701_playback_status : uint32_t
+	{
+		STATUS_STOP = 0,
+		STATUS_PLAYING = 1,
+		STATUS_PAUSE = 2,
+	};
+
 	void send_response();
 	unsigned char sum(unsigned char *buffer, int length);
+	void create_packet(unsigned char status, const unsigned char response[6]);
+
+	bool seek_chapter(int chapter);
+
+	jvc_xvd701_media_type m_media_type;
 
 	unsigned char m_command[11];
 	unsigned char m_response[11];
 	int m_response_index;
 	emu_timer *m_timer_response;
+
+	jvc_xvd701_playback_status m_playback_status;
+
+	unsigned char m_jlip_id;
+	bool m_is_powered;
+
+	int m_chapter;
+
+	enum : unsigned char {
+		STATUS_UNKNOWN_COMMAND = 1,
+		STATUS_OK = 3,
+		STATUS_ERROR = 5,
+	};
+	const unsigned char NO_RESPONSE[6] = { 0 };
 };
 
 DECLARE_DEVICE_TYPE(JVC_XVD701, jvc_xvd701_device)

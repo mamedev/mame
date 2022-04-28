@@ -153,12 +153,12 @@ protected:
 	virtual void video_start() override;
 	virtual void video_reset() override;
 
-	const pen_t *m_bg_pen;
-	uint8_t      m_vblank_level;
-	uint8_t      m_raster_level;
+	const pen_t *m_bg_pen = nullptr;
+	uint8_t      m_vblank_level = 0;
+	uint8_t      m_raster_level = 0;
 
-	int m_use_cart_vectors;
-	int m_use_cart_audio;
+	int m_use_cart_vectors = 0;
+	int m_use_cart_audio = 0;
 
 	void set_slot_idx(int slot);
 
@@ -168,11 +168,11 @@ protected:
 	void init_ym();
 	void init_sprites();
 	// temporary helper to restore memory banking while bankswitch is handled in the driver...
-	uint32_t m_bank_base;
+	uint32_t m_bank_base = 0;
 
 	optional_device_array<neogeo_cart_slot_device, 6> m_slots;
 
-	int m_curr_slot;
+	int m_curr_slot = 0;
 
 private:
 	void update_interrupts();
@@ -190,16 +190,16 @@ private:
 	void set_pens();
 
 	// internal state
-	bool       m_recurse;
+	bool       m_recurse = false;
 
-	emu_timer  *m_display_position_interrupt_timer;
-	emu_timer  *m_display_position_vblank_timer;
-	emu_timer  *m_vblank_interrupt_timer;
-	uint32_t     m_display_counter;
-	uint8_t      m_vblank_interrupt_pending;
-	uint8_t      m_display_position_interrupt_pending;
-	uint8_t      m_irq3_pending;
-	uint8_t      m_display_position_interrupt_control;
+	emu_timer  *m_display_position_interrupt_timer = nullptr;
+	emu_timer  *m_display_position_vblank_timer = nullptr;
+	emu_timer  *m_vblank_interrupt_timer = nullptr;
+	uint32_t     m_display_counter = 0;
+	uint8_t      m_vblank_interrupt_pending = 0;
+	uint8_t      m_display_position_interrupt_pending = 0;
+	uint8_t      m_irq3_pending = 0;
+	uint8_t      m_display_position_interrupt_control = 0;
 
 	uint16_t get_video_control();
 
@@ -207,9 +207,9 @@ private:
 
 	// color/palette related
 	std::vector<uint16_t> m_paletteram;
-	uint8_t      m_palette_lookup[32][4];
-	int          m_screen_shadow;
-	int          m_palette_bank;
+	uint8_t      m_palette_lookup[32][4]{};
+	int          m_screen_shadow = 0;
+	int          m_palette_bank = 0;
 };
 
 
@@ -248,7 +248,7 @@ private:
 	required_device<upd4990a_device> m_upd4990a;
 	required_ioport m_dsw;
 
-	uint8_t m_save_ram_unlocked;
+	uint8_t m_save_ram_unlocked = 0;
 };
 
 

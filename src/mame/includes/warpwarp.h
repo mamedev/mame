@@ -71,15 +71,15 @@ private:
 	optional_ioport m_in_config;
 	optional_ioport_array<4> m_ports;
 
-	int m_geebee_bgw;
-	int m_ball_on;
-	int m_ball_h;
-	int m_ball_v;
-	int m_ball_pen;
-	int m_ball_sizex;
-	int m_ball_sizey;
-	int m_handle_joystick;
-	tilemap_t *m_bg_tilemap;
+	int m_geebee_bgw = 0;
+	int m_ball_on = 0;
+	int m_ball_h = 0;
+	int m_ball_v = 0;
+	int m_ball_pen = 0;
+	int m_ball_sizex = 0;
+	int m_ball_sizey = 0;
+	int m_handle_joystick = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	// warpwarp and bombbee
 	uint8_t warpwarp_sw_r(offs_t offset);

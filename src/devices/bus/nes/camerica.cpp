@@ -64,11 +64,6 @@ nes_golden5_device::nes_golden5_device(const machine_config &mconfig, const char
 
 
 
-void nes_bf9093_device::device_start()
-{
-	common_start();
-}
-
 void nes_bf9093_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;

@@ -238,7 +238,7 @@ public:
 		result = dinput_set_dword_property(devinfo->dinput.device, DIPROP_AXISMODE, 0, DIPH_DEVICE, DIPROPAXISMODE_REL);
 		if (result != DI_OK && result != DI_PROPNOEFFECT)
 		{
-			osd_printf_error("DirectInput: Unable to set relative mode for mouse %u (%s)\n", static_cast<unsigned int>(devicelist()->size()), devinfo->name());
+			osd_printf_error("DirectInput: Unable to set relative mode for mouse %u (%s)\n", static_cast<unsigned int>(devicelist().size()), devinfo->name());
 			goto error;
 		}
 
@@ -277,7 +277,7 @@ public:
 
 	error:
 		if (devinfo)
-			devicelist()->free_device(*devinfo);
+			devicelist().free_device(*devinfo);
 		goto exit;
 	}
 };
@@ -449,10 +449,10 @@ void dinput_joystick_device::poll()
 int dinput_joystick_device::configure()
 {
 	HRESULT result;
-	auto devicelist = static_cast<input_module_base&>(module()).devicelist();
+	auto &devicelist = static_cast<input_module_base&>(module()).devicelist();
 
 	// temporary approximation of index
-	int devindex = devicelist->size();
+	int devindex = devicelist.size();
 
 	// set absolute mode
 	result = dinput_set_dword_property(dinput.device, DIPROP_AXISMODE, 0, DIPH_DEVICE, DIPROPAXISMODE_ABS);

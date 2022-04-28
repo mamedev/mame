@@ -320,15 +320,12 @@ void floppy_image_device::setup_led_cb(led_cb cb)
 
 void floppy_image_device::fs_enum::add(const floppy_image_format_t &type, u32 image_size, const char *name, const char *description)
 {
-	if(m_manager->can_format())
-		m_fid->m_create_fs.emplace_back(fs_info(m_manager, &type, image_size, name, description));
-	if(m_manager->can_read())
-		m_fid->m_io_fs.emplace_back(fs_info(m_manager, &type, image_size, name, description));
+	m_fid->m_fs.emplace_back(fs_info(m_manager, &type, image_size, name, description));
 }
 
 void floppy_image_device::fs_enum::add_raw(const char *name, u32 key, const char *description)
 {
-	m_fid->m_create_fs.emplace_back(fs_info(name, key, description));
+	m_fid->m_fs.emplace_back(fs_info(name, key, description));
 }
 
 void floppy_image_device::register_formats()
@@ -533,7 +530,7 @@ void floppy_image_device::device_timer(emu_timer &timer, device_timer_id id, int
 	index_resync();
 }
 
-const floppy_image_format_t *floppy_image_device::identify(std::string filename)
+const floppy_image_format_t *floppy_image_device::identify(std::string_view filename)
 {
 	util::core_file::ptr fd;
 	std::string revised_path;
@@ -1387,7 +1384,7 @@ void floppy_image_device::wspan_write(const std::vector<wspan> &wspans, std::vec
 				track[si] = floppy_image::MG_E | (ws.start-1);
 				si ++;
 			}
-		} 
+		}
 
 		// Check for a neutral zone at the end and reduce it if needed
 		if(ei != track.size() && (track[ei] & floppy_image::MG_MASK) == floppy_image::MG_E) {

@@ -159,8 +159,8 @@ private:
 	u8 m_strobe = 0U;             //!< switches strobe lines (5 lower bits used)
 	u8 m_nvram_addr = 0xffU;      //!< NVRAM address
 	u8 m_nvram_data = 0U;
-	bool m_nvram_e2 = 0;          //!< NVRWAM enable (E2 line)
-	bool m_nvram_wr = 0;          //!< NVRWAM write (W/R line)
+	bool m_nvram_e2 = false;      //!< NVRWAM enable (E2 line)
+	bool m_nvram_wr = false;      //!< NVRWAM write (W/R line)
 	u16 m_6351_addr = 0U;         //!< ROM MM6351 address (12 bits)
 	u8 m_z30_out = 0U;            //!< 4-to-16 decoder outputs
 	u8 m_lamp_data = 0U;

@@ -176,7 +176,7 @@ private:
 	floppy_image_device *m_floppy;
 	required_device<generic_slot_device> m_cart;
 
-	memory_region *m_cart_rom = 0;
+	memory_region *m_cart_rom = nullptr;
 };
 
 /*****************************************

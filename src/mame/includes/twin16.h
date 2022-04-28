@@ -61,18 +61,18 @@ protected:
 	optional_shared_ptr<uint16_t> m_sprite_gfx_ram;
 	required_region_ptr<uint16_t> m_gfxrom;
 
-	uint16_t m_CPUA_register;
-	uint16_t m_CPUB_register;
-	bool m_is_fround;
-	uint16_t m_sprite_buffer[0x800];
-	emu_timer *m_sprite_timer;
-	int m_sprite_busy;
-	int m_need_process_spriteram;
-	uint16_t m_scrollx[3];
-	uint16_t m_scrolly[3];
-	uint16_t m_video_register;
-	tilemap_t *m_fixed_tmap;
-	tilemap_t *m_scroll_tmap[2];
+	uint16_t m_CPUA_register = 0;
+	uint16_t m_CPUB_register = 0;
+	bool m_is_fround = false;
+	uint16_t m_sprite_buffer[0x800]{};
+	emu_timer *m_sprite_timer = nullptr;
+	int m_sprite_busy = 0;
+	int m_need_process_spriteram = 0;
+	uint16_t m_scrollx[3]{};
+	uint16_t m_scrolly[3]{};
+	uint16_t m_video_register = 0;
+	tilemap_t *m_fixed_tmap = nullptr;
+	tilemap_t *m_scroll_tmap[2]{};
 
 	void CPUA_register_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void CPUB_register_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -131,7 +131,7 @@ private:
 	virtual void video_start() override;
 	virtual void tile_get_info(tile_data &tileinfo, uint16_t data, int color_base) override;
 
-	uint8_t m_gfx_bank[4];
+	uint8_t m_gfx_bank[4]{};
 };
 
 class cuebrickj_state : public twin16_state
@@ -149,7 +149,7 @@ private:
 	void nvram_bank_w(uint8_t data);
 
 	void cuebrickj_main_map(address_map &map);
-	uint16_t m_nvram[0x400 * 0x20 / 2];
+	uint16_t m_nvram[0x400 * 0x20 / 2]{};
 };
 
 #endif // MAME_INCLUDES_TWIN16_H

@@ -2,14 +2,14 @@
 // copyright-holders:Robbbert
 /************************************************************************************************
 
-        Unior
+Unior
 
-    2009-05-12 Skeleton driver.
-    2013-10-09 Added DMA and CRTC
-    2013-10-11 Added PPI, PIT, UART, sound
+2009-05-12 Skeleton driver.
+2013-10-09 Added DMA and CRTC
+2013-10-11 Added PPI, PIT, UART, sound
 
-    Some info obtained from EMU-80.
-    The schematic is difficult to read, and some code is guesswork.
+Some info obtained from EMU-80.
+The schematic is difficult to read, and some code is guesswork.
 
 The monitor will only allow certain characters to be typed, thus the
 modifier keys appear to do nothing. There is no need to use the enter
@@ -95,7 +95,7 @@ private:
 
 	u8 m_4c = 0U;
 	u8 m_4e = 0U;
-	bool m_txe = 0, m_txd = 0, m_rts = 0, m_casspol = 0;
+	bool m_txe = false, m_txd = false, m_rts = false, m_casspol = false;
 	u8 m_cass_data[4]{};
 	virtual void machine_reset() override;
 	virtual void machine_start() override;

@@ -34,11 +34,11 @@ Year + Game               Board(s)               CPU      Company            Not
 88  Almond Pinky          D1401128L-0 + RM-1D    Z80      Dynax
 89  Mahjong Shinkirou     D210301BL2 + FRM-00?   TLCS-90  Dynax
 89  Mahjong Derringer     D2203018L              Z80      Dynax              Larger palette
-9?  Ichi Ban Jian         MJ911                  Z80      Excel              Larger palette, additional YM2413
 90  Mahjong If..?         D2909278L              TLCS-90  Dynax              Larger palette
 91  Mahjong Vegas         D5011308L1 + FRM-00    TLCS-90  Dynax              Undumped internal rom (mjvegas set)
 92  Mahjong Cafe Time     D6310128L1-1           TLCS-90  Dynax              Larger palette, RTC
 93  Mahjong Cafe Doll     D76052208L-2           TLCS-90  Dynax              Larger palette, RTC, Undumped internal rom
+93  Ichi Ban Jian         MJ911                  Z80      Excel              Larger palette, additional YM2413
 95  Mahjong Tensinhai     D10010318L1            TLCS-90  Dynax              Larger palette, RTC
 96  Janputer '96          NS503X0727             Z80      Dynax              Larger palette, RTC
 97  Janputer Special      CS166P008 + NS5110207  Z80      Dynax              Larger palette, RTC
@@ -370,7 +370,6 @@ void royalmah_state::machine_start()
 {
 	save_item(NAME(m_input_port_select));
 	save_item(NAME(m_dsw_select));
-	save_item(NAME(m_rombank));
 	save_item(NAME(m_palette_base));
 	save_item(NAME(m_flip_screen));
 
@@ -1403,8 +1402,8 @@ uint8_t royalmah_state::mjvegasa_rom_io_r(offs_t offset)
 
 	return m_rtc->read(offset & 0xf);
 
-	logerror("mjvegasa_rom_io_r: %04X: unmapped IO read at %04X\n", m_maincpu->pc(), offset);
-	return 0xff;
+	//logerror("mjvegasa_rom_io_r: %04X: unmapped IO read at %04X\n", m_maincpu->pc(), offset);
+	//return 0xff;
 }
 
 void royalmah_state::mjvegasa_rom_io_w(offs_t offset, uint8_t data)
@@ -5500,7 +5499,7 @@ ROM_END
 /***************************************************************************
 
 Ichi Ban Jyan
-Excel, 199?
+Excel, 1993
 
 PCB Layout
 ----------
@@ -5586,16 +5585,25 @@ void royalmah_state::init_daisyari()
 void royalmah_state::init_mjtensin()
 {
 	m_mainbank->configure_entries(0, 80, memregion("maincpu")->base() + 0x10000, 0x8000);
+
+	save_item(NAME(m_rombank));
+	m_rombank = 0;
 }
 
 void royalmah_state::init_cafetime()
 {
 	m_mainbank->configure_entries(0, 64, memregion("maincpu")->base() + 0x10000, 0x8000);
+
+	save_item(NAME(m_rombank));
+	m_rombank = 0;
 }
 
 void royalmah_state::init_mjvegasa()
 {
 	m_mainbank->configure_entries(0, 128, memregion("maincpu")->base() + 0x10000, 0x8000);
+
+	save_item(NAME(m_rombank));
+	m_rombank = 0;
 }
 
 void royalmah_state::init_jongshin()
@@ -5606,6 +5614,9 @@ void royalmah_state::init_jongshin()
 void royalmah_state::init_mjifb()
 {
 	m_mainbank->configure_entries(0, 256, memregion("maincpu")->base() + 0x10000, 0x4000);
+
+	save_item(NAME(m_rombank));
+	m_rombank = 0;
 }
 
 void royalmah_state::init_tontonb()
@@ -5727,7 +5738,6 @@ GAME( 1989,  mjdejavu, 0,        mjdejavu, mjdejavu, royalmah_state, init_mjifb,
 GAME( 1989,  mjdejav2, mjdejavu, mjdejavu, mjdejavu, royalmah_state, init_mjifb,    ROT0,   "Dynax",                      "Mahjong Shinkirou Deja Vu 2 (Japan)",   MACHINE_NOT_WORKING )
 GAME( 1989,  mjderngr, 0,        mjderngr, mjderngr, royalmah_state, init_dynax,    ROT0,   "Dynax",                      "Mahjong Derringer (Japan)",             0 )
 GAME( 1989,  daisyari, 0,        daisyari, daisyari, royalmah_state, init_daisyari, ROT0,   "Best System",                "Daisyarin [BET] (Japan)",               0 )
-GAME( 199?,  ichiban,  0,        ichiban,  ichiban,  royalmah_state, empty_init,    ROT0,   "Excel",                      "Ichi Ban Jyan",                         MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND ) // should just need correct palette and ROM banking
 GAME( 1990,  mjifb,    0,        mjifb,    mjifb,    royalmah_state, init_mjifb,    ROT0,   "Dynax",                      "Mahjong If...? [BET]",                  0 )
 GAME( 1990,  mjifb2,   mjifb,    mjifb,    mjifb,    royalmah_state, init_mjifb,    ROT0,   "Dynax",                      "Mahjong If...? [BET](2921)",            0 )
 GAME( 1990,  mjifb3,   mjifb,    mjifb,    mjifb,    royalmah_state, init_mjifb,    ROT0,   "Dynax",                      "Mahjong If...? [BET](2931)",            0 )
@@ -5735,6 +5745,7 @@ GAME( 1991,  mjvegasa, 0,        mjvegasa, mjvegasa, royalmah_state, init_mjvega
 GAME( 1991,  mjvegas,  mjvegasa, mjvegasa, mjvegasa, royalmah_state, init_mjvegasa, ROT0,   "Dynax",                      "Mahjong Vegas (Japan)",                 MACHINE_NOT_WORKING )
 GAME( 1992,  cafetime, 0,        cafetime, cafetime, royalmah_state, init_cafetime, ROT0,   "Dynax",                      "Mahjong Cafe Time",                     0 )
 GAME( 1993,  cafedoll, 0,        mjifb,    mjifb,    royalmah_state, init_mjifb,    ROT0,   "Dynax",                      "Mahjong Cafe Doll (Japan)",             MACHINE_NOT_WORKING )
+GAME( 1993,  ichiban,  0,        ichiban,  ichiban,  royalmah_state, empty_init,    ROT0,   "Excel",                      "Ichi Ban Jyan",                         MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND ) // should just need correct palette and ROM banking
 GAME( 1995,  mjtensin, 0,        mjtensin, mjtensin, royalmah_state, init_mjtensin, ROT0,   "Dynax",                      "Mahjong Tensinhai (Japan)",             MACHINE_NOT_WORKING )
 GAME( 1996,  janptr96, 0,        janptr96, janptr96, royalmah_state, init_janptr96, ROT0,   "Dynax",                      "Janputer '96 (Japan)",                  0 )
 GAME( 1997,  janptrsp, 0,        janptr96, janptr96, royalmah_state, init_janptr96, ROT0,   "Dynax",                      "Janputer Special (Japan)",              0 )

@@ -165,8 +165,17 @@ resulting mess can be seen in the F4 viewer display.
 /****************************************************************************************************/
 /* Spectrum 128 specific functions */
 
+void spectrum_128_state::video_start()
+{
+	m_frame_invert_count = 16;
+	m_screen_location = m_ram->pointer() + (5 << 14);
+	m_contention_pattern = {1, 0, 7, 6, 5, 4, 3, 2};
+}
+
 uint8_t spectrum_128_state::spectrum_128_pre_opcode_fetch_r(offs_t offset)
 {
+	if (is_contended(offset)) content_early();
+
 	/* this allows expansion devices to act upon opcode fetches from MEM addresses
 	   for example, interface1 detection fetches requires fetches at 0008 / 0708 to
 	   enable paged ROM and then fetches at 0700 to disable it
@@ -291,6 +300,18 @@ void spectrum_128_state::machine_reset()
 	spectrum_128_update_memory();
 }
 
+bool spectrum_128_state::is_vram_write(offs_t offset) {
+	// TODO respect banks 2,5 mapped to 0xc000
+	return (BIT(m_port_7ffd_data, 3))
+		? offset >= 0x8000 && offset < 0x9b00
+		: spectrum_state::is_vram_write(offset);
+}
+
+bool spectrum_128_state::is_contended(offs_t offset) {
+	// TODO Unlike the base 128K machine, RAM banks 4, 5, 6 and 7 are contended.
+	return spectrum_state::is_contended(offset);// || (offset >= 0x8000 && offset < 0xc000);
+}
+
 static const gfx_layout spectrum_charlayout =
 {
 	8, 8,           /* 8 x 8 characters */
@@ -323,7 +344,7 @@ void spectrum_128_state::spectrum_128(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
-	m_screen->set_raw(X1_128_SINCLAIR / 5, 456, 311, {get_screen_area().left() - 48, get_screen_area().right() + 48, get_screen_area().top() - 48, get_screen_area().bottom() + 48});
+	m_screen->set_raw(X1_128_SINCLAIR / 5, 456, 311, {get_screen_area().left() - 48, get_screen_area().right() + 48, get_screen_area().top() - 48, get_screen_area().bottom() + 56});
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(spec128);
 

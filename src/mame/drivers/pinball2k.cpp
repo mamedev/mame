@@ -25,6 +25,7 @@ Status:
 
 TODO:
 - Everything!
+- Save states
 - MediaGX features should be moved out to machine/ and shared with mediagx.c once we know what these games need
 
 ****************************************************************************************************************/

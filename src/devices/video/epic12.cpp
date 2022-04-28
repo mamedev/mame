@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Luca Elia, MetalliC
-/* emulation of Altera Cyclone EPIC12 FPGA programmed as a blitter */
+/* emulation of Altera Cyclone EP1C12 FPGA programmed as a blitter */
 
 #include "emu.h"
 #include "epic12.h"
@@ -61,6 +61,12 @@ void epic12_device::device_start()
 	m_blitter_delay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(epic12_device::blitter_delay_callback),this));
 	m_blitter_delay_timer->adjust(attotime::never);
 
+	m_firmware_pos = 0;
+	m_firmware.clear();
+	m_firmware.resize(290405, 0);
+	m_firmware_port = 0;
+	m_firmware_version = -1;
+
 	save_item(NAME(m_gfx_addr));
 	save_item(NAME(m_gfx_scroll_0_x));
 	save_item(NAME(m_gfx_scroll_0_y));
@@ -74,6 +80,10 @@ void epic12_device::device_start()
 	save_item(NAME(m_gfx_scroll_1_y_shadowcopy));
 	save_pointer(NAME(m_ram16_copy), m_main_ramsize/2);
 	save_item(NAME(*m_bitmaps));
+	save_item(NAME(m_firmware_pos));
+	save_item(NAME(m_firmware_port));
+	save_item(NAME(m_firmware));
+	save_item(NAME(m_firmware_version));
 }
 
 void epic12_device::device_reset()
@@ -1012,13 +1022,39 @@ u64 epic12_device::fpga_r()
 	return 0xff;
 }
 
-// todo, store what's written here and checksum it, different microcode probably leads to slightly different blitter timings
 void epic12_device::fpga_w(offs_t offset, u64 data, u64 mem_mask)
 {
-	if (ACCESSING_BITS_24_31)
+	if (ACCESSING_BITS_0_7)
 	{
 		// data & 0x08 = CE
 		// data & 0x10 = CLK
 		// data & 0x20 = DATA
+
+		if((data & 0x08) && !(m_firmware_port & 0x10) && (data & 0x10)) {
+			if(m_firmware_pos < 2323240 && (data & 0x20))
+				m_firmware[m_firmware_pos >> 3] |= 1 << (m_firmware_pos & 7);
+			m_firmware_pos++;
+		}
+
+		m_firmware_port = data;
+
+		if(m_firmware_pos == 2323240) {
+			u8 checksum = 0;
+			for(u8 c : m_firmware)
+				checksum += c;
+
+			switch(checksum) {
+			case 0x03: m_firmware_version = FW_A; break;
+			case 0x3e: m_firmware_version = FW_B; break;
+			case 0xf9: m_firmware_version = FW_C; break;
+			case 0xe1: m_firmware_version = FW_D; break;
+			default: m_firmware_version = -1; break;
+			}
+
+			if(m_firmware_version < 0)
+				logerror("Unrecognized firmware version\n");
+			else
+				logerror("Detected firmware version %c\n", 'A' + m_firmware_version);
+		}
 	}
 }

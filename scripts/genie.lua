@@ -93,11 +93,6 @@ function addprojectflags()
 		buildoptions_cpp {
 			"-Wsuggest-override",
 		}
-		configuration { "linux-*" }
-			buildoptions_cpp {
-				"-flifetime-dse=1", -- GCC for Linux takes issue with Sol's get<std::optional<T> >() otherwise
-			}
-		configuration {}
 	end
 end
 
@@ -1036,7 +1031,7 @@ end
 
 		local version = str_to_version(_OPTIONS["gcc_version"])
 		if string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android") then
-			if (version < 60000) then
+			if version < 60000 then
 				print("Clang version 6.0 or later needed")
 				os.exit(-1)
 			end
@@ -1065,23 +1060,28 @@ end
 				}
 			end
 		else
-			if (version < 70000) then
+			if version < 70000 then
 				print("GCC version 7.0 or later needed")
 				os.exit(-1)
 			end
+			buildoptions_cpp {
+				"-Wimplicit-fallthrough",
+			}
+			buildoptions_objcpp {
+				"-Wimplicit-fallthrough",
+			}
+			buildoptions {
+				"-Wno-unused-result", -- needed for fgets,fread on linux
+				-- array bounds checking seems to be buggy in 4.8.1 (try it on video/stvvdp1.c and video/model1.c without -Wno-array-bounds)
+				"-Wno-array-bounds",
+				"-Wno-error=attributes", -- GCC fails to recognize some uses of [[maybe_unused]]
+			}
+			if version < 100000 then
 				buildoptions_cpp {
-					"-Wimplicit-fallthrough",
+					"-flifetime-dse=1", -- GCC 9 takes issue with Sol's get<std::optional<T> >() otherwise
 				}
-				buildoptions_objcpp {
-					"-Wimplicit-fallthrough",
-				}
-				buildoptions {
-					"-Wno-unused-result", -- needed for fgets,fread on linux
-					-- array bounds checking seems to be buggy in 4.8.1 (try it on video/stvvdp1.c and video/model1.c without -Wno-array-bounds)
-					"-Wno-array-bounds",
-					"-Wno-error=attributes", -- GCC fails to recognize some uses of [[maybe_unused]]
-				}
-			if (version >= 80000) then
+			end
+			if version >= 80000 then
 				buildoptions {
 					"-Wno-stringop-truncation", -- ImGui again
 					"-Wno-stringop-overflow",   -- formats/victor9k_dsk.cpp bugs the compiler
@@ -1090,7 +1090,7 @@ end
 					"-Wno-class-memaccess", -- many instances in ImGui and BGFX
 				}
 			end
-			if (version >= 110000) then
+			if version >= 110000 then
 				buildoptions {
 					"-Wno-nonnull",                 -- luaengine.cpp lambdas do not need "this" captured but GCC 11.1 erroneously insists
 					"-Wno-stringop-overread",       -- machine/bbc.cpp in GCC 11.1

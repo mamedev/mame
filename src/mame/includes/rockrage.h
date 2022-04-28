@@ -49,7 +49,7 @@ private:
 	required_memory_bank m_rombank;
 
 	/* video-related */
-	int        m_vreg;
+	int        m_vreg = 0;
 
 	void rockrage_bankswitch_w(uint8_t data);
 	void rockrage_sh_irqtrigger_w(uint8_t data);

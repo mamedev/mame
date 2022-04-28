@@ -109,7 +109,10 @@ protected:
 
 	void set_mirror(u8 data);
 	void set_prg(int prg_base, int prg_mask);
+	void set_chr(int chr_base, int chr_mask);
 	virtual void set_prg() { set_prg(0x00, 0x1f); }
+	virtual void set_chr() { set_chr(0x00, 0x1ff); }
+
 	u16 m_mmc_vrom_bank[8];
 	u8 m_mmc_prg_bank[2];
 	u8 m_prg_flip;

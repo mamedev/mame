@@ -61,13 +61,13 @@ private:
 
 	required_region_ptr<uint8_t> m_adpcmrom;
 
-	uint32_t m_adpcm_pos;
-	uint32_t m_adpcm_end;
-	bool m_adpcm_playing;
+	uint32_t m_adpcm_pos = 0;
+	uint32_t m_adpcm_end = 0;
+	bool m_adpcm_playing = false;
 
-	int32_t m_scrollx;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
+	int32_t m_scrollx = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
 
 	uint8_t mcu_reset_r();
 	void bankswitch_w(uint8_t data);

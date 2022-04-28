@@ -5,7 +5,7 @@
 
 #include "ns32000.h"
 #include "ns32000dasm.h"
-#include "debugger.h"
+#include "debug/debugcpu.h"
 
 DEFINE_DEVICE_TYPE(NS32008, ns32008_device, "ns32008", "National Semiconductor NS32008")
 DEFINE_DEVICE_TYPE(NS32016, ns32016_device, "ns32016", "National Semiconductor NS32016")

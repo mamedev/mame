@@ -42,7 +42,6 @@
 #include "emu.h"
 #include "lr35902.h"
 #include "lr35902d.h"
-#include "debugger.h"
 
 /* Flag bit definitions */
 enum lr35902_flag

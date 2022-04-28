@@ -57,13 +57,13 @@ private:
 	u8 fdc_ctrl_r(offs_t offset);
 	void fdc_ctrl_w(offs_t offset, u8 data);
 
-	u8 m_romdrv_bank_reg;
-	u8 m_bram_banks;
-	u8 m_bram_bank_reg;
-	u8 m_dict_bank_reg;
+	u8 m_romdrv_bank_reg = 0;
+	u8 m_bram_banks = 0;
+	u8 m_bram_bank_reg = 0;
+	u8 m_dict_bank_reg = 0;
 
-	u8 m_floppy_mode;
-	u8 m_fdc_ctrl;
+	u8 m_floppy_mode = 0;
+	u8 m_fdc_ctrl = 0;
 };
 
 class pc98ha_state : public pc98lt_state
@@ -98,7 +98,7 @@ private:
 	void ems_bank_w(offs_t offset, u8 data);
 	u8 memcard_status_1_r(offs_t offset);
 	u8 memcard_status_2_r(offs_t offset);
-	u8 m_ext_view_sel;
+	u8 m_ext_view_sel = 0;
 };
 
 #endif // MAME_INCLUDES_PC9801_EPSON_H

@@ -8,6 +8,7 @@
 #define LOG_TIMERS          (1U << 2)
 #define LOG_DMA             (1U << 3)
 #define LOG_PCI             (1U << 4)
+#define LOG_IRQ             (1U << 5)
 
 //#define VERBOSE (LOG_GENERAL | LOG_GALILEO | LOG_TIMERS | LOG_DMA | LOG_PCI)
 #include "logmacro.h"
@@ -16,26 +17,28 @@
 #define LOGTIMERS(...)      LOGMASKED(LOG_TIMERS, __VA_ARGS__)
 #define LOGDMA(...)         LOGMASKED(LOG_DMA, __VA_ARGS__)
 #define LOGPCI(...)         LOGMASKED(LOG_PCI, __VA_ARGS__)
+#define LOGIRQ(...)         LOGMASKED(LOG_IRQ, __VA_ARGS__)
 
 
-/*************************************
- *
- *  Galileo constants
- *
- *************************************/
+//************************************
+//
+//  Galileo constants
+//
+//************************************
 
 #define TIMER_PERIOD        attotime::from_hz(clock())
 #define PCI_BUS_CLOCK       33000000
-// Number of dma words to transfer at a time, real hardware configurable between 8-32
+// Number of dma words (32 bits) to transfer at a time, real hardware configurable between 8-32
 #define DMA_BURST_SIZE      32
-#define DMA_TIMER_PERIOD    attotime::from_hz(PCI_BUS_CLOCK / 48)
+// DMA will transfer up to DMA_BURST_SIZE*4 bytes every DMA_TIMER_PERIOD seconds
+#define DMA_TIMER_PERIOD    attotime::from_hz(PCI_BUS_CLOCK / 64)
 
-/* Galileo registers - 0x000-0x3ff */
+// Galileo registers - 0x000-0x3ff
 #define GREG_CPU_CONFIG     (0x000/4)
-#define GREG_R1_0_LO     (0x008/4)
-#define GREG_R1_0_HI     (0x010/4)
-#define GREG_R3_2_LO     (0x018/4)
-#define GREG_R3_2_HI     (0x020/4)
+#define GREG_R1_0_LO        (0x008/4)
+#define GREG_R1_0_HI        (0x010/4)
+#define GREG_R3_2_LO        (0x018/4)
+#define GREG_R3_2_HI        (0x020/4)
 #define GREG_CS_2_0_LO      (0x028/4)
 #define GREG_CS_2_0_HI      (0x030/4)
 #define GREG_CS_3_BOOT_LO   (0x038/4)
@@ -51,7 +54,7 @@
 #define GREG_PCI_MEM1_LO    (0x080/4)
 #define GREG_PCI_MEM1_HI    (0x088/4)
 
-/* Galileo registers - 0x400-0x7ff */
+// Galileo registers - 0x400-0x7ff
 #define GREG_RAS0_LO        (0x400/4)
 #define GREG_RAS0_HI        (0x404/4)
 #define GREG_RAS1_LO        (0x408/4)
@@ -82,7 +85,7 @@
 #define GREG_DEVICE_BOOT    (0x46c/4)
 #define GREG_ADDRESS_ERROR  (0x470/4)
 
-/* Galileo registers - 0x800-0xbff */
+// Galileo registers - 0x800-0xbff
 #define GREG_DMA0_COUNT     (0x800/4)
 #define GREG_DMA1_COUNT     (0x804/4)
 #define GREG_DMA2_COUNT     (0x808/4)
@@ -110,20 +113,20 @@
 #define GREG_DMA_ARBITER    (0x860/4)
 #define GREG_TIMER_CONTROL  (0x864/4)
 
-/* Galileo registers - 0xc00-0xfff */
+// Galileo registers - 0xc00-0xfff
 #define GREG_PCI_COMMAND    (0xc00/4)
 #define GREG_PCI_TIMEOUT    (0xc04/4)
-#define GREG_PCI_R1_0    (0xc08/4)
-#define GREG_PCI_R3_2    (0xc0c/4)
+#define GREG_PCI_R1_0       (0xc08/4)
+#define GREG_PCI_R3_2       (0xc0c/4)
 #define GREG_PCI_CS_2_0     (0xc10/4)
 #define GREG_PCI_CS_3_BOOT  (0xc14/4)
-#define GREG_INT_STATE      (0xc18/4)
-#define GREG_INT_MASK       (0xc1c/4)
-#define GREG_PCI_INT_MASK   (0xc24/4)
+#define GREG_INTR_CAUSE     (0xc18/4)
+#define GREG_CPU_MASK       (0xc1c/4)
+#define GREG_PCI_MASK       (0xc24/4)
 #define GREG_CONFIG_ADDRESS (0xcf8/4)
 #define GREG_CONFIG_DATA    (0xcfc/4)
 
-/* Galileo interrupts */
+// Galileo interrupts
 #define GINT_SUMMARY_SHIFT  (0)
 #define GINT_MEMOUT_SHIFT   (1)
 #define GINT_DMAOUT_SHIFT   (2)
@@ -227,13 +230,15 @@ void gt64xxx_device::device_start()
 		LOGGALILEO("gt64xxx_device::device_start UPDATE Mapped size: 0x%08X start: 0x1fd00000 end: %08X\n", romSize, 0x1fd00000 + romSize - 1);
 	}
 
-	/* allocate timers for the galileo */
+	// allocate timers for the galileo
 	m_timer[0].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gt64xxx_device::timer_callback), this));
 	m_timer[1].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gt64xxx_device::timer_callback), this));
 	m_timer[2].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gt64xxx_device::timer_callback), this));
 	m_timer[3].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gt64xxx_device::timer_callback), this));
 
 	// Save states
+	save_item(NAME(m_irq_pending));
+	save_item(NAME(m_irq_state));
 	save_item(NAME(m_pci_stall_state));
 	save_item(NAME(m_retry_count));
 	save_item(NAME(m_pci_cpu_stalled));
@@ -306,6 +311,8 @@ void gt64xxx_device::device_reset()
 	map_cpu_space();
 	regenerate_config_mapping();
 
+	m_irq_pending = 0;
+	m_irq_state = CLEAR_LINE;
 	m_pci_stall_state = 0;
 	m_retry_count = 0;
 	m_pci_cpu_stalled = 0;
@@ -479,13 +486,13 @@ WRITE_LINE_MEMBER(gt64xxx_device::pci_stall)
 				m_stall_windex--;
 				index++;
 			}
-			/* resume CPU execution */
+			// resume CPU execution
 			machine().scheduler().trigger(45678);
-			LOGGALILEO("Resuming CPU on PCI Stall\n");
+			LOGMASKED(LOG_GALILEO | LOG_PCI | LOG_DMA, "Resuming CPU on PCI Stall\n");
 		}
 	}
 
-	/* set the new state */
+	// set the new state
 	m_pci_stall_state = state;
 }
 
@@ -520,7 +527,7 @@ void gt64xxx_device::master_mem0_w(offs_t offset, uint32_t data, uint32_t mem_ma
 			m_stall_windex++;
 			// Stall cpu until trigger
 			m_cpu_space->device().execute().spin_until_trigger(45678);
-			LOGMASKED(LOG_GALILEO | LOG_PCI, "%s Stalling CPU on PCI Stall\n", machine().describe_context());
+			LOGMASKED(LOG_GALILEO | LOG_PCI | LOG_DMA, "%s Stalling CPU on PCI Stall\n", machine().describe_context());
 		}
 		else {
 			fatalerror("master_mem0_w: m_stall_windex full\n");
@@ -621,7 +628,7 @@ uint32_t gt64xxx_device::cpu_if_r(offs_t offset)
 {
 	uint32_t result = m_reg[offset];
 
-	/* switch off the offset for special cases */
+	// switch off the offset for special cases
 	switch (offset)
 	{
 		case GREG_TIMER0_COUNT:
@@ -660,10 +667,16 @@ uint32_t gt64xxx_device::cpu_if_r(offs_t offset)
 			result = config_address_r();
 			break;
 
-		case GREG_INT_STATE:
-		case GREG_INT_MASK:
+		case GREG_INTR_CAUSE:
+			LOGIRQ("%s Galileo GREG_INTR_CAUSE read from offset %03X = %08X\n", machine().describe_context(), offset * 4, result);
+			break;
+
+		case GREG_CPU_MASK:
+			LOGGALILEO("%s Galileo GREG_CPU_MASK read from offset %03X = %08X\n", machine().describe_context(), offset*4, result);
+			break;
+
 		case GREG_TIMER_CONTROL:
-//          LOGGALILEO("%s Galileo read from offset %03X = %08X\n", machine().describe_context(), offset*4, result);
+			LOGTIMERS("%s Galileo read from offset %03X = %08X\n", machine().describe_context(), offset*4, result);
 			break;
 
 		default:
@@ -686,7 +699,7 @@ void gt64xxx_device::cpu_if_w(address_space &space, offs_t offset, uint32_t data
 	uint32_t oldata = m_reg[offset];
 	COMBINE_DATA(&m_reg[offset]);
 
-	/* switch off the offset for special cases */
+	// switch off the offset for special cases
 	switch (offset)
 	{
 		case GREG_R1_0_LO:
@@ -717,25 +730,33 @@ void gt64xxx_device::cpu_if_w(address_space &space, offs_t offset, uint32_t data
 		{
 			int which = offset % 4;
 
-			/* keep the read only activity bit */
+			// keep the read only activity bit
 			m_reg[offset] &= ~0x4000;
 			m_reg[offset] |= (oldata & 0x4000);
 
-			/* fetch next record */
+			// fetch next record
 			if (data & 0x2000)
 				dma_fetch_next(space, which);
 			m_reg[offset] &= ~0x2000;
 
-			/* if enabling, start the DMA */
+			// if enabling, start the DMA
 			if (!(oldata & 0x1000) && (data & 0x1000) && !(m_dma_active & (1<<which)))
 			{
 				// Trigger the timer if there are no dma's active
 				if (m_dma_active==0)
-					m_dma_timer->adjust(attotime::zero, 0, DMA_TIMER_PERIOD);
+					m_dma_timer->adjust(DMA_TIMER_PERIOD, 0, DMA_TIMER_PERIOD);
 				m_dma_active |= (1<< which);
 				//perform_dma(space, which);
 				LOGDMA("%s Galileo starting DMA Chan %i\n", machine().describe_context(), which);
 			}
+			if ((oldata & 0x1000) && !(data & 0x1000) && (m_dma_active & (1 << which)))
+			{
+				m_dma_active &= ~(1 << which);
+				// Turn off the timer
+				m_dma_timer->adjust(attotime::never);
+				LOGDMA("%s Galileo stopping DMA Chan %i\n", machine().describe_context(), which);
+			}
+
 			LOGGALILEO("%s Galileo write to offset %03X = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
 			break;
 		}
@@ -774,7 +795,7 @@ void gt64xxx_device::cpu_if_w(address_space &space, offs_t offset, uint32_t data
 							timer->count &= 0xffffff;
 					}
 					timer->timer->adjust(TIMER_PERIOD * timer->count, which);
-					LOGTIMERS("Adjusted timer to fire in %f secs\n", (TIMER_PERIOD * timer->count).as_double());
+					LOGTIMERS("Adjusted timer%d to fire in %f secs\n", which, (TIMER_PERIOD * timer->count).as_double());
 				}
 				else if (timer->active && !(data & mask))
 				{
@@ -782,15 +803,22 @@ void gt64xxx_device::cpu_if_w(address_space &space, offs_t offset, uint32_t data
 					timer->active = 0;
 					timer->count = (timer->count > elapsed) ? (timer->count - elapsed) : 0;
 					timer->timer->adjust(attotime::never, which);
-					LOGTIMERS("Disabled timer\n");
+					LOGTIMERS("Disabled timer%d\n", which);
 				}
 			}
 			break;
 		}
 
-		case GREG_INT_STATE:
-			LOGGALILEO("%s Galileo write to IRQ clear = %08X & %08X\n", offset*4, data, mem_mask);
+		case GREG_INTR_CAUSE:
+			LOGIRQ("%s Galileo GREG_INTR_CAUSE write to offset %03X = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
 			m_reg[offset] = oldata & data;
+			update_irqs();
+			break;
+
+		case GREG_CPU_MASK:
+			LOGGALILEO("%s Galileo GREG_CPU_MASK write to offset %03X = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
+			// Bits 0, 25:21, 31:30 are read only '0'
+			m_reg[offset] &= 0x3c1ffffe;
 			update_irqs();
 			break;
 
@@ -829,7 +857,6 @@ void gt64xxx_device::cpu_if_w(address_space &space, offs_t offset, uint32_t data
 		case GREG_DMA0_SOURCE:  case GREG_DMA1_SOURCE:  case GREG_DMA2_SOURCE:  case GREG_DMA3_SOURCE:
 		case GREG_DMA0_DEST:    case GREG_DMA1_DEST:    case GREG_DMA2_DEST:    case GREG_DMA3_DEST:
 		case GREG_DMA0_NEXT:    case GREG_DMA1_NEXT:    case GREG_DMA2_NEXT:    case GREG_DMA3_NEXT:
-		case GREG_INT_MASK:
 			LOGGALILEO("%s Galileo write to offset %03X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 			break;
 
@@ -839,39 +866,65 @@ void gt64xxx_device::cpu_if_w(address_space &space, offs_t offset, uint32_t data
 	}
 }
 
-/*************************************
- *
- *  Galileo timers & interrupts
- *
- *************************************/
+//************************************
+//
+//  Galileo timers & interrupts
+//
+//************************************
 
 void gt64xxx_device::update_irqs()
 {
+	// Set cause from pending only if current irq state is clear
+	// seattle hyprdriv freezes (MT07568) if a DMA0 interrupt is sent while the processor is already in the exception handler
+	if (!m_irq_state)
+	{
+		m_reg[GREG_INTR_CAUSE] = m_irq_pending;
+		m_irq_pending = 0;
+		// Set interrupt summary bit
+		if (m_reg[GREG_INTR_CAUSE] & 0xfffffffe)
+			m_reg[GREG_INTR_CAUSE] |= (1 << 0);
+		else
+			m_reg[GREG_INTR_CAUSE] &= ~(1 << 0);
+
+		// set CPU interrupt summary of bits 29:26, 20:1
+		if (m_reg[GREG_INTR_CAUSE] & m_reg[GREG_CPU_MASK] & 0x3c1ffffe)
+			m_reg[GREG_INTR_CAUSE] |= (1 << 30);
+		else
+			m_reg[GREG_INTR_CAUSE] &= ~(1 << 30);
+	}
+	// if any unmasked interrupts are active, we generate
 	int state = CLEAR_LINE;
-
-	/* if any unmasked interrupts are live, we generate */
-	if (m_reg[GREG_INT_STATE] & m_reg[GREG_INT_MASK])
+	if (m_reg[GREG_INTR_CAUSE] & m_reg[GREG_CPU_MASK])
 		state = ASSERT_LINE;
-	if (m_irq_num != -1)
+
+	if (m_irq_num != -1 && state != m_irq_state)
+	{
 		m_cpu->set_input_line(m_irq_num, state);
+		m_irq_state = state;
+		LOGIRQ("gt64xxx_device IRQ %s irqNum: %i cause = %08X mask = %08X time: %s\n", (state == ASSERT_LINE) ? "asserted" : "cleared", m_irq_num, m_reg[GREG_INTR_CAUSE], m_reg[GREG_CPU_MASK], machine().time().as_string());
+	}
 
-	LOGGALILEO("Galileo IRQ %s irqNum: %i state = %08X mask = %08X\n", (state == ASSERT_LINE) ? "asserted" : "cleared", m_irq_num, m_reg[GREG_INT_STATE], m_reg[GREG_INT_MASK]);
+	// Run again if we cleared and there are new interrupts pending
+	if (!state && m_irq_pending)
+	{
+		LOGIRQ("gt64xxx_device new irq pending %08x time: %s\n", m_irq_pending, machine().time().as_string());
+		update_irqs();
+	}
 }
-
 
 TIMER_CALLBACK_MEMBER(gt64xxx_device::timer_callback)
 {
 	int which = param;
 	galileo_timer *timer = &m_timer[which];
 
-	LOGTIMERS("timer %d fired\n", which);
+	LOGTIMERS("timer%d fired at time %s\n", which, machine().time().as_string());
 
-	/* copy the start value from the registers */
+	// copy the start value from the registers
 	timer->count = m_reg[GREG_TIMER0_COUNT + which];
 	if (which != 0)
 		timer->count &= 0xffffff;
 
-	/* if we're a timer, adjust the timer to fire again */
+	// if we're a timer, adjust the timer to fire again
 	if (m_reg[GREG_TIMER_CONTROL] & (2 << (2 * which)))
 	{
 		// unsure what a 0-length timer should do, but it produces an infinite loop so guard against it
@@ -883,8 +936,9 @@ TIMER_CALLBACK_MEMBER(gt64xxx_device::timer_callback)
 	else
 		timer->active = timer->count = 0;
 
-	/* trigger the interrupt */
-	m_reg[GREG_INT_STATE] |= 1 << (GINT_T0EXP_SHIFT + which);
+	// trigger the interrupt
+	//m_reg[GREG_INTR_CAUSE] |= 1 << (GINT_T0EXP_SHIFT + which);
+	m_irq_pending |= 1 << (GINT_T0EXP_SHIFT + which);
 	update_irqs();
 }
 
@@ -908,35 +962,30 @@ int gt64xxx_device::dma_fetch_next(address_space &space, int which)
 	offs_t address = 0;
 	uint32_t data;
 
-	/* no-op for unchained mode */
+	// no-op for unchained mode
 	if (!(m_reg[GREG_DMA0_CONTROL + which] & 0x200))
 		address = m_reg[GREG_DMA0_NEXT + which];
 
-	/* if we hit the end address, signal an interrupt */
+	// exit if we hit the end address
 	if (address == 0)
 	{
-		if (m_reg[GREG_DMA0_CONTROL + which] & 0x400)
-		{
-			m_reg[GREG_INT_STATE] |= 1 << (GINT_DMA0COMP_SHIFT + which);
-			update_irqs();
-		}
 		m_reg[GREG_DMA0_CONTROL + which] &= ~0x5000;
 		return 0;
 	}
 
-	/* fetch the byte count */
+	// fetch the byte count
 	data = space.read_dword(address); address += 4;
 	m_reg[GREG_DMA0_COUNT + which] = data;
 
-	/* fetch the source address */
+	// fetch the source address
 	data = space.read_dword(address); address += 4;
 	m_reg[GREG_DMA0_SOURCE + which] = data;
 
-	/* fetch the dest address */
+	// fetch the dest address
 	data = space.read_dword(address); address += 4;
 	m_reg[GREG_DMA0_DEST + which] = data;
 
-	/* fetch the next record address */
+	// fetch the next record address
 	data = space.read_dword(address); address += 4;
 	m_reg[GREG_DMA0_NEXT + which] = data;
 	return 1;
@@ -960,7 +1009,8 @@ TIMER_CALLBACK_MEMBER (gt64xxx_device::perform_dma)
 	if (which==-1)
 	{
 		logerror("gt64xxx_device::perform_dma Warning! DMA Timer called with no pending DMA. m_dma_active = %08X\n", m_dma_active);
-	} else
+	}
+	else
 	{
 		offs_t srcaddr = m_reg[GREG_DMA0_SOURCE + which];
 		offs_t dstaddr = m_reg[GREG_DMA0_DEST + which];
@@ -972,7 +1022,7 @@ TIMER_CALLBACK_MEMBER (gt64xxx_device::perform_dma)
 
 		m_reg[GREG_DMA0_CONTROL + which] |= 0x5000;
 
-		/* determine src/dst inc */
+		// determine src/dst inc
 		switch ((m_reg[GREG_DMA0_CONTROL + which] >> 2) & 3)
 		{
 			default:
@@ -988,36 +1038,39 @@ TIMER_CALLBACK_MEMBER (gt64xxx_device::perform_dma)
 			case 2:     dstinc = 0;     break;
 		}
 
-		LOGDMA("Performing DMA%d: src=%08X dst=%08X bytes=%04X sinc=%d dinc=%d\n", which, srcaddr, dstaddr, bytesleft, srcinc, dstinc);
-
-		int burstCount = 0;
-		/* standard transfer */
-		while (bytesleft > 0 && burstCount < DMA_BURST_SIZE)
+		// check for pci stall
+		if (m_pci_stall_state)
 		{
-			if (m_pci_stall_state)
+			uint32_t configRetryCount = (m_reg[GREG_PCI_TIMEOUT] >> 16) & 0xff;
+			m_retry_count++;
+			if (m_retry_count < 4)
+				LOGDMA("%s Stalling DMA on voodoo retry_count: %i max: %i time: %s\n", machine().describe_context(), m_retry_count, configRetryCount, machine().time().as_string());
+			if (configRetryCount == 0)
 			{
-				if (m_retry_count<4) LOGDMA("%s Stalling DMA on voodoo retry_count: %i\n", machine().describe_context(), m_retry_count);
-				// Save info
-				m_reg[GREG_DMA0_SOURCE + which] = srcaddr;
-				m_reg[GREG_DMA0_DEST + which] = dstaddr;
-				m_reg[GREG_DMA0_COUNT + which] = (m_reg[GREG_DMA0_COUNT + which] & ~0xffff) | bytesleft;
-
-				m_retry_count++;
-				uint32_t configRetryCount = (m_reg[GREG_PCI_TIMEOUT] >> 16) & 0xff;
-				if (m_retry_count >= configRetryCount && configRetryCount > 0)
-				{
-					logerror("gt64xxx_device::perform_dma Error! Too many PCI retries. DMA%d: src=%08X dst=%08X bytes=%04X sinc=%d dinc=%d\n", which, srcaddr, dstaddr, bytesleft, srcinc, dstinc);
-					// Signal error and abort DMA
-					m_dma_active &= ~(1 << which);
-					m_retry_count = 0;
-					return;
-				}
-				else
-				{
-					// Come back later
-					return;
-				}
+				// Almost infinite retries, but avoid hanging the machine
+				if (configRetryCount == ~0x0)
+					fatalerror("gt64xxx_device::perform_dma Error! PCI is hung. DMA%d: src=%08X dst=%08X bytes=%04X sinc=%d dinc=%d\n", which, srcaddr, dstaddr, bytesleft, srcinc, dstinc);
 			}
+			else if (m_retry_count >= configRetryCount)
+			{
+				logerror("gt64xxx_device::perform_dma Error! Too many PCI retries. DMA%d: src=%08X dst=%08X bytes=%04X sinc=%d dinc=%d\n", which, srcaddr, dstaddr, bytesleft, srcinc, dstinc);
+				// Signal error and abort DMA
+				m_dma_active &= ~(1 << which);
+				m_retry_count = 0;
+				// Turn off the timer
+				m_dma_timer->adjust(attotime::never);
+				// Set the RetryCtr interrupt
+				m_irq_pending |= 1 << (GINT_DMA0COMP_SHIFT + which);
+				update_irqs();
+			}
+			return;
+		}
+
+		// do the transfer
+		LOGDMA("gt64xxx_device: Starting DMA%d: src=%08X dst=%08X bytes=%04X sinc=%d dinc=%d time=%s\n", which, srcaddr, dstaddr, bytesleft, srcinc, dstinc, machine().time().as_string());
+		int burstCount = 0;
+		while (bytesleft > 0 && burstCount < DMA_BURST_SIZE && !m_pci_stall_state)
+		{
 			if (bytesleft < 4)
 			{
 				dstSpace->write_byte(dstaddr, srcSpace->read_byte(srcaddr));
@@ -1025,7 +1078,8 @@ TIMER_CALLBACK_MEMBER (gt64xxx_device::perform_dma)
 				dstaddr += dstinc;
 				bytesleft--;
 			}
-			else {
+			else
+			{
 				dstSpace->write_dword(dstaddr, srcSpace->read_dword(srcaddr));
 				srcaddr += srcinc * 4;
 				dstaddr += dstinc * 4;
@@ -1033,29 +1087,37 @@ TIMER_CALLBACK_MEMBER (gt64xxx_device::perform_dma)
 			}
 			burstCount++;
 		}
-		/* not verified, but seems logical these should be updated byte the end */
+		// not verified, but seems logical these should be updated at the end
 		m_reg[GREG_DMA0_SOURCE + which] = srcaddr;
 		m_reg[GREG_DMA0_DEST + which] = dstaddr;
 		m_reg[GREG_DMA0_COUNT + which] = (m_reg[GREG_DMA0_COUNT + which] & ~0xffff) | bytesleft;
 
-		/* if we did not hit zero, punt and return later */
-		if (bytesleft != 0)
+		// Check if we are done this descriptor
+		if (bytesleft == 0)
 		{
-			return;
-		}
-		/* interrupt? */
-		if (!(m_reg[GREG_DMA0_CONTROL + which] & 0x400))
-		{
-			m_reg[GREG_INT_STATE] |= 1 << (GINT_DMA0COMP_SHIFT + which);
-			update_irqs();
-		}
+			// byte count zero interrupt
+			if (!(m_reg[GREG_DMA0_CONTROL + which] & (1 << 10)))
+			{
+				m_irq_pending |= 1 << (GINT_DMA0COMP_SHIFT + which);
+				update_irqs();
+			}
 
-		// Fetch the next dma for this channel (to be performed next scheduled burst)
-		if (dma_fetch_next(*m_cpu_space, which) == 0)
-		{
-			m_dma_active &= ~(1 << which);
-			// Turn off the timer
-			m_dma_timer->adjust(attotime::never);
+			// Fetch the next dma for this channel (to be performed next scheduled burst)
+			if ((m_reg[GREG_DMA0_CONTROL + which] & (1 << 9)) || dma_fetch_next(*m_cpu_space, which) == 0)
+			{
+				LOGDMA("gt64xxx_device: Done DMA descriptors time: %s\n", machine().time().as_string());
+				m_dma_active &= ~(1 << which);
+
+				// Turn off the timer
+				m_dma_timer->adjust(attotime::never);
+
+				// no more descriptors interrupt (bit 10) in chained mode (not bit 9)
+				if ((m_reg[GREG_DMA0_CONTROL + which] & (1 << 10)) && !(m_reg[GREG_DMA0_CONTROL + which] & (1 << 9)))
+				{
+					m_irq_pending |= 1 << (GINT_DMA0COMP_SHIFT + which);
+					update_irqs();
+				}
+			}
 		}
 	}
 }

@@ -57,23 +57,23 @@ private:
 	void pc4_io(address_map &map);
 	void pc4_mem(address_map &map);
 
-	emu_timer *m_blink_timer;
-	emu_timer *m_busy_timer;
+	emu_timer *m_blink_timer = nullptr;
+	emu_timer *m_busy_timer = nullptr;
 
-	uint8_t m_busy_flag;
-	uint8_t m_ddram[0xa0];
-	uint8_t m_cgram[0x40];
-	int16_t m_ac;
-	uint8_t m_ac_mode;
-	uint8_t m_data_bus_flag;
-	int16_t m_cursor_pos;
-	uint8_t m_display_on;
-	uint8_t m_cursor_on;
-	uint8_t m_blink_on;
-	uint8_t m_shift_on;
-	int8_t m_disp_shift;
-	int8_t m_direction;
-	uint8_t m_blink;
+	uint8_t m_busy_flag = 0;
+	uint8_t m_ddram[0xa0]{};
+	uint8_t m_cgram[0x40]{};
+	int16_t m_ac = 0;
+	uint8_t m_ac_mode = 0;
+	uint8_t m_data_bus_flag = 0;
+	int16_t m_cursor_pos = 0;
+	uint8_t m_display_on = 0;
+	uint8_t m_cursor_on = 0;
+	uint8_t m_blink_on = 0;
+	uint8_t m_shift_on = 0;
+	int8_t m_disp_shift = 0;
+	int8_t m_direction = 0;
+	uint8_t m_blink = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beep;

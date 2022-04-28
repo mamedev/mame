@@ -309,6 +309,7 @@ public:
 	void add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base);
 	void clear_fastram(uint32_t select_start);
 	void mips3drc_set_options(uint32_t options);
+	uint32_t mips3drc_get_options();
 	void mips3drc_add_hotspot(offs_t pc, uint32_t opcode, uint32_t cycles);
 
 protected:
@@ -623,7 +624,7 @@ private:
 
 	void generate_update_mode(drcuml_block &block);
 	void generate_update_cycles(drcuml_block &block, compiler_state &compiler, uml::parameter param, bool allow_exception);
-	void generate_checksum_block(drcuml_block &block, compiler_state &compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
+	void generate_checksum_block(drcuml_block &block, compiler_state &compiler, const opcode_desc *seqhead, const opcode_desc *seqlast, const opcode_desc *codelast);
 	void generate_sequence_instruction(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 	void generate_delay_slot_and_branch(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint8_t linkreg);
 
@@ -969,7 +970,6 @@ private:
 COMPILER-SPECIFIC OPTIONS
 ***************************************************************************/
 
-/* fix me -- how do we make this work?? */
 #define MIPS3DRC_STRICT_VERIFY      0x0001          /* verify all instructions */
 #define MIPS3DRC_STRICT_COP0        0x0002          /* validate all COP0 instructions */
 #define MIPS3DRC_STRICT_COP1        0x0004          /* validate all COP1 instructions */
@@ -977,9 +977,9 @@ COMPILER-SPECIFIC OPTIONS
 #define MIPS3DRC_DISABLE_INTRABLOCK 0x0010          /* disable intrablock branching */
 #define MIPS3DRC_CHECK_OVERFLOWS    0x0020          /* actually check overflows on add/sub instructions */
 #define MIPS3DRC_ACCURATE_DIVZERO   0x0040          /* load correct values into HI/LO on integer divide-by-zero */
+#define MIPS3DRC_EXTRA_INSTR_CHECK  0x0080          /* adds the last instruction value to all validation entry locations, used with STRICT_VERIFY */
 
 #define MIPS3DRC_COMPATIBLE_OPTIONS (MIPS3DRC_STRICT_VERIFY | MIPS3DRC_STRICT_COP1 | MIPS3DRC_STRICT_COP0 | MIPS3DRC_STRICT_COP2)
 #define MIPS3DRC_FASTEST_OPTIONS    (0)
-
 
 #endif // MAME_CPU_MIPS_MIPS3_H

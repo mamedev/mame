@@ -262,7 +262,6 @@ public:
 		, m_pio(*this, "ppi8255")
 		, m_sound(*this, "ay8910")
 		, m_palette(*this, "palette")
-		, m_timer(nullptr)
 	{ }
 
 	void spc1500(machine_config &config);
@@ -300,21 +299,21 @@ private:
 	void spc1500_double_io(address_map &map);
 	void spc1500_mem(address_map &map);
 
-	uint8_t *m_p_ram;
-	uint8_t m_ipl;
-	uint8_t m_palet[3];
-	uint8_t m_paltbl[8];
-	uint8_t m_pcg_char, m_pcg_attr, m_char_change;
-	uint16_t m_pcg_offset[3];
-	int m_char_count;
+	uint8_t *m_p_ram = nullptr;
+	uint8_t m_ipl = 0;
+	uint8_t m_palet[3]{};
+	uint8_t m_paltbl[8]{};
+	uint8_t m_pcg_char = 0, m_pcg_attr = 0, m_char_change = 0;
+	uint16_t m_pcg_offset[3]{};
+	int m_char_count = 0;
 	attotime m_time;
-	bool m_romsel;
-	bool m_double_mode;
-	bool m_p5bit;
-	bool m_motor;
-	bool m_motor_toggle;
-	uint8_t m_crtc_vreg[0x100];
-	bool m_centronics_busy;
+	bool m_romsel = false;
+	bool m_double_mode = false;
+	bool m_p5bit = false;
+	bool m_motor = false;
+	bool m_motor_toggle = false;
+	uint8_t m_crtc_vreg[0x100]{};
+	bool m_centronics_busy = false;
 	required_device<z80_device> m_maincpu;
 	required_device<mc6845_device> m_vdg;
 	required_device<cassette_image_device> m_cass;
@@ -328,9 +327,9 @@ private:
 	required_device<i8255_device> m_pio;
 	required_device<ay8910_device> m_sound;
 	required_device<palette_device> m_palette;
-	uint8_t *m_font;
-	uint8_t m_priority;
-	emu_timer *m_timer;
+	uint8_t *m_font = nullptr;
+	uint8_t m_priority = 0;
+	emu_timer *m_timer = nullptr;
 	void get_pcg_addr();
 };
 

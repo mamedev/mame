@@ -59,6 +59,109 @@ correctly.
      at the sound CPU.
 
 
+***************************************************************************
+
+1942, Capcom 1984
+Hardware info by Guru
+
+PCB layout
+----------
+(Note the two boards are mounted solder side to solder side with components facing outwards)
+
+Top board:
+
+84100-01A-03
+       |-------------|                |---------|
+|------|-------------|----------------|---------|-------|
+|HA1368  VOL             82S129.F1                      |
+|                                                       |
+|              M58725(3)  SR02.F2                       |
+|                                              SR03.N3  |
+|                                                       |
+|                                 J1           SR04.N4  |
+|2                                                      |
+|8                                             SR05.N5  |
+|W                                                      |
+|A  SWA                           82S129.K6    SR06.N6  |
+|Y                                                      |
+|   SWB                                  J2    SR07.N7  |
+|                                              X        |
+|AY-3-8910   M58725(2)                         M58725(1)|
+|                                                       |
+|AY-3-8910   SR01.C11  Z80A(2) 12MHz   Z80A(1) M58725(1)|
+|-------------------------------------------------------|
+Notes:
+       Z80A(1) - Z80A CPU. Clock 3.000MHz [12/4] (Main CPU)
+       Z80A(2) - Z80A CPU. Clock 3.000MHz [12/4] (Sound CPU)
+     AY-3-8910 - General Instrument AY-3-8910 Programmable Sound Generator (PSG). Clock 1.500MHz [12/8, both chips)
+         SWA/B - 8-position DIP switch
+            J1 - Wire link set to lower position marked '100'
+            J2 - Wire link set to right position marked '100'
+         28WAY - Uses unique Capcom 28-way pinout for 1942. This is not JAMMA
+           VOL - 2k-ohm Volume Pot
+        HA1368 - Hitachi HA1368 5.3W Audio Power Amplifier
+     M58725(1) - Mitsubishi M58725 2kBx8-bit SRAM (main program RAM. 'W-RAM' on the test screen)
+     M58725(2) - Mitsubishi M58725 2kBx8-bit SRAM (sound program RAM. 'S-RAM' on the test screen)
+     M58725(3) - Mitsubishi M58725 2kBx8-bit SRAM (character RAM. 'V-RAM' on the test screen)
+             X - Empty DIP28 location (no ROM or socket)
+      SR01.C11 - 27C128 16kBx8-bit EPROM (sound program)
+       SR02.F2 - 27C64 8kBx8-bit EPROM (characters)
+       SR03.N3 - \
+       SR04.N4 -  |
+       SR05.N5 -  | 27C128 16kBx8-bit EPROM (main program)
+       SR07.N7 - /
+       SR06.N6 - 27C64 8kBx8-bit EPROM (part of main program)
+     82S129.F1 - Signetics 82S129 256x4-bit Bipolar PROM (character lookup table)
+     82S129.K6 - Signetics 82S129 256x4-bit Bipolar PROM (interrupt timing)
+         HSync - 15.6173kHz
+         VSync - 59.6079Hz
+
+
+Bottom board:
+
+84100-02A-3
+|-------------------------------------------------------|
+| SR08.A1    82S129.D1                  SR14.L1  SR16.N1|
+| SR09.A2    82S129.D2    6148          SR15.L2  SR17.N2|
+|                                                       |
+| SR10.A3                           82S129.K3           |
+| SR11.A4                        6148                   |
+|                                                       |
+| SR12.A5                                               |
+| SR13.A6    82S129.D6                                  |
+|                                                       |
+|  MB8128                                               |
+|                  82S129.E8  5114                      |
+|                                                       |
+|                  82S129.E9  5114                      |
+|                                                       |
+|                  82S129.E10                           |
+|                                          82S129.M11   |
+|------|-------------|----------------|---------|-------|
+       |-------------|                |---------|
+Notes:
+      MB8128 - Fujitsu MB8128 2kBx8-bit SRAM (background tile RAM)
+        6148 - Hitachi HM6148 1kBx4-bit SRAM (sprite generator RAM)
+        5114 - Sharp LH5114 1kBx4-bit SRAM (sprite display RAM)
+     SR14.L1 \
+     SR16.N1  |
+     SR15.L2  | 27C128 16kBx8-bit EPROM (sprites)
+     SR17.N2 /
+     SR08.A1 \
+     SR09.A2  |
+     SR10.A3  | 27C64 8kBx8-bit EPROM (background tiles)
+     SR11.A4  |
+     SR12.A5  |
+     SR13.A6 /
+   82S129.D1 - Signetics 82S129 256x4-bit Bipolar PROM (tile palette selector)
+   82S129.D2 - Signetics 82S129 256x4-bit Bipolar PROM (tile palette selector)
+   82S129.K3 - Signetics 82S129 256x4-bit Bipolar PROM (sprite lookup table)
+   82S129.D6 - Signetics 82S129 256x4-bit Bipolar PROM (tile lookup table)
+   82S129.E8 - Signetics 82S129 256x4-bit Bipolar PROM (red color PROM)
+   82S129.E9 - Signetics 82S129 256x4-bit Bipolar PROM (green color PROM)
+  82S129.E10 - Signetics 82S129 256x4-bit Bipolar PROM (blue color PROM)
+  82S129.M11 - Signetics 82S129 256x4-bit Bipolar PROM (video timing)
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -75,7 +178,7 @@ namespace {
 
 /* 12mhz OSC */
 constexpr XTAL MASTER_CLOCK(12_MHz_XTAL);
-constexpr XTAL MAIN_CPU_CLOCK(MASTER_CLOCK/3);
+constexpr XTAL MAIN_CPU_CLOCK(MASTER_CLOCK/4);
 constexpr XTAL SOUND_CPU_CLOCK(MASTER_CLOCK/4);
 constexpr XTAL AUDIO_CLOCK(MASTER_CLOCK/8);
 /* 20mhz OSC - both Z80s are 4 MHz */
@@ -499,12 +602,12 @@ void _1942_state::machine_reset()
 void _1942_state::_1942(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, MAIN_CPU_CLOCK);    /* 4 MHz ??? */
+	Z80(config, m_maincpu, MAIN_CPU_CLOCK);    /* 3 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &_1942_state::_1942_map);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(_1942_state::_1942_scanline), "screen", 0, 1);
 
-	Z80(config, m_audiocpu, SOUND_CPU_CLOCK);  /* 3 MHz ??? */
+	Z80(config, m_audiocpu, SOUND_CPU_CLOCK);  /* 3 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &_1942_state::sound_map);
 
 	/* video hardware */

@@ -72,18 +72,210 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/epos.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
-#include "machine/watchdog.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-void epos_state::dealer_decrypt_rom(offs_t offset, uint8_t data)
+namespace {
+
+class epos_base_state : public driver_device
+{
+public:
+	epos_base_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette")
+	{ }
+
+protected:
+	virtual void video_start() override;
+	virtual void video_reset() override;
+
+	static void set_pal_color(palette_device &palette, uint8_t offset, uint8_t data); // TODO: convert to an RGB converter and set_format
+
+	// memory pointers
+	required_shared_ptr<uint8_t> m_videoram;
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
+
+	// video-related
+	uint8_t m_palette_bank = 0U;
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+};
+
+class tristar8000_state : public epos_base_state
+{
+public:
+	tristar8000_state(const machine_config &mconfig, device_type type, const char *tag) :
+		epos_base_state(mconfig, type, tag),
+		m_leds(*this, "led%u", 0U)
+	{ }
+
+	void tristar8000(machine_config &config);
+
+protected:
+	virtual void machine_start() override { m_leds.resolve(); }
+
+private:
+	// I/O
+	output_finder<2> m_leds;
+
+	void port_1_w(uint8_t data);
+	void palette(palette_device &palette) const;
+
+	void io_map(address_map &map);
+	void prg_map(address_map &map);
+};
+
+class tristar9000_state : public epos_base_state
+{
+public:
+	tristar9000_state(const machine_config &mconfig, device_type type, const char *tag) :
+		epos_base_state(mconfig, type, tag),
+		m_mainbank(*this, "mainbank%u", 1U),
+		m_inputs(*this, { "INPUTS", "INPUTS2" }),
+		m_dsw(*this, "DSW")
+		{ }
+
+	void tristar9000(machine_config &config);
+
+	void init_tristar9000();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	required_memory_bank_array<2> m_mainbank;
+
+	required_ioport_array<2> m_inputs;
+	required_ioport m_dsw;
+
+	// misc
+	uint8_t m_counter = 0;
+	uint8_t m_input_multiplex = 0;
+	bool m_ay_porta_multiplex = false;
+
+	void decrypt_rom(offs_t offset, uint8_t data);
+	uint8_t i8255_porta_r();
+	void i8255_portc_w(uint8_t data);
+	uint8_t ay_porta_mpx_r();
+	void flip_screen_w(uint8_t data);
+	void pal_w(offs_t offset, uint8_t data);
+	void io_map(address_map &map);
+	void prg_map(address_map &map);
+};
+
+
+// video
+
+/***************************************************************************
+
+  These games has one 32 byte palette PROM, connected to the RGB output this way:
+
+  bit 7 -- 240 ohm resistor  -- RED
+        -- 510 ohm resistor  -- RED
+        -- 1  kohm resistor  -- RED
+        -- 240 ohm resistor  -- GREEN
+        -- 510 ohm resistor  -- GREEN
+        -- 1  kohm resistor  -- GREEN
+        -- 240 ohm resistor  -- BLUE
+  bit 0 -- 510 ohm resistor  -- BLUE
+
+***************************************************************************/
+
+void tristar8000_state::palette(palette_device &palette) const
+{
+	uint8_t const *const color_prom = memregion("proms")->base();
+	int const len = memregion("proms")->bytes();
+
+	for (offs_t i = 0; i < len; i++)
+		set_pal_color(palette, i, color_prom[i]);
+}
+
+void epos_base_state::set_pal_color(palette_device &palette, uint8_t offset, uint8_t data)
+{
+	int bit0 = BIT(data, 7);
+	int bit1 = BIT(data, 6);
+	int bit2 = BIT(data, 5);
+	int const r = 0x92 * bit0 + 0x4a * bit1 + 0x23 * bit2;
+
+	bit0 = BIT(data, 4);
+	bit1 = BIT(data, 3);
+	bit2 = BIT(data, 2);
+	int const g = 0x92 * bit0 + 0x4a * bit1 + 0x23 * bit2;
+
+	bit0 = BIT(data, 1);
+	bit1 = BIT(data, 0);
+	int const b = 0xad * bit0 + 0x52 * bit1;
+
+	palette.set_pen_color(offset, rgb_t(r, g, b));
+}
+
+// later (tristar 9000) games uses a dynamic palette instead of prom
+void tristar9000_state::pal_w(offs_t offset, uint8_t data)
+{
+	set_pal_color(*m_palette, offset, data);
+}
+
+void tristar8000_state::port_1_w(uint8_t data)
+{
+	/* D0 - start light #1
+	   D1 - start light #2
+	   D2 - coin counter
+	   D3 - palette select
+	   D4-D7 - unused
+	 */
+
+	m_leds[0] = BIT(data, 0);
+	m_leds[1] = BIT(data, 1);
+
+	machine().bookkeeping().coin_counter_w(0, (data >> 2) & 0x01);
+
+	m_palette_bank = (data >> 3) & 0x01;
+}
+
+
+uint32_t epos_base_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	for (offs_t offs = 0; offs < m_videoram.bytes(); offs++)
+	{
+		uint8_t const data = m_videoram[offs];
+
+		int x = (offs % 136) * 2;
+		int y = (offs / 136);
+
+		if (flip_screen())
+		{
+			bitmap.pix(240 - y, 270 - x + 1) = m_palette->pen((m_palette_bank << 4) | (data & 0x0f));
+			bitmap.pix(240 - y, 270 - x + 0) = m_palette->pen((m_palette_bank << 4) | (data >> 4));
+		}
+		else
+		{
+			bitmap.pix(y, x + 0) = m_palette->pen((m_palette_bank << 4) | (data & 0x0f));
+			bitmap.pix(y, x + 1) = m_palette->pen((m_palette_bank << 4) | (data >> 4));
+		}
+	}
+
+	return 0;
+}
+
+
+// machine
+
+void tristar9000_state::decrypt_rom(offs_t offset, uint8_t data)
 {
 	if (offset & 0x04)
 		m_counter = (m_counter + 1) & 0x03;
@@ -92,7 +284,7 @@ void epos_state::dealer_decrypt_rom(offs_t offset, uint8_t data)
 
 	//logerror("PC %08x: ctr=%04x\n",m_maincpu->pc(), m_counter);
 
-	membank("bank1")->set_entry(m_counter);
+	m_mainbank[0]->set_entry(m_counter);
 
 	// is the 2nd bank changed by the counter or it always uses the 1st key?
 }
@@ -104,19 +296,19 @@ void epos_state::dealer_decrypt_rom(offs_t offset, uint8_t data)
  *
  *************************************/
 
-void epos_state::epos_map(address_map &map)
+void tristar8000_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x77ff).rom();
 	map(0x7800, 0x7fff).ram();
-	map(0x8000, 0xffff).ram().share("videoram");
+	map(0x8000, 0xffff).ram().share(m_videoram);
 }
 
-void epos_state::dealer_map(address_map &map)
+void tristar9000_state::prg_map(address_map &map)
 {
-	map(0x0000, 0x5fff).bankr("bank1");
-	map(0x6000, 0x6fff).bankr("bank2");
+	map(0x0000, 0x5fff).bankr(m_mainbank[0]);
+	map(0x6000, 0x6fff).bankr(m_mainbank[1]);
 	map(0x7000, 0x7fff).ram().share("nvram");
-	map(0x8000, 0xffff).ram().share("videoram");
+	map(0x8000, 0xffff).ram().share(m_videoram);
 }
 
 
@@ -126,29 +318,29 @@ void epos_state::dealer_map(address_map &map)
  *
  *************************************/
 
-void epos_state::epos_io_map(address_map &map)
+void tristar8000_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("DSW").w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x01, 0x01).portr("SYSTEM").w(FUNC(epos_state::port_1_w));
+	map(0x01, 0x01).portr("SYSTEM").w(FUNC(tristar8000_state::port_1_w));
 	map(0x02, 0x02).portr("INPUTS").w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x03, 0x03).portr("UNK");
 	map(0x06, 0x06).w("aysnd", FUNC(ay8910_device::address_w));
 }
 
-void epos_state::dealer_io_map(address_map &map)
+void tristar9000_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x0f).w(FUNC(epos_state::dealer_pal_w));
+	map(0x00, 0x0f).w(FUNC(tristar9000_state::pal_w));
 	map(0x10, 0x13).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x20, 0x24).w(FUNC(epos_state::dealer_decrypt_rom));
+	map(0x20, 0x24).w(FUNC(tristar9000_state::decrypt_rom));
 	map(0x34, 0x34).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x38, 0x38).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x3c, 0x3c).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0x40, 0x40).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 }
 
-uint8_t epos_state::i8255_porta_r()
+uint8_t tristar9000_state::i8255_porta_r()
 {
 	uint8_t data = 0xff;
 
@@ -166,18 +358,18 @@ uint8_t epos_state::i8255_porta_r()
    There's a separate ROM check for banked U04 at 30F3.
    It looks like dealer/revenger uses ppi8255 to control bankswitching.
 */
-void epos_state::i8255_portc_w(uint8_t data)
+void tristar9000_state::i8255_portc_w(uint8_t data)
 {
-	membank("bank2")->set_entry(data & 0x01);
+	m_mainbank[1]->set_entry(data & 0x01);
 	m_input_multiplex = (data >> 5) & 3;
 }
 
-uint8_t epos_state::ay_porta_mpx_r()
+uint8_t tristar9000_state::ay_porta_mpx_r()
 {
-	return (m_ay_porta_multiplex ? 0xFF : ioport("DSW")->read());
+	return (m_ay_porta_multiplex ? 0xff : m_dsw->read());
 }
 
-void epos_state::flip_screen_w(uint8_t data)
+void tristar9000_state::flip_screen_w(uint8_t data)
 {
 	flip_screen_set(BIT(data, 7));
 	// bit 6: ay8910 port A/B multiplexer read
@@ -230,8 +422,8 @@ static INPUT_PORTS_START( megadon )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START2 )
 	PORT_SERVICE_NO_TOGGLE(0x10, IP_ACTIVE_LOW)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_CUSTOM )   /* this has to be HI */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM )   /* this has to be HI */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_CUSTOM )   // this has to be HI
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM )   // this has to be HI
 
 	PORT_START("INPUTS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
@@ -280,8 +472,8 @@ static INPUT_PORTS_START( suprglob )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START2 )
 	PORT_SERVICE_NO_TOGGLE(0x10, IP_ACTIVE_LOW)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* this has to be LO */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM )   /* this has to be HI */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM )   // this has to be LO
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM )   // this has to be HI
 
 	PORT_START("INPUTS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
@@ -332,8 +524,8 @@ static INPUT_PORTS_START( igmo )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START2 )
 	PORT_SERVICE_NO_TOGGLE(0x10, IP_ACTIVE_LOW)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_CUSTOM )   /* this has to be HI */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM )   /* this has to be HI */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_CUSTOM )   // this has to be HI
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM )   // this has to be HI
 
 	PORT_START("INPUTS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
@@ -414,8 +606,8 @@ static INPUT_PORTS_START( eeekk )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START2 )
 	PORT_SERVICE_NO_TOGGLE(0x10, IP_ACTIVE_LOW)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* this has to be LO */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* this has to be LO */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM )   // this has to be LO
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   // this has to be LO
 
 	PORT_START("INPUTS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
@@ -511,97 +703,97 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(epos_state,epos)
+void epos_base_state::video_start()
 {
 	save_item(NAME(m_palette_bank));
+}
+
+void tristar9000_state::machine_start()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+	m_mainbank[0]->configure_entries(0, 4, &rom[0x0000], 0x10000);
+	m_mainbank[1]->configure_entries(0, 2, &rom[0x6000], 0x1000);
+
+	m_mainbank[0]->set_entry(0);
+	m_mainbank[1]->set_entry(0);
+
 	save_item(NAME(m_counter));
 	save_item(NAME(m_input_multiplex));
 	save_item(NAME(m_ay_porta_multiplex));
 }
 
-void epos_state::machine_reset()
+void epos_base_state::video_reset()
 {
 	m_palette_bank = 0;
+}
+
+void tristar9000_state::machine_reset()
+{
 	m_counter = 0;
 	m_input_multiplex = 3;
 	m_ay_porta_multiplex = 0;
 }
 
-
-MACHINE_START_MEMBER(epos_state,dealer)
+void tristar8000_state::tristar8000(machine_config &config) // EPOS TRISTAR 8000 PCB
 {
-	uint8_t *ROM = memregion("maincpu")->base();
-	membank("bank1")->configure_entries(0, 4, &ROM[0x0000], 0x10000);
-	membank("bank2")->configure_entries(0, 2, &ROM[0x6000], 0x1000);
-
-	membank("bank1")->set_entry(0);
-	membank("bank2")->set_entry(0);
-
-	MACHINE_START_CALL_MEMBER(epos);
-}
-
-void epos_state::epos(machine_config &config) /* EPOS TRISTAR 8000 PCB */
-{
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(11'000'000)/4);    /* 2.75 MHz schematics confirm 11MHz XTAL (see notes) */
-	m_maincpu->set_addrmap(AS_PROGRAM, &epos_state::epos_map);
-	m_maincpu->set_addrmap(AS_IO, &epos_state::epos_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(epos_state::irq0_line_hold));
+	// basic machine hardware
+	Z80(config, m_maincpu, XTAL(11'000'000) / 4);    // 2.75 MHz schematics confirm 11MHz XTAL (see notes)
+	m_maincpu->set_addrmap(AS_PROGRAM, &tristar8000_state::prg_map);
+	m_maincpu->set_addrmap(AS_IO, &tristar8000_state::io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tristar8000_state::irq0_line_hold));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(272, 241);
 	screen.set_visarea(0, 271, 0, 235);
-	screen.set_screen_update(FUNC(epos_state::screen_update));
+	screen.set_screen_update(FUNC(tristar8000_state::screen_update));
 
-	PALETTE(config, m_palette, FUNC(epos_state::epos_palette), 32);
+	PALETTE(config, m_palette, FUNC(tristar8000_state::palette), 32);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	AY8912(config, "aysnd", XTAL(11'000'000)/16).add_route(ALL_OUTPUTS, "mono", 1.0); /*  0.6875 MHz, confirmed from schematics */
+	AY8912(config, "aysnd", XTAL(11'000'000) / 16).add_route(ALL_OUTPUTS, "mono", 1.0); //  0.6875 MHz, confirmed from schematics
 }
 
 
-void epos_state::dealer(machine_config &config) /* EPOS TRISTAR 9000 PCB */
+void tristar9000_state::tristar9000(machine_config &config) // EPOS TRISTAR 9000 PCB
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(22'118'400)/8);    /* 2.7648 MHz (measured) */
-	m_maincpu->set_addrmap(AS_PROGRAM, &epos_state::dealer_map);
-	m_maincpu->set_addrmap(AS_IO, &epos_state::dealer_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(epos_state::irq0_line_hold));
+	// basic machine hardware
+	Z80(config, m_maincpu, XTAL(22'118'400) / 8);    // 2.7648 MHz (measured)
+	m_maincpu->set_addrmap(AS_PROGRAM, &tristar9000_state::prg_map);
+	m_maincpu->set_addrmap(AS_IO, &tristar9000_state::io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tristar9000_state::irq0_line_hold));
 
 	i8255_device &ppi(I8255A(config, "ppi8255"));
-	ppi.in_pa_callback().set(FUNC(epos_state::i8255_porta_r));
-	ppi.out_pc_callback().set(FUNC(epos_state::i8255_portc_w));
+	ppi.in_pa_callback().set(FUNC(tristar9000_state::i8255_porta_r));
+	ppi.out_pc_callback().set(FUNC(tristar9000_state::i8255_portc_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-
-	MCFG_MACHINE_START_OVERRIDE(epos_state,dealer)
 
 	// RAM-based palette instead of prom
 	PALETTE(config, m_palette, palette_device::BLACK, 32);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(272, 241);
 	screen.set_visarea(0, 271, 0, 235);
-	screen.set_screen_update(FUNC(epos_state::screen_update));
+	screen.set_screen_update(FUNC(tristar9000_state::screen_update));
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(22'118'400)/32)); /* 0.6912 MHz (measured) */
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(22'118'400) / 32)); // 0.6912 MHz (measured)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
-	aysnd.port_a_read_callback().set(FUNC(epos_state::ay_porta_mpx_r));
+	aysnd.port_a_read_callback().set(FUNC(tristar9000_state::ay_porta_mpx_r));
 	// port a writes?
-	aysnd.port_b_write_callback().set(FUNC(epos_state::flip_screen_w)); // flipscreen and ay port a multiplex control
+	aysnd.port_b_write_callback().set(FUNC(tristar9000_state::flip_screen_w)); // flipscreen and ay port a multiplex control
 }
 
 
@@ -632,7 +824,7 @@ ROM_START( catapult )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "co3223.u10",     0x0000, 0x1000, CRC(50abcfd2) SHA1(13ce04addc7bcaa1ec6659da26b1c13ed9dc28f9) )
 	ROM_LOAD( "co3223.u09",     0x1000, 0x1000, CRC(fd5a9a1c) SHA1(512374e8450459537ba2cc41e7d0178052445316) )
-	ROM_LOAD( "co3223.u08",     0x2000, 0x1000, BAD_DUMP CRC(4bfc36f3) SHA1(b916805eed40cfeff0c1b0cb3cdcbcc6e362a236)  ) /* BADADDR xxxx-xxxxxxx */
+	ROM_LOAD( "co3223.u08",     0x2000, 0x1000, BAD_DUMP CRC(4bfc36f3) SHA1(b916805eed40cfeff0c1b0cb3cdcbcc6e362a236)  ) // BADADDR xxxx-xxxxxxx
 	ROM_LOAD( "co3223.u07",     0x3000, 0x1000, CRC(4113bb99) SHA1(3cebb874dae211d75082209e913d4afa4f621de1) )
 	ROM_LOAD( "co3223.u06",     0x4000, 0x1000, CRC(966bb9f5) SHA1(1a217c6f7a88c58e0deae0290bc5ddd2789d18eb) )
 	ROM_LOAD( "co3223.u05",     0x5000, 0x1000, CRC(65f9fb9a) SHA1(63b616a736d9e39a8f2f76889fd7c5fe4128a966) )
@@ -795,10 +987,10 @@ Sound: AY-3-8910   0.691200 MHz [22.1184MHz/32]
 
 ROM_START( revngr84 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "u_1__revenger__r06254__=c=_epos_corp.m5l2764k.u1",  0x0000, 0x2000, CRC(308f231f) SHA1(cf06695601bd0387e4fcb64d9b34143323e98b07) ) /* labeled as "U 1 // REVENGER // R06254 // (C) EPOS CORP" (hand written R06254 over R06124) */
-	ROM_LOAD( "u_2__revenger__r06254__=c=_epos_corp.m5l2764k.u2",  0x2000, 0x2000, CRC(e80bbfb4) SHA1(9302beaef8bbb7376b6a20e9ee5adbcf60d66dd8) ) /* labeled as "U 2 // REVENGER // R06254 // (C) EPOS CORP" (hand written R06254 over R06124) */
-	ROM_LOAD( "u_3__revenger__r06254__=c=_epos_corp.m5l2764k.u3",  0x4000, 0x2000, CRC(d9270929) SHA1(a95034b5387a40e02f04bdfa79e1d8e65dad30fe) ) /* labeled as "U 3 // REVENGER // R06254 // (C) EPOS CORP" (hand written R06254 over R06124) */
-	ROM_LOAD( "u_4__revenger__r06254__=c=_epos_corp.m5l2764k.u4",  0x6000, 0x2000, CRC(d6e6cfa8) SHA1(f10131bb2e9d088c7b6d6a5d5520073d78ad69cc) ) /* labeled as "U 4 // REVENGER // R06254 // (C) EPOS CORP" (hand written R06254 over R06124) */
+	ROM_LOAD( "u_1__revenger__r06254__=c=_epos_corp.m5l2764k.u1",  0x0000, 0x2000, CRC(308f231f) SHA1(cf06695601bd0387e4fcb64d9b34143323e98b07) ) // labeled as "U 1 // REVENGER // R06254 // (C) EPOS CORP" (hand written R06254 over R06124)
+	ROM_LOAD( "u_2__revenger__r06254__=c=_epos_corp.m5l2764k.u2",  0x2000, 0x2000, CRC(e80bbfb4) SHA1(9302beaef8bbb7376b6a20e9ee5adbcf60d66dd8) ) // labeled as "U 2 // REVENGER // R06254 // (C) EPOS CORP" (hand written R06254 over R06124)
+	ROM_LOAD( "u_3__revenger__r06254__=c=_epos_corp.m5l2764k.u3",  0x4000, 0x2000, CRC(d9270929) SHA1(a95034b5387a40e02f04bdfa79e1d8e65dad30fe) ) // labeled as "U 3 // REVENGER // R06254 // (C) EPOS CORP" (hand written R06254 over R06124)
+	ROM_LOAD( "u_4__revenger__r06254__=c=_epos_corp.m5l2764k.u4",  0x6000, 0x2000, CRC(d6e6cfa8) SHA1(f10131bb2e9d088c7b6d6a5d5520073d78ad69cc) ) // labeled as "U 4 // REVENGER // R06254 // (C) EPOS CORP" (hand written R06254 over R06124)
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "dm74s288n.u60", 0x0000, 0x0020, CRC(be2b0641) SHA1(26982903b6d942af8e0a526412d8e01978d76420) ) // unknown purpose
@@ -809,13 +1001,13 @@ ROM_END
 
 ROM_START( revenger )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	// these roms probably had the same "U x // REVENGER // R06124 // (C) EPOS CORP" printed labels as the newer set above, but without the hand-penned "25" in r06254 written over the printed "12" of r06124 as above
+	// these ROMs probably had the same "U x // REVENGER // R06124 // (C) EPOS CORP" printed labels as the newer set above, but without the hand-penned "25" in r06254 written over the printed "12" of r06124 as above
 	ROM_LOAD( "r06124.u1",    0x0000, 0x2000, BAD_DUMP CRC(fad1a2a5) SHA1(a31052c91fe67e2e90441abc40b6483f921ecfe3) )
 	ROM_LOAD( "r06124.u2",    0x2000, 0x2000, BAD_DUMP CRC(a8e0ee7b) SHA1(f6f78e8ce40eab07de461b364876c1eb4a78d96e) )
 	ROM_LOAD( "r06124.u3",    0x4000, 0x2000, BAD_DUMP CRC(cca414a5) SHA1(1c9dd3ff63d57e9452e63083cdbd7f5d693bb686) )
 	ROM_LOAD( "r06124.u4",    0x6000, 0x2000, BAD_DUMP CRC(0b81c303) SHA1(9022d18dec11312eb4bb471c22b563f5f897b4f7) )
 
-	ROM_REGION( 0x0020, "proms", 0 ) /* this PROM not included in this dump, but assumed to be the same as above set */
+	ROM_REGION( 0x0020, "proms", 0 ) // this PROM not included in this dump, but assumed to be the same as above set
 	ROM_LOAD( "dm74s288n.u60", 0x0000, 0x0020, CRC(be2b0641) SHA1(26982903b6d942af8e0a526412d8e01978d76420) ) // unknown purpose
 
 	ROM_REGION( 0x1000, "nvram", 0)
@@ -824,32 +1016,32 @@ ROM_END
 
 ROM_START( beastf )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "u_1__beastie__feastie__b09084.m5l2764k.u1",  0x0000, 0x2000, CRC(820d4019) SHA1(e953aaeeb626776dd86c521066b553d054ae4422) ) /* labeled as "U 1 // BEASTIE // FEASTIE // B09084" */
-	ROM_LOAD( "u_2__beastie__feastie__b09084.m5l2764k.u2",  0x2000, 0x2000, CRC(967405d8) SHA1(dd763be909e6966521b01ee878df9cef865c3b30) ) /* labeled as "U 2 // BEASTIE // FEASTIE // B09084" */
-	ROM_LOAD( "u_3__beastie__feastie__b09084.m5l2764k.u3",  0x4000, 0x2000, CRC(3edb5381) SHA1(14c236045e6df7a475c32222652860689d4f68ce) ) /* labeled as "U 3 // BEASTIE // FEASTIE // B09084" */
-	ROM_LOAD( "u_4__beastie__feastie__b09084.m5l2764k.u4",  0x6000, 0x2000, CRC(c8cd9640) SHA1(72da881b903ead873cc3f4df27646d1ffdd63c1c) ) /* labeled as "U 4 // BEASTIE // FEASTIE // B09084" */
+	ROM_LOAD( "u_1__beastie__feastie__b09084.m5l2764k.u1",  0x0000, 0x2000, CRC(820d4019) SHA1(e953aaeeb626776dd86c521066b553d054ae4422) ) // labeled as "U 1 // BEASTIE // FEASTIE // B09084"
+	ROM_LOAD( "u_2__beastie__feastie__b09084.m5l2764k.u2",  0x2000, 0x2000, CRC(967405d8) SHA1(dd763be909e6966521b01ee878df9cef865c3b30) ) // labeled as "U 2 // BEASTIE // FEASTIE // B09084"
+	ROM_LOAD( "u_3__beastie__feastie__b09084.m5l2764k.u3",  0x4000, 0x2000, CRC(3edb5381) SHA1(14c236045e6df7a475c32222652860689d4f68ce) ) // labeled as "U 3 // BEASTIE // FEASTIE // B09084"
+	ROM_LOAD( "u_4__beastie__feastie__b09084.m5l2764k.u4",  0x6000, 0x2000, CRC(c8cd9640) SHA1(72da881b903ead873cc3f4df27646d1ffdd63c1c) ) // labeled as "U 4 // BEASTIE // FEASTIE // B09084"
 
 	ROM_REGION( 0x1000, "nvram", 0)
 	ROM_LOAD( "beastf.nv", 0, 0x1000, CRC(98017b09) SHA1(0e2b2071bb47fc179d5bc36ef9431a9d2727d36a) )
 ROM_END
 
-void epos_state::init_dealer()
+void tristar9000_state::init_tristar9000()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
-	/* Key 0 */
+	// Key 0
 	for (int A = 0; A < 0x8000; A++)
 		rom[A] = bitswap<8>(rom[A] ^ 0xbd, 2,6,4,0,5,7,1,3 );
 
-	/* Key 1 */
+	// Key 1
 	for (int A = 0; A < 0x8000; A++)
 		rom[A + 0x10000] = bitswap<8>(rom[A], 7,5,4,6,3,2,1,0 );
 
-	/* Key 2 */
+	// Key 2
 	for (int A = 0; A < 0x8000; A++)
 		rom[A + 0x20000] = bitswap<8>(rom[A] ^ 1, 7,6,5,4,3,0,2,1 );
 
-	/* Key 3 */
+	// Key 3
 	for (int A = 0; A < 0x8000; A++)
 		rom[A + 0x30000] = bitswap<8>(rom[A] ^ 1, 7,5,4,6,3,0,2,1 );
 
@@ -872,6 +1064,8 @@ void epos_state::init_dealer()
 	*/
 }
 
+} // anonymous namespace
+
 
 /*************************************
  *
@@ -879,18 +1073,18 @@ void epos_state::init_dealer()
  *
  *************************************/
 
-/* EPOS TRISTAR 8000 PCB based */
-GAME( 1982, megadon,  0,        epos,   megadon,  epos_state, empty_init, ROT270, "Epos Corporation (Photar Industries license)", "Megadon", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, catapult, 0,        epos,   catapult, epos_state, empty_init, ROT270, "Epos Corporation", "Catapult",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* bad rom, hold f2 for test mode */
-GAME( 1983, suprglob, 0,        epos,   suprglob, epos_state, empty_init, ROT270, "Epos Corporation", "Super Glob",         MACHINE_SUPPORTS_SAVE )
-GAME( 1983, theglob,  suprglob, epos,   suprglob, epos_state, empty_init, ROT270, "Epos Corporation", "The Glob",           MACHINE_SUPPORTS_SAVE )
-GAME( 1983, theglob2, suprglob, epos,   suprglob, epos_state, empty_init, ROT270, "Epos Corporation", "The Glob (earlier)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, theglob3, suprglob, epos,   suprglob, epos_state, empty_init, ROT270, "Epos Corporation", "The Glob (set 3)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1984, igmo,     0,        epos,   igmo,     epos_state, empty_init, ROT270, "Epos Corporation", "IGMO",               MACHINE_SUPPORTS_SAVE )
-GAME( 1983, eeekk,    0,        epos,   eeekk,    epos_state, empty_init, ROT270, "Epos Corporation", "Eeekk!",             MACHINE_SUPPORTS_SAVE )
+// EPOS TRISTAR 8000 PCB based
+GAME( 1982, megadon,  0,        tristar8000,   megadon,  tristar8000_state, empty_init, ROT270, "Epos Corporation (Photar Industries license)", "Megadon", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, catapult, 0,        tristar8000,   catapult, tristar8000_state, empty_init, ROT270, "Epos Corporation", "Catapult",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // bad ROM, hold f2 for test mode
+GAME( 1983, suprglob, 0,        tristar8000,   suprglob, tristar8000_state, empty_init, ROT270, "Epos Corporation", "Super Glob",         MACHINE_SUPPORTS_SAVE )
+GAME( 1983, theglob,  suprglob, tristar8000,   suprglob, tristar8000_state, empty_init, ROT270, "Epos Corporation", "The Glob",           MACHINE_SUPPORTS_SAVE )
+GAME( 1983, theglob2, suprglob, tristar8000,   suprglob, tristar8000_state, empty_init, ROT270, "Epos Corporation", "The Glob (earlier)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, theglob3, suprglob, tristar8000,   suprglob, tristar8000_state, empty_init, ROT270, "Epos Corporation", "The Glob (set 3)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1984, igmo,     0,        tristar8000,   igmo,     tristar8000_state, empty_init, ROT270, "Epos Corporation", "IGMO",               MACHINE_SUPPORTS_SAVE )
+GAME( 1983, eeekk,    0,        tristar8000,   eeekk,    tristar8000_state, empty_init, ROT270, "Epos Corporation", "Eeekk!",             MACHINE_SUPPORTS_SAVE )
 
-/* EPOS TRISTAR 9000 PCB based */
-GAME( 1984, dealer,   0,        dealer, dealer,   epos_state, init_dealer, ROT270, "Epos Corporation", "The Dealer",           MACHINE_SUPPORTS_SAVE )
-GAME( 1984, revngr84, 0,        dealer, beastf,   epos_state, init_dealer, ROT270, "Epos Corporation", "Revenger '84 (newer)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, revenger, revngr84, dealer, beastf,   epos_state, init_dealer, ROT270, "Epos Corporation", "Revenger '84 (older)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, beastf,   suprglob, dealer, beastf,   epos_state, init_dealer, ROT270, "Epos Corporation", "Beastie Feastie",      MACHINE_SUPPORTS_SAVE )
+// EPOS TRISTAR 9000 PCB based
+GAME( 1984, dealer,   0,        tristar9000, dealer,   tristar9000_state, init_tristar9000, ROT270, "Epos Corporation", "The Dealer",           MACHINE_SUPPORTS_SAVE )
+GAME( 1984, revngr84, 0,        tristar9000, beastf,   tristar9000_state, init_tristar9000, ROT270, "Epos Corporation", "Revenger '84 (newer)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, revenger, revngr84, tristar9000, beastf,   tristar9000_state, init_tristar9000, ROT270, "Epos Corporation", "Revenger '84 (older)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // bad dump
+GAME( 1984, beastf,   suprglob, tristar9000, beastf,   tristar9000_state, init_tristar9000, ROT270, "Epos Corporation", "Beastie Feastie",      MACHINE_SUPPORTS_SAVE )

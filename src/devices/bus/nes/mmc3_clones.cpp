@@ -52,6 +52,7 @@ DEFINE_DEVICE_TYPE(NES_COCOMA,        nes_cocoma_device,        "nes_cocoma",   
 DEFINE_DEVICE_TYPE(NES_GOUDER,        nes_gouder_device,        "nes_gouder",        "NES Cart Gouder PCB")
 DEFINE_DEVICE_TYPE(NES_SA9602B,       nes_sa9602b_device,       "nes_sa9602b",       "NES Cart SA-9602B PCB")
 DEFINE_DEVICE_TYPE(NES_SACHEN_SHERO,  nes_sachen_shero_device,  "nes_shero",         "NES Cart Street Hero PCB")
+DEFINE_DEVICE_TYPE(NES_SACHEN_ZGDH,   nes_sachen_zgdh_device,   "nes_zgdh",          "NES Cart Zhongguo Daheng PCB")
 DEFINE_DEVICE_TYPE(NES_A9746,         nes_a9746_device,         "nes_bmc_a9746",     "NES Cart A-9746 PCB")
 
 DEFINE_DEVICE_TYPE(NES_A88S1,         nes_a88s1_device,         "nes_a88s1",         "NES Cart BMC A88S-1 PCB")
@@ -157,7 +158,7 @@ ioport_constructor nes_bmc_kc885_device::device_input_ports() const
 //  LIVE DEVICE
 //**************************************************************************
 
-nes_nitra_device::nes_nitra_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_nitra_device::nes_nitra_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_txrom_device(mconfig, NES_NITRA, tag, owner, clock)
 {
 }
@@ -167,17 +168,17 @@ nes_bmw8544_device::nes_bmw8544_device(const machine_config &mconfig, const char
 {
 }
 
-nes_fs6_device::nes_fs6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_fs6_device::nes_fs6_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_txrom_device(mconfig, NES_FS6, tag, owner, clock)
 {
 }
 
-nes_sbros11_device::nes_sbros11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_sbros11_device::nes_sbros11_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_txrom_device(mconfig, NES_SBROS11, tag, owner, clock)
 {
 }
 
-nes_malisb_device::nes_malisb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_malisb_device::nes_malisb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_txrom_device(mconfig, NES_MALISB, tag, owner, clock)
 {
 }
@@ -291,6 +292,11 @@ nes_sachen_shero_device::nes_sachen_shero_device(const machine_config &mconfig, 
 	: nes_txrom_device(mconfig, NES_SACHEN_SHERO, tag, owner, clock)
 	, m_jumper(*this, "JUMPER")
 	, m_reg(0)
+{
+}
+
+nes_sachen_zgdh_device::nes_sachen_zgdh_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_SACHEN_ZGDH, tag, owner, clock), m_reg(0)
 {
 }
 
@@ -689,6 +695,20 @@ void nes_sachen_shero_device::pcb_reset()
 	mmc3_common_initialize(0xff, 0xff, 0);
 }
 
+void nes_sachen_zgdh_device::device_start()
+{
+	mmc3_start();
+	save_item(NAME(m_reg));
+}
+
+void nes_sachen_zgdh_device::pcb_reset()
+{
+	assert(m_vram.size() >= 0x2000);
+
+	m_reg = 0;
+	mmc3_common_initialize(0x1f, 0x7f, 0);
+}
+
 void nes_a9746_device::device_start()
 {
 	mmc3_start();
@@ -909,8 +929,6 @@ void nes_bmc_f600_device::device_start()
 
 void nes_bmc_f600_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-
 	m_reg = 0;
 	mmc3_common_initialize(0x1f, 0x7f, 0);
 }
@@ -1021,8 +1039,6 @@ void nes_bmc_810305c_device::device_start()
 
 void nes_bmc_810305c_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-
 	m_outer = 0;
 	mmc3_common_initialize(0x1f, 0x7f, 0);
 }
@@ -1112,10 +1128,10 @@ void nes_smd133_device::pcb_reset()
 
  Bootleg Board by Nitra
 
- Games: Time Diver Avenger
+ Games: Queen Bee, Time Diver Avenger
 
- This acts basically like a MMC3 with different use of write
- address.
+ MMC3 clone with A10 tied to what is normally A0 and
+ data instead coming from the lower address lines.
 
  iNES: mapper 250
 
@@ -1218,6 +1234,8 @@ void nes_sbros11_device::write_h(offs_t offset, u8 data)
  This is very similar to mapper 196, but with additional
  data bit swap.
 
+ NES 2.0: mapper 325
+
  In MAME: Supported.
 
  -------------------------------------------------*/
@@ -1238,10 +1256,8 @@ void nes_malisb_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("malisb write_h, offset: %04x, data: %02x\n", offset, data));
 
-	if (offset > 0x4000)
-		txrom_write((offset & 0xfffe) | BIT(offset, 2) | BIT(offset, 3), data);
-	else
-		txrom_write((offset & 0xfffe) | BIT(offset, 3), data);
+	offset = (offset & 0x6000) | BIT(offset, 3) | (BIT(offset, 14) & BIT(offset, 2));
+	txrom_write(offset, data);
 }
 
 /*-------------------------------------------------
@@ -1786,10 +1802,9 @@ void nes_txc_tw_device::write_l(offs_t offset, uint8_t data)
 	prg32((data >> 4) | data);
 }
 
-// writes to 0x8000-0xffff are like MMC3 but no PRG bankswitch (beacuse it is handled by low writes)
+// writes to 0x8000-0xffff are like MMC3 but no PRG bankswitch (because it is handled by low writes)
 void nes_txc_tw_device::prg_cb(int start, int bank)
 {
-	return;
 }
 
 /*-------------------------------------------------
@@ -2014,10 +2029,9 @@ u8 nes_gouder_device::read_l(offs_t offset)
 	return get_open_bus();
 }
 
-// writes to 0x8000-0xffff are like MMC3 but no PRG bankswitch (beacuse it is handled by low writes)
+// writes to 0x8000-0xffff are like MMC3 but no PRG bankswitch (because it is handled by low writes)
 void nes_gouder_device::prg_cb(int start, int bank)
 {
-	return;
 }
 
 
@@ -2114,6 +2128,61 @@ u8 nes_sachen_shero_device::read_l(offs_t offset)
 		return m_jumper->read();
 	else
 		return get_open_bus();
+}
+
+/*-------------------------------------------------
+
+ SACHEN-ZGDH
+
+ Sachen board used for Zhongguo Daheng
+
+ NES 2.0: mapper 512
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+u8 nes_sachen_zgdh_device::nt_r(offs_t offset)
+{
+	if (m_reg == 1)
+		return m_vram[0x1000 + (offset & 0x0fff)];
+	else
+		return device_nes_cart_interface::nt_r(offset);
+}
+
+void nes_sachen_zgdh_device::nt_w(offs_t offset, u8 data)
+{
+	if (m_reg == 1)
+		m_vram[0x1000 + (offset & 0x0fff)] = data;
+	else
+		device_nes_cart_interface::nt_w(offset, data);
+}
+
+void nes_sachen_zgdh_device::set_chr(u8 chr, int chr_base, int chr_mask)
+{
+	if (m_reg <= 1)
+	{
+		chr = CHRROM;
+		m_chr_mask = 0x7f;
+	}
+	else
+	{
+		chr = CHRRAM;
+		m_chr_mask = 0x03;
+	}
+	nes_txrom_device::set_chr(chr, chr_base, m_chr_mask);
+}
+
+void nes_sachen_zgdh_device::write_l(offs_t offset, u8 data)
+{
+	LOG_MMC(("zgdh write_l, offset: %04x, data: %02x\n", offset, data));
+
+	offset += 0x100;
+	if ((offset & 0x1100) == 0x0100)
+	{
+		m_reg = data & 0x03;
+		set_chr(m_chr_source, m_chr_base, m_chr_mask);
+	}
 }
 
 /*-------------------------------------------------
@@ -3010,12 +3079,12 @@ void nes_bmc_f600_device::write_h(offs_t offset, u8 data)
 		nes_txrom_device::write_h(offset, data);
 }
 
-void nes_bmc_f600_device::chr_cb(int start, int bank, int source)
+void nes_bmc_f600_device::set_chr(u8 chr, int chr_base, int chr_mask)
 {
 	if ((m_reg & 0x07) == 1)
-		nes_txsrom_device::chr_cb(start, bank, source);
+		nes_txsrom_device::set_chr(chr, chr_base, chr_mask);
 	else
-		nes_txrom_device::chr_cb(start, bank, source);
+		nes_txrom_device::set_chr(chr, chr_base, chr_mask);
 }
 
 /*-------------------------------------------------
@@ -3377,16 +3446,10 @@ void nes_bmc_810305c_device::set_chr(u8 chr, int chr_base, int chr_mask)
 {
 	if (m_outer == 2 && BIT(m_mmc_vrom_bank[0], 7))
 		chr8(0, CHRRAM);
-	else
+	else if (m_outer)
 		nes_txrom_device::set_chr(chr, chr_base, chr_mask);
-}
-
-void nes_bmc_810305c_device::chr_cb(int start, int bank, int source)
-{
-	if (m_outer)
-		nes_txrom_device::chr_cb(start, bank, source);
 	else
-		nes_txsrom_device::chr_cb(start, bank, source);
+		nes_txsrom_device::set_chr(chr, chr_base, chr_mask);
 }
 
 void nes_bmc_810305c_device::write_h(offs_t offset, u8 data)

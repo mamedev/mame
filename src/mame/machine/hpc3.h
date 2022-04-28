@@ -177,10 +177,10 @@ protected:
 		ENET_XMIT = 1
 	};
 
-	const address_space_config m_pio_space_config[10];
+	const address_space_config m_pio_space_config[10]{};
 
 	required_address_space m_gio64_space;
-	address_space *m_pio_space[10];
+	address_space *m_pio_space[10]{};
 	required_device<hal2_device> m_hal2;
 	required_device<seeq80c03_device> m_enet;
 
@@ -199,20 +199,20 @@ protected:
 	devcb_write_line m_eeprom_pre_cb;
 	devcb_write_line m_dma_complete_int_cb;
 
-	uint32_t m_intstat;
-	uint32_t m_misc;
-	uint32_t m_cpu_aux_ctrl;
+	uint32_t m_intstat = 0;
+	uint32_t m_misc = 0;
+	uint32_t m_cpu_aux_ctrl = 0;
 
 	struct scsi_dma_t
 	{
-		uint32_t m_cbp;
-		uint32_t m_nbdp;
-		uint8_t m_ctrl;
-		uint32_t m_bc;
-		uint16_t m_count;
-		uint32_t m_dmacfg;
-		uint32_t m_piocfg;
-		bool m_drq;
+		uint32_t m_cbp = 0;
+		uint32_t m_nbdp = 0;
+		uint8_t m_ctrl = 0;
+		uint32_t m_bc = 0;
+		uint16_t m_count = 0;
+		uint32_t m_dmacfg = 0;
+		uint32_t m_piocfg = 0;
+		bool m_drq = false;
 		bool m_big_endian = false;
 		bool m_to_device = false;
 		bool m_active = false;

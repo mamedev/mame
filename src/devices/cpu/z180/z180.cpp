@@ -57,7 +57,6 @@ Hitachi HD647180 series:
 #include "emu.h"
 #include "z180.h"
 #include "z180dasm.h"
-#include "debugger.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"

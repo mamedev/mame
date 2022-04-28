@@ -28,14 +28,13 @@ public:
 	// construction/destruction
 	nes_dorepiano_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual u8 read_exp(offs_t offset) override;
+	virtual void write(u8 data) override;
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-
-	virtual u8 read_exp(offs_t offset) override;
-	virtual void write(u8 data) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	required_ioport_array<8> m_port;
@@ -47,6 +46,5 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(NES_DOREPIANO, nes_dorepiano_device)
-
 
 #endif // MAME_BUS_NES_CTRL_DOREPIANO_H

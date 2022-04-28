@@ -8,8 +8,10 @@
 
 #include "emu.h"
 #include "i8214.h"
+#include <iostream>
 
 //#define VERBOSE 1
+//#define LOG_OUTPUT_STREAM std::cout
 #include "logmacro.h"
 
 
@@ -40,7 +42,8 @@ void i8214_device::trigger_interrupt(int level)
 
 	// set interrupt line
 	m_write_int(ASSERT_LINE);
-	m_write_int(CLEAR_LINE);
+
+	//m_write_int(CLEAR_LINE);
 }
 
 
@@ -52,7 +55,12 @@ void i8214_device::check_interrupt()
 {
 	if (m_int_dis)
 	{
-		LOG("not checking interrupts because m_int_dis\n");
+		LOG("not checking interrupts because m_int_dis (%02x)\n", m_r);
+		if (m_r == 0xff)
+		{
+			m_int_dis = 0;
+			m_write_int(CLEAR_LINE);
+		}
 		return;
 	}
 	if (!m_etlg)
@@ -89,6 +97,9 @@ void i8214_device::check_interrupt()
 			}
 		}
 	}
+
+	m_int_dis = 0;
+	m_write_int(CLEAR_LINE);
 }
 
 

@@ -1,15 +1,16 @@
-# Ukrainian translations for PACKAGE package.
-# Copyright (C) 2016 THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# Automatically generated, 2016.
+# Ukrainian translations for MAME package.
+# Український переклад MAME-пакета
+# Copyright (C) 1997-2022 MAMEdev and contributors
+# This file is distributed under the same license as the MAME package.
+# Automatically generated, 2021.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-12-09 04:44+1100\n"
-"PO-Revision-Date: 2016-02-20 18:03+0100\n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2022-01-05 19:14+0200\n"
+"Last-Translator: Stanley Kid <stanley.udr.kid@gmail.com>\n"
 "Language-Team: MAME Language Team\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
@@ -24,10 +25,13 @@ msgid ""
 "\n"
 "Press any key to continue"
 msgstr ""
+"\n"
+"\n"
+"Натисни для продовження."
 
 #: src/frontend/mame/ui/ui.cpp:554
 msgid "This driver requires images to be loaded in the following device(s): "
-msgstr ""
+msgstr "Драйверу необхідне завантаження образів на пристрої: "
 
 #: src/frontend/mame/ui/ui.cpp:1248
 #, c-format
@@ -35,6 +39,8 @@ msgid ""
 "UI controls enabled\n"
 "Use %1$s to toggle"
 msgstr ""
+"UI-керування увімкнено.\n"
+"Використовуй %1$s для перемикання."
 
 #: src/frontend/mame/ui/ui.cpp:1250
 #, c-format
@@ -42,110 +48,112 @@ msgid ""
 "UI controls disabled\n"
 "Use %1$s to toggle"
 msgstr ""
+"UI-керування вимкнено.\n"
+"Використовуй %1$s для перемикання."
 
 #: src/frontend/mame/ui/ui.cpp:1459
 msgid "Master Volume"
-msgstr ""
+msgstr "Загальна гучність"
 
 #: src/frontend/mame/ui/ui.cpp:1468
 #, c-format
 msgid "%1$s Volume"
-msgstr ""
+msgstr "%1$s гучність"
 
 #: src/frontend/mame/ui/ui.cpp:1490
 #, c-format
 msgid "Overclock CPU %1$s"
-msgstr ""
+msgstr "CPU-розгін %1$s"
 
 #: src/frontend/mame/ui/ui.cpp:1498
 #, c-format
 msgid "Overclock %1$s sound"
-msgstr ""
+msgstr "Розгін %1$s звуку"
 
 #: src/frontend/mame/ui/ui.cpp:1517
 #, c-format
 msgid "%1$s Refresh Rate"
-msgstr ""
+msgstr "Частота оновлення %1$s"
 
 #: src/frontend/mame/ui/ui.cpp:1522
 #, c-format
 msgid "%1$s Brightness"
-msgstr ""
+msgstr "Яскравість %1$s"
 
 #: src/frontend/mame/ui/ui.cpp:1524
 #, c-format
 msgid "%1$s Contrast"
-msgstr ""
+msgstr "Контраст %1$s"
 
 #: src/frontend/mame/ui/ui.cpp:1526
 #, c-format
 msgid "%1$s Gamma"
-msgstr ""
+msgstr "Гама %1$s"
 
 #: src/frontend/mame/ui/ui.cpp:1530
 #, c-format
 msgid "%1$s Horiz Stretch"
-msgstr ""
+msgstr "Горизонтальне розтягування %1$s"
 
 #: src/frontend/mame/ui/ui.cpp:1532
 #, c-format
 msgid "%1$s Horiz Position"
-msgstr ""
+msgstr "Горизонтальне положення %1$s"
 
 #: src/frontend/mame/ui/ui.cpp:1534
 #, c-format
 msgid "%1$s Vert Stretch"
-msgstr ""
+msgstr "Вертикальне розтягування %1$s"
 
 #: src/frontend/mame/ui/ui.cpp:1536
 #, c-format
 msgid "%1$s Vert Position"
-msgstr ""
+msgstr "Вертикальне положення %1$s"
 
 #: src/frontend/mame/ui/ui.cpp:1552
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Stretch"
-msgstr ""
+msgstr "Горизонтальне розтягування %1$s Laserdisc"
 
 #: src/frontend/mame/ui/ui.cpp:1555
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Position"
-msgstr ""
+msgstr "Горизонтальне положення %1$s Laserdisc"
 
 #: src/frontend/mame/ui/ui.cpp:1557
 #, c-format
 msgid "Laserdisc '%1$s' Vert Stretch"
-msgstr ""
+msgstr "Вертикальне розтягування %1$s Laserdisc"
 
 #: src/frontend/mame/ui/ui.cpp:1560
 #, c-format
 msgid "Laserdisc '%1$s' Vert Position"
-msgstr ""
+msgstr "Вертикальне положення %1$s Laserdisc"
 
 #: src/frontend/mame/ui/ui.cpp:1570
 msgid "Vector Flicker"
-msgstr ""
+msgstr "Векторне мерехтіння"
 
 #: src/frontend/mame/ui/ui.cpp:1571
 msgid "Beam Width Minimum"
-msgstr ""
+msgstr "Мінімальна ширина променя"
 
 #: src/frontend/mame/ui/ui.cpp:1572
 msgid "Beam Width Maximum"
-msgstr ""
+msgstr "Максимальна ширина променя"
 
 #: src/frontend/mame/ui/ui.cpp:1573
 msgid "Beam Dot Size"
-msgstr ""
+msgstr "Розмір точки променя"
 
 #: src/frontend/mame/ui/ui.cpp:1574
 msgid "Beam Intensity Weight"
-msgstr ""
+msgstr "Інтенсивність променя"
 
 #: src/frontend/mame/ui/ui.cpp:1587
 #, c-format
 msgid "Crosshair Scale %1$s"
-msgstr ""
+msgstr "Масштаб прицілу %1$s"
 
 #: src/frontend/mame/ui/ui.cpp:1587 src/frontend/mame/ui/ui.cpp:1589
 msgid "X"
@@ -158,22 +166,22 @@ msgstr ""
 #: src/frontend/mame/ui/ui.cpp:1589
 #, c-format
 msgid "Crosshair Offset %1$s"
-msgstr ""
+msgstr "Зміщення прицілу %1$s"
 
 #: src/frontend/mame/ui/ui.cpp:1617
 #, c-format
 msgid "%1$3ddB"
-msgstr ""
+msgstr "%1$3d дБ"
 
 #: src/frontend/mame/ui/ui.cpp:1660
 #, c-format
 msgid "%1$d%%"
-msgstr ""
+msgstr "%1$d %%"
 
 #: src/frontend/mame/ui/ui.cpp:1675
 #, c-format
 msgid "%1$3.0f%%"
-msgstr ""
+msgstr "%1$3.0f %%"
 
 #: src/frontend/mame/ui/ui.cpp:1698 src/frontend/mame/ui/ui.cpp:1718
 #: src/frontend/mame/ui/ui.cpp:1737 src/frontend/mame/ui/ui.cpp:1755
@@ -195,31 +203,31 @@ msgstr ""
 #: src/frontend/mame/ui/ui.cpp:2006
 #, c-format
 msgid "Crosshair Scale X %1$1.3f"
-msgstr ""
+msgstr "Масштаб прицілу X %1$1.3f"
 
 #: src/frontend/mame/ui/ui.cpp:2006
 #, c-format
 msgid "Crosshair Scale Y %1$1.3f"
-msgstr ""
+msgstr "Масштаб прицілу Y %1$1.3f"
 
 #: src/frontend/mame/ui/ui.cpp:2023
 #, c-format
 msgid "Crosshair Offset X %1$1.3f"
-msgstr ""
+msgstr "Зміщення прицілу X %1$1.3f"
 
 #: src/frontend/mame/ui/ui.cpp:2023
 #, c-format
 msgid "Crosshair Offset Y %1$1.3f"
-msgstr ""
+msgstr "Зміщення прицілу Y %1$1.3f"
 
 #: src/frontend/mame/ui/ui.cpp:2110
 msgid "**Error saving ui.ini**"
-msgstr ""
+msgstr "**Помилка збереження ui.ini**"
 
 #: src/frontend/mame/ui/ui.cpp:2169
 #, c-format
 msgid "**Error saving %s.ini**"
-msgstr ""
+msgstr "**Помилка збереження %s.ini**"
 
 #: src/frontend/mame/ui/ui.cpp:2173 src/frontend/mame/ui/miscmenu.cpp:748
 msgid ""
@@ -227,6 +235,9 @@ msgid ""
 "    Configuration saved    \n"
 "\n"
 msgstr ""
+"\n"
+"    Конфігурацію збережено.    \n"
+"\n"
 
 #: src/frontend/mame/ui/selsoft.cpp:484 src/frontend/mame/ui/selgame.cpp:300
 #, c-format
@@ -234,6 +245,8 @@ msgid ""
 "%s\n"
 " added to favorites list."
 msgstr ""
+"%s\n"
+" додано до переліку вподобань."
 
 #: src/frontend/mame/ui/selsoft.cpp:489 src/frontend/mame/ui/selgame.cpp:305
 #: src/frontend/mame/ui/selgame.cpp:311
@@ -242,397 +255,399 @@ msgid ""
 "%s\n"
 " removed from favorites list."
 msgstr ""
+"%s\n"
+" вилучено з переліку вподобань."
 
 #: src/frontend/mame/ui/selsoft.cpp:522
 msgid "[Start empty]"
-msgstr ""
+msgstr "[Розпочати порожнім]"
 
 #: src/frontend/mame/ui/selsoft.cpp:522
 msgid "[Use file manager]"
-msgstr ""
+msgstr "(Використовувати менеджер файлів)"
 
 #: src/frontend/mame/ui/selsoft.cpp:705
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d software packages )"
-msgstr ""
+msgstr "%1$s %2$s (%3$d / %4$d програмні пакети)"
 
 #: src/frontend/mame/ui/selsoft.cpp:706
 #, c-format
 msgid "Driver: \"%1$s\" software list "
-msgstr ""
+msgstr "Драйвер: \"%1$s\" переліків програм "
 
 #: src/frontend/mame/ui/selsoft.cpp:711 src/frontend/mame/ui/selgame.cpp:1076
 #, c-format
 msgid "%1$s: %2$s - Search: %3$s_"
-msgstr ""
+msgstr "%1$s: %2$s - Шукати: %3$s_"
 
 #: src/frontend/mame/ui/selsoft.cpp:713 src/frontend/mame/ui/selgame.cpp:1078
 #, c-format
 msgid "Search: %1$s_"
-msgstr ""
+msgstr "Шукати: %1$s_"
 
 #: src/frontend/mame/ui/selsoft.cpp:720
 #, c-format
 msgid "Software list/item: %1$s:%2$s"
-msgstr ""
+msgstr "Перелік програм / пунктів: %1$s:%2$s"
 
 #: src/frontend/mame/ui/optsmenu.cpp:73 src/frontend/mame/ui/sndmenu.cpp:161
 msgid "Sound Options"
-msgstr ""
+msgstr "Опції аудіо"
 
 #: src/frontend/mame/ui/optsmenu.cpp:76
 msgid "General Inputs"
-msgstr ""
+msgstr "Загальне керування"
 
 #: src/frontend/mame/ui/optsmenu.cpp:79 src/frontend/mame/ui/miscmenu.cpp:945
 msgid "Plugins"
-msgstr ""
+msgstr "Плаґіни"
 
 #: src/frontend/mame/ui/optsmenu.cpp:81
 msgid "Save Configuration"
-msgstr ""
+msgstr "Зберегти конфігурацію"
 
 #: src/frontend/mame/ui/optsmenu.cpp:148
 msgid "Settings"
-msgstr ""
+msgstr "Налаштування"
 
 #: src/frontend/mame/ui/optsmenu.cpp:205
 msgid "Filter"
-msgstr ""
+msgstr "Фільтр"
 
 #: src/frontend/mame/ui/optsmenu.cpp:217
 msgid "Customize UI"
-msgstr ""
+msgstr "Змінити UI"
 
 #: src/frontend/mame/ui/optsmenu.cpp:218
 msgid "Configure Directories"
-msgstr ""
+msgstr "Налаштувати каталоги"
 
 #: src/frontend/mame/ui/filesel.cpp:260 src/frontend/mame/ui/swlist.cpp:89
 #: src/frontend/mame/ui/slotopt.cpp:220
 msgid "[empty slot]"
-msgstr ""
+msgstr "[порожній слот]"
 
 #: src/frontend/mame/ui/filesel.cpp:264
 msgid "[create]"
-msgstr ""
+msgstr "[створити]"
 
 #: src/frontend/mame/ui/filesel.cpp:268 src/frontend/mame/ui/swlist.cpp:100
 msgid "[software list]"
-msgstr ""
+msgstr "[перелік програм]"
 
 #: src/frontend/mame/ui/filesel.cpp:324
 #, c-format
 msgid "Error accessing %s"
-msgstr ""
+msgstr "Помилка доступу до %s."
 
 #: src/frontend/mame/ui/filesel.cpp:546
 msgid "Select access mode"
-msgstr ""
+msgstr "Вибери режим доступу."
 
 #: src/frontend/mame/ui/filesel.cpp:547
 msgid "Read-only"
-msgstr ""
+msgstr "Лише читання"
 
 #: src/frontend/mame/ui/filesel.cpp:549
 msgid "Read-write"
-msgstr ""
+msgstr "Читання-запис"
 
 #: src/frontend/mame/ui/filesel.cpp:550
 msgid "Read this image, write to another image"
-msgstr ""
+msgstr "Читання образу, запис до іншого"
 
 #: src/frontend/mame/ui/filesel.cpp:551
 msgid "Read this image, write to diff"
-msgstr ""
+msgstr "Читання образу, запис до diff"
 
 #: src/frontend/mame/ui/submenu.cpp:33
 msgid "Miscellaneous Options"
-msgstr ""
+msgstr "Різні опції"
 
 #: src/frontend/mame/ui/submenu.cpp:34
 msgid "Skip imperfect emulation warnings"
-msgstr ""
+msgstr "Пропускати попередження недосконалої емуляції"
 
 #: src/frontend/mame/ui/submenu.cpp:35
 msgid "Re-select last machine launched"
-msgstr ""
+msgstr "Вибрати останню запущену машину знову"
 
 #: src/frontend/mame/ui/submenu.cpp:36
 msgid "Enlarge images in the right panel"
-msgstr ""
+msgstr "Збільшувати зображення на правій панелі"
 
 #: src/frontend/mame/ui/submenu.cpp:37
 msgid "Cheats"
-msgstr ""
+msgstr "Чіти"
 
 #: src/frontend/mame/ui/submenu.cpp:38
 msgid "Show mouse pointer"
-msgstr ""
+msgstr "Показувати курсор миші"
 
 #: src/frontend/mame/ui/submenu.cpp:39
 msgid "Confirm quit from emulation"
-msgstr ""
+msgstr "Підтверджувати вихід із емуляції"
 
 #: src/frontend/mame/ui/submenu.cpp:40
 msgid "Skip system information screen"
-msgstr ""
+msgstr "Пропускати екран відомостей системи"
 
 #: src/frontend/mame/ui/submenu.cpp:41
 msgid "Force 4:3 aspect for snapshot display"
-msgstr ""
+msgstr "Примусове співвідношення 4:3 для відображення кадрів"
 
 #: src/frontend/mame/ui/submenu.cpp:42
 msgid "Use image as background"
-msgstr ""
+msgstr "Використовувати зображення як тло"
 
 #: src/frontend/mame/ui/submenu.cpp:43
 msgid "Skip BIOS selection menu"
-msgstr ""
+msgstr "Пропускати меню вибору BIOS"
 
 #: src/frontend/mame/ui/submenu.cpp:44
 msgid "Skip software part selection menu"
-msgstr ""
+msgstr "Пропускати меню вибору програмної частини"
 
 #: src/frontend/mame/ui/submenu.cpp:45
 msgid "Info auto audit"
-msgstr ""
+msgstr "Відомості автоперевірки"
 
 #: src/frontend/mame/ui/submenu.cpp:46
 msgid "Hide romless machine from available list"
-msgstr ""
+msgstr "Приховати машину без ROM із переліку доступних"
 
 #: src/frontend/mame/ui/submenu.cpp:52
 msgid "Advanced Options"
-msgstr ""
+msgstr "Розширені опції"
 
 #: src/frontend/mame/ui/submenu.cpp:53
 msgid "Performance Options"
-msgstr ""
+msgstr "Опції продуктивності"
 
 #: src/frontend/mame/ui/submenu.cpp:54
 msgid "Auto frame skip"
-msgstr ""
+msgstr "Автопропуск кадрів"
 
 #: src/frontend/mame/ui/submenu.cpp:55
 msgid "Frame skip"
-msgstr ""
+msgstr "Пропуск кадрів"
 
 #: src/frontend/mame/ui/submenu.cpp:56
 msgid "Throttle"
-msgstr ""
+msgstr "Прискорити"
 
 #: src/frontend/mame/ui/submenu.cpp:57
 msgid "Mute when unthrottled"
-msgstr ""
+msgstr "Притлумити звук без прискорення"
 
 #: src/frontend/mame/ui/submenu.cpp:58
 msgid "Sleep"
-msgstr ""
+msgstr "Сон"
 
 #: src/frontend/mame/ui/submenu.cpp:59
 msgid "Speed"
-msgstr ""
+msgstr "Швидкість"
 
 #: src/frontend/mame/ui/submenu.cpp:60
 msgid "Adjust speed to match refresh rate"
-msgstr ""
+msgstr "Регулювати швидкість за частотою оновлення"
 
 #: src/frontend/mame/ui/submenu.cpp:61
 msgid "Low latency"
-msgstr ""
+msgstr "Низька затримка"
 
 #: src/frontend/mame/ui/submenu.cpp:63
 msgid "Rotation Options"
-msgstr ""
+msgstr "Опції повороту"
 
 #: src/frontend/mame/ui/submenu.cpp:64 src/frontend/mame/ui/videoopt.cpp:179
 msgid "Rotate"
-msgstr ""
+msgstr "Повернути"
 
 #: src/frontend/mame/ui/submenu.cpp:65
 msgid "Rotate right"
-msgstr ""
+msgstr "Повернути праворуч"
 
 #: src/frontend/mame/ui/submenu.cpp:66
 msgid "Rotate left"
-msgstr ""
+msgstr "Повернути ліворуч"
 
 #: src/frontend/mame/ui/submenu.cpp:67
 msgid "Auto rotate right"
-msgstr ""
+msgstr "Автоповорот праворуч"
 
 #: src/frontend/mame/ui/submenu.cpp:68
 msgid "Auto rotate left"
-msgstr ""
+msgstr "Автоповорот ліворуч"
 
 #: src/frontend/mame/ui/submenu.cpp:69
 msgid "Flip X"
-msgstr ""
+msgstr "Перевернути X"
 
 #: src/frontend/mame/ui/submenu.cpp:70
 msgid "Flip Y"
-msgstr ""
+msgstr "Перевернути Y"
 
 #: src/frontend/mame/ui/submenu.cpp:72
 msgid "Artwork Options"
-msgstr ""
+msgstr "Опції оформлення"
 
 #: src/frontend/mame/ui/submenu.cpp:73
 msgid "Zoom to screen area"
-msgstr ""
+msgstr "Масштабувати до області екрана"
 
 #: src/frontend/mame/ui/submenu.cpp:75
 msgid "State/Playback Options"
-msgstr ""
+msgstr "Опції збереження / відтворення"
 
 #: src/frontend/mame/ui/submenu.cpp:76
 msgid "Automatic save/restore"
-msgstr ""
+msgstr "Автоматичне збереження / відновлення"
 
 #: src/frontend/mame/ui/submenu.cpp:77
 msgid "Allow rewind"
-msgstr ""
+msgstr "Дозволити перемотування назад"
 
 #: src/frontend/mame/ui/submenu.cpp:78
 msgid "Rewind capacity"
-msgstr ""
+msgstr "Швидкість перемотування назад"
 
 #: src/frontend/mame/ui/submenu.cpp:79
 msgid "Bilinear filtering for snapshots"
-msgstr ""
+msgstr "Білінійна фільтрація для кадрів"
 
 #: src/frontend/mame/ui/submenu.cpp:80
 msgid "Burn-in"
-msgstr ""
+msgstr "Вигорання"
 
 #: src/frontend/mame/ui/submenu.cpp:82
 msgid "Input Options"
-msgstr ""
+msgstr "Опції керування"
 
 #: src/frontend/mame/ui/submenu.cpp:83
 msgid "Coin lockout"
-msgstr ""
+msgstr "Блокування монет"
 
 #: src/frontend/mame/ui/submenu.cpp:84
 msgid "Mouse"
-msgstr ""
+msgstr "Миша"
 
 #: src/frontend/mame/ui/submenu.cpp:85
 msgid "Joystick"
-msgstr ""
+msgstr "Джойстик"
 
 #: src/frontend/mame/ui/submenu.cpp:86
 msgid "Lightgun"
-msgstr ""
+msgstr "Світловий пістолет"
 
 #: src/frontend/mame/ui/submenu.cpp:87
 msgid "Multi-keyboard"
-msgstr ""
+msgstr "Мультиклавіатура"
 
 #: src/frontend/mame/ui/submenu.cpp:88
 msgid "Multi-mouse"
-msgstr ""
+msgstr "Мультимиша"
 
 #: src/frontend/mame/ui/submenu.cpp:89
 msgid "Steadykey"
-msgstr ""
+msgstr "Постійна кнопка"
 
 #: src/frontend/mame/ui/submenu.cpp:90
 msgid "UI active"
-msgstr ""
+msgstr "Активний UI"
 
 #: src/frontend/mame/ui/submenu.cpp:91
 msgid "Off-screen reload"
-msgstr ""
+msgstr "Закадрове перезавантаження"
 
 #: src/frontend/mame/ui/submenu.cpp:92
 msgid "Joystick deadzone"
-msgstr ""
+msgstr "Мертва зона джойстика"
 
 #: src/frontend/mame/ui/submenu.cpp:93
 msgid "Joystick saturation"
-msgstr ""
+msgstr "Насиченість джойстика"
 
 #: src/frontend/mame/ui/submenu.cpp:94
 msgid "Natural keyboard"
-msgstr ""
+msgstr "Звичайна клавіатура"
 
 #: src/frontend/mame/ui/submenu.cpp:95
 msgid "Allow contradictory joystick inputs"
-msgstr ""
+msgstr "Дозволити протилежні керування джойстика"
 
 #: src/frontend/mame/ui/submenu.cpp:96
 msgid "Coin impulse"
-msgstr ""
+msgstr "Імпульс монети"
 
 #: src/frontend/mame/ui/submenu.cpp:102
 msgid "Input Device Options"
-msgstr ""
+msgstr "Опції пристрою керування"
 
 #: src/frontend/mame/ui/submenu.cpp:103
 msgid "Lightgun Device Assignment"
-msgstr ""
+msgstr "Призначення пристрою світлового пістолета"
 
 #: src/frontend/mame/ui/submenu.cpp:104
 msgid "Trackball Device Assignment"
-msgstr ""
+msgstr "Призначення пристрою трекболу"
 
 #: src/frontend/mame/ui/submenu.cpp:105
 msgid "Pedal Device Assignment"
-msgstr ""
+msgstr "Призначення пристрою педалі"
 
 #: src/frontend/mame/ui/submenu.cpp:106
 msgid "AD Stick Device Assignment"
-msgstr ""
+msgstr "Призначення пристрою аналогового джойстика"
 
 #: src/frontend/mame/ui/submenu.cpp:107
 msgid "Paddle Device Assignment"
-msgstr ""
+msgstr "Призначення пристрою весла"
 
 #: src/frontend/mame/ui/submenu.cpp:108
 msgid "Dial Device Assignment"
-msgstr ""
+msgstr "Призначення поворотного пристрою"
 
 #: src/frontend/mame/ui/submenu.cpp:109
 msgid "Positional Device Assignment"
-msgstr ""
+msgstr "Призначення позиційного пристрою"
 
 #: src/frontend/mame/ui/submenu.cpp:110
 msgid "Mouse Device Assignment"
-msgstr ""
+msgstr "Призначення пристрою миші"
 
 #: src/frontend/mame/ui/submenu.cpp:112
 msgid "Keyboard Input Provider"
-msgstr ""
+msgstr "Постачальник керування клавіатури"
 
 #: src/frontend/mame/ui/submenu.cpp:113
 msgid "Mouse Input Provider"
-msgstr ""
+msgstr "Постачальник керування миші"
 
 #: src/frontend/mame/ui/submenu.cpp:114
 msgid "Lightgun Input Provider"
-msgstr ""
+msgstr "Постачальник керування світлового пістолета"
 
 #: src/frontend/mame/ui/submenu.cpp:115
 msgid "Joystick Input Provider"
-msgstr ""
+msgstr "Постачальник керування джойстика"
 
 #: src/frontend/mame/ui/submenu.cpp:121 src/frontend/mame/ui/mainmenu.cpp:174
 msgid "Video Options"
-msgstr ""
+msgstr "Опції відео"
 
 #: src/frontend/mame/ui/submenu.cpp:122
 msgid "Video Mode"
-msgstr ""
+msgstr "Відеорежим"
 
 #: src/frontend/mame/ui/submenu.cpp:123
 msgid "Number Of Screens"
-msgstr ""
+msgstr "Кількість екранів"
 
 #: src/frontend/mame/ui/submenu.cpp:125
 msgid "Triple Buffering"
-msgstr ""
+msgstr "Потрійна буферизація"
 
 #: src/frontend/mame/ui/submenu.cpp:126
 msgid "HLSL"
@@ -644,38 +659,38 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:129
 msgid "Bilinear Filtering"
-msgstr ""
+msgstr "Білінійна фільтрація"
 
 #: src/frontend/mame/ui/submenu.cpp:130
 msgid "Bitmap Prescaling"
-msgstr ""
+msgstr "Попереднє масштабування растрового зображення"
 
 #: src/frontend/mame/ui/submenu.cpp:131
 msgid "Window Mode"
-msgstr ""
+msgstr "Режим вікна"
 
 #: src/frontend/mame/ui/submenu.cpp:132
 msgid "Enforce Aspect Ratio"
-msgstr ""
+msgstr "Примусове співвідношення сторін"
 
 #: src/frontend/mame/ui/submenu.cpp:133
 msgid "Start Out Maximized"
-msgstr ""
+msgstr "Розпочинати розгорнутим"
 
 #: src/frontend/mame/ui/submenu.cpp:134
 msgid "Synchronized Refresh"
-msgstr ""
+msgstr "Синхронізоване оновлення"
 
 #: src/frontend/mame/ui/submenu.cpp:135
 msgid "Wait Vertical Sync"
-msgstr ""
+msgstr "Дочекатися вертикальної синхронізації"
 
 #: src/frontend/mame/ui/menu.cpp:360 src/frontend/mame/ui/menu.cpp:689
 #: src/frontend/mame/ui/videoopt.cpp:191 src/frontend/mame/ui/custui.cpp:490
 #: src/frontend/mame/ui/analogipt.cpp:471 plugins/cheatfind/init.lua:766
 #: plugins/cheatfind/init.lua:777 plugins/cheat/init.lua:668
 msgid "On"
-msgstr ""
+msgstr "Увімкнути"
 
 #: src/frontend/mame/ui/menu.cpp:360 src/frontend/mame/ui/menu.cpp:692
 #: src/frontend/mame/ui/videoopt.cpp:207 src/frontend/mame/ui/custui.cpp:490
@@ -683,192 +698,193 @@ msgstr ""
 #: plugins/cheatfind/init.lua:774 plugins/cheat/init.lua:671
 #: plugins/cheat/init.lua:680
 msgid "Off"
-msgstr ""
+msgstr "Вимкнути"
 
 #: src/frontend/mame/ui/menu.cpp:695
 msgid "Auto"
-msgstr ""
+msgstr "Автоматично"
 
-#: src/frontend/mame/ui/menu.cpp:1197
-#: src/frontend/mame/ui/simpleselgame.cpp:278
+#: src/frontend/mame/ui/menu.cpp:1197 src/frontend/mame/ui/simpleselgame.cpp:278
 #: src/frontend/mame/ui/selmenu.cpp:1280
 msgid "Return to Previous Menu"
-msgstr ""
+msgstr "Повернутися до попереднього меню"
 
-#: src/frontend/mame/ui/filemngr.cpp:139
-#: src/frontend/mame/ui/confswitch.cpp:119
+#: src/frontend/mame/ui/filemngr.cpp:139 src/frontend/mame/ui/confswitch.cpp:119
 #: src/frontend/mame/ui/inputmap.cpp:563 src/frontend/mame/ui/analogipt.cpp:360
 #, c-format
 msgid "[root%1$s]"
 msgstr ""
 
-#: src/frontend/mame/ui/filemngr.cpp:153
-#: src/frontend/mame/ui/confswitch.cpp:170 src/frontend/mame/ui/slotopt.cpp:203
+#: src/frontend/mame/ui/filemngr.cpp:153 src/frontend/mame/ui/confswitch.cpp:170
+#: src/frontend/mame/ui/slotopt.cpp:203
 msgid "Reset Machine"
-msgstr ""
+msgstr "Перезавантажити машину"
 
 #: src/frontend/mame/ui/filemngr.cpp:153 src/frontend/mame/ui/mainmenu.cpp:208
 msgid "Start Machine"
-msgstr ""
+msgstr "Запустити машину"
 
 #: src/frontend/mame/ui/videoopt.cpp:57
 #, c-format
 msgid "Screen #%d"
-msgstr ""
+msgstr "Екран #%d"
 
 #: src/frontend/mame/ui/videoopt.cpp:183
 msgid "Zoom to Screen Area"
-msgstr ""
+msgstr "Масштабувати до області екрана"
 
 #: src/frontend/mame/ui/videoopt.cpp:195
 msgid "X Only"
-msgstr ""
+msgstr "Лише X"
 
 #: src/frontend/mame/ui/videoopt.cpp:199
 msgid "Y Only"
-msgstr ""
+msgstr "Лише Y"
 
 #: src/frontend/mame/ui/videoopt.cpp:203
 msgid "X or Y (Auto)"
-msgstr ""
+msgstr "X / Y (автоматично)"
 
 #: src/frontend/mame/ui/videoopt.cpp:210
 msgid "Non-Integer Scaling"
-msgstr ""
+msgstr "Неціле масштабування"
 
 #: src/frontend/mame/ui/videoopt.cpp:213
 msgid "Maintain Aspect Ratio"
-msgstr ""
+msgstr "Зберігати співвідношення сторін"
 
 #: src/frontend/mame/ui/videoopt.cpp:227
 msgid "Cannot change options while recording!"
-msgstr ""
+msgstr "Неможливо змінити опції при записі!"
 
 #: src/frontend/mame/ui/info.cpp:37
 msgctxt "emulation-feature"
 msgid "protection"
-msgstr ""
+msgstr "захист"
 
 #: src/frontend/mame/ui/info.cpp:38
 msgctxt "emulation-feature"
 msgid "timing"
-msgstr ""
+msgstr "швидкість"
 
 #: src/frontend/mame/ui/info.cpp:39
 msgctxt "emulation-feature"
 msgid "graphics"
-msgstr ""
+msgstr "графіка"
 
 #: src/frontend/mame/ui/info.cpp:40
 msgctxt "emulation-feature"
 msgid "color palette"
-msgstr ""
+msgstr "колірна палітра"
 
 #: src/frontend/mame/ui/info.cpp:41
 msgctxt "emulation-feature"
 msgid "sound"
-msgstr ""
+msgstr "звук"
 
 #: src/frontend/mame/ui/info.cpp:42
 msgctxt "emulation-feature"
 msgid "capture hardware"
-msgstr ""
+msgstr "обладнання захоплення"
 
 #: src/frontend/mame/ui/info.cpp:43
 msgctxt "emulation-feature"
 msgid "camera"
-msgstr ""
+msgstr "камера"
 
 #: src/frontend/mame/ui/info.cpp:44
 msgctxt "emulation-feature"
 msgid "microphone"
-msgstr ""
+msgstr "мікрофон"
 
 #: src/frontend/mame/ui/info.cpp:45
 msgctxt "emulation-feature"
 msgid "controls"
-msgstr ""
+msgstr "керування"
 
 #: src/frontend/mame/ui/info.cpp:46
 msgctxt "emulation-feature"
 msgid "keyboard"
-msgstr ""
+msgstr "клавіатура"
 
 #: src/frontend/mame/ui/info.cpp:47
 msgctxt "emulation-feature"
 msgid "mouse"
-msgstr ""
+msgstr "миша"
 
 #: src/frontend/mame/ui/info.cpp:48
 msgctxt "emulation-feature"
 msgid "media"
-msgstr ""
+msgstr "медіа"
 
 #: src/frontend/mame/ui/info.cpp:49
 msgctxt "emulation-feature"
 msgid "disk"
-msgstr ""
+msgstr "диск"
 
 #: src/frontend/mame/ui/info.cpp:50
 msgctxt "emulation-feature"
 msgid "printer"
-msgstr ""
+msgstr "принтер"
 
 #: src/frontend/mame/ui/info.cpp:51
 msgctxt "emulation-feature"
 msgid "magnetic tape"
-msgstr ""
+msgstr "магнітострічка"
 
 #: src/frontend/mame/ui/info.cpp:52
 msgctxt "emulation-feature"
 msgid "punch tape"
-msgstr ""
+msgstr "перфострічка"
 
 #: src/frontend/mame/ui/info.cpp:53
 msgctxt "emulation-feature"
 msgid "magnetic drum"
-msgstr ""
+msgstr "магнітний барабан"
 
 #: src/frontend/mame/ui/info.cpp:54
 msgctxt "emulation-feature"
 msgid "solid state storage"
-msgstr ""
+msgstr "твердотіле сховище"
 
 #: src/frontend/mame/ui/info.cpp:55
 msgctxt "emulation-feature"
 msgid "communications"
-msgstr ""
+msgstr "комунікації"
 
 #: src/frontend/mame/ui/info.cpp:56
 msgctxt "emulation-feature"
 msgid "LAN"
-msgstr ""
+msgstr "локальна мережа"
 
 #: src/frontend/mame/ui/info.cpp:57
 msgctxt "emulation-feature"
 msgid "WAN"
-msgstr ""
+msgstr "глобальна мережа"
 
 #: src/frontend/mame/ui/info.cpp:66
 msgid ""
-"One or more ROMs/CHDs for this machine are incorrect. The machine may not "
-"run correctly.\n"
+"One or more ROMs/CHDs for this machine are incorrect. The machine may not run "
+"correctly.\n"
 msgstr ""
+"Один або декілька ROM'ів / CHD'ів машини неправильні. Машина може неналежно "
+"працювати.\n"
 
 #: src/frontend/mame/ui/info.cpp:79
 msgid ""
 "There are known problems with this machine\n"
 "\n"
 msgstr ""
+"Відомі проблеми машини\n"
+"\n"
 
 #: src/frontend/mame/ui/info.cpp:84
-msgid ""
-"One or more ROMs/CHDs for this machine have not been correctly dumped.\n"
-msgstr ""
+msgid "One or more ROMs/CHDs for this machine have not been correctly dumped.\n"
+msgstr "Один або декілька ROM'ів / CHD'ів машини неналежно задамплено.\n"
 
 #: src/frontend/mame/ui/info.cpp:92
 msgid "Completely unemulated features: "
-msgstr ""
+msgstr "Повністю неемульовані особливості: "
 
 #: src/frontend/mame/ui/info.cpp:98 src/frontend/mame/ui/info.cpp:114
 #, c-format
@@ -883,35 +899,42 @@ msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:108
 msgid "Imperfectly emulated features: "
-msgstr ""
+msgstr "Недосконало емульовані особливості: "
 
 #: src/frontend/mame/ui/info.cpp:129
 msgid "Screen flipping in cocktail mode is not supported.\n"
-msgstr ""
+msgstr "Переворот екрана в коктейль-режим непідтримуваний.\n"
 
 #: src/frontend/mame/ui/info.cpp:131
 msgid "This machine requires external artwork files.\n"
-msgstr ""
+msgstr "Машині необхідні зовнішні файли оформлення.\n"
 
 #: src/frontend/mame/ui/info.cpp:133
 msgid ""
 "This machine was never completed. It may exhibit strange behavior or missing "
 "elements that are not bugs in the emulation.\n"
 msgstr ""
+"Машину не завершено. Її поведінка дивна чи відсутні елементи, які не є "
+"помилками емуляції.\n"
 
 #: src/frontend/mame/ui/info.cpp:135
 msgid ""
 "This machine has no sound hardware, MAME will produce no sounds, this is "
 "expected behaviour.\n"
 msgstr ""
+"Відсутнє звукове обладнання машини, MAME не видає звуків, очікувана "
+"поведінка.\n"
 
 #: src/frontend/mame/ui/info.cpp:139
 msgid ""
 "\n"
 "THIS MACHINE DOESN'T WORK. The emulation for this machine is not yet "
-"complete. There is nothing you can do to fix this problem except wait for "
-"the developers to improve the emulation.\n"
+"complete. There is nothing you can do to fix this problem except wait for the "
+"developers to improve the emulation.\n"
 msgstr ""
+"\n"
+"Машина не працює, її емуляцію не завершено. Дочекайся виправлення проблеми "
+"виробниками покращенням емуляції.\n"
 
 #: src/frontend/mame/ui/info.cpp:141
 msgid ""
@@ -920,6 +943,9 @@ msgid ""
 "interaction or consist of mechanical devices. It is not possible to fully "
 "experience this machine.\n"
 msgstr ""
+"\n"
+"Елементи машини неможливо емулювати, необхідна фізична взаємодія чи вони "
+"складаються з механічних пристроїв. Повністю випробувати машину неможливо.\n"
 
 #: src/frontend/mame/ui/info.cpp:163
 #, c-format
@@ -928,6 +954,9 @@ msgid ""
 "\n"
 "There are working clones of this machine: %s"
 msgstr ""
+"\n"
+"\n"
+"Робочі клони машини: %s"
 
 #: src/frontend/mame/ui/info.cpp:364
 #, c-format
@@ -938,46 +967,55 @@ msgid ""
 "\n"
 "CPU:\n"
 msgstr ""
+"%1$s\n"
+"%2$s %3$s\n"
+"Драйвер: %4$s\n"
+"\n"
+"CPU:\n"
 
 #: src/frontend/mame/ui/info.cpp:406 src/frontend/mame/ui/info.cpp:449
 #: src/frontend/mame/ui/devopt.cpp:105 src/frontend/mame/ui/devopt.cpp:184
 msgid "GHz"
-msgstr ""
+msgstr "ГГц"
 
 #: src/frontend/mame/ui/info.cpp:406 src/frontend/mame/ui/info.cpp:449
 #: src/frontend/mame/ui/devopt.cpp:105 src/frontend/mame/ui/devopt.cpp:184
 msgid "MHz"
-msgstr ""
+msgstr "МГц"
 
 #: src/frontend/mame/ui/info.cpp:406 src/frontend/mame/ui/info.cpp:449
 #: src/frontend/mame/ui/devopt.cpp:105 src/frontend/mame/ui/devopt.cpp:184
 msgid "kHz"
-msgstr ""
+msgstr "кГц"
 
 #: src/frontend/mame/ui/info.cpp:406 src/frontend/mame/ui/info.cpp:449
 #: src/frontend/mame/ui/devopt.cpp:105 src/frontend/mame/ui/devopt.cpp:184
 msgid "Hz"
-msgstr ""
+msgstr "Гц"
 
 #: src/frontend/mame/ui/info.cpp:420
 msgid ""
 "\n"
 "Sound:\n"
 msgstr ""
+"\n"
+"Аудіо:\n"
 
 #: src/frontend/mame/ui/info.cpp:453
 msgid ""
 "\n"
 "Video:\n"
 msgstr ""
+"\n"
+"Відео:\n"
 
 #: src/frontend/mame/ui/info.cpp:457
 msgid "None\n"
-msgstr ""
+msgstr "Не вказано\n"
 
 #: src/frontend/mame/ui/info.cpp:464
 msgid "Vector"
-msgstr ""
+msgstr "Вектор"
 
 #: src/frontend/mame/ui/info.cpp:483
 #, c-format
@@ -991,11 +1029,11 @@ msgstr ""
 #: src/frontend/mame/ui/info.cpp:500
 #, c-format
 msgid "Screen '%1$s'"
-msgstr ""
+msgstr "Екран '%1$s'"
 
 #: src/frontend/mame/ui/info.cpp:502
 msgid "Screen"
-msgstr ""
+msgstr "екрана"
 
 #: src/frontend/mame/ui/info.cpp:573 src/frontend/mame/ui/info.cpp:584
 #, c-format
@@ -1004,83 +1042,83 @@ msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:665
 msgid "Not supported"
-msgstr ""
+msgstr "Без підтримки"
 
 #: src/frontend/mame/ui/info.cpp:668
 msgid "Partially supported"
-msgstr ""
+msgstr "Часткова підтримка"
 
 #: src/frontend/mame/ui/info.cpp:677
 msgid "[empty]"
-msgstr ""
+msgstr "[порожньо]"
 
 #: src/frontend/mame/ui/swlist.cpp:94
 msgid "[file manager]"
-msgstr ""
+msgstr "[менеджер файлів]"
 
 #: src/frontend/mame/ui/swlist.cpp:227
 msgid "Switch Item Ordering"
-msgstr ""
+msgstr "Перемкнути порядок пунктів"
 
 #: src/frontend/mame/ui/swlist.cpp:259
 msgid "Switched Order: entries now ordered by shortname"
-msgstr ""
+msgstr "Перемкнений порядок: записи впорядковано за коротким іменем."
 
 #: src/frontend/mame/ui/swlist.cpp:260
 msgid "Switched Order: entries now ordered by description"
-msgstr ""
+msgstr "Перемкнений порядок: записи впорядковано за описом."
 
 #: src/frontend/mame/ui/swlist.cpp:396
 msgid "[compatible lists]"
-msgstr ""
+msgstr "[сумісні переліки]"
 
 #: src/frontend/mame/ui/filecreate.cpp:78
 msgid "File Already Exists - Override?"
-msgstr ""
+msgstr "Замінити файл?"
 
 #: src/frontend/mame/ui/filecreate.cpp:80 src/frontend/mame/ui/utils.cpp:1090
 msgid "No"
-msgstr ""
+msgstr "Ні"
 
 #: src/frontend/mame/ui/filecreate.cpp:81 src/frontend/mame/ui/utils.cpp:1090
 msgid "Yes"
-msgstr ""
+msgstr "Так"
 
 #: src/frontend/mame/ui/filecreate.cpp:167
 msgid "New Image Name:"
-msgstr ""
+msgstr "Ім'я нового образу:"
 
 #: src/frontend/mame/ui/filecreate.cpp:173
 msgid "Image Format:"
-msgstr ""
+msgstr "Формат образу:"
 
 #: src/frontend/mame/ui/filecreate.cpp:179
 msgid "Create"
-msgstr ""
+msgstr "Створити"
 
 #: src/frontend/mame/ui/filecreate.cpp:207
 msgid "Please enter a file extension too"
-msgstr ""
+msgstr "Укажи формат файлу."
 
 #: src/frontend/mame/ui/filecreate.cpp:258
 msgid "Select image format"
-msgstr ""
+msgstr "Вибери формат образу."
 
 #: src/frontend/mame/ui/filecreate.cpp:317
 msgid "Select initial contents"
-msgstr ""
+msgstr "Вибери початковий уміст."
 
 #: src/frontend/mame/ui/keyboard.cpp:45 src/frontend/mame/ui/mainmenu.cpp:170
 msgid "Keyboard Mode"
-msgstr ""
+msgstr "Режим клавіатури"
 
 #: src/frontend/mame/ui/keyboard.cpp:46 src/frontend/mame/ui/keyboard.cpp:91
 msgid "Natural"
-msgstr ""
+msgstr "Звичайна"
 
 #: src/frontend/mame/ui/keyboard.cpp:46 src/frontend/mame/ui/keyboard.cpp:91
 msgid "Emulated"
-msgstr ""
+msgstr "Емульована"
 
 #: src/frontend/mame/ui/keyboard.cpp:59 src/frontend/mame/ui/confswitch.cpp:117
 #: src/frontend/mame/ui/inputmap.cpp:561 src/frontend/mame/ui/analogipt.cpp:358
@@ -1094,41 +1132,41 @@ msgstr ""
 
 #: src/frontend/mame/ui/keyboard.cpp:62 src/frontend/mame/ui/keyboard.cpp:109
 msgid "Enabled"
-msgstr ""
+msgstr "Увімкнено"
 
 #: src/frontend/mame/ui/keyboard.cpp:62 src/frontend/mame/ui/keyboard.cpp:109
 msgid "Disabled"
-msgstr ""
+msgstr "Вимкнено"
 
 #: src/frontend/mame/ui/utils.cpp:63
 msgctxt "swlist-info"
 msgid "Alternate Title"
-msgstr ""
+msgstr "Альтернативна назва"
 
 #: src/frontend/mame/ui/utils.cpp:64
 msgctxt "swlist-info"
 msgid "Author"
-msgstr ""
+msgstr "Автор"
 
 #: src/frontend/mame/ui/utils.cpp:65
 msgctxt "swlist-info"
 msgid "Barcode Number"
-msgstr ""
+msgstr "Номер штрих-коду"
 
 #: src/frontend/mame/ui/utils.cpp:66
 msgctxt "swlist-info"
 msgid "Developer"
-msgstr ""
+msgstr "Виробник"
 
 #: src/frontend/mame/ui/utils.cpp:67
 msgctxt "swlist-info"
 msgid "Distributor"
-msgstr ""
+msgstr "Розповсюдник"
 
 #: src/frontend/mame/ui/utils.cpp:68
 msgctxt "swlist-info"
 msgid "Installation Instructions"
-msgstr ""
+msgstr "Посібник встановлення"
 
 #: src/frontend/mame/ui/utils.cpp:69
 msgctxt "swlist-info"
@@ -1143,87 +1181,87 @@ msgstr ""
 #: src/frontend/mame/ui/utils.cpp:71
 msgctxt "swlist-info"
 msgid "Original Publisher"
-msgstr ""
+msgstr "Початковий видавець"
 
 #: src/frontend/mame/ui/utils.cpp:72
 msgctxt "swlist-info"
 msgid "Part Number"
-msgstr ""
+msgstr "№ частини"
 
 #: src/frontend/mame/ui/utils.cpp:73
 msgctxt "swlist-info"
 msgid "PCB"
-msgstr ""
+msgstr "Друкована плата"
 
 #: src/frontend/mame/ui/utils.cpp:74
 msgctxt "swlist-info"
 msgid "Programmer"
-msgstr ""
+msgstr "Програміст"
 
 #: src/frontend/mame/ui/utils.cpp:75
 msgctxt "swlist-info"
 msgid "Release Date"
-msgstr ""
+msgstr "Дата випуску"
 
 #: src/frontend/mame/ui/utils.cpp:76
 msgctxt "swlist-info"
 msgid "Serial Number"
-msgstr ""
+msgstr "Серійний №"
 
 #: src/frontend/mame/ui/utils.cpp:77
 msgctxt "swlist-info"
 msgid "Usage Instructions"
-msgstr ""
+msgstr "Посібник використання"
 
 #: src/frontend/mame/ui/utils.cpp:78
 msgctxt "swlist-info"
 msgid "Version"
-msgstr ""
+msgstr "Версія"
 
 #: src/frontend/mame/ui/utils.cpp:84
 msgctxt "machine-filter"
 msgid "Unfiltered"
-msgstr ""
+msgstr "Без фільтра"
 
 #: src/frontend/mame/ui/utils.cpp:85
 msgctxt "machine-filter"
 msgid "Available"
-msgstr ""
+msgstr "Доступні"
 
 #: src/frontend/mame/ui/utils.cpp:86
 msgctxt "machine-filter"
 msgid "Unavailable"
-msgstr ""
+msgstr "Недоступні"
 
 #: src/frontend/mame/ui/utils.cpp:87
 msgctxt "machine-filter"
 msgid "Working"
-msgstr ""
+msgstr "Робочі"
 
 #: src/frontend/mame/ui/utils.cpp:88
 msgctxt "machine-filter"
 msgid "Not Working"
-msgstr ""
+msgstr "Неробочі"
 
 #: src/frontend/mame/ui/utils.cpp:89
 msgctxt "machine-filter"
 msgid "Mechanical"
-msgstr ""
+msgstr "Механічні"
 
 #: src/frontend/mame/ui/utils.cpp:90
 msgctxt "machine-filter"
 msgid "Not Mechanical"
-msgstr ""
+msgstr "Немеханічні"
 
 #: src/frontend/mame/ui/utils.cpp:91
 msgctxt "machine-filter"
 msgid "Category"
-msgstr ""
+msgstr "Категорії"
 
 #: src/frontend/mame/ui/utils.cpp:92
 msgctxt "machine-filter"
 msgid "Favorites"
-msgstr ""
+msgstr "Уподобання"
 
 #: src/frontend/mame/ui/utils.cpp:93
 msgctxt "machine-filter"
@@ -1233,7 +1271,7 @@ msgstr ""
 #: src/frontend/mame/ui/utils.cpp:94
 msgctxt "machine-filter"
 msgid "Not BIOS"
-msgstr ""
+msgstr "Не BIOS"
 
 #: src/frontend/mame/ui/utils.cpp:95
 msgctxt "machine-filter"
@@ -1243,72 +1281,72 @@ msgstr ""
 #: src/frontend/mame/ui/utils.cpp:96
 msgctxt "machine-filter"
 msgid "Clones"
-msgstr ""
+msgstr "Клони"
 
 #: src/frontend/mame/ui/utils.cpp:97
 msgctxt "machine-filter"
 msgid "Manufacturer"
-msgstr ""
+msgstr "Виробник"
 
 #: src/frontend/mame/ui/utils.cpp:98
 msgctxt "machine-filter"
 msgid "Year"
-msgstr ""
+msgstr "Рік"
 
 #: src/frontend/mame/ui/utils.cpp:99
 msgctxt "machine-filter"
 msgid "Save Supported"
-msgstr ""
+msgstr "Підтримка збережень"
 
 #: src/frontend/mame/ui/utils.cpp:100
 msgctxt "machine-filter"
 msgid "Save Unsupported"
-msgstr ""
+msgstr "Без підтримки збережень"
 
 #: src/frontend/mame/ui/utils.cpp:101
 msgctxt "machine-filter"
 msgid "CHD Required"
-msgstr ""
+msgstr "CHD"
 
 #: src/frontend/mame/ui/utils.cpp:102
 msgctxt "machine-filter"
 msgid "No CHD Required"
-msgstr ""
+msgstr "Без CHD"
 
 #: src/frontend/mame/ui/utils.cpp:103
 msgctxt "machine-filter"
 msgid "Vertical Screen"
-msgstr ""
+msgstr "Вертикальний екран"
 
 #: src/frontend/mame/ui/utils.cpp:104
 msgctxt "machine-filter"
 msgid "Horizontal Screen"
-msgstr ""
+msgstr "Горизонтальний екран"
 
 #: src/frontend/mame/ui/utils.cpp:105
 msgctxt "machine-filter"
 msgid "Custom Filter"
-msgstr ""
+msgstr "Указаний фільтр"
 
 #: src/frontend/mame/ui/utils.cpp:109
 msgctxt "software-filter"
 msgid "Unfiltered"
-msgstr ""
+msgstr "Без фільтра"
 
 #: src/frontend/mame/ui/utils.cpp:110
 msgctxt "software-filter"
 msgid "Available"
-msgstr ""
+msgstr "Доступні"
 
 #: src/frontend/mame/ui/utils.cpp:111
 msgctxt "software-filter"
 msgid "Unavailable"
-msgstr ""
+msgstr "Недоступні"
 
 #: src/frontend/mame/ui/utils.cpp:112
 msgctxt "software-filter"
 msgid "Favorites"
-msgstr ""
+msgstr "Уподобання"
 
 #: src/frontend/mame/ui/utils.cpp:113
 msgctxt "software-filter"
@@ -1318,143 +1356,143 @@ msgstr ""
 #: src/frontend/mame/ui/utils.cpp:114
 msgctxt "software-filter"
 msgid "Clones"
-msgstr ""
+msgstr "Клони"
 
 #: src/frontend/mame/ui/utils.cpp:115
 msgctxt "software-filter"
 msgid "Year"
-msgstr ""
+msgstr "Рік"
 
 #: src/frontend/mame/ui/utils.cpp:116
 msgctxt "software-filter"
 msgid "Publisher"
-msgstr ""
+msgstr "Видавець"
 
 #: src/frontend/mame/ui/utils.cpp:117
 msgctxt "software-filter"
 msgid "Developer"
-msgstr ""
+msgstr "Виробник"
 
 #: src/frontend/mame/ui/utils.cpp:118
 msgctxt "software-filter"
 msgid "Distributor"
-msgstr ""
+msgstr "Розповсюдник"
 
 #: src/frontend/mame/ui/utils.cpp:119
 msgctxt "software-filter"
 msgid "Author"
-msgstr ""
+msgstr "Автор"
 
 #: src/frontend/mame/ui/utils.cpp:120
 msgctxt "software-filter"
 msgid "Programmer"
-msgstr ""
+msgstr "Програміст"
 
 #: src/frontend/mame/ui/utils.cpp:121
 msgctxt "software-filter"
 msgid "Supported"
-msgstr ""
+msgstr "Підтримка"
 
 #: src/frontend/mame/ui/utils.cpp:122
 msgctxt "software-filter"
 msgid "Partially Supported"
-msgstr ""
+msgstr "Часткова підтримка"
 
 #: src/frontend/mame/ui/utils.cpp:123
 msgctxt "software-filter"
 msgid "Unsupported"
-msgstr ""
+msgstr "Без підтримки"
 
 #: src/frontend/mame/ui/utils.cpp:124
 msgctxt "software-filter"
 msgid "Release Region"
-msgstr ""
+msgstr "Регіон випуску"
 
 #: src/frontend/mame/ui/utils.cpp:125
 msgctxt "software-filter"
 msgid "Device Type"
-msgstr ""
+msgstr "Тип пристрою"
 
 #: src/frontend/mame/ui/utils.cpp:126
 msgctxt "software-filter"
 msgid "Software List"
-msgstr ""
+msgstr "Перелік програм"
 
 #: src/frontend/mame/ui/utils.cpp:127
 msgctxt "software-filter"
 msgid "Custom Filter"
-msgstr ""
+msgstr "Указаний фільтр"
 
 #: src/frontend/mame/ui/utils.cpp:291
 msgid "<set up filters>"
-msgstr ""
+msgstr "<встановити фільтри>"
 
 #: src/frontend/mame/ui/utils.cpp:396
 msgid "Select custom filters:"
-msgstr ""
+msgstr "Вибери вказані фільтри:"
 
 #: src/frontend/mame/ui/utils.cpp:547
 #, c-format
 msgid "Filter %1$u"
-msgstr ""
+msgstr "Фільтр %1$u"
 
 #: src/frontend/mame/ui/utils.cpp:561
 msgid "Remove last filter"
-msgstr ""
+msgstr "Вилучити останній фільтр"
 
 #: src/frontend/mame/ui/utils.cpp:563
 msgid "Add filter"
-msgstr ""
+msgstr "Додати фільтр"
 
 #: src/frontend/mame/ui/utils.cpp:1002
 msgid "Select category:"
-msgstr ""
+msgstr "Вибери категорію:"
 
 #: src/frontend/mame/ui/utils.cpp:1033
 msgid "[no category INI files]"
-msgstr ""
+msgstr "[INI без категорій]"
 
 #: src/frontend/mame/ui/utils.cpp:1041
 msgid "[no groups in INI file]"
-msgstr ""
+msgstr "[INI без груп]"
 
 #: src/frontend/mame/ui/utils.cpp:1075
 msgid "No category INI files found"
-msgstr ""
+msgstr "Не знайдено INI-файлів категорій."
 
 #: src/frontend/mame/ui/utils.cpp:1080
 msgid "File"
-msgstr ""
+msgstr "Файл"
 
 #: src/frontend/mame/ui/utils.cpp:1084
 msgid "No groups found in category file"
-msgstr ""
+msgstr "Не знайдено групи в файлі категорій."
 
 #: src/frontend/mame/ui/utils.cpp:1089
 msgid "Group"
-msgstr ""
+msgstr "Група"
 
 #: src/frontend/mame/ui/utils.cpp:1090
 msgid "Include clones"
-msgstr ""
+msgstr "З урахуванням клонів"
 
 #: src/frontend/mame/ui/utils.cpp:2048 src/frontend/mame/ui/inifile.cpp:272
 msgctxt "swlist-info"
 msgid "Software list/item"
-msgstr ""
+msgstr "Перелік програм / пунктів"
 
 #: src/frontend/mame/ui/datmenu.cpp:88 src/frontend/mame/ui/selmenu.cpp:2707
 msgid "Software List Info"
-msgstr ""
+msgstr "Відомості переліку програм"
 
 #: src/frontend/mame/ui/datmenu.cpp:316
 #, c-format
 msgid "Revision: %1$s"
-msgstr ""
+msgstr "Ревізія: %1$s"
 
 #: src/frontend/mame/ui/miscmenu.cpp:78
 msgid "Reset"
-msgstr ""
+msgstr "Перезавантажити"
 
 #: src/frontend/mame/ui/miscmenu.cpp:234
 #, c-format
@@ -1462,6 +1500,8 @@ msgid ""
 "Uptime: %1$d:%2$02d:%3$02d\n"
 "\n"
 msgstr ""
+"Час роботи: %1$d:%2$02d:%3$02d\n"
+"\n"
 
 #: src/frontend/mame/ui/miscmenu.cpp:236
 #, c-format
@@ -1469,6 +1509,8 @@ msgid ""
 "Uptime: %1$d:%2$02d\n"
 "\n"
 msgstr ""
+"Час роботи: %1$d:%2$02d\n"
+"\n"
 
 #: src/frontend/mame/ui/miscmenu.cpp:241
 #, c-format
@@ -1476,59 +1518,61 @@ msgid ""
 "Tickets dispensed: %1$d\n"
 "\n"
 msgstr ""
+"Видано квитків: %1$d\n"
+"\n"
 
 #: src/frontend/mame/ui/miscmenu.cpp:254
 msgid "Coin %1$c: NA%3$s\n"
-msgstr ""
+msgstr "Монета %1$c: НД%3$s\n"
 
 #: src/frontend/mame/ui/miscmenu.cpp:254
 #, c-format
 msgid "Coin %1$c: %2$d%3$s\n"
-msgstr ""
+msgstr "Монета %1$c: %2$d%3$s\n"
 
 #: src/frontend/mame/ui/miscmenu.cpp:257
 msgid " (locked)"
-msgstr ""
+msgstr " (заблоковано)"
 
 #: src/frontend/mame/ui/miscmenu.cpp:474
 #, c-format
 msgid "P%d Visibility"
-msgstr ""
+msgstr "Видимість P%d"
 
 #: src/frontend/mame/ui/miscmenu.cpp:528
 #, c-format
 msgid "P%d Crosshair"
-msgstr ""
+msgstr "Приціл P%d"
 
 #: src/frontend/mame/ui/miscmenu.cpp:545
 msgid "Visible Delay"
-msgstr ""
+msgstr "Видима затримка"
 
 #: src/frontend/mame/ui/miscmenu.cpp:629
 #, c-format
 msgid "%s.xml saved in UI settings folder."
-msgstr ""
+msgstr "%s.xml збережено до теки налаштувань UI."
 
 #: src/frontend/mame/ui/miscmenu.cpp:655
 msgid "Name:             Description:\n"
-msgstr ""
+msgstr "Ім'я:             Опис:\n"
 
 #: src/frontend/mame/ui/miscmenu.cpp:666
 #, c-format
 msgid "%s.txt saved in UI settings folder."
-msgstr ""
+msgstr "%s.txt збережено до теки налаштувань UI."
 
 #: src/frontend/mame/ui/miscmenu.cpp:683
 msgid "Export list in XML format (like -listxml)"
-msgstr ""
+msgstr "Експортувати перелік до XML (-listxml)"
 
 #: src/frontend/mame/ui/miscmenu.cpp:684
 msgid "Export list in XML format (like -listxml, but exclude devices)"
-msgstr ""
+msgstr "Експортувати перелік до XML (-listxml із вилученням пристроїв)"
 
 #: src/frontend/mame/ui/miscmenu.cpp:685
 msgid "Export list in TXT format (like -listfull)"
-msgstr ""
+msgstr "Експортувати перелік до TXT (-listfull)"
 
 #: src/frontend/mame/ui/miscmenu.cpp:792
 msgid "BIOS"
@@ -1536,35 +1580,35 @@ msgstr ""
 
 #: src/frontend/mame/ui/miscmenu.cpp:796
 msgid "Driver"
-msgstr ""
+msgstr "Драйвер"
 
 #: src/frontend/mame/ui/miscmenu.cpp:799
 msgid "This machine has no BIOS."
-msgstr ""
+msgstr "Відсутній BIOS машини."
 
 #: src/frontend/mame/ui/miscmenu.cpp:808 src/frontend/mame/ui/mainmenu.cpp:194
 msgid "Add To Favorites"
-msgstr ""
+msgstr "Додати до вподобань"
 
 #: src/frontend/mame/ui/miscmenu.cpp:810 src/frontend/mame/ui/mainmenu.cpp:196
 msgid "Remove From Favorites"
-msgstr ""
+msgstr "Вилучити з уподобань"
 
 #: src/frontend/mame/ui/miscmenu.cpp:813
 msgid "Save Machine Configuration"
-msgstr ""
+msgstr "Зберегти конфігурацію машини"
 
 #: src/frontend/mame/ui/miscmenu.cpp:824
 msgid "Configure Machine:"
-msgstr ""
+msgstr "Налаштувати машину:"
 
 #: src/frontend/mame/ui/miscmenu.cpp:858 src/frontend/mame/ui/selmenu.cpp:2647
 msgid " (default)"
-msgstr ""
+msgstr " (типово)"
 
 #: src/frontend/mame/ui/miscmenu.cpp:934
 msgid "No plugins found"
-msgstr ""
+msgstr "Не знайдено плаґінів."
 
 #: src/frontend/mame/ui/quitmenu.cpp:37
 #, c-format
@@ -1574,22 +1618,26 @@ msgid ""
 "Press %1$s to quit\n"
 "Press %2$s to return to emulation"
 msgstr ""
+"Вийти?\n"
+"\n"
+"%1$s - вихід.\n"
+"%2$s - повернення до емуляції."
 
 #: src/frontend/mame/ui/info_pty.cpp:30
 msgid "Pseudo terminals"
-msgstr ""
+msgstr "Псевдотермінали"
 
 #: src/frontend/mame/ui/info_pty.cpp:39
 msgid "[failed]"
-msgstr ""
+msgstr "[не виконано]"
 
 #: src/frontend/mame/ui/state.cpp:217
 msgid "[no saved states found]"
-msgstr ""
+msgstr "[не знайдено збережених станів]"
 
 #: src/frontend/mame/ui/state.cpp:222 plugins/cheatfind/init.lua:492
 msgid "Cancel"
-msgstr ""
+msgstr "Скасувати"
 
 #: src/frontend/mame/ui/state.cpp:261
 #, c-format
@@ -1598,150 +1646,156 @@ msgid ""
 "Press %2$s to delete\n"
 "Press %3$s to cancel"
 msgstr ""
+"Видалити збережені дані %1$s?\n"
+"%2$s - видалення.\n"
+"%3$s - скасування."
 
 #: src/frontend/mame/ui/state.cpp:374
 #, c-format
 msgid "Error removing saved state file %1$s"
-msgstr ""
+msgstr "Помилка вилучення збереженого стану %1$s."
 
 #: src/frontend/mame/ui/state.cpp:426
 #, c-format
 msgid "Press %1$s to delete"
-msgstr ""
+msgstr "Натисни %1$s для видалення."
 
 #: src/frontend/mame/ui/state.cpp:499
 msgid "Load State"
-msgstr ""
+msgstr "Завантажити стан"
 
 #: src/frontend/mame/ui/state.cpp:499
 msgid "Select state to load"
-msgstr ""
+msgstr "Вибери стан для завантаження."
 
 #: src/frontend/mame/ui/state.cpp:523
 msgid "Save State"
-msgstr ""
+msgstr "Зберегти стан"
 
 #: src/frontend/mame/ui/state.cpp:523
 msgid "Press a key or joystick button, or select state to overwrite"
-msgstr ""
+msgstr "Натисни кнопку клавіатури / джойстика чи вибери стан для перезапису."
 
 #: src/frontend/mame/ui/slotopt.cpp:192
 #, c-format
 msgid "%s [internal]"
-msgstr ""
+msgstr "%s [внутрішній]"
 
 #: src/frontend/mame/ui/inputmap.cpp:38
 msgid "User Interface"
-msgstr ""
+msgstr "Інтерфейс користувача"
 
 #: src/frontend/mame/ui/inputmap.cpp:41
 #, c-format
 msgid "Player %1$d Controls"
-msgstr ""
+msgstr "Керування гравця %1$d"
 
 #: src/frontend/mame/ui/inputmap.cpp:44
 msgid "Other Controls"
-msgstr ""
+msgstr "Інше керування"
 
 #: src/frontend/mame/ui/inputmap.cpp:231
 msgid "This machine has no configurable inputs."
-msgstr ""
+msgstr "Відсутні налаштовувані керування машини."
 
 #: src/frontend/mame/ui/inputmap.cpp:331
 msgid "Pressed"
-msgstr ""
+msgstr "Натиснено"
 
 #: src/frontend/mame/ui/inputmap.cpp:401
 msgid "Invalid sequence entered"
-msgstr ""
+msgstr "Указано недійсну послідовність."
 
 #: src/frontend/mame/ui/inputmap.cpp:546
 #, c-format
 msgctxt "input-name"
 msgid "%1$s Analog"
-msgstr ""
+msgstr "%1$s Аналог"
 
 #: src/frontend/mame/ui/inputmap.cpp:547
 #, c-format
 msgctxt "input-name"
 msgid "%1$s Analog Inc"
-msgstr ""
+msgstr "%1$s Аналог +"
 
 #: src/frontend/mame/ui/inputmap.cpp:548
 #, c-format
 msgctxt "input-name"
 msgid "%1$s Analog Dec"
-msgstr ""
+msgstr "%1$s Аналог -"
 
 #: src/frontend/mame/ui/inputmap.cpp:590
 #, c-format
 msgid "Press %1$s to set\n"
-msgstr ""
+msgstr "Натисни %1$s для встановлення.\n"
 
 #: src/frontend/mame/ui/inputmap.cpp:591
 #, c-format
 msgid "Press %1$s to append\n"
-msgstr ""
+msgstr "Натисни %1$s для додання.\n"
 
 #: src/frontend/mame/ui/inputmap.cpp:592
 #, c-format
 msgid "Press %1$s to clear\n"
-msgstr ""
+msgstr "Натисни %1$s для очищення.\n"
 
 #: src/frontend/mame/ui/inputmap.cpp:593
 #, c-format
 msgid "Press %1$s to restore default\n"
-msgstr ""
+msgstr "Натисни %1$s для типового відновлення.\n"
 
 #: src/frontend/mame/ui/tapectrl.cpp:86
 msgid "stopped"
-msgstr ""
+msgstr "зупинено"
 
 #: src/frontend/mame/ui/tapectrl.cpp:88
 msgid "playing"
-msgstr ""
+msgstr "відтворення"
 
 #: src/frontend/mame/ui/tapectrl.cpp:88
 msgid "(playing)"
-msgstr ""
+msgstr "(відтворення)"
 
 #: src/frontend/mame/ui/tapectrl.cpp:89
 msgid "recording"
-msgstr ""
+msgstr "запис"
 
 #: src/frontend/mame/ui/tapectrl.cpp:89
 msgid "(recording)"
-msgstr ""
+msgstr "(запис)"
 
 #: src/frontend/mame/ui/tapectrl.cpp:96
 msgid "Pause/Stop"
-msgstr ""
+msgstr "Призупинити / Зупинити"
 
 #: src/frontend/mame/ui/tapectrl.cpp:99
 msgid "Play"
-msgstr ""
+msgstr "Відтворити"
 
 #: src/frontend/mame/ui/tapectrl.cpp:102
 msgid "Record"
-msgstr ""
+msgstr "Записати"
 
 #: src/frontend/mame/ui/tapectrl.cpp:105
 msgid "Rewind"
-msgstr ""
+msgstr "Перемотати назад"
 
 #: src/frontend/mame/ui/tapectrl.cpp:108
 msgid "Fast Forward"
-msgstr ""
+msgstr "Перемотати вперед"
 
 #: src/frontend/mame/ui/imgcntrl.cpp:132
 msgid "Cannot save over directory"
-msgstr ""
+msgstr "Неможливо зберегти над каталогом."
 
 #: src/frontend/mame/ui/imgcntrl.cpp:165
 msgid ""
 "The software selected is missing one or more required ROM or CHD images.\n"
 "Please acquire the correct files or select a different one."
 msgstr ""
+"У вибраній програмі відсутній один або декілька необхідних ROM / CHD-"
+"образів.\n"
+"Знайди правильні файли чи вибери інший."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:146
 msgid ""
@@ -1750,16 +1804,20 @@ msgid ""
 "\n"
 "Press any key to continue."
 msgstr ""
+"У вибраній грі відсутній один або декілька необхідних ROM / CHD-образів. "
+"Вибери іншу гру.\n"
+"\n"
+"Натисни для продовження."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:273
 #: src/frontend/mame/ui/selgame.cpp:443
 msgid "Configure Options"
-msgstr ""
+msgstr "Налаштувати опції"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:274
 #: src/frontend/mame/ui/selmenu.cpp:1280
 msgid "Exit"
-msgstr ""
+msgstr "Вихід"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:299
 #, c-format
@@ -1769,15 +1827,19 @@ msgid ""
 "If this is your first time using %2$s, please see the config.txt file in the "
 "docs directory for information on configuring %2$s."
 msgstr ""
+"Не знайдено машин. Перевір указаний у %1$s.ini шлях ROM'ів.\n"
+"\n"
+"При першому використанні %2$s переглянь config.txt у каталозі документів для "
+"отримання відомостей налаштування %2$s."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:315
 #, c-format
 msgid "Type name or select: %1$s_"
-msgstr ""
+msgstr "Укажи ім'я чи вибери: %1$s_."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:317
 msgid "Type name or select: (random)"
-msgstr ""
+msgstr "Укажи ім'я чи вибери: (випадково)."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:331
 #, c-format
@@ -1792,57 +1854,57 @@ msgstr ""
 #: src/frontend/mame/ui/simpleselgame.cpp:337
 #, c-format
 msgid "Driver: %1$s"
-msgstr ""
+msgstr "Драйвер: %1$s"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:353
 #: src/frontend/mame/ui/selmenu.cpp:723
 msgid "Overall: NOT WORKING"
-msgstr ""
+msgstr "Загалом: Неробоче"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:355
 #: src/frontend/mame/ui/selmenu.cpp:725
 msgid "Overall: Unemulated Protection"
-msgstr ""
+msgstr "Загалом: Неемульований захист"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:357
 #: src/frontend/mame/ui/selmenu.cpp:727
 msgid "Overall: Working"
-msgstr ""
+msgstr "Загалом: Робоче"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:361
 #: src/frontend/mame/ui/selmenu.cpp:731
 msgid "Graphics: Unimplemented, "
-msgstr ""
+msgstr "Графіка: Не реалізовано, "
 
 #: src/frontend/mame/ui/simpleselgame.cpp:363
 #: src/frontend/mame/ui/selmenu.cpp:733
 msgid "Graphics: Imperfect, "
-msgstr ""
+msgstr "Графіка: Недосконало, "
 
 #: src/frontend/mame/ui/simpleselgame.cpp:365
 #: src/frontend/mame/ui/selmenu.cpp:735
 msgid "Graphics: OK, "
-msgstr ""
+msgstr "Графіка: OK, "
 
 #: src/frontend/mame/ui/simpleselgame.cpp:368
 #: src/frontend/mame/ui/selmenu.cpp:738
 msgid "Sound: None"
-msgstr ""
+msgstr "Аудіо: Не вказано"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:370
 #: src/frontend/mame/ui/selmenu.cpp:740
 msgid "Sound: Unimplemented"
-msgstr ""
+msgstr "Аудіо: Не реалізовано"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:372
 #: src/frontend/mame/ui/selmenu.cpp:742
 msgid "Sound: Imperfect"
-msgstr ""
+msgstr "Аудіо: Недосконало"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:374
 #: src/frontend/mame/ui/selmenu.cpp:744
 msgid "Sound: OK"
-msgstr ""
+msgstr "Аудіо: OK"
 
 #: src/frontend/mame/ui/cheatopt.cpp:82 plugins/cheat/init.lua:751
 #, c-format, lua-format
@@ -1850,263 +1912,265 @@ msgid ""
 "Cheat Comment:\n"
 "%s"
 msgstr ""
+"Коментар чіту:\n"
+"%s"
 
 #: src/frontend/mame/ui/cheatopt.cpp:95
 msgid "All cheats reloaded"
-msgstr ""
+msgstr "Усі чіти перезавантажено."
 
 #: src/frontend/mame/ui/cheatopt.cpp:136 plugins/cheat/init.lua:698
 msgid "Reset All"
-msgstr ""
+msgstr "Відновити всі"
 
 #: src/frontend/mame/ui/cheatopt.cpp:139 plugins/cheat/init.lua:699
 msgid "Reload All"
-msgstr ""
+msgstr "Перезавантажити всі"
 
 #: src/frontend/mame/ui/dirmenu.cpp:38
 msgctxt "path-option"
 msgid "ROMs"
-msgstr ""
+msgstr "ROM'и"
 
 #: src/frontend/mame/ui/dirmenu.cpp:39
 msgctxt "path-option"
 msgid "Software Media"
-msgstr ""
+msgstr "Програмний носій"
 
 #: src/frontend/mame/ui/dirmenu.cpp:40
 msgctxt "path-option"
 msgid "Sound Samples"
-msgstr ""
+msgstr "Звукові зразки"
 
 #: src/frontend/mame/ui/dirmenu.cpp:41
 msgctxt "path-option"
 msgid "Artwork"
-msgstr ""
+msgstr "Оформлення"
 
 #: src/frontend/mame/ui/dirmenu.cpp:42
 msgctxt "path-option"
 msgid "Crosshairs"
-msgstr ""
+msgstr "Приціли"
 
 #: src/frontend/mame/ui/dirmenu.cpp:43
 msgctxt "path-option"
 msgid "Cheat Files"
-msgstr ""
+msgstr "Чіти"
 
 #: src/frontend/mame/ui/dirmenu.cpp:44
 msgctxt "path-option"
 msgid "Plugins"
-msgstr ""
+msgstr "Плаґіни"
 
 #: src/frontend/mame/ui/dirmenu.cpp:45
 msgctxt "path-option"
 msgid "UI Translations"
-msgstr ""
+msgstr "UI-переклади"
 
 #: src/frontend/mame/ui/dirmenu.cpp:46
 msgctxt "path-option"
 msgid "INIs"
-msgstr ""
+msgstr "INI"
 
 #: src/frontend/mame/ui/dirmenu.cpp:47
 msgctxt "path-option"
 msgid "UI Settings"
-msgstr ""
+msgstr "UI-налаштування"
 
 #: src/frontend/mame/ui/dirmenu.cpp:48
 msgctxt "path-option"
 msgid "Plugin Data"
-msgstr ""
+msgstr "Дані плаґінів"
 
 #: src/frontend/mame/ui/dirmenu.cpp:49
 msgctxt "path-option"
 msgid "DATs"
-msgstr ""
+msgstr "DAT"
 
 #: src/frontend/mame/ui/dirmenu.cpp:50
 msgctxt "path-option"
 msgid "Category INIs"
-msgstr ""
+msgstr "INI категорій"
 
 #: src/frontend/mame/ui/dirmenu.cpp:51
 msgctxt "path-option"
 msgid "Snapshots"
-msgstr ""
+msgstr "Кадри"
 
 #: src/frontend/mame/ui/dirmenu.cpp:52
 msgctxt "path-option"
 msgid "Icons"
-msgstr ""
+msgstr "Піктограми"
 
 #: src/frontend/mame/ui/dirmenu.cpp:53
 msgctxt "path-option"
 msgid "Control Panels"
-msgstr ""
+msgstr "Панелі керування"
 
 #: src/frontend/mame/ui/dirmenu.cpp:54
 msgctxt "path-option"
 msgid "Cabinets"
-msgstr ""
+msgstr "Кабінети"
 
 #: src/frontend/mame/ui/dirmenu.cpp:55
 msgctxt "path-option"
 msgid "Marquees"
-msgstr ""
+msgstr "Рухомі рядки"
 
 #: src/frontend/mame/ui/dirmenu.cpp:56
 msgctxt "path-option"
 msgid "PCBs"
-msgstr ""
+msgstr "Друковані плати"
 
 #: src/frontend/mame/ui/dirmenu.cpp:57
 msgctxt "path-option"
 msgid "Flyers"
-msgstr ""
+msgstr "Буклети"
 
 #: src/frontend/mame/ui/dirmenu.cpp:58
 msgctxt "path-option"
 msgid "Title Screens"
-msgstr ""
+msgstr "Екрани назв"
 
 #: src/frontend/mame/ui/dirmenu.cpp:59
 msgctxt "path-option"
 msgid "Game Endings"
-msgstr ""
+msgstr "Завершення ігор"
 
 #: src/frontend/mame/ui/dirmenu.cpp:60
 msgctxt "path-option"
 msgid "Bosses"
-msgstr ""
+msgstr "Боси"
 
 #: src/frontend/mame/ui/dirmenu.cpp:61
 msgctxt "path-option"
 msgid "Artwork Previews"
-msgstr ""
+msgstr "Попередні перегляди оформлень"
 
 #: src/frontend/mame/ui/dirmenu.cpp:62
 msgctxt "path-option"
 msgid "Select"
-msgstr ""
+msgstr "Вибрати"
 
 #: src/frontend/mame/ui/dirmenu.cpp:63
 msgctxt "path-option"
 msgid "Game Over Screens"
-msgstr ""
+msgstr "Екрани завершенння гри"
 
 #: src/frontend/mame/ui/dirmenu.cpp:64
 msgctxt "path-option"
 msgid "HowTo"
-msgstr ""
+msgstr "Посібник"
 
 #: src/frontend/mame/ui/dirmenu.cpp:65
 msgctxt "path-option"
 msgid "Logos"
-msgstr ""
+msgstr "Логотипи"
 
 #: src/frontend/mame/ui/dirmenu.cpp:66
 msgctxt "path-option"
 msgid "Scores"
-msgstr ""
+msgstr "Рекорди"
 
 #: src/frontend/mame/ui/dirmenu.cpp:67
 msgctxt "path-option"
 msgid "Versus"
-msgstr ""
+msgstr "Проти"
 
 #: src/frontend/mame/ui/dirmenu.cpp:68
 msgctxt "path-option"
 msgid "Covers"
-msgstr ""
+msgstr "Обкладинки"
 
 #: src/frontend/mame/ui/dirmenu.cpp:119
 msgid "Folders Setup"
-msgstr ""
+msgstr "Налаштування тек"
 
 #: src/frontend/mame/ui/dirmenu.cpp:169
 #, c-format
 msgid "Current %1$s Folders"
-msgstr ""
+msgstr "Поточні теки %1$s"
 
 #: src/frontend/mame/ui/dirmenu.cpp:181
 msgid "Change Folder"
-msgstr ""
+msgstr "Змінити теку"
 
 #: src/frontend/mame/ui/dirmenu.cpp:181
 msgid "Add Folder"
-msgstr ""
+msgstr "Додати теку"
 
 #: src/frontend/mame/ui/dirmenu.cpp:184
 msgid "Remove Folder"
-msgstr ""
+msgstr "Вилучити теку"
 
 #: src/frontend/mame/ui/dirmenu.cpp:417
 #, c-format
 msgid "Change %1$s Folder - Search: %2$s_"
-msgstr ""
+msgstr "Змінити %1$s теку - Шукати: %2$s_"
 
 #: src/frontend/mame/ui/dirmenu.cpp:417
 #, c-format
 msgid "Add %1$s Folder - Search: %2$s_"
-msgstr ""
+msgstr "Додати %1$s теку - Шукати: %2$s_"
 
 #: src/frontend/mame/ui/dirmenu.cpp:428
 msgid "Press TAB to set"
-msgstr ""
+msgstr "Натисни Tab для встановлення."
 
 #: src/frontend/mame/ui/dirmenu.cpp:511
 #, c-format
 msgid "Remove %1$s Folder"
-msgstr ""
+msgstr "Вилучити %1$s теку"
 
 #: src/frontend/mame/ui/viewgfx.cpp:436
 msgid " COLORS"
-msgstr ""
+msgstr " Кольори"
 
 #: src/frontend/mame/ui/viewgfx.cpp:436
 msgid " PENS"
-msgstr ""
+msgstr " Пера"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1224 src/frontend/mame/ui/viewgfx.cpp:1255
 #, c-format
-msgid "Zoom = 1/%1$d"
-msgstr ""
+msgid "Zoom = 1 / %1$d"
+msgstr "Масштаб = 1 / %1$d"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1224 src/frontend/mame/ui/viewgfx.cpp:1255
 #, c-format
 msgid "Zoom = %1$d"
-msgstr ""
+msgstr "Масштаб = %1$d"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1262
 msgid "Expand to fit"
-msgstr ""
+msgstr "Розгорнути до розміру"
 
 #: src/frontend/mame/ui/selgame.cpp:444
 msgid "Configure Machine"
-msgstr ""
+msgstr "Налаштувати машину"
 
 #: src/frontend/mame/ui/selgame.cpp:1060
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d machines (%5$d BIOS) )"
-msgstr ""
+msgstr "%1$s %2$s (%3$d / %4$d машин; %5$d BIOS)"
 
 #: src/frontend/mame/ui/selgame.cpp:1088
 #, c-format
 msgid "System: %1$-.100s"
-msgstr ""
+msgstr "Система: %1$-.100s"
 
 #: src/frontend/mame/ui/selector.cpp:116
 msgid "Selection List - Search: "
-msgstr ""
+msgstr "Перелік вибору - Шукати: "
 
 #: src/frontend/mame/ui/selector.cpp:124
 #, c-format
 msgid "Double-click or press %1$s to select"
-msgstr ""
+msgstr "Натисни двічі ЛКМ чи %1$s для вибору."
 
 #: src/frontend/mame/ui/auditmenu.cpp:60
 #, c-format
 msgid "Results will be saved to %1$s"
-msgstr ""
+msgstr "Результати буде збережено до %1$s."
 
 #: src/frontend/mame/ui/auditmenu.cpp:98
 #, c-format
@@ -2114,6 +2178,8 @@ msgid ""
 "Auditing media for machine %2$u of %3$u...\n"
 "%1$s"
 msgstr ""
+"Перевірка медіа для машини %2$u / %3$u...\n"
+"%1$s"
 
 #: src/frontend/mame/ui/auditmenu.cpp:116
 #, c-format
@@ -2123,307 +2189,311 @@ msgid ""
 "Press %1$s to cancel\n"
 "Press %2$s to continue"
 msgstr ""
+"Скасувати перевірку?\n"
+"\n"
+"%1$s - скасування.\n"
+"%2$s - продовження."
 
 #: src/frontend/mame/ui/auditmenu.cpp:136
 #, c-format
 msgid "Audit media for %1$u machines marked unavailable"
-msgstr ""
+msgstr "Перевірити медіа для %1$u машин позначених недоступними"
 
 #: src/frontend/mame/ui/auditmenu.cpp:137
 #, c-format
 msgid "Audit media for all %1$u machines"
-msgstr ""
+msgstr "Перевірити медіа для всіх %1$u машин"
 
 #: src/frontend/mame/ui/auditmenu.cpp:154
 #, c-format
 msgid "Press %1$s to cancel\n"
-msgstr ""
+msgstr "Натисни %1$s для скасування.\n"
 
 #: src/frontend/mame/ui/custui.cpp:52
 msgid "Show All"
-msgstr ""
+msgstr "Показати все"
 
 #: src/frontend/mame/ui/custui.cpp:53
 msgid "Hide Filters"
-msgstr ""
+msgstr "Приховати фільтри"
 
 #: src/frontend/mame/ui/custui.cpp:54
 msgid "Hide Info/Image"
-msgstr ""
+msgstr "Приховати відомості / зображення"
 
 #: src/frontend/mame/ui/custui.cpp:55
 msgid "Hide Both"
-msgstr ""
+msgstr "Приховати обидва"
 
 #: src/frontend/mame/ui/custui.cpp:210
 msgid "Fonts"
-msgstr ""
+msgstr "Шрифти"
 
 #: src/frontend/mame/ui/custui.cpp:211
 msgid "Colors"
-msgstr ""
+msgstr "Кольори"
 
 #: src/frontend/mame/ui/custui.cpp:214
 msgid "Language"
-msgstr ""
+msgstr "Мова"
 
 #: src/frontend/mame/ui/custui.cpp:217
 msgid "System Names"
-msgstr ""
+msgstr "Системні імена"
 
 #: src/frontend/mame/ui/custui.cpp:220
 msgid "Show side panels"
-msgstr ""
+msgstr "Приховати бокові панелі"
 
 #: src/frontend/mame/ui/custui.cpp:232
 msgid "UI Customization Settings"
-msgstr ""
+msgstr "Зміна UI-налаштувань"
 
 #: src/frontend/mame/ui/custui.cpp:246 src/frontend/mame/ui/custui.cpp:290
 msgid "[built-in]"
-msgstr ""
+msgstr "[вбудовано]"
 
 #: src/frontend/mame/ui/custui.cpp:374
 msgid "default"
-msgstr ""
+msgstr "типово"
 
 #: src/frontend/mame/ui/custui.cpp:509
 msgid "UI Font"
-msgstr ""
+msgstr "UI-шрифт"
 
 #: src/frontend/mame/ui/custui.cpp:514
 msgid "Bold"
-msgstr ""
+msgstr "Жирний"
 
 #: src/frontend/mame/ui/custui.cpp:515
 msgid "Italic"
-msgstr ""
+msgstr "Курсив"
 
 #: src/frontend/mame/ui/custui.cpp:520
 msgid "Lines"
-msgstr ""
+msgstr "Лінії"
 
 #: src/frontend/mame/ui/custui.cpp:525
 msgid "Infos text size"
-msgstr ""
+msgstr "Розмір тексту відомостей"
 
 #: src/frontend/mame/ui/custui.cpp:539
 msgid "UI Fonts Settings"
-msgstr ""
+msgstr "Налаштування UI-шрифту"
 
 #: src/frontend/mame/ui/custui.cpp:548
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-msgstr ""
+msgstr "Зразок тексту - Сама біль - любов, головний замовник."
 
 #: src/frontend/mame/ui/custui.cpp:625
 msgctxt "color-option"
 msgid "Normal text"
-msgstr ""
+msgstr "Звичайний текст"
 
 #: src/frontend/mame/ui/custui.cpp:626
 msgctxt "color-option"
 msgid "Selected color"
-msgstr ""
+msgstr "Вибраний колір"
 
 #: src/frontend/mame/ui/custui.cpp:627
 msgctxt "color-option"
 msgid "Normal text background"
-msgstr ""
+msgstr "Звичайний текст тла"
 
 #: src/frontend/mame/ui/custui.cpp:628
 msgctxt "color-option"
 msgid "Selected background color"
-msgstr ""
+msgstr "Вибраний колір тла"
 
 #: src/frontend/mame/ui/custui.cpp:629
 msgctxt "color-option"
 msgid "Subitem color"
-msgstr ""
+msgstr "Колір підпункту"
 
 #: src/frontend/mame/ui/custui.cpp:630
 msgctxt "color-option"
 msgid "Clone"
-msgstr ""
+msgstr "Клон"
 
 #: src/frontend/mame/ui/custui.cpp:631
 msgctxt "color-option"
 msgid "Border"
-msgstr ""
+msgstr "Межа"
 
 #: src/frontend/mame/ui/custui.cpp:632
 msgctxt "color-option"
 msgid "Background"
-msgstr ""
+msgstr "Тло"
 
 #: src/frontend/mame/ui/custui.cpp:633
 msgctxt "color-option"
 msgid "DIP switch"
-msgstr ""
+msgstr "DIP-перемикач"
 
 #: src/frontend/mame/ui/custui.cpp:634
 msgctxt "color-option"
 msgid "Unavailable color"
-msgstr ""
+msgstr "Недоступний колір"
 
 #: src/frontend/mame/ui/custui.cpp:635
 msgctxt "color-option"
 msgid "Slider color"
-msgstr ""
+msgstr "Колір слайдера"
 
 #: src/frontend/mame/ui/custui.cpp:636
 msgctxt "color-option"
 msgid "Graphics viewer background"
-msgstr ""
+msgstr "Тло переглядача графіки"
 
 #: src/frontend/mame/ui/custui.cpp:637
 msgctxt "color-option"
 msgid "Mouse over color"
-msgstr ""
+msgstr "Колір під мишею"
 
 #: src/frontend/mame/ui/custui.cpp:638
 msgctxt "color-option"
 msgid "Mouse over background color"
-msgstr ""
+msgstr "Колір тла під мишею"
 
 #: src/frontend/mame/ui/custui.cpp:639
 msgctxt "color-option"
 msgid "Mouse down color"
-msgstr ""
+msgstr "Колір натисненої миші"
 
 #: src/frontend/mame/ui/custui.cpp:640
 msgctxt "color-option"
 msgid "Mouse down background color"
-msgstr ""
+msgstr "Колір тла натисненої миші"
 
 #: src/frontend/mame/ui/custui.cpp:644
 msgid "Restore default colors"
-msgstr ""
+msgstr "Відновити типові кольори"
 
 #: src/frontend/mame/ui/custui.cpp:656
 msgid "UI Color Settings"
-msgstr ""
+msgstr "Налаштування UI-кольорів"
 
 #: src/frontend/mame/ui/custui.cpp:665
 #, c-format
 msgid "Double-click or press %1$s to change color"
-msgstr ""
+msgstr "Натисни двічі ЛКМ чи %1$s для зміни кольору."
 
 #: src/frontend/mame/ui/custui.cpp:673
 msgid "Menu Preview"
-msgstr ""
+msgstr "Попередній перегляд меню"
 
 #: src/frontend/mame/ui/custui.cpp:687
 msgctxt "color-sample"
 msgid "Normal"
-msgstr ""
+msgstr "Звичайний"
 
 #: src/frontend/mame/ui/custui.cpp:688
 msgctxt "color-sample"
 msgid "Subitem"
-msgstr ""
+msgstr "Підпункт"
 
 #: src/frontend/mame/ui/custui.cpp:689
 msgctxt "color-sample"
 msgid "Selected"
-msgstr ""
+msgstr "Вибраний"
 
 #: src/frontend/mame/ui/custui.cpp:690
 msgctxt "color-sample"
 msgid "Mouse Over"
-msgstr ""
+msgstr "Під мишею"
 
 #: src/frontend/mame/ui/custui.cpp:691
 msgctxt "color-sample"
 msgid "Clone"
-msgstr ""
+msgstr "Клон"
 
 #: src/frontend/mame/ui/custui.cpp:906
 msgid "ARGB Settings"
-msgstr ""
+msgstr "ARGB-налаштування"
 
 #: src/frontend/mame/ui/custui.cpp:911 src/frontend/mame/ui/custui.cpp:914
 msgctxt "color-channel"
 msgid "Alpha"
-msgstr ""
+msgstr "Альфа"
 
 #: src/frontend/mame/ui/custui.cpp:919 src/frontend/mame/ui/custui.cpp:922
 msgctxt "color-channel"
 msgid "Red"
-msgstr ""
+msgstr "Червоний"
 
 #: src/frontend/mame/ui/custui.cpp:927 src/frontend/mame/ui/custui.cpp:930
 msgctxt "color-channel"
 msgid "Green"
-msgstr ""
+msgstr "Зелений"
 
 #: src/frontend/mame/ui/custui.cpp:935 src/frontend/mame/ui/custui.cpp:938
 msgctxt "color-channel"
 msgid "Blue"
-msgstr ""
+msgstr "Синій"
 
 #: src/frontend/mame/ui/custui.cpp:941
 msgid "Choose from palette"
-msgstr ""
+msgstr "Вибери з палітри."
 
 #: src/frontend/mame/ui/custui.cpp:988
 msgid "Color preview:"
-msgstr ""
+msgstr "Попередній перегляд кольору:"
 
 #: src/frontend/mame/ui/custui.cpp:1085
 msgctxt "color-preset"
 msgid "White"
-msgstr ""
+msgstr "Білий"
 
 #: src/frontend/mame/ui/custui.cpp:1086
 msgctxt "color-preset"
 msgid "Silver"
-msgstr ""
+msgstr "Срібний"
 
 #: src/frontend/mame/ui/custui.cpp:1087
 msgctxt "color-preset"
 msgid "Gray"
-msgstr ""
+msgstr "Сірий"
 
 #: src/frontend/mame/ui/custui.cpp:1088
 msgctxt "color-preset"
 msgid "Black"
-msgstr ""
+msgstr "Чорний"
 
 #: src/frontend/mame/ui/custui.cpp:1089
 msgctxt "color-preset"
 msgid "Red"
-msgstr ""
+msgstr "Червоний"
 
 #: src/frontend/mame/ui/custui.cpp:1090
 msgctxt "color-preset"
 msgid "Orange"
-msgstr ""
+msgstr "Помаранчевий"
 
 #: src/frontend/mame/ui/custui.cpp:1091
 msgctxt "color-preset"
 msgid "Yellow"
-msgstr ""
+msgstr "Жовтий"
 
 #: src/frontend/mame/ui/custui.cpp:1092
 msgctxt "color-preset"
 msgid "Green"
-msgstr ""
+msgstr "Зелений"
 
 #: src/frontend/mame/ui/custui.cpp:1093
 msgctxt "color-preset"
 msgid "Blue"
-msgstr ""
+msgstr "Синій"
 
 #: src/frontend/mame/ui/custui.cpp:1094
 msgctxt "color-preset"
 msgid "Violet"
-msgstr ""
+msgstr "Фіолетовий"
 
 #: src/frontend/mame/ui/about.cpp:42
 #, c-format
 msgctxt "about-header"
 msgid "%1$s %2$s (%3$s%4$sP%5$s, debug)"
-msgstr ""
+msgstr "%1$s %2$s (%3$s%4$sP%5$s, відлагодження)"
 
 #: src/frontend/mame/ui/about.cpp:44
 #, c-format
@@ -2435,250 +2505,250 @@ msgstr ""
 #, c-format
 msgctxt "about-header"
 msgid "Revision: %1$s"
-msgstr ""
+msgstr "Огляд: %1$s"
 
 #: src/frontend/mame/ui/analogipt.cpp:91
 #, c-format
 msgid "Press %s to show menu"
-msgstr ""
+msgstr "Натисни %s для показу меню"
 
 #: src/frontend/mame/ui/analogipt.cpp:369
 #, c-format
 msgid "%1$s Increment/Decrement Speed"
-msgstr ""
+msgstr "%1$s збільшення / зменшення швидкості"
 
 #: src/frontend/mame/ui/analogipt.cpp:374
 #, c-format
 msgid "%1$s Auto-centering Speed"
-msgstr ""
+msgstr "%1$s автоцентрування швидкості"
 
 #: src/frontend/mame/ui/analogipt.cpp:379
 #, c-format
 msgid "%1$s Reverse"
-msgstr ""
+msgstr "%1$s зворот"
 
 #: src/frontend/mame/ui/analogipt.cpp:384
 #, c-format
 msgid "%1$s Sensitivity"
-msgstr ""
+msgstr "%1$s чутливість"
 
 #: src/frontend/mame/ui/barcode.cpp:77
 msgid "New Barcode:"
-msgstr ""
+msgstr "Новий штрих-код:"
 
 #: src/frontend/mame/ui/barcode.cpp:80
 msgid "Enter Code"
-msgstr ""
+msgstr "Укажи код."
 
 #: src/frontend/mame/ui/barcode.cpp:116
 msgid "Barcode length invalid!"
-msgstr ""
+msgstr "Недійсна довжина штрих-коду!"
 
 #: src/frontend/mame/ui/mainmenu.cpp:121
 msgid "Input (general)"
-msgstr ""
+msgstr "Керування (загальне)"
 
 #: src/frontend/mame/ui/mainmenu.cpp:123
 msgid "Input (this machine)"
-msgstr ""
+msgstr "Керування (машина)"
 
 #: src/frontend/mame/ui/mainmenu.cpp:126
 msgid "Analog Controls"
-msgstr ""
+msgstr "Аналогове керування"
 
 #: src/frontend/mame/ui/mainmenu.cpp:128
 msgid "DIP Switches"
-msgstr ""
+msgstr "DIP-перемикачі"
 
 #: src/frontend/mame/ui/mainmenu.cpp:130
 msgid "Machine Configuration"
-msgstr ""
+msgstr "Конфігурація машини"
 
 #: src/frontend/mame/ui/mainmenu.cpp:132
 msgid "Bookkeeping Info"
-msgstr ""
+msgstr "Облік відомостей"
 
 #: src/frontend/mame/ui/mainmenu.cpp:134
 msgid "Machine Information"
-msgstr ""
+msgstr "Відомості машини"
 
 #: src/frontend/mame/ui/mainmenu.cpp:137
 msgid "Warning Information"
-msgstr ""
+msgstr "Відомості попередження"
 
 #: src/frontend/mame/ui/mainmenu.cpp:143
 msgid "Image Information"
-msgstr ""
+msgstr "Відомості образу"
 
 #: src/frontend/mame/ui/mainmenu.cpp:145
 msgid "File Manager"
-msgstr ""
+msgstr "Менеджер файлів"
 
 #: src/frontend/mame/ui/mainmenu.cpp:152
 msgid "Tape Control"
-msgstr ""
+msgstr "Керування стрічкою"
 
 #: src/frontend/mame/ui/mainmenu.cpp:155
 msgid "Pseudo Terminals"
-msgstr ""
+msgstr "Псевдотермінали"
 
 #: src/frontend/mame/ui/mainmenu.cpp:158
 msgid "BIOS Selection"
-msgstr ""
+msgstr "Вибір BIOS"
 
 #: src/frontend/mame/ui/mainmenu.cpp:161
 msgid "Slot Devices"
-msgstr ""
+msgstr "Слот-пристрої"
 
 #: src/frontend/mame/ui/mainmenu.cpp:164
 msgid "Barcode Reader"
-msgstr ""
+msgstr "Читач штрих-кодів"
 
 #: src/frontend/mame/ui/mainmenu.cpp:167
 msgid "Network Devices"
-msgstr ""
+msgstr "Мережеві пристрої"
 
 #: src/frontend/mame/ui/mainmenu.cpp:172
 msgid "Slider Controls"
-msgstr ""
+msgstr "Керування слайдерами"
 
 #: src/frontend/mame/ui/mainmenu.cpp:177
 msgid "Crosshair Options"
-msgstr ""
+msgstr "Опції прицілу"
 
 #: src/frontend/mame/ui/mainmenu.cpp:180 plugins/cheat/init.lua:799
 msgid "Cheat"
-msgstr ""
+msgstr "Чіти"
 
 #: src/frontend/mame/ui/mainmenu.cpp:185
 msgid "Plugin Options"
-msgstr ""
+msgstr "Опції плаґінів"
 
 #: src/frontend/mame/ui/mainmenu.cpp:188
 msgid "External DAT View"
-msgstr ""
+msgstr "Зовнішній перегляд DAT"
 
 #: src/frontend/mame/ui/mainmenu.cpp:200
 #, c-format
 msgid "About %1$s"
-msgstr ""
+msgstr "Про %1$s"
 
 #: src/frontend/mame/ui/mainmenu.cpp:212
 msgid "Select New Machine"
-msgstr ""
+msgstr "Вибрати нову машину"
 
 #: src/frontend/mame/ui/mainmenu.cpp:213
 msgid "Return to Machine"
-msgstr ""
+msgstr "Повернутися до машини"
 
 #: src/frontend/mame/ui/selmenu.cpp:76
 msgctxt "selmenu-artwork"
 msgid "Snapshots"
-msgstr ""
+msgstr "Кадри"
 
 #: src/frontend/mame/ui/selmenu.cpp:77
 msgctxt "selmenu-artwork"
 msgid "Cabinet"
-msgstr ""
+msgstr "Кабінет"
 
 #: src/frontend/mame/ui/selmenu.cpp:78
 msgctxt "selmenu-artwork"
 msgid "Control Panel"
-msgstr ""
+msgstr "Панель керування"
 
 #: src/frontend/mame/ui/selmenu.cpp:79
 msgctxt "selmenu-artwork"
 msgid "PCB"
-msgstr ""
+msgstr "Друкована плата"
 
 #: src/frontend/mame/ui/selmenu.cpp:80
 msgctxt "selmenu-artwork"
 msgid "Flyer"
-msgstr ""
+msgstr "Буклет"
 
 #: src/frontend/mame/ui/selmenu.cpp:81
 msgctxt "selmenu-artwork"
 msgid "Title Screen"
-msgstr ""
+msgstr "Екран назви"
 
 #: src/frontend/mame/ui/selmenu.cpp:82
 msgctxt "selmenu-artwork"
 msgid "Ending"
-msgstr ""
+msgstr "Завершення"
 
 #: src/frontend/mame/ui/selmenu.cpp:83
 msgctxt "selmenu-artwork"
 msgid "Artwork Preview"
-msgstr ""
+msgstr "Попередній перегляд оформлення"
 
 #: src/frontend/mame/ui/selmenu.cpp:84
 msgctxt "selmenu-artwork"
 msgid "Bosses"
-msgstr ""
+msgstr "Боси"
 
 #: src/frontend/mame/ui/selmenu.cpp:85
 msgctxt "selmenu-artwork"
 msgid "Logo"
-msgstr ""
+msgstr "Логотип"
 
 #: src/frontend/mame/ui/selmenu.cpp:86
 msgctxt "selmenu-artwork"
 msgid "Versus"
-msgstr ""
+msgstr "Проти"
 
 #: src/frontend/mame/ui/selmenu.cpp:87
 msgctxt "selmenu-artwork"
 msgid "Game Over"
-msgstr ""
+msgstr "Завершення гри"
 
 #: src/frontend/mame/ui/selmenu.cpp:88
 msgctxt "selmenu-artwork"
 msgid "HowTo"
-msgstr ""
+msgstr "Посібник"
 
 #: src/frontend/mame/ui/selmenu.cpp:89
 msgctxt "selmenu-artwork"
 msgid "Scores"
-msgstr ""
+msgstr "Рекорди"
 
 #: src/frontend/mame/ui/selmenu.cpp:90
 msgctxt "selmenu-artwork"
 msgid "Select"
-msgstr ""
+msgstr "Вибрати"
 
 #: src/frontend/mame/ui/selmenu.cpp:91
 msgctxt "selmenu-artwork"
 msgid "Marquee"
-msgstr ""
+msgstr "Рухомий рядок"
 
 #: src/frontend/mame/ui/selmenu.cpp:92
 msgctxt "selmenu-artwork"
 msgid "Covers"
-msgstr ""
+msgstr "Обкладинки"
 
 #: src/frontend/mame/ui/selmenu.cpp:96
 msgid "Add or remove favorite"
-msgstr ""
+msgstr "Додати чи вилучити з уподобань"
 
 #: src/frontend/mame/ui/selmenu.cpp:97
 msgid "Export displayed list to file"
-msgstr ""
+msgstr "Експортувати відображений перелік до файлу"
 
 #: src/frontend/mame/ui/selmenu.cpp:98
 msgid "Audit media"
-msgstr ""
+msgstr "Перевірити медіа"
 
 #: src/frontend/mame/ui/selmenu.cpp:99
 msgid "Show DATs view"
-msgstr ""
+msgstr "Показати перегляд DAT"
 
 #: src/frontend/mame/ui/selmenu.cpp:319
 msgid "Software part selection:"
-msgstr ""
+msgstr "Вибір програмної частини:"
 
 #: src/frontend/mame/ui/selmenu.cpp:424
 msgid "BIOS selection:"
-msgstr ""
+msgstr "Вибір BIOS:"
 
 #: src/frontend/mame/ui/selmenu.cpp:677 src/frontend/mame/ui/selmenu.cpp:708
 #, c-format
@@ -2688,7 +2758,7 @@ msgstr ""
 #: src/frontend/mame/ui/selmenu.cpp:681
 #, c-format
 msgid "Software is clone of: %1$s"
-msgstr ""
+msgstr "Програма - клон: %1$s"
 
 #: src/frontend/mame/ui/selmenu.cpp:683
 msgid "Software is parent"
@@ -2696,15 +2766,15 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:688
 msgid "Supported: No"
-msgstr ""
+msgstr "Без підтримки"
 
 #: src/frontend/mame/ui/selmenu.cpp:693
 msgid "Supported: Partial"
-msgstr ""
+msgstr "Часткова підтримка"
 
 #: src/frontend/mame/ui/selmenu.cpp:698
 msgid "Supported: Yes"
-msgstr ""
+msgstr "Підтримка"
 
 #: src/frontend/mame/ui/selmenu.cpp:714
 msgid "Driver is parent"
@@ -2713,7 +2783,7 @@ msgstr ""
 #: src/frontend/mame/ui/selmenu.cpp:716 src/frontend/mame/ui/selmenu.cpp:718
 #, c-format
 msgid "Driver is clone of: %1$s"
-msgstr ""
+msgstr "Драйвер - клон: %1$s"
 
 #: src/frontend/mame/ui/selmenu.cpp:754
 #, c-format
@@ -2722,11 +2792,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:2244
 msgid "Images"
-msgstr ""
+msgstr "Зображення"
 
 #: src/frontend/mame/ui/selmenu.cpp:2245
 msgid "Infos"
-msgstr ""
+msgstr "Відомості"
 
 #: src/frontend/mame/ui/selmenu.cpp:2560
 msgid ""
@@ -2734,6 +2804,9 @@ msgid ""
 "Please acquire the correct files or select a different system.\n"
 "\n"
 msgstr ""
+"Необхідні образи ROM'у / диска для вибраної системи відсутні чи неправильні. "
+"Знайди правильні файли чи вибери іншу систему.\n"
+"\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2576
 msgid ""
@@ -2741,18 +2814,21 @@ msgid ""
 "Please acquire the correct files or select a different software item.\n"
 "\n"
 msgstr ""
+"Необхідні образи ROM'у / диска для вибраної програми відсутні чи неправильні. "
+"Знайди правильні файли чи вибери іншу програму.\n"
+"\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2592
 msgid "incorrect checksum"
-msgstr ""
+msgstr "неправильна контрольна сума"
 
 #: src/frontend/mame/ui/selmenu.cpp:2595
 msgid "incorrect length"
-msgstr ""
+msgstr "неправильна довжина"
 
 #: src/frontend/mame/ui/selmenu.cpp:2598
 msgid "not found"
-msgstr ""
+msgstr "не знайдено"
 
 #: src/frontend/mame/ui/selmenu.cpp:2609
 #, c-format
@@ -2766,31 +2842,31 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:2615
 msgid "Press any key to continue."
-msgstr ""
+msgstr "Натисни для продовження."
 
 #: src/frontend/mame/ui/selmenu.cpp:2744
 msgid "General Info"
-msgstr ""
+msgstr "Загальні відомості"
 
 #: src/frontend/mame/ui/selmenu.cpp:2896
 #, c-format
 msgid "Romset\t%1$s\n"
-msgstr ""
+msgstr "ROM-набір\t%1$s\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2897
 #, c-format
 msgid "Year\t%1$s\n"
-msgstr ""
+msgstr "Рік\t%1$s\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2898
 #, c-format
 msgid "Manufacturer\t%1$s\n"
-msgstr ""
+msgstr "Виробник\t%1$s\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2905
 #, c-format
 msgid "Driver is Clone of\t%1$s\n"
-msgstr ""
+msgstr "Драйвер - клон\t%1$s\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2910
 msgid "Driver is Parent\t\n"
@@ -2798,297 +2874,299 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:2914
 msgid "Analog Controls\tYes\n"
-msgstr ""
+msgstr "Аналогове керування\tТак\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2916
 msgid "Keyboard Inputs\tYes\n"
-msgstr ""
+msgstr "Клавіатурне керування\tТак\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2919
 msgid "Overall\tNOT WORKING\n"
-msgstr ""
+msgstr "Загалом\tНеробоче\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2921
 msgid "Overall\tUnemulated Protection\n"
-msgstr ""
+msgstr "Загалом\tНеемульований захист\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2923
 msgid "Overall\tWorking\n"
-msgstr ""
+msgstr "Загалом\tРобоче\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2926
 msgid "Graphics\tUnimplemented\n"
-msgstr ""
+msgstr "Графіка\tНе реалізовано\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2928
 msgid "Graphics\tWrong Colors\n"
-msgstr ""
+msgstr "Графіка\tНеправильні кольори\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2930
 msgid "Graphics\tImperfect Colors\n"
-msgstr ""
+msgstr "Графіка\tНедосконалі кольори\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2932
 msgid "Graphics\tImperfect\n"
-msgstr ""
+msgstr "Графіка\tНедосконало\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2934
 msgid "Graphics\tOK\n"
-msgstr ""
+msgstr "Графіка\tOK\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2937
 msgid "Sound\tNone\n"
-msgstr ""
+msgstr "Аудіо\tНе вказано\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2939
 msgid "Sound\tUnimplemented\n"
-msgstr ""
+msgstr "Аудіо\tНе реалізовано\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2941
 msgid "Sound\tImperfect\n"
-msgstr ""
+msgstr "Аудіо\tНедосконало\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2943
 msgid "Sound\tOK\n"
-msgstr ""
+msgstr "Аудіо\tOK\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2946
 msgid "Capture\tUnimplemented\n"
-msgstr ""
+msgstr "Захоплення\tНе реалізовано\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2948
 msgid "Capture\tImperfect\n"
-msgstr ""
+msgstr "Захоплення\tНедосконало\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2951
 msgid "Camera\tUnimplemented\n"
-msgstr ""
+msgstr "Камера\tНе реалізовано\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2953
 msgid "Camera\tImperfect\n"
-msgstr ""
+msgstr "Камера\tНедосконало\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2956
 msgid "Microphone\tUnimplemented\n"
-msgstr ""
+msgstr "Мікрофон\tНе реалізовано\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2958
 msgid "Microphone\tImperfect\n"
-msgstr ""
+msgstr "Мікрофон\tНедосконало\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2961
 msgid "Controls\tUnimplemented\n"
-msgstr ""
+msgstr "Керування\tНе реалізовано\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2963
 msgid "Controls\tImperfect\n"
-msgstr ""
+msgstr "Керування\tНедосконало\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2966
 msgid "Keyboard\tUnimplemented\n"
-msgstr ""
+msgstr "Клавіатура\tНе реалізовано\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2968
 msgid "Keyboard\tImperfect\n"
-msgstr ""
+msgstr "Клавіатура\tНедосконало\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2971
 msgid "Mouse\tUnimplemented\n"
-msgstr ""
+msgstr "Миша\tНе реалізовано\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2973
 msgid "Mouse\tImperfect\n"
-msgstr ""
+msgstr "Миша\tНедосконало\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2976
 msgid "Media\tUnimplemented\n"
-msgstr ""
+msgstr "Медіа\tНе реалізовано\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2978
 msgid "Media\tImperfect\n"
-msgstr ""
+msgstr "Медіа\tНедосконало\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2981
 msgid "Disk\tUnimplemented\n"
-msgstr ""
+msgstr "Диск\tНе реалізовано\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2983
 msgid "Disk\tImperfect\n"
-msgstr ""
+msgstr "Диск\tНедосконало\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2986
 msgid "Printer\tUnimplemented\n"
-msgstr ""
+msgstr "Принтер\tНе реалізовано\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2988
 msgid "Printer\tImperfect\n"
-msgstr ""
+msgstr "Принтер\tНедосконало\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2991
 msgid "Mag. Tape\tUnimplemented\n"
-msgstr ""
+msgstr "Магнітострічка\tНе реалізовано\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2993
 msgid "Mag. Tape\tImperfect\n"
-msgstr ""
+msgstr "Магнітострічка\tНедосконало\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2996
 msgid "Punch Tape\tUnimplemented\n"
-msgstr ""
+msgstr "Перфострічка\tНе реалізовано\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2998
 msgid "Punch Tape\tImperfect\n"
-msgstr ""
+msgstr "Перфострічка\tНедосконало\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3001
 msgid "Mag. Drum\tUnimplemented\n"
-msgstr ""
+msgstr "Магнітний барабан\tНе реалізовано\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3003
 msgid "Mag. Drum\tImperfect\n"
-msgstr ""
+msgstr "Магнітний барабан\tНедосконало\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3006
 msgid "(EP)ROM\tUnimplemented\n"
-msgstr ""
+msgstr "(EP)ROM\tНе реалізовано\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3008
 msgid "(EP)ROM\tImperfect\n"
-msgstr ""
+msgstr "(EP)ROM\tНедосконало\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3011
 msgid "Communications\tUnimplemented\n"
-msgstr ""
+msgstr "Комунікації\tНе реалізовано\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3013
 msgid "Communications\tImperfect\n"
-msgstr ""
+msgstr "Комунікації\tНедосконало\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3016
 msgid "LAN\tUnimplemented\n"
-msgstr ""
+msgstr "Локальна мережа\tНе реалізовано\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3018
 msgid "LAN\tImperfect\n"
-msgstr ""
+msgstr "Локальна мережа\tНедосконало\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3021
 msgid "WAN\tUnimplemented\n"
-msgstr ""
+msgstr "Глобальна мережа\tНе реалізовано\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3023
 msgid "WAN\tImperfect\n"
-msgstr ""
+msgstr "Глобальна мережа\tНедосконало\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3026
 msgid "Timing\tUnimplemented\n"
-msgstr ""
+msgstr "Швидкість\tНе реалізовано\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3028
 msgid "Timing\tImperfect\n"
-msgstr ""
+msgstr "Швидкість\tНедосконало\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3030
 msgid "Mechanical Machine\tYes\n"
-msgstr ""
+msgstr "Механічна машина\tТак\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3030
 msgid "Mechanical Machine\tNo\n"
-msgstr ""
+msgstr "Механічна машина\tНі\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3031
 msgid "Requires Artwork\tYes\n"
-msgstr ""
+msgstr "Оформлення\tТак\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3031
 msgid "Requires Artwork\tNo\n"
-msgstr ""
+msgstr "Оформлення\tНі\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3032
 msgid "Requires Clickable Artwork\tYes\n"
-msgstr ""
+msgstr "Інтерактивне оформлення\tТак\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3032
 msgid "Requires Clickable Artwork\tNo\n"
-msgstr ""
+msgstr "Інтерактивне оформлення\tНі\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3034
 msgid "Support Cocktail\tNo\n"
-msgstr ""
+msgstr "Підтримка коктейль-режиму\tНі\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3035
 msgid "Driver is BIOS\tYes\n"
-msgstr ""
+msgstr "Драйвер - BIOS\tТак\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3035
 msgid "Driver is BIOS\tNo\n"
-msgstr ""
+msgstr "Драйвер - BIOS\tНі\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3036
 msgid "Support Save\tYes\n"
-msgstr ""
+msgstr "Підтримка збережень\tТак\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3036
 msgid "Support Save\tNo\n"
-msgstr ""
+msgstr "Підтримка збережень\tНі\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3037
 msgid "Screen Orientation\tVertical\n"
-msgstr ""
+msgstr "Орієнтація екрана\tВертикальна\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3037
 msgid "Screen Orientation\tHorizontal\n"
-msgstr ""
+msgstr "Орієнтація екрана\tГоризонтальна\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3047
 msgid "Requires CHD\tYes\n"
-msgstr ""
+msgstr "CHD\tТак\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3047
 msgid "Requires CHD\tNo\n"
-msgstr ""
+msgstr "CHD\tНі\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3060
 msgid "Media Audit Result\tOK\n"
-msgstr ""
+msgstr "Результат перевірки медіа\tOK\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3062
 msgid "Media Audit Result\tBAD\n"
-msgstr ""
+msgstr "Результат перевірки медіа\tПошкоджено\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3065
 msgid "Samples Audit Result\tNone Needed\n"
-msgstr ""
+msgstr "Результат перевірки зразків\tБез необхідності\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3067
 msgid "Samples Audit Result\tOK\n"
-msgstr ""
+msgstr "Результат перевірки зразків\tOK\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3069
 msgid "Samples Audit Result\tBAD\n"
-msgstr ""
+msgstr "Результат перевірки зразків\tПошкоджено\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3073
 msgid ""
 "Media Audit\tDisabled\n"
 "Samples Audit\tDisabled\n"
 msgstr ""
+"Перевірка медіа\tВимкнено\n"
+"Перевірка зразків\tВимкнено\n"
 
 #: src/frontend/mame/ui/sndmenu.cpp:146
 msgid "Sound"
-msgstr ""
+msgstr "Аудіо"
 
 #: src/frontend/mame/ui/sndmenu.cpp:147
 msgid "Compressor"
-msgstr ""
+msgstr "Компресор"
 
 #: src/frontend/mame/ui/sndmenu.cpp:148
 msgid "Sample Rate"
-msgstr ""
+msgstr "Частота дискретизації"
 
 #: src/frontend/mame/ui/sndmenu.cpp:149
 msgid "Use External Samples"
-msgstr ""
+msgstr "Використовувати зовнішні зразки"
 
 #: src/frontend/mame/ui/devopt.cpp:58
 #, c-format
@@ -3100,6 +3178,12 @@ msgid ""
 "\n"
 "The selected option enables the following items:\n"
 msgstr ""
+"(Опцію змонтовано в запущеній системі)\n"
+"\n"
+"Опція: %1$s\n"
+"Пристрій: %2$s\n"
+"\n"
+"Вибрана опція увімкне наведені пункти:\n"
 
 #: src/frontend/mame/ui/devopt.cpp:59
 #, c-format
@@ -3111,6 +3195,12 @@ msgid ""
 "\n"
 "If you select this option, the following items will be enabled:\n"
 msgstr ""
+"(Опцію не змонтовано в запущеній системі)\n"
+"\n"
+"Опція: %1$s\n"
+"Пристрій: %2$s\n"
+"\n"
+"При виборі опції буде увімкнено наведені пункти:\n"
 
 #: src/frontend/mame/ui/devopt.cpp:68
 msgid "* CPU:\n"
@@ -3118,26 +3208,26 @@ msgstr ""
 
 #: src/frontend/mame/ui/devopt.cpp:114
 msgid "* Video:\n"
-msgstr ""
+msgstr "* Відео:\n"
 
 #: src/frontend/mame/ui/devopt.cpp:119
 #, c-format
 msgid "  Screen '%1$s': Vector\n"
-msgstr ""
+msgstr "  Екран '%1$s': Вектор\n"
 
 #: src/frontend/mame/ui/devopt.cpp:135
 #, c-format
-msgid "  Screen '%1$s': %2$d × %3$d (V) %4$s Hz\n"
-msgstr ""
+msgid "  Screen '%1$s': %2$d × %3$d (V) %4$s Hz\n"
+msgstr "  Екран '%1$s': %2$d * %3$d (В) %4$s Гц\n"
 
 #: src/frontend/mame/ui/devopt.cpp:136
 #, c-format
-msgid "  Screen '%1$s': %2$d × %3$d (H) %4$s Hz\n"
-msgstr ""
+msgid "  Screen '%1$s': %2$d × %3$d (H) %4$s Hz\n"
+msgstr "  Екран '%1$s': %2$d * %3$d (Г) %4$s Гц\n"
 
 #: src/frontend/mame/ui/devopt.cpp:150
 msgid "* Sound:\n"
-msgstr ""
+msgstr "* Аудіо:\n"
 
 #: src/frontend/mame/ui/devopt.cpp:214
 #, c-format
@@ -3145,12 +3235,14 @@ msgid ""
 "* BIOS settings:\n"
 "  %1$d options    [default: %2$s]\n"
 msgstr ""
+"* BIOS-налаштування:\n"
+"  %1$d опцій    (типово: %2$s)\n"
 
 #: src/frontend/mame/ui/devopt.cpp:258 src/frontend/mame/ui/devopt.cpp:274
 #: src/frontend/mame/ui/devopt.cpp:335
 #, c-format
 msgid "  %1$s    [default: %2$s]\n"
-msgstr ""
+msgstr "  %1$s    (типово: %2$s)\n"
 
 #: src/frontend/mame/ui/devopt.cpp:263 src/frontend/mame/ui/devopt.cpp:279
 #, c-format
@@ -3159,133 +3251,133 @@ msgstr ""
 
 #: src/frontend/mame/ui/devopt.cpp:285
 msgid "* DIP switch settings:\n"
-msgstr ""
+msgstr "* Налаштування DIP-перемикача:\n"
 
 #: src/frontend/mame/ui/devopt.cpp:290
 msgid "* Configuration settings:\n"
-msgstr ""
+msgstr "* Налаштування конфігурації:\n"
 
 #: src/frontend/mame/ui/devopt.cpp:294
 msgid "* Input device(s):\n"
-msgstr ""
+msgstr "* Пристрої керування:\n"
 
 #: src/frontend/mame/ui/devopt.cpp:296
 #, c-format
 msgid "  User inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Користувацьке керування    (%1$d даних)\n"
 
 #: src/frontend/mame/ui/devopt.cpp:298
 #, c-format
 msgid "  Mahjong inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Маджонг-керування    (%1$d даних)\n"
 
 #: src/frontend/mame/ui/devopt.cpp:300
 #, c-format
 msgid "  Hanafuda inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Ханафуда-керування    (%1$d даних)\n"
 
 #: src/frontend/mame/ui/devopt.cpp:302
 #, c-format
 msgid "  Gambling inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Азартні керування    (%1$d даних)\n"
 
 #: src/frontend/mame/ui/devopt.cpp:304
 #, c-format
 msgid "  Analog inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Аналогові керування    (%1$d даних)\n"
 
 #: src/frontend/mame/ui/devopt.cpp:306
 #, c-format
 msgid "  Adjuster inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Регулювальні керування    (%1$d даних)\n"
 
 #: src/frontend/mame/ui/devopt.cpp:308
 #, c-format
 msgid "  Keypad inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Міні-клавіатурні керування    (%1$d даних)\n"
 
 #: src/frontend/mame/ui/devopt.cpp:310
 #, c-format
 msgid "  Keyboard inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Клавіатурні керування    (%1$d даних)\n"
 
 #: src/frontend/mame/ui/devopt.cpp:315
 msgid "* Media Options:\n"
-msgstr ""
+msgstr "* Опції медіа:\n"
 
 #: src/frontend/mame/ui/devopt.cpp:320
 #, c-format
 msgid "  %1$s    [tag: %2$s]\n"
-msgstr ""
+msgstr "  %1$s    [теґ: %2$s]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:330
 msgid "* Slot Options:\n"
-msgstr ""
+msgstr "* Слот-опції:\n"
 
 #: src/frontend/mame/ui/devopt.cpp:344
 msgid "[None]\n"
-msgstr ""
+msgstr "[Не вказано]\n"
 
 #: src/emu/render.cpp:1796
 #, c-format
 msgctxt "view-name"
 msgid "Screen %1$u Standard (%2$u:%3$u)"
-msgstr ""
+msgstr "Екран %1$u Типовий (%2$u:%3$u)"
 
 #: src/emu/render.cpp:1822
 #, c-format
 msgctxt "view-name"
 msgid "Screen %1$u Pixel Aspect (%2$u:%3$u)"
-msgstr ""
+msgstr "Екран %1$u Піксельне співвідношення (%2$u:%3$u)"
 
 #: src/emu/render.cpp:1844 src/emu/render.cpp:1979
 msgctxt "view-name"
 msgid "Cocktail"
-msgstr ""
+msgstr "Коктейль"
 
 #: src/emu/render.cpp:1964
 msgctxt "view-name"
 msgid "Left-to-Right"
-msgstr ""
+msgstr "Зліва направо"
 
 #: src/emu/render.cpp:1965
 msgctxt "view-name"
 msgid "Left-to-Right (Gapless)"
-msgstr ""
+msgstr "Зліва направо (неперервно)"
 
 #: src/emu/render.cpp:1966
 msgctxt "view-name"
 msgid "Top-to-Bottom"
-msgstr ""
+msgstr "Згори донизу"
 
 #: src/emu/render.cpp:1967
 msgctxt "view-name"
 msgid "Top-to-Bottom (Gapless)"
-msgstr ""
+msgstr "Згори донизу (неперервно)"
 
 #: src/emu/render.cpp:2018
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Left-to-Right, Top-to-Bottom"
-msgstr ""
+msgstr "%1$u * %2$u Зліва направо, Згори донизу"
 
 #: src/emu/render.cpp:2027
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Left-to-Right, Top-to-Bottom (Gapless)"
-msgstr ""
+msgstr "%1$u * %2$u Зліва направо, Згори донизу (неперервно)"
 
 #: src/emu/render.cpp:2036
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Top-to-Bottom, Left-to-Right"
-msgstr ""
+msgstr "%1$u * %2$u Згори донизу, Зліва направо"
 
 #: src/emu/render.cpp:2045
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Top-to-Bottom, Left-to-Right (Gapless)"
-msgstr ""
+msgstr "%1$u * %2$u Згори донизу, Зліва направо (неперервно)"
 
 #: src/emu/ioport.cpp:332
 #, c-format
@@ -3305,7 +3397,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Up"
-msgstr ""
+msgstr "%p ↑"
 
 #: src/emu/inpttype.ipp:23 src/emu/inpttype.ipp:141 src/emu/inpttype.ipp:222
 #: src/emu/inpttype.ipp:256 src/emu/inpttype.ipp:290 src/emu/inpttype.ipp:324
@@ -3314,7 +3406,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Down"
-msgstr ""
+msgstr "%p ↓"
 
 #: src/emu/inpttype.ipp:24 src/emu/inpttype.ipp:142 src/emu/inpttype.ipp:223
 #: src/emu/inpttype.ipp:257 src/emu/inpttype.ipp:291 src/emu/inpttype.ipp:325
@@ -3323,7 +3415,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Left"
-msgstr ""
+msgstr "%p ←"
 
 #: src/emu/inpttype.ipp:25 src/emu/inpttype.ipp:143 src/emu/inpttype.ipp:224
 #: src/emu/inpttype.ipp:258 src/emu/inpttype.ipp:292 src/emu/inpttype.ipp:326
@@ -3332,7 +3424,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Right"
-msgstr ""
+msgstr "%p →"
 
 #: src/emu/inpttype.ipp:26 src/emu/inpttype.ipp:144 src/emu/inpttype.ipp:225
 #: src/emu/inpttype.ipp:259 src/emu/inpttype.ipp:293 src/emu/inpttype.ipp:327
@@ -3341,7 +3433,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Right Stick/Up"
-msgstr ""
+msgstr "%p Правий важіль ↑"
 
 #: src/emu/inpttype.ipp:27 src/emu/inpttype.ipp:145 src/emu/inpttype.ipp:226
 #: src/emu/inpttype.ipp:260 src/emu/inpttype.ipp:294 src/emu/inpttype.ipp:328
@@ -3350,7 +3442,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Right Stick/Down"
-msgstr ""
+msgstr "%p Правий важіль ↓"
 
 #: src/emu/inpttype.ipp:28 src/emu/inpttype.ipp:146 src/emu/inpttype.ipp:227
 #: src/emu/inpttype.ipp:261 src/emu/inpttype.ipp:295 src/emu/inpttype.ipp:329
@@ -3359,7 +3451,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Right Stick/Left"
-msgstr ""
+msgstr "%p Правий важіль ←"
 
 #: src/emu/inpttype.ipp:29 src/emu/inpttype.ipp:147 src/emu/inpttype.ipp:228
 #: src/emu/inpttype.ipp:262 src/emu/inpttype.ipp:296 src/emu/inpttype.ipp:330
@@ -3368,7 +3460,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Right Stick/Right"
-msgstr ""
+msgstr "%p Правий важіль →"
 
 #: src/emu/inpttype.ipp:30 src/emu/inpttype.ipp:148 src/emu/inpttype.ipp:229
 #: src/emu/inpttype.ipp:263 src/emu/inpttype.ipp:297 src/emu/inpttype.ipp:331
@@ -3377,7 +3469,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Left Stick/Up"
-msgstr ""
+msgstr "%p Лівий важіль ↑"
 
 #: src/emu/inpttype.ipp:31 src/emu/inpttype.ipp:149 src/emu/inpttype.ipp:230
 #: src/emu/inpttype.ipp:264 src/emu/inpttype.ipp:298 src/emu/inpttype.ipp:332
@@ -3386,7 +3478,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Left Stick/Down"
-msgstr ""
+msgstr "%p Лівий важіль ↓"
 
 #: src/emu/inpttype.ipp:32 src/emu/inpttype.ipp:150 src/emu/inpttype.ipp:231
 #: src/emu/inpttype.ipp:265 src/emu/inpttype.ipp:299 src/emu/inpttype.ipp:333
@@ -3395,7 +3487,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Left Stick/Left"
-msgstr ""
+msgstr "%p Лівий важіль ←"
 
 #: src/emu/inpttype.ipp:33 src/emu/inpttype.ipp:151 src/emu/inpttype.ipp:232
 #: src/emu/inpttype.ipp:266 src/emu/inpttype.ipp:300 src/emu/inpttype.ipp:334
@@ -3404,7 +3496,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Left Stick/Right"
-msgstr ""
+msgstr "%p Лівий важіль →"
 
 #: src/emu/inpttype.ipp:34 src/emu/inpttype.ipp:152 src/emu/inpttype.ipp:233
 #: src/emu/inpttype.ipp:267 src/emu/inpttype.ipp:301 src/emu/inpttype.ipp:335
@@ -3413,7 +3505,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Button 1"
-msgstr ""
+msgstr "%p Кнопка 1"
 
 #: src/emu/inpttype.ipp:35 src/emu/inpttype.ipp:153 src/emu/inpttype.ipp:234
 #: src/emu/inpttype.ipp:268 src/emu/inpttype.ipp:302 src/emu/inpttype.ipp:336
@@ -3422,7 +3514,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Button 2"
-msgstr ""
+msgstr "%p Кнопка 2"
 
 #: src/emu/inpttype.ipp:36 src/emu/inpttype.ipp:154 src/emu/inpttype.ipp:235
 #: src/emu/inpttype.ipp:269 src/emu/inpttype.ipp:303 src/emu/inpttype.ipp:337
@@ -3431,7 +3523,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Button 3"
-msgstr ""
+msgstr "%p Кнопка 3"
 
 #: src/emu/inpttype.ipp:37 src/emu/inpttype.ipp:155 src/emu/inpttype.ipp:236
 #: src/emu/inpttype.ipp:270 src/emu/inpttype.ipp:304 src/emu/inpttype.ipp:338
@@ -3440,7 +3532,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Button 4"
-msgstr ""
+msgstr "%p Кнопка 4"
 
 #: src/emu/inpttype.ipp:38 src/emu/inpttype.ipp:156 src/emu/inpttype.ipp:237
 #: src/emu/inpttype.ipp:271 src/emu/inpttype.ipp:305 src/emu/inpttype.ipp:339
@@ -3449,7 +3541,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Button 5"
-msgstr ""
+msgstr "%p Кнопка 5"
 
 #: src/emu/inpttype.ipp:39 src/emu/inpttype.ipp:157 src/emu/inpttype.ipp:238
 #: src/emu/inpttype.ipp:272 src/emu/inpttype.ipp:306 src/emu/inpttype.ipp:340
@@ -3458,7 +3550,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Button 6"
-msgstr ""
+msgstr "%p Кнопка 6"
 
 #: src/emu/inpttype.ipp:40 src/emu/inpttype.ipp:158 src/emu/inpttype.ipp:239
 #: src/emu/inpttype.ipp:273 src/emu/inpttype.ipp:307 src/emu/inpttype.ipp:341
@@ -3467,7 +3559,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Button 7"
-msgstr ""
+msgstr "%p Кнопка 7"
 
 #: src/emu/inpttype.ipp:41 src/emu/inpttype.ipp:159 src/emu/inpttype.ipp:240
 #: src/emu/inpttype.ipp:274 src/emu/inpttype.ipp:308 src/emu/inpttype.ipp:342
@@ -3476,7 +3568,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Button 8"
-msgstr ""
+msgstr "%p Кнопка 8"
 
 #: src/emu/inpttype.ipp:42 src/emu/inpttype.ipp:160 src/emu/inpttype.ipp:241
 #: src/emu/inpttype.ipp:275 src/emu/inpttype.ipp:309 src/emu/inpttype.ipp:343
@@ -3485,7 +3577,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Button 9"
-msgstr ""
+msgstr "%p Кнопка 9"
 
 #: src/emu/inpttype.ipp:43 src/emu/inpttype.ipp:161 src/emu/inpttype.ipp:242
 #: src/emu/inpttype.ipp:276 src/emu/inpttype.ipp:310 src/emu/inpttype.ipp:344
@@ -3494,7 +3586,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Button 10"
-msgstr ""
+msgstr "%p Кнопка 10"
 
 #: src/emu/inpttype.ipp:44 src/emu/inpttype.ipp:162 src/emu/inpttype.ipp:243
 #: src/emu/inpttype.ipp:277 src/emu/inpttype.ipp:311 src/emu/inpttype.ipp:345
@@ -3503,7 +3595,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Button 11"
-msgstr ""
+msgstr "%p Кнопка 11"
 
 #: src/emu/inpttype.ipp:45 src/emu/inpttype.ipp:163 src/emu/inpttype.ipp:244
 #: src/emu/inpttype.ipp:278 src/emu/inpttype.ipp:312 src/emu/inpttype.ipp:346
@@ -3512,7 +3604,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Button 12"
-msgstr ""
+msgstr "%p Кнопка 12"
 
 #: src/emu/inpttype.ipp:46 src/emu/inpttype.ipp:164 src/emu/inpttype.ipp:245
 #: src/emu/inpttype.ipp:279 src/emu/inpttype.ipp:313 src/emu/inpttype.ipp:347
@@ -3521,7 +3613,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Button 13"
-msgstr ""
+msgstr "%p Кнопка 13"
 
 #: src/emu/inpttype.ipp:47 src/emu/inpttype.ipp:165 src/emu/inpttype.ipp:246
 #: src/emu/inpttype.ipp:280 src/emu/inpttype.ipp:314 src/emu/inpttype.ipp:348
@@ -3530,7 +3622,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Button 14"
-msgstr ""
+msgstr "%p Кнопка 14"
 
 #: src/emu/inpttype.ipp:48 src/emu/inpttype.ipp:166 src/emu/inpttype.ipp:247
 #: src/emu/inpttype.ipp:281 src/emu/inpttype.ipp:315 src/emu/inpttype.ipp:349
@@ -3539,7 +3631,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Button 15"
-msgstr ""
+msgstr "%p Кнопка 15"
 
 #: src/emu/inpttype.ipp:49 src/emu/inpttype.ipp:167 src/emu/inpttype.ipp:248
 #: src/emu/inpttype.ipp:282 src/emu/inpttype.ipp:316 src/emu/inpttype.ipp:350
@@ -3548,7 +3640,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Button 16"
-msgstr ""
+msgstr "%p Кнопка 16"
 
 #: src/emu/inpttype.ipp:50 src/emu/inpttype.ipp:168 src/emu/inpttype.ipp:249
 #: src/emu/inpttype.ipp:283 src/emu/inpttype.ipp:317 src/emu/inpttype.ipp:351
@@ -3572,540 +3664,540 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong A"
-msgstr ""
+msgstr "%p Маджонг A"
 
 #: src/emu/inpttype.ipp:57 src/emu/inpttype.ipp:175
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong B"
-msgstr ""
+msgstr "%p Маджонг B"
 
 #: src/emu/inpttype.ipp:58 src/emu/inpttype.ipp:176
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong C"
-msgstr ""
+msgstr "%p Маджонг C"
 
 #: src/emu/inpttype.ipp:59 src/emu/inpttype.ipp:177
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong D"
-msgstr ""
+msgstr "%p Маджонг D"
 
 #: src/emu/inpttype.ipp:60 src/emu/inpttype.ipp:178
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong E"
-msgstr ""
+msgstr "%p Маджонг E"
 
 #: src/emu/inpttype.ipp:61 src/emu/inpttype.ipp:179
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong F"
-msgstr ""
+msgstr "%p Маджонг F"
 
 #: src/emu/inpttype.ipp:62 src/emu/inpttype.ipp:180
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong G"
-msgstr ""
+msgstr "%p Маджонг G"
 
 #: src/emu/inpttype.ipp:63 src/emu/inpttype.ipp:181
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong H"
-msgstr ""
+msgstr "%p Маджонг H"
 
 #: src/emu/inpttype.ipp:64 src/emu/inpttype.ipp:182
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong I"
-msgstr ""
+msgstr "%p Маджонг I"
 
 #: src/emu/inpttype.ipp:65 src/emu/inpttype.ipp:183
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong J"
-msgstr ""
+msgstr "%p Маджонг J"
 
 #: src/emu/inpttype.ipp:66 src/emu/inpttype.ipp:184
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong K"
-msgstr ""
+msgstr "%p Маджонг K"
 
 #: src/emu/inpttype.ipp:67 src/emu/inpttype.ipp:185
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong L"
-msgstr ""
+msgstr "%p Маджонг L"
 
 #: src/emu/inpttype.ipp:68 src/emu/inpttype.ipp:186
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong M"
-msgstr ""
+msgstr "%p Маджонг M"
 
 #: src/emu/inpttype.ipp:69 src/emu/inpttype.ipp:187
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong N"
-msgstr ""
+msgstr "%p Маджонг N"
 
 #: src/emu/inpttype.ipp:70 src/emu/inpttype.ipp:188
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong O"
-msgstr ""
+msgstr "%p Маджонг O"
 
 #: src/emu/inpttype.ipp:71 src/emu/inpttype.ipp:189
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong P"
-msgstr ""
+msgstr "%p Маджонг P"
 
 #: src/emu/inpttype.ipp:72 src/emu/inpttype.ipp:190
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong Q"
-msgstr ""
+msgstr "%p Маджонг Q"
 
 #: src/emu/inpttype.ipp:73 src/emu/inpttype.ipp:191
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong Kan"
-msgstr ""
+msgstr "%p Маджонг Кан"
 
 #: src/emu/inpttype.ipp:74 src/emu/inpttype.ipp:192
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong Pon"
-msgstr ""
+msgstr "%p Маджонг Пон"
 
 #: src/emu/inpttype.ipp:75 src/emu/inpttype.ipp:193
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong Chi"
-msgstr ""
+msgstr "%p Маджонг Чі"
 
 #: src/emu/inpttype.ipp:76 src/emu/inpttype.ipp:194
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong Reach"
-msgstr ""
+msgstr "%p Маджонг Річ"
 
 #: src/emu/inpttype.ipp:77 src/emu/inpttype.ipp:195
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong Ron"
-msgstr ""
+msgstr "%p Маджонг Рон"
 
 #: src/emu/inpttype.ipp:78 src/emu/inpttype.ipp:200
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong Flip Flop"
-msgstr ""
+msgstr "%p Маджонг Фліп-флоп"
 
 #: src/emu/inpttype.ipp:79 src/emu/inpttype.ipp:196
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong Bet"
-msgstr ""
+msgstr "%p Маджонг Ставка"
 
 #: src/emu/inpttype.ipp:80 src/emu/inpttype.ipp:198
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong Take Score"
-msgstr ""
+msgstr "%p Маджонг Отримання пунктів"
 
 #: src/emu/inpttype.ipp:81 src/emu/inpttype.ipp:199
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong Double Up"
-msgstr ""
+msgstr "%p Маджонг Подвоєння"
 
 #: src/emu/inpttype.ipp:82 src/emu/inpttype.ipp:201
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong Big"
-msgstr ""
+msgstr "%p Маджонг Великий"
 
 #: src/emu/inpttype.ipp:83 src/emu/inpttype.ipp:202
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong Small"
-msgstr ""
+msgstr "%p Маджонг Малий"
 
 #: src/emu/inpttype.ipp:84 src/emu/inpttype.ipp:197
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong Last Chance"
-msgstr ""
+msgstr "%p Маджонг Останній шанс"
 
 #: src/emu/inpttype.ipp:89 src/emu/inpttype.ipp:207
 #, c-format
 msgctxt "input-name"
 msgid "%p Hanafuda A/1"
-msgstr ""
+msgstr "%p Ханафуда A / 1"
 
 #: src/emu/inpttype.ipp:90 src/emu/inpttype.ipp:208
 #, c-format
 msgctxt "input-name"
 msgid "%p Hanafuda B/2"
-msgstr ""
+msgstr "%p Ханафуда B / 2"
 
 #: src/emu/inpttype.ipp:91 src/emu/inpttype.ipp:209
 #, c-format
 msgctxt "input-name"
 msgid "%p Hanafuda C/3"
-msgstr ""
+msgstr "%p Ханафуда C / 3"
 
 #: src/emu/inpttype.ipp:92 src/emu/inpttype.ipp:210
 #, c-format
 msgctxt "input-name"
 msgid "%p Hanafuda D/4"
-msgstr ""
+msgstr "%p Ханафуда D / 4"
 
 #: src/emu/inpttype.ipp:93 src/emu/inpttype.ipp:211
 #, c-format
 msgctxt "input-name"
 msgid "%p Hanafuda E/5"
-msgstr ""
+msgstr "%p Ханафуда E / 5"
 
 #: src/emu/inpttype.ipp:94 src/emu/inpttype.ipp:212
 #, c-format
 msgctxt "input-name"
 msgid "%p Hanafuda F/6"
-msgstr ""
+msgstr "%p Ханафуда F / 6"
 
 #: src/emu/inpttype.ipp:95 src/emu/inpttype.ipp:213
 #, c-format
 msgctxt "input-name"
 msgid "%p Hanafuda G/7"
-msgstr ""
+msgstr "%p Ханафуда G / 7"
 
 #: src/emu/inpttype.ipp:96 src/emu/inpttype.ipp:214
 #, c-format
 msgctxt "input-name"
 msgid "%p Hanafuda H/8"
-msgstr ""
+msgstr "%p Ханафуда H / 8"
 
 #: src/emu/inpttype.ipp:97 src/emu/inpttype.ipp:215
 #, c-format
 msgctxt "input-name"
 msgid "%p Hanafuda Yes"
-msgstr ""
+msgstr "%p Ханафуда Так"
 
 #: src/emu/inpttype.ipp:98 src/emu/inpttype.ipp:216
 #, c-format
 msgctxt "input-name"
 msgid "%p Hanafuda No"
-msgstr ""
+msgstr "%p Ханафуда Ні"
 
 #: src/emu/inpttype.ipp:103
 msgctxt "input-name"
 msgid "Key In"
-msgstr ""
+msgstr "Вставити ключ"
 
 #: src/emu/inpttype.ipp:104
 msgctxt "input-name"
 msgid "Key Out"
-msgstr ""
+msgstr "Вилучити ключ"
 
 #: src/emu/inpttype.ipp:105 src/emu/inpttype.ipp:540
 msgctxt "input-name"
 msgid "Service"
-msgstr ""
+msgstr "Обслуговування"
 
 #: src/emu/inpttype.ipp:106
 msgctxt "input-name"
 msgid "Book-Keeping"
-msgstr ""
+msgstr "Облік"
 
 #: src/emu/inpttype.ipp:107
 msgctxt "input-name"
 msgid "Door"
-msgstr ""
+msgstr "Двері"
 
 #: src/emu/inpttype.ipp:108
 msgctxt "input-name"
 msgid "Payout"
-msgstr ""
+msgstr "Оплата"
 
 #: src/emu/inpttype.ipp:109
 msgctxt "input-name"
 msgid "Bet"
-msgstr ""
+msgstr "Ставка"
 
 #: src/emu/inpttype.ipp:110
 msgctxt "input-name"
 msgid "Deal"
-msgstr ""
+msgstr "Згода"
 
 #: src/emu/inpttype.ipp:111
 msgctxt "input-name"
 msgid "Stand"
-msgstr ""
+msgstr "Зупинка"
 
 #: src/emu/inpttype.ipp:112
 msgctxt "input-name"
 msgid "Take Score"
-msgstr ""
+msgstr "Отримання пунктів"
 
 #: src/emu/inpttype.ipp:113
 msgctxt "input-name"
 msgid "Double Up"
-msgstr ""
+msgstr "Подвоєння"
 
 #: src/emu/inpttype.ipp:114
 msgctxt "input-name"
 msgid "Half Gamble"
-msgstr ""
+msgstr "Напівазарт"
 
 #: src/emu/inpttype.ipp:115
 msgctxt "input-name"
 msgid "High"
-msgstr ""
+msgstr "Великий"
 
 #: src/emu/inpttype.ipp:116
 msgctxt "input-name"
 msgid "Low"
-msgstr ""
+msgstr "Малий"
 
 #: src/emu/inpttype.ipp:121
 msgctxt "input-name"
 msgid "Hold 1"
-msgstr ""
+msgstr "Затримка 1"
 
 #: src/emu/inpttype.ipp:122
 msgctxt "input-name"
 msgid "Hold 2"
-msgstr ""
+msgstr "Затримка 2"
 
 #: src/emu/inpttype.ipp:123
 msgctxt "input-name"
 msgid "Hold 3"
-msgstr ""
+msgstr "Затримка 3"
 
 #: src/emu/inpttype.ipp:124
 msgctxt "input-name"
 msgid "Hold 4"
-msgstr ""
+msgstr "Затримка 4"
 
 #: src/emu/inpttype.ipp:125
 msgctxt "input-name"
 msgid "Hold 5"
-msgstr ""
+msgstr "Затримка 5"
 
 #: src/emu/inpttype.ipp:126
 msgctxt "input-name"
 msgid "Cancel"
-msgstr ""
+msgstr "Скасувати"
 
 #: src/emu/inpttype.ipp:131
 msgctxt "input-name"
 msgid "Stop Reel 1"
-msgstr ""
+msgstr "Зупинка барабана 1"
 
 #: src/emu/inpttype.ipp:132
 msgctxt "input-name"
 msgid "Stop Reel 2"
-msgstr ""
+msgstr "Зупинка барабана 2"
 
 #: src/emu/inpttype.ipp:133
 msgctxt "input-name"
 msgid "Stop Reel 3"
-msgstr ""
+msgstr "Зупинка барабана 3"
 
 #: src/emu/inpttype.ipp:134
 msgctxt "input-name"
 msgid "Stop Reel 4"
-msgstr ""
+msgstr "Зупинка барабана 4"
 
 #: src/emu/inpttype.ipp:135
 msgctxt "input-name"
 msgid "Stop All Reels"
-msgstr ""
+msgstr "Зупинка всіх барабанів"
 
 #: src/emu/inpttype.ipp:493
 msgctxt "input-name"
 msgid "1 Player Start"
-msgstr ""
+msgstr "Розпочати 1 гравцем"
 
 #: src/emu/inpttype.ipp:494
 msgctxt "input-name"
 msgid "2 Players Start"
-msgstr ""
+msgstr "Розпочати 2 гравцями"
 
 #: src/emu/inpttype.ipp:495
 msgctxt "input-name"
 msgid "3 Players Start"
-msgstr ""
+msgstr "Розпочати 3 гравцями"
 
 #: src/emu/inpttype.ipp:496
 msgctxt "input-name"
 msgid "4 Players Start"
-msgstr ""
+msgstr "Розпочати 4 гравцями"
 
 #: src/emu/inpttype.ipp:497
 msgctxt "input-name"
 msgid "5 Players Start"
-msgstr ""
+msgstr "Розпочати 5 гравцями"
 
 #: src/emu/inpttype.ipp:498
 msgctxt "input-name"
 msgid "6 Players Start"
-msgstr ""
+msgstr "Розпочати 6 гравцями"
 
 #: src/emu/inpttype.ipp:499
 msgctxt "input-name"
 msgid "7 Players Start"
-msgstr ""
+msgstr "Розпочати 7 гравцями"
 
 #: src/emu/inpttype.ipp:500
 msgctxt "input-name"
 msgid "8 Players Start"
-msgstr ""
+msgstr "Розпочати 8 гравцями"
 
 #: src/emu/inpttype.ipp:505
 msgctxt "input-name"
 msgid "Coin 1"
-msgstr ""
+msgstr "Монета 1"
 
 #: src/emu/inpttype.ipp:506
 msgctxt "input-name"
 msgid "Coin 2"
-msgstr ""
+msgstr "Монета 2"
 
 #: src/emu/inpttype.ipp:507
 msgctxt "input-name"
 msgid "Coin 3"
-msgstr ""
+msgstr "Монета 3"
 
 #: src/emu/inpttype.ipp:508
 msgctxt "input-name"
 msgid "Coin 4"
-msgstr ""
+msgstr "Монета 4"
 
 #: src/emu/inpttype.ipp:509
 msgctxt "input-name"
 msgid "Coin 5"
-msgstr ""
+msgstr "Монета 5"
 
 #: src/emu/inpttype.ipp:510
 msgctxt "input-name"
 msgid "Coin 6"
-msgstr ""
+msgstr "Монета 6"
 
 #: src/emu/inpttype.ipp:511
 msgctxt "input-name"
 msgid "Coin 7"
-msgstr ""
+msgstr "Монета 7"
 
 #: src/emu/inpttype.ipp:512
 msgctxt "input-name"
 msgid "Coin 8"
-msgstr ""
+msgstr "Монета 8"
 
 #: src/emu/inpttype.ipp:513
 msgctxt "input-name"
 msgid "Coin 9"
-msgstr ""
+msgstr "Монета 9"
 
 #: src/emu/inpttype.ipp:514
 msgctxt "input-name"
 msgid "Coin 10"
-msgstr ""
+msgstr "Монета 10"
 
 #: src/emu/inpttype.ipp:515
 msgctxt "input-name"
 msgid "Coin 11"
-msgstr ""
+msgstr "Монета 11"
 
 #: src/emu/inpttype.ipp:516
 msgctxt "input-name"
 msgid "Coin 12"
-msgstr ""
+msgstr "Монета 12"
 
 #: src/emu/inpttype.ipp:517
 msgctxt "input-name"
 msgid "Bill 1"
-msgstr ""
+msgstr "Банкнота 1"
 
 #: src/emu/inpttype.ipp:522
 msgctxt "input-name"
 msgid "Service 1"
-msgstr ""
+msgstr "Служба 1"
 
 #: src/emu/inpttype.ipp:523
 msgctxt "input-name"
 msgid "Service 2"
-msgstr ""
+msgstr "Служба 2"
 
 #: src/emu/inpttype.ipp:524
 msgctxt "input-name"
 msgid "Service 3"
-msgstr ""
+msgstr "Служба 3"
 
 #: src/emu/inpttype.ipp:525
 msgctxt "input-name"
 msgid "Service 4"
-msgstr ""
+msgstr "Служба 4"
 
 #: src/emu/inpttype.ipp:530
 msgctxt "input-name"
 msgid "Tilt 1"
-msgstr ""
+msgstr "Нахил 1"
 
 #: src/emu/inpttype.ipp:531
 msgctxt "input-name"
 msgid "Tilt 2"
-msgstr ""
+msgstr "Нахил 2"
 
 #: src/emu/inpttype.ipp:532
 msgctxt "input-name"
 msgid "Tilt 3"
-msgstr ""
+msgstr "Нахил 3"
 
 #: src/emu/inpttype.ipp:533
 msgctxt "input-name"
 msgid "Tilt 4"
-msgstr ""
+msgstr "Нахил 4"
 
 #: src/emu/inpttype.ipp:538
 msgctxt "input-name"
 msgid "Power On"
-msgstr ""
+msgstr "Увімкнути живлення"
 
 #: src/emu/inpttype.ipp:539
 msgctxt "input-name"
 msgid "Power Off"
-msgstr ""
+msgstr "Вимкнути живлення"
 
 #: src/emu/inpttype.ipp:541
 msgctxt "input-name"
 msgid "Tilt"
-msgstr ""
+msgstr "Нахил"
 
 #: src/emu/inpttype.ipp:542
 msgctxt "input-name"
 msgid "Door Interlock"
-msgstr ""
+msgstr "Блокування дверей"
 
 #: src/emu/inpttype.ipp:543
 msgctxt "input-name"
 msgid "Memory Reset"
-msgstr ""
+msgstr "Перезавантаження пам'яті"
 
 #: src/emu/inpttype.ipp:544
 msgctxt "input-name"
 msgid "Volume Down"
-msgstr ""
+msgstr "Зменшити гучність"
 
 #: src/emu/inpttype.ipp:545
 msgctxt "input-name"
 msgid "Volume Up"
-msgstr ""
+msgstr "Збільшити гучність"
 
 #: src/emu/inpttype.ipp:550 src/emu/inpttype.ipp:551 src/emu/inpttype.ipp:552
 #: src/emu/inpttype.ipp:553 src/emu/inpttype.ipp:554 src/emu/inpttype.ipp:555
@@ -4114,7 +4206,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Pedal 1"
-msgstr ""
+msgstr "%p Педаль 1"
 
 #: src/emu/inpttype.ipp:564 src/emu/inpttype.ipp:565 src/emu/inpttype.ipp:566
 #: src/emu/inpttype.ipp:567 src/emu/inpttype.ipp:568 src/emu/inpttype.ipp:569
@@ -4123,7 +4215,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Pedal 2"
-msgstr ""
+msgstr "%p Педаль 2"
 
 #: src/emu/inpttype.ipp:578 src/emu/inpttype.ipp:579 src/emu/inpttype.ipp:580
 #: src/emu/inpttype.ipp:581 src/emu/inpttype.ipp:582 src/emu/inpttype.ipp:583
@@ -4132,1171 +4224,1173 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Pedal 3"
-msgstr ""
+msgstr "%p Педаль 3"
 
 #: src/emu/inpttype.ipp:592
 msgctxt "input-name"
 msgid "Paddle"
-msgstr ""
+msgstr "Весло 1"
 
 #: src/emu/inpttype.ipp:593
 msgctxt "input-name"
 msgid "Paddle 2"
-msgstr ""
+msgstr "Весло 2"
 
 #: src/emu/inpttype.ipp:594
 msgctxt "input-name"
 msgid "Paddle 3"
-msgstr ""
+msgstr "Весло 3"
 
 #: src/emu/inpttype.ipp:595
 msgctxt "input-name"
 msgid "Paddle 4"
-msgstr ""
+msgstr "Весло 4"
 
 #: src/emu/inpttype.ipp:596
 msgctxt "input-name"
 msgid "Paddle 5"
-msgstr ""
+msgstr "Весло 5"
 
 #: src/emu/inpttype.ipp:597
 msgctxt "input-name"
 msgid "Paddle 6"
-msgstr ""
+msgstr "Весло 6"
 
 #: src/emu/inpttype.ipp:598
 msgctxt "input-name"
 msgid "Paddle 7"
-msgstr ""
+msgstr "Весло 7"
 
 #: src/emu/inpttype.ipp:599
 msgctxt "input-name"
 msgid "Paddle 8"
-msgstr ""
+msgstr "Весло 8"
 
 #: src/emu/inpttype.ipp:600
 msgctxt "input-name"
 msgid "Paddle 9"
-msgstr ""
+msgstr "Весло 9"
 
 #: src/emu/inpttype.ipp:601
 msgctxt "input-name"
 msgid "Paddle 10"
-msgstr ""
+msgstr "Весло 10"
 
 #: src/emu/inpttype.ipp:606
 msgctxt "input-name"
 msgid "Paddle V"
-msgstr ""
+msgstr "Весло вертикально 1"
 
 #: src/emu/inpttype.ipp:607
 msgctxt "input-name"
 msgid "Paddle V 2"
-msgstr ""
+msgstr "Весло вертикально 2"
 
 #: src/emu/inpttype.ipp:608
 msgctxt "input-name"
 msgid "Paddle V 3"
-msgstr ""
+msgstr "Весло вертикально 3"
 
 #: src/emu/inpttype.ipp:609
 msgctxt "input-name"
 msgid "Paddle V 4"
-msgstr ""
+msgstr "Весло вертикально 4"
 
 #: src/emu/inpttype.ipp:610
 msgctxt "input-name"
 msgid "Paddle V 5"
-msgstr ""
+msgstr "Весло вертикально 5"
 
 #: src/emu/inpttype.ipp:611
 msgctxt "input-name"
 msgid "Paddle V 6"
-msgstr ""
+msgstr "Весло вертикально 6"
 
 #: src/emu/inpttype.ipp:612
 msgctxt "input-name"
 msgid "Paddle V 7"
-msgstr ""
+msgstr "Весло вертикально 7"
 
 #: src/emu/inpttype.ipp:613
 msgctxt "input-name"
 msgid "Paddle V 8"
-msgstr ""
+msgstr "Весло вертикально 8"
 
 #: src/emu/inpttype.ipp:614
 msgctxt "input-name"
 msgid "Paddle V 9"
-msgstr ""
+msgstr "Весло вертикально 9"
 
 #: src/emu/inpttype.ipp:615
 msgctxt "input-name"
 msgid "Paddle V 10"
-msgstr ""
+msgstr "Весло вертикально 10"
 
 #: src/emu/inpttype.ipp:620
 msgctxt "input-name"
 msgid "Positional"
-msgstr ""
+msgstr "Позиційний 1"
 
 #: src/emu/inpttype.ipp:621
 msgctxt "input-name"
 msgid "Positional 2"
-msgstr ""
+msgstr "Позиційний 2"
 
 #: src/emu/inpttype.ipp:622
 msgctxt "input-name"
 msgid "Positional 3"
-msgstr ""
+msgstr "Позиційний 3"
 
 #: src/emu/inpttype.ipp:623
 msgctxt "input-name"
 msgid "Positional 4"
-msgstr ""
+msgstr "Позиційний 4"
 
 #: src/emu/inpttype.ipp:624
 msgctxt "input-name"
 msgid "Positional 5"
-msgstr ""
+msgstr "Позиційний 5"
 
 #: src/emu/inpttype.ipp:625
 msgctxt "input-name"
 msgid "Positional 6"
-msgstr ""
+msgstr "Позиційний 6"
 
 #: src/emu/inpttype.ipp:626
 msgctxt "input-name"
 msgid "Positional 7"
-msgstr ""
+msgstr "Позиційний 7"
 
 #: src/emu/inpttype.ipp:627
 msgctxt "input-name"
 msgid "Positional 8"
-msgstr ""
+msgstr "Позиційний 8"
 
 #: src/emu/inpttype.ipp:628
 msgctxt "input-name"
 msgid "Positional 9"
-msgstr ""
+msgstr "Позиційний 9"
 
 #: src/emu/inpttype.ipp:629
 msgctxt "input-name"
 msgid "Positional 10"
-msgstr ""
+msgstr "Позиційний 10"
 
 #: src/emu/inpttype.ipp:634
 msgctxt "input-name"
 msgid "Positional V"
-msgstr ""
+msgstr "Позиційний вертикально 1"
 
 #: src/emu/inpttype.ipp:635
 msgctxt "input-name"
 msgid "Positional V 2"
-msgstr ""
+msgstr "Позиційний вертикально 2"
 
 #: src/emu/inpttype.ipp:636
 msgctxt "input-name"
 msgid "Positional V 3"
-msgstr ""
+msgstr "Позиційний вертикально 3"
 
 #: src/emu/inpttype.ipp:637
 msgctxt "input-name"
 msgid "Positional V 4"
-msgstr ""
+msgstr "Позиційний вертикально 4"
 
 #: src/emu/inpttype.ipp:638
 msgctxt "input-name"
 msgid "Positional V 5"
-msgstr ""
+msgstr "Позиційний вертикально 5"
 
 #: src/emu/inpttype.ipp:639
 msgctxt "input-name"
 msgid "Positional V 6"
-msgstr ""
+msgstr "Позиційний вертикально 6"
 
 #: src/emu/inpttype.ipp:640
 msgctxt "input-name"
 msgid "Positional V 7"
-msgstr ""
+msgstr "Позиційний вертикально 7"
 
 #: src/emu/inpttype.ipp:641
 msgctxt "input-name"
 msgid "Positional V 8"
-msgstr ""
+msgstr "Позиційний вертикально 8"
 
 #: src/emu/inpttype.ipp:642
 msgctxt "input-name"
 msgid "Positional V 9"
-msgstr ""
+msgstr "Позиційний вертикально 9"
 
 #: src/emu/inpttype.ipp:643
 msgctxt "input-name"
 msgid "Positional V 10"
-msgstr ""
+msgstr "Позиційний вертикально 10"
 
 #: src/emu/inpttype.ipp:648
 msgctxt "input-name"
 msgid "Dial"
-msgstr ""
+msgstr "Поворот 1"
 
 #: src/emu/inpttype.ipp:649
 msgctxt "input-name"
 msgid "Dial 2"
-msgstr ""
+msgstr "Поворот 2"
 
 #: src/emu/inpttype.ipp:650
 msgctxt "input-name"
 msgid "Dial 3"
-msgstr ""
+msgstr "Поворот 3"
 
 #: src/emu/inpttype.ipp:651
 msgctxt "input-name"
 msgid "Dial 4"
-msgstr ""
+msgstr "Поворот 4"
 
 #: src/emu/inpttype.ipp:652
 msgctxt "input-name"
 msgid "Dial 5"
-msgstr ""
+msgstr "Поворот 5"
 
 #: src/emu/inpttype.ipp:653
 msgctxt "input-name"
 msgid "Dial 6"
-msgstr ""
+msgstr "Поворот 6"
 
 #: src/emu/inpttype.ipp:654
 msgctxt "input-name"
 msgid "Dial 7"
-msgstr ""
+msgstr "Поворот 7"
 
 #: src/emu/inpttype.ipp:655
 msgctxt "input-name"
 msgid "Dial 8"
-msgstr ""
+msgstr "Поворот 8"
 
 #: src/emu/inpttype.ipp:656
 msgctxt "input-name"
 msgid "Dial 9"
-msgstr ""
+msgstr "Поворот 9"
 
 #: src/emu/inpttype.ipp:657
 msgctxt "input-name"
 msgid "Dial 10"
-msgstr ""
+msgstr "Поворот 10"
 
 #: src/emu/inpttype.ipp:662
 msgctxt "input-name"
 msgid "Dial V"
-msgstr ""
+msgstr "Поворот вертикально 1"
 
 #: src/emu/inpttype.ipp:663
 msgctxt "input-name"
 msgid "Dial V 2"
-msgstr ""
+msgstr "Поворот вертикально 2"
 
 #: src/emu/inpttype.ipp:664
 msgctxt "input-name"
 msgid "Dial V 3"
-msgstr ""
+msgstr "Поворот вертикально 3"
 
 #: src/emu/inpttype.ipp:665
 msgctxt "input-name"
 msgid "Dial V 4"
-msgstr ""
+msgstr "Поворот вертикально 4"
 
 #: src/emu/inpttype.ipp:666
 msgctxt "input-name"
 msgid "Dial V 5"
-msgstr ""
+msgstr "Поворот вертикально 5"
 
 #: src/emu/inpttype.ipp:667
 msgctxt "input-name"
 msgid "Dial V 6"
-msgstr ""
+msgstr "Поворот вертикально 6"
 
 #: src/emu/inpttype.ipp:668
 msgctxt "input-name"
 msgid "Dial V 7"
-msgstr ""
+msgstr "Поворот вертикально 7"
 
 #: src/emu/inpttype.ipp:669
 msgctxt "input-name"
 msgid "Dial V 8"
-msgstr ""
+msgstr "Поворот вертикально 8"
 
 #: src/emu/inpttype.ipp:670
 msgctxt "input-name"
 msgid "Dial V 9"
-msgstr ""
+msgstr "Поворот вертикально 9"
 
 #: src/emu/inpttype.ipp:671
 msgctxt "input-name"
 msgid "Dial V 10"
-msgstr ""
+msgstr "Поворот вертикально 10"
 
 #: src/emu/inpttype.ipp:676
 msgctxt "input-name"
 msgid "Track X"
-msgstr ""
+msgstr "Трекбол X 1"
 
 #: src/emu/inpttype.ipp:677
 msgctxt "input-name"
 msgid "Track X 2"
-msgstr ""
+msgstr "Трекбол X 2"
 
 #: src/emu/inpttype.ipp:678
 msgctxt "input-name"
 msgid "Track X 3"
-msgstr ""
+msgstr "Трекбол X 3"
 
 #: src/emu/inpttype.ipp:679
 msgctxt "input-name"
 msgid "Track X 4"
-msgstr ""
+msgstr "Трекбол X 4"
 
 #: src/emu/inpttype.ipp:680
 msgctxt "input-name"
 msgid "Track X 5"
-msgstr ""
+msgstr "Трекбол X 5"
 
 #: src/emu/inpttype.ipp:681
 msgctxt "input-name"
 msgid "Track X 6"
-msgstr ""
+msgstr "Трекбол X 6"
 
 #: src/emu/inpttype.ipp:682
 msgctxt "input-name"
 msgid "Track X 7"
-msgstr ""
+msgstr "Трекбол X 7"
 
 #: src/emu/inpttype.ipp:683
 msgctxt "input-name"
 msgid "Track X 8"
-msgstr ""
+msgstr "Трекбол X 8"
 
 #: src/emu/inpttype.ipp:684
 msgctxt "input-name"
 msgid "Track X 9"
-msgstr ""
+msgstr "Трекбол X 9"
 
 #: src/emu/inpttype.ipp:685
 msgctxt "input-name"
 msgid "Track X 10"
-msgstr ""
+msgstr "Трекбол X 10"
 
 #: src/emu/inpttype.ipp:690
 msgctxt "input-name"
 msgid "Track Y"
-msgstr ""
+msgstr "Трекбол Y 1"
 
 #: src/emu/inpttype.ipp:691
 msgctxt "input-name"
 msgid "Track Y 2"
-msgstr ""
+msgstr "Трекбол Y 2"
 
 #: src/emu/inpttype.ipp:692
 msgctxt "input-name"
 msgid "Track Y 3"
-msgstr ""
+msgstr "Трекбол Y 3"
 
 #: src/emu/inpttype.ipp:693
 msgctxt "input-name"
 msgid "Track Y 4"
-msgstr ""
+msgstr "Трекбол Y 4"
 
 #: src/emu/inpttype.ipp:694
 msgctxt "input-name"
 msgid "Track Y 5"
-msgstr ""
+msgstr "Трекбол Y 5"
 
 #: src/emu/inpttype.ipp:695
 msgctxt "input-name"
 msgid "Track Y 6"
-msgstr ""
+msgstr "Трекбол Y 6"
 
 #: src/emu/inpttype.ipp:696
 msgctxt "input-name"
 msgid "Track Y 7"
-msgstr ""
+msgstr "Трекбол Y 7"
 
 #: src/emu/inpttype.ipp:697
 msgctxt "input-name"
 msgid "Track Y 8"
-msgstr ""
+msgstr "Трекбол Y 8"
 
 #: src/emu/inpttype.ipp:698
 msgctxt "input-name"
 msgid "Track Y 9"
-msgstr ""
+msgstr "Трекбол Y 9"
 
 #: src/emu/inpttype.ipp:699
 msgctxt "input-name"
 msgid "Track Y 10"
-msgstr ""
+msgstr "Трекбол Y 10"
 
 #: src/emu/inpttype.ipp:704
 msgctxt "input-name"
 msgid "AD Stick X"
-msgstr ""
+msgstr "Аналоговий джойстик X 1"
 
 #: src/emu/inpttype.ipp:705
 msgctxt "input-name"
 msgid "AD Stick X 2"
-msgstr ""
+msgstr "Аналоговий джойстик X 2"
 
 #: src/emu/inpttype.ipp:706
 msgctxt "input-name"
 msgid "AD Stick X 3"
-msgstr ""
+msgstr "Аналоговий джойстик X 3"
 
 #: src/emu/inpttype.ipp:707
 msgctxt "input-name"
 msgid "AD Stick X 4"
-msgstr ""
+msgstr "Аналоговий джойстик X 4"
 
 #: src/emu/inpttype.ipp:708
 msgctxt "input-name"
 msgid "AD Stick X 5"
-msgstr ""
+msgstr "Аналоговий джойстик X 5"
 
 #: src/emu/inpttype.ipp:709
 msgctxt "input-name"
 msgid "AD Stick X 6"
-msgstr ""
+msgstr "Аналоговий джойстик X 6"
 
 #: src/emu/inpttype.ipp:710
 msgctxt "input-name"
 msgid "AD Stick X 7"
-msgstr ""
+msgstr "Аналоговий джойстик X 7"
 
 #: src/emu/inpttype.ipp:711
 msgctxt "input-name"
 msgid "AD Stick X 8"
-msgstr ""
+msgstr "Аналоговий джойстик X 8"
 
 #: src/emu/inpttype.ipp:712
 msgctxt "input-name"
 msgid "AD Stick X 9"
-msgstr ""
+msgstr "Аналоговий джойстик X 9"
 
 #: src/emu/inpttype.ipp:713
 msgctxt "input-name"
 msgid "AD Stick X 10"
-msgstr ""
+msgstr "Аналоговий джойстик X 10"
 
 #: src/emu/inpttype.ipp:718
 msgctxt "input-name"
 msgid "AD Stick Y"
-msgstr ""
+msgstr "Аналоговий джойстик Y 1"
 
 #: src/emu/inpttype.ipp:719
 msgctxt "input-name"
 msgid "AD Stick Y 2"
-msgstr ""
+msgstr "Аналоговий джойстик Y 2"
 
 #: src/emu/inpttype.ipp:720
 msgctxt "input-name"
 msgid "AD Stick Y 3"
-msgstr ""
+msgstr "Аналоговий джойстик Y 3"
 
 #: src/emu/inpttype.ipp:721
 msgctxt "input-name"
 msgid "AD Stick Y 4"
-msgstr ""
+msgstr "Аналоговий джойстик Y 4"
 
 #: src/emu/inpttype.ipp:722
 msgctxt "input-name"
 msgid "AD Stick Y 5"
-msgstr ""
+msgstr "Аналоговий джойстик Y 5"
 
 #: src/emu/inpttype.ipp:723
 msgctxt "input-name"
 msgid "AD Stick Y 6"
-msgstr ""
+msgstr "Аналоговий джойстик Y 6"
 
 #: src/emu/inpttype.ipp:724
 msgctxt "input-name"
 msgid "AD Stick Y 7"
-msgstr ""
+msgstr "Аналоговий джойстик Y 7"
 
 #: src/emu/inpttype.ipp:725
 msgctxt "input-name"
 msgid "AD Stick Y 8"
-msgstr ""
+msgstr "Аналоговий джойстик Y 8"
 
 #: src/emu/inpttype.ipp:726
 msgctxt "input-name"
 msgid "AD Stick Y 9"
-msgstr ""
+msgstr "Аналоговий джойстик Y 9"
 
 #: src/emu/inpttype.ipp:727
 msgctxt "input-name"
 msgid "AD Stick Y 10"
-msgstr ""
+msgstr "Аналоговий джойстик Y 10"
 
 #: src/emu/inpttype.ipp:732
 msgctxt "input-name"
 msgid "AD Stick Z"
-msgstr ""
+msgstr "Аналоговий джойстик Z 1"
 
 #: src/emu/inpttype.ipp:733
 msgctxt "input-name"
 msgid "AD Stick Z 2"
-msgstr ""
+msgstr "Аналоговий джойстик Z 2"
 
 #: src/emu/inpttype.ipp:734
 msgctxt "input-name"
 msgid "AD Stick Z 3"
-msgstr ""
+msgstr "Аналоговий джойстик Z 3"
 
 #: src/emu/inpttype.ipp:735
 msgctxt "input-name"
 msgid "AD Stick Z 4"
-msgstr ""
+msgstr "Аналоговий джойстик Z 4"
 
 #: src/emu/inpttype.ipp:736
 msgctxt "input-name"
 msgid "AD Stick Z 5"
-msgstr ""
+msgstr "Аналоговий джойстик Z 5"
 
 #: src/emu/inpttype.ipp:737
 msgctxt "input-name"
 msgid "AD Stick Z 6"
-msgstr ""
+msgstr "Аналоговий джойстик Z 6"
 
 #: src/emu/inpttype.ipp:738
 msgctxt "input-name"
 msgid "AD Stick Z 7"
-msgstr ""
+msgstr "Аналоговий джойстик Z 7"
 
 #: src/emu/inpttype.ipp:739
 msgctxt "input-name"
 msgid "AD Stick Z 8"
-msgstr ""
+msgstr "Аналоговий джойстик Z 8"
 
 #: src/emu/inpttype.ipp:740
 msgctxt "input-name"
 msgid "AD Stick Z 9"
-msgstr ""
+msgstr "Аналоговий джойстик Z 9"
 
 #: src/emu/inpttype.ipp:741
 msgctxt "input-name"
 msgid "AD Stick Z 10"
-msgstr ""
+msgstr "Аналоговий джойстик Z 10"
 
 #: src/emu/inpttype.ipp:746
 msgctxt "input-name"
 msgid "Lightgun X"
-msgstr ""
+msgstr "Світловий пістолет X 1"
 
 #: src/emu/inpttype.ipp:747
 msgctxt "input-name"
 msgid "Lightgun X 2"
-msgstr ""
+msgstr "Світловий пістолет X 2"
 
 #: src/emu/inpttype.ipp:748
 msgctxt "input-name"
 msgid "Lightgun X 3"
-msgstr ""
+msgstr "Світловий пістолет X 3"
 
 #: src/emu/inpttype.ipp:749
 msgctxt "input-name"
 msgid "Lightgun X 4"
-msgstr ""
+msgstr "Світловий пістолет X 4"
 
 #: src/emu/inpttype.ipp:750
 msgctxt "input-name"
 msgid "Lightgun X 5"
-msgstr ""
+msgstr "Світловий пістолет X 5"
 
 #: src/emu/inpttype.ipp:751
 msgctxt "input-name"
 msgid "Lightgun X 6"
-msgstr ""
+msgstr "Світловий пістолет X 6"
 
 #: src/emu/inpttype.ipp:752
 msgctxt "input-name"
 msgid "Lightgun X 7"
-msgstr ""
+msgstr "Світловий пістолет X 7"
 
 #: src/emu/inpttype.ipp:753
 msgctxt "input-name"
 msgid "Lightgun X 8"
-msgstr ""
+msgstr "Світловий пістолет X 8"
 
 #: src/emu/inpttype.ipp:754
 msgctxt "input-name"
 msgid "Lightgun X 9"
-msgstr ""
+msgstr "Світловий пістолет X 9"
 
 #: src/emu/inpttype.ipp:755
 msgctxt "input-name"
 msgid "Lightgun X 10"
-msgstr ""
+msgstr "Світловий пістолет X 10"
 
 #: src/emu/inpttype.ipp:760
 msgctxt "input-name"
 msgid "Lightgun Y"
-msgstr ""
+msgstr "Світловий пістолет Y 1"
 
 #: src/emu/inpttype.ipp:761
 msgctxt "input-name"
 msgid "Lightgun Y 2"
-msgstr ""
+msgstr "Світловий пістолет Y 2"
 
 #: src/emu/inpttype.ipp:762
 msgctxt "input-name"
 msgid "Lightgun Y 3"
-msgstr ""
+msgstr "Світловий пістолет Y 3"
 
 #: src/emu/inpttype.ipp:763
 msgctxt "input-name"
 msgid "Lightgun Y 4"
-msgstr ""
+msgstr "Світловий пістолет Y 4"
 
 #: src/emu/inpttype.ipp:764
 msgctxt "input-name"
 msgid "Lightgun Y 5"
-msgstr ""
+msgstr "Світловий пістолет Y 5"
 
 #: src/emu/inpttype.ipp:765
 msgctxt "input-name"
 msgid "Lightgun Y 6"
-msgstr ""
+msgstr "Світловий пістолет Y 6"
 
 #: src/emu/inpttype.ipp:766
 msgctxt "input-name"
 msgid "Lightgun Y 7"
-msgstr ""
+msgstr "Світловий пістолет Y 7"
 
 #: src/emu/inpttype.ipp:767
 msgctxt "input-name"
 msgid "Lightgun Y 8"
-msgstr ""
+msgstr "Світловий пістолет Y 8"
 
 #: src/emu/inpttype.ipp:768
 msgctxt "input-name"
 msgid "Lightgun Y 9"
-msgstr ""
+msgstr "Світловий пістолет Y 9"
 
 #: src/emu/inpttype.ipp:769
 msgctxt "input-name"
 msgid "Lightgun Y 10"
-msgstr ""
+msgstr "Світловий пістолет Y 10"
 
 #: src/emu/inpttype.ipp:774
 msgctxt "input-name"
 msgid "Mouse X"
-msgstr ""
+msgstr "Миша X 1"
 
 #: src/emu/inpttype.ipp:775
 msgctxt "input-name"
 msgid "Mouse X 2"
-msgstr ""
+msgstr "Миша X 2"
 
 #: src/emu/inpttype.ipp:776
 msgctxt "input-name"
 msgid "Mouse X 3"
-msgstr ""
+msgstr "Миша X 3"
 
 #: src/emu/inpttype.ipp:777
 msgctxt "input-name"
 msgid "Mouse X 4"
-msgstr ""
+msgstr "Миша X 4"
 
 #: src/emu/inpttype.ipp:778
 msgctxt "input-name"
 msgid "Mouse X 5"
-msgstr ""
+msgstr "Миша X 5"
 
 #: src/emu/inpttype.ipp:779
 msgctxt "input-name"
 msgid "Mouse X 6"
-msgstr ""
+msgstr "Миша X 6"
 
 #: src/emu/inpttype.ipp:780
 msgctxt "input-name"
 msgid "Mouse X 7"
-msgstr ""
+msgstr "Миша X 7"
 
 #: src/emu/inpttype.ipp:781
 msgctxt "input-name"
 msgid "Mouse X 8"
-msgstr ""
+msgstr "Миша X 8"
 
 #: src/emu/inpttype.ipp:782
 msgctxt "input-name"
 msgid "Mouse X 9"
-msgstr ""
+msgstr "Миша X 9"
 
 #: src/emu/inpttype.ipp:783
 msgctxt "input-name"
 msgid "Mouse X 10"
-msgstr ""
+msgstr "Миша X 10"
 
 #: src/emu/inpttype.ipp:788
 msgctxt "input-name"
 msgid "Mouse Y"
-msgstr ""
+msgstr "Миша Y 1"
 
 #: src/emu/inpttype.ipp:789
 msgctxt "input-name"
 msgid "Mouse Y 2"
-msgstr ""
+msgstr "Миша Y 2"
 
 #: src/emu/inpttype.ipp:790
 msgctxt "input-name"
 msgid "Mouse Y 3"
-msgstr ""
+msgstr "Миша Y 3"
 
 #: src/emu/inpttype.ipp:791
 msgctxt "input-name"
 msgid "Mouse Y 4"
-msgstr ""
+msgstr "Миша Y 4"
 
 #: src/emu/inpttype.ipp:792
 msgctxt "input-name"
 msgid "Mouse Y 5"
-msgstr ""
+msgstr "Миша Y 5"
 
 #: src/emu/inpttype.ipp:793
 msgctxt "input-name"
 msgid "Mouse Y 6"
-msgstr ""
+msgstr "Миша Y 6"
 
 #: src/emu/inpttype.ipp:794
 msgctxt "input-name"
 msgid "Mouse Y 7"
-msgstr ""
+msgstr "Миша Y 7"
 
 #: src/emu/inpttype.ipp:795
 msgctxt "input-name"
 msgid "Mouse Y 8"
-msgstr ""
+msgstr "Миша Y 8"
 
 #: src/emu/inpttype.ipp:796
 msgctxt "input-name"
 msgid "Mouse Y 9"
-msgstr ""
+msgstr "Миша Y 9"
 
 #: src/emu/inpttype.ipp:797
 msgctxt "input-name"
 msgid "Mouse Y 10"
-msgstr ""
+msgstr "Миша Y 10"
 
 #: src/emu/inpttype.ipp:802
 msgctxt "input-name"
 msgid "Keypad"
-msgstr ""
+msgstr "Міні-клавіатура"
 
 #: src/emu/inpttype.ipp:803
 msgctxt "input-name"
 msgid "Keyboard"
-msgstr ""
+msgstr "Клавіатура"
 
 #: src/emu/inpttype.ipp:808
 msgctxt "input-name"
 msgid "On Screen Display"
-msgstr ""
+msgstr "Відображати на екрані"
 
 #: src/emu/inpttype.ipp:809
 msgctxt "input-name"
 msgid "Break in Debugger"
-msgstr ""
+msgstr "Зупинка налагоджувача"
 
 #: src/emu/inpttype.ipp:810
 msgctxt "input-name"
 msgid "Config Menu"
-msgstr ""
+msgstr "Меню конфігурації"
 
 #: src/emu/inpttype.ipp:811
 msgctxt "input-name"
 msgid "Pause"
-msgstr ""
+msgstr "Призупинити"
 
 #: src/emu/inpttype.ipp:812
 msgctxt "input-name"
 msgid "Pause - Single Step"
-msgstr ""
+msgstr "Призупинити - одиничний крок"
 
 #: src/emu/inpttype.ipp:813
 msgctxt "input-name"
 msgid "Rewind - Single Step"
-msgstr ""
+msgstr "Перемотати назад - одиничний крок"
 
 #: src/emu/inpttype.ipp:814
 msgctxt "input-name"
 msgid "Reset Machine"
-msgstr ""
+msgstr "Перезавантажити машину"
 
 #: src/emu/inpttype.ipp:815
 msgctxt "input-name"
 msgid "Soft Reset"
-msgstr ""
+msgstr "Програмне перезавантаження"
 
 #: src/emu/inpttype.ipp:816
 msgctxt "input-name"
 msgid "Show Decoded Graphics"
-msgstr ""
+msgstr "Показати декодовану графіку"
 
 #: src/emu/inpttype.ipp:817
 msgctxt "input-name"
 msgid "Frameskip Dec"
-msgstr ""
+msgstr "Зменшити пропуск кадрів"
 
 #: src/emu/inpttype.ipp:818
 msgctxt "input-name"
 msgid "Frameskip Inc"
-msgstr ""
+msgstr "Збільшити пропуск кадрів"
 
 #: src/emu/inpttype.ipp:819
 msgctxt "input-name"
 msgid "Throttle"
-msgstr ""
+msgstr "Прискорити"
 
 #: src/emu/inpttype.ipp:820
 msgctxt "input-name"
 msgid "Fast Forward"
-msgstr ""
+msgstr "Перемотати вперед"
 
 #: src/emu/inpttype.ipp:821
 msgctxt "input-name"
 msgid "Show FPS"
-msgstr ""
+msgstr "Показати FPS"
 
 #: src/emu/inpttype.ipp:822
 msgctxt "input-name"
 msgid "Save Snapshot"
-msgstr ""
+msgstr "Зберегти кадр"
 
 #: src/emu/inpttype.ipp:823
 msgctxt "input-name"
 msgid "Record MNG"
-msgstr ""
+msgstr "Записати MNG"
 
 #: src/emu/inpttype.ipp:824
 msgctxt "input-name"
 msgid "Record AVI"
-msgstr ""
+msgstr "Записати AVI"
 
 #: src/emu/inpttype.ipp:825
 msgctxt "input-name"
 msgid "Toggle Cheat"
-msgstr ""
+msgstr "Перемкнути чіти"
 
 #: src/emu/inpttype.ipp:826
 msgctxt "input-name"
 msgid "UI Up"
-msgstr ""
+msgstr "UI ↑"
 
 #: src/emu/inpttype.ipp:827
 msgctxt "input-name"
 msgid "UI Down"
-msgstr ""
+msgstr "UI ↓"
 
 #: src/emu/inpttype.ipp:828
 msgctxt "input-name"
 msgid "UI Left"
-msgstr ""
+msgstr "UI ←"
 
 #: src/emu/inpttype.ipp:829
 msgctxt "input-name"
 msgid "UI Right"
-msgstr ""
+msgstr "UI →"
 
 #: src/emu/inpttype.ipp:830
 msgctxt "input-name"
 msgid "UI Home"
-msgstr ""
+msgstr "UI Початок"
 
 #: src/emu/inpttype.ipp:831
 msgctxt "input-name"
 msgid "UI End"
-msgstr ""
+msgstr "UI Кінець"
 
 #: src/emu/inpttype.ipp:832
 msgctxt "input-name"
 msgid "UI Page Up"
-msgstr ""
+msgstr "UI Сторінка вгору"
 
 #: src/emu/inpttype.ipp:833
 msgctxt "input-name"
 msgid "UI Page Down"
-msgstr ""
+msgstr "UI Сторінка вниз"
 
 #: src/emu/inpttype.ipp:834
 msgctxt "input-name"
 msgid "UI Focus Next"
-msgstr ""
+msgstr "UI Перейти до наступного"
 
 #: src/emu/inpttype.ipp:835
 msgctxt "input-name"
 msgid "UI Focus Previous"
-msgstr ""
+msgstr "UI Перейти до попереднього"
 
 #: src/emu/inpttype.ipp:836
 msgctxt "input-name"
 msgid "UI Select"
-msgstr ""
+msgstr "UI Вибрати"
 
 #: src/emu/inpttype.ipp:837
 msgctxt "input-name"
 msgid "UI Cancel"
-msgstr ""
+msgstr "UI Скасувати"
 
 #: src/emu/inpttype.ipp:838
 msgctxt "input-name"
 msgid "UI Display Comment"
-msgstr ""
+msgstr "UI Відобразити коментар"
 
 #: src/emu/inpttype.ipp:839
 msgctxt "input-name"
 msgid "UI Clear"
-msgstr ""
+msgstr "UI Очистити"
 
 #: src/emu/inpttype.ipp:840
 msgctxt "input-name"
 msgid "UI Zoom In"
-msgstr ""
+msgstr "UI Збільшити масштаб"
 
 #: src/emu/inpttype.ipp:841
 msgctxt "input-name"
 msgid "UI Zoom Out"
-msgstr ""
+msgstr "UI Зменшити масштаб"
 
 #: src/emu/inpttype.ipp:842
 msgctxt "input-name"
 msgid "UI Default Zoom"
-msgstr ""
+msgstr "UI Типовий масштаб"
 
 #: src/emu/inpttype.ipp:843
 msgctxt "input-name"
 msgid "UI Previous Group"
-msgstr ""
+msgstr "UI Попередня група"
 
 #: src/emu/inpttype.ipp:844
 msgctxt "input-name"
 msgid "UI Next Group"
-msgstr ""
+msgstr "UI Наступна група"
 
 #: src/emu/inpttype.ipp:845
 msgctxt "input-name"
 msgid "UI Rotate"
-msgstr ""
+msgstr "UI Повернути"
 
 #: src/emu/inpttype.ipp:846
 msgctxt "input-name"
 msgid "Show Profiler"
-msgstr ""
+msgstr "Показати профайлер"
 
 #: src/emu/inpttype.ipp:847
 msgctxt "input-name"
 msgid "UI Toggle"
-msgstr ""
+msgstr "UI Перемкнути"
 
 #: src/emu/inpttype.ipp:848
 msgctxt "input-name"
 msgid "UI Release Pointer"
-msgstr ""
+msgstr "UI Встановити вказівник"
 
 #: src/emu/inpttype.ipp:849
 msgctxt "input-name"
 msgid "UI Paste Text"
-msgstr ""
+msgstr "UI Вставити текст"
 
 #: src/emu/inpttype.ipp:850
 msgctxt "input-name"
 msgid "Save State"
-msgstr ""
+msgstr "Зберегти стан"
 
 #: src/emu/inpttype.ipp:851
 msgctxt "input-name"
 msgid "Load State"
-msgstr ""
+msgstr "Завантажити стан"
 
 #: src/emu/inpttype.ipp:852
 msgctxt "input-name"
 msgid "UI (First) Tape Start"
-msgstr ""
+msgstr "UI (Початково) Відтворення стрічки"
 
 #: src/emu/inpttype.ipp:853
 msgctxt "input-name"
 msgid "UI (First) Tape Stop"
-msgstr ""
+msgstr "UI (Початково) Зупинка стрічки"
 
 #: src/emu/inpttype.ipp:854
 msgctxt "input-name"
 msgid "UI External DAT View"
-msgstr ""
+msgstr "UI Переглянути зовнішній DAT"
 
 #: src/emu/inpttype.ipp:855
 msgctxt "input-name"
 msgid "UI Add/Remove favorite"
-msgstr ""
+msgstr "UI Додати / вилучити з уподобань"
 
 #: src/emu/inpttype.ipp:856
 msgctxt "input-name"
 msgid "UI Export List"
-msgstr ""
+msgstr "UI Експортувати перелік"
 
 #: src/emu/inpttype.ipp:857
 msgctxt "input-name"
 msgid "UI Audit Media"
-msgstr ""
+msgstr "UI Перевірити медіа"
 
 #: src/osd/modules/input/input_windows.cpp:111
 #: src/osd/modules/input/input_sdlcommon.cpp:175
 msgctxt "input-name"
 msgid "Toggle Fullscreen"
-msgstr ""
+msgstr "Перемкнути повний екран"
 
 #: src/osd/modules/input/input_windows.cpp:117
 msgctxt "input-name"
 msgid "Take Rendered Snapshot"
-msgstr ""
+msgstr "Узяти опрацьований кадр"
 
 #: src/osd/modules/input/input_windows.cpp:128
 #: src/osd/modules/input/input_sdlcommon.cpp:223
 msgctxt "input-name"
 msgid "Record Rendered Video"
-msgstr ""
+msgstr "Записати опрацьоване відео"
 
 #: src/osd/modules/input/input_windows.cpp:144
 msgctxt "input-name"
 msgid "Toggle Post-Processing"
-msgstr ""
+msgstr "Перемкнути постопрацювання"
 
 #: src/osd/modules/input/input_sdlcommon.cpp:201
 msgctxt "input-name"
 msgid "Toggle Filter"
-msgstr ""
+msgstr "Перемкнути фільтр"
 
 #: src/osd/modules/input/input_sdlcommon.cpp:207
 msgctxt "input-name"
 msgid "Decrease Prescaling"
-msgstr ""
+msgstr "Зменшити попереднє масштабування"
 
 #: src/osd/modules/input/input_sdlcommon.cpp:217
 msgctxt "input-name"
 msgid "Increase Prescaling"
-msgstr ""
+msgstr "Збільшити попереднє масштабування"
 
 #: plugins/hiscore/init.lua:85
 msgctxt "plugin-hiscore"
 msgid "When updated"
-msgstr ""
+msgstr "При оновленні"
 
 #: plugins/hiscore/init.lua:85
 msgctxt "plugin-hiscore"
 msgid "On exit"
-msgstr ""
+msgstr "При виході"
 
 #: plugins/hiscore/init.lua:86
 msgctxt "plugin-hiscore"
 msgid "Hiscore Support Options"
-msgstr ""
+msgstr "Опції підтримки рекордів"
 
 #: plugins/hiscore/init.lua:88
 msgctxt "plugin-hiscore"
 msgid "Save scores"
-msgstr ""
+msgstr "Зберегти рекорди"
 
 #: plugins/hiscore/init.lua:372
 msgctxt "plugin-hiscore"
 msgid "Hiscore Support"
-msgstr ""
+msgstr "Підтримка рекордів"
 
 #: plugins/cheatfind/init.lua:387
 msgid "Other: "
-msgstr ""
+msgstr "Інше: "
 
 #: plugins/cheatfind/init.lua:388
 msgid "Save Cheat"
-msgstr ""
+msgstr "Зберегти чіт"
 
 #: plugins/cheatfind/init.lua:391
 msgid "Default"
-msgstr ""
+msgstr "Типово"
 
 #: plugins/cheatfind/init.lua:391
 msgid "Custom"
-msgstr ""
+msgstr "Указаний"
 
 #: plugins/cheatfind/init.lua:392
 msgid "Cheat Name"
-msgstr ""
+msgstr "Ім'я чіту"
 
 #: plugins/cheatfind/init.lua:398 plugins/cheatfind/init.lua:977
 #, lua-format
 msgid "Default name is %s"
-msgstr ""
+msgstr "Типове ім'я: %s."
 
 #: plugins/cheatfind/init.lua:406
 msgid "Player"
-msgstr ""
+msgstr "Гравець"
 
 #: plugins/cheatfind/init.lua:411
 msgid "Type"
-msgstr ""
+msgstr "Тип"
 
 #: plugins/cheatfind/init.lua:411
 msgid "(empty)"
-msgstr ""
+msgstr "(порожньо)"
 
 #: plugins/cheatfind/init.lua:427
 msgid "You can enter any type name"
-msgstr ""
+msgstr "Можна вказати будь-який тип імені."
 
 #: plugins/cheatfind/init.lua:436
 msgid "Save"
-msgstr ""
+msgstr "Зберегти"
 
 #: plugins/cheatfind/init.lua:444
 msgid "Type name is empty"
-msgstr ""
+msgstr "Порожній тип імені."
 
 #: plugins/cheatfind/init.lua:468
 #, lua-format
 msgid "Cheat written to %s and added to cheat.simple"
-msgstr ""
+msgstr "Чіт записано до %s та додано до cheat.simple."
 
 #: plugins/cheatfind/init.lua:478
 msgid "Cheat added to cheat.simple"
-msgstr ""
+msgstr "Чіт додано до cheat.simple."
 
 #: plugins/cheatfind/init.lua:483
 msgid ""
 "Unable to write file\n"
 "Ensure that cheatpath folder exists"
 msgstr ""
+"Неможливо записати файл.\n"
+"Переконайсь у наявності теки cheatpath."
 
 #: plugins/cheatfind/init.lua:497
 msgid "CPU or RAM"
-msgstr ""
+msgstr "CPU чи RAM"
 
 #: plugins/cheatfind/init.lua:501
 msgid "Changes to this only take effect when \"Start new search\" is selected"
-msgstr ""
+msgstr "Зміни відбудуться лише при виборі \"Почати новий пошук\"."
 
 #: plugins/cheatfind/init.lua:511
 msgid "Automatic"
-msgstr ""
+msgstr "Автоматично"
 
 #: plugins/cheatfind/init.lua:511
 msgid "Manual"
-msgstr ""
+msgstr "Власноруч"
 
 #: plugins/cheatfind/init.lua:512
 msgid "Pause Mode"
-msgstr ""
+msgstr "Режим призупинення"
 
 #: plugins/cheatfind/init.lua:519
 msgid "Manually toggle pause when needed"
-msgstr ""
+msgstr "За необхідності власноруч перемикай призупинення."
 
 #: plugins/cheatfind/init.lua:522
 msgid "Automatically toggle pause with on-screen menus"
-msgstr ""
+msgstr "Автоматично перемикати призупинення екранними меню"
 
 #: plugins/cheatfind/init.lua:543
 msgid "All slots cleared and current state saved to Slot 1"
@@ -5304,7 +5398,7 @@ msgstr ""
 
 #: plugins/cheatfind/init.lua:555
 msgid "Start new search"
-msgstr ""
+msgstr "Розпочати новий пошук"
 
 #: plugins/cheatfind/init.lua:566
 #, lua-format
@@ -5319,7 +5413,7 @@ msgstr ""
 #: plugins/cheatfind/init.lua:614
 #, lua-format
 msgid "%d total matches found"
-msgstr ""
+msgstr "Загалом знайдено %d збігів."
 
 #: plugins/cheatfind/init.lua:623
 #, lua-format
@@ -5348,59 +5442,59 @@ msgstr ""
 
 #: plugins/cheatfind/init.lua:678
 msgid "Left less than right"
-msgstr ""
+msgstr "Ліворуч менше, ніж праворуч"
 
 #: plugins/cheatfind/init.lua:680
 msgid "Left greater than right"
-msgstr ""
+msgstr "Ліворуч більше, ніж праворуч"
 
 #: plugins/cheatfind/init.lua:682
 msgid "Left equal to right"
-msgstr ""
+msgstr "Ліворуч рівне праворуч"
 
 #: plugins/cheatfind/init.lua:684
 msgid "Left not equal to right"
-msgstr ""
+msgstr "Ліворуч не рівне праворуч"
 
 #: plugins/cheatfind/init.lua:686
 msgid "Left equal to right with bitmask"
-msgstr ""
+msgstr "Ліворуч рівне праворуч за бітмаскою"
 
 #: plugins/cheatfind/init.lua:688
 msgid "Left not equal to right with bitmask"
-msgstr ""
+msgstr "Ліворуч не рівне праворуч за бітмаскою"
 
 #: plugins/cheatfind/init.lua:690
 msgid "Left less than value"
-msgstr ""
+msgstr "Ліворуч менше, ніж значення"
 
 #: plugins/cheatfind/init.lua:692
 msgid "Left greater than value"
-msgstr ""
+msgstr "Ліворуч більше, ніж значення"
 
 #: plugins/cheatfind/init.lua:694
 msgid "Left equal to value"
-msgstr ""
+msgstr "Ліворуч рівне значенню"
 
 #: plugins/cheatfind/init.lua:696
 msgid "Left not equal to value"
-msgstr ""
+msgstr "Ліворуч не рівне значенню"
 
 #: plugins/cheatfind/init.lua:718
 msgid "Value"
-msgstr ""
+msgstr "Значення"
 
 #: plugins/cheatfind/init.lua:720
 msgid "Difference"
-msgstr ""
+msgstr "Різниця"
 
 #: plugins/cheatfind/init.lua:725
 msgid "Any"
-msgstr ""
+msgstr "Будь-який"
 
 #: plugins/cheatfind/init.lua:731
 msgid "Data Format"
-msgstr ""
+msgstr "Формат даних"
 
 #: plugins/cheatfind/init.lua:737
 msgid "Slot 1 Value"
@@ -5412,12 +5506,12 @@ msgstr ""
 
 #: plugins/cheatfind/init.lua:740
 msgid "Test/Write Poke Value"
-msgstr ""
+msgstr "Тестувати / Записати отримане значення"
 
 #: plugins/cheatfind/init.lua:747
 msgid ""
-"Use this if you want to poke the Slot 1 value (eg. You started with "
-"something but lost it)"
+"Use this if you want to poke the Slot 1 value (eg. You started with something "
+"but lost it)"
 msgstr ""
 
 #: plugins/cheatfind/init.lua:749
@@ -5429,226 +5523,224 @@ msgstr ""
 #: plugins/cheatfind/init.lua:751
 #, lua-format
 msgid "Use this if you want to poke %s"
-msgstr ""
+msgstr "Використовуй для отримання %s."
 
 #: plugins/cheatfind/init.lua:774
 msgid "Aligned only"
-msgstr ""
+msgstr "Лише вирівняні"
 
 #: plugins/cheatfind/init.lua:791
 msgid "Undo last search -- #"
-msgstr ""
+msgstr "Скасувати останній пошук -- #"
 
 #: plugins/cheatfind/init.lua:795
 msgid "Match block"
-msgstr ""
+msgstr "Збіжний блок"
 
 #: plugins/cheatfind/init.lua:798
 msgid "All"
-msgstr ""
+msgstr "Усі"
 
 #: plugins/cheatfind/init.lua:907
 #, lua-format
 msgid "Test Cheat %08X_%02X"
-msgstr ""
+msgstr "Тестувати чіт %08X_%02X"
 
 #: plugins/cheatfind/init.lua:947
 msgid "Cheat engine not available"
-msgstr ""
+msgstr "Чіт-рушій недоступний."
 
 #: plugins/cheatfind/init.lua:1003
 msgid "Test"
-msgstr ""
+msgstr "Тестувати"
 
 #: plugins/cheatfind/init.lua:1003
 msgid "Write"
-msgstr ""
+msgstr "Записати"
 
 #: plugins/cheatfind/init.lua:1003
 msgid "Watch"
-msgstr ""
+msgstr "Переглянути"
 
 #: plugins/cheatfind/init.lua:1020
 msgid "Page"
-msgstr ""
+msgstr "Сторінка"
 
 #: plugins/cheatfind/init.lua:1039
 msgid "Clear Watches"
-msgstr ""
+msgstr "Очистити перегляд"
 
 #: plugins/cheatfind/init.lua:1054
 msgid "Cheat Finder"
-msgstr ""
+msgstr "Шукач чітів"
 
 #: plugins/portname/init.lua:103
 msgid "Save input names to file"
-msgstr ""
+msgstr "Зберегти імена керувань до файлу"
 
 #: plugins/portname/init.lua:134 plugins/portname/init.lua:139
 #: plugins/portname/init.lua:155
 msgid "Failed to save input name file"
-msgstr ""
+msgstr "Не вдалося зберегти імена керувань."
 
 #: plugins/portname/init.lua:167
 #, lua-format
 msgid "Input port name file saved to %s"
-msgstr ""
+msgstr "Імена портів керування збережено до %s."
 
 #: plugins/portname/init.lua:172
 msgid "Input ports"
-msgstr ""
+msgstr "Порти керування"
 
 #: plugins/autofire/init.lua:94
 msgctxt "plugin-autofire"
 msgid "Failed to load autofire menu"
-msgstr ""
+msgstr "Не вдалося завантажити меню турборежиму."
 
 #: plugins/autofire/init.lua:101
 msgctxt "plugin-autofire"
 msgid "Autofire"
-msgstr ""
+msgstr "Турборежим"
 
 #: plugins/autofire/autofire_menu.lua:74
 msgctxt "plugin-autofire"
 msgid "Autofire buttons"
-msgstr ""
+msgstr "Турбокнопки"
 
 #: plugins/autofire/autofire_menu.lua:75
 #, lua-format
 msgctxt "plugin-autofire"
 msgid "Press %s to delete"
-msgstr ""
+msgstr "Натисни %s для видалення."
 
 #: plugins/autofire/autofire_menu.lua:93
 #, lua-format
 msgctxt "plugin-autofire"
 msgid "%s [%g Hz]"
-msgstr ""
+msgstr "%s [%g Гц]"
 
 #: plugins/autofire/autofire_menu.lua:95
 #, lua-format
 msgctxt "plugin-autofire"
 msgid "n/a [%g Hz]"
-msgstr ""
+msgstr "Не доступно [%g Гц]"
 
 #: plugins/autofire/autofire_menu.lua:103
 msgctxt "plugin-autofire"
 msgid "[no autofire buttons]"
-msgstr ""
+msgstr "[відсутні турбокнопки]"
 
-#: plugins/autofire/autofire_menu.lua:109
-#: plugins/autofire/autofire_menu.lua:263
+#: plugins/autofire/autofire_menu.lua:109 plugins/autofire/autofire_menu.lua:263
 msgctxt "plugin-autofire"
 msgid "Add autofire button"
-msgstr ""
+msgstr "Додати турбокнопку"
 
 #: plugins/autofire/autofire_menu.lua:150
 msgctxt "plugin-autofire"
 msgid "n/a"
-msgstr ""
+msgstr "Не доступно"
 
-#: plugins/autofire/autofire_menu.lua:152
-#: plugins/autofire/autofire_menu.lua:154
+#: plugins/autofire/autofire_menu.lua:152 plugins/autofire/autofire_menu.lua:154
 msgctxt "plugin-autofire"
 msgid "[not set]"
-msgstr ""
+msgstr "[не встановлено]"
 
 #: plugins/autofire/autofire_menu.lua:155
 msgctxt "plugin-autofire"
 msgid "Input"
-msgstr ""
+msgstr "Керування"
 
 #: plugins/autofire/autofire_menu.lua:159
 msgctxt "plugin-autofire"
 msgid "Hotkey"
-msgstr ""
+msgstr "Гаряча кнопка"
 
 #: plugins/autofire/autofire_menu.lua:160
 msgctxt "plugin-autofire"
 msgid "On frames"
-msgstr ""
+msgstr "Кадри увімкнення"
 
 #: plugins/autofire/autofire_menu.lua:161
 msgctxt "plugin-autofire"
 msgid "Off frames"
-msgstr ""
+msgstr "Кадри вимкнення"
 
 #: plugins/autofire/autofire_menu.lua:200
 msgctxt "plugin-autofire"
 msgid "Number of frames button will be pressed"
-msgstr ""
+msgstr "Кількість кадрів для натисненої кнопки"
 
 #: plugins/autofire/autofire_menu.lua:213
 msgctxt "plugin-autofire"
 msgid "Number of frames button will be released"
-msgstr ""
+msgstr "Кількість кадрів для натисненої кнопки"
 
 #: plugins/autofire/autofire_menu.lua:230
 msgctxt "plugin-autofire"
 msgid "Edit autofire button"
-msgstr ""
+msgstr "Редагувати турбокнопку"
 
 #: plugins/autofire/autofire_menu.lua:238
 msgctxt "plugin-autofire"
 msgid "Done"
-msgstr ""
+msgstr "Виконано"
 
 #: plugins/autofire/autofire_menu.lua:272
 msgctxt "plugin-autofire"
 msgid "Create"
-msgstr ""
+msgstr "Створити"
 
 #: plugins/autofire/autofire_menu.lua:274
 msgctxt "plugin-autofire"
 msgid "Cancel"
-msgstr ""
+msgstr "Скасувати"
 
 #: plugins/autofire/autofire_menu.lua:325
 msgctxt "plugin-autofire"
 msgid "Select an input for autofire"
-msgstr ""
+msgstr "Вибери керування для турборежиму."
 
 #: plugins/timecode/init.lua:155
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Intro started at %s"
-msgstr ""
+msgstr "TIMECODE: Вступ розпочато на %s."
 
 #: plugins/timecode/init.lua:160
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Intro duration %s"
-msgstr ""
+msgstr "TIMECODE: Тривалість вступу %s."
 
 #: plugins/timecode/init.lua:165
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Gameplay started at %s"
-msgstr ""
+msgstr "TIMECODE: Ігровий процес розпочато на %s."
 
 #: plugins/timecode/init.lua:170
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Gameplay duration %s"
-msgstr ""
+msgstr "TIMECODE: Тривалість ігрового процесу %s."
 
 #: plugins/timecode/init.lua:176
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Extra %d started at %s"
-msgstr ""
+msgstr "TIMECODE: Додаток %d розпочато на %s."
 
 #: plugins/timecode/init.lua:182
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Extra %d duration %s"
-msgstr ""
+msgstr "TIMECODE: Тривалість додатку %d %s."
 
 #: plugins/timecode/init.lua:207
 #, lua-format
 msgctxt "plugin-timecode"
 msgid " %s%s%02d:%02d [paused] "
-msgstr ""
+msgstr " %s%s%02d:%02d [призупинено] "
 
 #: plugins/timecode/init.lua:207
 #, lua-format
@@ -5660,189 +5752,189 @@ msgstr ""
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TOTAL %02d:%02d "
-msgstr ""
+msgstr "Загалом %02d:%02d "
 
 #: plugins/timecode/init.lua:323 plugins/timecode/init.lua:345
 msgctxt "plugin-timecode"
 msgid "Timecode Recorder"
-msgstr ""
+msgstr "Записувач часових кодів"
 
 #: plugins/timecode/init.lua:326
 msgctxt "plugin-timecode"
 msgid "Assume 60 Hz"
-msgstr ""
+msgstr "Припустимо 60 Гц"
 
 #: plugins/timecode/init.lua:326
 msgctxt "plugins-timecode"
 msgid "Count emulated frames"
-msgstr ""
+msgstr "Кількість емульованих кадрів"
 
 #: plugins/timecode/init.lua:327
 msgctxt "plugin-timecode"
 msgid "Frame numbers"
-msgstr ""
+msgstr "Числа кадрів"
 
 #: plugins/timecode/init.lua:330
 msgctxt "plugin-timecode"
 msgid "Hotkey"
-msgstr ""
+msgstr "Гаряча кнопка"
 
 #: plugins/inputmacro/init.lua:135 plugins/inputmacro/inputmacro_menu.lua:560
 msgctxt "plugin-inputmacro"
 msgid "Input Macros"
-msgstr ""
+msgstr "Макрос керування"
 
 #: plugins/inputmacro/inputmacro_menu.lua:31
 msgctxt "plugin-inputmacro"
 msgid "New macro"
-msgstr ""
+msgstr "Новий макрос"
 
 #: plugins/inputmacro/inputmacro_menu.lua:35
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "New macro %d"
-msgstr ""
+msgstr "Новий макрос %d"
 
 #: plugins/inputmacro/inputmacro_menu.lua:84
 msgctxt "plugin-inputmacro"
 msgid "Set Input"
-msgstr ""
+msgstr "Встановити керування"
 
 #: plugins/inputmacro/inputmacro_menu.lua:350
 msgctxt "plugin-inputmacro"
 msgid "Name"
-msgstr ""
+msgstr "Ім'я"
 
 #: plugins/inputmacro/inputmacro_menu.lua:358
 #: plugins/inputmacro/inputmacro_menu.lua:400
 msgctxt "plugin-inputmacro"
 msgid "[not set]"
-msgstr ""
+msgstr "[не встановлено]"
 
 #: plugins/inputmacro/inputmacro_menu.lua:359
 msgctxt "plugin-inputmacro"
 msgid "Activation sequence"
-msgstr ""
+msgstr "Послідовність активації"
 
 #: plugins/inputmacro/inputmacro_menu.lua:362
 msgctxt "plugin-inputmacro"
 msgid "Stop immediately"
-msgstr ""
+msgstr "Зупинити негайно"
 
 #: plugins/inputmacro/inputmacro_menu.lua:362
 msgctxt "plugin-inputmacro"
 msgid "Complete macro"
-msgstr ""
+msgstr "Завершити макрос"
 
 #: plugins/inputmacro/inputmacro_menu.lua:363
 msgctxt "plugin-inputmacro"
 msgid "On release"
-msgstr ""
+msgstr "При випуску"
 
 #: plugins/inputmacro/inputmacro_menu.lua:369
 msgctxt "plugin-inputmacro"
 msgid "Release"
-msgstr ""
+msgstr "Випуск"
 
 #: plugins/inputmacro/inputmacro_menu.lua:372
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Loop to step %d"
-msgstr ""
+msgstr "Повторити до кроку %d"
 
 #: plugins/inputmacro/inputmacro_menu.lua:377
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Prolong step %d"
-msgstr ""
+msgstr "Повторити лише крок %d"
 
 #: plugins/inputmacro/inputmacro_menu.lua:379
 msgctxt "plugin-inputmacro"
 msgid "When held"
-msgstr ""
+msgstr "При проведенні"
 
 #: plugins/inputmacro/inputmacro_menu.lua:383
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Step %d"
-msgstr ""
+msgstr "Крок %d"
 
 #: plugins/inputmacro/inputmacro_menu.lua:384
 msgctxt "plugin-inputmacro"
 msgid "Delay (frames)"
-msgstr ""
+msgstr "Затримка (кадрів)"
 
 #: plugins/inputmacro/inputmacro_menu.lua:390
 msgctxt "plugin-inputmacro"
 msgid "Duration (frames)"
-msgstr ""
+msgstr "Тривалість (кадрів)"
 
 #: plugins/inputmacro/inputmacro_menu.lua:398
 msgctxt "plugin-inputmacro"
 msgid "n/a"
-msgstr ""
+msgstr "не доступно"
 
 #: plugins/inputmacro/inputmacro_menu.lua:402
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Input %d"
-msgstr ""
+msgstr "Керування %d"
 
 #: plugins/inputmacro/inputmacro_menu.lua:407
 msgctxt "plugin-inputmacro"
 msgid "Add input"
-msgstr ""
+msgstr "Додати керування"
 
 #: plugins/inputmacro/inputmacro_menu.lua:412
 msgctxt "plugin-inputmacro"
 msgid "Delete step"
-msgstr ""
+msgstr "Видалити крок"
 
 #: plugins/inputmacro/inputmacro_menu.lua:428
 msgctxt "plugin-inputmacro"
 msgid "Add step at position"
-msgstr ""
+msgstr "Додати крок на позицію"
 
 #: plugins/inputmacro/inputmacro_menu.lua:474
 msgctxt "plugin-inputmacro"
 msgid "Add Input Macro"
-msgstr ""
+msgstr "Додати макрос керування"
 
 #: plugins/inputmacro/inputmacro_menu.lua:481
 msgctxt "plugin-inputmacro"
 msgid "Create"
-msgstr ""
+msgstr "Створити"
 
 #: plugins/inputmacro/inputmacro_menu.lua:483
 msgctxt "plugin-inputmacro"
 msgid "Cancel"
-msgstr ""
+msgstr "Скасувати"
 
 #: plugins/inputmacro/inputmacro_menu.lua:499
 msgctxt "plugin-inputmacro"
 msgid "Edit Input Macro"
-msgstr ""
+msgstr "Редагувати макрос керування"
 
 #: plugins/inputmacro/inputmacro_menu.lua:505
 msgctxt "plugin-inputmacro"
 msgid "Done"
-msgstr ""
+msgstr "Виконано"
 
 #: plugins/inputmacro/inputmacro_menu.lua:561
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Press %s to delete"
-msgstr ""
+msgstr "Натисни %s для видалення"
 
 #: plugins/inputmacro/inputmacro_menu.lua:573
 msgctxt "plugin-inputmacro"
 msgid "[no macros]"
-msgstr ""
+msgstr "(без макросів)"
 
 #: plugins/inputmacro/inputmacro_menu.lua:578
 msgctxt "plugin-inputmacro"
 msgid "Add macro"
-msgstr ""
+msgstr "Додати макрос"
 
 #: plugins/timer/init.lua:27
 #, lua-format
@@ -5853,122 +5945,122 @@ msgstr ""
 #: plugins/timer/init.lua:32
 msgctxt "plugin-timer"
 msgid "Wall clock"
-msgstr ""
+msgstr "Системний час"
 
 #: plugins/timer/init.lua:32
 msgctxt "plugin-timer"
 msgid "Emulated time"
-msgstr ""
+msgstr "Емульований час"
 
 #: plugins/timer/init.lua:37
 msgctxt "plugin-timer"
 msgid "Reference"
-msgstr ""
+msgstr "Посилання"
 
 #: plugins/timer/init.lua:39
 msgctxt "plugin-timer"
 msgid "Current time"
-msgstr ""
+msgstr "Поточний час"
 
 #: plugins/timer/init.lua:40
 msgctxt "plugin-timer"
 msgid "Total time"
-msgstr ""
+msgstr "Загальний час"
 
 #: plugins/timer/init.lua:41
 msgctxt "plugin-timer"
 msgid "Play Count"
-msgstr ""
+msgstr "Кількість ігор"
 
 #: plugins/timer/init.lua:73
 msgctxt "plugin-timer"
 msgid "Timer"
-msgstr ""
+msgstr "Таймер"
 
 #: plugins/cheat/init.lua:611
 msgid "Select cheat to set hotkey"
-msgstr ""
+msgstr "Вибери чіт для встановлення гарячої кнопки."
 
 #: plugins/cheat/init.lua:612
 #, lua-format
 msgid "Press %s to clear hotkey"
-msgstr ""
+msgstr "Натисни %s для очищення гарячої кнопки."
 
 #: plugins/cheat/init.lua:640
 msgid "None"
-msgstr ""
+msgstr "Не вказано"
 
 #: plugins/cheat/init.lua:646
 msgid "Done"
-msgstr ""
+msgstr "Виконано"
 
 #: plugins/cheat/init.lua:664 plugins/cheat/init.lua:678
 msgid "Set"
-msgstr ""
+msgstr "Встановити"
 
 #: plugins/cheat/init.lua:697
 msgid "Set hotkeys"
-msgstr ""
+msgstr "Встановити гарячі кнопки"
 
 #: plugins/cheat/init.lua:785
 #, lua-format
 msgid "Activated: %s = %s"
-msgstr ""
+msgstr "Активовано: %s = %s."
 
 #: plugins/cheat/init.lua:787 plugins/cheat/init.lua:845
 #, lua-format
 msgid "Activated: %s"
-msgstr ""
+msgstr "Активовано: %s."
 
 #: plugins/cheat/init.lua:849
 #, lua-format
 msgid "Enabled: %s"
-msgstr ""
+msgstr "Увімкнено: %s."
 
 #: plugins/cheat/init.lua:854
 #, lua-format
 msgid "Disabled: %s"
-msgstr ""
+msgstr "Вимкнено: %s."
 
 #: plugins/cheat/init.lua:913
 #, lua-format
 msgid "%s added"
-msgstr ""
+msgstr "%s додано."
 
 #: plugins/data/data_command.lua:22
 msgctxt "plugin-data"
 msgid "Command"
-msgstr ""
+msgstr "Команда"
 
 #: plugins/data/data_story.lua:22
 msgctxt "plugin-data"
 msgid "Mamescore"
-msgstr ""
+msgstr "MAME-пункти"
 
 #: plugins/data/data_sysinfo.lua:15
 msgctxt "plugin-data"
 msgid "Sysinfo"
-msgstr ""
+msgstr "Системні відомості"
 
 #: plugins/data/data_hiscore.lua:1220 plugins/data/data_hiscore.lua:1268
 msgctxt "plugin-data"
 msgid "High Scores"
-msgstr ""
+msgstr "Рекорди"
 
 #: plugins/data/data_marp.lua:136
 msgctxt "plugin-data"
 msgid "MARPScore"
-msgstr ""
+msgstr "MARP-пункти"
 
 #: plugins/data/data_gameinit.lua:16
 msgctxt "plugin-data"
 msgid "Gameinit"
-msgstr ""
+msgstr "Початок гри"
 
 #: plugins/data/data_history.lua:172
 msgctxt "plugin-data"
 msgid "History"
-msgstr ""
+msgstr "Історія"
 
 #: plugins/data/data_messinfo.lua:19 plugins/data/data_mameinfo.lua:18
 msgctxt "plugin-data"
@@ -5978,16 +6070,20 @@ msgid ""
 "--- DRIVER INFO ---\n"
 "Driver: "
 msgstr ""
+"\n"
+"\n"
+"--- Відомості драйвера ---\n"
+"Драйвер: "
 
 #: plugins/data/data_messinfo.lua:21
 msgctxt "plugin-data"
 msgid "MESSinfo"
-msgstr ""
+msgstr "MESS-відомості"
 
 #: plugins/data/data_mameinfo.lua:20
 msgctxt "plugin-data"
 msgid "MAMEinfo"
-msgstr ""
+msgstr "MAME-відомості"
 
 #: plugins/commonui/init.lua:93
 #, lua-format
@@ -6004,12 +6100,12 @@ msgstr ""
 #: plugins/commonui/init.lua:101
 msgctxt "plugin-commonui"
 msgid "Cancel"
-msgstr ""
+msgstr "Скасувати"
 
 #: plugins/commonui/init.lua:197
 msgctxt "plugin-commonui"
 msgid "Invalid sequence entered"
-msgstr ""
+msgstr "Указано недійсну послідовність."
 
 #: plugins/commonui/init.lua:203
 #, lua-format
@@ -6018,3 +6114,5 @@ msgid ""
 "Enter sequence or press %s to cancel\n"
 "%s"
 msgstr ""
+"Укажи послідовність або натисни %s для скасування.\n"
+"%s"

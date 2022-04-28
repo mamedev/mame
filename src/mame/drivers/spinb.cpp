@@ -164,8 +164,8 @@ private:
 	void music_map(address_map &map);
 	void vrnwrld_map(address_map &map);
 
-	bool m_pc0a = 0;
-	bool m_pc0m = 0;
+	bool m_pc0a = false;
+	bool m_pc0m = false;
 	u8 m_game = 0U;
 	u8 m_row = 0U;
 	u8 m_p3 = 0U;

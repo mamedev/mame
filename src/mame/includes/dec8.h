@@ -105,11 +105,11 @@ protected:
 	required_memory_bank m_mainbank;
 
 	// MCU communication
-	uint8_t  m_i8751_p2;
-	int      m_i8751_port0;
-	int      m_i8751_port1;
-	int      m_i8751_return;
-	int      m_i8751_value;
+	uint8_t  m_i8751_p2 = 0;
+	int      m_i8751_port0 = 0;
+	int      m_i8751_port1 = 0;
+	int      m_i8751_return = 0;
+	int      m_i8751_value = 0;
 
 private:
 	optional_device<input_merger_device> m_nmigate;
@@ -120,37 +120,37 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	optional_shared_ptr<uint8_t> m_bg_data;
 
-	uint8_t *  m_pf1_data;
-	uint8_t *  m_row;
+	uint8_t *  m_pf1_data = nullptr;
+	uint8_t *  m_row = nullptr;
 	std::unique_ptr<uint16_t[]>   m_buffered_spriteram16; // for the mxc06 sprite chip emulation (oscar, cobra)
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	tilemap_t  *m_pf1_tilemap;
-	tilemap_t  *m_fix_tilemap;
-	//int      m_scroll1[4];
-	int      m_scroll2[4];
-	int      m_bg_control[0x20];
-	int      m_pf1_control[0x20];
-	int      m_game_uses_priority;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	tilemap_t  *m_pf1_tilemap = nullptr;
+	tilemap_t  *m_fix_tilemap = nullptr;
+	//int      m_scroll1[4]{};
+	int      m_scroll2[4]{};
+	int      m_bg_control[0x20]{};
+	int      m_pf1_control[0x20]{};
+	int      m_game_uses_priority = 0;
 
 	/* misc */
-	bool     m_secclr;
-	bool     m_nmi_enable;
-	int      m_coinage_id;
-	int      m_coin1;
-	int      m_coin2;
-	int      m_need1;
-	int      m_need2;
-	int      m_cred1;
-	int      m_cred2;
-	int      m_credits;
-	int      m_latch;
-	bool     m_coin_state;
-	int      m_snd;
+	bool     m_secclr = false;
+	bool     m_nmi_enable = false;
+	int      m_coinage_id = 0;
+	int      m_coin1 = 0;
+	int      m_coin2 = 0;
+	int      m_need1 = 0;
+	int      m_need2 = 0;
+	int      m_cred1 = 0;
+	int      m_cred2 = 0;
+	int      m_credits = 0;
+	int      m_latch = 0;
+	bool     m_coin_state = false;
+	int      m_snd = 0;
 
-	emu_timer *m_i8751_timer;
-	emu_timer *m_m6502_timer;
+	emu_timer *m_i8751_timer = nullptr;
+	emu_timer *m_m6502_timer = nullptr;
 
 	void i8751_reset_w(uint8_t data);
 	uint8_t gondo_player_1_r(offs_t offset);
@@ -253,8 +253,8 @@ private:
 	required_device<msm5205_device> m_msm;
 	required_memory_bank m_soundbank;
 
-	int      m_toggle;
-	int      m_msm5205next;
+	int      m_toggle = 0;
+	int      m_msm5205next = 0;
 };
 
 #endif // MAME_INCLUDES_DEC8_H

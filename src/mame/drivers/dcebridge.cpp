@@ -308,5 +308,5 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY    FULLNAME                 FLAGS
-SYST( 197?, dcebridge, 0,      0,      dcebridge, dcebridge, dcebridge_state, empty_init, "generic", "RS-232 DCE-DCE Bridge", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY      FULLNAME                 FLAGS
+SYST( 197?, dcebridge, 0,      0,      dcebridge, dcebridge, dcebridge_state, empty_init, "<generic>", "RS-232 DCE-DCE Bridge", MACHINE_NO_SOUND_HW )

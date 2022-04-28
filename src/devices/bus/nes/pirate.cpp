@@ -18,7 +18,6 @@
 #include "pirate.h"
 
 #include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE
-#include "screen.h"
 
 
 #ifdef NES_PCB_DEBUG
@@ -111,23 +110,6 @@ nes_eh8813a_device::nes_eh8813a_device(const machine_config &mconfig, const char
 
 
 
-void nes_agci_device::device_start()
-{
-	common_start();
-}
-
-void nes_agci_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_dreamtech_device::device_start()
-{
-	common_start();
-}
-
 void nes_dreamtech_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
@@ -188,11 +170,6 @@ void nes_daou306_device::pcb_reset()
 	set_nt_mirroring(PPU_MIRROR_LOW);
 
 	memset(m_reg, 0, sizeof(m_reg));
-}
-
-void nes_xiaozy_device::device_start()
-{
-	common_start();
 }
 
 void nes_xiaozy_device::pcb_reset()

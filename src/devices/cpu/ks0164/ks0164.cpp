@@ -6,7 +6,6 @@
 #include "emu.h"
 #include "ks0164.h"
 #include "ks0164d.h"
-#include "debugger.h"
 
 DEFINE_DEVICE_TYPE(KS0164CPU, ks0164_cpu_device, "ks0164cpu", "Samsung KS0164 audio processor")
 

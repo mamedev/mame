@@ -19,6 +19,16 @@ Irem board numbers for Vigilante sets:
 Top board - M75-A-B (up to Rev A), M75-A-C (Rev B onwards)
 Bottom board - M75-B-A (all versions regardless of mask ROM/EPROM)
 
+****************************************************************************
+
+Roberto Fresca 2022.04.23:
+Added Bowmen, from Ten-Level.  A very rare Spanish game.
+
+The game uses derivative hardware, and has some oddities, like lack of some
+music codes or clipped samples.  They may have finished development
+abruptly, without time for final polish.  Seems to finish in level 10
+(30 stages), but the game is so hard, testing is difficult.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -116,6 +126,27 @@ void vigilant_state::kikcubic_io_map(address_map &map)
 	map(0x04, 0x04).portr("IN2").w(FUNC(vigilant_state::bank_select_w));
 	map(0x06, 0x06).w("soundlatch", FUNC(generic_latch_8_device::write));
 //  map(0x07, 0x07).nopw(); /* ?? */
+}
+
+void vigilant_state::bowmen_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("IN0").w("soundlatch", FUNC(generic_latch_8_device::write));  // SD seems BAD
+	map(0x01, 0x01).portr("IN1").w(FUNC(vigilant_state::vigilant_out2_w));              // OUT2?
+	map(0x02, 0x02).portr("IN2");
+	map(0x03, 0x03).portr("DSW2");
+	map(0x04, 0x04).portr("DSW1").w(FUNC(vigilant_state::bank_select_w));  // PBANK?
+//  map(0x10, 0x11).w(FUNC(vigilant_state::vigilant_horiz_scroll_w));      // HSPL, HSPH
+	map(0x12, 0x13).w(FUNC(vigilant_state::bowmen_rear_horiz_scroll_w));   // RHSPL, RHSPH
+	map(0x14, 0x14).w(FUNC(vigilant_state::bowmen_rear_color_w));          // RCOD
+/*
+    02;  w
+    10;  w
+    11;  w
+    12;  w
+    13;  w
+    14;  w
+*/
 }
 
 void vigilant_state::sound_map(address_map &map)
@@ -377,6 +408,95 @@ static INPUT_PORTS_START( buccanra )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( bowmen )
+	PORT_START("IN0")
+	PORT_SERVICE( 0x2f, IP_ACTIVE_LOW )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_START("IN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )  // checked in the test mode.
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
+
+	PORT_START("IN2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_COCKTAIL
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL  // checked in the test mode.
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "Screen Orientation" )    PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, "Normal Screen" )
+	PORT_DIPSETTING(    0x00, "Inverted Screen" )
+	PORT_DIPNAME( 0x02, 0x02, "Players" )               PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, "Two Players" )
+	PORT_DIPSETTING(    0x00, "One Player" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Time for Round" )        PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(    0x00, "Free Time per Round" )
+	PORT_DIPSETTING(    0x04, "30 Seconds per Round" )
+	PORT_DIPSETTING(    0x08, "50 Seconds per Round" )
+	PORT_DIPSETTING(    0x0c, "60 Seconds per Round" )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Very_Easy ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPNAME( 0x80, 0x80, "Test Type" )             PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, "Easy Test" )
+	PORT_DIPSETTING(    0x00, "Advanced Test" )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW2:1,2,3,4")
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_2C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 4C_5C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 3C_5C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_5C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW2:5,6,7,8")
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_2C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 4C_5C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x50, DEF_STR( 3C_5C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x70, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 2C_5C ) )
+	PORT_DIPSETTING(    0x90, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
+INPUT_PORTS_END
+
+
 static const gfx_layout text_layout =
 {
 	8,8, /* tile size */
@@ -471,6 +591,13 @@ static GFXDECODE_START( gfx_buccanrs )
 	GFXDECODE_ENTRY( "gfx3", 0, buccaneer_back_layout,   512,  2 )  /* actually the background uses colors */
 													/* 256-511, but giving it exclusive */
 													/* pens we can handle it more easily. */
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_bowmen )
+	GFXDECODE_ENTRY( "gfx1", 0, text_layout,             256, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout_buccanrs,  0, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, buccaneer_back_layout,   512, 2 )
+
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_kikcubic )
@@ -643,6 +770,73 @@ void vigilant_state::kikcubic(machine_config &config)
 	dac_8bit_r2r_device &dac(DAC_8BIT_R2R(config, "dac", 0)); // unknown DAC
 	dac.add_route(ALL_OUTPUTS, "lspeaker", 0.5);
 	dac.add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+}
+
+
+void vigilant_state::bowmen(machine_config &config)
+{
+	// basic machine hardware
+	Z80(config, m_maincpu, 18_MHz_XTAL / 3);    // 5.99538 MHz verified
+	m_maincpu->set_addrmap(AS_PROGRAM, &vigilant_state::vigilant_map);
+	m_maincpu->set_addrmap(AS_IO, &vigilant_state::bowmen_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(vigilant_state::irq0_line_hold));
+
+	z80_device &soundcpu(Z80(config, "soundcpu", 18_MHz_XTAL / 3)); // 5.99528 MHz verified
+	soundcpu.set_addrmap(AS_PROGRAM, &vigilant_state::sound_map);
+	soundcpu.set_addrmap(AS_IO, &vigilant_state::buccanrs_sound_io_map);
+	soundcpu.set_periodic_int(FUNC(vigilant_state::nmi_line_pulse), attotime::from_hz(7806.5)); // 7.80650 kHz measured
+
+	soundcpu.set_irq_acknowledge_callback("soundirq", FUNC(rst_neg_buffer_device::inta_cb));
+
+	// video hardware
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(55);  // 54.9752 Hz verified
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(64 * 8, 32 * 8);
+	screen.set_visarea(16 * 8, (64 - 16) * 8 - 1, 0 * 8, 32 * 8 - 1);
+	screen.set_screen_update(FUNC(vigilant_state::screen_update_bowmen));
+	screen.set_palette(m_palette);
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bowmen);
+	PALETTE(config, m_palette).set_entries(512 + 32); // 512 real palette, 32 virtual palette
+
+	// sound hardware
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
+	soundlatch.data_pending_callback().set("soundirq", FUNC(rst_neg_buffer_device::rst18_w));
+	soundlatch.set_separate_acknowledge(true);
+
+	RST_NEG_BUFFER(config, "soundirq", 0).int_callback().set_inputline("soundcpu", 0);
+
+	IREM_M72_AUDIO(config, m_audio);
+	m_audio->set_dac_tag("dac");
+
+	ym2203_device &ym1(YM2203(config, "ym1", 18_MHz_XTAL / 6));
+	ym1.irq_handler().set("soundirq", FUNC(rst_neg_buffer_device::rst28_w));
+	ym1.add_route(0, "lspeaker",  0.35);
+	ym1.add_route(0, "rspeaker", 0.35);
+	ym1.add_route(1, "lspeaker",  0.35);
+	ym1.add_route(1, "rspeaker", 0.35);
+	ym1.add_route(2, "lspeaker",  0.35);
+	ym1.add_route(2, "rspeaker", 0.35);
+	ym1.add_route(3, "lspeaker",  0.50);
+	ym1.add_route(3, "rspeaker", 0.50);
+
+	ym2203_device &ym2(YM2203(config, "ym2", 18_MHz_XTAL / 6));
+	ym2.add_route(0, "lspeaker",  0.35);
+	ym2.add_route(0, "rspeaker", 0.35);
+	ym2.add_route(1, "lspeaker",  0.35);
+	ym2.add_route(1, "rspeaker", 0.35);
+	ym2.add_route(2, "lspeaker",  0.35);
+	ym2.add_route(2, "rspeaker", 0.35);
+	ym2.add_route(3, "lspeaker",  0.50);
+	ym2.add_route(3, "rspeaker", 0.50);
+
+	dac_8bit_r2r_device &dac(DAC_8BIT_R2R(config, "dac", 0)); // unknown DAC
+	dac.add_route(ALL_OUTPUTS, "lspeaker", 0.35);
+	dac.add_route(ALL_OUTPUTS, "rspeaker", 0.35);
 }
 
 
@@ -1161,6 +1355,63 @@ ROM_START( buccanrsb )
 	ROM_LOAD( "prom2.u99",  0x0300, 0x0100, CRC(e0aa8869) SHA1(ac8bdfeba69420ba56ec561bf3d0f1229d02cea2) )
 ROM_END
 
+
+ROM_START( bowmen )
+	ROM_REGION( 0x30000, "maincpu", 0 )  // 64k for code (+ 128k for bankswitching?)
+	ROM_LOAD( "4_27256.bin",   0x00000, 0x08000, CRC(e8dcabb6) SHA1(d6baf9af0ebdced8b73a36486ffd9b48b0d446ca) )
+	ROM_LOAD( "3_27c512.bin",  0x10000, 0x10000, CRC(9c8af1eb) SHA1(e36efb2b6d1df4b313bf81c083df64ccf6764bbc) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )  // 64k for sound
+	ROM_LOAD( "2_27c512.bin",  0x00000, 0x10000, CRC(477a5756) SHA1(675e066adec5fa34c491d71520827d568a5f8d7a) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )  // chars
+	ROM_LOAD( "8_27c512.bin",  0x00000, 0x10000, CRC(782b0b7f) SHA1(35eef9bd32ca2063c730026a71300a7cf2e55778) )
+	ROM_LOAD( "7_27c512.bin",  0x10000, 0x10000, CRC(449720ea) SHA1(aa52ea17293ab86c87eeb04c0c4172001ec56379) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )  // sprites
+	ROM_LOAD( "10_27c512.bin", 0x00000, 0x10000, CRC(8cf4e040) SHA1(641a5d13a63ca0dc56fef42ea1ada3b5b28ca864) )
+	ROM_LOAD( "9_27c512.bin",  0x10000, 0x10000, CRC(3c06fdf7) SHA1(cfce7eda1e6353b850777c38cabc304e1b123ea0) )
+
+	ROM_REGION( 0x100000, "gfx3", 0 )  // bitmaps
+	ROM_LOAD( "5_27c040.bin",  0x00000, 0x80000, CRC(5bac2567) SHA1(bd773761ce31192efc69d031fee13a95ab13b2fd) )
+	ROM_LOAD( "6_27c4001.bin", 0x80000, 0x80000, CRC(35b3b7bc) SHA1(2b7dc0606deb52e5ac725cd63cd56e1e2ef040f8) )
+
+	ROM_REGION( 0x10000, "m72", 0 )  // samples
+	ROM_LOAD( "1_27c512.bin",  0x00000, 0x10000, CRC(456c478b) SHA1(c8c8bf682dcc2b3a28ffbadcfaaba524141f792b) )
+
+	ROM_REGION( 0x400, "proms", 0 )
+	ROM_LOAD( "prom_4_82s129.bin",  0x0000, 0x0100, CRC(c324835e) SHA1(cf6ffe38523badfda211d341410e93e647de87a9) )  // video timing prom
+	ROM_LOAD( "prom_3_82s129.bin",  0x0100, 0x0100, CRC(e6506ef4) SHA1(079841da7640b14d94aaaeb572bf018932b58293) )  // unknown
+	ROM_LOAD( "prom_2_82s129.bin",  0x0200, 0x0100, CRC(b43d094f) SHA1(2bed4892d8a91d7faac5a07bf858d9294eb30606) )  // unknown
+	ROM_LOAD( "prom_1_82s129.bin",  0x0300, 0x0100, CRC(e0aa8869) SHA1(ac8bdfeba69420ba56ec561bf3d0f1229d02cea2) )  // unknown
+
+	ROM_REGION( 0x2000, "plds", 0 )
+	ROM_LOAD( "1_16v8.bin",   0x0000, 0x0117, NO_DUMP )  // PLD is read protected
+	ROM_LOAD( "2_22v10.bin",  0x0200, 0x0200, NO_DUMP )  // PLD is read protected
+	ROM_LOAD( "3_20v8.bin",   0x0400, 0x0157, NO_DUMP )  // PLD is read protected
+	ROM_LOAD( "4_16v8.bin",   0x0600, 0x0117, NO_DUMP )  // PLD is read protected
+	ROM_LOAD( "5_22v10.bin",  0x0800, 0x0200, NO_DUMP )  // PLD is read protected
+	ROM_LOAD( "6_16v8.bin",   0x0a00, 0x0117, NO_DUMP )  // PLD is read protected
+	ROM_LOAD( "7_22v10.bin",  0x0c00, 0x0200, NO_DUMP )  // PLD is read protected
+	ROM_LOAD( "8_16v8.bin",   0x0e00, 0x0117, NO_DUMP )  // PLD is read protected
+	ROM_LOAD( "9_16v8.bin",   0x1000, 0x0117, NO_DUMP )  // PLD is read protected
+ROM_END
+
+
+void vigilant_state::init_bowmen()
+{
+	uint8_t *ROM = memregion("maincpu")->base();
+	int size = memregion("maincpu")->bytes();
+
+	m_rear_pages = 16;
+
+	for (int i = 0x0000; i < size; i++)
+	{
+		ROM[i]= bitswap(ROM[i], 2, 5, 0, 7, 6, 1, 4, 3);  // 0->5, 1->2, 2->7, 3->0, 4->1, 5->6, 6->3, 7->4
+	}
+}
+
+
 GAME( 1988, vigilant,   0,          vigilant, vigilant, vigilant_state, empty_init, ROT0, "Irem", "Vigilante (World, Rev E)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, vigilantg,  vigilant,   vigilant, vigilant, vigilant_state, empty_init, ROT0, "Irem (Data East license)", "Vigilante (US, Rev G)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, vigilanto,  vigilant,   vigilant, vigilant, vigilant_state, empty_init, ROT0, "Irem (Data East license)", "Vigilante (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
@@ -1176,3 +1427,5 @@ GAME( 1988, kikcubicb,  kikcubic,   kikcubic, kikcubic, vigilant_state, empty_in
 GAME( 1989, buccanrs,   0,          buccanrs, buccanrs, vigilant_state, empty_init, ROT0, "Duintronic", "Buccaneers (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, buccanrsa,  buccanrs,   buccanrs, buccanra, vigilant_state, empty_init, ROT0, "Duintronic", "Buccaneers (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, buccanrsb,  buccanrs,   buccanrs, buccanrs, vigilant_state, empty_init, ROT0, "Duintronic", "Buccaneers (set 3, harder)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+
+GAME( 1994, bowmen,     0,          bowmen,   bowmen,   vigilant_state, init_bowmen, ROT0, "Ten-Level", "Bowmen", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

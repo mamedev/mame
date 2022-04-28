@@ -216,20 +216,20 @@ cdrom_file::cdrom_file(std::string_view inputfile)
 
 		if (EXTRA_VERBOSE)
 			printf("Track %02d is format %d subtype %d datasize %d subsize %d frames %d extraframes %d pregap %d pgmode %d presize %d postgap %d logofs %d physofs %d chdofs %d logframes %d\n", i+1,
-	            track.trktype,
-	            track.subtype,
-	            track.datasize,
-	            track.subsize,
-	            track.frames,
-	            track.extraframes,
-	            track.pregap,
-	            track.pgtype,
-	            track.pgdatasize,
-	            track.postgap,
-	            track.logframeofs,
-	            track.physframeofs,
-	            track.chdframeofs,
-	            track.logframes);
+				track.trktype,
+				track.subtype,
+				track.datasize,
+				track.subsize,
+				track.frames,
+				track.extraframes,
+				track.pregap,
+				track.pgtype,
+				track.pgdatasize,
+				track.postgap,
+				track.logframeofs,
+				track.physframeofs,
+				track.chdframeofs,
+				track.logframes);
 	}
 
 	// fill out dummy entries for the last track to help our search

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Jonathan Gevaryahu, Robbbert
+// copyright-holders:Jonathan Gevaryahu
 /******************************************************************************
 
   Self Contained zexall 'Z80 instruction exerciser' test driver

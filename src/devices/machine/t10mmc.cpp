@@ -157,6 +157,14 @@ void t10mmc::ExecCommand()
 		break;
 
 	case T10SBC_CMD_READ_10:
+		if (m_cdrom == nullptr)
+		{
+			m_phase = SCSI_PHASE_STATUS;
+			m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
+			m_transfer_length = 0;
+			break;
+		}
+
 		m_lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
 		m_blocks = SCSILengthFromUINT16( &command[7] );
 
@@ -180,6 +188,14 @@ void t10mmc::ExecCommand()
 		break;
 
 	case T10MMC_CMD_READ_SUB_CHANNEL:
+		if (m_cdrom == nullptr)
+		{
+			m_phase = SCSI_PHASE_STATUS;
+			m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
+			m_transfer_length = 0;
+			break;
+		}
+
 		//m_device->logerror("T10MMC: READ SUB-CHANNEL type %d\n", command[3]);
 		m_phase = SCSI_PHASE_DATAIN;
 		m_status_code = SCSI_STATUS_CODE_GOOD;
@@ -188,6 +204,14 @@ void t10mmc::ExecCommand()
 
 	case T10MMC_CMD_READ_TOC_PMA_ATIP:
 	{
+		if (m_cdrom == nullptr)
+		{
+			m_phase = SCSI_PHASE_STATUS;
+			m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
+			m_transfer_length = 0;
+			break;
+		}
+
 		int length;
 
 		switch (toc_format())
@@ -221,6 +245,14 @@ void t10mmc::ExecCommand()
 		break;
 	}
 	case T10MMC_CMD_PLAY_AUDIO_10:
+		if (m_cdrom == nullptr)
+		{
+			m_phase = SCSI_PHASE_STATUS;
+			m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
+			m_transfer_length = 0;
+			break;
+		}
+
 		m_lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
 		m_blocks = SCSILengthFromUINT16( &command[7] );
 
@@ -260,6 +292,14 @@ void t10mmc::ExecCommand()
 		break;
 
 	case T10MMC_CMD_PLAY_AUDIO_MSF:
+		if (m_cdrom == nullptr)
+		{
+			m_phase = SCSI_PHASE_STATUS;
+			m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
+			m_transfer_length = 0;
+			break;
+		}
+
 		m_lba = (command[5] % 75) + ((command[4] * 75) % (60*75)) + (command[3] * (75*60));
 		m_blocks = (command[8] % 75) + ((command[7] * 75) % (60*75)) + (command[6] * (75*60)) - m_lba;
 
@@ -297,6 +337,14 @@ void t10mmc::ExecCommand()
 		break;
 
 	case T10MMC_CMD_PLAY_AUDIO_TRACK_INDEX:
+		if (m_cdrom == nullptr)
+		{
+			m_phase = SCSI_PHASE_STATUS;
+			m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
+			m_transfer_length = 0;
+			break;
+		}
+
 		if (command[4] > command[7])
 		{
 			// TODO: check error
@@ -377,6 +425,14 @@ void t10mmc::ExecCommand()
 		break;
 
 	case T10MMC_CMD_PLAY_AUDIO_12:
+		if (m_cdrom == nullptr)
+		{
+			m_phase = SCSI_PHASE_STATUS;
+			m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
+			m_transfer_length = 0;
+			break;
+		}
+
 		m_lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
 		m_blocks = command[6]<<24 | command[7]<<16 | command[8]<<8 | command[9];
 
@@ -413,6 +469,14 @@ void t10mmc::ExecCommand()
 		break;
 
 	case T10SBC_CMD_READ_12:
+		if (m_cdrom == nullptr)
+		{
+			m_phase = SCSI_PHASE_STATUS;
+			m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
+			m_transfer_length = 0;
+			break;
+		}
+
 		m_lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
 		m_blocks = command[7]<<16 | command[8]<<8 | command[9];
 

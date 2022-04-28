@@ -118,13 +118,12 @@ private:
 	void cursinit_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	static constexpr int sounddma_ch_size = 2;
-	u32 m_sndcur, m_sndend;
-	u32 m_sndcur_reg[sounddma_ch_size], m_sndend_reg[sounddma_ch_size];
-	bool m_sndstop_reg[sounddma_ch_size], m_sndlast_reg[sounddma_ch_size];
-	bool m_sndbuffer_ok[sounddma_ch_size];
-	bool m_sound_dma_on;
-	u8 m_sndcur_buffer;
-	bool m_snd_overrun, m_snd_int;
+	u32 m_sndcur = 0, m_sndend = 0;
+	u32 m_sndcur_reg[sounddma_ch_size]{}, m_sndend_reg[sounddma_ch_size]{};
+	bool m_sndstop_reg[sounddma_ch_size]{}, m_sndlast_reg[sounddma_ch_size]{};
+	bool m_sndbuffer_ok[sounddma_ch_size]{};
+	bool m_sound_dma_on = false;
+	u8 m_sndcur_buffer = 0;
 	inline void sounddma_swap_buffer();
 	template <unsigned Which> u32 sdcur_r();
 	template <unsigned Which> void sdcur_w(offs_t offset, u32 data, u32 mem_mask = ~0);

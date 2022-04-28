@@ -235,13 +235,13 @@ private:
 		int line_offset_zbuf = 0;
 	} m_blit;
 
-	std::unique_ptr<sprite_cave []> m_sprite[4]{};
+	std::unique_ptr<sprite_cave []> m_sprite[4];
 	sprite_cave *m_sprite_table[4][MAX_PRIORITY][MAX_SPRITE_NUM + 1]{};
 
-	bitmap_ind16 m_sprite_zbuf[4]{};
+	bitmap_ind16 m_sprite_zbuf[4];
 	u16       m_sprite_zbuf_baseval = 0U;
 
-	std::unique_ptr<u8[]> m_sprite_gfx[4]{};
+	std::unique_ptr<u8[]> m_sprite_gfx[4];
 	offs_t                m_sprite_gfx_mask[4]{};
 
 	int       m_num_sprites[4]{};

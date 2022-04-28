@@ -45,7 +45,7 @@ private:
 	required_ioport m_penx;
 	required_ioport m_peny;
 
-	uint32_t m_port[9];
+	uint32_t m_port[9] = { };
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);

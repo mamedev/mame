@@ -33,7 +33,8 @@ Reference: [1] TMS9901 Programmable Systems Interface Data Manual, July 1977
 Overview:
     TMS9901 is a support chip for TMS9900.  It handles interrupts, provides
     several I/O pins, and a timer, which is a register which
-    decrements regularly and can generate an interrupt when it reaches 0.
+    decrements continuously and can be set to generate an interrupt when it
+    reaches 0.
 
     It communicates with the TMS9900 with the CRU bus, and with the rest of the
     world with a number of parallel I/O pins.
@@ -79,7 +80,8 @@ Interrupt inputs (group 1 and 2)
     The interrupt inputs (INT1*-INT15*) are sampled on each falling edge of
     the phi* clock. An interrupt mask is applied to mask away levels that
     shall not trigger an interrupt. The mask can be set using the SBO/SBZ
-    commands (1=arm, 0=disarm) on each of the 15 bits.
+    commands (1=arm, 0=disarm) on each of the 15 bits. A disarmed interrupt
+    input can still be read like a normal input port via CRU access.
 
     After each clock cycle, the TMS9901 latches the state of INT1*-INT15*
     (except those pins which are set as output pins).
@@ -98,8 +100,7 @@ Group 2 pins (shared I/O and INT*)
     and triggers an interrupt at level 7 when asserted.
 
     In contrast, when writing to bit 31, P15 (same pin) is configured as an
-    output, and the written value appears on the pin. When the port is set
-    as output, the interrupt input on the shared pin is deactivated.
+    output, and the written value appears on the pin.
 
     According to [1], the interrupt mask should be set to 0 for those group 2
     pins that are used as input/output pins so that no unwanted interrupts are
@@ -108,16 +109,20 @@ Group 2 pins (shared I/O and INT*)
 Clock mode:
     The "clock mode" is entered by setting bit 0 to 1; setting to 0 enters
     "interrupt mode". The internal clock is a 14-bit decrementer that
-    counts down by 1 every 64 clock ticks. On entering clock mode, the current
-    value of the decrementer is copied to the clock read register and can be
-    read by the CRU bits 1 to 14. Writing to these CRU bits modifies the
-    respective bit of the clock register that serves as the start value. Every
-    time a bit is written, the decrementer is loaded with the current clock
-    register value.
+    counts down by 1 every 64 clock ticks. On every update, the value is copied
+    into the read register, but only in interrupt mode. In clock mode, the read
+    register is locked so that it can be read without being changed.
+    Whenever the counter reaches 0, it is reloaded from the clock register on
+    the next update.
+    Setting the clock register is possible via CRU addresses 1 to 14 in clock
+    mode, with bit 1 being the LSB and bit 14 being the MSB. On each bit write
+    operation, the current state of the clock register is copied into the counter.
+
+
                            Interrupt
                               ^
                               |
-    [Clock register] -> [Decrementer] -> [Clock read register]
+    [Clock register]  -> [Decrementer]  ->  [Read register]
          ^                                         |
          |                                         v
          +--<---  CRU write         CRU read---<---+
@@ -126,7 +131,7 @@ Clock mode:
     and "the clock is disabled by RST1* or by writing a zero value into the clock register".
     Tests show that when a 0 has been written, the chip still counts down from
     0x3FFF to 0. However, no interrupt is raised when reaching 0, so "enable"
-    or "disable" most likely refer to the interrupt.
+    or "disable" most likely refers to the interrupt.
 
     When enabled, the clock raises an interrupt level 3 when reaching 0,
     overriding the input from the INT3* input. CRU bit 3 is the mask bit for
@@ -394,14 +399,6 @@ void tms9901_device::write_bit(int offset, bool data)
 		// Write to control bit (CB)
 		m_clock_mode = (data!=0);
 		LOGMASKED(LOG_MODE, "Enter %s mode\n", m_clock_mode? "clock" : "interrupt");
-
-		if (m_clock_mode)
-		{
-			// we are switching to clock mode: latch the current value of
-			// the decrementer register
-			m_clock_read_register = m_decrementer_value;
-			LOGMASKED(LOG_MODE, "Clock setting = %d\n", m_clock_read_register);
-		}
 		break;
 
 	case 15:
@@ -449,6 +446,26 @@ void tms9901_device::write_bit(int offset, bool data)
 }
 
 /*
+    Update clock line. This is not a real connection to the 9901; it represents
+    the effect of setting selection line S0 to 1. Since we use a separate
+    I/O address space, and in the real machine, the same address lines as for
+    memory access are used, and one of the address lines is connected to S0,
+    we have settings of S0 even in situations when there is no I/O access but
+    ordinary memory access.
+
+    Offering a method explicitly for S0 looks inconsistent with the way of
+    addressing the bits in this chip (that is, we should then offer S1 to   S4 as
+    well).
+
+    Drivers may use this line for higher emulation precision concerning the
+    clock.
+*/
+void tms9901_device::update_clock()
+{
+	m_clock_read_register = m_decrementer_value;
+}
+
+/*
     Timer callback
     Decrementer counts down the value set in clock mode; when it reaches 0,
     raises an interrupt and resets to the start value
@@ -467,6 +484,10 @@ void tms9901_device::timer_clock_in(line_state clk)
 	if (clk == ASSERT_LINE)
 	{
 		m_decrementer_value = (m_decrementer_value - 1) & 0x3FFF;
+
+		if (!m_clock_mode)
+			m_clock_read_register = m_decrementer_value;
+
 		LOGMASKED(LOG_CLOCK, "Clock = %04x\n", m_decrementer_value);
 		if (m_decrementer_value==0)
 		{
@@ -495,6 +516,9 @@ void tms9901_device::phi_line(int state)
 		if (m_clockdiv==0)
 		{
 			timer_clock_in(ASSERT_LINE);
+
+			if (!m_clock_mode)
+				m_clock_read_register = m_decrementer_value;
 
 			// We signal the interrupt in sync with the clock line
 			signal_int();

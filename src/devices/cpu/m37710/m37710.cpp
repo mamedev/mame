@@ -63,7 +63,6 @@
 #include "emu.h"
 #include "m37710.h"
 
-#include "debugger.h"
 #include "m37710cm.h"
 #include "m37710il.h"
 

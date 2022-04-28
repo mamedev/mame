@@ -54,11 +54,11 @@ private:
 	void dma_w(offs_t offset, uint8_t data);
 
 	/* video state */
-	int m_cdp1864_efx;      /* EFx */
-	uint8_t m_color;
+	int m_cdp1864_efx = 0;      /* EFx */
+	uint8_t m_color = 0;
 
 	/* keyboard state */
-	int m_keylatch;         /* key latch */
+	int m_keylatch = 0;         /* key latch */
 	void tmc2000e_io_map(address_map &map);
 	void tmc2000e_map(address_map &map);
 

@@ -159,34 +159,34 @@ private:
 
 
 	/* global data */
-	uint8_t m_shooter;
-	uint8_t m_shooter_x;
-	uint8_t m_shooter_y;
-	uint8_t m_adc_shift;
+	uint8_t m_shooter = 0;
+	uint8_t m_shooter_x = 0;
+	uint8_t m_shooter_y = 0;
+	uint8_t m_adc_shift = 0;
 
 	/* random number generator states */
-	uint8_t m_rand17[POLY17_SIZE + 1];
+	uint8_t m_rand17[POLY17_SIZE + 1]{};
 
 	/* ADC I/O states */
-	int8_t m_analog_input_data[4];
-	uint8_t m_adc_value;
+	int8_t m_analog_input_data[4]{};
+	uint8_t m_adc_value = 0;
 
 	/* game-specific states */
-	uint8_t m_nstocker_bits;
-	uint8_t m_spiker_expand_color;
-	uint8_t m_spiker_expand_bgcolor;
-	uint8_t m_spiker_expand_bits;
-	uint8_t m_grudge_steering_result;
-	uint8_t m_grudge_last_steering[3];
-	uint8_t m_teamht_input;
+	uint8_t m_nstocker_bits = 0;
+	uint8_t m_spiker_expand_color = 0;
+	uint8_t m_spiker_expand_bgcolor = 0;
+	uint8_t m_spiker_expand_bits = 0;
+	uint8_t m_grudge_steering_result = 0;
+	uint8_t m_grudge_last_steering[3]{};
+	uint8_t m_teamht_input = 0;
 
 	/* video data */
-	uint8_t m_expanded_videoram[256*256];
-	uint8_t *m_sprite_data;
-	uint32_t m_sprite_mask;
-	uint8_t *m_sprite_bank[2];
+	uint8_t m_expanded_videoram[256*256]{};
+	uint8_t *m_sprite_data = nullptr;
+	uint32_t m_sprite_mask = 0;
+	uint8_t *m_sprite_bank[2]{};
 
-	uint8_t m_palettebank_vis;
+	uint8_t m_palettebank_vis = 0;
 
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_videoram;

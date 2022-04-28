@@ -92,8 +92,8 @@ private:
 	void hunter2_io(address_map &map);
 	void hunter2_mem(address_map &map);
 
-	uint8_t m_keydata;
-	uint8_t m_irq_mask;
+	uint8_t m_keydata = 0;
+	uint8_t m_irq_mask = 0;
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_ioport_array<7> m_kbd;

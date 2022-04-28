@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert, Nigel Barnes
+// copyright-holders:Nigel Barnes
 /***************************************************************************
 
     Acorn System 2, 3, 4, and 5

@@ -392,7 +392,7 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME( 1979, centauri,  0,        inderp, inderp, inderp_state, init_1player, ROT0, "Inder", "Centaur (Inder)",         MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979, centauri2, centauri, inderp, inderp, inderp_state, init_1player, ROT0, "Inder", "Centaur (Inder, alternate set)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979, topaz,     0,        inderp, inderp, inderp_state, empty_init,   ROT0, "Inder", "Topaz (Inder)",           MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1980, skatebrd,  0,        inderp, inderp, inderp_state, empty_init,   ROT0, "Inder", "Skate Board (Inder)",     MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, centauri,  0,        inderp, inderp, inderp_state, init_1player, ROT0, "Inder", "Centaur (Inder) (set 1)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, centauri2, centauri, inderp, inderp, inderp_state, init_1player, ROT0, "Inder", "Centaur (Inder) (set 2)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, topaz,     0,        inderp, inderp, inderp_state, empty_init,   ROT0, "Inder", "Topaz (Inder)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, skatebrd,  0,        inderp, inderp, inderp_state, empty_init,   ROT0, "Inder", "Skate Board (Inder)",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

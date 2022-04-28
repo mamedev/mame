@@ -87,32 +87,366 @@ QB output = "1/2CLK" = 12mhz
 QC output = "CLK" = 6mhz
 "1/2phi" = 24M / 3 = 8mhz
 
-The z80B main cpu is clocked by (depending on a jumper) either "1/2CLK"/2 OR "1/2PHI"/2, so either 6mhz or 4mhz.
+The z80B main CPU is clocked by (depending on a jumper) either "1/2CLK"/2 OR "1/2PHI"/2, so either 6mhz or 4mhz.
 Schematics show the jumper set to the 6mhz setting.
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/buggychl.h"
 
-#include "cpu/z80/z80.h"
+#include "machine/taito68705interface.h"
+
 #include "cpu/m6805/m6805.h"
+#include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/input_merger.h"
 #include "machine/watchdog.h"
+#include "sound/ay8910.h"
+#include "sound/msm5232.h"
+#include "sound/ta7630.h"
+
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
 
 #include "buggychl.lh"
 
 
+namespace {
+
+class buggychl_state : public driver_device
+{
+public:
+	buggychl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_charram(*this, "charram"),
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_scrollv(*this, "scrollv"),
+		m_scrollh(*this, "scrollh"),
+		m_mainbank(*this, "mainbank"),
+		m_sprite_zoom_table(*this, "sprite_zoom_table"),
+		m_audiocpu(*this, "audiocpu"),
+		m_maincpu(*this, "maincpu"),
+		m_bmcu(*this, "bmcu"),
+		m_ta7630(*this, "ta7630"),
+		m_msm(*this, "msm"),
+		m_ay(*this, "ay%u", 1U),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_soundnmi(*this, "soundnmi"),
+		m_soundlatch(*this, "soundlatch%u", 1U),
+		m_pedal_input(*this, "PEDAL"),
+		m_led(*this, "led%u", 0U)
+	{ }
+
+	void buggychl(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(pedal_in_r);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	// memory pointers
+	required_shared_ptr<uint8_t> m_charram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_scrollv;
+	required_shared_ptr<uint8_t> m_scrollh;
+	required_memory_bank m_mainbank;
+	required_region_ptr<uint8_t> m_sprite_zoom_table;
+
+	// devices
+	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<taito68705_mcu_device> m_bmcu;
+	required_device<ta7630_device> m_ta7630;
+	required_device<msm5232_device> m_msm;
+	required_device_array<ay8910_device, 2> m_ay;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<input_merger_device> m_soundnmi;
+	required_device_array<generic_latch_8_device, 2> m_soundlatch;
+	required_ioport m_pedal_input;
+
+	output_finder<1> m_led;
+
+	// video-related
+	bitmap_ind16 m_tmp_bitmap[2];
+	uint16_t m_sl_bank;
+	uint8_t m_bg_clip_on;
+	uint8_t m_sky_on;
+	uint8_t m_sprite_color_base;
+	int32_t m_bg_scrollx;
+	uint8_t m_sprite_lookup[0x2000];
+
+	void bankswitch_w(uint8_t data);
+	void sound_enable_w(uint8_t data);
+	uint8_t mcu_status_r();
+	uint8_t sound_status_main_r();
+	uint8_t sound_status_sound_r();
+	void chargen_w(offs_t offset, uint8_t data);
+	void sprite_lookup_bank_w(uint8_t data);
+	void sprite_lookup_w(offs_t offset, uint8_t data);
+	void ctrl_w(uint8_t data);
+	void bg_scrollx_w(uint8_t data);
+	template <uint8_t Which> void ta7630_volbal_ay_w(uint8_t data);
+	template <uint8_t Which> void port_b_w(uint8_t data);
+	void ta7630_volbal_msm_w(uint8_t data);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sky(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_bg(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_fg(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
+};
+
+
+// video
+
+void buggychl_state::palette(palette_device &palette) const
+{
+	// arbitrary blue shading for the sky, estimation
+	for (int i = 0; i < 128; i++)
+		palette.set_pen_color(i + 128, rgb_t(0, 240 - i, 255));
+}
+
+void buggychl_state::video_start()
+{
+	m_screen->register_screen_bitmap(m_tmp_bitmap[0]);
+	m_screen->register_screen_bitmap(m_tmp_bitmap[1]);
+
+	save_item(NAME(m_tmp_bitmap[0]));
+	save_item(NAME(m_tmp_bitmap[1]));
+
+	m_gfxdecode->gfx(0)->set_source(m_charram);
+}
+
+void buggychl_state::chargen_w(offs_t offset, uint8_t data)
+{
+	if (m_charram[offset] != data)
+	{
+		m_charram[offset] = data;
+		m_gfxdecode->gfx(0)->mark_dirty((offset / 8) & 0xff);
+	}
+}
+
+void buggychl_state::sprite_lookup_bank_w(uint8_t data)
+{
+	m_sl_bank = (data & 0x10) << 8;
+}
+
+void buggychl_state::sprite_lookup_w(offs_t offset, uint8_t data)
+{
+	m_sprite_lookup[offset + m_sl_bank] = data;
+}
+
+void buggychl_state::ctrl_w(uint8_t data)
+{
+/*
+    bit7 = lamp
+    bit6 = lockout
+    bit4 = OJMODE
+    bit3 = SKY OFF
+    bit2 = /SN3OFF
+    bit1 = HINV
+    bit0 = VINV
+*/
+
+	flip_screen_y_set(data & 0x01);
+	flip_screen_x_set(data & 0x02);
+
+	m_bg_clip_on = data & 0x04;
+	m_sky_on = data & 0x08;
+
+	m_sprite_color_base = (data & 0x10) ? 1 * 16 : 3 * 16;
+
+	machine().bookkeeping().coin_lockout_global_w((~data & 0x40) >> 6);
+	m_led[0] = BIT(~data, 7);
+}
+
+void buggychl_state::bg_scrollx_w(uint8_t data)
+{
+	m_bg_scrollx = -(data - 0x12);
+}
+
+
+void buggychl_state::draw_sky(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int y = 0; y < 256; y++)
+		for (int x = 0; x < 256; x++)
+			bitmap.pix(y, x) = 128 + x / 2;
+}
+
+
+void buggychl_state::draw_bg(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// prevent wraparound
+	rectangle clip = cliprect;
+
+	// enable clipping if on (title screen disables this to cover all of the area)
+	if (m_bg_clip_on)
+	{
+		if (flip_screen_x()) clip.min_x += 8 * 8;
+		else clip.max_x -= 8 * 8;
+	}
+
+	for (int offs = 0; offs < 0x400; offs++)
+	{
+		int code = m_videoram[0x400 + offs];
+
+		int sx = offs % 32;
+		int sy = offs / 32;
+
+		if (flip_screen_x())
+			sx = 31 - sx;
+		if (flip_screen_y())
+			sy = 31 - sy;
+
+		m_gfxdecode->gfx(0)->opaque(m_tmp_bitmap[0], m_tmp_bitmap[0].cliprect(),
+				code,
+				2,
+				flip_screen_x(), flip_screen_y(),
+				8 * sx, 8 * sy);
+	}
+
+	int scroll[256];
+
+	// first copy to a temp bitmap doing column scroll
+	for (int offs = 0; offs < 256; offs++)
+		scroll[offs] = -m_scrollv[offs / 8];
+
+	copyscrollbitmap(m_tmp_bitmap[1], m_tmp_bitmap[0], 1, &m_bg_scrollx, 256, scroll, m_tmp_bitmap[1].cliprect());
+
+	// then copy to the screen doing row scroll
+	for (int offs = 0; offs < 256; offs++)
+		scroll[offs] = -m_scrollh[offs];
+
+	copyscrollbitmap_trans(bitmap, m_tmp_bitmap[1], 256, scroll, 0, nullptr, clip, 32);
+}
+
+
+void buggychl_state::draw_fg(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int offs = 0; offs < 0x400; offs++)
+	{
+		int sx = offs % 32;
+		int sy = offs / 32;
+		int flipx = flip_screen_x();
+		int flipy = flip_screen_y();
+
+		int code = m_videoram[offs];
+
+		if (flipx)
+			sx = 31 - sx;
+		if (flipy)
+			sy = 31 - sy;
+
+		m_gfxdecode->gfx(0)->transpen(bitmap, cliprect,
+				code,
+				0,
+				flipx, flipy,
+				8 * sx, 8 * sy,
+				0);
+	}
+}
+
+
+void buggychl_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	g_profiler.start(PROFILER_USER1);
+
+	for (int offs = 0; offs < m_spriteram.bytes(); offs += 4)
+	{
+		int sx = m_spriteram[offs + 3] - ((m_spriteram[offs + 2] & 0x80) << 1);
+		int sy = 256 - 64 - m_spriteram[offs] + ((m_spriteram[offs + 1] & 0x80) << 1);
+		int flipy = m_spriteram[offs + 1] & 0x40;
+		int zoom = m_spriteram[offs + 1] & 0x3f;
+		uint8_t const *const zoomy_rom = &m_sprite_zoom_table[zoom << 6];
+		uint8_t const *const zoomx_rom = &m_sprite_zoom_table[0x2000 + (zoom << 3)];
+
+		uint8_t const *const lookup = m_sprite_lookup + ((m_spriteram[offs + 2] & 0x7f) << 6);
+
+		for (int y = 0; y < 64; y++)
+		{
+			int dy = flip_screen_y() ? (255 - sy - y) : (sy + y);
+
+			if ((dy & ~0xff) == 0)
+			{
+				int charline = zoomy_rom[y] & 0x07;
+				int base_pos = zoomy_rom[y] & 0x38;
+				if (flipy)
+					base_pos ^= 0x38;
+
+				int px = 0;
+				for (int ch = 0; ch < 4; ch++)
+				{
+					int pos = base_pos + 2 * ch;
+					int code = 8 * (lookup[pos] | ((lookup[pos + 1] & 0x07) << 8));
+					int realflipy = (lookup[pos + 1] & 0x80) ? !flipy : flipy;
+					code += (realflipy ? (charline ^ 7) : charline);
+					uint8_t const *const pendata = m_gfxdecode->gfx(1)->get_data(code);
+
+					for (int x = 0; x < 16; x++)
+					{
+						int col = pendata[x];
+						if (col)
+						{
+							int dx = flip_screen_x() ? (255 - sx - px) : (sx + px);
+							if ((dx & ~0xff) == 0)
+								bitmap.pix(dy, dx) = m_sprite_color_base + col;
+						}
+
+						// the following line is almost certainly wrong
+						if (zoomx_rom[7 - (2 * ch + x / 8)] & (1 << (x & 7)))
+							px++;
+					}
+				}
+			}
+		}
+	}
+
+	g_profiler.stop();
+}
+
+
+uint32_t buggychl_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	if (m_sky_on)
+		draw_sky(bitmap, cliprect);
+	else
+		bitmap.fill(0x20, cliprect); // stage 3 disables sky, wants background pen to be blue
+
+	draw_bg(bitmap, cliprect);
+
+	draw_sprites(bitmap, cliprect);
+
+	draw_fg(bitmap, cliprect);
+
+	return 0;
+}
+
+
+// machine
+
 void buggychl_state::bankswitch_w(uint8_t data)
 {
-	membank("bank1")->set_entry(data & 0x07);   // shall we check if data&7 < # banks?
+	m_mainbank->set_entry(data & 0x07);   // shall we check if data & 7 < # banks?
 }
 
 void buggychl_state::sound_enable_w(uint8_t data)
 {
 	// does this really only control the sound irq 'timer' enable state, rather than the entire sound system?
 	// this would be more in line with the (admittedly incorrect) schematic...
-	//logerror("Sound_enable_w written with data of %02x\n", data);
+	// logerror("Sound_enable_w written with data of %02x\n", data);
 	machine().sound().system_mute(!BIT(data, 0));
 }
 
@@ -125,26 +459,26 @@ uint8_t buggychl_state::mcu_status_r()
 		((CLEAR_LINE != m_bmcu->mcu_semaphore_r()) ? 0x02 : 0x00);
 }
 
-// the schematics show that the two sound semaphore latch bits are actually flipped backwards when read by the sound cpu
-//   vs when read by the main cpu.
-//   Given the other schematic errors, and the fact that the sound board schematic is for the wrong pcb, is this even correct?
-//   It isn't even obvious if the maincpu or sound cpu read the semaphores at all, ever.
-// a cpu write to soundlatch sets ic12.2 so /Q is low, so cpu bit 1 and sound bit 0 read as clear
-// a sound write to soundlatch2 clears ic12.1 so /Q is high, so cpu bit 0 and sound bit 1 read as set
-// a cpu read of soundlatch2 sets ic12.1 so /Q is low, so cpu bit 0 and sound bit 1 read as clear
-// a sound read of soundlatch clears ic12.2 so /Q is high, so cpu bit 1 and sound bit 0 read as set
+// the schematics show that the two sound semaphore latch bits are actually flipped backwards when read by the sound CPU
+//   vs when read by the main CPU.
+//   Given the other schematic errors, and the fact that the sound board schematic is for the wrong PCB, is this even correct?
+//   It isn't even obvious if the main CPU or sound CPU read the semaphores at all, ever.
+// a CPU write to soundlatch[0] sets ic12.2 so /Q is low, so CPU bit 1 and sound bit 0 read as clear
+// a sound write to soundlatch[1] clears ic12.1 so /Q is high, so CPU bit 0 and sound bit 1 read as set
+// a CPU read of soundlatch[1] sets ic12.1 so /Q is low, so CPU bit 0 and sound bit 1 read as clear
+// a sound read of soundlatch[0] clears ic12.2 so /Q is high, so CPU bit 1 and sound bit 0 read as set
 // ic12.1 is set and ic12.2 is cleared by /SRESET
 uint8_t buggychl_state::sound_status_main_r()
 {
-	return (m_soundlatch2->pending_r() ? 1 : 0) | (m_soundlatch->pending_r() ? 0 : 2);
+	return (m_soundlatch[1]->pending_r() ? 1 : 0) | (m_soundlatch[0]->pending_r() ? 0 : 2);
 }
 
 uint8_t buggychl_state::sound_status_sound_r()
 {
-	return (m_soundlatch2->pending_r() ? 2 : 0) | (m_soundlatch->pending_r() ? 0 : 1);
+	return (m_soundlatch[1]->pending_r() ? 2 : 0) | (m_soundlatch[0]->pending_r() ? 0 : 1);
 }
 
-/* Main cpu address map ( * = used within this section; x = don't care )
+/* Main CPU address map ( * = used within this section; x = don't care )
            |           |           |
 15 14 13 12 11 10  9  8  7  6  5  4  3  2  1  0
  *  *                                             R  74LS139 @ ic53
@@ -197,64 +531,64 @@ uint8_t buggychl_state::sound_status_sound_r()
  1  1  1  0  ?  ?  ?  ?  ?  ?  ?  ?  ?  ?  ?  ?   ?  (unknown, cut off on schematic)
  1  1  1  1  ?  ?  ?  ?  ?  ?  ?  ?  ?  ?  ?  ?   ?  (unknown, cut off on schematic)
 */
-void buggychl_state::buggychl_map(address_map &map)
+void buggychl_state::main_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rom(); /* A22-04 (23) */
-	map(0x4000, 0x7fff).rom(); /* A22-05 (22) */
-	map(0x8000, 0x87ff).ram(); /* 6116 SRAM (36) */
-	map(0x8800, 0x8fff).ram(); /* 6116 SRAM (35) */
-	map(0x9000, 0x9fff).w(FUNC(buggychl_state::buggychl_sprite_lookup_w));
-	map(0xa000, 0xbfff).bankr("bank1").w(FUNC(buggychl_state::buggychl_chargen_w)).share("charram");
-	map(0xc800, 0xcfff).ram().share("videoram");
+	map(0x0000, 0x3fff).rom(); // A22-04 (23)
+	map(0x4000, 0x7fff).rom(); // A22-05 (22)
+	map(0x8000, 0x87ff).ram(); // 6116 SRAM (36)
+	map(0x8800, 0x8fff).ram(); // 6116 SRAM (35)
+	map(0x9000, 0x9fff).w(FUNC(buggychl_state::sprite_lookup_w));
+	map(0xa000, 0xbfff).bankr(m_mainbank).w(FUNC(buggychl_state::chargen_w)).share(m_charram);
+	map(0xc800, 0xcfff).ram().share(m_videoram);
 	map(0xd000, 0xd000).nopw(); // ???
-	map(0xd100, 0xd100).mirror(0x00ff).w(FUNC(buggychl_state::buggychl_ctrl_w));
+	map(0xd100, 0xd100).mirror(0x00ff).w(FUNC(buggychl_state::ctrl_w));
 	map(0xd200, 0xd200).mirror(0x00ff).w(FUNC(buggychl_state::bankswitch_w));
 	map(0xd300, 0xd300).mirror(0x00f8).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	// d301 = flp stuff, unused?
 	// d302 = mcu reset latched d0
-	map(0xd303, 0xd303).mirror(0x00f8).w(FUNC(buggychl_state::buggychl_sprite_lookup_bank_w));
+	map(0xd303, 0xd303).mirror(0x00f8).w(FUNC(buggychl_state::sprite_lookup_bank_w));
 	map(0xd304, 0xd307).nopw(); // d304-d307 is SCCON, which seems to be for a bezel mounted 7seg score/time display like Grand Champion has
 	map(0xd400, 0xd400).mirror(0x00fc).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
 	map(0xd401, 0xd401).mirror(0x00fc).r(FUNC(buggychl_state::mcu_status_r));
-	map(0xd500, 0xd57f).writeonly().share("spriteram");
+	map(0xd500, 0xd57f).writeonly().share(m_spriteram);
 	map(0xd600, 0xd600).mirror(0x00e4).portr("DSW1");
 	map(0xd601, 0xd601).mirror(0x00e4).portr("DSW2");
 	map(0xd602, 0xd602).mirror(0x00e4).portr("DSW3");
-	map(0xd603, 0xd603).mirror(0x00e4).portr("IN0");    /* player inputs */
+	map(0xd603, 0xd603).mirror(0x00e4).portr("IN0");    // player inputs
 	map(0xd608, 0xd608).mirror(0x00e4).portr("WHEEL");
-	map(0xd609, 0xd609).mirror(0x00e4).portr("IN1");    /* coin + accelerator */
+	map(0xd609, 0xd609).mirror(0x00e4).portr("IN1");    // coin + accelerator
 //  map(0xd60a, 0xd60a).mirror(0x00e4); // other inputs, not used?
 //  map(0xd60b, 0xd60b).mirror(0x00e4); // other inputs, not used?
-	map(0xd610, 0xd610).mirror(0x00e4).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xd610, 0xd610).mirror(0x00e4).r(m_soundlatch[1], FUNC(generic_latch_8_device::read)).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
 	map(0xd611, 0xd611).mirror(0x00e4).r(FUNC(buggychl_state::sound_status_main_r));
 //  map(0xd613, 0xd613).mirror(0x00e4).w(FUNC(buggychl_state::sound_reset_w));
-	map(0xd618, 0xd618).mirror(0x00e7).nopw();    /* accelerator clear; TODO: should we emulate the proper quadrature counter here? */
+	map(0xd618, 0xd618).mirror(0x00e7).nopw();    // accelerator clear; TODO: should we emulate the proper quadrature counter here?
 	map(0xd700, 0xd7ff).w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xd820, 0xd83f).ram(); // TODO
-	map(0xd840, 0xd85f).writeonly().share("scrollv");
-	map(0xdb00, 0xdbff).writeonly().share("scrollh");
-	map(0xdc04, 0xdc04).nopw(); /* should be fg scroll */
-	map(0xdc06, 0xdc06).w(FUNC(buggychl_state::buggychl_bg_scrollx_w));
+	map(0xd840, 0xd85f).writeonly().share(m_scrollv);
+	map(0xdb00, 0xdbff).writeonly().share(m_scrollh);
+	map(0xdc04, 0xdc04).nopw(); // should be fg scroll
+	map(0xdc06, 0xdc06).w(FUNC(buggychl_state::bg_scrollx_w));
 }
 
-/* The schematics for buggy challenge has the wrong sound board schematic attached to it.
-  (The schematic is for an unknown taito game, possibly never released.)
-   The final buggy challenge sound board is more similar to Fairyland Story sound
+/* The schematics for Buggy Challenge have the wrong sound board schematic attached to it.
+  (The schematic is for an unknown Taito game, possibly never released.)
+   The final Buggy Challenge sound board is more similar to Fairyland Story sound
    hardware, except it has two YM2149 chips instead of one, and much less ROM space. */
 void buggychl_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram();
-	map(0x4800, 0x4801).w(m_ay1, FUNC(ay8910_device::address_data_w));
-	map(0x4802, 0x4803).w(m_ay2, FUNC(ay8910_device::address_data_w));
+	map(0x4800, 0x4801).w(m_ay[0], FUNC(ay8910_device::address_data_w));
+	map(0x4802, 0x4803).w(m_ay[1], FUNC(ay8910_device::address_data_w));
 	map(0x4810, 0x481d).w(m_msm, FUNC(msm5232_device::write));
-	map(0x4820, 0x4820).w(FUNC(buggychl_state::ta7630_volbal_msm_w)); /* VOL/BAL   for the 7630 on the MSM5232 output */
-	map(0x4830, 0x4830).ram(); /* TRBL/BASS for the 7630 on the MSM5232 output */
-	map(0x5000, 0x5000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(m_soundlatch2, FUNC(generic_latch_8_device::write));
+	map(0x4820, 0x4820).w(FUNC(buggychl_state::ta7630_volbal_msm_w)); // VOL/BAL   for the 7630 on the MSM5232 output
+	map(0x4830, 0x4830).ram(); // TRBL/BASS for the 7630 on the MSM5232 output
+	map(0x5000, 0x5000).r(m_soundlatch[0], FUNC(generic_latch_8_device::read)).w(m_soundlatch[1], FUNC(generic_latch_8_device::write));
 	map(0x5001, 0x5001).r(FUNC(buggychl_state::sound_status_sound_r)).w(m_soundnmi, FUNC(input_merger_device::in_set<1>));
 	map(0x5002, 0x5002).w(m_soundnmi, FUNC(input_merger_device::in_clear<1>));
 	map(0x5003, 0x5003).w(FUNC(buggychl_state::sound_enable_w)); // unclear what this actually controls
-	map(0xe000, 0xefff).rom(); /* space for diagnostics ROM */
+	map(0xe000, 0xefff).rom(); // space for diagnostics ROM
 }
 
 /* Here is the memory maps from the 'wrong' sound schematic
@@ -290,28 +624,28 @@ Sound Master CPU (SMCPU)
  0  1  1  1  0  0  1  x  x  x  x  x  x  x  x  x   W  OPEN BUS
  0  1  1  1  0  1  0  x  x  x  x  x  x  x  x  x   W  Main VR Control voltage DAC
  0  1  1  1  0  1  1  x  x  x  x  x  x  x  x  x   W  OPEN BUS
- 0  1  1  1  1  0  0  x  x  x  x  x  x  x  x  x   W  CHA Level (selectively gate the 4 dac bits for 2x 4bit r2r dac, one on d7-4, one d3-0, for front right)
- 0  1  1  1  1  0  1  x  x  x  x  x  x  x  x  x   W  CHB Level (selectively gate the 4 dac bits for 2x 4bit r2r dac, one on d7-4, one d3-0, for rear right)
- 0  1  1  1  1  1  0  x  x  x  x  x  x  x  x  x   W  CHC Level (selectively gate the 4 dac bits for 2x 4bit r2r dac, one on d7-4, one d3-0, for front left)
- 0  1  1  1  1  1  1  x  x  x  x  x  x  x  x  x   W  CHD Level (selectively gate the 4 dac bits for 2x 4bit r2r dac, one on d7-4, one d3-0, for rear left)
+ 0  1  1  1  1  0  0  x  x  x  x  x  x  x  x  x   W  CHA Level (selectively gate the 4 DAC bits for 2x 4bit r2r DAC, one on d7-4, one d3-0, for front right)
+ 0  1  1  1  1  0  1  x  x  x  x  x  x  x  x  x   W  CHB Level (selectively gate the 4 DAC bits for 2x 4bit r2r DAC, one on d7-4, one d3-0, for rear right)
+ 0  1  1  1  1  1  0  x  x  x  x  x  x  x  x  x   W  CHC Level (selectively gate the 4 DAC bits for 2x 4bit r2r DAC, one on d7-4, one d3-0, for front left)
+ 0  1  1  1  1  1  1  x  x  x  x  x  x  x  x  x   W  CHD Level (selectively gate the 4 DAC bits for 2x 4bit r2r DAC, one on d7-4, one d3-0, for rear left)
  1  0  0  x  x  x  x  x  x  x  x  x  x  *  *  *   SM-8 /CS (inject ?4? SM waitstates cycles)
  1  0  0  x  x  x  x  x  x  x  x  x  x  0  0  x   W  OPEN BUS
  1  0  0  x  x  x  x  x  x  x  x  x  x  0  1  0   W  AY #1 @ic42 Address write
  1  0  0  x  x  x  x  x  x  x  x  x  x  0  1  1   W  AY #1 @ic42 Data write
-                                                     AY #1 IOB7-4 connect to an r2r dac+opamp controlling ay1 TA7630P Treble
-                                                     AY #1 IOB3-0 connect to an r2r dac+opamp controlling ay1 TA7630P Bass
-                                                     AY #1 IOA7-4 connect to an r2r dac+opamp controlling ay1 TA7630P Volume
-                                                     AY #1 IOA3-0 connect to an r2r dac+opamp controlling ay1 TA7630P Balance
+                                                     AY #1 IOB7-4 connect to an r2r DAC+opamp controlling ay1 TA7630P Treble
+                                                     AY #1 IOB3-0 connect to an r2r DAC+opamp controlling ay1 TA7630P Bass
+                                                     AY #1 IOA7-4 connect to an r2r DAC+opamp controlling ay1 TA7630P Volume
+                                                     AY #1 IOA3-0 connect to an r2r DAC+opamp controlling ay1 TA7630P Balance
  1  0  0  x  x  x  x  x  x  x  x  x  x  1  0  0   W  AY #2 @ic41 Address write
  1  0  0  x  x  x  x  x  x  x  x  x  x  1  0  1   W  AY #2 @ic41 Data write
-                                                     AY #2 IOB7-4 connect to an r2r dac+opamp controlling ay2 TA7630P Treble
-                                                     AY #2 IOB3-0 connect to an r2r dac+opamp controlling ay2 TA7630P Bass
-                                                     AY #2 IOA7-4 connect to an r2r dac+opamp controlling ay2 TA7630P Volume
-                                                     AY #2 IOA3-0 connect to an r2r dac+opamp controlling ay2 TA7630P Balance
+                                                     AY #2 IOB7-4 connect to an r2r DAC+opamp controlling ay2 TA7630P Treble
+                                                     AY #2 IOB3-0 connect to an r2r DAC+opamp controlling ay2 TA7630P Bass
+                                                     AY #2 IOA7-4 connect to an r2r DAC+opamp controlling ay2 TA7630P Volume
+                                                     AY #2 IOA3-0 connect to an r2r DAC+opamp controlling ay2 TA7630P Balance
  1  0  0  x  x  x  x  x  x  x  x  x  x  1  1  x   W  OPEN BUS
- 1  0  1  *  *  *  *  *  *  *  *  *  *  *  *  *   RW SM-A /CS (read or write to slave cpu address space 0000-1fff; slave cpu is held in waitstate during this)
+ 1  0  1  *  *  *  *  *  *  *  *  *  *  *  *  *   RW SM-A /CS (read or write to slave CPU address space 0000-1fff; slave CPU is held in waitstate during this)
  1  1  0  x  x  *  *  *  *  *  *  *  *  *  *  *   RW SRAM (ic3)
- 1  1  1  x  x  x  x  x  x  x  x  x  x  x  x  x   OPEN BUS (diag rom may map here?)
+ 1  1  1  x  x  x  x  x  x  x  x  x  x  x  x  x   OPEN BUS (diag ROM may map here?)
 */
 
 /******************************************************************************/
@@ -325,7 +659,7 @@ CUSTOM_INPUT_MEMBER( buggychl_state::pedal_in_r )
 
 static INPUT_PORTS_START( buggychl )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, "Game Over Bonus" ) PORT_DIPLOCATION("SW1:1,2")   /* Arks/Flags/Fuel */
+	PORT_DIPNAME( 0x03, 0x03, "Game Over Bonus" ) PORT_DIPLOCATION("SW1:1,2")   // Arks/Flags/Fuel
 	PORT_DIPSETTING(    0x03, "2000/1000/50" )
 	PORT_DIPSETTING(    0x02, "1000/500/30" )
 	PORT_DIPSETTING(    0x01, "500/200/10" )
@@ -334,15 +668,15 @@ static INPUT_PORTS_START( buggychl )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:4,5")
-	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )         /* 1300 units of fuel */
-	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )       /* 1200 units of fuel */
-	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )         /* 1100 units of fuel */
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )      /* 1000 units of fuel */
+	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )         // 1300 units of fuel
+	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )       // 1200 units of fuel
+	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )         // 1100 units of fuel
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )      // 1000 units of fuel
 	PORT_SERVICE_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW1:6" )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )        /* Only listed as OFF in the manual */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )        // Only listed as OFF in the manual
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:1,2,3,4")
@@ -384,11 +718,11 @@ static INPUT_PORTS_START( buggychl )
 	PORT_DIPNAME( 0x01, 0x01, "Start button needed" ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
-	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW3:2" )        /* Only listed as OFF in the manual */
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW3:2" )        // Only listed as OFF in the manual
 	PORT_DIPNAME( 0x04, 0x04, "Fuel loss (Cheat)") PORT_DIPLOCATION("SW3:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "Crash only" )
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW3:4" )        /* Only listed as OFF in the manual */
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW3:4" )        // Only listed as OFF in the manual
 	PORT_DIPNAME( 0x10, 0x10, "Coinage Display" ) PORT_DIPLOCATION("SW3:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
@@ -406,7 +740,7 @@ static INPUT_PORTS_START( buggychl )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_TOGGLE PORT_NAME("P1 Gear Shift")  /* shift */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_TOGGLE PORT_NAME("P1 Gear Shift")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Test Button") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -420,9 +754,9 @@ static INPUT_PORTS_START( buggychl )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(buggychl_state, pedal_in_r)
 
 	PORT_START("PEDAL")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_NAME("P1 Pedal") PORT_SENSITIVITY(100) PORT_KEYDELTA(15)   /* accelerator */
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_NAME("P1 Pedal") PORT_SENSITIVITY(100) PORT_KEYDELTA(15)   // accelerator
 
-	PORT_START("WHEEL") /* wheel */
+	PORT_START("WHEEL")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(10) PORT_KEYDELTA(10) PORT_REVERSE
 INPUT_PORTS_END
 
@@ -452,9 +786,9 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_buggychl )
-	GFXDECODE_ENTRY( nullptr,           0, charlayout,   0, 8 ) /* decoded at runtime */
-	/* sprites are drawn pixel by pixel by draw_sprites() */
-	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0, 8 )
+	GFXDECODE_ENTRY( nullptr,   0, charlayout,   0, 8 ) // decoded at runtime
+	// sprites are drawn pixel by pixel by draw_sprites()
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 0, 8 )
 GFXDECODE_END
 
 
@@ -463,33 +797,25 @@ void buggychl_state::ta7630_volbal_msm_w(uint8_t data)
 	m_ta7630->set_device_volume(m_msm, data >> 4);
 }
 
-void buggychl_state::ta7630_volbal_ay1_w(uint8_t data)
+template <uint8_t Which>
+void buggychl_state::ta7630_volbal_ay_w(uint8_t data)
 {
-	/* VOL/BAL   for the 7630 on this 8910 output */
-	m_ta7630->set_device_volume(m_ay1, data >> 4);
+	// VOL/BAL   for the 7630 on this 8910 output
+	m_ta7630->set_device_volume(m_ay[Which], data >> 4);
 }
 
-void buggychl_state::port_b_0_w(uint8_t data)
+template <uint8_t Which>
+void buggychl_state::port_b_w(uint8_t data)
 {
-	/* TRBL/BASS for the 7630 on this 8910 output */
+	// TRBL/BASS for the 7630 on this 8910 output
 }
 
-void buggychl_state::ta7630_volbal_ay2_w(uint8_t data)
-{
-	/* VOL/BAL   for the 7630 on this 8910 output */
-	m_ta7630->set_device_volume(m_ay2, data >> 4);
-}
-
-void buggychl_state::port_b_1_w(uint8_t data)
-{
-	/* TRBL/BASS for the 7630 on this 8910 output */
-}
 
 void buggychl_state::machine_start()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
-	membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x2000);
+	m_mainbank->configure_entries(0, 6, &ROM[0x10000], 0x2000);
 
 	save_item(NAME(m_sprite_lookup));
 	save_item(NAME(m_sl_bank));
@@ -512,65 +838,65 @@ void buggychl_state::machine_reset()
 
 void buggychl_state::buggychl(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 48_MHz_XTAL/8); /* 6 MHz according to schematics, though it can be jumpered for 4MHz as well */
-	m_maincpu->set_addrmap(AS_PROGRAM, &buggychl_state::buggychl_map);
+	// basic machine hardware
+	Z80(config, m_maincpu, 48_MHz_XTAL / 8); // 6 MHz according to schematics, though it can be jumpered for 4MHz as well
+	m_maincpu->set_addrmap(AS_PROGRAM, &buggychl_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(buggychl_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 8_MHz_XTAL/2); /* 4 MHz according to schematics */
+	Z80(config, m_audiocpu, 8_MHz_XTAL / 2); // 4 MHz according to schematics
 	m_audiocpu->set_addrmap(AS_PROGRAM, &buggychl_state::sound_map);
-	m_audiocpu->set_periodic_int(FUNC(buggychl_state::irq0_line_hold), attotime::from_hz(8_MHz_XTAL/2/2/256/64)); // timer irq
-	//TIMER(config, "soundirq").configure_periodic(m_audiocpu, FUNC(buggychl_state::irq0_line_hold), 8_MHz_XTAL/2/2/256/64);
+	m_audiocpu->set_periodic_int(FUNC(buggychl_state::irq0_line_hold), attotime::from_hz(8_MHz_XTAL / 2 / 2 / 256 / 64)); // timer IRQ
+	//TIMER(config, "soundirq").configure_periodic(m_audiocpu, FUNC(buggychl_state::irq0_line_hold), 8_MHz_XTAL / 2 / 2 / 256 / 64);
 	// The schematics (which are at least partly for the wrong sound board) show a configurable timer with rates of
-	// 61.035Hz (8_MHz_XTAL/2/2/256/128)
-	// or 122.0Hz (8_MHz_XTAL/2/2/256/64)
+	// 61.035Hz (8_MHz_XTAL / 2 / 2 / 256 / 128)
+	// or 122.0Hz (8_MHz_XTAL / 2 / 2 / 256 / 64)
 	// similar to flstory.cpp and other Taito MSM5232 based games.
-	// The real sound pcb probably lacks the latch for this configurable timer, but does have a jumper which likely has a similar function.
-	// The game code implies the timer int is enable/disabled by one of the "sound_enable_w" bits?
+	// The real sound PCB probably lacks the latch for this configurable timer, but does have a jumper which likely has a similar function.
+	// The game code implies the timer int is enabled/disabled by one of the "sound_enable_w" bits?
 	// TODO: actually hook this up?
-	/* audiocpu nmi is caused by (main->sound semaphore)&&(sound_nmi_enabled), identical to bubble bobble. */
+	// audiocpu NMI is caused by (main->sound semaphore)&&(sound_nmi_enabled), identical to Bubble Bobble.
 
-	TAITO68705_MCU(config, m_bmcu, 48_MHz_XTAL/8/2); /* CPUspeed/2 MHz according to schematics, so 3MHz if cpu is jumpered for 6MHz */
+	TAITO68705_MCU(config, m_bmcu, 48_MHz_XTAL / 8 / 2); // CPUspeed/2 MHz according to schematics, so 3MHz if CPU is jumpered for 6MHz
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // typical Taito 74ls392
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	// derived from ladyfrog.cpp, causes glitches?
 //  m_screen->set_raw(8_MHz_XTAL, 510, 0, 256, 262, 2*8, 30*8); // pixel clock appears to run at 8 MHz
-	m_screen->set_screen_update(FUNC(buggychl_state::screen_update_buggychl));
+	m_screen->set_screen_update(FUNC(buggychl_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_buggychl);
-	PALETTE(config, m_palette, FUNC(buggychl_state::buggychl_palette)).set_format(palette_device::xRGB_444, 128 + 128);
+	PALETTE(config, m_palette, FUNC(buggychl_state::palette)).set_format(palette_device::xRGB_444, 128 + 128);
 	m_palette->set_endianness(ENDIANNESS_BIG);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<0>));
-	GENERIC_LATCH_8(config, m_soundlatch2);
+	GENERIC_LATCH_8(config, m_soundlatch[0]).data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<0>));
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
 	INPUT_MERGER_ALL_HIGH(config, m_soundnmi).output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	TA7630(config, m_ta7630);
 
-	YM2149(config, m_ay1, 8_MHz_XTAL/4);
-	m_ay1->port_a_write_callback().set(FUNC(buggychl_state::ta7630_volbal_ay1_w));
-	m_ay1->port_b_write_callback().set(FUNC(buggychl_state::port_b_0_w));
-	m_ay1->add_route(ALL_OUTPUTS, "mono", 0.50);
+	YM2149(config, m_ay[0], 8_MHz_XTAL / 4);
+	m_ay[0]->port_a_write_callback().set(FUNC(buggychl_state::ta7630_volbal_ay_w<0>));
+	m_ay[0]->port_b_write_callback().set(FUNC(buggychl_state::port_b_w<0>));
+	m_ay[0]->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	YM2149(config, m_ay2, 8_MHz_XTAL/4);
-	m_ay2->port_a_write_callback().set(FUNC(buggychl_state::ta7630_volbal_ay2_w));
-	m_ay2->port_b_write_callback().set(FUNC(buggychl_state::port_b_1_w));
-	m_ay2->add_route(ALL_OUTPUTS, "mono", 0.50);
+	YM2149(config, m_ay[1], 8_MHz_XTAL / 4);
+	m_ay[1]->port_a_write_callback().set(FUNC(buggychl_state::ta7630_volbal_ay_w<1>));
+	m_ay[1]->port_b_write_callback().set(FUNC(buggychl_state::port_b_w<1>));
+	m_ay[1]->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MSM5232(config, m_msm, 8_MHz_XTAL/4);
-	m_msm->set_capacitors(0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6); /* default 0.39 uF capacitors (not verified) */
+	MSM5232(config, m_msm, 8_MHz_XTAL / 4);
+	m_msm->set_capacitors(0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6); // default 0.39 uF capacitors (not verified)
 	m_msm->add_route(0, "mono", 1.0);   // pin 28  2'-1
 	m_msm->add_route(1, "mono", 1.0);   // pin 29  4'-1
 	m_msm->add_route(2, "mono", 1.0);   // pin 30  8'-1
@@ -594,17 +920,17 @@ ROM_START( buggychl )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
 	ROM_LOAD( "a22-04-2.23", 0x00000, 0x4000, CRC(16445a6a) SHA1(5ce7b0b1aeb3b6cd400965467f913558f39c251f) )
 	ROM_LOAD( "a22-05-2.22", 0x04000, 0x4000, CRC(d57430b2) SHA1(3e5b8c21a342d8e26c12a78535748073bc5b8742) )
-	ROM_LOAD( "a22-01.3",    0x10000, 0x4000, CRC(af3b7554) SHA1(fd4f5a6cf9253f64c7e86d566802a02baae3b379) ) /* banked */
-	ROM_LOAD( "a22-02.2",    0x14000, 0x4000, CRC(b8a645fb) SHA1(614a0656dee0cfa1d7e16ec1e0138a423ecaf18b) ) /* banked */
-	ROM_LOAD( "a22-03.1",    0x18000, 0x4000, CRC(5f45d469) SHA1(3a1b9ab2d57c06bfffb1271583944c90d3f6b5a2) ) /* banked */
+	ROM_LOAD( "a22-01.3",    0x10000, 0x4000, CRC(af3b7554) SHA1(fd4f5a6cf9253f64c7e86d566802a02baae3b379) ) // banked
+	ROM_LOAD( "a22-02.2",    0x14000, 0x4000, CRC(b8a645fb) SHA1(614a0656dee0cfa1d7e16ec1e0138a423ecaf18b) ) // banked
+	ROM_LOAD( "a22-03.1",    0x18000, 0x4000, CRC(5f45d469) SHA1(3a1b9ab2d57c06bfffb1271583944c90d3f6b5a2) ) // banked
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )  /* sound Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )  // Z80
 	ROM_LOAD( "a22-24.28",   0x00000, 0x4000, CRC(1e7f841f) SHA1(2dc0787b08d32acb78291b689c02dbb83d04d08c) )
 
-	ROM_REGION( 0x0800, "bmcu:mcu", 0 )  /* 8k for the microcontroller */
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )
 	ROM_LOAD( "a22-19.31",   0x00000, 0x0800, CRC(06a71df0) SHA1(28183e6769e1471e7f28dc2a9f5b54e14b7ef339) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )    /* sprites */
+	ROM_REGION( 0x20000, "sprites", 0 )
 	ROM_LOAD( "a22-06.111",  0x00000, 0x4000, CRC(1df91b17) SHA1(440d33bf984042fb4eac8f17bb385992ccdc6113) )
 	ROM_LOAD( "a22-07.110",  0x04000, 0x4000, CRC(2f0ab9b7) SHA1(07b98e23d12da834d522e29fe7891503dc258b05) )
 	ROM_LOAD( "a22-08.109",  0x08000, 0x4000, CRC(49cb2134) SHA1(f9998617c097b90be7257ba6fc1e46ff9e1f8916) )
@@ -614,27 +940,27 @@ ROM_START( buggychl )
 	ROM_LOAD( "a22-12.105",  0x18000, 0x4000, CRC(8b365b24) SHA1(a306c1f6fe1f5563602ab424f1b4f6ac17d1e47d) )
 	ROM_LOAD( "a22-13.104",  0x1c000, 0x4000, CRC(2c6d68fe) SHA1(9e1a0e44ae2b9986d0ebff49a0fd4df3e8a7f4e7) )
 
-	ROM_REGION( 0x4000, "gfx2", 0 ) /* sprite zoom tables */
-	ROM_LOAD( "a22-14.59",   0x0000, 0x2000, CRC(a450b3ef) SHA1(42646bfaed19ea01ffe06996bb6c2fd6c70076d6) ) /* vertical */
-	ROM_LOAD( "a22-15.115",  0x2000, 0x1000, CRC(337a0c14) SHA1(2aa6814f74497c5c55bf7098d7f6f5508845e36c) ) /* horizontal */
-	ROM_LOAD( "a22-16.116",  0x3000, 0x1000, CRC(337a0c14) SHA1(2aa6814f74497c5c55bf7098d7f6f5508845e36c) ) /* horizontal */
+	ROM_REGION( 0x4000, "sprite_zoom_table", 0 )
+	ROM_LOAD( "a22-14.59",   0x0000, 0x2000, CRC(a450b3ef) SHA1(42646bfaed19ea01ffe06996bb6c2fd6c70076d6) ) // vertical
+	ROM_LOAD( "a22-15.115",  0x2000, 0x1000, CRC(337a0c14) SHA1(2aa6814f74497c5c55bf7098d7f6f5508845e36c) ) // horizontal
+	ROM_LOAD( "a22-16.116",  0x3000, 0x1000, CRC(337a0c14) SHA1(2aa6814f74497c5c55bf7098d7f6f5508845e36c) ) // horizontal
 ROM_END
 
 ROM_START( buggychlt )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
 	ROM_LOAD( "bu04.bin",    0x00000, 0x4000, CRC(f90ab854) SHA1(d4536c98be35de3d888548e2de15f8435ca4f08c) )
 	ROM_LOAD( "bu05.bin",    0x04000, 0x4000, CRC(543d0949) SHA1(b7b0b0319f5376e7cfcfd0e8a4fa6fea566e0206) )
-	ROM_LOAD( "a22-01.3",    0x10000, 0x4000, CRC(af3b7554) SHA1(fd4f5a6cf9253f64c7e86d566802a02baae3b379) ) /* banked */
-	ROM_LOAD( "a22-02.2",    0x14000, 0x4000, CRC(b8a645fb) SHA1(614a0656dee0cfa1d7e16ec1e0138a423ecaf18b) ) /* banked */
-	ROM_LOAD( "a22-03.1",    0x18000, 0x4000, CRC(5f45d469) SHA1(3a1b9ab2d57c06bfffb1271583944c90d3f6b5a2) ) /* banked */
+	ROM_LOAD( "a22-01.3",    0x10000, 0x4000, CRC(af3b7554) SHA1(fd4f5a6cf9253f64c7e86d566802a02baae3b379) ) // banked
+	ROM_LOAD( "a22-02.2",    0x14000, 0x4000, CRC(b8a645fb) SHA1(614a0656dee0cfa1d7e16ec1e0138a423ecaf18b) ) // banked
+	ROM_LOAD( "a22-03.1",    0x18000, 0x4000, CRC(5f45d469) SHA1(3a1b9ab2d57c06bfffb1271583944c90d3f6b5a2) ) // banked
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )  /* sound Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )  // Z80
 	ROM_LOAD( "a22-24.28",   0x00000, 0x4000, CRC(1e7f841f) SHA1(2dc0787b08d32acb78291b689c02dbb83d04d08c) )
 
-	ROM_REGION( 0x0800, "bmcu:mcu", 0 )  /* 8k for the microcontroller */
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )
 	ROM_LOAD( "a22-19.31",   0x00000, 0x0800, CRC(06a71df0) SHA1(28183e6769e1471e7f28dc2a9f5b54e14b7ef339) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )    /* sprites */
+	ROM_REGION( 0x20000, "sprites", 0 )
 	ROM_LOAD( "a22-06.111",  0x00000, 0x4000, CRC(1df91b17) SHA1(440d33bf984042fb4eac8f17bb385992ccdc6113) )
 	ROM_LOAD( "a22-07.110",  0x04000, 0x4000, CRC(2f0ab9b7) SHA1(07b98e23d12da834d522e29fe7891503dc258b05) )
 	ROM_LOAD( "a22-08.109",  0x08000, 0x4000, CRC(49cb2134) SHA1(f9998617c097b90be7257ba6fc1e46ff9e1f8916) )
@@ -644,11 +970,13 @@ ROM_START( buggychlt )
 	ROM_LOAD( "a22-12.105",  0x18000, 0x4000, CRC(8b365b24) SHA1(a306c1f6fe1f5563602ab424f1b4f6ac17d1e47d) )
 	ROM_LOAD( "a22-13.104",  0x1c000, 0x4000, CRC(2c6d68fe) SHA1(9e1a0e44ae2b9986d0ebff49a0fd4df3e8a7f4e7) )
 
-	ROM_REGION( 0x4000, "gfx2", 0 ) /* sprite zoom tables */
-	ROM_LOAD( "a22-14.59",   0x0000, 0x2000, CRC(a450b3ef) SHA1(42646bfaed19ea01ffe06996bb6c2fd6c70076d6) ) /* vertical */
-	ROM_LOAD( "a22-15.115",  0x2000, 0x1000, CRC(337a0c14) SHA1(2aa6814f74497c5c55bf7098d7f6f5508845e36c) ) /* horizontal */
-	ROM_LOAD( "a22-16.116",  0x3000, 0x1000, CRC(337a0c14) SHA1(2aa6814f74497c5c55bf7098d7f6f5508845e36c) ) /* horizontal */
+	ROM_REGION( 0x4000, "sprite_zoom_table", 0 )
+	ROM_LOAD( "a22-14.59",   0x0000, 0x2000, CRC(a450b3ef) SHA1(42646bfaed19ea01ffe06996bb6c2fd6c70076d6) ) // vertical
+	ROM_LOAD( "a22-15.115",  0x2000, 0x1000, CRC(337a0c14) SHA1(2aa6814f74497c5c55bf7098d7f6f5508845e36c) ) // horizontal
+	ROM_LOAD( "a22-16.116",  0x3000, 0x1000, CRC(337a0c14) SHA1(2aa6814f74497c5c55bf7098d7f6f5508845e36c) ) // horizontal
 ROM_END
+
+} // anonymous namespace
 
 
 GAMEL( 1984, buggychl,  0,        buggychl, buggychl, buggychl_state, empty_init, ROT270, "Taito Corporation",                  "Buggy Challenge",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_buggychl )

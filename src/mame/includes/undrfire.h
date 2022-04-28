@@ -48,12 +48,12 @@ protected:
 private:
 	struct uf_tempsprite
 	{
-		u8 gfx;
-		u32 code,color;
-		bool flipx,flipy;
-		int x,y;
-		int zoomx,zoomy;
-		u32 primask;
+		u8 gfx = 0;
+		u32 code = 0, color = 0;
+		bool flipx = 0, flipy = 0;
+		int x = 0, y = 0;
+		int zoomx = 0, zoomy = 0;
+		u32 primask = 0;
 	};
 
 	required_device<cpu_device> m_maincpu;
@@ -64,10 +64,10 @@ private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_shared_ptr<u32> m_ram;
 	optional_shared_ptr<u16> m_shared_ram;
-	u16 m_port_sel;
-	int m_frame_counter;
+	u16 m_port_sel = 0;
+	int m_frame_counter = 0;
 	std::unique_ptr<uf_tempsprite[]> m_spritelist;
-	u16 m_rotate_ctrl[8];
+	u16 m_rotate_ctrl[8]{};
 #ifdef MAME_DEBUG
 	u8 m_dislayer[6] = { 0, 0, 0, 0, 0, 0 };
 #endif

@@ -50,7 +50,7 @@ protected:
 	virtual void machine_start() override { m_leds.resolve(); }
 	virtual void machine_reset() override;
 
-	int m_lastdata;
+	int m_lastdata = 0;
 	required_device<cpu_device> m_maincpu;
 	required_device<er2055_device> m_earom;
 	optional_ioport m_in3;

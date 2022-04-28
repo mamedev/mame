@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert, hap
+// copyright-holders:hap
 /****************************************************************************************
 
 2018-09-15

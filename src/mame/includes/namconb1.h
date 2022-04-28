@@ -72,7 +72,7 @@ protected:
 	virtual void video_start() override;
 
 private:
-	int m_gametype;
+	int m_gametype = 0;
 	enum
 	{
 		/* Namco NB1 */
@@ -112,12 +112,12 @@ private:
 	optional_shared_ptr<u32> m_rozbank32;
 	required_shared_ptr<u16> m_namconb_shareram;
 
-	u8 m_vbl_irq_level;
-	u8 m_pos_irq_level;
-	u8 m_unk_irq_level;
-	u16 m_count;
-	u8 m_port6;
-	u32 m_tilemap_tile_bank[4];
+	u8 m_vbl_irq_level = 0;
+	u8 m_pos_irq_level = 0;
+	u8 m_unk_irq_level = 0;
+	u16 m_count = 0;
+	u8 m_port6 = 0;
+	u32 m_tilemap_tile_bank[4]{};
 	std::unique_ptr<u32[]> m_spritebank32_delayed;
 	bool m_update_to_line_before_posirq;
 

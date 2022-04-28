@@ -219,6 +219,8 @@ public:
 		, m_adlc(*this, "adlc")
 		, m_centronics(*this, "centronics")
 		, m_cent_data_out(*this, "cent_data_out")
+		, m_i2cmem(*this, "i2cmem")
+		, m_rtc(*this, "rtc")
 	{ }
 
 	void aa500(machine_config &config);
@@ -238,6 +240,8 @@ private:
 	required_device<mc6854_device> m_adlc;
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
+	required_device<i2c_pcf8570_device> m_i2cmem;
+	required_device<pcf8573_device> m_rtc;
 };
 
 
@@ -326,6 +330,7 @@ class aa4000_state : public aabase_state
 public:
 	aa4000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: aabase_state(mconfig, type, tag)
+		, m_i2cmem(*this,"i2cmem")
 		, m_floppy(*this, "upc:fdc:%u", 0U)
 		//, m_test(*this, "test")
 		, m_ioeb_control(0)
@@ -334,6 +339,8 @@ public:
 	void aa3010(machine_config &config);
 	void aa3020(machine_config &config);
 	void aa4000(machine_config &config);
+	
+	required_device<pcf8583_device> m_i2cmem;
 
 protected:
 	virtual void machine_reset() override;
@@ -347,6 +354,7 @@ protected:
 	//required_device<archimedes_test_slot_device> m_test;
 
 	u8 m_ioeb_control;
+
 };
 
 
@@ -377,6 +385,7 @@ public:
 	aa4_state(const machine_config &mconfig, device_type type, const char *tag)
 		: aa5000_state(mconfig, type, tag)
 		, m_lc(*this, "lc")
+		, m_bmu(*this, "bmu")
 	{ }
 
 	void aa4(machine_config &config);
@@ -386,6 +395,8 @@ protected:
 
 private:
 	required_device<acorn_lc_device> m_lc;
+	required_device<acorn_bmu_device> m_bmu;
+	
 };
 
 
@@ -1076,12 +1087,11 @@ void aa500_state::aa500(machine_config &config)
 	m_ioc->peripheral_w<5>().set(FUNC(aa500_state::peripheral5_w));
 	m_ioc->peripheral_r<6>().set_constant(0xff);
 	m_ioc->peripheral_w<6>().set(FUNC(aa500_state::peripheral6_w));
-	m_ioc->gpio_r<0>().set("i2cmem", FUNC(i2c_pcf8570_device::read_sda));
-	m_ioc->gpio_r<0>().append("rtc", FUNC(pcf8573_device::sda_r));
-	m_ioc->gpio_w<0>().set("i2cmem", FUNC(i2c_pcf8570_device::write_sda));
-	m_ioc->gpio_w<0>().append("rtc", FUNC(pcf8573_device::sda_w));
-	m_ioc->gpio_w<1>().set("i2cmem", FUNC(i2c_pcf8570_device::write_scl));
-	m_ioc->gpio_w<1>().append("rtc", FUNC(pcf8573_device::scl_w));
+	m_ioc->gpio_r<0>().set([this]() { return m_i2cmem->read_sda() & m_rtc->sda_r(); });
+	m_ioc->gpio_w<0>().set(m_i2cmem, FUNC(i2c_pcf8570_device::write_sda));
+	m_ioc->gpio_w<0>().append(m_rtc, FUNC(pcf8573_device::sda_w));
+	m_ioc->gpio_w<1>().set(m_i2cmem, FUNC(i2c_pcf8570_device::write_scl));
+	m_ioc->gpio_w<1>().append(m_rtc, FUNC(pcf8573_device::scl_w));
 	//m_ioc->gpio_r<2>().set("rtc", FUNC(pcf8573_device::min_r));
 	//m_ioc->gpio_r<3>().set("rtc", FUNC(pcf8573_device::sec_r));
 	m_ioc->gpio_r<4>().set([this] { return m_selected_floppy ? m_selected_floppy->dskchg_r() : 1; });
@@ -1097,8 +1107,8 @@ void aa500_state::aa500(machine_config &config)
 	m_ram->set_default_size("4M");
 
 	// PCF8570 and PCF8573 (pre PCF8583)
-	I2C_PCF8570(config, "i2cmem");
-	PCF8573(config, "rtc", 32.768_kHz_XTAL);
+	I2C_PCF8570(config, m_i2cmem);
+	PCF8573(config, m_rtc, 32.768_kHz_XTAL);
 
 	FD1793(config, m_fdc, 24_MHz_XTAL / 24);
 	m_fdc->intrq_wr_callback().set(m_ioc, FUNC(acorn_ioc_device::fh1_w));
@@ -1468,9 +1478,9 @@ void aa4000_state::aa3010(machine_config &config)
 	m_ioc->peripheral_w<3>().set_log("IOC: Peripheral Select 3 W");
 	m_ioc->peripheral_r<5>().set(FUNC(aa4000_state::ioeb_r));
 	m_ioc->peripheral_w<5>().set(FUNC(aa4000_state::ioeb_w));
-	m_ioc->gpio_r<0>().set("i2cmem", FUNC(pcf8583_device::sda_r));
-	m_ioc->gpio_w<0>().set("i2cmem", FUNC(pcf8583_device::sda_w));
-	m_ioc->gpio_w<1>().set("i2cmem", FUNC(pcf8583_device::scl_w));
+	m_ioc->gpio_r<0>().set(m_i2cmem, FUNC(pcf8583_device::sda_r));
+	m_ioc->gpio_w<0>().set(m_i2cmem, FUNC(pcf8583_device::sda_w));
+	m_ioc->gpio_w<1>().set(m_i2cmem, FUNC(pcf8583_device::scl_w));
 	m_ioc->gpio_r<2>().set_constant(1); // FDHden
 	m_ioc->gpio_r<3>().set("idrom", FUNC(ds2401_device::read));
 	m_ioc->gpio_w<3>().set("idrom", FUNC(ds2401_device::write));
@@ -1479,7 +1489,7 @@ void aa4000_state::aa3010(machine_config &config)
 
 	m_ram->set_default_size("1M").set_extra_options("2M");
 
-	PCF8583(config, "i2cmem", 32.768_kHz_XTAL);
+	PCF8583(config, m_i2cmem, 32.768_kHz_XTAL);
 
 	DS2401(config, "idrom", 0); // DS2400
 
@@ -1616,14 +1626,14 @@ void aa4_state::aa4(machine_config &config)
 	m_maincpu->set_clock(24_MHz_XTAL); // ARM3
 	m_maincpu->set_copro_type(arm_cpu_device::copro_type::VL86C020);
 
-	ACORN_BMU(config, "bmu", 4.194304_MHz_XTAL);
+	ACORN_BMU(config, m_bmu, 4.194304_MHz_XTAL);
 	//bmu.battlo_callback().set(m_ioc, FUNC(acorn_ioc_device::il7_w));
 
 	//m_ioc->peripheral_r<2>().set("lc", FUNC(lc_device::read));
 	//m_ioc->peripheral_w<2>().set("lc", FUNC(lc_device::write));
-	m_ioc->gpio_r<0>().append("bmu", FUNC(acorn_bmu_device::sda_r));
-	m_ioc->gpio_w<0>().append("bmu", FUNC(acorn_bmu_device::sda_w));
-	m_ioc->gpio_w<1>().append("bmu", FUNC(acorn_bmu_device::scl_w));
+	m_ioc->gpio_r<0>().set([this]() { return m_i2cmem->sda_r() & m_bmu->sda_r(); });
+	m_ioc->gpio_w<0>().append(m_bmu, FUNC(acorn_bmu_device::sda_w));
+	m_ioc->gpio_w<1>().append(m_bmu, FUNC(acorn_bmu_device::scl_w));
 
 	// video hardware
 	screen_device &screen(SCREEN(config.replace(), "screen", SCREEN_TYPE_LCD));

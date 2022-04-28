@@ -489,7 +489,7 @@ public:
 			m_global_inputs_enabled = downcast<windows_options &>(machine.options()).global_inputs();
 
 		// If we added no devices, no need to register for notifications
-		if (devicelist()->empty())
+		if (devicelist().empty())
 			return;
 
 		// finally, register to receive raw input WM_INPUT messages if we found devices
@@ -539,7 +539,7 @@ protected:
 
 		tname.reset();
 
-		TDevice &devinfo = devicelist()->create_device<TDevice>(machine, std::move(utf8_name), std::move(utf8_id), *this);
+		TDevice &devinfo = devicelist().create_device<TDevice>(machine, std::move(utf8_name), std::move(utf8_id), *this);
 
 		// Add the handle
 		devinfo.set_handle(rawinputdevice.hDevice);
@@ -594,14 +594,14 @@ protected:
 
 					// find the device in the list and update
 					auto target_device = std::find_if(
-							devicelist()->begin(),
-							devicelist()->end(),
+							devicelist().begin(),
+							devicelist().end(),
 							[input] (auto const &device)
 							{
 								auto devinfo = dynamic_cast<rawinput_device *>(device.get());
 								return devinfo && (input->header.hDevice == devinfo->device_handle());
 							});
-					if (devicelist()->end() == target_device)
+					if (devicelist().end() == target_device)
 						return false;
 
 					static_cast<rawinput_device *>(target_device->get())->queue_events(input, 1);
@@ -629,14 +629,14 @@ protected:
 
 				// find the device in the list and update
 				auto target_device = std::find_if(
-						devicelist()->begin(),
-						devicelist()->end(),
+						devicelist().begin(),
+						devicelist().end(),
 						[&utf8_id] (auto const &device)
 						{
 							auto devinfo = dynamic_cast<rawinput_device *>(device.get());
 							return devinfo && !devinfo->device_handle() && (devinfo->id() == utf8_id);
 						});
-				if (devicelist()->end() == target_device)
+				if (devicelist().end() == target_device)
 					return false;
 
 				static_cast<rawinput_device *>(target_device->get())->set_handle(rawinputdevice);
@@ -652,15 +652,15 @@ protected:
 
 				// find the device in the list and update
 				auto target_device = std::find_if(
-						devicelist()->begin(),
-						devicelist()->end(),
+						devicelist().begin(),
+						devicelist().end(),
 						[rawinputdevice] (auto const &device)
 						{
 							auto devinfo = dynamic_cast<rawinput_device *>(device.get());
 							return devinfo && (rawinputdevice == devinfo->device_handle());
 						});
 
-				if (devicelist()->end() == target_device)
+				if (devicelist().end() == target_device)
 					return false;
 
 				(*target_device)->reset();

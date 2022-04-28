@@ -27,14 +27,13 @@ public:
 	// construction/destruction
 	nes_powerpad_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual u8 read_bit34() override;
+	virtual void write(u8 data) override;
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-
-	virtual u8 read_bit34() override;
-	virtual void write(u8 data) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	required_ioport_array<2> m_ipt;

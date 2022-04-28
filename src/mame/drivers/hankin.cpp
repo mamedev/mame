@@ -79,7 +79,7 @@ private:
 	void main_map(address_map &map);
 	void audio_map(address_map &map);
 
-	bool m_timer_sb = 0;
+	bool m_timer_sb = false;
 	u8 m_timer_s[3]{};
 	u8 m_vol = 0U;
 	u8 m_ic2a = 0U;
@@ -87,11 +87,11 @@ private:
 	u8 m_ic10a = 0U;
 	u8 m_ic10b = 0U;
 	u8 m_ic11a = 0U;
-	bool m_ic11_ca2 = 0;
-	bool m_ic11_cb2 = 0;
-	bool m_ic10_cb2 = 0;
-	bool m_ic2_ca2 = 0;
-	bool m_ic2_cb2 = 0;
+	bool m_ic11_ca2 = false;
+	bool m_ic11_cb2 = false;
+	bool m_ic10_cb2 = false;
+	bool m_ic2_ca2 = false;
+	bool m_ic2_cb2 = false;
 	u8 m_counter = 0U;
 	u8 m_digit = 0U;
 	u8 m_segment[5]{};
@@ -654,8 +654,8 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME(1978,  fjholden, 0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "FJ Holden",                                MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1978,  orbit1,   0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "Orbit 1",                                  MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1980,  shark,    0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "Shark",                                    MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1980,  howzat,   0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "Howzat!",                                  MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1981,  empsback, 0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "The Empire Strikes Back (Hankin Pinball)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1978,  fjholden, 0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "FJ Holden",                                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  orbit1,   0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "Orbit 1",                                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  shark,    0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "Shark",                                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  howzat,   0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "Howzat!",                                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981,  empsback, 0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "The Empire Strikes Back (Hankin Pinball)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
