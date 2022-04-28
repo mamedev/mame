@@ -763,10 +763,9 @@ void nes_cart_slot_device::call_load_ines()
 			m_cart->set_ce(0x03, ce_state);
 		}
 		// iNES Mapper 232
-		else if (mapper == 210 && submapper == 1)
+		else if (mapper == 232 && submapper == 1)
 		{
-			submapper = 0;
-			logerror("Unimplemented NES 2.0 submapper: CAMERICA-BF9096.\n");
+			pcb_id = CAMERICA_BF9096_ALT;
 		}
 		// 268: SMD133 boards
 		else if (mapper == 268)
@@ -1282,6 +1281,11 @@ const char * nes_cart_slot_device::get_default_card_ines(get_default_card_softwa
 		else if (mapper == 116 && submapper == 2)
 		{
 			pcb_id = SOMARI_HUANG2; // Mapper 116 is used for 2 diff boards
+		}
+		// iNES Mapper 232
+		else if (mapper == 232 && submapper == 1)
+		{
+			pcb_id = CAMERICA_BF9096_ALT;
 		}
 	}
 

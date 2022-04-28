@@ -17,9 +17,8 @@
 
 
  TODO:
- - check what causes flickering from PPU in Fire Hawk, Poogie and Big Nose (same PPU issue as Back to
-   Future 2&3?)
- - not all the Golden Five games work. investigate!
+ - check what causes flickering from PPU in Fire Hawk, Pogie and Big Nose Freaks Out (same PPU issue as Back to Future 2&3?)
+ - mapper 232 games need properly dumped to determine if the "alt" BF9096 board really exists.
 
  ***********************************************************************************************************/
 
@@ -43,21 +42,32 @@
 
 DEFINE_DEVICE_TYPE(NES_BF9093,  nes_bf9093_device,  "nes_bf9093",  "NES Cart Camerica BF9093 PCB")
 DEFINE_DEVICE_TYPE(NES_BF9096,  nes_bf9096_device,  "nes_bf9096",  "NES Cart Camerica BF9096 PCB")
+DEFINE_DEVICE_TYPE(NES_BF9096A, nes_bf9096a_device, "nes_bf9096a", "NES Cart Camerica BF9096 Alt PCB")
 DEFINE_DEVICE_TYPE(NES_GOLDEN5, nes_golden5_device, "nes_golden5", "NES Cart Camerica Golden 5 PCB")
 
 
-nes_bf9093_device::nes_bf9093_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_bf9093_device::nes_bf9093_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_BF9093, tag, owner, clock)
 {
 }
 
-nes_bf9096_device::nes_bf9096_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_BF9096, tag, owner, clock), m_bank_base(0), m_latch(0)
+nes_bf9096_device::nes_bf9096_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool page_swap)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_reg(0), m_page_swap(page_swap)
 {
 }
 
-nes_golden5_device::nes_golden5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_GOLDEN5, tag, owner, clock), m_bank_base(0), m_latch(0)
+nes_bf9096_device::nes_bf9096_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_bf9096_device(mconfig, NES_BF9096, tag, owner, clock, false)
+{
+}
+
+nes_bf9096a_device::nes_bf9096a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_bf9096_device(mconfig, NES_BF9096A, tag, owner, clock, true)
+{
+}
+
+nes_golden5_device::nes_golden5_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_GOLDEN5, tag, owner, clock), m_lock(0), m_reg(0)
 {
 }
 
@@ -66,46 +76,42 @@ nes_golden5_device::nes_golden5_device(const machine_config &mconfig, const char
 
 void nes_bf9093_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0xff);
-	chr8(0, m_chr_source);
+	prg16_89ab(0);
+	prg16_cdef(m_prg_chunks - 1);
+	if (m_pcb_ctrl_mirror)
+		set_nt_mirroring(PPU_MIRROR_LOW);
 }
 
 void nes_bf9096_device::device_start()
 {
 	common_start();
-	save_item(NAME(m_latch));
-	save_item(NAME(m_bank_base));
+	save_item(NAME(m_reg));
 }
 
 void nes_bf9096_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	chr8(0, m_chr_source);
+	prg16_89ab(0);
+	prg16_cdef(3);
 
-	m_latch = 0x00;
-	m_bank_base = 0x0c;
-	prg16_89ab(m_bank_base | m_latch);
-	prg16_cdef(m_bank_base | 3);
+	m_reg = 0;
 }
 
 void nes_golden5_device::device_start()
 {
 	common_start();
-	save_item(NAME(m_latch));
+	save_item(NAME(m_lock));
+	save_item(NAME(m_reg));
+
+	// these are not cleared on reset
+	m_lock = 0;
+	m_reg = 0;
 }
 
 void nes_golden5_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	chr8(0, m_chr_source);
-
-	m_latch = 0x00;
-	m_bank_base = 0x00;
-	prg16_89ab(m_bank_base | m_latch);
-	prg16_cdef(m_bank_base | 0x0f);
+	prg16_89ab(m_reg);
+	prg16_cdef(m_reg | 0x0f);
 }
-
 
 
 
@@ -127,25 +133,22 @@ void nes_golden5_device::pcb_reset()
 
  iNES: mapper 71
 
- In MESS: Partially Supported.
+ In MAME: Partially supported.
 
  -------------------------------------------------*/
 
-void nes_bf9093_device::write_h(offs_t offset, uint8_t data)
+void nes_bf9093_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("bf9093 write_h, offset: %04x, data: %02x\n", offset, data));
 
-	switch (offset & 0x7000)
+	switch (offset & 0x6000)
 	{
 		case 0x0000:
-		case 0x1000:
 			if (m_pcb_ctrl_mirror)
 				set_nt_mirroring(BIT(data, 4) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
 			break;
 		case 0x4000:
-		case 0x5000:
 		case 0x6000:
-		case 0x7000:
 			prg16_89ab(data);
 			break;
 	}
@@ -165,24 +168,26 @@ void nes_bf9093_device::write_h(offs_t offset, uint8_t data)
 
  iNES: mapper 232
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_bf9096_device::write_h(offs_t offset, uint8_t data)
+void nes_bf9096_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("bf9096 write_h, offset: %04x, data: %02x\n", offset, data));
 
 	if (offset < 0x4000)
 	{
-		m_bank_base = (data & 0x18) >> 1;
-		prg16_89ab(m_bank_base | m_latch);
-		prg16_cdef(m_bank_base | 3);
+		m_reg = (m_reg & 0x03) | (data & 0x18) >> 1;
+		if (m_page_swap)
+			m_reg = bitswap<4>(m_reg, 2, 3, 1, 0);
+		prg16_89ab(m_reg);
+		prg16_cdef(m_reg | 0x03);
 	}
 	else
 	{
-		m_latch = data & 3;
-		prg16_89ab(m_bank_base | m_latch);
+		m_reg = (m_reg & 0x0c) | (data & 0x03);
+		prg16_89ab(m_reg);
 	}
 }
 
@@ -194,27 +199,24 @@ void nes_bf9096_device::write_h(offs_t offset, uint8_t data)
 
  iNES: mapper 104
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_golden5_device::write_h(offs_t offset, uint8_t data)
+void nes_golden5_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("golden5 write_h, offset: %04x, data: %02x\n", offset, data));
 
-	if (offset < 0x4000)
+	if (offset >= 0x4000)
 	{
-		if (data & 0x08)
-		{
-			m_bank_base = (data & 0x07) << 4;
-			prg16_89ab(m_bank_base | m_latch);
-			prg16_cdef(m_bank_base | 0x0f);
-		}
-
+		m_reg = (m_reg & 0x70) | (data & 0x0f);
+		prg16_89ab(m_reg);
 	}
-	else
+	else if (!m_lock)
 	{
-		m_latch = data & 0x0f;
-		prg16_89ab(m_bank_base | m_latch);
+		m_lock = BIT(data, 3);
+		m_reg = (m_reg & 0x0f) | (data & 0x07) << 4;
+		prg16_89ab(m_reg);
+		prg16_cdef(m_reg | 0x0f);
 	}
 }

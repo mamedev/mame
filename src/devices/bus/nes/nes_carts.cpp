@@ -191,6 +191,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("nina006",          NES_NINA006);
 	device.option_add_internal("bf9093",           NES_BF9093);
 	device.option_add_internal("bf9096",           NES_BF9096);
+	device.option_add_internal("bf9096a",          NES_BF9096A);
 	device.option_add_internal("goldenfive",       NES_GOLDEN5);
 	device.option_add_internal("ade",              NES_ALADDIN);
 	device.option_add_internal("cne_decathl",      NES_CNE_DECATHL);
