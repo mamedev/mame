@@ -119,24 +119,29 @@ WRITE_LINE_MEMBER(sis950_lpc_device::cpu_reset_w)
 
 void sis950_lpc_device::device_add_mconfig(machine_config &config)
 {
+	constexpr XTAL lpc_pit_clock = XTAL(14'318'181);
+
 	// confirmed 82C54
 	PIT8254(config, m_pit, 0);
-	m_pit->set_clk<0>(4772720/4); // heartbeat IRQ
+	// heartbeat IRQ
+	m_pit->set_clk<0>(lpc_pit_clock / 12);
 	m_pit->out_handler<0>().set(FUNC(sis950_lpc_device::pit_out0));
-	m_pit->set_clk<1>(4772720/4); // DRAM refresh
+	// DRAM refresh
+	m_pit->set_clk<1>(lpc_pit_clock / 12);
 	m_pit->out_handler<1>().set(FUNC(sis950_lpc_device::pit_out1));
-	m_pit->set_clk<2>(4772720/4); // PIO port C pin 4, and speaker polling enough
+	// PIO port C pin 4, and speaker polling enough
+	m_pit->set_clk<2>(lpc_pit_clock / 12);
 	m_pit->out_handler<2>().set(FUNC(sis950_lpc_device::pit_out2));
 
-	// TODO: unknown part & clock
-	AM9517A(config, m_dmac_master, XTAL(14'318'181)/3);
+	// TODO: unknown part #
+	AM9517A(config, m_dmac_master, lpc_pit_clock / 3);
 	m_dmac_master->out_hreq_callback().set(m_dmac_slave, FUNC(am9517a_device::dreq0_w));
 //	m_dmac_master->out_eop_callback().set(FUNC(sis950_lpc_device::at_dma8237_out_eop));
 	m_dmac_master->in_memr_callback().set(FUNC(sis950_lpc_device::pc_dma_read_byte));
 	m_dmac_master->out_memw_callback().set(FUNC(sis950_lpc_device::pc_dma_write_byte));
 	// TODO: ior/iow/dack/eop callbacks
 
-	AM9517A(config, m_dmac_slave, XTAL(14'318'181)/3);
+	AM9517A(config, m_dmac_slave, lpc_pit_clock / 3);
 	m_dmac_slave->out_hreq_callback().set(FUNC(sis950_lpc_device::pc_dma_hrq_changed));
 	m_dmac_slave->in_memr_callback().set(FUNC(sis950_lpc_device::pc_dma_read_word));
 	m_dmac_slave->out_memw_callback().set(FUNC(sis950_lpc_device::pc_dma_write_word));
@@ -170,7 +175,7 @@ void sis950_lpc_device::device_add_mconfig(machine_config &config)
 	m_aux_con->out_data_cb().set(m_keybc, FUNC(ps2_keyboard_controller_device::aux_data_w));
 
 	// TODO: selectable between PCI clock / 4 (33 MHz) or 7.159 MHz, via reg $47 bit 5
-	PS2_KEYBOARD_CONTROLLER(config, m_keybc, XTAL(33'000'000) / 4);
+	PS2_KEYBOARD_CONTROLLER(config, m_keybc, DERIVED_CLOCK(1, 4));
 	// TODO: default ibm BIOS doesn't cope with this too well
 	m_keybc->set_default_bios_tag("compaq");
 	m_keybc->hot_res().set(FUNC(sis950_lpc_device::cpu_reset_w));

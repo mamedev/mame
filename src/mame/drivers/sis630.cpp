@@ -196,7 +196,7 @@ void sis630_state::sis630(machine_config &config)
 	m_ide->irq_sec().set("pci:01.0:pic_slave", FUNC(pic8259_device::ir7_w));
 		//FUNC(sis950_lpc_device::pc_mirq0_w));
 
-	SIS950_LPC  (config, "pci:01.0", 0, "maincpu", "flash");
+	SIS950_LPC  (config, "pci:01.0", XTAL(33'000'000), "maincpu", "flash");
 	LPC_ACPI    (config, "pci:01.0:acpi", 0);
 	SIS950_SMBUS(config, "pci:01.0:smbus", 0);
 
