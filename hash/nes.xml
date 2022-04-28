@@ -80580,10 +80580,11 @@ be better to redump them properly. -->
 		<publisher>5Seven Records</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="uxrom" />
+			<feature name="pcb_model" value="INL-XO-ROM" />
 			<dataarea name="prg" size="2097152">
 				<rom name="polygondwanaland.prg" size="2097152" crc="2e86704d" sha1="bd934d2981fa00ca44d5af0023b14c60c7b4b0c4" />
 			</dataarea>
-			<!-- 8k VRAM on cartridge -->
+			<!-- 8k VRAM on cartridge (really 32k?) -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
@@ -86630,19 +86631,21 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
-<!-- This dump was made in a hex editor from the hacked clone. It matches the known MD5 hash of the unreleased dump. -->
+<!-- This dump was made in a hex editor from the hacked clone. It matches the known MD5 hash of the unreleased dump and individual chip 16-bit checksums. -->
 	<software name="tysonipp">
 		<description>Mike Tyson's Intergalactic Power Punch (USA, prototype)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
+			<feature name="pcb_model" value="NES-TKEPROM-01" />
+			<feature name="mmc3_type" value="MMC3B" />
 			<dataarea name="prg" size="131072">
-				<rom name="mike tyson's intergalactic power punch (june 1991 ces prototype).prg" size="131072" crc="fe9239d6" sha1="88cf22111bedd0583d8e49f70730d802e7851e5b" />
+				<rom name="16b prg0 05-31 5a14.u1" size="131072" crc="fe9239d6" sha1="88cf22111bedd0583d8e49f70730d802e7851e5b" />
 			</dataarea>
 			<dataarea name="chr" size="262144">
-				<rom name="mike tyson's intergalactic power punch (june 1991 ces prototype).chr" size="262144" crc="65f969e2" sha1="fe84a134e37790571542325665806b8064de6de6" />
+				<rom name="16b chr0 05-31 5a6b.u5" size="131072" crc="9542b8c1" sha1="eeabdc82563460d78bea23adb41b03e046cb72a7" offset="0x00000" />
+				<rom name="16b chr1 05-31 a29f.u6" size="131072" crc="892b575f" sha1="4d728c2fa57061cf575219c1307de514da738d93" offset="0x20000" />
 			</dataarea>
 		</part>
 	</software>
