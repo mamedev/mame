@@ -3333,8 +3333,9 @@ void pentium3_device::device_reset()
 
 	// [ 0:0] FPU on chip
 	// [ 4:4] Time Stamp Counter
+	// [ 8:8] CMPXCHG8B instruction
 	// [ D:D] PTE Global Bit
-	m_feature_flags = 0x00002011;       // TODO: enable relevant flags here
+	m_feature_flags = 0x00002111;       // TODO: enable relevant flags here
 
 	CHANGE_PC(m_eip);
 }
@@ -3402,7 +3403,8 @@ void pentium4_device::device_reset()
 	m_cpu_version = REG32(EDX);
 
 	// [ 0:0] FPU on chip
-	m_feature_flags = 0x00000001;       // TODO: enable relevant flags here
+	// [ 8:8] CMPXCHG8B instruction
+	m_feature_flags = 0x00000101;       // TODO: enable relevant flags here
 
 	CHANGE_PC(m_eip);
 }
