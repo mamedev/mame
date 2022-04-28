@@ -120,7 +120,7 @@ public:
 		m_sio(*this, "sio"),
 		m_fdc(*this, "fdc"),
 		m_floppy(*this, "fdc:%u", 0U),
-		m_video(*this, "video"),
+		m_video(*this, "apvideo"),  // "video" causes assert in debug build
 		m_cur_floppy(nullptr)
 	{ }
 
