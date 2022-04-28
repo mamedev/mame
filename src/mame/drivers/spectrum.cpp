@@ -778,9 +778,13 @@ void spectrum_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
+attotime spectrum_state::time_until_int() {
+	return m_screen->time_until_pos(0, get_screen_area().left());
+};
+
 INTERRUPT_GEN_MEMBER(spectrum_state::spec_interrupt)
 {
-	timer_set(m_screen->time_until_pos(0, get_screen_area().left()), TIMER_IRQ_ON, 0);
+	timer_set(time_until_int(), TIMER_IRQ_ON, 0);
 }
 
 void spectrum_state::spectrum_common(machine_config &config)

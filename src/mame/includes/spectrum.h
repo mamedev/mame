@@ -138,6 +138,7 @@ protected:
 	void spectrum_palette(palette_device &palette) const;
 	virtual u32 screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(spec_interrupt);
+	virtual attotime time_until_int();
 
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
