@@ -3335,7 +3335,8 @@ void pentium3_device::device_reset()
 	// [ 4:4] Time Stamp Counter
 	// [ 8:8] CMPXCHG8B instruction
 	// [ D:D] PTE Global Bit
-	m_feature_flags = 0x00002111;       // TODO: enable relevant flags here
+	// [15:15] CMOV and FCMOV
+	m_feature_flags = 0x0000a111;       // TODO: enable relevant flags here
 
 	CHANGE_PC(m_eip);
 }
@@ -3404,7 +3405,8 @@ void pentium4_device::device_reset()
 
 	// [ 0:0] FPU on chip
 	// [ 8:8] CMPXCHG8B instruction
-	m_feature_flags = 0x00000101;       // TODO: enable relevant flags here
+	// [15:15] CMOV and FCMOV
+	m_feature_flags = 0x00008101;       // TODO: enable relevant flags here
 
 	CHANGE_PC(m_eip);
 }
