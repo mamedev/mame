@@ -222,7 +222,7 @@ void sis630_state::sis630(machine_config &config)
 	// TODO: 1 game port
 	// TODO: move keyboard/mouse PS/2 connectors in here
 
-	// TODO: AMR (Audio/modem riser) + UPT (?), assume [E]ISA complaint, needs specific slot options
+	// TODO: AMR (Audio/modem riser) + UPT (Panel Link-TV out), assume [E]ISA complaint, needs specific slot options
 //	ISA16_SLOT(config, "isa1", 0, "pci:01.0:isabus", pc_isa16_cards, nullptr, false);
 //	ISA16_SLOT(config, "isa2", 0, "pci:01.0:isabus", pc_isa16_cards, nullptr, false);
 }
