@@ -151,7 +151,7 @@ void vigilant_state::bowmen_io_map(address_map &map)
 
 void vigilant_state::sound_map(address_map &map)
 {
-	map(0x0000, 0xbfff).rom();
+	map(0x0000, 0xefff).rom();
 	map(0xf000, 0xffff).ram();
 }
 
