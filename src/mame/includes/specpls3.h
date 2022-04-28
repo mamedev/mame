@@ -30,6 +30,7 @@ public:
 	void spectrum_plus3(machine_config &config);
 
 protected:
+	virtual void video_start() override;
 	virtual void machine_reset() override;
 	virtual void plus3_update_memory() override;
 
