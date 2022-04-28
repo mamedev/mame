@@ -25479,8 +25479,8 @@ license:CC0
 			<dataarea name="chr" size="131072">
 				<rom name="0.chr" size="131072" crc="7375d251" sha1="c240631e734fec873f546f20edaa81e0d31b4e27" offset="00000" />
 			</dataarea>
-			<dataarea name="adpcm" size="262144">
-				<rom name="upd7756c" size="262144" status="nodump" offset="00000" />
+			<dataarea name="adpcm" size="32768">
+				<rom name="d7756c" size="32768" status="nodump" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -25501,8 +25501,8 @@ license:CC0
 			<dataarea name="chr" size="131072">
 				<rom name="0.chr" size="131072" crc="221f85cf" sha1="9379b8b4d440f039993a2f156e67667b38668094" offset="00000" />
 			</dataarea>
-			<dataarea name="adpcm" size="262144">
-				<rom name="upd7756c" size="262144" status="nodump" offset="00000" />
+			<dataarea name="adpcm" size="32768">
+				<rom name="d7756c" size="32768" status="nodump" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -25526,8 +25526,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="moejudo" supported="partial">
-		<description>Moero!! Juudou Warriors (Jpn)</description>
+	<software name="moejudo" supported="no">
+		<description>Moero!! Juudou Warriors (Japan)</description>
 		<year>1990</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-28"/>
@@ -25563,8 +25563,8 @@ license:CC0
 			<dataarea name="chr" size="131072">
 				<rom name="jf-17 chr" size="131072" crc="43e86efa" sha1="5aaba33768eaf8bc66090f28a2aecb89e496b135" offset="00000" />
 			</dataarea>
-			<dataarea name="adpcm" size="262144">
-				<rom name="upd7756c" size="262144" status="nodump" offset="00000" />
+			<dataarea name="adpcm" size="32768">
+				<rom name="d7756c" size="32768" status="nodump" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -25586,8 +25586,8 @@ license:CC0
 			<dataarea name="chr" size="65536">
 				<rom name="chr" size="65536" crc="26a94526" sha1="c06ef1f446c4e66ce5efc4e8b282e5f7b9eb3baa" offset="00000" />
 			</dataarea>
-			<dataarea name="adpcm" size="262144">
-				<rom name="upd7756c" size="262144" status="nodump" offset="00000" />
+			<dataarea name="adpcm" size="32768">
+				<rom name="d7756c" size="32768" status="nodump" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -25609,8 +25609,8 @@ license:CC0
 			<dataarea name="chr" size="65536">
 				<rom name="chr" size="65536" crc="26a94526" sha1="c06ef1f446c4e66ce5efc4e8b282e5f7b9eb3baa" offset="00000" />
 			</dataarea>
-			<dataarea name="adpcm" size="262144">
-				<rom name="upd7756c" size="262144" status="nodump" offset="00000" />
+			<dataarea name="adpcm" size="32768">
+				<rom name="d7756c" size="32768" status="nodump" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -25632,8 +25632,8 @@ license:CC0
 			<dataarea name="chr" size="65536">
 				<rom name="chr" size="65536" crc="26a94526" sha1="c06ef1f446c4e66ce5efc4e8b282e5f7b9eb3baa" offset="00000" />
 			</dataarea>
-			<dataarea name="adpcm" size="262144">
-				<rom name="upd7756c" size="262144" status="nodump" offset="00000" />
+			<dataarea name="adpcm" size="32768">
+				<rom name="d7756c" size="32768" status="nodump" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -25655,8 +25655,8 @@ license:CC0
 			<dataarea name="chr" size="65536">
 				<rom name="chr" size="65536" crc="26a94526" sha1="c06ef1f446c4e66ce5efc4e8b282e5f7b9eb3baa" offset="00000" />
 			</dataarea>
-			<dataarea name="adpcm" size="262144">
-				<rom name="upd7756c" size="262144" status="nodump" offset="00000" />
+			<dataarea name="adpcm" size="32768">
+				<rom name="d7756c" size="32768" status="nodump" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -25678,8 +25678,8 @@ license:CC0
 			<dataarea name="chr" size="131072">
 				<rom name="0.chr" size="131072" crc="f20e819f" sha1="93c693f222586e51836fd41ef369fac9af2356e5" offset="00000" />
 			</dataarea>
-			<dataarea name="adpcm" size="262144">
-				<rom name="upd7756c" size="262144" status="nodump" offset="00000" />
+			<dataarea name="adpcm" size="32768">
+				<rom name="d7756c" size="32768" status="nodump" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -33867,8 +33867,8 @@ license:CC0
 			<dataarea name="chr" size="131072">
 				<rom name="jf-23 chr" size="131072" crc="81bf8283" sha1="ac024e7bfe2fef7300c5d21702a03b5ca8117529" offset="00000" />
 			</dataarea>
-			<dataarea name="adpcm" size="262144">
-				<rom name="upd7756c" size="262144" status="nodump" offset="00000" />
+			<dataarea name="adpcm" size="32768">
+				<rom name="d7756c" size="32768" status="nodump" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -39118,8 +39118,8 @@ license:CC0
 			<dataarea name="chr" size="131072">
 				<rom name="0.chr" size="131072" crc="a7c1010e" sha1="afd6fb56d97f35ee19a4b297845c995b47bc3ade" offset="00000" />
 			</dataarea>
-			<dataarea name="adpcm" size="262144">
-				<rom name="upd7755c" size="262144" status="nodump" offset="00000" />
+			<dataarea name="adpcm" size="12288">
+				<rom name="d7755c" size="12288" status="nodump" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -49135,8 +49135,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 				<rom name="chr" size="65536" crc="26a94526" sha1="c06ef1f446c4e66ce5efc4e8b282e5f7b9eb3baa" offset="00000" />
 			</dataarea>
 			<!-- was this present on the proto board? -->
-			<dataarea name="adpcm" size="262144">
-				<rom name="upd7756c" size="262144" status="nodump" offset="00000" />
+			<dataarea name="adpcm" size="32768">
+				<rom name="d7756c" size="32768" status="nodump" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
