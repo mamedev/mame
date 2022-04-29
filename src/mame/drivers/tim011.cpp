@@ -156,7 +156,7 @@ void tim011_state::tim011(machine_config &config)
 	HD64180RP(config, m_maincpu, XTAL(12'288'000)); // location U17 HD64180
 	m_maincpu->set_addrmap(AS_PROGRAM, &tim011_state::tim011_mem);
 	m_maincpu->set_addrmap(AS_IO, &tim011_state::tim011_io);
-	m_maincpu->tend1_wr_callback().set([this](int state) { m_fdc->tc_w(state); });
+	m_maincpu->tend1_wr_callback().set(m_fdc, FUNC(upd765a_device::tc_line_w));
 
 //  CDP1802(config, "keyboard", XTAL(1'750'000)); // CDP1802, unknown clock
 
