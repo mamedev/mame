@@ -47,7 +47,7 @@ void sis5513_ide_device::device_add_mconfig(machine_config &config)
 	m_ide1->set_bus_master_space(":maincpu", AS_PROGRAM);
 
 	BUS_MASTER_IDE_CONTROLLER(config, m_ide2).options(ata_devices, "cdrom", nullptr, false);
-	m_ide1->irq_handler().set([this](int state) { m_irq_sec_callback(state); });
+	m_ide2->irq_handler().set([this](int state) { m_irq_sec_callback(state); });
 	m_ide2->set_bus_master_space(":maincpu", AS_PROGRAM);
 }
 
