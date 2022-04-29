@@ -50,6 +50,8 @@ public:
 
 	static constexpr feature_type unemulated_features() { return feature::MOUSE; }
 
+	auto fast_reset_cb() { return m_fast_reset_cb.bind(); }
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -80,6 +82,8 @@ private:
 	required_device<pc_kbdc_device> m_aux_con;
 	required_device<lpc_acpi_device> m_acpi;
 	required_device<sis950_smbus_device> m_smbus;
+
+	devcb_write_line m_fast_reset_cb;
 
 	// PCI interface
 	u8 bios_control_r();

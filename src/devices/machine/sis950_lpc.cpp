@@ -67,6 +67,7 @@ sis950_lpc_device::sis950_lpc_device(const machine_config &mconfig, const char *
 	, m_aux_con(*this, "aux_con")
 	, m_acpi(*this, "acpi")
 	, m_smbus(*this, "smbus")
+	, m_fast_reset_cb(*this)
 {
 }
 
@@ -74,14 +75,7 @@ void sis950_lpc_device::device_start()
 {
 	pci_device::device_start();
 
-#if 0
-	memory_window_start = 0;
-	memory_window_end   = 0xffffffff;
-	memory_offset       = 0;
-	io_window_start = 0;
-	io_window_end   = 0xffff;
-	io_offset       = 0;
-#endif
+	m_fast_reset_cb.resolve_safe();
 }
 
 void sis950_lpc_device::device_reset()
@@ -331,9 +325,10 @@ void sis950_lpc_device::init_enable_w(u8 data)
 	// (perhaps PS/2 controller can intercept this? Or it's a full on LPC reset like using an actual MAME soft reset implies?)
 	if ((data & 0xc0) == 0xc0)// && (m_init_reg & 0xc0) == 0)
 	{
-		const int fast_reset_time = BIT(data, 3) ? 6 : 2;
+		//const int fast_reset_time = BIT(data, 3) ? 6 : 2;
 		LOGIO("Fast reset issued\n");
-		m_host_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::from_usec(fast_reset_time));
+		//m_host_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::from_usec(fast_reset_time));
+		m_fast_reset_cb(1);
 	}
 
 	m_init_reg = data;

@@ -5,38 +5,41 @@
 
     SiS 630 chipset based PC
 
-    TODO:
-    - PCI banking doesn't work as intended
-      \- cfr. GUI expansion ROM, host shadow RAM bit 15, misc
-    - Verify that PCI listing honors real HW
-      \- Currently lists GUI, USB, '900, '7018, ACPI Controller;
-    - Identify flash ROM type;
-    - Video is sketchy;
-      \- Shows SiS AGP header text in less than 1 frame (catchable with debugger only)
-	  \- Needs proper position on the bus, particularly true for making it to proper switch
-	     mode to a non-16 colors one;
-    - Floppy drive
-      \- LPC accepts a SMC37C673 as default;
-    - SMBus isn't extensively tested
-      \- POST fails with a CMOS crc error for CPU identifier/speed, may need sensible defaults;
-	- shutms11: Accesses I/O $294 for the Super I/O fans in BIOS menu, cfr. '950 LPC;
-	- gamecstl setup BIOS: has more Super I/O tests, and '900 ETH setup as well
-	  (including MAC address check et al.)
-	- gamecstl Kontron BIOS:
-	  \- hangs at PC=0xf3cf2, again wanting a SMI# from devtrap_en_w;
-	  \- No PS/2 inputs;
-    - gamecstl dump (tested from shutms11):
-	  \- Currently black screens before booting normal Windows, reading $5004 from the LPC ACPI
-	    (flip EAX to non-zero to bypass).
-		 NB: it also writes to $5048 once (devtrap_en_w), which should generate a SMI# event;
-      \- Doesn't accept any PS/2 input, tries to install a "PCI standard CPU Host Bridge" (?),
-	     hangs there;
-      \- GUI is never recognized no matter what, punts with DirectX not installed;
-    - windows xp sp3: tests HW then does an ACPI devtrap write, skipping that will BSoD with a
-	  STOP #7b (INACCESSIBLE_BOOT_DEVICE) with param #0 pointing at the CDROM
-    - xubuntu 10.10: detects EISA boards with a "@@@@0000" value (?), stalls pointlessly with both
-      tsc and notsc options (i.e. PIT ch.0 never gives a value bigger than the threshold),
-	  eventually throws a kernel panic.
+    TODO (main):
+    - PS/2 loses IRQs, mouse is unusable, "ibm" BIOS doesn't work at all;
+    - '900 Ethernet (missing ROM dump);
+    - USB controllers (OpenHCI complaint);
+    - Floppy drive, unsupported SMC37C673 default;
+    - ACPI is not fully lpc-acpi complaint;
+    - EISA slots;
+    - PnP from LPC;
+    - SMBus;
+    - Super I/O handling in LPC (HW motherboard monitor, cfr. I/O $294 reads in shutms11 fan tests);
+
+    TODO (usability, to be moved in a SW list):
+    - windows xp sp3: tests HW then does an ACPI devtrap write ($48), will eventually BSoD with
+      ACPI STOP #a5 error with param $11
+    \- To bypass hold F7 while the "to install SCSI drivers [...] press F6" appears.
+       And by F7 I really mean it :shrug:
+
+    - windows xp sp3: BSoDs during install with a STOP #0a IRQL_NOT_LESS_OR_EQUAL;
+
+    - gamecstl Kontron BIOS:
+    \- hangs at PC=0xf3cf2, again wanting a SMI# from devtrap_en_w;
+    \- No PS/2 inputs;
+
+    - gamecstl dump (tested from shutms11, also see notes below):
+    \- Currently black screens before booting normal Windows, reading $5004 from the LPC ACPI
+       (flip EAX to non-zero to bypass).
+       NB: it also writes to $5048 once (devtrap_en_w), which should generate a SMI# event;
+    \- Doesn't accept any PS/2 input, tries to install a "PCI standard CPU Host Bridge" (?),
+       hangs there;
+    \- GUI is never recognized no matter what, punts with DirectX not installed;
+
+    - xubuntu 6.10: throws several SCSIDEV unhandled $51 & $46 commands, eventually punts to
+      prompt with a "can't access tty: job control turned off";
+
+    - xubuntu 10.10: stalls after '900 ethernet check;
 
 ===================================================================================================
 
@@ -54,8 +57,8 @@
       1. edit C:\WINDOWS\system.ini and change shell property to explorer.exe
       2. remove the autoexec.bat contents, it will otherwise copy a bunch of .ini
          files from C:\dat to C:\WINDOWS, and replacing the system.ini shell launcher.
-	  Alternatively you can also execute "open.exe" from MS-DOS, that removes above customization
-	  too.
+      Alternatively you can also execute "open.exe" from MS-DOS, that removes above customization
+      too.
     - (gamecstl) Device Manager installed devices:
       - two Samsung SyncMaster 900SL monitors ('630 + '301?);
       - SiS 630 display adapter;
@@ -78,12 +81,12 @@
     - C:\GH4\mvs contains movie clips of the emulated games.
       These are MS-CRAM encoded, 288x208 at 20 fps, stereo MS ADPCM with 11025 Hz sample rate,
       36 seconds length.
-	  Mentioning this because SiS 630 has several HW registers dedicated to video playback,
-	  which will be most likely used once we get there.
+      Mentioning this because SiS 630 has several HW registers dedicated to video playback,
+      which will be most likely used once we get there.
     - C:\GH4\rdir contains filled NVRAM directory of the supported games.
-	  These are probably copied from a factory default (like skipping NVRAM errors in spang & mk),
-	  needs to be extensively checked if they can be flushed and given a working state with no
-	  arbitrary user data (i.e. the mk games sports about 3 hours of playtime each)
+      These are probably copied from a factory default (like skipping NVRAM errors in spang & mk),
+      needs to be extensively checked if they can be flushed and given a working state with no
+      arbitrary user data (i.e. the mk games sports about 3 hours of playtime each)
 
     Updates 27/11/2007 (Diego Nappino):
     The COM1 port is opened at 19200 bps, No parity, 8 bit data, 1 stop bit.
@@ -154,7 +157,8 @@ public:
 	sis630_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_ide(*this, "pci:00.1")
+		, m_ide_00_1(*this, "pci:00.1")
+		, m_lpc_01_0(*this, "pci:01.0")
 	{ }
 
 	void sis630(machine_config &config);
@@ -163,7 +167,8 @@ public:
 private:
 
 	required_device<pentium3_device> m_maincpu;
-	required_device<sis5513_ide_device> m_ide;
+	required_device<sis5513_ide_device> m_ide_00_1;
+	required_device<sis950_lpc_device> m_lpc_01_0;
 
 //  void main_io(address_map &map);
 //  void main_map(address_map &map);
@@ -190,13 +195,18 @@ void sis630_state::sis630(machine_config &config)
 	PCI_ROOT(config, "pci", 0);
 	// up to 512MB, 2 x DIMM sockets
 	SIS630_HOST(config, "pci:00.0", 0, "maincpu", "pci:02.0:00.0", 256*1024*1024);
-	SIS5513_IDE(config, m_ide, 0);
-	m_ide->irq_pri().set("pci:01.0:pic_slave", FUNC(pic8259_device::ir6_w));
+	SIS5513_IDE(config, m_ide_00_1, 0);
+	// TODO: both on same line as default, should also trigger towards LPC
+	m_ide_00_1->irq_pri().set("pci:01.0:pic_slave", FUNC(pic8259_device::ir6_w));
 		//FUNC(sis950_lpc_device::pc_irq14_w));
-	m_ide->irq_sec().set("pci:01.0:pic_slave", FUNC(pic8259_device::ir7_w));
+	m_ide_00_1->irq_sec().set("pci:01.0:pic_slave", FUNC(pic8259_device::ir7_w));
 		//FUNC(sis950_lpc_device::pc_mirq0_w));
 
-	SIS950_LPC  (config, "pci:01.0", XTAL(33'000'000), "maincpu", "flash");
+	SIS950_LPC  (config, m_lpc_01_0, XTAL(33'000'000), "maincpu", "flash");
+	m_lpc_01_0->fast_reset_cb().set([this] (int state) {
+		if (state)
+			machine().schedule_soft_reset();
+	});
 	LPC_ACPI    (config, "pci:01.0:acpi", 0);
 	SIS950_SMBUS(config, "pci:01.0:smbus", 0);
 
@@ -215,8 +225,8 @@ void sis630_state::sis630(machine_config &config)
 	SIS630_GUI(config, "pci:02.0:00.0", 0);
 
 	// optional stuff (according to Kontron 786LCD manual)
-//	"pci:08.0" SCSI controller (vendor=1000 NCR / LSI Logic / Symbios Logic device=0012 53C895A)
-//	"pci:09.0" IEEE1394 controller (vendor=1033 NEC device=00ce uPD72872 / μPD72872)
+//  "pci:08.0" SCSI controller (vendor=1000 NCR / LSI Logic / Symbios Logic device=0012 53C895A)
+//  "pci:09.0" IEEE1394 controller (vendor=1033 NEC device=00ce uPD72872 / μPD72872)
 
 	// TODO: 3 expansion PCI slots (PC104+)
 	// "pci:09.x" to "pci:12.x"?
@@ -224,12 +234,11 @@ void sis630_state::sis630(machine_config &config)
 	// "pci:20.x" to "pci:17.x"?
 
 	// TODO: 1 parallel + 2 serial ports
-	// TODO: 1 game port
-	// TODO: move keyboard/mouse PS/2 connectors in here
+	// TODO: 1 game port ('7018?)
 
 	// TODO: AMR (Audio/modem riser) + UPT (Panel Link-TV out), assume [E]ISA complaint, needs specific slot options
-//	ISA16_SLOT(config, "isa1", 0, "pci:01.0:isabus", pc_isa16_cards, nullptr, false);
-//	ISA16_SLOT(config, "isa2", 0, "pci:01.0:isabus", pc_isa16_cards, nullptr, false);
+//  ISA16_SLOT(config, "isa1", 0, "pci:01.0:isabus", pc_isa16_cards, nullptr, false);
+//  ISA16_SLOT(config, "isa2", 0, "pci:01.0:isabus", pc_isa16_cards, nullptr, false);
 }
 
 // Kontron 786LCD/3.5 based
@@ -246,8 +255,8 @@ void sis630_state::gamecstl(machine_config &config)
 	// TODO: mapped RAM config
 	// TODO: add custom inputs
 	// TODO: eventually remove PS/2 connector defaults
-//	subdevice<pc_kbdc_device>("pci:01.0:ps2_con")->set_default_option(nullptr);
-//	subdevice<pc_kbdc_device>("pci:01.0:aux_con")->set_default_option(nullptr);
+//  subdevice<pc_kbdc_device>("pci:01.0:ps2_con")->set_default_option(nullptr);
+//  subdevice<pc_kbdc_device>("pci:01.0:aux_con")->set_default_option(nullptr);
 }
 
 ROM_START(shutms11)

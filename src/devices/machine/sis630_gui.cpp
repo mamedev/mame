@@ -17,20 +17,22 @@
     - GUI is the 630 PCI/AGP i/f
     \- it's actually internal to the rest of 630;
     \- 301 is external but closely tied to it: the digital i/f ports (RIO+$4) selects where it
-	   should start drawing/sync etc. while the "VGA2 regs" (RIO+$14) seems to be a custom set
-	   rather than be related at all (i.e. it most likely be just capable to have VGA-like
-	   resolutions).
-	- sis_main.c portions refers to the correlated Linux driver at
-	  https://github.com/torvalds/linux/blob/master/drivers/video/fbdev/sis/sis_main.c
+       should start drawing/sync etc. while the "VGA2 regs" (RIO+$14) seems to be a custom set
+       rather than be related at all (i.e. it most likely be just capable to have VGA-like
+       resolutions).
+    - sis_main.c portions refers to the correlated Linux driver at
+      https://github.com/torvalds/linux/blob/master/drivers/video/fbdev/sis/sis_main.c
 
     TODO:
-    - Very preliminary, enough to make it to draw basic VGA primary screen and not much else;
-    - Backward port '630 GUI/PCI implementation to '300;
-    - With current config it claims memory size to be 3MB instead of 64
-      (regressed during development)
-    - Hardware cursor is supposed to be extended reg $6 bit 6, but it's apparently not the
-      right trigger by gamecstl Windows non-safe mode;
-    - Interface with '301;
+    - Backward port '630 GUI/PCI implementation to '300 and other flavours
+      (needs VGA mods to do this properly);
+    - 2d acceleration;
+    - Turbo queue stuff;
+    - AGP;
+    - interlace (cfr. xubuntu 6.10 splash screen on 1024x768x32);
+    - xubuntu 6.10 splash screen is decentered (zooming?)
+    - xubuntu 6.10 splash screen text is unreadable or not visible depending on res selected;
+    - Interface with '301 bridge (a lovely can of worms);
 
 **************************************************************************************************/
 
@@ -303,7 +305,7 @@ u8 sis630_svga_device::port_03c0_r(offs_t offset)
 	if (offset == 0xb)
 		return m_svga_bank_reg_r;
 
-	return 	svga_device::port_03c0_r(offset);
+	return  svga_device::port_03c0_r(offset);
 }
 
 void sis630_svga_device::port_03c0_w(offs_t offset, uint8_t data)
