@@ -616,6 +616,10 @@
 #include "tiki100_dsk.h"
 #endif
 
+#ifdef HAS_FORMATS_TIM011_DSK
+#include "tim011_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_TRD_DSK
 #include "trd_dsk.h"
 #endif
