@@ -8259,7 +8259,7 @@ license:CC0
 		<description>Garou - Mark of the Wolves (NGH-2530)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
-		<info name="serial" value="NGM-2530"/>
+		<info name="serial" value="NGH-2530"/>
 		<info name="release" value="19991126"/>
 		<info name="alt_title" value="餓狼"/>
 		<sharedfeat name="release" value="AES" />
