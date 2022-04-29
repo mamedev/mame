@@ -183,7 +183,7 @@ void spectrum_state::content_early(s8 shift)
 	if (m_contention_pattern.empty() || vpos < get_screen_area().top() || vpos > get_screen_area().bottom())
 		return;
 
-	u64 now = m_maincpu->cycles_from_irq() + shift;
+	u64 now = m_maincpu->attotime_to_clocks(m_screen->frame_period() - time_until_int()) + shift;
 	u64 cf = vpos * m_screen->width() * m_maincpu->clock() / m_screen->clock() - 1;
 	u64 ct = cf + get_screen_area().width() * m_maincpu->clock() / m_screen->clock();
 
@@ -201,7 +201,7 @@ void spectrum_state::content_late()
 	if (m_contention_pattern.empty() || vpos < get_screen_area().top() || vpos > get_screen_area().bottom())
 		return;
 
-	u64 now = m_maincpu->cycles_from_irq() + 1;
+	u64 now = m_maincpu->attotime_to_clocks(m_screen->frame_period() - time_until_int()) + 1;
 	u64 cf = vpos * m_screen->width() * m_maincpu->clock() / m_screen->clock() - 1;
 	u64 ct = cf + get_screen_area().width() * m_maincpu->clock() / m_screen->clock();
 	for(auto i = 0x04; i; i >>= 1)

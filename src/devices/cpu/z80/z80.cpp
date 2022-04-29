@@ -3677,7 +3677,6 @@ void z80_device::execute_set_input(int inputnum, int state)
 		break;
 
 	case INPUT_LINE_IRQ0:
-		if(state && !m_irq_state) m_irq_at = total_cycles() + m_icount;
 		/* update the IRQ state via the daisy chain */
 		m_irq_state = state;
 		if (daisy_chain_present())
