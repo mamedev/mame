@@ -24,7 +24,7 @@ license:CC0
 		<element name="left top pad" ref="rect">
 			<bounds x="16" y="209" width="64" height="64" />
 			<color state="50" alpha="0" />
-			<color state="150" alha="1" />
+			<color state="150" alpha="1" />
 		</element>
 		<element name="left top lamp" ref="rect">
 			<bounds x="16" y="209" width="64" height="64" />
@@ -35,7 +35,7 @@ license:CC0
 		<element name="left middle pad" ref="rect">
 			<bounds x="16" y="289" width="64" height="64" />
 			<color state="50" alpha="0" />
-			<color state="150" alha="1" />
+			<color state="150" alpha="1" />
 		</element>
 		<element name="left middle lamp" ref="rect">
 			<bounds x="16" y="289" width="64" height="64" />
@@ -46,7 +46,7 @@ license:CC0
 		<element name="left bottom pad" ref="rect">
 			<bounds x="16" y="369" width="64" height="64" />
 			<color state="50" alpha="0" />
-			<color state="150" alha="1" />
+			<color state="150" alpha="1" />
 		</element>
 		<element name="left bottom lamp" ref="rect">
 			<bounds x="16" y="369" width="64" height="64" />
@@ -57,7 +57,7 @@ license:CC0
 		<element name="right top pad" ref="rect">
 			<bounds x="752" y="209" width="64" height="64" />
 			<color state="50" alpha="0" />
-			<color state="150" alha="1" />
+			<color state="150" alpha="1" />
 		</element>
 		<element name="right top lamp" ref="rect">
 			<bounds x="752" y="209" width="64" height="64" />
@@ -68,7 +68,7 @@ license:CC0
 		<element name="right middle pad" ref="rect">
 			<bounds x="752" y="289" width="64" height="64" />
 			<color state="50" alpha="0" />
-			<color state="150" alha="1" />
+			<color state="150" alpha="1" />
 		</element>
 		<element name="right middle lamp" ref="rect">
 			<bounds x="752" y="289" width="64" height="64" />
@@ -79,7 +79,7 @@ license:CC0
 		<element name="right bottom pad" ref="rect">
 			<bounds x="752" y="369" width="64" height="64" />
 			<color state="50" alpha="0" />
-			<color state="150" alha="1" />
+			<color state="150" alpha="1" />
 		</element>
 		<element name="right bottom lamp" ref="rect">
 			<bounds x="752" y="369" width="64" height="64" />
