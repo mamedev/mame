@@ -131,7 +131,8 @@ void mas3507d_device::i2c_scl_w(bool line)
 	if(line == i2c_scli)
 		return;
 	i2c_scli = line;
-
+	// FIXME: sda output should only change state when clock is low.
+	// On wrong device-id ensure sda is left high (Think it's OK but not certain)
 	if(i2c_scli) {
 		if(i2c_bus_state == STARTED) {
 			if(i2c_sdai)

@@ -77,7 +77,7 @@ void pcf8593_device::device_reset()
 	m_pin_scl = 1;
 	m_pin_sda = 1;
 	m_active  = false;
-	m_inp     = 0;
+	m_inp     = 0; // FIXME: sda should default 1 not 0.
 	m_mode    = RTC_MODE_RECV;
 	m_bits    = 0;
 	m_pos     = 0;
@@ -161,6 +161,10 @@ bool pcf8593_device::nvram_write(util::write_stream &file)
 WRITE_LINE_MEMBER(pcf8593_device::scl_w)
 {
 	// send bit
+	// FIXME: Processing on the rising edge of the clock causes sda output to
+	// change while clock is high. This is not allowed.
+	// All received data is currently acknowledge, need to add checks for
+	// valid device-id and ACK/NAK as required.
 	if ((m_active) && (!m_pin_scl) && (state))
 	{
 		switch (m_mode)
