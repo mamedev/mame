@@ -36,8 +36,9 @@
 #define LOG_TODO   (1U << 2) // log unimplemented registers
 #define LOG_MAP    (1U << 3) // log full remaps
 #define LOG_LPC    (1U << 4) // log LPC legacy regs
+#define LOG_IRQ    (1U << 5) // log IRQ remaps
 
-#define VERBOSE (LOG_GENERAL | LOG_IO | LOG_TODO)
+#define VERBOSE (LOG_GENERAL | LOG_IO | LOG_TODO | LOG_IRQ)
 //#define LOG_OUTPUT_FUNC osd_printf_warning
 
 #include "logmacro.h"
@@ -46,6 +47,7 @@
 #define LOGMAP(...)    LOGMASKED(LOG_MAP,  __VA_ARGS__)
 #define LOGTODO(...)   LOGMASKED(LOG_TODO, __VA_ARGS__)
 #define LOGLPC(...)    LOGMASKED(LOG_LPC, __VA_ARGS__)
+#define LOGIRQ(...)    LOGMASKED(LOG_IRQ, __VA_ARGS__)
 
 DEFINE_DEVICE_TYPE(SIS950_LPC, sis950_lpc_device, "sis950_lpc", "SiS 950 LPC Super-South Bridge")
 
@@ -98,6 +100,8 @@ void sis950_lpc_device::device_reset()
 	m_dma_high_byte = 0;
 	m_init_reg = 0;
 	m_rtc_reg = 0x10;
+	// remapping is disabled for all as default
+	std::fill(std::begin(m_irq_remap), std::end(m_irq_remap), 0x80);
 
 	m_lpc_legacy.fast_init = 0;
 	remap_cb();
@@ -206,7 +210,11 @@ void sis950_lpc_device::config_map(address_map &map)
 
 	// LPC control regs
 	map(0x40, 0x40).rw(FUNC(sis950_lpc_device::bios_control_r), FUNC(sis950_lpc_device::bios_control_w));
-//	map(0x41, 0x44) INTA-INTB-INTC-INTD irq remaps
+	map(0x41, 0x41).rw(FUNC(sis950_lpc_device::irq_remap_r<IRQ_INTA>), FUNC(sis950_lpc_device::irq_remap_w<IRQ_INTA>));
+	map(0x42, 0x42).rw(FUNC(sis950_lpc_device::irq_remap_r<IRQ_INTB>), FUNC(sis950_lpc_device::irq_remap_w<IRQ_INTB>));
+	map(0x43, 0x43).rw(FUNC(sis950_lpc_device::irq_remap_r<IRQ_INTC>), FUNC(sis950_lpc_device::irq_remap_w<IRQ_INTC>));
+	map(0x44, 0x44).rw(FUNC(sis950_lpc_device::irq_remap_r<IRQ_INTD>), FUNC(sis950_lpc_device::irq_remap_w<IRQ_INTD>));
+
 	map(0x45, 0x45).rw(FUNC(sis950_lpc_device::flash_ctrl_r), FUNC(sis950_lpc_device::flash_ctrl_w));
 	map(0x46, 0x46).rw(FUNC(sis950_lpc_device::init_enable_r), FUNC(sis950_lpc_device::init_enable_w));
 	map(0x47, 0x47).rw(FUNC(sis950_lpc_device::keybc_reg_r), FUNC(sis950_lpc_device::keybc_reg_w));
@@ -224,9 +232,10 @@ void sis950_lpc_device::config_map(address_map &map)
 //	map(0x58, 0x5f) PIT counters 0-1-2 low/high, $5e -> control 43h, $5f -> read count pointer statuses
 //	map(0x60, 0x60) EISA port $70
 
-//	map(0x61, 0x61) IDE irq remap
+	map(0x61, 0x61).rw(FUNC(sis950_lpc_device::irq_remap_r<IRQ_IDE>), FUNC(sis950_lpc_device::irq_remap_w<IRQ_IDE>));
 //	map(0x62, 0x62) <reserved>, hardwired to 0x80 (PIT irq remap?)
-//	map(0x63, 0x63) [ACPI?] GPE irq remap
+	map(0x62, 0x62).lr8(NAME([] () { return 0x80; }));
+	map(0x63, 0x63).rw(FUNC(sis950_lpc_device::irq_remap_r<IRQ_GPE>), FUNC(sis950_lpc_device::irq_remap_w<IRQ_GPE>));
 
 //	map(0x64, 0x64) PCI bus priority timer
 // 	map(0x65, 0x65) PHOLD# timer
@@ -235,10 +244,10 @@ void sis950_lpc_device::config_map(address_map &map)
 //	map(0x67, 0x67) Serial IRQ 1 & 12 latch control (FDC super I/O)
 //	map(0x68, 0x69) <reserved>
 
-//	map(0x6a, 0x6a) ACPI SCI irq remap
+	map(0x63, 0x63).rw(FUNC(sis950_lpc_device::irq_remap_r<IRQ_ACPI>), FUNC(sis950_lpc_device::irq_remap_w<IRQ_ACPI>));
 //	map(0x6b, 0x6b) <reserved>
-//	map(0x6c, 0x6c) SMBus irq remap
-//	map(0x6d, 0x6d) watchdog irq remap
+	map(0x6c, 0x6c).rw(FUNC(sis950_lpc_device::irq_remap_r<IRQ_SMBUS>), FUNC(sis950_lpc_device::irq_remap_w<IRQ_SMBUS>));
+	map(0x6d, 0x6d).rw(FUNC(sis950_lpc_device::irq_remap_r<IRQ_SWDOG>), FUNC(sis950_lpc_device::irq_remap_w<IRQ_SWDOG>));
 
 //	map(0x6e, 0x6f) SW irq triggers
 //	map(0x70, 0x70) Serial irq control
@@ -262,6 +271,27 @@ void sis950_lpc_device::bios_control_w(u8 data)
 	LOGIO("Write BIOS control [$40] %02x\n", data);
 	m_bios_control = data;
 	remap_cb();
+}
+
+template <unsigned N> u8 sis950_lpc_device::irq_remap_r()
+{
+	return m_irq_remap[N];
+}
+
+template <unsigned N> void sis950_lpc_device::irq_remap_w(u8 data)
+{
+	m_irq_remap[N] = data;
+	LOGIRQ("%s IRQ remap write %02x (%s)\n", std::array<char const *, 9> {{
+		"INTA",
+		"INTB",
+		"INTC",
+		"INTD",
+		"IDEIRQ",
+		"GPEIRQ",
+		"ACPI/SCI",
+		"SMBus",
+		"Software Watchdog"
+	 }}[N], data, BIT(data, 7) ? "disable" : "enable");
 }
 
 u8 sis950_lpc_device::flash_ctrl_r()

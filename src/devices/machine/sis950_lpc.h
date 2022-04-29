@@ -97,6 +97,8 @@ private:
 	void rtc_index_w(u8 data);
 	u8 rtc_data_r();
 	void rtc_data_w(u8 data);
+	template <unsigned N> u8 irq_remap_r();
+	template <unsigned N> void irq_remap_w(u8 data);
 	u8 unmap_log_r(offs_t offset);
 	void unmap_log_w(offs_t offset, u8 data);
 	
@@ -107,6 +109,20 @@ private:
 	u8 m_keybc_reg = 0;
 	u8 m_rtc_reg = 0;
 	u8 m_rtc_index = 0;
+
+	enum {
+		IRQ_INTA = 0,
+		IRQ_INTB,
+		IRQ_INTC,
+		IRQ_INTD,
+		IRQ_IDE,
+		IRQ_GPE,
+		// or SCI
+		IRQ_ACPI,
+		IRQ_SMBUS,
+		IRQ_SWDOG
+	};
+	u8 m_irq_remap[9]{};
 
 	// LPC vendor specific, verify if it's common for all
 	u8 lpc_fast_init_r();
