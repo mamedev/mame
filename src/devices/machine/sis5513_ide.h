@@ -42,6 +42,15 @@ private:
 	devcb_write_line m_irq_pri_callback;
 	devcb_write_line m_irq_sec_callback;
 
+	void prog_if_w(u8 data);
+	u8 ide_ctrl_0_r();
+	void ide_ctrl_0_w(u8 data);
+	u8 ide_misc_ctrl_r();
+	void ide_misc_ctrl_w(u8 data);
+
+	u8 m_ide_ctrl0 = 0;
+	u8 m_ide_misc = 0;
+
 	uint32_t ide1_read32_cs0_r(offs_t offset, uint32_t mem_mask = ~0);
 	void ide1_write32_cs0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t ide2_read32_cs0_r(offs_t offset, uint32_t mem_mask = ~0);
@@ -50,6 +59,8 @@ private:
 	void ide1_write_cs1_w(uint8_t data);
 	uint8_t ide2_read_cs1_r();
 	void ide2_write_cs1_w(uint8_t data);
+
+	void compatible_io_map(address_map &map);
 
 	u8 unmap_log_r(offs_t offset);
 	void unmap_log_w(offs_t offset, u8 data);
