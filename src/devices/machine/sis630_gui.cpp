@@ -20,6 +20,8 @@
 	   should start drawing/sync etc. while the "VGA2 regs" (RIO+$14) seems to be a custom set
 	   rather than be related at all (i.e. it most likely be just capable to have VGA-like
 	   resolutions).
+	- sis_main.c portions refers to the correlated Linux driver at
+	  https://github.com/torvalds/linux/blob/master/drivers/video/fbdev/sis/sis_main.c
 
     TODO:
     - Very preliminary, enough to make it to draw basic VGA primary screen and not much else;
@@ -99,6 +101,16 @@ uint8_t sis630_svga_device::crtc_reg_read(uint8_t index)
 	if (index < 0x19)
 		return svga_device::crtc_reg_read(index);
 
+	// make sure '301 CRT2 is not enabled
+	if (index == 0x30)
+		return 0;
+
+	if (index == 0x31)
+		return 0x60;
+
+	if (index == 0x32)
+		return 0x20;
+
 	// TODO: if one of these is 0xff then it enables a single port transfer to $b8000
 	return m_crtc_ext_regs[index];
 }
@@ -115,14 +127,54 @@ void sis630_svga_device::crtc_reg_write(uint8_t index, uint8_t data)
 
 uint8_t sis630_svga_device::seq_reg_read(uint8_t index)
 {
-	// extended id register
-	if (index == 0x05)
-		return m_unlock_reg ? 0xa1 : 0x21;
-	//LOGSVGA("%02x\n", index);
-	if (index == 0x06)
-		return m_ramdac_mode;
+	switch (index)
+	{
+		// extended id register
+		case 0x05:
+			return m_unlock_reg ? 0xa1 : 0x21;
+		case 0x06:
+			return m_ramdac_mode;
+		case 0x07:
+			return m_ext_misc_ctrl_0;
+		case 0x0a:
+			return m_ext_vert_overflow;
+		case 0x0b ... 0x0c:
+			return m_ext_horz_overflow[index - 0xb];
+		case 0x0d:
+			return vga.crtc.start_addr_latch >> 16;
+		case 0x14:
+			// sis_main.c calculates VRAM size in two ways:
+			// 1. the legacy way ('300), by probing this register
+			// 2. by reading '630 PCI host register $63 (as shared DRAM?)
+			// Method 1 seems enough to enforce "64MB" message at POST,
+			// 2 is probably more correct but unsure about how to change the shared area in BIOS
+			// (shutms11 will always write a "0x41" on fresh CMOS then a "0x47"
+			//  on successive boots no matter what)
+			const u8 bus_width = m_seq_ext_regs[index] & 0xc0;
+			return (bus_width) | ((vga.svga_intf.vram_size / (1024 * 1024) - 1) & 0x3f);
+	}
+
+	//LOGSVGA("Unemulated index R [%02x]\n", index);
 	return m_seq_ext_regs[index];
 }
+
+std::tuple<u8, u8> sis630_svga_device::flush_true_color_mode()
+{
+	// punt if extended or true color is off
+	if ((m_ramdac_mode & 0x12) != 0x12)
+		return std::make_tuple(0, 0);
+
+	const u8 res = (m_ext_misc_ctrl_0 & 4) >> 2;
+
+	return std::make_tuple(res, res ^ 1);
+}
+
+void sis630_svga_device::recompute_params()
+{
+	// TODO: ext clock
+	recompute_params_clock(1, XTAL(25'174'800).value());
+}
+
 
 void sis630_svga_device::seq_reg_write(uint8_t index, uint8_t data)
 {
@@ -171,11 +223,62 @@ void sis630_svga_device::seq_reg_write(uint8_t index, uint8_t data)
 							svga.rgb15_en = 1;
 						if (BIT(data, 3))
 							svga.rgb16_en = 1;
+						std::tie(svga.rgb24_en, svga.rgb32_en) = flush_true_color_mode();
 					}
+					break;
+				case 0x07:
+					LOGSVGA("Extended Misc. Control register 0 (%02x) %02x\n", index, data);
+					m_ext_misc_ctrl_0 = data;
+					std::tie(svga.rgb24_en, svga.rgb32_en) = flush_true_color_mode();
+					break;
+				case 0x0a:
+					LOGSVGA("Extended vertical Overflow register (%02x) %02x\n", index, data);
+					m_ext_vert_overflow = data;
+					vga.crtc.vert_retrace_end  =  (vga.crtc.vert_retrace_end & 0xf)      | ((data & 0x20) >> 1);
+					vga.crtc.vert_blank_end  =    (vga.crtc.vert_blank_end & 0x00ff)     | ((data & 0x10) << 4);
+					vga.crtc.vert_retrace_start = (vga.crtc.vert_retrace_start & 0x03ff) | ((data & 0x08) << 7);
+					vga.crtc.vert_blank_start =   (vga.crtc.vert_blank_start & 0x03ff)   | ((data & 0x04) << 8);
+					vga.crtc.vert_disp_end =      (vga.crtc.vert_disp_end & 0x03ff)      | ((data & 0x02) << 9);
+					vga.crtc.vert_total =         (vga.crtc.vert_total & 0x03ff)         | ((data & 0x01) << 10);
+					recompute_params();
 					break;
 				case 0x0b:
 					//m_dual_seg_mode = bool(BIT(data, 3));
-					LOGSVGA("Extended Misc. Control register (%02x) %02x\n", index, data);
+					LOGSVGA("Extended horizontal Overflow 1 (%02x) %02x\n", index, data);
+					m_ext_horz_overflow[0] = data;
+
+					vga.crtc.horz_retrace_start = (vga.crtc.horz_retrace_start & 0x00ff) | ((data & 0xc0) << 2);
+					vga.crtc.horz_blank_start =   (vga.crtc.horz_blank_start & 0x00ff)   | ((data & 0x30) << 4);
+					vga.crtc.horz_disp_end =      (vga.crtc.horz_disp_end & 0x00ff)      | ((data & 0x0c) << 6);
+					vga.crtc.horz_total =         (vga.crtc.horz_total & 0x00ff)         | ((data & 0x03) << 8);
+
+					recompute_params();
+					break;
+				case 0x0c:
+					LOGSVGA("Extended horizontal Overflow 2 (%02x) %02x\n", index, data);
+					m_ext_horz_overflow[1] = data;
+
+					vga.crtc.horz_retrace_end =   (vga.crtc.horz_retrace_end & 0x001f) | ((data & 0x04) << 3);
+					vga.crtc.horz_blank_end =     (vga.crtc.horz_blank_end & 0x003f)   | ((data & 0x03) << 6);
+					recompute_params();
+					break;
+				case 0x0d:
+					LOGSVGA("Extended starting address register (%02x) %02x\n", index, data);
+					vga.crtc.start_addr_latch &= ~0xff0000;
+					vga.crtc.start_addr_latch |= data << 16;
+					break;
+				case 0x0e:
+					LOGSVGA("Extended pitch register (%02x) %02x\n", index, data);
+					// sis_main.c implicitly sets this with bits 0-3 granularity, assume being right
+					vga.crtc.offset = (vga.crtc.offset & 0x00ff) | ((data & 0x0f) << 8);
+					break;
+				case 0x1e:
+					if (data & 0x40)
+						popmessage("Warning: enable 2d engine");
+					break;
+				case 0x20:
+					if (data & 0x81)
+						popmessage("Warning: %s %s", BIT(data, 7) ? "PCI address enabled" : "", BIT(data, 0) ? "memory map I/O enable" : "");
 					break;
 				default:
 					LOGSVGA("Extended write %02x %02x\n", index, data);
@@ -187,13 +290,12 @@ void sis630_svga_device::seq_reg_write(uint8_t index, uint8_t data)
 
 uint16_t sis630_svga_device::offset()
 {
-	// TODO: extended CRT pitch register $0e
 	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en || svga.rgb32_en)
 		return vga.crtc.offset << 3;
 	return svga_device::offset();
 }
 
-// read by gamecstl BIOS
+// read by gamecstl Kontron BIOS
 u8 sis630_svga_device::port_03c0_r(offs_t offset)
 {
 	if (offset == 0xd)
@@ -393,6 +495,7 @@ void sis630_gui_device::subvendor_w(offs_t offset, u32 data, u32 mem_mask)
 
 void sis630_gui_device::memory_map(address_map &map)
 {
+	map(0x0000000, 0x3ffffff).rw(m_svga, FUNC(sis630_svga_device::mem_linear_r), FUNC(sis630_svga_device::mem_linear_w)).umask32(0xffffffff);
 }
 
 void sis630_gui_device::io_map(address_map &map)
