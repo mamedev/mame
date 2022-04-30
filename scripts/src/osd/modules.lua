@@ -13,10 +13,14 @@ function string.starts(String,Start)
 	return string.sub(String,1,string.len(Start))==Start
 end
 
+function string.ends(String,EndPart)
+	return (EndPart == "") or String:sub(-#EndPart) == EndPart
+end
+
 function addlibfromstring(str)
-	if (str==nil) then return  end
+	if (str==nil) then return end
 	for w in str:gmatch("%S+") do
-		if string.starts(w,"-l")==true then
+		if string.starts(w,"-l") then
 			links {
 				string.sub(w,3)
 			}
@@ -25,10 +29,34 @@ function addlibfromstring(str)
 end
 
 function addoptionsfromstring(str)
-	if (str==nil) then return  end
+	if (str==nil) then return end
 	for w in str:gmatch("%S+") do
-		if string.starts(w,"-l")==false then
+		if not string.starts(w,"-l") then
 			linkoptions {
+				w
+			}
+		end
+	end
+end
+
+function addincluderootfromstring(str, EndPart)
+	if (str==nil) then return end
+	for w in str:gmatch("%S+") do
+		if string.starts(w,"-I") then
+			if string.ends(w, EndPart) then
+				includedirs {
+					w:sub(3, #w - #EndPart)
+				}
+			end
+		end
+	end
+end
+
+function addcppoptionsfromstring(str)
+	if (str==nil) then return end
+	for w in str:gmatch("%S+") do
+		if not string.starts(w,"-I") then
+			buildoptions {
 				w
 			}
 		end
