@@ -655,3 +655,47 @@ void sis630_gui_device::vga_3d0_w(offs_t offset, uint32_t data, uint32_t mem_mas
 	if (ACCESSING_BITS_24_31)
 		downcast<sis630_svga_device *>(m_svga.target())->port_03d0_w(offset * 4 + 3, data >> 24);
 }
+
+/*****************************
+ *
+ * 630 bridge PCI implementation
+ *
+ ****************************/
+
+DEFINE_DEVICE_TYPE(SIS630_BRIDGE, sis630_bridge_device, "sis630_bridge", "SiS 630 Virtual PCI-to-PCI bridge")
+
+sis630_bridge_device::sis630_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pci_bridge_device(mconfig, SIS630_BRIDGE, tag, owner, clock)
+	, m_vga(*this, finder_base::DUMMY_TAG)
+{
+
+}
+
+void sis630_bridge_device::map_extra(
+	uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+	uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space
+)
+{
+	if (BIT(bridge_control, 3))
+	{
+		LOGMAP("- Enable VGA control\n");
+		memory_space->install_device(0, 0xfffff, *m_vga, &sis630_gui_device::legacy_memory_map);
+		io_space->install_device(0, 0x0fff, *m_vga, &sis630_gui_device::legacy_io_map);
+	}
+}
+
+void sis630_bridge_device::bridge_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	pci_bridge_device::bridge_control_w(offset, data, mem_mask);
+	remap_cb();
+}
+
+void sis630_bridge_device::device_start()
+{
+	pci_bridge_device::device_start();
+}
+
+void sis630_bridge_device::device_reset()
+{
+	pci_bridge_device::device_reset();
+}

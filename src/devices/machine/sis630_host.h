@@ -14,14 +14,13 @@ class sis630_host_device : public pci_host_device
 public:
 	sis630_host_device(
 		const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
-		const char *cpu_tag, const char *vga_tag, int ram_size
+		const char *cpu_tag, int ram_size
 	) : sis630_host_device(mconfig, tag, owner, clock)
 	{
 		// Revision 1 -> A1
 		set_ids(0x10390630, 0x01, 0x060000, 0x00);
 		//set_multifunction_device(true);
 		m_host_cpu.set_tag(cpu_tag);
-		m_vga.set_tag(vga_tag);
 		set_ram_size(ram_size);
 	}
 
@@ -48,7 +47,6 @@ protected:
 
 private:
 	required_device<cpu_device> m_host_cpu;
-	required_device<sis630_gui_device> m_vga;
 	std::vector<uint32_t> m_ram;
 
 	void map_shadowram(address_space *memory_space, offs_t start_offs, offs_t end_offs, bool read_enable, bool write_enable);

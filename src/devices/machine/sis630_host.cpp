@@ -12,6 +12,7 @@
     - PCI-Hole;
     - Convert RAM to device;
     - Verify that multifunction flag always returns true;
+	- Integrated VGA control;
 
 **************************************************************************************************/
 
@@ -39,7 +40,6 @@ DEFINE_DEVICE_TYPE(SIS630_HOST, sis630_host_device, "sis630_host", "SiS 630 Host
 sis630_host_device::sis630_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_host_device(mconfig, SIS630_HOST, tag, owner, clock)
 	, m_host_cpu(*this, finder_base::DUMMY_TAG)
-	, m_vga(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -201,12 +201,6 @@ void sis630_host_device::map_extra(
 
 	LOGMAP("Host Remapping table (shadow: %08x smram: %02x):\n", m_shadow_ram_ctrl, m_smram);
 
-	if (!BIT(m_vga_control, 2))
-	{
-		memory_space->install_device(0, 0xfffff, *m_vga, &sis630_gui_device::legacy_memory_map);
-		io_space->install_device(0, 0x0fff, *m_vga, &sis630_gui_device::legacy_io_map);
-	}
-
 	for (int i = 0; i < 12; i ++)
 	{
 		u32 start_offs = 0x000c0000 + i * 0x4000;
@@ -349,8 +343,9 @@ u8 sis630_host_device::vga_control_r()
 void sis630_host_device::vga_control_w(u8 data)
 {
 	LOGIO("Write integrated VGA control data [$9c] %02x\n", data);
+	// TODO: "integrated VGA control" (?)
 	m_vga_control = data;
-	remap_cb();
+//	remap_cb();
 }
 
 u32 sis630_host_device::agp_priority_timer_r(offs_t offset, uint32_t mem_mask)

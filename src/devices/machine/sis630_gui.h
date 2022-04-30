@@ -107,4 +107,38 @@ private:
 
 DECLARE_DEVICE_TYPE(SIS630_GUI, sis630_gui_device)
 
+class sis630_bridge_device : public pci_bridge_device
+{
+public:
+	sis630_bridge_device(
+		const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, 
+		const char *gui_tag
+	) : sis630_bridge_device(mconfig, tag, owner, clock)
+	{
+		// either 0001 or 6001 as device ID
+		set_ids_bridge(0x10396001, 0x00);
+		//set_multifunction_device(true);
+		m_vga.set_tag(gui_tag);
+	}
+
+	sis630_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
+
+private:
+	required_device<sis630_gui_device> m_vga;
+	
+	virtual void bridge_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+
+	
+};
+
+DECLARE_DEVICE_TYPE(SIS630_BRIDGE, sis630_bridge_device)
+
+
 #endif
