@@ -20,17 +20,20 @@ protected:
 	virtual void device_start() override;
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
+private:
+	required_memory_region m_rom;
 };
 
 rom_device::rom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, RC2014_ROM, tag, owner, clock)
 	, device_rc2014_card_interface(mconfig, *this)
+	, m_rom(*this, "rom")
 {
 }
 
 void rom_device::device_start()
 {
-	m_bus->space(AS_PROGRAM)->install_rom(0x0000, 0x1fff, 0x0000, memregion("rom")->base()+ 0xe000);
+	m_bus->space(AS_PROGRAM)->install_rom(0x0000, 0x1fff, 0x0000, m_rom->base()+ 0xe000);
 }
 
 ROM_START(rc2014_rom)
