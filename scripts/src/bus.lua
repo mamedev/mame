@@ -2079,6 +2079,27 @@ if (BUSES["POFO"]~=null) then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/devices/bus/rc2014/rc2014.h,BUSES["RC2014"] = true
+---------------------------------------------------
+
+if (BUSES["RC2014"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/rc2014/rc2014.cpp",
+		MAME_DIR .. "src/devices/bus/rc2014/rc2014.h",
+		MAME_DIR .. "src/devices/bus/rc2014/z80cpu.cpp",
+		MAME_DIR .. "src/devices/bus/rc2014/z80cpu.h",
+		MAME_DIR .. "src/devices/bus/rc2014/clock.cpp",
+		MAME_DIR .. "src/devices/bus/rc2014/clock.h",
+		MAME_DIR .. "src/devices/bus/rc2014/ram.cpp",
+		MAME_DIR .. "src/devices/bus/rc2014/ram.h",
+		MAME_DIR .. "src/devices/bus/rc2014/rom.cpp",
+		MAME_DIR .. "src/devices/bus/rc2014/rom.h",
+		MAME_DIR .. "src/devices/bus/rc2014/serial.cpp",
+		MAME_DIR .. "src/devices/bus/rc2014/serial.h",
+	}
+end
 
 ---------------------------------------------------
 --
