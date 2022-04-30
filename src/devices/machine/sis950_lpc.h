@@ -11,6 +11,7 @@
 #include "bus/ata/ataintf.h"
 #include "bus/isa/isa.h"
 #include "bus/pc_kbd/pc_kbdc.h"
+#include "bus/rs232/rs232.h"
 #include "lpc-acpi.h"
 #include "sis950_smbus.h"
 
@@ -80,6 +81,7 @@ private:
 	required_device<ds12885ext_device> m_rtc;
 	required_device<pc_kbdc_device> m_ps2_con;
 	required_device<pc_kbdc_device> m_aux_con;
+	required_device<ins8250_device> m_uart;
 	required_device<lpc_acpi_device> m_acpi;
 	required_device<sis950_smbus_device> m_smbus;
 

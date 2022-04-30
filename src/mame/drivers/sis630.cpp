@@ -37,7 +37,8 @@
     \- GUI is never recognized no matter what, punts with DirectX not installed;
 
     - xubuntu 6.10: throws several SCSIDEV unhandled $51 & $46 commands, eventually punts to
-      prompt with a "can't access tty: job control turned off";
+      prompt with a "can't access tty: job control turned off" (on live CD) or
+	  hangs at "Configuring network interfaces" (on actual install);
 
     - xubuntu 10.10: stalls after '900 ethernet check;
 
