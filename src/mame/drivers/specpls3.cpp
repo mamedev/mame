@@ -167,10 +167,10 @@ but with a disc drive */
 
 static const int spectrum_plus3_memory_selections[]=
 {
-		0,1,2,3,
-		4,5,6,7,
-		4,5,6,3,
-		4,7,6,3
+	0, 1, 2, 3,
+	4, 5, 6, 7,
+	4, 5, 6, 3,
+	4, 7, 6, 3
 };
 
 void specpls3_state::port_3ffd_w(offs_t offset, uint8_t data)
@@ -203,6 +203,7 @@ uint8_t specpls3_state::port_2ffd_r()
 
 void specpls3_state::plus3_update_memory()
 {
+	m_screen->update_now();
 	if (m_port_7ffd_data & 8)
 	{
 		LOG("+3 SCREEN 1: BLOCK 7\n");
@@ -297,6 +298,9 @@ uint8_t specpls3_state::bank1_r(offs_t offset)
 
 void specpls3_state::port_7ffd_w(offs_t offset, uint8_t data)
 {
+	if (is_contended(offset)) content_early();
+	content_early(1);
+
 	/* D0-D2 - RAM page located at 0x0c000-0x0ffff */
 	/* D3    - Screen select (screen 0 in ram page 5, screen 1 in ram page 7 */
 	/* D4    - ROM select low bit - which rom paged into 0x0000-0x03fff */
@@ -353,6 +357,14 @@ void specpls3_state::port_1ffd_w(offs_t offset, uint8_t data)
 	}
 }
 
+void specpls3_state::video_start()
+{
+	spectrum_128_state::video_start();
+	// This is reported contention pattern for +2A/+3. Keep +2 for now.
+	//m_contention_pattern = {1, 0, 7, 6, 5, 4, 3, 2};
+	//m_screen->configure(m_screen->width(), m_screen->height(), m_screen->visible_area(), HZ_TO_ATTOSECONDS(50.01));
+}
+
 /* ports are not decoded full.
 The function decodes the ports appropriately */
 void specpls3_state::plus3_io(address_map &map)
@@ -405,15 +417,13 @@ static void specpls3_floppies(device_slot_interface &device)
 /* F4 Character Displayer */
 static const gfx_layout spectrum_charlayout =
 {
-	8, 8,                   /* 8 x 8 characters */
-	96,                 /* 96 characters */
-	1,                  /* 1 bits per pixel */
-	{ 0 },                  /* no bitplanes */
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8                 /* every char takes 8 bytes */
+	8, 8,                                       /* 8 x 8 characters */
+	96,                                         /* 96 characters */
+	1,                                          /* 1 bits per pixel */
+	{ 0 },                                      /* no bitplanes */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },                 /* x offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 }, /* y offsets */
+	8*8                                         /* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( specpls3 )
@@ -427,8 +437,6 @@ void specpls3_state::spectrum_plus2(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &specpls3_state::plus3_mem);
 	m_maincpu->set_addrmap(AS_IO, &specpls3_state::plus3_io);
-
-	m_screen->set_refresh_hz(50.01);
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(specpls3);
 
