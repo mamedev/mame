@@ -83,6 +83,8 @@ void sis630_host_device::device_add_mconfig(machine_config &config)
 void sis630_host_device::config_map(address_map &map)
 {
 	pci_host_device::config_map(map);
+	// override header type, needed for actual IDE detection
+	map(0x0e, 0x0e).lr8(NAME([] () { return 0x80; }));
 	map(0x34, 0x34).r(FUNC(sis630_host_device::capptr_r));
 
 	// host & DRAM regs

@@ -19,7 +19,7 @@ public:
 	{
 		// Revision 1 -> A1
 		set_ids(0x10390630, 0x01, 0x060000, 0x00);
-		//set_multifunction_device(true);
+		set_multifunction_device(true);
 		m_host_cpu.set_tag(cpu_tag);
 		set_ram_size(ram_size);
 	}

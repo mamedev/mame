@@ -94,7 +94,7 @@ void sis900_eth_device::device_start()
 	add_map(4096, M_MEM, FUNC(sis900_eth_device::memory_map));
 	add_rom((u8 *)m_eth_rom->base(), m_eth_rom->bytes());
 
-	// INTC
+	// INTC#
 	intr_pin = 3;
 	// TODO: "if auto load is enabled it is set by subvendor ID stored in EEPROM" (?)
 	subsystem_id = 0x10390900;

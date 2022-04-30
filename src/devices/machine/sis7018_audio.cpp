@@ -104,8 +104,8 @@ void sis7018_audio_device::device_reset()
 	
 	command = 0x0000;
 	status = 0x0000;
-	// hardwired, INTB
-	intr_pin = 0x01;
+	// INTB#
+	intr_pin = 2;
 	// TODO: can be written to with $46=1
 	subsystem_id = 0x10397018;
 }

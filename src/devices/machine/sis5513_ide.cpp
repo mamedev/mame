@@ -120,7 +120,8 @@ void sis5513_ide_device::ide2_control_map(address_map &map)
 
 void sis5513_ide_device::bus_master_ide_control_map(address_map &map)
 {
-	// ...
+	map(0x0, 0x7).rw(m_ide1, FUNC(bus_master_ide_controller_device::bmdma_r), FUNC(bus_master_ide_controller_device::bmdma_w));
+	map(0x8, 0xf).rw(m_ide2, FUNC(bus_master_ide_controller_device::bmdma_r), FUNC(bus_master_ide_controller_device::bmdma_w));
 }
 
 void sis5513_ide_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
@@ -162,7 +163,7 @@ void sis5513_ide_device::device_start()
 void sis5513_ide_device::device_reset()
 {
 	pci_device::device_reset();
-	
+
 	command = 0x0000;
 	status = 0x0000;
 	pclass = 0x010180;

@@ -552,8 +552,8 @@ void sis630_gui_device::device_start()
 
 	add_rom((u8 *)m_gui_rom->base(), m_gui_rom->bytes());
 
-	// TODO: INTA, correct as 0?
-	intr_pin = 0;
+	// INTA#
+	intr_pin = 1;
 }
 
 void sis630_gui_device::device_reset()
