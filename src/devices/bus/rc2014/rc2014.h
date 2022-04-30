@@ -74,7 +74,8 @@ public:
 /*
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_write_nmi(state); }
-*/  void assign_spaces(address_space *memory_space, address_space *io_space) { m_memory_space = memory_space; m_io_space = io_space; }
+*/  
+	void assign_spaces(address_space *memory_space, address_space *io_space);
 	address_space *space(int index) const;
 protected:
 	// device-level overrides

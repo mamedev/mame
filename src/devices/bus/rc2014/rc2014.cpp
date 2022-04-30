@@ -81,6 +81,8 @@ rc2014_bus_device::rc2014_bus_device(const machine_config &mconfig, const char *
 
 void rc2014_bus_device::device_start()
 {
+	if (m_memory_space == nullptr || m_io_space == nullptr)
+		throw emu_fatalerror("No address spaces set on RC2014 bus !!!");
 	// resolve callbacks
 /*	m_write_irq.resolve_safe();
 	m_write_nmi.resolve_safe();
@@ -105,6 +107,14 @@ void rc2014_bus_device::set_bus_clock(u32 clock)
 {
 	set_clock(clock);
 	notify_clock_changed();
+}
+
+void rc2014_bus_device::assign_spaces(address_space *memory_space, address_space *io_space)
+{
+	if (m_memory_space != nullptr || m_io_space != nullptr)
+		throw emu_fatalerror("Address spaces already set on RC2014 bus !!!");
+	m_memory_space = memory_space;
+	m_io_space = io_space;
 }
 
 address_space *rc2014_bus_device::space(int index) const
