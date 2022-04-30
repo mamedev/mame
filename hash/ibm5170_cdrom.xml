@@ -3742,4 +3742,18 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Linux flavours -->
+	<software name="knoppix31bsi">
+		<description>Knoppix 3.1 "Bundesamt für Sicherheit in der Informationstechnik" edition</description>
+		<!-- This is a Knoppix CD that was available for free from a German government IT security agency -->
+		<year>2002</year>
+		<publisher>Knopper.Net</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="knoppix31bsi" sha1="423736fcd14c4771d4be817935a75d119a75428a" />
+			</diskarea>
+		</part>
+	</software>	
+
 </softwarelist>
