@@ -2287,7 +2287,7 @@ void z80scc_channel::do_sccreg_wr15(uint8_t data)
 	LOG("Tx underr./EOM ints: %s\n", data & WR15_TX_EOM      ? WR15NO : "disabled");
 	LOG("Break/Abort ints   : %s\n", data & WR15_BREAK_ABORT ? WR15NO : "disabled");
 
-	const bool old_reg = m_wr15;
+	const uint8_t old_reg = m_wr15;
 	m_wr15 = data;
 	if ((old_reg & WR15_ZEROCOUNT) != (m_wr15 & WR15_ZEROCOUNT))
 	{

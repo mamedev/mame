@@ -180,6 +180,7 @@
   Known games on this or similar hardware:
 
   - [DUMPED]  4 en Línea (Compumatic)
+  - [DUMPED]  Dardos (Oper Coin)
   - [DUMPED]  Olympic Darts (K7 Kursaal. At least three different hardware revisions)
   - [DUMPED]  Sport Darts TV (Compumatic / Desarrollos y Recambios S.L.)
   - [MISSING] Dart Queen (Compumatic / Daryde)
@@ -701,13 +702,11 @@ ROM_START( 4enlineb )
 ROM_END
 
 /*
-  Unknown darts game.
+  Dardos
   Oper Coin. 1991.
-
   Running in 487 System I.
-
 */
-ROM_START( unkdarts )
+ROM_START( dardos )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "diana_iv_video_27-1-92.bin",  0x0000, 0x8000, CRC(f23b5313) SHA1(488cf9bedce7b0c7b474bd93da70181c81fa300b) )
 
@@ -790,9 +789,9 @@ ROM_END
 ***********************************/
 
 //    YEAR  NAME       PARENT    MACHINE    INPUT     CLASS            INIT        ROT    COMPANY                                      FULLNAME                            FLAGS
-GAME( 1991, 4enlinea,  0,        _4enlinea, 4enlinea, _4enlinea_state, empty_init, ROT0, "Compumatic / CIC Play",                     "Cuatro en Linea (rev. A-07)",       MACHINE_NOT_WORKING )
-GAME( 1991, 4enlineb,  4enlinea, _4enlinea, 4enlinea, _4enlinea_state, empty_init, ROT0, "Compumatic / CIC Play",                     "Cuatro en Linea (rev. A-06)",       MACHINE_NOT_WORKING )
-GAME( 1992, unkdarts,  0,        _4enlinea, 4enlinea, _4enlinea_state, empty_init, ROT0, "Oper Coin",                                 "unknown darts game (487 System I)", MACHINE_NOT_WORKING )
-GAME( 1994, k7_olym,   0,        k7_olym,   k7_olym,  _4enlinea_state, empty_init, ROT0, "K7 Kursaal / NMI Electronics",              "Olympic Darts K7 (v3.11)",          MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 1994, k7_olym30, k7_olym,  k7_olym,   k7_olym,  _4enlinea_state, empty_init, ROT0, "K7 Kursaal / NMI Electronics",              "Olympic Darts K7 (v3.00)",          MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 1993, sprtdart,  0,        k7_olym,   k7_olym,  _4enlinea_state, empty_init, ROT0, "Compumatic / Desarrollos y Recambios S.L.", "Sport Darts T.V.",                  MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1991, 4enlinea,  0,        _4enlinea, 4enlinea, _4enlinea_state, empty_init, ROT0, "Compumatic / CIC Play",                     "Cuatro en Linea (rev. A-07)", MACHINE_NOT_WORKING )
+GAME( 1991, 4enlineb,  4enlinea, _4enlinea, 4enlinea, _4enlinea_state, empty_init, ROT0, "Compumatic / CIC Play",                     "Cuatro en Linea (rev. A-06)", MACHINE_NOT_WORKING )
+GAME( 1992, dardos,    0,        _4enlinea, 4enlinea, _4enlinea_state, empty_init, ROT0, "Oper Coin",                                 "Dardos",                      MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1994, k7_olym,   0,        k7_olym,   k7_olym,  _4enlinea_state, empty_init, ROT0, "K7 Kursaal / NMI Electronics",              "Olympic Darts K7 (v3.11)",    MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1994, k7_olym30, k7_olym,  k7_olym,   k7_olym,  _4enlinea_state, empty_init, ROT0, "K7 Kursaal / NMI Electronics",              "Olympic Darts K7 (v3.00)",    MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1993, sprtdart,  0,        k7_olym,   k7_olym,  _4enlinea_state, empty_init, ROT0, "Compumatic / Desarrollos y Recambios S.L.", "Sport Darts T.V.",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
