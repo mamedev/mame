@@ -34,10 +34,11 @@ ram_32k_device::ram_32k_device(const machine_config &mconfig, const char *tag, d
 
 void ram_32k_device::device_start()
 {
-	m_ram = make_unique_clear<u8[]>(0x8000);
+	m_ram = std::make_unique<u8[]>(0x8000);
+	std::fill_n(m_ram.get(), 0x8000, 0xff);
 	save_pointer(NAME(m_ram), 0x8000);
 
-	m_bus->space(AS_PROGRAM)->install_ram(0x8000, 0xffff, &m_ram[0]);
+	m_bus->space(AS_PROGRAM)->install_ram(0x8000, 0xffff, m_ram.get());
 }
 
 void ram_32k_device::device_add_mconfig(machine_config &config)
