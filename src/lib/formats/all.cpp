@@ -1263,6 +1263,11 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.add(FLOPPY_TIKI100_FORMAT); // tiki100_dsk.h
 #endif
 
+	en.category("TIM 011");
+#ifdef HAS_FORMATS_TIM011_DSK
+	en.add(FLOPPY_TIM011_FORMAT); // tim011_dsk.h
+#endif
+
 	en.category("Videoton");
 #ifdef HAS_FORMATS_TVC_CAS
 	en.add(tvc64_cassette_formats); // tvc_cas.h

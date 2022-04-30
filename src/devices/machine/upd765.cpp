@@ -536,14 +536,14 @@ uint8_t upd765_family_device::fifo_r()
 	case PHASE_CMD:
 		if(command_pos)
 			fifo_w(0xff);
-		LOGFIFO("fifo_r in phase %d\n", main_phase);
+		LOGFIFO("fifo_r in command phase\n");
 		break;
 	case PHASE_EXEC:
 		if(machine().side_effects_disabled())
 			return fifo[0];
 		if(internal_drq)
 			return fifo_pop(false);
-		LOGFIFO("fifo_r in phase %d\n", main_phase);
+		LOGFIFO("fifo_r in execution phase\n");
 		break;
 
 	case PHASE_RESULT:
@@ -599,7 +599,7 @@ void upd765_family_device::fifo_w(uint8_t data)
 			fifo_push(data, false);
 			return;
 		}
-		LOGFIFO("fifo_w in phase %d\n", main_phase);
+		LOGFIFO("fifo_w in execution phase\n");
 		break;
 
 	default:
