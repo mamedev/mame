@@ -318,6 +318,11 @@ if BASE_TARGETOS=="unix" then
 			local str = backtick(sdlconfigcmd() .. " --libs")
 			addlibfromstring(str)
 			addoptionsfromstring(str)
+			if _OPTIONS["SDL_INSTALL_ROOT"] then
+				includedirs {
+					path.join(_OPTIONS["SDL_INSTALL_ROOT"],"include"),
+				}
+			end
 		end
 
 		if _OPTIONS["targetos"]~="haiku" and _OPTIONS["targetos"]~="android" then
