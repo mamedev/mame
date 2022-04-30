@@ -22568,4 +22568,52 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="runforit">
+		<description>Run For It</description>
+		<year>1984</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="release" value="2022-04-29"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Run For It" is a 1984 action game developed by Richard Hefter and Steve Worthington, and distributed by Optimum Resource. It runs on any Apple ][ with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234841">
+				<rom name="run for it.woz" size="234841" crc="5ac6ea0d" sha1="b7d99b23bd97a6ca0d54cd387ab60d361844af46"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starmines">
+		<description>Starmines</description>
+		<year>1981</year>
+		<publisher>Softape</publisher>
+		<info name="release" value="2022-04-29"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Starmines" is a 1981 action game developed by Steve A. Baker and distributed by Softape. It runs on any Apple ][ with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234772">
+				<rom name="starmines.woz" size="234772" crc="406a60dd" sha1="fe97774a21c7ad6ac89f89bc67057a74345de2d8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bwoodsafe">
+		<description>Basic Woodshop Safety</description>
+		<year>1983</year>
+		<publisher>Abraxas</publisher>
+		<info name="release" value="2022-04-29"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Basic Woodshop Safety" is a 1983 educational program developed and distributed by Abraxas. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="228121">
+				<rom name="basic woodshop safety.woz" size="228121" crc="7036cc5d" sha1="62db58a0f6c45896720f1ff34f10d76c89d4d106"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

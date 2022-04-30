@@ -48019,4 +48019,102 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="bublgumm">
+		<description>The Bubble Gum Machine (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Heartsoft</publisher>
+		<info name="release" value="2022-04-26"/>
+		<!--"The Bubble Gum Machine" is a 1987 educational program developed and distributed by Heartsoft. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the bubble gum machine (4am crack).dsk" size="143360" crc="4e3c82e9" sha1="376c861070627da3b097aa4975fa45c55cb8ab06"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="verbusg10189">
+		<description>Verb Usage 1 (Version 01.31.89) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2022-04-26"/>
+		<!--"Verb Usage 1" is a 1986 educational program developed and distributed by Hartley Courseware. This version is dated 01.31.89. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="verb usage 1 v01.31.89 (4am crack).dsk" size="143360" crc="a097ef98" sha1="fa0ab229d3fe9703a0ccbbc0932e5ec46d38d7a4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="antsyn10889">
+		<description>Antonyms/Synonyms (Version 08.02.89) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2022-04-29"/>
+		<!--"Antonyms/Synonyms" is a 1989 educational program with content authoring by Carolyn Micklatcher and distributed by Hartley Courseware. This version is dated 08.02.89. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="antonyms-synonyms v08.02.89 (4am crack) disk 1.dsk" size="143360" crc="19a04510" sha1="cea7ce48b004271173b66f53456740ee18078643"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="antonyms-synonyms v08.02.89 (4am crack) disk 2.dsk" size="143360" crc="ea1cd3e8" sha1="304582fb5fbddfee75d1254eca2a37a81bec9880"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="homonyms0189">
+		<description>Homonyms (Version 01.19.89) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2022-04-29"/>
+		<!--"Homonyms" is a 1989 educational program with content authoring by Jane Hartley and distributed by Hartley Courseware. This version is dated 01.19.89. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="homonyms v01.19.89 (4am crack) disk 1.dsk" size="143360" crc="5b3bd83f" sha1="fcd92a3374ac2e22a2433a612ae7521adf9295d4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="homonyms v01.19.89 (4am crack) disk 2.dsk" size="143360" crc="05423e27" sha1="56bbd84231363aacf8c109e0a8f068c99436b5a6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="verbusg20189">
+		<description>Verb Usage 2 (Version 01.31.89) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2022-04-29"/>
+		<!--"Verb Usage 2" is a 1989 educational program developed and distributed by Hartley Courseware. This version is dated 01.31.89. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="verb usage 2 v01.31.89 (4am crack).dsk" size="143360" crc="471e875a" sha1="798e29181d421eb7e8b735bbb0697224678e2c8c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="medapres0985">
+		<description>Medalist Series: Presidents (Version 09.27.85) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2022-04-29"/>
+		<!--"Medalist Series: Presidents" is a 1985 educational program developed and distributed by Hartley Courseware. This version is dated 09.27.85. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="medalist series- presidents (4am crack).dsk" size="143360" crc="49991a47" sha1="57bbf36d45e0dc4d6cdd704a6a016ae520e909b1"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
