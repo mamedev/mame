@@ -44293,23 +44293,6 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ntf2tc1" cloneof="ntf2tc">
-		<description>Nintendo - NTF2 Test Cartridge (USA)</description>
-		<year>19??</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="nrom" />
-			<feature name="pcb" value="NES-NROM-256" />
-			<feature name="mirroring" value="horizontal" />
-			<dataarea name="chr" size="8192">
-				<rom name="nintendo - ntf2 test cartridge (usa).chr" size="8192" crc="97f119b8" sha1="ee190360fd59359f8c70ee853ee11ef7ffc549b0" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="32768">
-				<rom name="nintendo - ntf2 test cartridge (usa).prg" size="32768" crc="3719a6a5" sha1="8f0737980441e8bafd049cdcfffaa666f93ea3fd" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="nestest">
 		<description>Nintendo - NTF2 Test Cartridge (USA, NES Test v1.1)</description>
 		<year>19??</year>
@@ -55581,7 +55564,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<!-- Alt. Title: Adan y Eva (on the cart label) -->
-	<software name="adanyeva">
+	<software name="adanyeva" cloneof="adamneve">
 		<description>Adam &amp; Eve (Spa)</description>
 		<year>1991</year>
 		<publisher>Gluk Video</publisher>
@@ -55595,7 +55578,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 				<rom name="0.prg" size="32768" crc="626238f8" sha1="7e757c3f67849330066da6984d97a377bb910f21" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="32768">
-				<rom name="0.chr" size="32768" crc="0a7307d9" sha1="de1ef6c5c390947aab477afe7d61e37b6c4d2e32" offset="00000" />
+				<rom name="0.chr" size="32768" crc="0a7307d9" sha1="de1ef6c5c390947aab477afe7d61e37b6c4d2e32" offset="00000" /> <!-- second 16k is zeros, but these boards are always seen with 32k EPROM -->
 			</dataarea>
 		</part>
 	</software>
@@ -61869,10 +61852,11 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="modaosyma" cloneof="lilmagic">
-		<description>Mo Dao Shi Yin Mou (Chi, Alt)</description>
+	<software name="modaosym" cloneof="lilmagic">
+		<description>Módàoshì Yīnmóu (China)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
+		<info name="alt_title" value="魔道士阴谋"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
@@ -61881,27 +61865,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="mo dao shi yin mou (ch) [a1].prg" size="131072" crc="86523dfc" sha1="2f2245bcf1c8dff28d8e25335525da9dcc1e0ac1" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up -->
-			<dataarea name="bwram" size="8192">
-				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="modaosym" cloneof="lilmagic">
-		<description>Mo Dao Shi Yin Mou (Chi)</description>
-		<year>19??</year>
-		<publisher>Waixing</publisher>
-		<info name="alt_title" value="魔道士阴谋"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="262144">
-				<rom name="mo dao shi yin mou (ch).chr" size="262144" crc="d4deda46" sha1="72e1974937d2a71afb5c233cfac1d928704387e2" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="262144">
-				<rom name="mo dao shi yin mou (ch).prg" size="262144" crc="c1a1c044" sha1="947b1aa29f84b7f6ca7effa15c23e709acfee7b8" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
@@ -64778,24 +64741,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- Does it come from an original cart or has it been ripped from mc_20asd (ASDER 20-in-1)?? -->
-	<software name="dreamfgtasd" cloneof="dreamfgt">
-		<description>Dream Fighter (Asia, ASDER)</description>
-		<year>19??</year>
-		<publisher>Asder</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="cnrom" />
-			<feature name="pcb" value="NES-CNROM" />
-			<feature name="mirroring" value="horizontal" />
-			<dataarea name="chr" size="32768">
-				<rom name="dream fighter (unl).chr" size="32768" crc="3ab47f3a" sha1="45d3be8b964e323cd7d619c8e338b6aaf7a72670" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="32768">
-				<rom name="dream fighter (unl).prg" size="32768" crc="891aa448" sha1="55f5985f420bace951480534e0ba4981fe348b8f" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="ejim2">
 		<description>Earthworm Jim 2 (Asia)</description>
 		<year>19??</year>
@@ -65538,22 +65483,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="musicboxa" cloneof="musicbox">
-		<description>Karaoke (Asia, Chinese)</description>
-		<year>19??</year>
-		<publisher>Xian</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="karaoke(chinses)(by xian).chr" size="131072" crc="7d196a8c" sha1="bc1d1fcd001cb8ada75089cc0e10cdee282aceac" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="karaoke(chinses)(by xian).prg" size="131072" crc="00424682" sha1="8e39502292a75127ff33be67cc710cb77423281e" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="kolaoka" cloneof="kolaok">
 		<description>Kola OK (Asia, Alt)</description>
 		<year>19??</year>
@@ -66056,6 +65985,7 @@ We don't include these hacks because they were not burned into real carts nor so
 			<feature name="slot" value="8237" />
 			<feature name="pcb" value="UNL-8237" />
 			<dataarea name="chr" size="524288">
+				<!-- First 256k of this is CHR from set 'booger'. Super Games had multi-use ROMs like this, but is this correct? -->
 				<rom name="pocahontas 2 (unl) [u].chr" size="524288" crc="789dcb73" sha1="ceafd9337fb7b08818d00e688f4b760fc18da34c" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="262144">
