@@ -6,6 +6,7 @@
 
     TODO:
 	- Stub interface, to be improved;
+	- NM93Cxx EEPROM (93C66 based);
 
 **************************************************************************************************/
 
@@ -67,9 +68,17 @@ void sis900_eth_device::map_extra(uint64_t memory_window_start, uint64_t memory_
 }
 
 ROM_START( sis900eth )
-	ROM_REGION32_LE( 0x8000, "eth_rom", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x10000, "eth_rom", ROMREGION_ERASEFF )
 	// TODO: documentation hints that this has an internal BIOS
-	ROM_LOAD( "sis900.bin", 0x0000, 0x8000, NO_DUMP )
+	ROM_LOAD( "pxe_m.19", 0x0000, 0xa000, BAD_DUMP CRC(c8da34a6) SHA1(f11b4f5398176b7d924c63c77a1951cb83020e48) )
+	// structure:
+	// [0x00] signature -> likely 0x55aa
+	// [0x02] vendor ID -> likely 0x1039
+	// [0x04] device ID -> likely 0x0900 (*)
+	// [0x08] MAC address
+	// [0x0b] checksum
+
+	// (*) Linux driver sis900.h sets a pointer to [0x03], looks unlikely?
 ROM_END
 
 const tiny_rom_entry *sis900_eth_device::device_rom_region() const
@@ -84,7 +93,7 @@ void sis900_eth_device::device_start()
 	add_map(256, M_IO, FUNC(sis900_eth_device::io_map));
 	add_map(4096, M_MEM, FUNC(sis900_eth_device::memory_map));
 	add_rom((u8 *)m_eth_rom->base(), m_eth_rom->bytes());
-	
+
 	// INTC
 	intr_pin = 3;
 	// TODO: "if auto load is enabled it is set by subvendor ID stored in EEPROM" (?)
