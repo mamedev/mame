@@ -2,10 +2,10 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-	SiS 950 SMBus implementation
-	
-	TODO:
-	- Stub, needs an smbus_interface, bare minimum to make shutms11 happy;
+    SiS 950 SMBus implementation
+
+    TODO:
+    - Stub, needs an smbus_interface, bare minimum to make shutms11 happy;
 
 **************************************************************************************************/
 #include "emu.h"
@@ -74,7 +74,7 @@ u8 sis950_smbus_device::smb_sts_r()
 
 void sis950_smbus_device::smb_sts_w(u8 data)
 {
-    m_status &= ~data;
+	m_status &= ~data;
 	LOGCMD("%s: smb_sts_w = %02x\n", tag(), data);
 }
 

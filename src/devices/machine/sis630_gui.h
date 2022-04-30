@@ -111,7 +111,7 @@ class sis630_bridge_device : public pci_bridge_device
 {
 public:
 	sis630_bridge_device(
-		const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, 
+		const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
 		const char *gui_tag
 	) : sis630_bridge_device(mconfig, tag, owner, clock)
 	{
@@ -132,10 +132,10 @@ protected:
 
 private:
 	required_device<sis630_gui_device> m_vga;
-	
+
 	virtual void bridge_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
-	
+
 };
 
 DECLARE_DEVICE_TYPE(SIS630_BRIDGE, sis630_bridge_device)

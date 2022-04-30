@@ -2,11 +2,11 @@
 // copyright-holders: Angelo Salese
 /**************************************************************************************************
 
-	SiS 900 Fast Ethernet Controller / Adapter
+    SiS 900 Fast Ethernet Controller / Adapter
 
     TODO:
-	- Stub interface, to be improved;
-	- NM93Cxx EEPROM (93C66 based);
+    - Stub interface, to be improved;
+    - NM93Cxx EEPROM (93C66 based);
 
 **************************************************************************************************/
 
@@ -48,12 +48,12 @@ void sis900_eth_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
 	map(0x40, 0x43).r(FUNC(sis900_eth_device::pmc_id_r));
-//	map(0x44, 0x47).r(FUNC(sis900_eth_device::pmc_status_r), FUNC(sis900_eth_device::pmc_control_w));
+//  map(0x44, 0x47).r(FUNC(sis900_eth_device::pmc_status_r), FUNC(sis900_eth_device::pmc_control_w));
 }
 
 void sis900_eth_device::memory_map(address_map &map)
 {
-	
+
 }
 
 void sis900_eth_device::io_map(address_map &map)
@@ -64,7 +64,7 @@ void sis900_eth_device::io_map(address_map &map)
 void sis900_eth_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
-//	io_space->install_device(0, 0x03ff, *this, &sis900_eth_device::io_map);
+//  io_space->install_device(0, 0x03ff, *this, &sis900_eth_device::io_map);
 }
 
 ROM_START( sis900eth )
@@ -103,7 +103,7 @@ void sis900_eth_device::device_start()
 void sis900_eth_device::device_reset()
 {
 	pci_device::device_reset();
-	
+
 	command = 0x0000;
 	status = 0x0290;
 }

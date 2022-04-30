@@ -32,11 +32,11 @@
 #include "sound/spkrdev.h"
 
 
-class sis950_lpc_device : public pci_device 
+class sis950_lpc_device : public pci_device
 {
 public:
 	sis950_lpc_device(
-		const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, 
+		const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
 		const char *cpu_tag, const char *flash_tag
 	) : sis950_lpc_device(mconfig, tag, owner, clock)
 	{
@@ -46,7 +46,7 @@ public:
 		m_host_cpu.set_tag(cpu_tag);
 		m_flash_rom.set_tag(flash_tag);
 	}
-	
+
 	sis950_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static constexpr feature_type unemulated_features() { return feature::MOUSE; }
@@ -58,16 +58,16 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-//	virtual void reset_all_mappings() override;
+//  virtual void reset_all_mappings() override;
 
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 	virtual void config_map(address_map &map) override;
-	
+
 	template <unsigned N> void memory_map(address_map &map);
 	void io_map(address_map &map);
-	
+
 private:
 	required_device<cpu_device> m_host_cpu;
 	required_device<intelfsh8_device> m_flash_rom;
@@ -107,7 +107,7 @@ private:
 	template <unsigned N> void irq_remap_w(u8 data);
 	u8 unmap_log_r(offs_t offset);
 	void unmap_log_w(offs_t offset, u8 data);
-	
+
 	u8 m_bios_control = 0;
 	u8 m_flash_control = 0;
 	u16 m_acpi_base = 0x0000;
@@ -161,7 +161,7 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(cpu_a20_w);
 	DECLARE_WRITE_LINE_MEMBER(cpu_reset_w);
-	
+
 	uint8_t at_page8_r(offs_t offset);
 	void at_page8_w(offs_t offset, uint8_t data);
 	u8 nmi_status_r();

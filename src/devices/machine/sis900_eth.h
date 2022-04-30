@@ -8,7 +8,7 @@
 
 #include "pci.h"
 
-class sis900_eth_device : public pci_device 
+class sis900_eth_device : public pci_device
 {
 public:
 	sis900_eth_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -22,7 +22,7 @@ protected:
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-//	virtual void reset_all_mappings() override;
+//  virtual void reset_all_mappings() override;
 
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
@@ -37,8 +37,8 @@ private:
 
 	virtual uint8_t capptr_r() override;
 	u32 pmc_id_r();
-//	void pmc_status_r();
-//	u32 pmc_control(offs_t offset, u32 data, u32 mem_mask = ~0);
+//  void pmc_status_r();
+//  u32 pmc_control(offs_t offset, u32 data, u32 mem_mask = ~0);
 };
 
 DECLARE_DEVICE_TYPE(SIS900_ETH, sis900_eth_device)

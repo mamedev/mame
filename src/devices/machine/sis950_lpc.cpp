@@ -2,28 +2,28 @@
 // copyright-holders: Angelo Salese
 /**************************************************************************************************
 
-	SiS950 LPC implementation (Super I/O & southbridge)
+    SiS950 LPC implementation (Super I/O & southbridge)
 
     TODO:
     - Convert most stuff declared here to generic interfaces;
-	- Flash ROM handling
-	  \- Doesn't survive a soft reset;
-	- Fix EISA;
+    - Flash ROM handling
+      \- Doesn't survive a soft reset;
+    - Fix EISA;
     - INIT register (reset & A20 control + fast gates + fast reset timing control);
-	- Override PS/2 ports if USB legacy mode is enabled;
-	- NMI & SMI handling;
-	- SMBus handling;
-	- RTC extended bank enable;
-	  \- Doesn't survive a CMOS write after fast reset;
-	- Shadow registers for PIC and PIT;
-	- IRQ remaps
-	  \- INTA GUI
-	  \- INTB AUDIO and MODEM
-	  \- INTC ethernet
-	  \- INTD USB
-	- IRQ software traps ($6e-$6f);
-	  \- Documentation mentions that those can be read-back too, huh?
-	- Understand what's the caveat of "changing device ID number" via BIOS control $40 bit 6;
+    - Override PS/2 ports if USB legacy mode is enabled;
+    - NMI & SMI handling;
+    - SMBus handling;
+    - RTC extended bank enable;
+      \- Doesn't survive a CMOS write after fast reset;
+    - Shadow registers for PIC and PIT;
+    - IRQ remaps
+      \- INTA GUI
+      \- INTB AUDIO and MODEM
+      \- INTC ethernet
+      \- INTD USB
+    - IRQ software traps ($6e-$6f);
+      \- Documentation mentions that those can be read-back too, huh?
+    - Understand what's the caveat of "changing device ID number" via BIOS control $40 bit 6;
 
 **************************************************************************************************/
 
@@ -82,10 +82,10 @@ void sis950_lpc_device::device_start()
 void sis950_lpc_device::device_reset()
 {
 	pci_device::device_reset();
-	
+
 	command = 0x000c;
 	status = 0x0200;
-	
+
 	m_bios_control = 1;
 	m_acpi_base = 0;
 	m_flash_control = 0x40;
@@ -105,8 +105,8 @@ void sis950_lpc_device::device_reset()
 WRITE_LINE_MEMBER(sis950_lpc_device::cpu_a20_w)
 {
 	// TODO: confirm "A20M# being always high"
-//	if (BIT(m_init_reg, 1))
-//		state = ASSERT_LINE;
+//  if (BIT(m_init_reg, 1))
+//      state = ASSERT_LINE;
 	m_host_cpu->set_input_line(INPUT_LINE_A20, state);
 }
 
@@ -135,7 +135,7 @@ void sis950_lpc_device::device_add_mconfig(machine_config &config)
 	// TODO: unknown part #
 	AM9517A(config, m_dmac_master, lpc_pit_clock / 3);
 	m_dmac_master->out_hreq_callback().set(m_dmac_slave, FUNC(am9517a_device::dreq0_w));
-//	m_dmac_master->out_eop_callback().set(FUNC(sis950_lpc_device::at_dma8237_out_eop));
+//  m_dmac_master->out_eop_callback().set(FUNC(sis950_lpc_device::at_dma8237_out_eop));
 	m_dmac_master->in_memr_callback().set(FUNC(sis950_lpc_device::pc_dma_read_byte));
 	m_dmac_master->out_memw_callback().set(FUNC(sis950_lpc_device::pc_dma_write_byte));
 	// TODO: ior/iow/dack/eop callbacks
@@ -198,8 +198,8 @@ void sis950_lpc_device::device_add_mconfig(machine_config &config)
 	m_uart->out_tx_callback().set("com1", FUNC(rs232_port_device::write_txd));
 	m_uart->out_dtr_callback().set("com1", FUNC(rs232_port_device::write_dtr));
 	m_uart->out_rts_callback().set("com1", FUNC(rs232_port_device::write_rts));
-//	m_uart->out_int_callback().set()
-//	m_uart->out_baudout_callback().set([this](int state){ if (m_8251dtr_state) m_uart->rclk_w(state); }); // TODO: Fix INS8250 BAUDOUT pin support
+//  m_uart->out_int_callback().set()
+//  m_uart->out_baudout_callback().set([this](int state){ if (m_8251dtr_state) m_uart->rclk_w(state); }); // TODO: Fix INS8250 BAUDOUT pin support
 
 	rs232_port_device &rs232(RS232_PORT(config, "com1", default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_uart, FUNC(ins8250_uart_device::rx_w));
@@ -232,37 +232,37 @@ void sis950_lpc_device::config_map(address_map &map)
 	map(0x48, 0x48).rw(FUNC(sis950_lpc_device::rtc_reg_r), FUNC(sis950_lpc_device::rtc_reg_w));
 
 	// DMA control regs
-//	map(0x49, 0x49) Distributed DMA channel enable
-//	map(0x4a, 0x4b) Distributed DMA Master config
+//  map(0x49, 0x49) Distributed DMA channel enable
+//  map(0x4a, 0x4b) Distributed DMA Master config
 
 	// Shadow regs (r/o)
-//	map(0x4c, 0x4f) PIC master ICW*
-//	map(0x50, 0x53) PIC slave ICW*
-//	map(0x54, 0x55) PIC master OCW2-3
-//	map(0x56, 0x57) PIC slave OCW2-3 (NB: assume documentation 0x54-0x55 to be a typo)
-//	map(0x58, 0x5f) PIT counters 0-1-2 low/high, $5e -> control 43h, $5f -> read count pointer statuses
-//	map(0x60, 0x60) EISA port $70
+//  map(0x4c, 0x4f) PIC master ICW*
+//  map(0x50, 0x53) PIC slave ICW*
+//  map(0x54, 0x55) PIC master OCW2-3
+//  map(0x56, 0x57) PIC slave OCW2-3 (NB: assume documentation 0x54-0x55 to be a typo)
+//  map(0x58, 0x5f) PIT counters 0-1-2 low/high, $5e -> control 43h, $5f -> read count pointer statuses
+//  map(0x60, 0x60) EISA port $70
 
 	map(0x61, 0x61).rw(FUNC(sis950_lpc_device::irq_remap_r<IRQ_IDE>), FUNC(sis950_lpc_device::irq_remap_w<IRQ_IDE>));
-//	map(0x62, 0x62) <reserved>, hardwired to 0x80 (PIT irq remap?)
+//  map(0x62, 0x62) <reserved>, hardwired to 0x80 (PIT irq remap?)
 	map(0x62, 0x62).lr8(NAME([] () { return 0x80; }));
 	map(0x63, 0x63).rw(FUNC(sis950_lpc_device::irq_remap_r<IRQ_GPE>), FUNC(sis950_lpc_device::irq_remap_w<IRQ_GPE>));
 
-//	map(0x64, 0x64) PCI bus priority timer
-// 	map(0x65, 0x65) PHOLD# timer
+//  map(0x64, 0x64) PCI bus priority timer
+//  map(0x65, 0x65) PHOLD# timer
 
-//	map(0x66, 0x66) <reserved>
-//	map(0x67, 0x67) Serial IRQ 1 & 12 latch control (FDC super I/O)
-//	map(0x68, 0x69) <reserved>
+//  map(0x66, 0x66) <reserved>
+//  map(0x67, 0x67) Serial IRQ 1 & 12 latch control (FDC super I/O)
+//  map(0x68, 0x69) <reserved>
 
 	map(0x63, 0x63).rw(FUNC(sis950_lpc_device::irq_remap_r<IRQ_ACPI>), FUNC(sis950_lpc_device::irq_remap_w<IRQ_ACPI>));
-//	map(0x6b, 0x6b) <reserved>
+//  map(0x6b, 0x6b) <reserved>
 	map(0x6c, 0x6c).rw(FUNC(sis950_lpc_device::irq_remap_r<IRQ_SMBUS>), FUNC(sis950_lpc_device::irq_remap_w<IRQ_SMBUS>));
 	map(0x6d, 0x6d).rw(FUNC(sis950_lpc_device::irq_remap_r<IRQ_SWDOG>), FUNC(sis950_lpc_device::irq_remap_w<IRQ_SWDOG>));
 
-//	map(0x6e, 0x6f) SW irq triggers
-//	map(0x70, 0x70) Serial irq control
-//	map(0x71, 0x73) Serial irq enable
+//  map(0x6e, 0x6f) SW irq triggers
+//  map(0x70, 0x70) Serial irq control
+//  map(0x71, 0x73) Serial irq enable
 
 	// $74 should be ACPI lower base bank, but marked as <reserved> regardless
 	// (by logic that should go to NOP too)
@@ -518,7 +518,7 @@ void sis950_lpc_device::map_extra(uint64_t memory_window_start, uint64_t memory_
 	}
 
 	// TODO: disable flash access write thru reg $45
-	// TODO: BIOS positive decode 
+	// TODO: BIOS positive decode
 	// (bios_control bit 1), which should disable BIOS mapping to E and F segment
 
 	memory_space->install_device(0x000e0000, 0x000fffff, *this, &sis950_lpc_device::memory_map<3>);
@@ -708,7 +708,7 @@ WRITE_LINE_MEMBER( sis950_lpc_device::pc_dma_hrq_changed )
 #if 0
 WRITE_LINE_MEMBER( sis950_lpc_device::iochck_w )
 {
-//	if (!state && !m_channel_check && m_nmi_enabled)
+//  if (!state && !m_channel_check && m_nmi_enabled)
 	if (!state && !m_channel_check)
 		m_host_cpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }

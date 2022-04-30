@@ -38,12 +38,15 @@
 
     - xubuntu 6.10: throws several SCSIDEV unhandled $51 & $46 commands, eventually punts to
       prompt with a "can't access tty: job control turned off" (on live CD) or
-	  hangs at "Configuring network interfaces" (on actual install);
+      hangs at "Configuring network interfaces" (on actual install);
 
     - xubuntu 10.10: stalls after '900 ethernet check;
 
-	- Haiku 0.1: hangs throwing an "unhandled READ TOC format 2",
-	  serial COM1 prints a "vm_mark_page_range_inuse: page 0x9f in non-free state 7!"
+    - Haiku 0.1: hangs throwing an "unhandled READ TOC format 2",
+      serial COM1 prints a "vm_mark_page_range_inuse: page 0x9f in non-free state 7!"
+
+    - Red Hat 6.2: Triple Faults on x87 exception check
+    \- prints the type of mounted floating point exception if bypassed.
 
 ===================================================================================================
 

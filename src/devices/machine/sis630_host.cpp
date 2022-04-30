@@ -11,8 +11,7 @@
     - HW trap control;
     - PCI-Hole;
     - Convert RAM to device;
-    - Verify that multifunction flag always returns true;
-	- Integrated VGA control;
+    - Integrated VGA control;
 
 **************************************************************************************************/
 
@@ -106,8 +105,8 @@ void sis630_host_device::config_map(address_map &map)
 //  map(0x6c, 0x6c) power management DRAM self refresh control
 
 //  Shadow RAM & PCI-Hole area
-    map(0x70, 0x73).rw(FUNC(sis630_host_device::shadow_ram_ctrl_r), FUNC(sis630_host_device::shadow_ram_ctrl_w));
-    map(0x77, 0x77).rw(FUNC(sis630_host_device::pci_hole_r), FUNC(sis630_host_device::pci_hole_w));
+	map(0x70, 0x73).rw(FUNC(sis630_host_device::shadow_ram_ctrl_r), FUNC(sis630_host_device::shadow_ram_ctrl_w));
+	map(0x77, 0x77).rw(FUNC(sis630_host_device::pci_hole_r), FUNC(sis630_host_device::pci_hole_w));
 //  map(0x78, 0x79) PCI-Hole #1 allocation
 //  map(0x7a, 0x7b) PCI-Hole #2 allocation
 
@@ -347,7 +346,7 @@ void sis630_host_device::vga_control_w(u8 data)
 	LOGIO("Write integrated VGA control data [$9c] %02x\n", data);
 	// TODO: "integrated VGA control" (?)
 	m_vga_control = data;
-//	remap_cb();
+//  remap_cb();
 }
 
 u32 sis630_host_device::agp_priority_timer_r(offs_t offset, uint32_t mem_mask)
