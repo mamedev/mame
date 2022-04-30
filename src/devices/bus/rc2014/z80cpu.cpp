@@ -21,10 +21,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
-
-	// device_rc2014_card_interface overrides
-
-
+	virtual void device_resolve_objects() override;
 private:
 /*	void bus_mem_w(offs_t offset, u8 data) { m_bus->space(AS_PROGRAM).write_byte(offset, data); }
 	u8 bus_mem_r(offs_t offset) { return m_bus->space(AS_PROGRAM).read_byte(offset); }
@@ -54,13 +51,11 @@ void z80cpu_device::device_start()
 void z80cpu_device::addrmap_mem(address_map &map)
 {
 	map.unmap_value_high(); // unmapped addresses return 0xff
-	//map(0x0000, 0xffff).rw(FUNC(z80cpu_device::bus_mem_r), FUNC(z80cpu_device::bus_mem_w));
 }
 
 void z80cpu_device::addrmap_io(address_map &map)
 {
 	map.global_mask(0xff);  // use 8-bit ports
-	//map(0x00, 0xff).rw(FUNC(z80cpu_device::bus_io_r), FUNC(z80cpu_device::bus_io_w));
 }
 
 void z80cpu_device::device_add_mconfig(machine_config &config)
@@ -68,4 +63,9 @@ void z80cpu_device::device_add_mconfig(machine_config &config)
 	Z80(config, m_maincpu, DERIVED_CLOCK(1,1));
 	m_maincpu->set_addrmap(AS_PROGRAM, &z80cpu_device::addrmap_mem);
 	m_maincpu->set_addrmap(AS_IO, &z80cpu_device::addrmap_io);
+}
+
+void z80cpu_device::device_resolve_objects()
+{
+	m_bus->assign_spaces(&m_maincpu->space(AS_PROGRAM), &m_maincpu->space(AS_IO));
 }

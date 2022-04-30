@@ -61,7 +61,6 @@
 // ======================> rc2014_bus_device
 
 class rc2014_bus_device : public device_t
-						, public device_memory_interface
 {
 public:
 	// construction/destruction
@@ -75,20 +74,19 @@ public:
 /*
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_write_nmi(state); }
-*/
+*/  void assign_spaces(address_space *memory_space, address_space *io_space) { m_memory_space = memory_space; m_io_space = io_space; }
+	address_space *space(int index) const;
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	// device_memory_interface overrides
-	virtual space_config_vector memory_space_config() const override;
 
 private:
+	address_space *m_memory_space;
+	address_space *m_io_space;
 /*	devcb_write_line   m_write_irq;
 	devcb_write_line   m_write_nmi;
 */
-	address_space_config const m_mem_config;
-	address_space_config const m_io_config;
 };
 
 // ======================> device_rc2014_card_interface

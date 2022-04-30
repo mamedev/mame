@@ -39,7 +39,7 @@ void serial_io_device::device_start()
 	// make sure the ram device is already running
 	if (!m_acia->started())
 		throw device_missing_dependencies();
-	m_bus->space(AS_IO).install_readwrite_handler(0x80, 0x81, read8sm_delegate(*m_acia, FUNC(acia6850_device::read)), write8sm_delegate(*m_acia, FUNC(acia6850_device::write)));
+	m_bus->space(AS_IO)->install_readwrite_handler(0x80, 0x81, read8sm_delegate(*m_acia, FUNC(acia6850_device::read)), write8sm_delegate(*m_acia, FUNC(acia6850_device::write)));
 }
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )

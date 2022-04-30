@@ -30,7 +30,7 @@ rom_device::rom_device(const machine_config &mconfig, const char *tag, device_t 
 
 void rom_device::device_start()
 {
-	m_bus->space(AS_PROGRAM).install_rom(0x0000, 0x1fff, 0x0000, memregion("rom")->base()+ 0xe000);
+	m_bus->space(AS_PROGRAM)->install_rom(0x0000, 0x1fff, 0x0000, memregion("rom")->base()+ 0xe000);
 }
 
 ROM_START(rc2014_rom)

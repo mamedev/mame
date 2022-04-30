@@ -66,9 +66,8 @@ void rc2014_slot_device::device_resolve_objects()
 
 rc2014_bus_device::rc2014_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, RC2014_BUS, tag, owner, clock)
-	, device_memory_interface(mconfig, *this)
-	, m_mem_config("mem", ENDIANNESS_LITTLE, 8, 16)
-	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8)
+	, m_memory_space(nullptr)
+	, m_io_space(nullptr)
 	/*
 	,m_write_irq(*this)
 	,m_write_nmi(*this)*/
@@ -98,13 +97,7 @@ void rc2014_bus_device::device_reset()
 }
 
 
-device_memory_interface::space_config_vector rc2014_bus_device::memory_space_config() const
-{
-	return space_config_vector { std::make_pair(AS_PROGRAM, &m_mem_config), std::make_pair(AS_IO, &m_io_config) };
-}
-
-
-//-------------------------------------------------
+///-------------------------------------------------
 //  set_bus_clock - set main bus clock
 //-------------------------------------------------
 
@@ -114,6 +107,13 @@ void rc2014_bus_device::set_bus_clock(u32 clock)
 	notify_clock_changed();
 }
 
+address_space *rc2014_bus_device::space(int index) const
+{
+	if (index == AS_PROGRAM)
+		return m_memory_space;
+	else
+		return m_io_space;
+}
 
 void device_rc2014_card_interface::set_bus_device(rc2014_bus_device &bus_device)
 {
