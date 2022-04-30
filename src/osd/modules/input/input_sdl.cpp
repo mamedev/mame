@@ -1095,12 +1095,18 @@ public:
 #endif // SDL_VERSION_ATLEAST(2, 0, 14)
 				devinfo->sdl_state.serial = std::nullopt;
 
+#if SDL_VERSION_ATLEAST(2, 0, 6)
 			osd_printf_verbose("Joystick: %s [GUID %s] Vendor ID %04X, Product ID %04X, Revision %04X\n",
 					SDL_JoystickNameForIndex(physical_stick),
 					guid_str,
 					SDL_JoystickGetVendor(joy),
 					SDL_JoystickGetProduct(joy),
 					SDL_JoystickGetProductVersion(joy));
+#else
+			osd_printf_verbose("Joystick: %s [GUID %s]\n",
+					SDL_JoystickNameForIndex(physical_stick),
+					guid_str);
+#endif // SDL_VERSION_ATLEAST(2, 0, 14)
 			osd_printf_verbose("Joystick:   ...  %d axes, %d buttons %d hats %d balls\n",
 					SDL_JoystickNumAxes(joy),
 					SDL_JoystickNumButtons(joy),
